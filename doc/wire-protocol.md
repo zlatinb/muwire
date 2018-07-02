@@ -24,7 +24,7 @@ The JSON payload has two mandatory top-level fields - type and version:
 }
 ```
 
-Binary messages can be two types: full bloom filter or a patch message to be applied to a previously sent bloom filter.  Binary messages travel only between ultrapeers.
+Binary messages can be two types: full bloom filter or a patch message to be applied to a previously sent bloom filter.  Binary messages travel only between ultrapeers.  There is a single byte after the payload indicating the type of the binary message.  That byte is counted in the total payload length.
 
 ### Leaf to ultrapeer
 
@@ -74,9 +74,18 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
 
 ### Ultrapeer to leaf
 
-The only message sent from an ultrapeer to leaf is the "Search" message which is identical to the one sent from the leaf.
+The only message sent from an ultrapeer to leaf is the "Search" message which is identical to the one sent from a leaf.
 
 ### Between Ultrapeers
 
+The only JSON message that can travel between ultrapeers is the "Search" message which is identical to the one sent from a leaf.
 
+There are two types of binary messages that can travel between ultrapeers:
 
+#### Bloom filter
+
+This message starts with a single byte which indicates the size of the bloom filter in bits in power of 2, maximum being 22 -> 512kb.  The rest of the payload is the bloom filter itself.
+
+#### Patch
+
+This message starts with two unsigned bytes indicating the number of patches included in the message.  Each patch consists of 3 bytes, where the most significant bit indicates whether the corresponding bit should be set or cleared and the remaining 23 contain the position within the Bloom filter that is to be patched.
