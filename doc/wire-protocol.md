@@ -67,6 +67,7 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
 {
     type : "Search",
     version: 1,
+    firstHop: false,
     keywords : "great speeches"
     replyTo : "asdfasf..."
 }
