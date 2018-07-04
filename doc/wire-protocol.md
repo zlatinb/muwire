@@ -67,6 +67,7 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
 {
     type : "Search",
     version: 1,
+	uuid: "asdf-1234..."
     firstHop: false,
     keywords : "great speeches"
     replyTo : "asdfasf..."
@@ -90,3 +91,33 @@ This message starts with a single byte which indicates the size of the bloom fil
 #### Patch
 
 This message starts with two unsigned bytes indicating the number of patches included in the message.  Each patch consists of 3 bytes, where the most significant bit indicates whether the corresponding bit should be set or cleared and the remaining 23 contain the position within the Bloom filter that is to be patched.
+
+### Any node to any node over datagrams
+
+Search results are sent in "Result" type message over an I2P datagram, uncompressed.  The format of this message is the following:
+
+```
+{
+    type: "Result",
+	version: 1,
+	uuid: "asdf-1234-...",
+    address : "asdfqwer...b64"
+	results : [ 
+	     {
+		     name: "File name 1",
+			 infohash: "asdfasdf...",
+			 altlocs: [ "b64.1", "b64.2", ...]
+	     },
+		 {
+		     name: "File name 2",
+			 infohash: "asdfasdf...",
+			 altlocs: [ "b64.3", "b64.4", ... ]
+		 },
+		 ...
+    ]
+}
+```
+
+* The "uuid" field must match the uuid of the "Search" message which triggered this search result.
+* The "address" field is the I2P Destination listening to incoming HTTP requests that can serve the file
+* The "altlocs" list contains list of alternate locations in b64 format that may also have the file.
