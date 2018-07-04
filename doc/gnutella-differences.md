@@ -1,4 +1,4 @@
-# MuWire design
+# Differences between Gnutella and MuWire
 
 **This document assumes thorough familiarity with the Gnutella and I2P protocols.**
 
