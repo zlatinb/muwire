@@ -9,3 +9,10 @@ In response to the request, the HostCache sends back an I2P datagram containing 
 ### Connectivity to peers
 
 Each node, be it leaf or ultrapeer will open two I2P tunnels - one for incoming I2P datagrams containing search results and incoming streaming connections for HTTP file transfer requests.  In addition to this, ultrapeers will open an additional tunnel for incoming MuWire protocol connections.  This simplifies implementation because the different pseudo-sockets can have dedicated logic to handle traffic, i.e. there is no need to multiplex between MuWire protocol connections and incoming HTTP requests.
+
+
+### Search request propagation
+
+Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only forward it to any of its connected leafs that match the keyword search.
+
+This is equivalent to setting the maximum TTL in Gnutella to 1.
