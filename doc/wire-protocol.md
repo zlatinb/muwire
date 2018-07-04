@@ -106,11 +106,15 @@ Search results are sent in "Result" type message over an I2P datagram, uncompres
 	     {
 		     name: "File name 1",
 			 infohash: "asdfasdf...",
+			 size: 12345,
+			 pieceSize: 17,
 			 altlocs: [ "b64.1", "b64.2", ...]
 	     },
 		 {
 		     name: "File name 2",
 			 infohash: "asdfasdf...",
+			 size: 12345,
+			 pieceSize: 17
 			 altlocs: [ "b64.3", "b64.4", ... ]
 		 },
 		 ...
@@ -121,3 +125,4 @@ Search results are sent in "Result" type message over an I2P datagram, uncompres
 * The "uuid" field must match the uuid of the "Search" message which triggered this search result.
 * The "address" field is the I2P Destination listening to incoming HTTP requests that can serve the file
 * The "altlocs" list contains list of alternate locations in b64 format that may also have the file.
+* The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
