@@ -76,7 +76,18 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
 
 ### Ultrapeer to leaf
 
-The only message sent from an ultrapeer to leaf is the "Search" message which is identical to the one sent from a leaf.
+The "Search" message is also sent from an ultrapeer to a leaf.
+
+#### Pong
+
+A message containing addresses of other ultrapeers that the leaf is suggested to connect to.
+```
+{
+    type: "Pong",
+    version: 1,
+    pongs: [ "b64.1", "b64.2" ... ]
+}
+```
 
 ### Between Ultrapeers
 
