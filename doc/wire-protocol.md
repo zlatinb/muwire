@@ -12,9 +12,13 @@ All traffic after the handshake is compressed using the same compression algorit
 
 ## Messages
 
-After the handhsake follows a stream of messages.  Messages can arrive in any order.  Each message consists of 3 bytes - the most significant bit of the first message indicates if the payload is binary or JSON.  The remaining 23 bits indicate the length of the message.
+After the handhsake follows a stream of messages.  Messages can arrive in any order.  
 
-The JSON payload has two mandatory top-level fields - type and version:
+Between ultrapeers, each message consists of 3 bytes - the most significant bit of the first byte indicates if the payload is binary or JSON.  The remaining 23 bits indicate the length of the message.
+
+Between leaf and ultrapeer, each message consists of 2 bytes unsigned payload length followed by the JSON payload.
+
+The JSON structure has two mandatory top-level fields - type and version:
 
 ```
 {
