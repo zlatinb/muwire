@@ -97,7 +97,7 @@ A message containing addresses of other ultrapeers that the leaf is suggested to
 
 The only JSON message that can travel between ultrapeers is the "Search" message which is identical to the one sent from a leaf.
 
-There are two types of binary messages that can travel between ultrapeers:
+There are two types of binary messages that can travel between ultrapeers - Bloom filter and Patch.  Bloom filter should be the first message that is sent after establishing the connection, but that is not enforced.  If any Patch messages arrive before any Bloom filter has been received, they are ignored.  In the unlikely case that the size of a Patch message would exceed that of a complete Bloom filter the ultrapeer may choose to send a new Bloom filter which replaces the old one.
 
 #### Bloom filter
 
