@@ -75,7 +75,7 @@ Sent when the leaf wants to find the addresses of more ultrapeers to connect to.
 
 #### "Search"
 
-Sent by a leaf when performing a search.  Contains the reply-to b64 destination for signed I2P datagrams.
+Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to b64 destination for signed I2P datagrams.
 
 ```
 {
@@ -83,10 +83,13 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
     version: 1,
 	uuid: "asdf-1234..."
     firstHop: false,
-    keywords : "great speeches"
+    keywords : "great speeches",
+    infohash: "asdfasdf...",
     replyTo : "asdfasf...b64"
 }
 ```
+
+A search can contain either a list of keyword or the infohash if the user is looking for a specific file.  If both are present, the infohash takes precedence and the keywords are ignored.
 
 ### Ultrapeer to leaf
 

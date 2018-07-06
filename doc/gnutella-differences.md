@@ -18,6 +18,8 @@ In the LimeWire flavor of Gnutella, ultrapeers had 32 slots for leaf connections
 
 Search requests originating from a leaf or locally at the ultrapeer get forwarded to all neighboring ultrapeers.  Search requests arriving from an ultrapeer connection get forwarded only to those ultrapeer that have a keyword hit in their published Bloom filters.  This simplifies the Gnutella model because instead of numeric ttl value a simple boolean can be used.  Due to the higher fan-out factor this should result in similar search horizon.
 
+Because the search depth is capped, there will be no dynamic querying, and searches by hash are permitted.
+
 ## Content indexing
 
 In Gnutella leafs upload Bloom filters of the keywords describing the files they are sharing to ultrapeers.  Then, when a search query arrives at an ultrapeer if the hash of that query matches a bloom filter uploaded by a given leaf, the query is forwarded to that leaf.
