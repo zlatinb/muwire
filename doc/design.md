@@ -29,3 +29,7 @@ Before issuing any GET requests for actual content, it is necessary to acquire t
 
 Download mesh management is identical to Gnutella, except instead of ip addresses b64 I2P destinations are used.  [More information](http://rfc-gnutella.sourceforge.net/developer/tmp/download-mesh.html) 
 
+### In-Network updates
+
+Nodes will periodically ping a pre-defined Destination for a JSON document containing the infohash of a new binary update package using signed datagrams.  If the response indicates a newer version is available, the node will issue an automatic search for that infohash and download it, then prompt the user to install the update.
+
