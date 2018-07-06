@@ -1,6 +1,6 @@
 # MuWire network protocol
 
-The MuWire protocol operates over a TCP-like streaming layer offered by the I2P streaming library, except for "Result" type messages which are delivered of I2P datagrams.
+The MuWire protocol operates over a TCP-like streaming layer offered by the I2P streaming library, except for "Result" type messages which are delivered in signed I2P datagrams.
 
 ## Handshake
 
@@ -65,7 +65,7 @@ Sent when the leaf wants to find the addresses of more ultrapeers to connect to.
 
 #### "Search"
 
-Sent by a leaf when performing a search.  Contains the reply-to b64 destination for I2P datagrams.
+Sent by a leaf when performing a search.  Contains the reply-to b64 destination for signed I2P datagrams.
 
 ```
 {
@@ -74,7 +74,7 @@ Sent by a leaf when performing a search.  Contains the reply-to b64 destination 
 	uuid: "asdf-1234..."
     firstHop: false,
     keywords : "great speeches"
-    replyTo : "asdfasf..."
+    replyTo : "asdfasf...b64"
 }
 ```
 
@@ -107,7 +107,7 @@ This message starts with a single byte which indicates the size of the bloom fil
 
 This message starts with two unsigned bytes indicating the number of patches included in the message.  Each patch consists of 3 bytes, where the most significant bit indicates whether the corresponding bit should be set or cleared and the remaining 23 contain the position within the Bloom filter that is to be patched.
 
-### Any node to any node over datagrams
+### Any node to any node over signed datagrams
 
 Search results are sent in "Result" type message over an I2P datagram, uncompressed.  The format of this message is the following:
 
@@ -116,7 +116,6 @@ Search results are sent in "Result" type message over an I2P datagram, uncompres
     type: "Result",
 	version: 1,
 	uuid: "asdf-1234-...",
-    address : "asdfqwer...b64"
 	results : [ 
 	     {
 		     name: "File name 1",
@@ -138,6 +137,5 @@ Search results are sent in "Result" type message over an I2P datagram, uncompres
 ```
 
 * The "uuid" field must match the uuid of the "Search" message which triggered this search result.
-* The "address" field is the I2P Destination listening to incoming HTTP requests that can serve the file
 * The "altlocs" list contains list of alternate locations in b64 format that may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
