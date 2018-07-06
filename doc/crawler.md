@@ -21,6 +21,7 @@ The ultrapeer responds with the following message, also in a signed datagram.  I
 {
     type: "CrawlerPong",
     version: 1,
+    clientVersion: "MuWire 1.2.3",
     peers: [ b64.1, b64.2...]
 }
 ```
