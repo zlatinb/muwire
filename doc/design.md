@@ -4,7 +4,7 @@
 
 Initial bootstrap into the MuWire network is done in a similar fashion to Gnutella.  Dedicated bootstrap servers ("HostCaches") listen for incoming I2P Datagrams which contain requests for addresses of ultrapeers.  The incoming signed datagram has a flag whether the requesting node is an ultrapeer or a leaf; if the node claims to be an ultrapeer it may be added to the list of known ultrapeers by the HostCache.  Implementors of HostCaches are free to choose other discovery strategies such as crawling, active polling and so on.
 
-In response to the request, the HostCache sends back an I2P datagram containing b64 destinations of selected ultrapeers.  
+In response to the request, the HostCache sends back an I2P datagram containing b64 destinations of chosen ultrapeers.  For ease of implementation, the response datagram is also signed and it's payload is JSON.
 
 ### Connectivity to peers
 
