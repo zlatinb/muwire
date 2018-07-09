@@ -1,13 +1,1 @@
-apply plugin: 'groovy'
-apply plugin: 'application'
-
-dependencies {
-    compile 'net.i2p:i2p:0.9.35'
-    compile 'org.codehaus.groovy:groovy-all:2.5.0'
-}
-
-compileGroovy {
-    groovyOptions.optimizationOptions.indy = true
-}
-
 mainClassName = 'com.muwire.hostcache.HostCache'
