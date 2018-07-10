@@ -24,6 +24,8 @@ The ultrapeer responds with the following message, also in a signed datagram.  I
     version: 1,
     uuid: "asdf-1234-...",
     clientVersion: "MuWire 1.2.3",
+	leafSlots: true,
+	peerSlots: true,
     peers: [ b64.1, b64.2...]
 }
 ```
