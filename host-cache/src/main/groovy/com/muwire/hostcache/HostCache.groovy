@@ -83,6 +83,10 @@ public class HostCache {
                 
                 payload = dissector.getPayload()
                 payload = json.parse(payload)
+                if (payload.type == null) {
+                    println "WARN: type field missing"
+                    return
+                }
                 switch(payload.type) {
                     case "Ping" : 
                     println "Ping"
