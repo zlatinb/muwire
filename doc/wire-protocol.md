@@ -124,7 +124,7 @@ This message starts with two unsigned bytes indicating the number of patches inc
 
 ### Search results - any node to any node
 
-Search results are sent in "results" type connection from the responder to the originator of the query.  This connection is uncompressed and only Alice sends any data on it, i.e. there is no handshake.  The first thing that Alice sends is the UUID of the search that generated the results.  This allows Bob to drop the connection if he does not recognize that UUID.  After that, Alice sends a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:  
+Search results are sent in "results" type connection from the responder to the originator of the query.  This connection is uncompressed and only Alice sends any data on it, i.e. there is no handshake.  The first thing that Alice sends is the UUID of the search that generated the results.  This allows Bob to drop the connection if he does not recognize that UUID.  After that Alice sends her human-readable username so that Bob can choose whether to trust or distrust her.  After that, Alice sends a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:  
 
 ```
 {

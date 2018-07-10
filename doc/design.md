@@ -33,3 +33,6 @@ Download mesh management is identical to Gnutella, except instead of ip addresse
 
 Nodes will periodically ping a pre-defined Destination for a JSON document containing the infohash of a new binary update package using signed datagrams.  If the response indicates a newer version is available, the node will issue an automatic search for that infohash and download it, then prompt the user to install the update.
 
+### Web Of Trust
+
+Users may choose to "Trust" or "Blacklist" Destinations that return search results.  This trust is local to the user, but it can be shared with others.  Upon installation the user picks a username which does not need to be unique, but from which a globally unique "persona" is created by concatenating the human-readable username with @ and the b32 hash of the destination of their node.  This persona is returned together with search results and when displayed in the UI the user is given the choice to trust or distrust them.
