@@ -160,4 +160,14 @@ class HostPoolTest {
         assert hp.getVerified(10,true).isEmpty()
         assert hp.getUnverified(10).size() == 1
     }
+    
+    @Test
+    void doNotAddIfVerified() {
+        hp.addUnverified(freeBoth)
+        hp.verify(freeBoth)
+        assert hp.getUnverified(1).isEmpty()
+        
+        hp.addUnverified(freeBoth)
+        assert hp.getUnverified(1).isEmpty()
+    }
 }

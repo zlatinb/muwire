@@ -26,7 +26,9 @@ class HostPool {
     }
     
     synchronized def addUnverified(host) {
-        unverified.add(host)
+        if (!verified.contains(host)) {
+            unverified.add(host)
+        }
     }
     
     synchronized def getUnverified(int max) {
