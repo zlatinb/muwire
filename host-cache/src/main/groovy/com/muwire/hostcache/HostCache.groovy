@@ -1,5 +1,6 @@
 package com.muwire.hostcache
 
+import groovy.json.JsonSlurper
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
@@ -56,6 +57,8 @@ public class HostCache {
     }
     
     static class Listener implements I2PSessionMuxedListener {
+        final def json = new JsonSlurper()
+        
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
             println "ERROR: session disconnected, exiting"
@@ -70,17 +73,29 @@ public class HostCache {
                 println "WARN: received unexpected protocol ${proto}"
                 return
             }
-            
+
             def payload = session.receiveMessage(msgId)
             def dissector = new I2PDatagramDissector()
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
-                def query = dissector.getPayload()
-                println "INFO: from ${sender.toBase64()} received query ${query}"
-            } catch (DataFormatException dfe) {
+                println "INFO: Received something from ${sender}"
+                
+                payload = dissector.getPayload()
+                payload = json.parse(payload)
+                switch(payload.type) {
+                    case "Ping" : 
+                    println "Ping"
+                    break
+                    case "CrawlerPong":
+                    println "CrawlerPong"
+                    break
+                    default:
+                    println "WARN: Unexpected message type ${payload.type}, dropping"
+                }
+            } catch (Exception dfe) {
                 println "WARN: invalid datagram ${dfe}"
-            }
+            } 
         }
         void messageAvailable(I2PSession session, int msgId, long size) {
         }
