@@ -13,13 +13,13 @@ Each node will register a single I2P Destination and then multiplex between I2P 
 
 ### Search request propagation
 
-Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only return search results locally.
+Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only return local search results or forward the query to those leaves that have a keyword match.
 
 This is similar but not equivalent to setting the maximum TTL in Gnutella to 1.
 
-### Search result confirmation
+### Search result verification
 
-Unlike Gnutella clients, MuWire uses a two-step process to download a file.  When search results first arrive at the originator, they are in "Unconfirmed" state.  Then the user must manually choose to "Verify" the search result by sending a signed datagram to the destination that the search result claims to come from.  That datagram contains the infohash of the search result, and the response contains the full name of the file as well as the list of hashes.  Those are verified by the originator and only if they match the claimed file name the search result becomes "verified" and the user is allowed to download it.
+Unlike Gnutella, MuWire nodes send search results over a streaming connection.  This is to ensure that the Destination carried in the search result cannot be spoofed, and to make blacklisting of Destinations that return undesired results effective.  To make spamming more difficult, the UI will show up to 3 search results by default from each Destination, but will give the option to display all of them.  After the results have been delivered, the streaming connection is closed.
 
 ### File transfer
 
