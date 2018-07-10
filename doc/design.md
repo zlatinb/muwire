@@ -13,17 +13,17 @@ Each node will register a single I2P Destination and then multiplex between I2P 
 
 ### Search request propagation
 
-Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only forward it to any of its connected leafs that match the keyword search.
+Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only return search results locally.
 
-This is equivalent to setting the maximum TTL in Gnutella to 1.
+This is similar but not equivalent to setting the maximum TTL in Gnutella to 1.
+
+### Search result confirmation
+
+Unlike Gnutella clients, MuWire uses a two-step process to download a file.  When search results first arrive at the originator, they are in "Unconfirmed" state.  Then the user must manually choose to "Verify" the search result by sending a signed datagram to the destination that the search result claims to come from.  That datagram contains the infohash of the search result, and the response contains the full name of the file as well as the list of hashes.  Those are verified by the originator and only if they match the claimed file name the search result becomes "verified" and the user is allowed to download it.
 
 ### File transfer
 
 Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.  
-
-### List of hashes transfer
-
-Before issuing any GET requests for actual content, it is necessary to acquire the list of hashes of the pieces of the file.  This is done by appending "/hashlist" to the URL after the infohash.  The server will then respond with a body containing list of binary SHA256 hashes of the pieces of the file.  Clients are encouraged to then verify that the SHA256 hash of this list matches the infohash of the file as presented in the search result.
 
 ### Mesh management
 
