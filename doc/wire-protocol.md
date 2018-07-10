@@ -1,10 +1,12 @@
 # MuWire network protocol
 
-The MuWire protocol operates over a TCP-like streaming layer offered by the I2P streaming library, except for "Result" type messages which are delivered in signed I2P datagrams.
+The MuWire protocol operates over a TCP-like streaming layer offered by the I2P streaming library.
 
 ## Handshake
 
-A connection begins with the word "MuWire" followed by a space and either the word "leaf" or "peer", depending on whether Alice is in a leaf or an ultrapeer role.  This allows Bob to immediately drop the connection without allocating any more resources if it is a leaf or if it does not have any more connection slots.  Bob responds to the handshake by either accepting it or rejecting it and optionally suggesting other ultrapeers to connect to.
+A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf", "peer" or "results", depending on whether Alice is in a leaf, ultrapeer or responder role.  This allows Bob to immediately drop the connection without allocating any more resources.  
+
+If Bob is an ultrapeer he responds to the handshake by either accepting it or rejecting it and optionally suggesting other ultrapeers to connect to.
 
 Accepting the handshake is done by responding with a single word "OK".
 
@@ -120,35 +122,22 @@ This message starts with a single byte which indicates the size of the bloom fil
 
 This message starts with two unsigned bytes indicating the number of patches included in the message.  Each patch consists of 3 bytes, where the most significant bit indicates whether the corresponding bit should be set or cleared and the remaining 23 contain the position within the Bloom filter that is to be patched.
 
-### Any node to any node over signed datagrams
+### Search results - any node to any node
 
-Search results are sent in "Result" type message over an I2P datagram, uncompressed.  The format of this message is the following:
+Search results are sent in "results" type connection from the responder to the originator of the query.  This connection is uncompressed and only Alice sends any data on it, i.e. there is no handshake.  The first thing that Alice sends is the UUID of the search that generated the results.  This allows Bob to drop the connection if he does not recognize that UUID.  After that, Alice sends a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:  
 
 ```
 {
     type: "Result",
 	version: 1,
-	uuid: "asdf-1234-...",
-	results : [ 
-	     {
-		     name: "File name 1",
-			 infohash: "asdfasdf...",
-			 size: 12345,
-			 pieceSize: 17,
-			 altlocs: [ "b64.1", "b64.2", ...]
-	     },
-		 {
-		     name: "File name 2",
-			 infohash: "asdfasdf...",
-			 size: 12345,
-			 pieceSize: 17
-			 altlocs: [ "b64.3", "b64.4", ... ]
-		 },
-		 ...
-    ]
+	name: "File name",
+	infohash: "asdfasdf..."
+	size: 12345,
+	pieceSize: 17,
+	hashList: [ "asdfasdf...", "asdfasdf...", ... ]
+	altlocs: [ "b64.1", "b64.2", ... ]
 }
 ```
-
-* The "uuid" field must match the uuid of the "Search" message which triggered this search result.
-* The "altlocs" list contains list of alternate locations in b64 format that may also have the file.
+* The "hashList" list contains the list of hashes that correspond to the pieces of the file
+* The "altlocs" list contains list of alternate locations in b64 format that Alice thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
