@@ -7,13 +7,12 @@ import net.i2p.client.datagram.I2PDatagramMaker
 class Pinger {
     
     final def session
-    final def maker
     Pinger(session) {
         this.session = session
-        this.maker = new I2PDatagramMaker(session)
     }
     
     def ping(host, uuid) {
+    	def maker = new I2PDatagramMaker(session)
         def payload = new HashMap()
         payload.type = "CrawlerPing"
         payload.version = 1

@@ -10,6 +10,7 @@ class HostPool {
     def verified = new HashMap()
     def unverified = new HashMap()
     
+	HostPool() {}
     HostPool(maxFailures, maxAge) {
         this.maxAge = maxAge
         this.maxFailures = maxFailures
