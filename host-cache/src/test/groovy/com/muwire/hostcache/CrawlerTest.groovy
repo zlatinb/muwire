@@ -18,7 +18,10 @@ class CrawlerTest {
 	
 	def crawler
 	
+	Destinations destinations = new Destinations()
 	final Host host = new Host(destination: new Destination())
+	final Host host1 = new Host(destination: destinations.dest1)
+	final Host host2 = new Host(destination: destinations.dest2)
 	
 	final int parallel = 5
 	
@@ -71,5 +74,65 @@ class CrawlerTest {
 		
 		crawler.startCrawl()
 		crawler.startCrawl()
+	}
+	
+	@Test
+	void testVerifiesAnswered() {
+		def currentUUID
+		hostPoolMock.demand.getUnverified { n -> [host1] }
+		hostPoolMock.demand.verify { h -> assert h == host1 }
+		pingerMock.demand.ping { h, uuid -> currentUUID = uuid }
+		
+		initCrawler()
+		
+		crawler.startCrawl()
+		
+		def pong = [uuid : currentUUID.toString(), leafSlots : "false", peerSlots: "false", peers: [] ]
+		crawler.handleCrawlerPong(pong, host1.destination)
+	}
+	
+	@Test
+	void testWrongSourceIgnored() {
+		def currentUUID
+		hostPoolMock.demand.getUnverified { n -> [host1] }
+		pingerMock.demand.ping { h, uuid -> currentUUID = uuid }
+		
+		initCrawler()
+		
+		crawler.startCrawl()
+		
+		def pong = [uuid : currentUUID.toString(), leafSlots : "false", peerSlots: "false", peers: [] ]
+		crawler.handleCrawlerPong(pong, host2.destination)
+	}
+	
+	@Test
+	void testHost1CarriesHost2() {
+		def currentUUID
+		hostPoolMock.demand.getUnverified { n -> [host1] }
+		hostPoolMock.demand.addUnverified { h -> assert h == host2 }
+		hostPoolMock.demand.verify { h -> assert h == host1 }
+		pingerMock.demand.ping { h, uuid -> currentUUID = uuid }
+		
+		initCrawler()
+		
+		crawler.startCrawl()
+		
+		def pong = [uuid : currentUUID.toString(), leafSlots : "false", peerSlots: "false", peers: [destinations.dest2.toBase64()] ]
+		crawler.handleCrawlerPong(pong, host1.destination)
+	}
+	
+	@Test
+	void testWrongUUID() {
+		def currentUUID
+		hostPoolMock.demand.getUnverified { n -> [host1] }
+		hostPoolMock.demand.fail { h -> assert h == host1 }
+		pingerMock.demand.ping { h, uuid -> currentUUID = uuid }
+		
+		initCrawler()
+		
+		crawler.startCrawl()
+		
+		def pong = [uuid : UUID.randomUUID().toString(), leafSlots : "false", peerSlots: "false", peers: [] ]
+		crawler.handleCrawlerPong(pong, host1.destination)
 	}
 }

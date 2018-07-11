@@ -1,5 +1,7 @@
 package com.muwire.hostcache
 
+import java.util.stream.Collectors
+
 import net.i2p.data.Destination
 
 class Crawler {
