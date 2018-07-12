@@ -141,3 +141,21 @@ Search results are sent in "results" type connection from the responder to the o
 * The "hashList" list contains the list of hashes that correspond to the pieces of the file
 * The "altlocs" list contains list of alternate locations in b64 format that Alice thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
+
+# HostCache protocol
+
+### Node to HostCache
+
+Nodes send a "Ping" message to the hostcache, enriched with a boolean "leaf" field indicating whether the node is a leaf or not:
+
+```
+{
+    type: "Ping",
+    version: 1,
+    leaf: true
+}
+```
+
+### HostCache to Node
+
+The HostCache replies with a "Pong" message.
