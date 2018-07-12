@@ -106,7 +106,13 @@ public class HostCache {
                 switch(payload.type) {
                     case "Ping" : 
                     println "Ping"
-					hostPool.addUnverified(new Host(destination: sender))
+					if (payload.leaf == null) {
+						println "WARN: ping didn't specify if leaf"
+						return
+					}
+					payload.leaf = Boolean.parseBoolean(payload.leaf.toString())
+					if (!payload.leaf)
+					    hostPool.addUnverified(new Host(destination: sender))
 					respond(session, sender, payload)
                     break
                     case "CrawlerPong":
@@ -124,12 +130,8 @@ public class HostCache {
         }
 		
 		def respond(session, destination, ping) {
-			if (ping.leaf == null) {
-				println "WARN: ping didn't specify if it were a leaf"
-				return
-			}
-			boolean leaf = Boolean.parseBoolean(ping.leaf.toString())
-			def pongs = hostPool.getVerified(toReturn, leaf)
+
+			def pongs = hostPool.getVerified(toReturn, ping.leaf)
 			pongs = pongs.stream().map({ x -> x.destination.toBase64() }).collect(Collectors.toList())
 			
 			def pong = [type:"Pong", version: 1, pongs: pongs]
