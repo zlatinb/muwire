@@ -61,7 +61,7 @@ public class HostCache {
 		timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
 		timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
 		
-        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2), 
+        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler), 
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         println "INFO: connected, going to sleep"
@@ -73,6 +73,7 @@ public class HostCache {
         final def json = new JsonSlurper()
 		def hostPool
 		int toReturn
+		def crawler
         
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
@@ -110,6 +111,7 @@ public class HostCache {
                     break
                     case "CrawlerPong":
                     println "CrawlerPong"
+					crawler.handleCrawlerPong(sender, payload)
                     break
                     default:
                     println "WARN: Unexpected message type ${payload.type}, dropping"
