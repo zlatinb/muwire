@@ -51,7 +51,7 @@ class HostPool {
     
     synchronized def fail(host) {
         if (!unverified.containsKey(host.destination))
-            throw new IllegalArgumentException()
+			return
         host.verificationFailures++
     }
     

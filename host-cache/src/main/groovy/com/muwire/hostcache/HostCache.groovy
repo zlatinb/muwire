@@ -1,10 +1,14 @@
 package com.muwire.hostcache
 
+import java.util.stream.Collectors
+
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
 import net.i2p.client.datagram.I2PDatagramDissector
+import net.i2p.client.datagram.I2PDatagramMaker
 import net.i2p.util.SystemVersion
 import net.i2p.data.*
 
@@ -48,7 +52,16 @@ public class HostCache {
         session = i2pClient.createSession(new FileInputStream(keyfile), props)
         myDest = session.getMyDestination()
         
-        session.addMuxedSessionListener(new Listener(), 
+		// initialize hostpool and crawler
+		HostPool hostPool = new HostPool(3, 60 * 1000 * 1000)
+		Pinger pinger = new Pinger(session)
+		Crawler crawler = new Crawler(pinger, hostPool, 5)
+		
+		Timer timer = new Timer("timer", true)
+		timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
+		timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
+		
+        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2), 
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         println "INFO: connected, going to sleep"
@@ -58,6 +71,8 @@ public class HostCache {
     
     static class Listener implements I2PSessionMuxedListener {
         final def json = new JsonSlurper()
+		def hostPool
+		int toReturn
         
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
@@ -79,7 +94,7 @@ public class HostCache {
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
-                println "INFO: Received something from ${sender}"
+                println "INFO: Received something from ${sender.toBase32()}"
                 
                 payload = dissector.getPayload()
                 payload = json.parse(payload)
@@ -90,6 +105,8 @@ public class HostCache {
                 switch(payload.type) {
                     case "Ping" : 
                     println "Ping"
+					hostPool.addUnverified(new Host(destination: sender))
+					respond(session, sender, payload)
                     break
                     case "CrawlerPong":
                     println "CrawlerPong"
@@ -103,5 +120,21 @@ public class HostCache {
         }
         void messageAvailable(I2PSession session, int msgId, long size) {
         }
+		
+		def respond(session, destination, ping) {
+			if (ping.leaf == null) {
+				println "WARN: ping didn't specify if it were a leaf"
+				return
+			}
+			boolean leaf = Boolean.parseBoolean(ping.leaf.toString())
+			def pongs = hostPool.getVerified(toReturn, leaf)
+			pongs = pongs.stream().map({ x -> x.destination.toBase64() }).collect(Collectors.toList())
+			
+			def pong = [type:"Pong", version: 1, pongs: pongs]
+			pong = JsonOutput.toJson(pong)
+			def maker = new I2PDatagramMaker(session)
+			pong = maker.makeI2PDatagram(pong.bytes)
+			session.sendMessage(destination, pong, I2PSession.PROTO_DATAGRAM, 0, 0)
+		}
     }
 }
