@@ -40,7 +40,7 @@ public class InfoHash {
 	
 	public static InfoHash fromHashList(byte []hashList) {
 		try {
-			MessageDigest sha256 = MessageDigest.getInstance("SHA256");
+			MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
 			byte[] root = sha256.digest(hashList);
 			return new InfoHash(root, hashList);
 		} catch (NoSuchAlgorithmException impossible) {
