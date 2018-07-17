@@ -1,2 +1,3 @@
 include 'pinger'
 include 'host-cache'
+include 'core'
