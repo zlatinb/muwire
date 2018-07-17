@@ -2,7 +2,9 @@ package com.muwire.core;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import net.i2p.data.Base32;
 
@@ -71,5 +73,18 @@ public class InfoHash {
 		}
 		InfoHash other = (InfoHash) o;
 		return Arrays.equals(root, other.root);
+	}
+	
+	public String toString() {
+		String rv = "InfoHash[root:"+Base32.encode(root) + " hashList:";
+		List<String> b32HashList = new ArrayList<>(hashList.length / SIZE);
+		byte [] tmp = new byte[SIZE];
+		for (int i = 0; i < hashList.length / SIZE; i++) {
+			System.arraycopy(hashList, SIZE * i, tmp, 0, SIZE);
+			b32HashList.add(Base32.encode(tmp));
+		}
+		rv += b32HashList.toString();
+		rv += "]";
+		return rv;
 	}
 }
