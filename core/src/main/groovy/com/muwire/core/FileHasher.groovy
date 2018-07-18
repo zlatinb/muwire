@@ -3,7 +3,7 @@ package com.muwire.core
 class FileHasher {
 
 	/** max size of shared file is 128 GB */
-	public static final long MAX_SIZE = 0x1 << 37
+	public static final long MAX_SIZE = 0x1L << 37
 	
 	/**
 	 * @param size of the file to be shared
@@ -14,7 +14,7 @@ class FileHasher {
 			return 18
 		
 		for (int i = 26; i <= 37; i++) {
-			if (size <= 0x1 << i) {
+			if (size <= 0x1L << i) {
 				return i-7
 			}
 		}
