@@ -1,5 +1,6 @@
-package com.muwire.core
+package com.muwire.core.files
 
+import com.muwire.core.InfoHash
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode

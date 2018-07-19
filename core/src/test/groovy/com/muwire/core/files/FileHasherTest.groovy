@@ -1,4 +1,4 @@
-package com.muwire.core
+package com.muwire.core.files
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 
