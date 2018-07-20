@@ -19,7 +19,7 @@ class PersisterService {
 	final Timer timer
 	final def fileSource
 	
-	PersisterService(File location, EventBus listener, int interval, def FileSource) {
+	PersisterService(File location, EventBus listener, int interval, def fileSource) {
 		this.location = location
 		this.listener = listener
 		this.interval = interval
