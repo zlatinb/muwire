@@ -13,7 +13,7 @@ import groovy.json.JsonOutput
 import groovy.util.GroovyTestCase
 import net.i2p.data.Base32
 
-class PersisterServiceTest {
+class PersisterServiceLoadingTest {
 
 	class Listener {
 		def publishedFiles = []
