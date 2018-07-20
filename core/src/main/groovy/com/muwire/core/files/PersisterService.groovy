@@ -7,6 +7,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import net.i2p.data.Base32
 import net.i2p.data.Destination
@@ -36,12 +37,12 @@ class PersisterService {
 			def slurper = new JsonSlurper()
 			try {
 				location.eachLine {
-					if (it.trim().length() == 0)
-						return
-					def parsed = slurper.parseText it
-					def event = fromJson parsed
-					if (event != null)
-						listener.publish event
+					if (it.trim().length() > 0) {
+						def parsed = slurper.parseText it
+						def event = fromJson parsed
+						if (event != null)
+							listener.publish event
+					}
 				}
 			} catch (IllegalArgumentException|NumberFormatException e) {
 				// abort loading
@@ -94,6 +95,32 @@ class PersisterService {
 	}
 	
 	private void persistFiles() {
+		location.delete()
+		def sharedFiles = fileSource.getSharedFiles()
+		sharedFiles.each { k, v -> 
+			def json = toJson(k,v)
+			json = JsonOutput.toJson(json)
+			location.append "$json\n"
+		}
+	}
+	
+	private def toJson(File f, SharedFile sf) {
+		def json = [:]
+		json.file = f.getCanonicalFile().toString()
+		json.length = f.length()
+		InfoHash ih = sf.getInfoHash()
+		json.infoHash = Base32.encode ih.getRoot()
+		byte [] tmp = new byte [32]
+		json.hashList = []
+		for (int i = 0;i < ih.getHashList().length / 32; i++) {
+			System.arraycopy(ih.getHashList(), i * 32, tmp, 0, 32)
+			json.hashList.add Base32.encode(tmp)
+		}
 		
+		if (sf instanceof DownloadedFile) {
+			json.sources = sf.sources.stream().flatMap( {d -> d.toBase64()}).collect(Collectors.toList())
+		}
+		
+		json
 	}
 }
