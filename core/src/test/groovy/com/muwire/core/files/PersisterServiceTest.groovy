@@ -23,7 +23,7 @@ class PersisterServiceTest {
 	EventBus eventBus
 	Listener listener
 	File sharedDir
-	File sharedFile1
+	File sharedFile1, sharedFile2
 	
 	@Before
 	void setup() {
@@ -37,10 +37,13 @@ class PersisterServiceTest {
 		
 		sharedFile1 = new File(sharedDir,"file1")
 		sharedFile1.deleteOnExit()
+		
+		sharedFile2 = new File(sharedDir,"file2")
+		sharedFile2.deleteOnExit()
 	}
 	
-	private void writeToSharedFile(int size) {
-		FileOutputStream fos = new FileOutputStream(sharedFile1);
+	private void writeToSharedFile(File file, int size) {
+		FileOutputStream fos = new FileOutputStream(file);
 		fos.write new byte[size]
 		fos.close()
 	}
@@ -55,7 +58,7 @@ class PersisterServiceTest {
 	
 	@Test
 	void test1SharedFile1Piece() {
-		writeToSharedFile(1)
+		writeToSharedFile(sharedFile1, 1)
 		FileHasher fh = new FileHasher()
 		InfoHash ih1 = fh.hashFile(sharedFile1)
 		
@@ -83,7 +86,7 @@ class PersisterServiceTest {
 
 	@Test
 	public void test1SharedFile2Pieces() {
-		writeToSharedFile((0x1 << 18) + 1)
+		writeToSharedFile(sharedFile1, (0x1 << 18) + 1)
 		FileHasher fh = new FileHasher()
 		InfoHash ih1 = fh.hashFile(sharedFile1)
 		
@@ -115,5 +118,49 @@ class PersisterServiceTest {
 		assert loadedFile != null
 		assert loadedFile.file == sharedFile1.getCanonicalFile()
 		assert loadedFile.infoHash == ih1
+	}
+	
+	@Test
+	void test2SharedFiles() {
+		writeToSharedFile(sharedFile1, 1)
+		writeToSharedFile(sharedFile2, 2)
+		FileHasher fh = new FileHasher()
+		InfoHash ih1 = fh.hashFile(sharedFile1)
+		InfoHash ih2 = fh.hashFile(sharedFile2)
+		
+		assert ih1 != ih2
+		
+		File persisted = initPersisted()
+		
+		def json1 = [:]
+		json1.file = sharedFile1.getCanonicalFile().toString()
+		json1.length = 1
+		json1.infoHash = Base32.encode(ih1.getRoot())
+		json1.hashList = [Base32.encode(ih1.getHashList())]
+		
+		json1 = JsonOutput.toJson(json1)
+		
+		def json2 = [:]
+		json2.file = sharedFile2.getCanonicalFile().toString()
+		json2.length = 2
+		json2.infoHash = Base32.encode(ih2.getRoot())
+		json2.hashList = [Base32.encode(ih2.getHashList())]
+		
+		json2 = JsonOutput.toJson(json2)
+		
+		persisted.append "$json1\n"
+		persisted.append json2
+		
+		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
+		ps.start()
+		Thread.sleep(2000)
+		
+		assert listener.publishedFiles.size() == 2
+		def loadedFile1 = listener.publishedFiles[0]
+		assert loadedFile1.file == sharedFile1.getCanonicalFile()
+		assert loadedFile1.infoHash == ih1
+		def loadedFile2 = listener.publishedFiles[1]
+		assert loadedFile2.file == sharedFile2.getCanonicalFile()
+		assert loadedFile2.infoHash == ih2
 	}
 }
