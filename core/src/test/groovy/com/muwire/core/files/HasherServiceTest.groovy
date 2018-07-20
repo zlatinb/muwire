@@ -47,7 +47,7 @@ class HasherServiceTest {
 		service.onFileSharedEvent new FileSharedEvent(file: f)
 		Set<String> fileNames = new HashSet<>()
 		while (true) {
-			def hashed = listener.poll(100, TimeUnit.MILLISECONDS)
+			def hashed = listener.poll(1000, TimeUnit.MILLISECONDS)
 			if (hashed == null)
 				break
 			fileNames.add(hashed.sharedFile?.file?.getName())
