@@ -36,6 +36,8 @@ class PersisterService {
 			def slurper = new JsonSlurper()
 			try {
 				location.eachLine {
+					if (it.trim().length() == 0)
+						return
 					def parsed = slurper.parseText it
 					def event = fromJson parsed
 					if (event != null)

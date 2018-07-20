@@ -151,7 +151,7 @@ class PersisterServiceLoadingTest {
 		json2 = JsonOutput.toJson(json2)
 		
 		persisted.append "$json1\n"
-		persisted.append json2
+		persisted.append "$json2\n"
 		
 		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
 		ps.start()
