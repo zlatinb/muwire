@@ -3,6 +3,8 @@ package com.muwire.core.files
 import org.junit.Before
 import org.junit.Test
 
+import com.muwire.core.Destinations
+import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
@@ -162,5 +164,37 @@ class PersisterServiceTest {
 		def loadedFile2 = listener.publishedFiles[1]
 		assert loadedFile2.file == sharedFile2.getCanonicalFile()
 		assert loadedFile2.infoHash == ih2
+	}
+	
+	@Test
+	void testDownloadedFile() {
+		writeToSharedFile(sharedFile1, 1)
+		FileHasher fh = new FileHasher()
+		InfoHash ih1 = fh.hashFile(sharedFile1)
+		
+		File persisted = initPersisted()
+		
+		Destinations dests = new Destinations()
+		def json1 = [:]
+		json1.file = sharedFile1.getCanonicalFile().toString()
+		json1.length = 1
+		json1.infoHash = Base32.encode(ih1.getRoot())
+		json1.hashList = [Base32.encode(ih1.getHashList())]
+		json1.sources = [ dests.dest1.toBase64(), dests.dest2.toBase64()]
+		
+		json1 = JsonOutput.toJson(json1)
+		persisted.write json1
+		
+		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
+		ps.start()
+		Thread.sleep(2000)
+		
+		assert listener.publishedFiles.size() == 1
+		def loadedFile1 = listener.publishedFiles[0]
+		assert loadedFile1 instanceof DownloadedFile
+		assert loadedFile1.sources.size() == 2
+		assert loadedFile1.sources.contains(dests.dest1)
+		assert loadedFile1.sources.contains(dests.dest2)
+		
 	}
 }
