@@ -32,6 +32,10 @@ class PersisterService {
 		timer.schedule({load()} as TimerTask, 1000)
 	}
 	
+	void stop() {
+		timer.cancel()
+	}
+	
 	private void load() {
 		if (location.exists() && location.isFile()) {
 			def slurper = new JsonSlurper()
@@ -118,7 +122,7 @@ class PersisterService {
 		}
 		
 		if (sf instanceof DownloadedFile) {
-			json.sources = sf.sources.stream().flatMap( {d -> d.toBase64()}).collect(Collectors.toList())
+			json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())
 		}
 		
 		json
