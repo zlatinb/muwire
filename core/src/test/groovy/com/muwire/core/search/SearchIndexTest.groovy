@@ -40,4 +40,19 @@ class SearchIndexTest {
 		assert found.size() == 1
 		assert found.contains("c d.e")
 	}
+	
+	@Test
+	void testNotFound() {
+		initIndex(["a b.c"])
+		def found = index.search(["d"])
+		assert found.size() == 0
+	}
+	
+	@Test
+	void testSomeNotFound() {
+		initIndex(["a b.c"])
+		def found = index.search(["a","d"])
+		assert found.size() == 0
+		
+	}
 }

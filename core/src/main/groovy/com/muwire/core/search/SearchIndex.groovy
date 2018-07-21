@@ -22,7 +22,7 @@ class SearchIndex {
 		Set<String> rv = null;
 		
 		terms.each {
-			Set<String> forWord = keywords.get it
+			Set<String> forWord = keywords.getOrDefault(it,[])
 			if (rv == null) {
 				rv = forWord
 			} else {
@@ -31,6 +31,8 @@ class SearchIndex {
 				
 		}
 		
-		rv.asList()
+		if (rv != null)
+			return rv.asList()
+		[]
 	}
 }
