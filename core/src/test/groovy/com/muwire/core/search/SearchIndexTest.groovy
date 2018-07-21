@@ -55,4 +55,21 @@ class SearchIndexTest {
 		assert found.size() == 0
 		
 	}
+	
+	@Test
+	void testRemove() {
+		initIndex(["a b.c"])
+		index.remove("a b.c")
+		def found = index.search(["a"])
+		assert found.size() == 0
+	}
+	
+	@Test
+	void testRemoveOverlap() {
+		initIndex(["a b.c", "b c.d"])
+		index.remove("a b.c")
+		def found = index.search(["b"])
+		assert found.size() == 1
+		assert found.contains("b c.d")
+	}
 }

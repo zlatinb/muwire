@@ -6,8 +6,7 @@ class SearchIndex {
 	final Map<String, Set<String>> keywords = new HashMap<>()
 	
 	void add(String string) {
-		String name = string.replaceAll("\\."," ")
-		String [] split = name.split(" ")
+		String [] split = split(string)
 		split.each {
 			Set<String> existing = keywords.get(it)
 			if (existing == null) {
@@ -16,6 +15,24 @@ class SearchIndex {
 			}
 			existing.add(string)
 		}
+	}
+	
+	void remove(String string) {
+		String [] split = split(string)
+		split.each {
+			Set<String> existing = keywords.get it
+			if (existing != null) {
+				existing.remove(string)
+				if (existing.isEmpty()) {
+					keywords.remove(it)
+				}
+			}
+		}
+	}
+	
+	private static String[] split(String source) {
+		source = source.replaceAll("[\\.,_-]", " ")
+		source.split(" ")
 	}
 	
 	String[] search(List<String> terms) {
