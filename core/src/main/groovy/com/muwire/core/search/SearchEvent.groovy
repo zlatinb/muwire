@@ -4,7 +4,7 @@ import com.muwire.core.Event
 
 class SearchEvent extends Event {
 
-	String[] searchTerms
+	List<String> searchTerms
 	byte [] searchHash
 	UUID uuid
 }
