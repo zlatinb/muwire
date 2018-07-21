@@ -1,4 +1,4 @@
-package com.muwire.core.files
+package com.muwire.core.search
 
 
 class SearchIndex {

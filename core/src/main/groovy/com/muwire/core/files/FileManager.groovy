@@ -2,6 +2,8 @@ package com.muwire.core.files
 
 import com.muwire.core.EventBus
 import com.muwire.core.SharedFile
+import com.muwire.core.search.ResultsEvent
+import com.muwire.core.search.SearchEvent
 
 class FileManager {
 
