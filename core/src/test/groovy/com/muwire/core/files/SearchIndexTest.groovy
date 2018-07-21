@@ -9,8 +9,7 @@ class SearchIndexTest {
 	private void initIndex(List<String> entries) {
 		index = new SearchIndex()
 		entries.each {
-			File f = new File(it)
-			index.add(f)
+			index.add(it)
 		}
 	}
 	
@@ -20,7 +19,7 @@ class SearchIndexTest {
 		
 		def found = index.search(["a"])
 		assert found.size() == 1
-		assert found.contains(new File("a b.c"))
+		assert found.contains("a b.c")
 	}
 	
 	@Test
@@ -29,8 +28,8 @@ class SearchIndexTest {
 		
 		def found = index.search(["c"])
 		assert found.size() == 2
-		assert found.contains(new File("a b.c"))
-		assert found.contains(new File("c d.e"))
+		assert found.contains("a b.c")
+		assert found.contains("c d.e")
 	}
 	
 	@Test
@@ -39,6 +38,6 @@ class SearchIndexTest {
 		
 		def found = index.search(["c", "e"])
 		assert found.size() == 1
-		assert found.contains(new File("c d.e"))
+		assert found.contains("c d.e")
 	}
 }
