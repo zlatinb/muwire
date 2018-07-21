@@ -1,0 +1,64 @@
+package com.muwire.core.trust
+
+import net.i2p.data.Destination
+import net.i2p.util.ConcurrentHashSet
+
+class TrustService {
+
+	final File persistGood, persistBad
+	final long persistInterval
+	
+	final Set<Destination> good = new ConcurrentHashSet<>()
+	final Set<Destination> bad = new ConcurrentHashSet<>()
+	
+	final Timer timer
+	
+	TrustService(File persistGood, File persistBad, long persistInterval) {
+		this.persistBad = persistBad
+		this.persistGood = persistGood
+		this.persistInterval = persistInterval
+		this.timer = new Timer("trust-persister",true)
+	}
+	
+	void start() {
+		timer.schedule({load()} as TimerTask, 1)
+	}
+	
+	void stop() {
+		timer.cancel()
+	}
+	
+	private void load() {
+		// TODO: load good and bad
+		timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
+	}
+	
+	private void persist() {
+		// TODO: persist good and bad
+	}
+	
+	TrustLevel getLevel(Destination dest) {
+		if (good.contains(dest))
+			return TrustLevel.TRUSTED
+		else if (bad.contains(dest))
+			return TrustLevel.DISTRUSTED
+		TrustLevel.NEUTRAL
+	}
+	
+	void onTrustEvent(TrustEvent e) {
+		switch(e.level) {
+			case TrustLevel.TRUSTED:
+				bad.remove(e.destination)
+				good.add(e.destination)
+				break
+			case TrustLevel.DISTRUSTED:
+				good.remove(e.destination)
+				bad.add(e.destination)
+				break
+			case TrustLevel.NEUTRAL:
+				good.remove(e.destination)
+				bad.remove(e.destination)
+				break
+		}
+	}
+}
