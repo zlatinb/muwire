@@ -29,12 +29,28 @@ class TrustService {
 	}
 	
 	private void load() {
-		// TODO: load good and bad
+		if (persistGood.exists()) {
+			persistGood.eachLine {
+				good.add(new Destination(it))
+			}
+		}
+		if (persistBad.exists()) {
+			persistBad.eachLine {
+				bad.add(new Destination(it))
+			}
+		}
 		timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
 	}
 	
 	private void persist() {
-		// TODO: persist good and bad
+		persistGood.delete()
+		good.each {
+			persistGood.append("${it.toBase64()}\n")
+		}
+		persistBad.delete()
+		bad.each {
+			persistBad.append("${it.toBase64()}\n")
+		}
 	}
 	
 	TrustLevel getLevel(Destination dest) {
