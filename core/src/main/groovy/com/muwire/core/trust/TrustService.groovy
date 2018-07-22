@@ -13,6 +13,8 @@ class TrustService {
 	
 	final Timer timer
 	
+	TrustService() {}
+	
 	TrustService(File persistGood, File persistBad, long persistInterval) {
 		this.persistBad = persistBad
 		this.persistGood = persistGood

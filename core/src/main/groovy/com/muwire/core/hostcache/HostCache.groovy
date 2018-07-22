@@ -66,7 +66,7 @@ class HostCache {
 	
 	List<Destination> getHosts(int n) {
 		List<Destination> rv = new ArrayList<>(hosts.keySet())
-		rv.retainAll {allowHost(it)}
+		rv.retainAll {allowHost(hosts[it])}
 		if (rv.size() <= n)
 			return rv
 		Collections.shuffle(rv)
