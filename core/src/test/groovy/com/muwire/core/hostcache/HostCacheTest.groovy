@@ -11,7 +11,10 @@ import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.mock.interceptor.MockFor
+import groovy.mock.interceptor.StubFor
 
 class HostCacheTest {
 
@@ -95,11 +98,11 @@ class HostCacheTest {
 	
 	@Test
 	void testOnDiscoverNeutralHostsProhibited() {
-		trustMock.demand.getLevel { d ->
+		trustMock.ignore.getLevel { d ->
 			assert d == destinations.dest1
 			TrustLevel.NEUTRAL
 		}
-		settingsMock.demand.allowUntrusted { false }
+		settingsMock.ignore.allowUntrusted { false }
 		
 		initMocks()
 		
@@ -144,5 +147,94 @@ class HostCacheTest {
 		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
 		
 		assert cache.getHosts(5).size() == 0
+	}
+	
+	@Test
+	void testFailedHostSuceeds() {
+		trustMock.demand.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		trustMock.demand.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		
+		initMocks()
+		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
+		
+		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.SUCCESSFUL))
+		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		
+		def rv = cache.getHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
+	}
+		
+	
+	@Test
+	void testDuplicateHostDiscovered() {
+		trustMock.demand.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		trustMock.demand.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		
+		initMocks()
+		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
+		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
+		
+		def rv = cache.getHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
+	}
+	
+	@Test
+	void testSaving() {
+		trustMock.ignore.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		initMocks()
+		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
+		Thread.sleep(150)
+		
+		assert persist.exists()
+		int lines = 0
+		persist.eachLine {
+			lines++
+			JsonSlurper slurper = new JsonSlurper()
+			def json = slurper.parseText(it)
+			assert json.destination == destinations.dest1.toBase64()
+			assert json.failures == 0
+		}
+		assert lines == 1
+	}
+	
+	@Test
+	void testLoading() {
+		def json = [:]
+		json.destination = destinations.dest1.toBase64()
+		json.failures = 0
+		json = JsonOutput.toJson(json)
+		persist.append("${json}\n")
+		
+		trustMock.ignore.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		
+		initMocks()
+		def rv = cache.getHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
+		
+
 	}
 }
