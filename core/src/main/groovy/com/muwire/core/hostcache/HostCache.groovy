@@ -3,6 +3,8 @@ package com.muwire.core.hostcache
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.MuWireSettings
+import com.muwire.core.connection.ConnectionAttemptStatus
+import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
@@ -33,6 +35,33 @@ class HostCache {
 	
 	void stop() {
 		timer.cancel()
+	}
+	
+	void onHostDiscoveredEvent(HostDiscoveredEvent e) {
+		if (hosts.containsKey(e.destination))
+			return
+		Host host = new Host(e.destination)
+		if (allowHost(host)) {
+			hosts.put(e.destination, host)
+		}
+	}
+	
+	void onConnectionEvent(ConnectionEvent e) {
+		Host host = hosts.get(e.destination)
+		if (host == null) {
+			host = new Host(e.destination)
+			hosts.put(e.destination, host)
+		}
+
+		switch(e.status) {
+			case ConnectionAttemptStatus.SUCCESSFUL:
+			case ConnectionAttemptStatus.REJECTED:
+				host.onConnect()
+				break
+			case ConnectionAttemptStatus.FAILED:
+				host.onFailure()
+				break
+		}
 	}
 	
 	List<Destination> getHosts(int n) {
