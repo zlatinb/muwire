@@ -19,5 +19,7 @@ abstract class ConnectionManager {
 			drop(e.destination)
 	}
 	
-	abstract void drop(Destination d);
+	abstract void drop(Destination d)
+	
+	abstract boolean hasConnection()
 }

@@ -1,5 +1,7 @@
 package com.muwire.core
 
+import com.muwire.core.hostcache.CrawlerResponse
+
 class MuWireSettings {
 
 	boolean isLeaf() {
@@ -11,4 +13,9 @@ class MuWireSettings {
 		// TODO: implement
 		true
 	} 
+	
+	CrawlerResponse getCrawlerResponse() {
+		// TODO: implement
+		CrawlerResponse.REGISTERED
+	}
 }

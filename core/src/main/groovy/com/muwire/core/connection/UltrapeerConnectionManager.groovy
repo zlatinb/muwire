@@ -19,4 +19,9 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		
 	}
 
+	@Override
+	public boolean hasConnection() {
+		// TODO: implement
+		false
+	}
 }
