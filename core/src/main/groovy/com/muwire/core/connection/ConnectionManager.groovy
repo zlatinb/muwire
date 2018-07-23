@@ -21,5 +21,5 @@ abstract class ConnectionManager {
 	
 	abstract void drop(Destination d)
 	
-	abstract boolean hasConnection()
+	abstract Collection<Connection> getConnections()
 }

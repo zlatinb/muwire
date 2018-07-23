@@ -20,8 +20,8 @@ class LeafConnectionManager extends ConnectionManager {
 	}
 
 	@Override
-	public boolean hasConnection() {
+	public Collection<Connection> getConnections() {
 		// TODO implement
-		false
+		[]
 	}
 }

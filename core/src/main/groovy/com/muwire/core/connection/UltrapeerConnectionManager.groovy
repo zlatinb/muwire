@@ -1,5 +1,7 @@
 package com.muwire.core.connection
 
+import java.util.Collection
+
 import com.muwire.core.EventBus
 
 import net.i2p.data.Destination
@@ -20,8 +22,18 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	}
 
 	@Override
-	public boolean hasConnection() {
-		// TODO: implement
-		false
+	public Collection<Connection> getConnections() {
+		// TODO implement
+		[]
+	}
+	
+	boolean hasLeafSlots() {
+		// TODO implement
+		true
+	}
+	
+	boolean hasPeerSlots() {
+		// TODO implement
+		true
 	}
 }
