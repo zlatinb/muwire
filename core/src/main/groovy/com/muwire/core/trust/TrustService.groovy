@@ -1,9 +1,11 @@
 package com.muwire.core.trust
 
+import com.muwire.core.Service
+
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
 
-class TrustService {
+class TrustService extends Service {
 
 	final File persistGood, persistBad
 	final long persistInterval
@@ -30,7 +32,7 @@ class TrustService {
 		timer.cancel()
 	}
 	
-	private void load() {
+	void load() {
 		if (persistGood.exists()) {
 			persistGood.eachLine {
 				good.add(new Destination(it))
@@ -42,6 +44,7 @@ class TrustService {
 			}
 		}
 		timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
+		loaded = true
 	}
 	
 	private void persist() {

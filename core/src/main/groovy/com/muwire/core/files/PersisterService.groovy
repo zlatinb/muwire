@@ -5,6 +5,7 @@ import java.util.stream.Collectors
 import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.Service
 import com.muwire.core.SharedFile
 
 import groovy.json.JsonOutput
@@ -12,7 +13,7 @@ import groovy.json.JsonSlurper
 import net.i2p.data.Base32
 import net.i2p.data.Destination
 
-class PersisterService {
+class PersisterService extends Service {
 
 	final File location
 	final EventBus listener
@@ -36,7 +37,7 @@ class PersisterService {
 		timer.cancel()
 	}
 	
-	private void load() {
+	void load() {
 		if (location.exists() && location.isFile()) {
 			def slurper = new JsonSlurper()
 			try {
@@ -53,6 +54,7 @@ class PersisterService {
 			}
 		}
 		timer.schedule({persistFiles()} as TimerTask, 0, interval)
+		loaded = true
 	}
 	
 	private static FileLoadedEvent fromJson(def json) {

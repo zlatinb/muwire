@@ -3,6 +3,7 @@ package com.muwire.core.hostcache
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Service
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.trust.TrustLevel
@@ -12,7 +13,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import net.i2p.data.Destination
 
-class HostCache {
+class HostCache extends Service {
 
 	final TrustService trustService
 	final File storage
@@ -73,7 +74,7 @@ class HostCache {
 		rv[0..n-1]
 	}
 	
-	private void load() {
+	void load() {
 		if (storage.exists()) {
 			JsonSlurper slurper = new JsonSlurper()
 			storage.eachLine {
@@ -86,6 +87,7 @@ class HostCache {
 			}
 		}
 		timer.schedule({save()} as TimerTask, interval, interval)
+		loaded = true
 	}
 	
 	private boolean allowHost(Host host) {
