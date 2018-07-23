@@ -107,13 +107,15 @@ class HostCache extends Service {
 	
 	private void save() {
 		storage.delete()
-		hosts.each { dest, host ->
-			if (allowHost(host)) {
-				def map = [:]
-				map.destination = dest.toBase64()
-				map.failures = host.failures
-				def json = JsonOutput.toJson(map)
-				storage.append("${json}\n")
+		storage.withPrintWriter { writer ->
+			hosts.each { dest, host ->
+				if (allowHost(host)) {
+					def map = [:]
+					map.destination = dest.toBase64()
+					map.failures = host.failures
+					def json = JsonOutput.toJson(map)
+					writer.println json
+				}
 			}
 		}
 	}

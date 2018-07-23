@@ -49,12 +49,16 @@ class TrustService extends Service {
 	
 	private void persist() {
 		persistGood.delete()
-		good.each {
-			persistGood.append("${it.toBase64()}\n")
+		persistGood.withPrintWriter { writer ->
+			good.each {
+				writer.println it.toBase64()
+			}
 		}
 		persistBad.delete()
-		bad.each {
-			persistBad.append("${it.toBase64()}\n")
+		persistBad.withPrintWriter { writer ->
+			bad.each { 
+				writer.println it.toBase64()
+			}
 		}
 	}
 	

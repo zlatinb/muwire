@@ -103,10 +103,12 @@ class PersisterService extends Service {
 	private void persistFiles() {
 		location.delete()
 		def sharedFiles = fileSource.getSharedFiles()
-		sharedFiles.each { k, v -> 
-			def json = toJson(k,v)
-			json = JsonOutput.toJson(json)
-			location.append "$json\n"
+		location.withPrintWriter { writer ->
+			sharedFiles.each { k, v ->
+				def json = toJson(k,v)
+				json = JsonOutput.toJson(json)
+				writer.println json
+			}
 		}
 	}
 	
