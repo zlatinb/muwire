@@ -3,19 +3,36 @@ package com.muwire.core
 import com.muwire.core.hostcache.CrawlerResponse
 
 class MuWireSettings {
+	
+	MuWireSettings() {}
+	
+	MuWireSettings(Properties props) {
+		isLeaf = Boolean.valueOf(props.get("leaf","false"))
+		allowUntrusted = Boolean.valueOf(props.get("allowUntrusted","true"))
+		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
+	}
+	
+	final boolean isLeaf
+	boolean allowUntrusted
+	CrawlerResponse crawlerResponse
 
 	boolean isLeaf() {
-		// TODO: implement
-		false
+		isLeaf
 	}
 	
 	boolean allowUntrusted() {
-		// TODO: implement
-		true
+		allowUntrusted
 	} 
 	
+	void setAllowUntrusted(boolean allowUntrusted) {
+		this.allowUntrusted = allowUntrusted
+	}
+	
 	CrawlerResponse getCrawlerResponse() {
-		// TODO: implement
-		CrawlerResponse.REGISTERED
+		crawlerResponse
+	}
+	
+	void setCrawlerResponse(CrawlerResponse crawlerResponse) {
+		this.crawlerResponse = crawlerResponse
 	}
 }
