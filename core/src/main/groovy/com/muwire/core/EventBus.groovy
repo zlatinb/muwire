@@ -11,10 +11,10 @@ class EventBus {
 	private Map handlers = new HashMap()
 
 	void publish(Event e) {
-		log.fine "publishing event of type ${e.getClass().getSimpleName()}"
+		log.fine "publishing event of type ${e.getClass().getSimpleName()} seqNo ${e.seqNo} timestamp ${e.timestamp}"
 		def currentHandlers
 		final def clazz = e.getClass()
-		synchronized(handlers) {
+		synchronized(this) {
 			currentHandlers = handlers.getOrDefault(clazz, [])
 		}
 		currentHandlers.each {
