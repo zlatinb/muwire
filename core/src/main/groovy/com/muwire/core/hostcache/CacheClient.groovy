@@ -36,10 +36,12 @@ class CacheClient {
 		this.manager = manager
 		this.session = session
 		this.settings = settings
+		this.interval = interval
 		this.timer = new Timer("hostcache-client",true)
 	}
 	
 	void start() {
+		session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
 		timer.schedule({queryIfNeeded()} as TimerTask, 1, interval)
 	}
 	
@@ -173,6 +175,7 @@ class CacheClient {
 		def pong = [:]
 		pong.peers = neighbors
 		pong.uuid = ping.uuid
+		pong.type = "CrawlerPong"
 		pong.version = 1
 		pong.leafSlots = upManager.hasLeafSlots()
 		pong.peerSlots = upManager.hasPeerSlots()
