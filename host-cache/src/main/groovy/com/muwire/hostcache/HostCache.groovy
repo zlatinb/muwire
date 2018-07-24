@@ -117,7 +117,7 @@ public class HostCache {
                     break
                     case "CrawlerPong":
                     println "CrawlerPong"
-					crawler.handleCrawlerPong(sender, payload)
+					crawler.handleCrawlerPong(payload, sender)
                     break
                     default:
                     println "WARN: Unexpected message type ${payload.type}, dropping"
