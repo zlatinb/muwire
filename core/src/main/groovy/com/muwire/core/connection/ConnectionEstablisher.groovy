@@ -146,29 +146,31 @@ class ConnectionEstablisher {
 		}
 		log.info("connection to ${e.destination.toBase32()} rejected")
 		
-		// can publish the rejected event now
+		
 		eventBus.publish(new ConnectionEvent(endpoint: e, incoming: false, status: ConnectionAttemptStatus.REJECTED))
-		
-		DataInputStream dais = new DataInputStream(e.inputStream)
-		int payloadSize = dais.readUnsignedShort()
-		byte[] payload = new byte[payloadSize]
-		dais.readFully(payload)
-		
-		JsonSlurper json = new JsonSlurper()
-		json = json.parse(payload)
-		
-		if (json.tryHosts == null) {
-			log.warning("post-rejection json didn't contain hosts to try")
+		try {
+			DataInputStream dais = new DataInputStream(e.inputStream)
+			int payloadSize = dais.readUnsignedShort()
+			byte[] payload = new byte[payloadSize]
+			dais.readFully(payload)
+
+			JsonSlurper json = new JsonSlurper()
+			json = json.parse(payload)
+
+			if (json.tryHosts == null) {
+				log.warning("post-rejection json didn't contain hosts to try")
+				return
+			}
+
+			json.tryHosts.asList().each {
+				Destination suggested = new Destination(it)
+				eventBus.publish(new HostDiscoveredEvent(destination: suggested))
+			}
+		} catch (Exception ignore) {
+			log.warning("Problem parsing post-rejection payload",ignore)
+		} finally {
+			// the end
 			e.closeQuietly()
-			return
 		}
-		
-		json.tryHosts.asList().each { 
-			Destination suggested = new Destination(it)
-			eventBus.publish(new HostDiscoveredEvent(destination: suggested))
-		}
-		
-		// the end
-		e.closeQuietly()
 	}
 }
