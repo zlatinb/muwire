@@ -14,7 +14,7 @@ Rejecting the handshake is done by responding with the word "REJECT", optionally
 
 ```
 {
-    try: [b64.1, b64.2...]
+    tryHosts: [b64.1, b64.2...]
 }
 ```
 
