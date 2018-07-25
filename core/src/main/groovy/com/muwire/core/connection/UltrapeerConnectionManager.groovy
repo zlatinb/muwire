@@ -40,4 +40,9 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	protected int getDesiredConnections() {
 		return maxPeers / 2;
 	}
+	@Override
+	public boolean isConnected(Destination d) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

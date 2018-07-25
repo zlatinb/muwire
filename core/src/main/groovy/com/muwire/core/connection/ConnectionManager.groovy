@@ -28,4 +28,6 @@ abstract class ConnectionManager {
 	boolean needsConnections() {
 		return getConnections().size() < getDesiredConnections()
 	}
+	
+	abstract boolean isConnected(Destination d);
 }

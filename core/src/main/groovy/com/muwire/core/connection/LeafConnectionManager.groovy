@@ -29,6 +29,11 @@ class LeafConnectionManager extends ConnectionManager {
 	protected int getDesiredConnections() {
 		return maxConnections;
 	}
-	
+
+	@Override
+	public boolean isConnected(Destination d) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }
