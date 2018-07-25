@@ -6,7 +6,8 @@ import net.i2p.data.Destination
 
 class ConnectionEvent extends Event {
 
-	Destination destination
+	Endpoint endpoint
+	boolean incoming
 	ConnectionAttemptStatus status
 
 }

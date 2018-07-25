@@ -8,6 +8,7 @@ import com.muwire.core.Destinations
 import com.muwire.core.MuWireSettings
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
+import com.muwire.core.connection.Endpoint
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
@@ -143,9 +144,10 @@ class HostCacheTest {
 		initMocks()
 		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 		
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		def endpoint = new Endpoint(destinations.dest1, null, null)
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		
 		assert cache.getHosts(5).size() == 0
 	}
@@ -164,11 +166,12 @@ class HostCacheTest {
 		initMocks()
 		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 		
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.SUCCESSFUL))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
-		cache.onConnectionEvent( new ConnectionEvent(destination: destinations.dest1, status: ConnectionAttemptStatus.FAILED))
+		def endpoint = new Endpoint(destinations.dest1, null, null)
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.SUCCESSFUL))
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		
 		def rv = cache.getHosts(5)
 		assert rv.size() == 1
