@@ -23,6 +23,8 @@ class HostCache extends Service {
 	final Destination myself
 	final Map<Destination, Host> hosts = new ConcurrentHashMap<>()
 	
+	HostCache(){}
+	
 	public HostCache(TrustService trustService, File storage, int interval, 
 		MuWireSettings settings, Destination myself) {
 		this.trustService = trustService

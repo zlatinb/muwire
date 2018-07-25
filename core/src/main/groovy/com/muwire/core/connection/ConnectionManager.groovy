@@ -10,6 +10,8 @@ abstract class ConnectionManager {
 
 	final EventBus eventBus
 	
+	ConnectionManager() {}
+	
 	ConnectionManager(EventBus eventBus) {
 		this.eventBus = eventBus
 	}
