@@ -7,18 +7,13 @@ import net.i2p.data.Destination
 abstract class Connection {
 
 	final EventBus eventBus
-	final InputStream inputStream
-	final OutputStream outputStream
-	final Destination remoteSide
+	final Endpoint endpoint
 	final boolean incoming
 	
-	Connection(EventBus eventBus, InputStream inputStream, OutputStream outputStream,
-		Destination remoteSide, boolean incoming) {
+	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming) {
 		this.eventBus = eventBus
-		this.inputStream = inputStream
-		this.outputStream = outputStream
-		this.remoteSide = remoteSide
 		this.incoming = incoming
+		this.endpoint = endpoint
 	}
 	
 	/**
