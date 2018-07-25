@@ -3,6 +3,7 @@ package com.muwire.core.connection
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.logging.Level
 import java.util.zip.DeflaterInputStream
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.InflaterInputStream
@@ -42,7 +43,8 @@ class ConnectionEstablisher {
 		this.hostCache = hostCache
 		timer = new Timer("connection-timer",true)
 		executor = Executors.newFixedThreadPool(CONCURRENT, { r -> 
-			def rv = new Thread(r, true)
+			def rv = new Thread(r)
+			rv.setDaemon(true)
 			rv.setName("connector-${System.currentTimeMillis()}")
 			rv 
 		} as ThreadFactory)
@@ -106,7 +108,7 @@ class ConnectionEstablisher {
 					fail endpoint
 			}
 		} catch (Exception e) {
-			log.warning("Couldn't connect to ${toTry.toBase32()}", e)
+			log.log(Level.WARNING, "Couldn't connect to ${toTry.toBase32()}", e)
 			def endpoint = new Endpoint(toTry, null, null)
 			fail(endpoint)
 		} finally {
@@ -167,7 +169,7 @@ class ConnectionEstablisher {
 				eventBus.publish(new HostDiscoveredEvent(destination: suggested))
 			}
 		} catch (Exception ignore) {
-			log.warning("Problem parsing post-rejection payload",ignore)
+			log.log(Level.WARNING,"Problem parsing post-rejection payload",ignore)
 		} finally {
 			// the end
 			e.closeQuietly()
