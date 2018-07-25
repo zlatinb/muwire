@@ -1,1 +1,6 @@
 mainClassName = 'com.muwire.core.Core'
+
+dependencies {
+    compile 'net.i2p.client:mstreaming:0.9.35'
+    compile 'net.i2p.client:streaming:0.9.35'
+}
