@@ -24,4 +24,11 @@ class LeafConnectionManager extends ConnectionManager {
 		// TODO implement
 		[]
 	}
+
+	@Override
+	protected int getDesiredConnections() {
+		return maxConnections;
+	}
+	
+	
 }

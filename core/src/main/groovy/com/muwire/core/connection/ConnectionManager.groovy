@@ -22,4 +22,10 @@ abstract class ConnectionManager {
 	abstract void drop(Destination d)
 	
 	abstract Collection<Connection> getConnections()
+	
+	protected abstract int getDesiredConnections()
+	
+	boolean needsConnections() {
+		return getConnections().size() < getDesiredConnections()
+	}
 }

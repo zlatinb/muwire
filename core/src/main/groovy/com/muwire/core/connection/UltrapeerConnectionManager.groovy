@@ -36,4 +36,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		// TODO implement
 		true
 	}
+	@Override
+	protected int getDesiredConnections() {
+		return maxPeers / 2;
+	}
 }
