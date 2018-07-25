@@ -56,7 +56,7 @@ class ConnectionEstablisher {
 		if (inProgress.size() >= CONCURRENT)
 			return
 
-		def toTry
+		def toTry = null
 		for (int i = 0; i < 5; i++) {
 			toTry = hostCache.getHosts(1)
 			if (toTry.isEmpty())
@@ -67,7 +67,8 @@ class ConnectionEstablisher {
 				break
 			}
 		}
-		
+		if (toTry == null)
+			return
 		inProgress.add(toTry)
 		executor.execute({connect(toTry)} as Runnable)
 	}
