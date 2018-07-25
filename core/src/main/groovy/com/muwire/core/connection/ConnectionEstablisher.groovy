@@ -10,7 +10,9 @@ import java.util.zip.InflaterInputStream
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.hostcache.HostDiscoveredEvent
 
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
@@ -125,6 +127,8 @@ class ConnectionEstablisher {
 			return
 		}
 		
+		log.info("connection to ${e.destination.toBase32()} established")
+		
 		// wrap into deflater / inflater streams and publish
 		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream))
 		eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, status: ConnectionAttemptStatus.SUCCESSFUL))
@@ -140,10 +144,31 @@ class ConnectionEstablisher {
 				return
 			}
 		}
+		log.info("connection to ${e.destination.toBase32()} rejected")
 		
 		// can publish the rejected event now
 		eventBus.publish(new ConnectionEvent(endpoint: e, incoming: false, status: ConnectionAttemptStatus.REJECTED))
 		
-		// TODO: read the json for suggested peers if present
+		DataInputStream dais = new DataInputStream(e.inputStream)
+		int payloadSize = dais.readUnsignedShort()
+		byte[] payload = new byte[payloadSize]
+		dais.readFully(payload)
+		
+		JsonSlurper json = new JsonSlurper()
+		json = json.parse(payload)
+		
+		if (json.tryHosts == null) {
+			log.warning("post-rejection json didn't contain hosts to try")
+			e.closeQuietly()
+			return
+		}
+		
+		json.tryHosts.asList().each { 
+			Destination suggested = new Destination(it)
+			eventBus.publish(new HostDiscoveredEvent(destination: suggested))
+		}
+		
+		// the end
+		e.closeQuietly()
 	}
 }
