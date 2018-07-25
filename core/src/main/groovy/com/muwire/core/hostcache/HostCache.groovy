@@ -20,13 +20,16 @@ class HostCache extends Service {
 	final int interval
 	final Timer timer
 	final MuWireSettings settings
+	final Destination myself
 	final Map<Destination, Host> hosts = new ConcurrentHashMap<>()
 	
-	public HostCache(TrustService trustService, File storage, int interval, MuWireSettings settings) {
+	public HostCache(TrustService trustService, File storage, int interval, 
+		MuWireSettings settings, Destination myself) {
 		this.trustService = trustService
 		this.storage = storage
 		this.interval = interval
 		this.settings = settings
+		this.myself = myself
 		this.timer = new Timer("host-persister",true)
 	}
 
@@ -39,6 +42,8 @@ class HostCache extends Service {
 	}
 	
 	void onHostDiscoveredEvent(HostDiscoveredEvent e) {
+		if (myself == e.destination)
+			return
 		if (hosts.containsKey(e.destination))
 			return
 		Host host = new Host(e.destination)
@@ -92,6 +97,8 @@ class HostCache extends Service {
 	
 	private boolean allowHost(Host host) {
 		if (host.isFailed())
+			return false
+		if (host.destination == myself)
 			return false
 		TrustLevel trust = trustService.getLevel(host.destination)
 		switch(trust) {

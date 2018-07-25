@@ -38,28 +38,6 @@ class Core {
 		props = new MuWireSettings(props)
 		
 		
-		EventBus eventBus = new EventBus()
-		
-		log.info("initializing trust service")
-		File goodTrust = new File(home, "trust.good")
-		File badTrust = new File(home, "trust.bad")
-		TrustService trustService = new TrustService(goodTrust, badTrust, 5000)
-		eventBus.register(TrustEvent.class, trustService)
-		trustService.start()
-		trustService.waitForLoad()
-		
-		log.info("initializing host cache")
-		File hostStorage = new File(home, "hosts.json")
-		HostCache hostCache = new HostCache(trustService,hostStorage, 30000, props)
-		eventBus.register(HostDiscoveredEvent.class, hostCache)
-		eventBus.register(ConnectionEvent.class, hostCache)
-		hostCache.start()
-		hostCache.waitForLoad()
-		
-		log.info("initializing connection manager")
-		ConnectionManager connectionManager = props.isLeaf() ? 
-			new LeafConnectionManager(eventBus,3) : new UltrapeerConnectionManager(eventBus, 512, 512)
-		eventBus.register(TrustEvent.class, connectionManager)
 		
 		log.info("initializing I2P session")
 		def i2pClient = new I2PClientFactory().createClient()
@@ -72,14 +50,37 @@ class Core {
 		}
 		
 		def sysProps = System.getProperties().clone()
-		sysProps["inbound.nickname"] = "MuWire"
-		I2PSession i2pSession
-		keyDat.withInputStream { 
+				sysProps["inbound.nickname"] = "MuWire"
+				I2PSession i2pSession
+				keyDat.withInputStream { 
 			i2pSession = i2pClient.createSession(it, sysProps)
 		}
 		
 		log.info("connecting i2p session")
 		i2pSession.connect()
+		
+		EventBus eventBus = new EventBus()
+		
+		log.info("initializing trust service")
+		File goodTrust = new File(home, "trust.good")
+		File badTrust = new File(home, "trust.bad")
+		TrustService trustService = new TrustService(goodTrust, badTrust, 5000)
+		eventBus.register(TrustEvent.class, trustService)
+		trustService.start()
+		trustService.waitForLoad()
+		
+		log.info("initializing host cache")
+		File hostStorage = new File(home, "hosts.json")
+		HostCache hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
+		eventBus.register(HostDiscoveredEvent.class, hostCache)
+		eventBus.register(ConnectionEvent.class, hostCache)
+		hostCache.start()
+		hostCache.waitForLoad()
+		
+		log.info("initializing connection manager")
+		ConnectionManager connectionManager = props.isLeaf() ? 
+			new LeafConnectionManager(eventBus,3) : new UltrapeerConnectionManager(eventBus, 512, 512)
+		eventBus.register(TrustEvent.class, connectionManager)
 		
 		log.info("initializing cache client")
 		CacheClient cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)

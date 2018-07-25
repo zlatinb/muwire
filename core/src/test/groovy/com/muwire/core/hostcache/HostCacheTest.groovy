@@ -15,6 +15,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
+import net.i2p.data.Destination
 
 class HostCacheTest {
 
@@ -50,7 +51,7 @@ class HostCacheTest {
 	private void initMocks() {
 		trust = trustMock.proxyInstance()
 		settings = settingsMock.proxyInstance()
-		cache = new HostCache(trust, persist, 100, settings)
+		cache = new HostCache(trust, persist, 100, settings, new Destination())
 		cache.start()
 		Thread.sleep(150)
 	}
