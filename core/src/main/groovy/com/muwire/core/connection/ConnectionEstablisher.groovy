@@ -57,7 +57,7 @@ class ConnectionEstablisher {
 			return
 
 		def toTry
-		while(true) {
+		for (int i = 0; i < 5; i++) {
 			toTry = hostCache.getHosts(1)
 			if (toTry.isEmpty())
 				return
