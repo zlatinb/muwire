@@ -101,8 +101,8 @@ class ConnectionEstablisher {
 				return
 			}
 			switch(read) {
-				case 'O': readK(endpoint); break
-				case 'R': readEJECT(endpoint); break
+				case (byte)'O': readK(endpoint); break
+				case (byte)'R': readEJECT(endpoint); break
 				default :
 					log.warning("unknown response $read")
 					fail endpoint
@@ -156,7 +156,7 @@ class ConnectionEstablisher {
 			byte[] payload = new byte[payloadSize]
 			dais.readFully(payload)
 
-			JsonSlurper json = new JsonSlurper()
+			def json = new JsonSlurper()
 			json = json.parse(payload)
 
 			if (json.tryHosts == null) {
@@ -172,7 +172,7 @@ class ConnectionEstablisher {
 			log.log(Level.WARNING,"Problem parsing post-rejection payload",ignore)
 		} finally {
 			// the end
-			e.closeQuietly()
+			e.close()
 		}
 	}
 }
