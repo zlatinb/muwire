@@ -24,7 +24,7 @@ All traffic after the handshake is compressed using the same compression algorit
 
 ## Messages
 
-After the handhsake follows a stream of messages.  Messages can arrive in any order.  
+After the handhsake follows a stream of messages.  Messages can arrive in any order.  Every 10 seconds a "Ping" message is sent on each connection which serves as a keep-alive.  The response to that message is a "Pong" which carries b64 destinations of ultrapeers the remote side has been able to connect to.  This keeps the host pool in each node fresh.
 
 Between ultrapeers, each message consists of 3 bytes - the most significant bit of the first byte indicates if the payload is binary or JSON.  The remaining 23 bits indicate the length of the message.
 
@@ -41,6 +41,21 @@ The JSON structure has two mandatory top-level fields - type and version:
 ```
 
 Binary messages can be two types: full bloom filter or a patch message to be applied to a previously sent bloom filter.  Binary messages travel only between ultrapeers.  There is a single byte after the payload indicating the type of the binary message.  That byte is counted in the total payload length.
+
+#### "Ping"
+
+Sent periodically as a keep-alive on every type of connection.  Other than the header this message has no payload.
+
+#### Pong
+
+A message containing addresses of other ultrapeers that the sender has successfully connected to.
+```
+{
+    type: "Pong",
+    version: 1,
+    pongs: [ "b64.1", "b64.2" ... ]
+}
+```
 
 ### Leaf to ultrapeer
 
@@ -71,10 +86,6 @@ The opposite of Upsert - the leaf is no longer sharing the specified file.  The 
 }
 ```
 
-#### "Ping"
-
-Sent when the leaf wants to find the addresses of more ultrapeers to connect to.  Other than the header this message has no payload.
-
 #### "Search"
 
 Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to b64 destination for signed I2P datagrams.
@@ -97,20 +108,9 @@ A search can contain either a list of keyword or the infohash if the user is loo
 
 The "Search" message is also sent from an ultrapeer to a leaf.
 
-#### Pong
-
-A message containing addresses of other ultrapeers that the leaf is suggested to connect to.
-```
-{
-    type: "Pong",
-    version: 1,
-    pongs: [ "b64.1", "b64.2" ... ]
-}
-```
-
 ### Between Ultrapeers
 
-The only JSON message that can travel between ultrapeers is the "Search" message which is identical to the one sent from a leaf.
+The only JSON message other than "Ping" and "Pong" that can travel between ultrapeers is the "Search" message which is identical to the one sent from a leaf.
 
 There are two types of binary messages that can travel between ultrapeers - Bloom filter and Patch.  Bloom filter should be the first message that is sent after establishing the connection, but that is not enforced.  If any Patch messages arrive before any Bloom filter has been received, they are ignored.  In the unlikely case that the size of a Patch message would exceed that of a complete Bloom filter the ultrapeer may choose to send a new Bloom filter which replaces the old one.
 
