@@ -12,4 +12,9 @@ class Event {
 		seqNo = SEQ_NO.getAndIncrement()
 		timestamp = System.currentTimeMillis()
 	}
+	
+	@Override
+	public String toString() {
+		"seqNo $seqNo timestamp $timestamp"
+	}
 }

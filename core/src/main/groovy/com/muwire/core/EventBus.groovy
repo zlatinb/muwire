@@ -23,7 +23,7 @@ class EventBus {
 	}
 	
 	private void publishInternal(Event e) {
-		log.fine "publishing event of type ${e.getClass().getSimpleName()} seqNo ${e.seqNo} timestamp ${e.timestamp}"
+		log.fine "publishing event $e"
 		def currentHandlers
 		final def clazz = e.getClass()
 		synchronized(this) {

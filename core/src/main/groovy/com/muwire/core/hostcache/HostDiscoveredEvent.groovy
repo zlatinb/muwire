@@ -7,4 +7,9 @@ import net.i2p.data.Destination
 class HostDiscoveredEvent extends Event {
 
 	Destination destination
+	
+	@Override
+	public String toString() {
+		"HostDiscoveredEvent ${super.toString()} destination:${destination.toBase32()}"
+	}
 }

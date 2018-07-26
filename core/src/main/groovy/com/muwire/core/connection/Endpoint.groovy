@@ -32,4 +32,9 @@ class Endpoint implements Closeable {
 			try {outputStream.close()} catch (Exception ignore) {}
 		}
 	}
+	
+	@Override
+	public String toString() {
+		"destination: ${destination.toBase32()}"
+	}
 } 
