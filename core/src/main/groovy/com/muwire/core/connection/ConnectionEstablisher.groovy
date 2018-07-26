@@ -78,8 +78,8 @@ class ConnectionEstablisher {
 		}
 		if (toTry == null)
 			return
-		inProgress.add(toTry)
-		executor.execute({connect(toTry)} as Runnable)
+		if (inProgress.add(toTry))
+			executor.execute({connect(toTry)} as Runnable)
 	}
 	
 	private void connect(Destination toTry) {
