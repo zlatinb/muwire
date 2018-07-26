@@ -18,4 +18,16 @@ class LeafConnection extends Connection {
 		super(eventBus, endpoint, true);
 	}
 
+	@Override
+	protected void read() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void write(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

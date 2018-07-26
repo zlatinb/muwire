@@ -19,4 +19,16 @@ class UltrapeerConnection extends Connection {
 		super(eventBus, endpoint, false)
 	}
 
+	@Override
+	protected void read() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void write(Object message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

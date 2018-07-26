@@ -12,10 +12,27 @@ import net.i2p.data.Destination
  * @author zab
  */
 class PeerConnection extends Connection {
+	
+	private final DataInputStream dis
+	private final DataOutputStream dos
 
 	public PeerConnection(EventBus eventBus, Endpoint endpoint,
 			boolean incoming) {
 		super(eventBus, endpoint, incoming)
+		this.dis = new DataInputStream(endpoint.inputStream)
+		this.dos = new DataOutputStream(endpoint.outputStream)
+	}
+
+	@Override
+	protected void read() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void write(Object message) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
