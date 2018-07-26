@@ -13,9 +13,9 @@ import net.i2p.data.Destination
  */
 class PeerConnection extends Connection {
 
-	public PeerConnection(EventBus eventBus, InputStream inputStream, OutputStream outputStream, Destination remoteSide,
+	public PeerConnection(EventBus eventBus, Endpoint endpoint,
 			boolean incoming) {
-		super(eventBus, inputStream, outputStream, remoteSide, incoming)
+		super(eventBus, endpoint, incoming)
 	}
 
 }

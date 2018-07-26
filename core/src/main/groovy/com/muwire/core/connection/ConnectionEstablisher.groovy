@@ -78,7 +78,7 @@ class ConnectionEstablisher {
 		}
 		if (toTry == null)
 			return
-		if (inProgress.add(toTry))
+		if (!connectionManager.isConnected(toTry) && inProgress.add(toTry))
 			executor.execute({connect(toTry)} as Runnable)
 	}
 	

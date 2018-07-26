@@ -14,8 +14,8 @@ import net.i2p.data.Destination
  */
 class LeafConnection extends Connection {
 
-	public LeafConnection(EventBus eventBus, InputStream inputStream, OutputStream outputStream, Destination remoteSide) {
-		super(eventBus, inputStream, outputStream, remoteSide, true);
+	public LeafConnection(EventBus eventBus, Endpoint endpoint) {
+		super(eventBus, endpoint, true);
 	}
 
 }

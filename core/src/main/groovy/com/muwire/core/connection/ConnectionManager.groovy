@@ -31,5 +31,7 @@ abstract class ConnectionManager {
 		return getConnections().size() < getDesiredConnections()
 	}
 	
-	abstract boolean isConnected(Destination d);
+	abstract boolean isConnected(Destination d)
+	
+	abstract void onConnectionEvent(ConnectionEvent e)
 }

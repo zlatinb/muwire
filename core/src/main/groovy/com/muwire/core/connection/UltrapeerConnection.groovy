@@ -15,9 +15,8 @@ import net.i2p.data.Destination
  */
 class UltrapeerConnection extends Connection {
 
-	public UltrapeerConnection(EventBus eventBus, InputStream inputStream, OutputStream outputStream,
-			Destination remoteSide) {
-		super(eventBus, inputStream, outputStream, remoteSide, false)
+	public UltrapeerConnection(EventBus eventBus, Endpoint endpoint) {
+		super(eventBus, endpoint, false)
 	}
 
 }
