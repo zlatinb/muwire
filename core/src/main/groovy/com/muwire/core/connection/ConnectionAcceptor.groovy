@@ -97,7 +97,7 @@ class ConnectionAcceptor {
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "incoming connection failed",ex)
 			e.close()
-			eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, status: ConnectionAttemptStatus.FAILED)
+			eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, leaf: null, status: ConnectionAttemptStatus.FAILED)
 		}
 	}
 	
@@ -140,7 +140,7 @@ class ConnectionAcceptor {
 			e.outputStream.write("OK".bytes)
 			e.outputStream.flush()
 			def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream))
-			eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: true, status: ConnectionAttemptStatus.SUCCESSFUL))
+			eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.SUCCESSFUL))
 		} else {
 			log.info("rejecting connection, leaf:$leaf")
 			e.outputStream.write("REJECT".bytes)
@@ -155,7 +155,7 @@ class ConnectionAcceptor {
 			}
 			e.outputStream.flush()
 			e.close()
-			eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, status: ConnectionAttemptStatus.REJECTED))
+			eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.REJECTED))
 		}
 	}
 	

@@ -55,7 +55,7 @@ class HostCache extends Service {
 	}
 	
 	void onConnectionEvent(ConnectionEvent e) {
-		if (e.incoming)
+		if (e.incoming || e.leaf)
 			return
 		Destination dest = e.endpoint.destination
 		Host host = hosts.get(dest)

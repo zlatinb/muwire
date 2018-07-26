@@ -113,6 +113,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.SUCCESSFUL
+		assert event.incoming == true
+		assert event.leaf == true
 	}
 	
 	@Test
@@ -149,6 +151,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.SUCCESSFUL
+		assert event.incoming == true
+		assert event.leaf == false
 	}
 	
 	@Test
@@ -183,6 +187,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.FAILED
+		assert event.incoming == true
+		assert event.leaf == null
 	}
 	
 	@Test
@@ -217,6 +223,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.FAILED
+		assert event.incoming == true
+		assert event.leaf == null
 	}
 	
 	@Test
@@ -257,6 +265,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.REJECTED
+		assert event.incoming == true
+		assert event.leaf == false
 	}
 	
 	@Test
@@ -297,6 +307,8 @@ class ConnectionAcceptorTest {
 		def event = connectionEvents[0]
 		assert event.endpoint.destination == destinations.dest1
 		assert event.status == ConnectionAttemptStatus.REJECTED
+		assert event.incoming == true
+		assert event.leaf == true
 	}
 	
 	@Test
