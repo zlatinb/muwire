@@ -84,6 +84,18 @@ class HostCache extends Service {
 		rv[0..n-1]
 	}
 	
+	List<Destination> getGoodHosts(int n) {
+		List<Destination> rv = new ArrayList<>(hosts.keySet())
+		rv.retainAll {
+			Host host = hosts[it]
+			allowHost(host) && host.hasSucceeded()
+		}
+		if (rv.size() <= n)
+			return rv
+		Collections.shuffle(rv)
+		rv[0..n-1]
+	}
+	
 	void load() {
 		if (storage.exists()) {
 			JsonSlurper slurper = new JsonSlurper()
@@ -92,6 +104,7 @@ class HostCache extends Service {
 				Destination dest = new Destination(entry.destination)
 				Host host = new Host(dest)
 				host.failures = Integer.valueOf(String.valueOf(entry.failures))
+				host.successes = Integer.valueOf(String.valueOf(entry.successes))
 				if (allowHost(host))
 					hosts.put(dest, host)
 			}
@@ -125,6 +138,7 @@ class HostCache extends Service {
 					def map = [:]
 					map.destination = dest.toBase64()
 					map.failures = host.failures
+					map.successes = host.successes
 					def json = JsonOutput.toJson(map)
 					writer.println json
 				}

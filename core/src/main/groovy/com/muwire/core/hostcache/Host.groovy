@@ -7,7 +7,7 @@ class Host {
 	private static final int MAX_FAILURES = 3
 	
 	final Destination destination
-	int failures
+	int failures,successes
 	
 	public Host(Destination destination) {
 		this.destination = destination
@@ -15,13 +15,19 @@ class Host {
 
 	synchronized void onConnect() {
 		failures = 0
+		successes++
 	}
 	
 	synchronized void onFailure() {
 		failures++
+		successes = 0
 	}
 	
 	synchronized boolean isFailed() {
 		failures >= MAX_FAILURES
+	}
+	
+	synchronized boolean hasSucceeded() {
+		successes > 0
 	}
 }
