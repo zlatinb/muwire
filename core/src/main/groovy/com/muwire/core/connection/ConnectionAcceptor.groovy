@@ -12,6 +12,7 @@ import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
+import groovy.json.JsonOutput
 import groovy.util.logging.Log
 
 @Log
@@ -143,7 +144,18 @@ class ConnectionAcceptor {
 		} else {
 			log.info("rejecting connection, leaf:$leaf")
 			e.outputStream.write("REJECT".bytes)
-			// TODO: suggest peers
+			def hosts = hostCache.getHosts(10)
+			if (!hosts.isEmpty()) {
+				def json = [:]
+				json.tryHosts = hosts.collect { d -> d.toBase64() }
+				json = JsonOutput.toJson(json)
+				def os = new DataOutputStream(e.outputStream)
+				os.writeShort(json.bytes.length)
+				os.write(json.bytes)
+			}
+			e.outputStream.flush()
+			e.close()
+			eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, status: ConnectionAttemptStatus.REJECTED))
 		}
 	}
 	
