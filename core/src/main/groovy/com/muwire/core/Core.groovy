@@ -1,7 +1,11 @@
 package com.muwire.core
 
+import com.muwire.core.connection.ConnectionAcceptor
+import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.ConnectionManager
+import com.muwire.core.connection.I2PAcceptor
+import com.muwire.core.connection.I2PConnector
 import com.muwire.core.connection.LeafConnectionManager
 import com.muwire.core.connection.UltrapeerConnectionManager
 import com.muwire.core.hostcache.CacheClient
@@ -13,6 +17,8 @@ import com.muwire.core.trust.TrustService
 import groovy.util.logging.Log
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
+import net.i2p.client.streaming.I2PSocketManager
+import net.i2p.client.streaming.I2PSocketManagerFactory
 
 @Log
 class Core {
@@ -39,7 +45,7 @@ class Core {
 		
 		
 		
-		log.info("initializing I2P session")
+		log.info("initializing I2P socket manager")
 		def i2pClient = new I2PClientFactory().createClient()
 		File keyDat = new File(home, "key.dat")
 		if (!keyDat.exists()) {
@@ -50,14 +56,14 @@ class Core {
 		}
 		
 		def sysProps = System.getProperties().clone()
-				sysProps["inbound.nickname"] = "MuWire"
-				I2PSession i2pSession
-				keyDat.withInputStream { 
-			i2pSession = i2pClient.createSession(it, sysProps)
+		sysProps["inbound.nickname"] = "MuWire"
+		I2PSession i2pSession
+		I2PSocketManager socketManager
+		keyDat.withInputStream {
+			socketManager = new I2PSocketManagerFactory().createManager(it, sysProps)
 		}
+		i2pSession = socketManager.getSession()
 		
-		log.info("connecting i2p session")
-		i2pSession.connect()
 		
 		EventBus eventBus = new EventBus()
 		
@@ -85,6 +91,16 @@ class Core {
 		log.info("initializing cache client")
 		CacheClient cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
 		cacheClient.start()
+		
+		log.info("initializing acceptor")
+		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
+		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, i2pAcceptor, hostCache, trustService)
+		acceptor.start()
+		
+		log.info("initializing connector")
+		I2PConnector i2pConnector = new I2PConnector(socketManager)
+		ConnectionEstablisher connector = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
+		connector.start()
 		
 		// ... at the end, sleep
 		log.info("initialized everything, sleeping")
