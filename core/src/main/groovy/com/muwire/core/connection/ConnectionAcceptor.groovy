@@ -144,7 +144,7 @@ class ConnectionAcceptor {
 		} else {
 			log.info("rejecting connection, leaf:$leaf")
 			e.outputStream.write("REJECT".bytes)
-			def hosts = hostCache.getHosts(10)
+			def hosts = hostCache.getGoodHosts(10)
 			if (!hosts.isEmpty()) {
 				def json = [:]
 				json.tryHosts = hosts.collect { d -> d.toBase64() }

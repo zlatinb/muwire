@@ -247,7 +247,7 @@ class ConnectionAcceptorTest {
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
 		}
-		hostCacheMock.ignore.getHosts { n -> [] }
+		hostCacheMock.ignore.getGoodHosts { n -> [] }
 		
 		initMocks()
 		
@@ -289,7 +289,7 @@ class ConnectionAcceptorTest {
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
 		}
-		hostCacheMock.ignore.getHosts { n -> [] }
+		hostCacheMock.ignore.getGoodHosts { n -> [] }
 		
 		initMocks()
 		
@@ -331,7 +331,7 @@ class ConnectionAcceptorTest {
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
 		}
-		hostCacheMock.ignore.getHosts { n -> [destinations.dest2] }
+		hostCacheMock.ignore.getGoodHosts { n -> [destinations.dest2] }
 		
 		initMocks()
 		

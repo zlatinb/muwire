@@ -47,6 +47,7 @@ class HostCacheTest {
 		cache?.stop()
 		trustMock.verify trust
 		settingsMock.verify settings
+		Thread.sleep(150)
 	}
 	
 	private void initMocks() {
@@ -61,20 +62,16 @@ class HostCacheTest {
 	void testEmpty() {
 		initMocks()
 		assert cache.getHosts(5).size() == 0
+		assert cache.getGoodHosts(5).size() == 0
 	}
 
 	@Test	
 	void testOnDiscoveredEvent() {
-		trustMock.demand.getLevel { d ->
+		trustMock.ignore.getLevel { d ->
 			assert d == destinations.dest1
 			TrustLevel.NEUTRAL
 		}
-		trustMock.demand.getLevel { d ->
-			assert d == destinations.dest1
-			TrustLevel.NEUTRAL
-		}
-		settingsMock.demand.allowUntrusted { true }
-		settingsMock.demand.allowUntrusted { true }
+		settingsMock.ignore.allowUntrusted { true }
 		
 		initMocks()
 		
@@ -83,6 +80,8 @@ class HostCacheTest {
 		def rv = cache.getHosts(5)
 		assert rv.size() == 1
 		assert rv.contains(destinations.dest1)
+		
+		assert cache.getGoodHosts(5).size() == 0
 	}
 	
 	@Test
@@ -154,11 +153,7 @@ class HostCacheTest {
 	
 	@Test
 	void testFailedHostSuceeds() {
-		trustMock.demand.getLevel { d ->
-			assert d == destinations.dest1
-			TrustLevel.TRUSTED
-		}
-		trustMock.demand.getLevel { d ->
+		trustMock.ignore.getLevel { d ->
 			assert d == destinations.dest1
 			TrustLevel.TRUSTED
 		}
@@ -171,13 +166,42 @@ class HostCacheTest {
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.SUCCESSFUL))
-		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		
 		def rv = cache.getHosts(5)
 		assert rv.size() == 1
 		assert rv.contains(destinations.dest1)
+		
+		rv = cache.getGoodHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
 	}
 		
+	@Test
+	void testFailedOnceNoLongerGood() {
+		trustMock.ignore.getLevel { d ->
+			assert d == destinations.dest1
+			TrustLevel.TRUSTED
+		}
+		
+		initMocks()
+		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
+		
+		def endpoint = new Endpoint(destinations.dest1, null, null)
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.SUCCESSFUL))
+		
+		def rv = cache.getHosts(5)
+		def rv2 = cache.getGoodHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
+		assert rv == rv2
+		
+		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
+		
+		rv = cache.getHosts(5)
+		assert rv.size() == 1
+		assert rv.contains(destinations.dest1)
+		assert cache.getGoodHosts(5).size() == 0
+	}
 	
 	@Test
 	void testDuplicateHostDiscovered() {
@@ -217,6 +241,7 @@ class HostCacheTest {
 			def json = slurper.parseText(it)
 			assert json.destination == destinations.dest1.toBase64()
 			assert json.failures == 0
+			assert json.successes == 0
 		}
 		assert lines == 1
 	}
@@ -226,6 +251,7 @@ class HostCacheTest {
 		def json = [:]
 		json.destination = destinations.dest1.toBase64()
 		json.failures = 0
+		json.successes = 1
 		json = JsonOutput.toJson(json)
 		persist.append("${json}\n")
 		
@@ -239,6 +265,6 @@ class HostCacheTest {
 		assert rv.size() == 1
 		assert rv.contains(destinations.dest1)
 		
-
+		assert cache.getGoodHosts(5) == rv
 	}
 }
