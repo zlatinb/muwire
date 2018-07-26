@@ -14,8 +14,8 @@ class I2PConnector {
 	}
 	
 	Endpoint connect(Destination dest) {
-		//TODO implement
-		null
+		def socket = socketManager.connect(dest)
+		new Endpoint(dest, socket.getInputStream(), socket.getOutputStream())
 	}
 
 }
