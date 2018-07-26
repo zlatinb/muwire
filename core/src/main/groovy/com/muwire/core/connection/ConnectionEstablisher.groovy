@@ -118,7 +118,7 @@ class ConnectionEstablisher {
 	
 	private void fail(Endpoint endpoint) {
 		endpoint.close()
-		eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, status: ConnectionAttemptStatus.FAILED))
+		eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
 	}
 	
 	private void readK(Endpoint e) {
@@ -133,7 +133,7 @@ class ConnectionEstablisher {
 		
 		// wrap into deflater / inflater streams and publish
 		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream))
-		eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, status: ConnectionAttemptStatus.SUCCESSFUL))
+		eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, leaf: false, status: ConnectionAttemptStatus.SUCCESSFUL))
 	}
 	
 	private void readEJECT(Endpoint e) {
@@ -149,7 +149,7 @@ class ConnectionEstablisher {
 		log.info("connection to ${e.destination.toBase32()} rejected")
 		
 		
-		eventBus.publish(new ConnectionEvent(endpoint: e, incoming: false, status: ConnectionAttemptStatus.REJECTED))
+		eventBus.publish(new ConnectionEvent(endpoint: e, incoming: false, leaf: false, status: ConnectionAttemptStatus.REJECTED))
 		try {
 			DataInputStream dais = new DataInputStream(e.inputStream)
 			int payloadSize = dais.readUnsignedShort()
