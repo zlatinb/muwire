@@ -9,6 +9,8 @@ import net.i2p.data.Destination
 class UltrapeerConnectionManager extends ConnectionManager {
 	
 	final int maxPeers, maxLeafs
+	
+	UltrapeerConnectionManager() {}
 
 	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs) {
 		super(eventBus)

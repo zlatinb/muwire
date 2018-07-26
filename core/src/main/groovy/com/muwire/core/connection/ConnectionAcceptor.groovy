@@ -65,7 +65,7 @@ class ConnectionAcceptor {
 	private void acceptLoop() {
 		while(true) {
 			def incoming = acceptor.accept()
-			log.info("accepted connection from ${incoming.destination}")
+			log.info("accepted connection from ${incoming.destination.toBase32()}")
 			switch(trustService.getLevel(incoming.destination)) {
 				case TrustLevel.TRUSTED : break
 				case TrustLevel.NEUTRAL :
