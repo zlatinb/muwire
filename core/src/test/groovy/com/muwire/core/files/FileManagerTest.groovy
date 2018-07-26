@@ -14,7 +14,7 @@ class FileManagerTest {
 	EventBus eventBus
 	
 	FileManager manager
-	ResultsEvent results
+	volatile ResultsEvent results
 	
 	def listener = new Object() {
 		void onResultsEvent(ResultsEvent e) {
@@ -42,6 +42,7 @@ class FileManagerTest {
 		SearchEvent se = new SearchEvent(searchHash: ih.getRoot(), uuid: uuid)
 		
 		manager.onSearchEvent(se)
+		Thread.sleep(20)
 		
 		assert results != null
 		assert results.results.size() == 1
@@ -61,6 +62,7 @@ class FileManagerTest {
 		SearchEvent se = new SearchEvent(searchHash: ih.getRoot(), uuid: uuid)
 		
 		manager.onSearchEvent(se)
+		Thread.sleep(20)
 		
 		assert results != null
 		assert results.results.size() == 2
@@ -78,6 +80,7 @@ class FileManagerTest {
 		manager.onFileHashedEvent(fhe)
 		
 		manager.onSearchEvent new SearchEvent(searchHash: new byte[32], uuid: UUID.randomUUID())
+		Thread.sleep(20)
 		
 		assert results == null
 	}
@@ -92,6 +95,7 @@ class FileManagerTest {
 		
 		UUID uuid = UUID.randomUUID()
 		manager.onSearchEvent new SearchEvent(searchTerms: ["a"], uuid:uuid)
+		Thread.sleep(20)
 		
 		assert results != null
 		assert results.results.size() == 1
@@ -113,6 +117,7 @@ class FileManagerTest {
 		
 		UUID uuid = UUID.randomUUID()
 		manager.onSearchEvent new SearchEvent(searchTerms: ["c"], uuid:uuid)
+		Thread.sleep(20)
 		
 		assert results != null
 		assert results.results.size() == 2
@@ -130,6 +135,7 @@ class FileManagerTest {
 		manager.onFileHashedEvent(fhe)
 		
 		manager.onSearchEvent new SearchEvent(searchTerms: ["d"], uuid: UUID.randomUUID())
+		Thread.sleep(20)
 		
 		assert results == null
 	}
@@ -145,6 +151,7 @@ class FileManagerTest {
 		manager.onFileUnsharedEvent new FileUnsharedEvent(unsharedFile: sf2)
 		
 		manager.onSearchEvent new SearchEvent(searchHash : ih.getRoot())
+		Thread.sleep(20)
 		assert results != null
 		assert results.results.size() == 1
 		assert results.results.contains(sf1)
@@ -166,6 +173,7 @@ class FileManagerTest {
 		
 		// 1 match left
 		manager.onSearchEvent new SearchEvent(searchTerms: ["c"])
+		Thread.sleep(20)
 		assert results != null
 		assert results.results.size() == 1
 		assert results.results.contains(sf1)

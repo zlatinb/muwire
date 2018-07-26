@@ -1,6 +1,8 @@
 package com.muwire.core
 
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 import com.muwire.core.files.FileSharedEvent
 
@@ -9,8 +11,18 @@ import groovy.util.logging.Log
 class EventBus {
 	
 	private Map handlers = new HashMap()
+	private final Executor executor = Executors.newSingleThreadExecutor {r ->
+		def rv = new Thread(r)
+		rv.setDaemon(true)
+		rv.setName("event-bus")
+		rv
+	}
 
 	void publish(Event e) {
+		executor.execute({publishInternal(e)} as Runnable)
+	}
+	
+	private void publishInternal(Event e) {
 		log.fine "publishing event of type ${e.getClass().getSimpleName()} seqNo ${e.seqNo} timestamp ${e.timestamp}"
 		def currentHandlers
 		final def clazz = e.getClass()
