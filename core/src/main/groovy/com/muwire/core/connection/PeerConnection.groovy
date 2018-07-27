@@ -62,10 +62,10 @@ class PeerConnection extends Connection {
 	protected void write(Object message) {
 		byte[] payload
 		if (message instanceof Map) {
-			log.fine "$name writing message type ${message.type}"
 			payload = JsonOutput.toJson(message).bytes
 			DataUtil.packHeader(payload.length, writeHeader)
-			writeHeader[0] &= 0x7F
+			log.fine "$name writing message type ${message.type} length $payload.length"
+			writeHeader[0] &= (byte)0x7F
 		} else {
 			// TODO: write binary
 		}
