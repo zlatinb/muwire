@@ -53,7 +53,7 @@ abstract class ConnectionManager {
 	
 	abstract void onConnectionEvent(ConnectionEvent e)
 	
-	private void sendPings() {
+	protected void sendPings() {
 		final long now = System.currentTimeMillis()
 		getConnections().each { 
 			if (now - it.lastPingSentTime > PING_TIME)

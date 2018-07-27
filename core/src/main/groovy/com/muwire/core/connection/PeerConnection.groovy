@@ -63,7 +63,7 @@ class PeerConnection extends Connection {
 		byte [] payload
 		if (message instanceof Map) {
 			payload = JsonOutput.toJson(message)
-			DataUtil.packHeader(payload.bytes.length, writeHeader)
+			DataUtil.packHeader(payload.length, writeHeader)
 			writeHeader[0] &= 0x7F
 		} else {
 			// TODO: write binary

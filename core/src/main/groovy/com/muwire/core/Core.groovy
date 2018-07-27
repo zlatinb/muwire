@@ -88,6 +88,7 @@ class Core {
 			new LeafConnectionManager(eventBus,3, hostCache) : new UltrapeerConnectionManager(eventBus, 512, 512, hostCache)
 		eventBus.register(TrustEvent.class, connectionManager)
 		eventBus.register(ConnectionEvent.class, connectionManager)
+		connectionManager.start()
 		
 		log.info("initializing cache client")
 		CacheClient cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
