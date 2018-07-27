@@ -170,7 +170,7 @@ class CacheClient {
 	private void respondToCrawler(I2PSession session, Destination from, def ping) {
 		log.info "responding to crawler ping"
 		
-		def neighbors = manager.getConnections().collect { c -> c.remoteSide.toBase64() }
+		def neighbors = manager.getConnections().collect { c -> c.endpoint.destination.toBase64() }
 		Collections.shuffle(neighbors)
 		if (neighbors.size() > CRAWLER_RETURN)
 			neighbors = neighbors[0..CRAWLER_RETURN - 1]

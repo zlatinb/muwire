@@ -3,6 +3,7 @@ package com.muwire.core.connection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -13,9 +14,9 @@ class LeafConnectionManager extends ConnectionManager {
 	final int maxConnections
 	
 	final Map<Destination, UltrapeerConnection> connections = new ConcurrentHashMap()
-
-	public LeafConnectionManager(EventBus eventBus, int maxConnections) {
-		super(eventBus)
+	
+	public LeafConnectionManager(EventBus eventBus, int maxConnections, HostCache hostCache) {
+		super(eventBus, hostCache)
 		this.maxConnections = maxConnections
 	}
 	

@@ -1,6 +1,7 @@
 package com.muwire.core.connection
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
@@ -14,10 +15,13 @@ abstract class ConnectionManager {
 	
 	private final Timer timer
 	
+	protected final HostCache hostCache
+	
 	ConnectionManager() {}
 	
-	ConnectionManager(EventBus eventBus) {
+	ConnectionManager(EventBus eventBus, HostCache hostCache) {
 		this.eventBus = eventBus
+		this.hostCache = hostCache
 		this.timer = new Timer("connections-pinger",true)
 	}
 	

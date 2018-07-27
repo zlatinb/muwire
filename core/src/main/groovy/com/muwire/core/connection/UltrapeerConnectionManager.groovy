@@ -4,6 +4,7 @@ import java.util.Collection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -18,8 +19,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	
 	UltrapeerConnectionManager() {}
 
-	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs) {
-		super(eventBus)
+	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs, HostCache hostCache) {
+		super(eventBus, hostCache)
 		this.maxPeers = maxPeers
 		this.maxLeafs = maxLeafs
 	}
@@ -64,7 +65,9 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		if (e.status != ConnectionAttemptStatus.SUCCESSFUL)
 			return
 		
-		Connection c = e.leaf ? new LeafConnection(eventBus, e.endpoint) : new PeerConnection(eventBus, e.endpoint, e.incoming)
+		Connection c = e.leaf ? 
+			new LeafConnection(eventBus, e.endpoint, hostCache) : 
+			new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache)
 		def map = e.leaf ? leafConnections : peerConnections
 		map.put(e.endpoint.destination, c)
 		c.start()

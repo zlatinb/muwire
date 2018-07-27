@@ -85,7 +85,7 @@ class Core {
 		
 		log.info("initializing connection manager")
 		ConnectionManager connectionManager = props.isLeaf() ? 
-			new LeafConnectionManager(eventBus,3) : new UltrapeerConnectionManager(eventBus, 512, 512)
+			new LeafConnectionManager(eventBus,3, hostCache) : new UltrapeerConnectionManager(eventBus, 512, 512, hostCache)
 		eventBus.register(TrustEvent.class, connectionManager)
 		eventBus.register(ConnectionEvent.class, connectionManager)
 		

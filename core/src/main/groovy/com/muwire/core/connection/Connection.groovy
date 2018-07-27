@@ -69,7 +69,7 @@ abstract class Connection implements Closeable {
 		writer.join()
 	}
 	
-	private void readLoop() {
+	protected void readLoop() {
 		try {
 			while(running.get()) {
 				read()
@@ -84,7 +84,7 @@ abstract class Connection implements Closeable {
 	
 	protected abstract void read()
 	
-	private void writeLoop() {
+	protected void writeLoop() {
 		try {
 			while(running.get()) {
 				def message = messages.take()
