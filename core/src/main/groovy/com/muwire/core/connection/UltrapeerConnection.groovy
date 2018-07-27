@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
 
 import net.i2p.data.Destination
 
@@ -15,8 +16,8 @@ import net.i2p.data.Destination
  */
 class UltrapeerConnection extends Connection {
 
-	public UltrapeerConnection(EventBus eventBus, Endpoint endpoint) {
-		super(eventBus, endpoint, false)
+	public UltrapeerConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache) {
+		super(eventBus, endpoint, false, hostCache)
 	}
 
 	@Override

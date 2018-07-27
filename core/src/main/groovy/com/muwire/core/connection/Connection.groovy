@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
+import com.muwire.core.hostcache.HostDiscoveredEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -16,6 +18,7 @@ abstract class Connection implements Closeable {
 	final EventBus eventBus
 	final Endpoint endpoint
 	final boolean incoming
+	final HostCache hostCache
 	
 	private final AtomicBoolean running = new AtomicBoolean()
 	private final BlockingQueue messages = new LinkedBlockingQueue()
@@ -25,10 +28,11 @@ abstract class Connection implements Closeable {
 	
 	long lastPingSentTime, lastPingReceivedTime
 	
-	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming) {
+	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, HostCache hostCache) {
 		this.eventBus = eventBus
 		this.incoming = incoming
 		this.endpoint = endpoint
+		this.hostCache = hostCache
 		
 		this.name = endpoint.destination.toBase32().substring(0,8)
 		
@@ -101,5 +105,24 @@ abstract class Connection implements Closeable {
 		ping.type = "Ping"
 		ping.version = 1
 		messages.put(ping)
+	}
+	
+	protected void handlePing() {
+		log.fine("$name received ping")
+		def pong = [:]
+		pong.type = "Pong"
+		pong.version = 1
+		pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
+		messages.put(pong)
+	}
+	
+	protected void handlePong(def pong) {
+		log.fine("$name received pong")
+		if (pong.pongs == null)
+			throw new Exception("Pong doesn't have pongs")
+		pong.pongs.each { 
+			def dest = new Destination(it)
+			eventBus.publish(new HostDiscoveredEvent(destination: dest))
+		}
 	}
 }

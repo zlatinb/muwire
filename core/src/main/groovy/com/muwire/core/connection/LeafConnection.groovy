@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 import com.muwire.core.EventBus
+import com.muwire.core.hostcache.HostCache
 
 import net.i2p.data.Destination
 
@@ -14,8 +15,8 @@ import net.i2p.data.Destination
  */
 class LeafConnection extends Connection {
 
-	public LeafConnection(EventBus eventBus, Endpoint endpoint) {
-		super(eventBus, endpoint, true);
+	public LeafConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache) {
+		super(eventBus, endpoint, true, hostCache);
 	}
 
 	@Override
