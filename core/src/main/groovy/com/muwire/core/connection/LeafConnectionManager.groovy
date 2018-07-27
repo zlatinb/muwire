@@ -27,8 +27,7 @@ class LeafConnectionManager extends ConnectionManager {
 
 	@Override
 	public Collection<Connection> getConnections() {
-		// TODO implement
-		[]
+		connections.values()
 	}
 
 	@Override
@@ -47,9 +46,12 @@ class LeafConnectionManager extends ConnectionManager {
 			log.severe("Got inconsistent event as a leaf! $e")
 			return
 		}
+		if (e.status != ConnectionAttemptStatus.SUCCESSFUL)
+			return
+			
 		Connection c = new UltrapeerConnection(eventBus, e.endpoint)
-		// TODO: start and stuff
 		connections.put(e.endpoint.destination, c)
+		c.start()
 	}
 	
 }

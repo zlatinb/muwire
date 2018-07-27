@@ -7,13 +7,27 @@ import com.muwire.core.trust.TrustLevel
 import net.i2p.data.Destination
 
 abstract class ConnectionManager {
+	
+	private static final int PING_TIME = 20000
 
 	final EventBus eventBus
+	
+	private final Timer timer
 	
 	ConnectionManager() {}
 	
 	ConnectionManager(EventBus eventBus) {
 		this.eventBus = eventBus
+		this.timer = new Timer("connections-pinger",true)
+	}
+	
+	void start() {
+		timer.schedule({sendPings()} as TimerTask, 1000,1000)
+	}
+	
+	void stop() {
+		timer.cancel()
+		getConnections().each { it.close() }
 	}
 	
 	void onTrustEvent(TrustEvent e) {
@@ -34,4 +48,12 @@ abstract class ConnectionManager {
 	abstract boolean isConnected(Destination d)
 	
 	abstract void onConnectionEvent(ConnectionEvent e)
+	
+	private void sendPings() {
+		final long now = System.currentTimeMillis()
+		getConnections().each { 
+			if (now - it.lastPingSentTime > PING_TIME)
+				it.sendPing()
+		}
+	}
 }

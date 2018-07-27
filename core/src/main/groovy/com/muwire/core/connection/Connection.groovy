@@ -26,7 +26,7 @@ abstract class Connection implements Closeable {
 	
 	protected final String name
 	
-	long lastPingSentTime, lastPingReceivedTime
+	long lastPingSentTime, lastPongReceivedTime
 	
 	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, HostCache hostCache) {
 		this.eventBus = eventBus
@@ -105,6 +105,7 @@ abstract class Connection implements Closeable {
 		ping.type = "Ping"
 		ping.version = 1
 		messages.put(ping)
+		lastPingSentTime = System.currentTimeMillis()
 	}
 	
 	protected void handlePing() {
@@ -118,6 +119,7 @@ abstract class Connection implements Closeable {
 	
 	protected void handlePong(def pong) {
 		log.fine("$name received pong")
+		lastPongReceivedTime = System.currentTimeMillis()
 		if (pong.pongs == null)
 			throw new Exception("Pong doesn't have pongs")
 		pong.pongs.each { 

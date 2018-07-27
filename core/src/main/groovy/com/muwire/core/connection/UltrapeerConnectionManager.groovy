@@ -31,19 +31,20 @@ class UltrapeerConnectionManager extends ConnectionManager {
 
 	@Override
 	public Collection<Connection> getConnections() {
-		// TODO implement
-		[]
+		def rv = new ArrayList(peerConnections.size() + leafConnections.size())
+		rv.addAll(peerConnections.values())
+		rv.addAll(leafConnections.values())
+		rv
 	}
 	
 	boolean hasLeafSlots() {
-		// TODO implement
-		true
+		leafConnections.size() < maxLeafs
 	}
 	
 	boolean hasPeerSlots() {
-		// TODO implement
-		true
+		peerConnections.size() < maxPeers
 	}
+	
 	@Override
 	protected int getDesiredConnections() {
 		return maxPeers / 2;
@@ -60,9 +61,12 @@ class UltrapeerConnectionManager extends ConnectionManager {
 			return
 		}
 		
+		if (e.status != ConnectionAttemptStatus.SUCCESSFUL)
+			return
+		
 		Connection c = e.leaf ? new LeafConnection(eventBus, e.endpoint) : new PeerConnection(eventBus, e.endpoint, e.incoming)
-		// TODO: start and stuff
 		def map = e.leaf ? leafConnections : peerConnections
 		map.put(e.endpoint.destination, c)
+		c.start()
 	}
 }
