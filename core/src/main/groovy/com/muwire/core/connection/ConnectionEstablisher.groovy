@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.logging.Level
+import java.util.zip.Deflater
 import java.util.zip.DeflaterInputStream
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.InflaterInputStream
@@ -132,7 +133,7 @@ class ConnectionEstablisher {
 		log.info("connection to ${e.destination.toBase32()} established")
 		
 		// wrap into deflater / inflater streams and publish
-		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream))
+		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true))
 		eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, leaf: false, status: ConnectionAttemptStatus.SUCCESSFUL))
 	}
 	

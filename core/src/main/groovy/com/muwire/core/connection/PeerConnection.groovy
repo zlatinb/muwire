@@ -43,7 +43,7 @@ class PeerConnection extends Connection {
 		byte[] payload = new byte[length]
 		dis.readFully(payload)
 		
-		if (readHeader[0] & 0x80 == 0x80) {
+		if ((readHeader[0] & (byte)0x80) == 0x80) {
 			// TODO process binary
 		} else {
 			def json = slurper.parse(payload)
@@ -60,9 +60,10 @@ class PeerConnection extends Connection {
 
 	@Override
 	protected void write(Object message) {
-		byte [] payload
+		byte[] payload
 		if (message instanceof Map) {
-			payload = JsonOutput.toJson(message)
+			log.fine "$name writing message type ${message.type}"
+			payload = JsonOutput.toJson(message).bytes
 			DataUtil.packHeader(payload.length, writeHeader)
 			writeHeader[0] &= 0x7F
 		} else {
@@ -71,6 +72,7 @@ class PeerConnection extends Connection {
 		
 		dos.write(writeHeader)
 		dos.write(payload)
+		dos.flush()
 	}
 
 }
