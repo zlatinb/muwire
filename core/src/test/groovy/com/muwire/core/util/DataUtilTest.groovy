@@ -37,6 +37,7 @@ class DataUtilTest {
 	void testHeader() {
 		header(0)
 		header(1)
+		header(556)
 		header(8 * 1024 * 1024 - 1)
 		try {
 			header(8 * 1024 *  1024)

@@ -33,7 +33,7 @@ class DataUtil {
 			throw new IllegalArgumentException("header length $header.length")
 			
 		return (((int)(header[0] & 0x7F)) << 16) |
-				((int)(header[1] & 0xFF << 8)) |
+				(((int)(header[1] & 0xFF) << 8)) |
 				((int)header[2] & 0xFF)
 	}
 }
