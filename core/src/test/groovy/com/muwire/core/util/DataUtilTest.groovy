@@ -26,4 +26,21 @@ class DataUtilTest {
 			fail()
 		} catch (IllegalArgumentException expected) {}
 	}
+	
+	private static header(int value) {
+		byte [] header = new byte[3]
+		DataUtil.packHeader(value, header)
+		assert value == DataUtil.readLength(header)
+	}
+	
+	@Test
+	void testHeader() {
+		header(0)
+		header(1)
+		header(8 * 1024 * 1024 - 1)
+		try {
+			header(8 * 1024 *  1024)
+			fail()
+		} catch (IllegalArgumentException expected) {}
+	}
 }
