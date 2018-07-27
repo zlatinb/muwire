@@ -27,8 +27,18 @@ class UltrapeerConnection extends Connection {
 
 	@Override
 	protected void write(Object message) {
-		// TODO Auto-generated method stub
-		
+		if (message instanceof Map) {
+			writeJsonMessage(message)
+		} else {
+			writeBinaryMessage(message)
+		}
 	}
 
+	private void writeJsonMessage(def message) {
+		
+	}
+	
+	private void writeBinaryMessage(def message) {
+		
+	}
 }

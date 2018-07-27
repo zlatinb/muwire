@@ -95,4 +95,11 @@ abstract class Connection implements Closeable {
 	}
 	
 	protected abstract void write(def message);
+	
+	void sendPing() {
+		def ping = [:]
+		ping.type = "Ping"
+		ping.version = 1
+		messages.put(ping)
+	}
 }
