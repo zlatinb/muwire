@@ -73,6 +73,8 @@ abstract class Connection implements Closeable {
 			while(running.get()) {
 				read()
 			}
+		} catch (SocketTimeoutException e) {
+			close()
 		} catch (Exception e) {
 			if (running.get()) {
 				log.log(Level.WARNING,"unhandled exception in reader",e)

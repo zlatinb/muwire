@@ -20,6 +20,7 @@ import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.streaming.I2PSocketManager
 import net.i2p.client.streaming.I2PSocketManagerFactory
+import net.i2p.client.streaming.I2PSocketOptions
 
 @Log
 class Core {
@@ -63,6 +64,8 @@ class Core {
 		keyDat.withInputStream {
 			socketManager = new I2PSocketManagerFactory().createManager(it, sysProps)
 		}
+		socketManager.getDefaultOptions().setReadTimeout(60000)
+		socketManager.getDefaultOptions().setConnectTimeout(30000)
 		i2pSession = socketManager.getSession()
 		
 		
