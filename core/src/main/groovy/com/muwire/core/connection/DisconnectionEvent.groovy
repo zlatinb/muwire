@@ -10,6 +10,6 @@ class DisconnectionEvent extends Event {
 
 	@Override
 	public String toString() {
-		"DisconnectionEvent ${super.toString()} destination:${destianation.toBase32()}"
+		"DisconnectionEvent ${super.toString()} destination:${destination.toBase32()}"
 	}
 }
