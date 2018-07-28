@@ -4,6 +4,7 @@ import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.ConnectionManager
+import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.connection.I2PAcceptor
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.connection.LeafConnectionManager
@@ -88,6 +89,7 @@ class Core {
 			new LeafConnectionManager(eventBus,3, hostCache) : new UltrapeerConnectionManager(eventBus, 512, 512, hostCache)
 		eventBus.register(TrustEvent.class, connectionManager)
 		eventBus.register(ConnectionEvent.class, connectionManager)
+		eventBus.register(DisconnectionEvent.class, connectionManager)
 		connectionManager.start()
 		
 		log.info("initializing cache client")

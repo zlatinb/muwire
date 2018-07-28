@@ -72,4 +72,13 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		map.put(e.endpoint.destination, c)
 		c.start()
 	}
+	
+	@Override
+	public void onDisconnectionEvent(DisconnectionEvent e) {
+		def removed = peerConnections.remove(e.destination)
+		if (removed == null)
+			removed = leafConnections.remove(e.destination)
+		if (removed == null)
+			log.severe("Removed connection not present in either leaf or peer map ${e.destination.toBase32()}")
+	}
 }

@@ -65,8 +65,7 @@ abstract class Connection implements Closeable {
 		}
 		reader.interrupt()
 		writer.interrupt()
-		reader.join()
-		writer.join()
+		eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
 	}
 	
 	protected void readLoop() {

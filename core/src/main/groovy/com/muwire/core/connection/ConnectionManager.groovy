@@ -53,6 +53,8 @@ abstract class ConnectionManager {
 	
 	abstract void onConnectionEvent(ConnectionEvent e)
 	
+	abstract void onDisconnectionEvent(DisconnectionEvent e)
+	
 	protected void sendPings() {
 		final long now = System.currentTimeMillis()
 		getConnections().each { 

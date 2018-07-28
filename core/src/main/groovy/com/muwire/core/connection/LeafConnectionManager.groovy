@@ -55,4 +55,11 @@ class LeafConnectionManager extends ConnectionManager {
 		c.start()
 	}
 	
+	@Override 
+	public void onDisconnectionEvent(DisconnectionEvent e) {
+		def removed = connections.remove(e.destination)
+		if (removed == null)
+			log.severe("removed destination not present in connection manager ${e.destination.toBase32()}")
+	}
+	
 }
