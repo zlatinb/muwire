@@ -109,9 +109,25 @@ class Core {
 		ConnectionEstablisher connector = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 		connector.start()
 		
-		// ... at the end, sleep
-		log.info("initialized everything, sleeping")
-		Thread.sleep(Integer.MAX_VALUE)
+		// ... at the end, sleep or execute script
+		if (args.length == 0) {
+			log.info("initialized everything, sleeping")
+			Thread.sleep(Integer.MAX_VALUE)
+		} else {
+			log.info("executing script ${args[0]}")
+			File f = new File(args[0])
+			if (!f.exists()) {
+				log.warning("Script file doesn't exist")
+				System.exit(1)
+			}
+			
+			def binding = new Binding()
+			binding.setProperty("eventBus", eventBus)
+			// TOOD: other bindings?
+			def shell = new GroovyShell(binding)
+			def script = shell.parse(f)
+			script.run()
+		}
 	}
 
 }
