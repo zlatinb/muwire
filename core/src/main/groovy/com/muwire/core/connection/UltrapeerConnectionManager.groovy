@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.search.QueryEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -80,5 +81,9 @@ class UltrapeerConnectionManager extends ConnectionManager {
 			removed = leafConnections.remove(e.destination)
 		if (removed == null)
 			log.severe("Removed connection not present in either leaf or peer map ${e.destination.toBase32()}")
+	}
+	
+	void forwardQueryToLeaf(Destination leaf, QueryEvent e) {
+		
 	}
 }

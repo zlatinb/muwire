@@ -7,7 +7,7 @@ import net.i2p.data.Destination
 
 class UpsertEvent extends Event {
 
-	List<String> names
+	Set<String> names
 	byte [] infoHash
 	Destination leaf
 	
