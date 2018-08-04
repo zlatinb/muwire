@@ -6,5 +6,6 @@ class QueryEvent extends SearchEvent {
 	
 	boolean firstHop
 	Destination replyTo
+	Destination receivedOn
 
 }
