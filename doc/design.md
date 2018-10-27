@@ -35,4 +35,4 @@ Nodes will periodically ping a pre-defined Destination for a JSON document conta
 
 ### Web Of Trust
 
-Users may choose to "Trust" or "Blacklist" Destinations that return search results.  This trust is local to the user, but it can be shared with others.  Each user is assigned a "personna" which is the first 32 bytes of the b32 hash of their node Destination.  This persona is returned together with search results and when displayed in the UI other users are given the choice to trust or distrust it.
+Users may choose to "Trust" or "Blacklist" Destinations that return search results.  This trust is local to the user, but it can be shared with others.  Each user is assigned a perona which is returned together with search results and when displayed in the UI.  For more information see the web-of-trust document.
