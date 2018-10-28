@@ -34,7 +34,10 @@ This query is more informative when making the decision whether to trust someone
 A trust certificate is a signed document stating that Alice trusts Bob.  If Charlie has Alice's persona details, he can verify that trust even if he does not know anything about Bob.  To make that possible, a trust certificate contains:
 1. Alices' persona details
 2. Bob's persona details
-3. Alices' signature of the two.
+3. Timestamp of the creation of the certificate
+3. Alices' signature of the above.
+
+The timestamp serves only informational purposes, i.e. there is no built-in expiration of certificates.
 
 ### Propagation of trust certificates in the network
 
