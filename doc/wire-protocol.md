@@ -25,35 +25,37 @@ All traffic after the handshake is compressed using the same compression algorit
 ## Internationalization support
 
 All protocol elements that may contain non-ascii characters (file names, search terms, persona nicknames) are represented as a binary blob with the following format:
-
+```
 byte 0: unsigned length of the official charset name
 bytes 1 to N: name of the charset in ASCII
 bytes N+1 and N+2: unsigned length of the binary representation of the string
 bytes N+3 to N+M: binary representation of the string
-
+```
 When transferred in JSON documents, this blob gets Base64-encoded.
 
 ## Persona wire format
 (See the "web-of-trust" document for the definition of a MuWire persona).
 
 A persona is represented as a blob with the following format:
-
+```
 byte 0: unsigned version number of the format.  Currently fixed at 1.
 bytes 1 to N: nickname of the persona in internationalized format
 bytes N+1 and N+2: unsigned length of the I2P destination of the persona
 bytes N+3 to N+M: the I2P destination of the persona
 bytes N+M+1 to N+M+O: public key of the persona (length of public key TBD)
 bytes N+M+O+1 to N+M+O+P: signature of bytes 0 to N+M+O (length TBD)
-
+```
 ## Certificate wire format
 (See the "web-of-trust" document for the definition of a MuWire certificate)
 
+A certificate is represented as a blob with the following format:
+```
 byte 0: unsigned version number of the format.  Currently fixed at 1.
 bytes 1 to 8: timestamp in milliseconds the certificate was created
 bytes 9 to N: Alice's persona
 bytes N+1 to M: Bob's persona
 bytes M+1 to O: signature of bytes 0 to M, signed by Alice (length TBD)
-
+```
 ## Messages
 
 After the handhsake follows a stream of messages.  Messages can arrive in any order.  Every 10 seconds a "Ping" message is sent on each connection which serves as a keep-alive.  The response to that message is a "Pong" which carries b64 destinations of ultrapeers the remote side has been able to connect to.  This keeps the host pool in each node fresh.
