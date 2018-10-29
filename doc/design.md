@@ -19,15 +19,15 @@ This is similar but not equivalent to setting the maximum TTL in Gnutella to 1.
 
 ### Search result verification
 
-Unlike Gnutella, MuWire nodes send search results over a streaming connection.  This is to ensure that the Destination carried in the search result cannot be spoofed, and to make blacklisting of Destinations that return undesired results effective.  To make spamming more difficult, the UI will show up to 3 search results by default from each Destination, but will give the option to display all of them.  After the results have been delivered, the streaming connection is closed.
+Unlike Gnutella, MuWire nodes send search results over a streaming I2P connection.  This is to ensure that the persona carried in the search result cannot be spoofed, and to make blacklisting of personas that return undesired results effective.  To make spamming less efficient, the UI will show up to 3 search results by default from each persona, but will give the option to display all of them.  After the results have been delivered, the streaming connection is closed.
 
 ### File transfer
 
-Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.  
+Files are transferred over HTTP1.1 protocol with some custom headerss added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.  The URL itself is encrypted with the public key of the target persona to prevent carpet-bombing the network with GET requests.
 
 ### Mesh management
 
-Download mesh management is identical to Gnutella, except instead of ip addresses b64 I2P destinations are used.  [More information](http://rfc-gnutella.sourceforge.net/developer/tmp/download-mesh.html) 
+Download mesh management is identical to Gnutella, except instead of ip addresses MuWire personas are used.  [More information](http://rfc-gnutella.sourceforge.net/developer/tmp/download-mesh.html) 
 
 ### In-Network updates
 

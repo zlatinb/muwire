@@ -22,6 +22,10 @@ Rejecting the handshake is done by responding with the word "REJECT", optionally
 
 All traffic after the handshake is compressed using the same compression algorithm in Gnutella.
 
+## Blobs in JSON 
+
+All protocol elements that are represented as blobs (personas, certificates, file names, seach terms) get Base64 encoded when transmitted as part of JSON documents.
+
 ## Internationalization support
 
 All protocol elements that may contain non-ascii characters (file names, search terms, persona nicknames) are represented as a binary blob with the following format:
@@ -31,7 +35,6 @@ bytes 1 to N: name of the charset in ASCII
 bytes N+1 and N+2: unsigned length of the binary representation of the string
 bytes N+3 to N+M: binary representation of the string
 ```
-When transferred in JSON documents, this blob gets Base64-encoded.
 
 ## Persona wire format
 (See the "web-of-trust" document for the definition of a MuWire persona).
@@ -122,21 +125,21 @@ The opposite of Upsert - the leaf is no longer sharing the specified file.  The 
 
 #### "Search"
 
-Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to b64 destination for signed I2P datagrams.
+Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to persona of the originator (base64-encoded).
 
 ```
 {
     type : "Search",
     version: 1,
-	uuid: "asdf-1234..."
+    uuid: "asdf-1234..."
     firstHop: false,
-    keywords : "great speeches",
+    keywords : "search query (i18n encoded)",
     infohash: "asdfasdf...",
     replyTo : "asdfasf...b64"
 }
 ```
 
-A search can contain either a list of keyword or the infohash if the user is looking for a specific file.  If both are present, the infohash takes precedence and the keywords are ignored.
+A search can contain either the query entered by the user in the UI or the infohash if the user is looking for a specific file.  If both are present, the infohash takes precedence and the keyword query is ignored.
 
 ### Ultrapeer to leaf
 
@@ -158,22 +161,22 @@ This message starts with two unsigned bytes indicating the number of patches inc
 
 ### Search results - any node to any node
 
-Search results are sent in "results" type connection from the responder to the originator of the query.  This connection is uncompressed and only Alice sends any data on it, i.e. there is no handshake.  The first thing that Alice sends is the UUID of the search that generated the results.  This allows Bob to drop the connection if he does not recognize that UUID.  After that, Alice sends a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:  
+Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response, encrypted with the public key of the originating persona.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
 
 ```
 {
     type: "Result",
 	version: 1,
-	name: "File name",
+	name: "File name (i18n encoded)",
 	infohash: "asdfasdf..."
 	size: 12345,
 	pieceSize: 17,
 	hashList: [ "asdfasdf...", "asdfasdf...", ... ]
-	altlocs: [ "b64.1", "b64.2", ... ]
+	altlocs: [ "persona.1", "persona.2", ... ]
 }
 ```
 * The "hashList" list contains the list of hashes that correspond to the pieces of the file
-* The "altlocs" list contains list of alternate locations in b64 format that Alice thinks may also have the file.
+* The "altlocs" list contains list of alternate personas that the responder thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
 
 # HostCache protocol
