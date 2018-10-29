@@ -179,6 +179,20 @@ Search results are sent through and HTTP POST method from the responder to the o
 * The "altlocs" list contains list of alternate personas that the responder thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
 
+### "Who do you trust" query - any node to any node
+(See the "web-of-trust" document for more info on this query)
+
+This is a GET request with the URL "/who-do-you-trust" encrypted with the target node's persona key.  The response is a binary stream of persona details.
+
+### "Who trusts you" query - any node to any node
+(See the "web-of-trust" document for more info on this query)
+
+This is a GET request with the URL "/who-trusts-you" encrypted with the target node's persona key.  The response is a binary stream of certificate details.
+
+### "Browse host" query - any node to any node
+
+This is a GET request with the URL "/browse" encrypted with the target node's persona key.  The response is a stream with the same format as the body of the search results POST method above.
+
 # HostCache protocol
 
 ### Node to HostCache
