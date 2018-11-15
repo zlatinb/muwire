@@ -4,7 +4,7 @@ The MuWire protocol operates over a TCP-like streaming layer offered by the I2P 
 
 ## Handshake
 
-A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf", "peer" or "results", depending on whether Alice is in a leaf, ultrapeer or responder role.  This allows Bob to immediately drop the connection without allocating any more resources.  
+A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf", "peer" or "results", depending on whether Alice is in a leaf, ultrapeer or responder role.  This allows Bob to immediately drop the connection without allocating any more resources.
 
 If Bob is an ultrapeer he responds to the handshake by either accepting it or rejecting it and optionally suggesting other ultrapeers to connect to.
 
@@ -43,10 +43,8 @@ A persona is represented as a blob with the following format:
 ```
 byte 0: unsigned version number of the format.  Currently fixed at 1.
 bytes 1 to N: nickname of the persona in internationalized format
-bytes N+1 and N+2: unsigned length of the I2P destination of the persona
-bytes N+3 to N+M: the I2P destination of the persona
-bytes N+M+1 to N+M+O: public key of the persona (length of public key TBD)
-bytes N+M+O+1 to N+M+O+P: signature of bytes 0 to N+M+O (length TBD)
+bytes N+1 to M: the I2P destination of the persona
+bytes M+1 to O: signature of bytes 0 to M (length TBD)
 ```
 ## Certificate wire format
 (See the "web-of-trust" document for the definition of a MuWire certificate)
@@ -161,7 +159,7 @@ This message starts with two unsigned bytes indicating the number of patches inc
 
 ### Search results - any node to any node
 
-Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response, encrypted with the public key of the originating persona.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
+Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
 
 ```
 {
@@ -172,7 +170,7 @@ Search results are sent through and HTTP POST method from the responder to the o
 	size: 12345,
 	pieceSize: 17,
 	hashList: [ "asdfasdf...", "asdfasdf...", ... ]
-	altlocs: [ "persona.1", "persona.2", ... ]
+	altlocs: [ "persona.1.b64", "persona.2.b64", ... ]
 }
 ```
 * The "hashList" list contains the list of hashes that correspond to the pieces of the file
@@ -182,16 +180,16 @@ Search results are sent through and HTTP POST method from the responder to the o
 ### "Who do you trust" query - any node to any node
 (See the "web-of-trust" document for more info on this query)
 
-This is a GET request with the URL "/who-do-you-trust" encrypted with the target node's persona key.  The response is a binary stream of persona details.
+This is a GET request with the URL "/who-do-you-trust".  The response is a binary stream of persona details.
 
 ### "Who trusts you" query - any node to any node
 (See the "web-of-trust" document for more info on this query)
 
-This is a GET request with the URL "/who-trusts-you" encrypted with the target node's persona key.  The response is a binary stream of certificate details.
+This is a GET request with the URL "/who-trusts-you".  The response is a binary stream of certificate details.
 
 ### "Browse host" query - any node to any node
 
-This is a GET request with the URL "/browse" encrypted with the target node's persona key.  The response is a stream with the same format as the body of the search results POST method above.
+This is a GET request with the URL "/browse".  The response is a stream with the same format as the body of the search results POST method above.
 
 # HostCache protocol
 

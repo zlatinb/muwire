@@ -45,7 +45,7 @@ Unlike Gnutella, MuWire nodes send search results over a streaming I2P connectio
 
 ### File transfer
 
-Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.  The URL itself is encrypted with the public key of the target persona to prevent carpet-bombing the network with GET requests.
+Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.
 
 ### Mesh management
 
@@ -55,6 +55,3 @@ Download mesh management is identical to Gnutella, except instead of ip addresse
 
 Nodes will periodically ping a pre-defined Destination for a JSON document containing the infohash of a new binary update package using signed datagrams.  If the response indicates a newer version is available, the node will issue an automatic search for that infohash and download it, then prompt the user to install the update.
 
-### Web Of Trust
-
-Users may choose to "Trust" or "Blacklist" Destinations that return search results.  This trust is local to the user, but it can be shared with others.  Each user is assigned a perona which is returned together with search results and when displayed in the UI.  For more information see the web-of-trust document.

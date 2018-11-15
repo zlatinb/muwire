@@ -4,12 +4,13 @@ The Gnutella protocol is very efficient at keyword search, but it is very expose
 
 ### Definition of a Persona
 
-MuWire assumes that each human user is going to have a single persona.  A persona consists of the following three items:
+MuWire assumes that each human user is going to have a single persona.  A persona consists of the following two items:
 * An I2P destination - this is the destination where the MuWire node is listening for incoming requests.
 * A human-readable nickname 
-* A public key
 
-For UI purposes, the persona will be displayed as the human-readable nickname plus underscore followed by the first 32 bytes of the b32 I2P address derived from the b64 destination.  The intention is to make it easier for users to differentiate between personas, but at the same to prevent spoofing of personas through mass generation of I2P destinations.
+The nickname and the I2P destination are signed by the signing key which is part of the destination.  This is to provide assurance that the owner of the private key is the one who has chosen the nickname.
+
+For UI purposes, the persona will be displayed as the human-readable nickname plus '@' followed by the first 32 bytes of the b32 I2P address derived from the b64 destination.  The intention is to make it easier for users to differentiate between personas, but at the same to prevent spoofing of personas through mass generation of I2P destinations.
 
 ### Trusting other personas
 
