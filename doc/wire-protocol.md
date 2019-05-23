@@ -30,10 +30,8 @@ All protocol elements that are represented as blobs (personas, certificates, fil
 
 All protocol elements that may contain non-ascii characters (file names, search terms, persona nicknames) are represented as a binary blob with the following format:
 ```
-byte 0: unsigned length of the official charset name
-bytes 1 to N: name of the charset in ASCII
-bytes N+1 and N+2: unsigned length of the binary representation of the string
-bytes N+3 to N+M: binary representation of the string
+bytes 0 and 1: unsigned length of the binary representation of the string
+bytes 2 to N+2: binary representation of the string in UTF-8 encoding
 ```
 
 ## Persona wire format
