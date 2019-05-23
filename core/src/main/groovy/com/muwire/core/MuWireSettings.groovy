@@ -4,7 +4,14 @@ import com.muwire.core.hostcache.CrawlerResponse
 
 class MuWireSettings {
 	
-	MuWireSettings() {}
+    final boolean isLeaf
+    boolean allowUntrusted
+    String nickname
+    CrawlerResponse crawlerResponse
+    
+	MuWireSettings() {
+        this(new Properties())
+    }
 	
 	MuWireSettings(Properties props) {
 		isLeaf = Boolean.valueOf(props.get("leaf","false"))
@@ -12,11 +19,15 @@ class MuWireSettings {
 		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
         nickname = props.getProperty("nickname","MuWireUser")
 	}
-	
-	final boolean isLeaf
-	boolean allowUntrusted
-    String nickname
-	CrawlerResponse crawlerResponse
+    
+    void write(OutputStream out) throws IOException {
+        Properties props = new Properties()
+        props.setProperty("leaf", isLeaf.toString())
+        props.setProperty("allowUntrusted", allowUntrusted.toString())
+        props.setProperty("crawlerResponse", crawlerResponse.toString())
+        props.setProperty("nickname", nickname)
+        props.store(out, "")
+    }
 
 	boolean isLeaf() {
 		isLeaf

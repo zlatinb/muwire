@@ -48,11 +48,14 @@ class Core {
 			propsFile.withInputStream {
 				props.load(it)
 			}
-		} else
+			props = new MuWireSettings(props)
+		} else {
 			log.info("creating default properties")
-		
-		props = new MuWireSettings(props)
-		
+            props = new MuWireSettings()
+            propsFile.withOutputStream { 
+                props.write(it)
+            }
+		}
 		
 		log.info("initializing I2P socket manager")
 		def i2pClient = new I2PClientFactory().createClient()
