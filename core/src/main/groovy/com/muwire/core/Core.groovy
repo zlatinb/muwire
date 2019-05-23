@@ -1,5 +1,7 @@
 package com.muwire.core
 
+import java.nio.charset.StandardCharsets
+
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -21,6 +23,12 @@ import net.i2p.client.I2PSession
 import net.i2p.client.streaming.I2PSocketManager
 import net.i2p.client.streaming.I2PSocketManagerFactory
 import net.i2p.client.streaming.I2PSocketOptions
+import net.i2p.crypto.DSAEngine
+import net.i2p.crypto.SigType
+import net.i2p.data.Destination
+import net.i2p.data.PrivateKey
+import net.i2p.data.Signature
+import net.i2p.data.SigningPrivateKey
 
 @Log
 class Core {
@@ -46,14 +54,13 @@ class Core {
 		props = new MuWireSettings(props)
 		
 		
-		
 		log.info("initializing I2P socket manager")
 		def i2pClient = new I2PClientFactory().createClient()
 		File keyDat = new File(home, "key.dat")
 		if (!keyDat.exists()) {
 			log.info("Creating new key.dat")
 			keyDat.withOutputStream { 
-				i2pClient.createDestination(it)
+				i2pClient.createDestination(it, Constants.SIG_TYPE)
 			}
 		}
 		
@@ -68,7 +75,32 @@ class Core {
 		socketManager.getDefaultOptions().setConnectTimeout(30000)
 		i2pSession = socketManager.getSession()
 		
-		
+        Persona me
+        def destination = new Destination()
+        def spk = new SigningPrivateKey(Constants.SIG_TYPE)
+        keyDat.withInputStream {
+            destination.readBytes(it)
+            def privateKey = new PrivateKey()
+            privateKey.readBytes(it)
+            spk.readBytes(it)
+		}
+            
+        def baos = new ByteArrayOutputStream()
+        def daos = new DataOutputStream(baos)
+        daos.write(Constants.PERSONA_VERSION)
+        daos.writeShort((short)props.getNickname().length())
+        daos.write(props.getNickname().getBytes(StandardCharsets.UTF_8))
+        destination.writeBytes(daos)
+        daos.flush()
+        byte [] payload = baos.toByteArray()
+        Signature sig = DSAEngine.getInstance().sign(payload, spk)
+
+        baos = new ByteArrayOutputStream()
+        baos.write(payload)
+        sig.writeBytes(baos)
+        me = new Persona(new ByteArrayInputStream(baos.toByteArray()))
+        log.info("Loaded myself as "+me.getHumanReadableName())
+
 		EventBus eventBus = new EventBus()
 		
 		log.info("initializing trust service")

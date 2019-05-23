@@ -23,7 +23,7 @@ public class Name {
     public void write(OutputStream out) throws IOException {
         DataOutputStream dos = new DataOutputStream(out)
         dos.writeShort(name.length())
-        dos.writeBuffer(name.getBytes(StandardCharsets.UTF_8))
+        dos.write(name.getBytes(StandardCharsets.UTF_8))
     }
     
     public getName() {

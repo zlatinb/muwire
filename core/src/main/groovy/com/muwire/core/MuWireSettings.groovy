@@ -10,7 +10,7 @@ class MuWireSettings {
 		isLeaf = Boolean.valueOf(props.get("leaf","false"))
 		allowUntrusted = Boolean.valueOf(props.get("allowUntrusted","true"))
 		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
-        nickname = props.getProperty("nickname")
+        nickname = props.getProperty("nickname","MuWireUser")
 	}
 	
 	final boolean isLeaf
@@ -37,4 +37,8 @@ class MuWireSettings {
 	void setCrawlerResponse(CrawlerResponse crawlerResponse) {
 		this.crawlerResponse = crawlerResponse
 	}
+    
+    String getNickname() {
+        nickname
+    }
 }
