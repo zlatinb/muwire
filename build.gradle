@@ -3,8 +3,8 @@ subprojects {
     apply plugin: 'application'
 
     dependencies {
-        compile 'net.i2p:i2p:0.9.35'
-        compile 'org.codehaus.groovy:groovy-all:2.5.0'
+        compile 'net.i2p:i2p:0.9.40'
+        compile 'org.codehaus.groovy:groovy-all:2.5.7'
     }
 
     compileGroovy {
