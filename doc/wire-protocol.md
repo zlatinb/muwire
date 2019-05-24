@@ -129,7 +129,7 @@ Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to per
     version: 1,
     uuid: "asdf-1234..."
     firstHop: false,
-    keywords : "search query (i18n encoded)",
+    keywords : ["keyword1","keyword2"...]
     infohash: "asdfasdf...",
     replyTo : "asdfasf...b64"
 }
