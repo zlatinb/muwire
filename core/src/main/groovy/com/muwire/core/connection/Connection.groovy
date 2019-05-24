@@ -10,6 +10,8 @@ import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
+import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustService
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -21,6 +23,7 @@ abstract class Connection implements Closeable {
 	final Endpoint endpoint
 	final boolean incoming
 	final HostCache hostCache
+    final TrustService trustService
 	
 	private final AtomicBoolean running = new AtomicBoolean()
 	private final BlockingQueue messages = new LinkedBlockingQueue()
@@ -30,11 +33,12 @@ abstract class Connection implements Closeable {
 	
 	long lastPingSentTime, lastPongReceivedTime
 	
-	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, HostCache hostCache) {
+	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, HostCache hostCache, TrustService trustService) {
 		this.eventBus = eventBus
 		this.incoming = incoming
 		this.endpoint = endpoint
 		this.hostCache = hostCache
+        this.trustService = trustService
 		
 		this.name = endpoint.destination.toBase32().substring(0,8)
 		
@@ -135,7 +139,14 @@ abstract class Connection implements Closeable {
         UUID uuid = UUID.fromString(search.uuid)
         if (search.infohash != null)
             search.keywords = null
+            
         Destination replyTo = new Destination(search.replyTo)
+        if (trustService.getLevel(replyTo) == TrustLevel.DISTRUSTED) {
+            log.info "dropping search from distrusted peer"
+            return
+        }
+        // TODO: add option to respond only to trusted peers
+        
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : search.infohash,
                                             uuid : uuid)

@@ -5,6 +5,7 @@ import java.io.OutputStream
 
 import com.muwire.core.EventBus
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
@@ -28,8 +29,8 @@ class PeerConnection extends Connection {
 	private final JsonSlurper slurper = new JsonSlurper()
 
 	public PeerConnection(EventBus eventBus, Endpoint endpoint,
-			boolean incoming, HostCache hostCache) {
-		super(eventBus, endpoint, incoming, hostCache)
+			boolean incoming, HostCache hostCache, TrustService trustService) {
+		super(eventBus, endpoint, incoming, hostCache, trustService)
 		this.dis = new DataInputStream(endpoint.inputStream)
 		this.dos = new DataOutputStream(endpoint.outputStream)
 	}

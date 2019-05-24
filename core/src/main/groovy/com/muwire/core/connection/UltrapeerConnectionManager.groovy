@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.muwire.core.EventBus
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
+import com.muwire.core.trust.TrustService
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -14,16 +15,19 @@ import net.i2p.data.Destination
 class UltrapeerConnectionManager extends ConnectionManager {
 	
 	final int maxPeers, maxLeafs
+    final TrustService trustService
 	
 	final Map<Destination, PeerConnection> peerConnections = new ConcurrentHashMap()
 	final Map<Destination, LeafConnection> leafConnections = new ConcurrentHashMap()
 	
 	UltrapeerConnectionManager() {}
 
-	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs, HostCache hostCache) {
+	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs, 
+        HostCache hostCache, TrustService trustService) {
 		super(eventBus, hostCache)
 		this.maxPeers = maxPeers
 		this.maxLeafs = maxLeafs
+        this.trustService = trustService
 	}
 	@Override
 	public void drop(Destination d) {
@@ -67,8 +71,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 			return
 		
 		Connection c = e.leaf ? 
-			new LeafConnection(eventBus, e.endpoint, hostCache) : 
-			new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache)
+			new LeafConnection(eventBus, e.endpoint, hostCache, trustService) : 
+			new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache, trustService)
 		def map = e.leaf ? leafConnections : peerConnections
 		map.put(e.endpoint.destination, c)
 		c.start()
