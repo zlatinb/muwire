@@ -188,6 +188,8 @@ class ConnectionAcceptor {
                 throw new IOException("invalid request header")
 
             Persona sender = new Persona(dis)
+            if (sender.destination != e.getDestination())
+                throw new IOException("Sender destination mismatch expected $e.getDestination(), got $sender.destination")
             int nResults = dis.readUnsignedShort()
             for (int i = 0; i < nResults; i++) {
                 int jsonSize = dis.readUnsignedShort()

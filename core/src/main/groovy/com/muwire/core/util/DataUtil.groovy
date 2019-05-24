@@ -1,5 +1,7 @@
 package com.muwire.core.util
 
+import java.nio.charset.StandardCharsets
+
 class DataUtil {
 	
 	private final static int MAX_SHORT = (0x1 << 16) - 1
@@ -36,4 +38,15 @@ class DataUtil {
 				(((int)(header[1] & 0xFF) << 8)) |
 				((int)header[2] & 0xFF)
 	}
+    
+    static String readi18nString(byte [] encoded) {
+        if (encoded.length < 2)
+            throw new IllegalArgumentException("encoding too short $encoded.length")
+        int length = ((encoded[0] & 0xFF) << 8) | (encoded[1] & 0xFF)
+        if (encoded.length != length + 2)
+            throw new IllegalArgumentException("encoding doesn't match length, expected $length found $encoded.length")
+        byte [] string = new byte[length]
+        System.arraycopy(encoded, 2, string, 0, length)
+        new String(string, StandardCharsets.UTF_8) 
+    }
 }

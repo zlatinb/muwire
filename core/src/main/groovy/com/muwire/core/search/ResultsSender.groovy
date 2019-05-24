@@ -48,9 +48,16 @@ class ResultsSender {
     void sendResults(UUID uuid, SharedFile[] results, Destination target) {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()}")
         if (target.equals(me.destination)) {
-            def resultEvent = new ResultsEvent( uuid : uuid, results : results )
-            def uiResultEvent = new UIResultEvent(sender: me, resultsEvent : resultEvent)
-            eventBus.publish(uiResultEvent)
+            results.each { 
+                long length = it.getFile().length()
+                def uiResultEvent = new UIResultEvent( sender : me,
+                    name : it.getFile().getName(),
+                    size : length,
+                    infohash : it.getInfoHash(),
+                    pieceSize : FileHasher.getPieceSize(length)
+                    )
+                    eventBus.publish(uiResultEvent)
+            }
         } else {
             executor.execute(new ResultSendJob(uuid : uuid, results : results, target: target))
         }
