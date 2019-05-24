@@ -189,9 +189,9 @@ class Core {
 			}
 			
 			def binding = new Binding()
-			binding.setProperty("eventBus", eventBus)
-			// TOOD: other bindings?
 			def shell = new GroovyShell(binding)
+			binding.setProperty('eventBus', eventBus)
+			// TOOD: other bindings?
 			def script = shell.parse(f)
 			script.run()
 		}
