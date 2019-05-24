@@ -114,6 +114,17 @@ abstract class Connection implements Closeable {
 		messages.put(ping)
 		lastPingSentTime = System.currentTimeMillis()
 	}
+    
+    void sendQuery(QueryEvent e) {
+        def query = [:]
+        query.type = "Search"
+        query.version = 1
+        query.uuid = e.searchEvent.getUuid()
+        // TODO: first hop figure out
+        query.keywords = e.searchEvent.getSearchTerms()
+        query.replyTo = e.getReceivedOn().toBase64()
+        messages.put(query)
+    }
 	
 	protected void handlePing() {
 		log.fine("$name received ping")

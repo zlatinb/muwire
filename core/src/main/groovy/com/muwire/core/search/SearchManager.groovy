@@ -1,6 +1,7 @@
 package com.muwire.core.search
 
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -9,17 +10,20 @@ import net.i2p.data.Destination
 public class SearchManager {
     
     private final EventBus eventBus
+    private final Persona me
     private final ResultsSender resultsSender
     private final Map<UUID, Destination> responderAddress = new HashMap<>()
     
     SearchManager(){}
     
-    SearchManager(EventBus eventBus, ResultsSender resultsSender) {
+    SearchManager(EventBus eventBus, Persona me, ResultsSender resultsSender) {
         this.eventBus = eventBus
+        this.me = me
         this.resultsSender = resultsSender
     }
     
     void onQueryEvent(QueryEvent event) {
+        // TODO: duplicate UUID check
         responderAddress.put(event.searchEvent.uuid, event.replyTo)
         eventBus.publish(event.searchEvent)
     }
@@ -36,6 +40,6 @@ public class SearchManager {
     }
     
     boolean hasLocalSearch(UUID uuid) {
-        false
+        me.destination.equals(responderAddress.get(uuid))
     }
 }

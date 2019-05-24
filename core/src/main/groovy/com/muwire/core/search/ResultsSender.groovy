@@ -29,7 +29,8 @@ class ResultsSender {
         new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                Thread rv = new Thread("Results Sender "+THREAD_NO.incrementAndGet(), r)
+                Thread rv = new Thread(r)
+                rv.setName("Results Sender "+THREAD_NO.incrementAndGet())
                 rv.setDaemon(true)
                 rv
             }
@@ -86,11 +87,11 @@ class ResultsSender {
                     daos.writeShort((short) name.length)
                     daos.write(name)
                     daos.flush()
-                    name = Base64.encode(baos.toByteArray())
+                    String encodedName = Base64.encode(baos.toByteArray())
                     def obj = [:]
                     obj.type = "Result"
                     obj.version = 1
-                    obj.name = name
+                    obj.name = encodedName
                     obj.infohash = Base64.encode(it.getInfoHash().getRoot())
                     obj.size = it.getFile().length()
                     obj.pieceSize = FileHasher.getPieceSize(it.getFile().length())
@@ -108,8 +109,7 @@ class ResultsSender {
                 }
                 os.flush()
             } finally {
-                if (endpoint != null)
-                    endpoint.closeQuietly()
+                endpoint?.close()
             }
         }
     }

@@ -26,11 +26,11 @@ class ResultsParser {
             throw new InvalidSearchResultException("hashlist not a list")
         try {
             String name = DataUtil.readi18nString(Base64.decode(json.name))
-            long size = Long.parseLong(json.size)
+            long size = json.size
             byte [] infoHash = Base64.decode(json.infohash)
             if (infoHash.length != InfoHash.SIZE)
                 throw new InvalidSearchResultException("invalid infohash size $infoHash.length")
-            int pieceSize = Integer.parseInt(json.pieceSize)
+            int pieceSize = json.pieceSize
             byte [] hashList = new byte[json.hashList.size() * InfoHash.SIZE]
             json.hashList.eachWithIndex { string, index ->
                 byte [] hashPiece = Base64.decode(string)

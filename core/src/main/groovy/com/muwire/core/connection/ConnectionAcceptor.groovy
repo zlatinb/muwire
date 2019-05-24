@@ -176,13 +176,13 @@ class ConnectionAcceptor {
             throw new IOException("Invalid POST connection")
         JsonSlurper slurper = new JsonSlurper()
         try {
-            byte uuid = new byte[36]
+            byte[] uuid = new byte[36]
             dis.readFully(uuid)
             UUID resultsUUID = UUID.fromString(new String(uuid, StandardCharsets.US_ASCII))
             if (!searchManager.hasLocalSearch(resultsUUID))
                 throw new UnexpectedResultsException(resultsUUID.toString())
 
-            byte rn = new byte[2]
+            byte[] rn = new byte[2]
             dis.readFully(rn)
             if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new IOException("invalid request header")
@@ -199,9 +199,9 @@ class ConnectionAcceptor {
                 eventBus.publish(ResultsParser.parse(sender, json))
             }
         } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
-            log.warning(bad)
+            log.log(Level.WARNING, "failed to process POST", bad)
         } finally {
-            e.closeQuietly()
+            e.close()
         }
     }
 	

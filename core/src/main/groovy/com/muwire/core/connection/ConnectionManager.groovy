@@ -2,6 +2,7 @@ package com.muwire.core.connection
 
 import com.muwire.core.EventBus
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.search.QueryEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
@@ -38,6 +39,13 @@ abstract class ConnectionManager {
 		if (e.level == TrustLevel.DISTRUSTED)
 			drop(e.destination)
 	}
+    
+    void onQueryEvent(QueryEvent e) {
+        getConnections().each {
+            if (e.getReceivedOn() != it.getEndpoint().getDestination())
+                it.sendQuery(e)
+        }
+    }
 	
 	abstract void drop(Destination d)
 	

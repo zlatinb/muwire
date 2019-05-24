@@ -141,6 +141,7 @@ class Core {
 		eventBus.register(TrustEvent.class, connectionManager)
 		eventBus.register(ConnectionEvent.class, connectionManager)
 		eventBus.register(DisconnectionEvent.class, connectionManager)
+        eventBus.register(QueryEvent.class, connectionManager)
 		connectionManager.start()
 		
 		log.info("initializing cache client")
@@ -154,7 +155,7 @@ class Core {
 		ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me)
 		
 		log.info "initializing search manager"
-		SearchManager searchManager = new SearchManager(eventBus, resultsSender)
+		SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
 		eventBus.register(QueryEvent.class, searchManager)
 		eventBus.register(ResultsEvent.class, searchManager)
 		
