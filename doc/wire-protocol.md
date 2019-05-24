@@ -157,7 +157,7 @@ This message starts with two unsigned bytes indicating the number of patches inc
 
 ### Search results - any node to any node
 
-Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
+Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  That is followed by two unsigned bytes containing the number of search results.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
 
 ```
 {
