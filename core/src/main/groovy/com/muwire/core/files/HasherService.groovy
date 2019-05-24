@@ -3,17 +3,18 @@ package com.muwire.core.files
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+import com.muwire.core.EventBus
 import com.muwire.core.SharedFile
 
 class HasherService {
 
 	final FileHasher hasher
-	final def listener
+	final EventBus eventBus
 	Executor executor
 	
-	HasherService(FileHasher hasher, def listener) {
+	HasherService(FileHasher hasher, EventBus eventBus) {
 		this.hasher = hasher
-		this.listener = listener
+		this.eventBus = eventBus
 	}
 	
 	void start() {
@@ -30,12 +31,12 @@ class HasherService {
 			f.listFiles().each {onFileSharedEvent new FileSharedEvent(file: it) }
 		} else {
 			if (f.length() == 0) {
-				listener.publish new FileHashedEvent(error: "Not sharing empty file $f")
+				eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
 			} else if (f.length() > FileHasher.MAX_SIZE) {
-				listener.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
+				eventBus.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
 			} else {
 				def hash = hasher.hashFile f
-				listener.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash))
+				eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash))
 			}
 		}
 	}

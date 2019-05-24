@@ -8,6 +8,8 @@ import java.util.logging.Level
 import com.muwire.core.EventBus
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.SearchEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -128,4 +130,19 @@ abstract class Connection implements Closeable {
 			eventBus.publish(new HostDiscoveredEvent(destination: dest))
 		}
 	}
+    
+    protected void handleSearch(def search) {
+        UUID uuid = UUID.fromString(search.uuid)
+        if (search.infohash != null)
+            search.keywords = null
+        Destination replyTo = new Destination(search.replyTo)
+        SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
+                                            searchHash : search.infohash,
+                                            uuid : uuid)
+        QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
+                                            replyTo : replyTo,
+                                            receivedOn : endpoint.destination )
+        eventBus.publish(event)
+                                            
+    }
 }

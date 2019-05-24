@@ -7,20 +7,25 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+import com.muwire.core.EventBus
+
 class HasherServiceTest {
 
 	HasherService service
 	FileHasher hasher
+    EventBus eventBus
 	def listener = new ArrayBlockingQueue(100) {
-		void publish(def evt) {
+		void onFileHashedEvent(FileHashedEvent evt) {
 			offer evt
 		}
 	}
 	
 	@Before
 	void before() {
+        eventBus = new EventBus()
 		hasher = new FileHasher()
-		service = new HasherService(hasher, listener)
+		service = new HasherService(hasher, eventBus)
+        eventBus.register(FileHashedEvent.class, listener)
 		service.start()
 	}
 	

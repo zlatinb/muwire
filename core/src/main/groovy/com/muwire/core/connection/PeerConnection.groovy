@@ -52,6 +52,7 @@ class PeerConnection extends Connection {
 			switch(json.type) {
 				case "Ping" : handlePing(); break;
 				case "Pong" : handlePong(json); break;
+                case "Search": handleSearch(json); break
 				default :
 					throw new Exception("unknown json type ${json.type}")
 			}

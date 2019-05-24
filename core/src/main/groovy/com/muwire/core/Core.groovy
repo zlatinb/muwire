@@ -11,9 +11,21 @@ import com.muwire.core.connection.I2PAcceptor
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.connection.LeafConnectionManager
 import com.muwire.core.connection.UltrapeerConnectionManager
+import com.muwire.core.files.FileDownloadedEvent
+import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileHasher
+import com.muwire.core.files.FileLoadedEvent
+import com.muwire.core.files.FileManager
+import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.files.HasherService
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.ResultsEvent
+import com.muwire.core.search.ResultsSender
+import com.muwire.core.search.SearchManager
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
 
@@ -143,6 +155,26 @@ class Core {
 		I2PConnector i2pConnector = new I2PConnector(socketManager)
 		ConnectionEstablisher connector = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 		connector.start()
+        
+        log.info("initializing hasher service")
+        HasherService hasherService = new HasherService(new FileHasher(), eventBus)
+        eventBus.register(FileSharedEvent.class, hasherService)
+        hasherService.start()
+        
+        log.info "initializing file manager"
+        FileManager fileManager = new FileManager(eventBus)
+        eventBus.register(FileHashedEvent.class, fileManager)
+        eventBus.register(FileLoadedEvent.class, fileManager)
+        eventBus.register(FileDownloadedEvent.class, fileManager)
+        eventBus.register(FileUnsharedEvent.class, fileManager)
+        
+        log.info "initializing results sender"
+        ResultsSender resultsSender = new ResultsSender()
+        
+        log.info "initializing search manager"
+        SearchManager searchManager = new SearchManager(eventBus, resultsSender)
+        eventBus.register(QueryEvent.class, searchManager)
+        eventBus.register(ResultsEvent.class, searchManager)
 		
 		// ... at the end, sleep or execute script
 		if (args.length == 0) {
