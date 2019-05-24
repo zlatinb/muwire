@@ -1,5 +1,5 @@
 mainClassName = 'com.muwire.core.Core'
-
+applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 dependencies {
     compile 'net.i2p.client:mstreaming:0.9.40'
     compile 'net.i2p.client:streaming:0.9.40'
