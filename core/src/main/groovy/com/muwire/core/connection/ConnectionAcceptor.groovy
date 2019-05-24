@@ -174,35 +174,33 @@ class ConnectionAcceptor {
         dis.readFully(ost)
         if (ost != "OST ".getBytes(StandardCharsets.US_ASCII))
             throw new IOException("Invalid POST connection")
-        handshakerThreads.execute({
-            JsonSlurper slurper = new JsonSlurper()
-            try {
-                byte uuid = new byte[36]
-                dis.readFully(uuid)
-                UUID resultsUUID = UUID.fromString(new String(uuid, StandardCharsets.US_ASCII))
-                if (!searchManager.hasLocalSearch(resultsUUID))
-                    throw new UnexpectedResultsException(resultsUUID.toString())
+        JsonSlurper slurper = new JsonSlurper()
+        try {
+            byte uuid = new byte[36]
+            dis.readFully(uuid)
+            UUID resultsUUID = UUID.fromString(new String(uuid, StandardCharsets.US_ASCII))
+            if (!searchManager.hasLocalSearch(resultsUUID))
+                throw new UnexpectedResultsException(resultsUUID.toString())
 
-                byte rn = new byte[2]
-                dis.readFully(rn)
-                if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
-                    throw new IOException("invalid request header")
-                
-                Persona sender = new Persona(dis)
-                int nResults = dis.readUnsignedShort()
-                for (int i = 0; i < nResults; i++) {
-                    int jsonSize = dis.readUnsignedShort()
-                    byte [] payload = new byte[jsonSize]
-                    dis.readFully(payload)
-                    def json = slurper.parse(payload)
-                    eventBus.publish(ResultsParser.parse(sender, json))
-                }
-            } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
-                log.warning(bad)
-            } finally {
-                e.closeQuietly()
+            byte rn = new byte[2]
+            dis.readFully(rn)
+            if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new IOException("invalid request header")
+
+            Persona sender = new Persona(dis)
+            int nResults = dis.readUnsignedShort()
+            for (int i = 0; i < nResults; i++) {
+                int jsonSize = dis.readUnsignedShort()
+                byte [] payload = new byte[jsonSize]
+                dis.readFully(payload)
+                def json = slurper.parse(payload)
+                eventBus.publish(ResultsParser.parse(sender, json))
             }
-        } as Runnable)
+        } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
+            log.warning(bad)
+        } finally {
+            e.closeQuietly()
+        }
     }
 	
 }
