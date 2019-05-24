@@ -7,5 +7,4 @@ class ResultsEvent extends Event {
 
 	SharedFile[] results
 	UUID uuid
-
 }

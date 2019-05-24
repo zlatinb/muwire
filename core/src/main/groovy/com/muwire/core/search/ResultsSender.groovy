@@ -49,7 +49,7 @@ class ResultsSender {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()}")
         if (target.equals(me.destination)) {
             def resultEvent = new ResultsEvent( uuid : uuid, results : results )
-            def uiResultEvent = new UIResultEvent(resultsEvent : resultEvent)
+            def uiResultEvent = new UIResultEvent(sender: me, resultsEvent : resultEvent)
             eventBus.publish(uiResultEvent)
         } else {
             executor.execute(new ResultSendJob(uuid : uuid, results : results, target: target))

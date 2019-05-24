@@ -1,5 +1,6 @@
 package com.muwire.core.connection
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Level
@@ -8,11 +9,17 @@ import java.util.zip.InflaterInputStream
 
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
+import com.muwire.core.search.InvalidSearchResultException
+import com.muwire.core.search.ResultsParser
+import com.muwire.core.search.SearchManager
+import com.muwire.core.search.UnexpectedResultsException
 
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 
 @Log
@@ -24,19 +31,21 @@ class ConnectionAcceptor {
 	final I2PAcceptor acceptor
 	final HostCache hostCache
 	final TrustService trustService
+    final SearchManager searchManager 
 	
 	final ExecutorService acceptorThread
 	final ExecutorService handshakerThreads
 	
 	ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
 		MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
-		TrustService trustService) {
+		TrustService trustService, searchManager) {
 		this.eventBus = eventBus
 		this.manager = manager
 		this.settings = settings
 		this.acceptor = acceptor
 		this.hostCache = hostCache
 		this.trustService = trustService
+        this.searchManager = searchManager
 		
 		acceptorThread = Executors.newSingleThreadExecutor { r -> 
 			def rv = new Thread(r)
@@ -86,11 +95,16 @@ class ConnectionAcceptor {
 			int read = is.read()
 			switch(read) {
 				case (byte)'M':
+                    if (settings.isLeaf())
+                        throw new IOException("Incoming connection as leaf")
 					processMuWire(e)
 					break
 				case (byte)'G':
 					processGET(e)
 					break
+                case (byte)'P':
+                    processPOST(e)
+                    break
 				default:
 					throw new Exception("Invalid read $read")
 			}
@@ -109,30 +123,19 @@ class ConnectionAcceptor {
 				throw new IOException("unexpected value $read at position $i")
 			}
 		}
-		
+        
 		byte[] type = new byte[4]
 		DataInputStream dis = new DataInputStream(e.inputStream)
 		dis.readFully(type)
-		
-		if (settings.isLeaf()) {
-			if (type != "resu".bytes) {
-				throw new IOException("Received incoming non-results connection as leaf")
-			}
-			byte [] lts = new byte[3]
-			dis.readFully(lts)
-			if (lts != "lts".bytes)
-				throw new IOException("malformed results connection")
-			// TODO: hand-off results connection
-		} else {
-			if (type == "leaf".bytes)
-				handleIncoming(e, true)
-			else if (type == "peer".bytes)
-				handleIncoming(e, false)
-			else
-				throw new IOException("unknown connection type $type")
-		}
-	}
-	
+                
+        if (type == "leaf".bytes)
+            handleIncoming(e, true)
+        else if (type == "peer".bytes)
+            handleIncoming(e, false)
+        else 
+            throw new IOException("unknown connection type $type")
+    }
+
 	private void handleIncoming(Endpoint e, boolean leaf) {
 		boolean accept = leaf ? manager.hasLeafSlots() : manager.hasPeerSlots()
 		if (accept) {
@@ -164,5 +167,42 @@ class ConnectionAcceptor {
 	private void processGET(Endpoint e) {
 		// TODO: implement
 	}
+    
+    private void processPOST(final Endpoint e) throws IOException {
+        byte [] ost = new byte[4]
+        final DataInputStream dis = new DataInputStream(e.getInputStream())
+        dis.readFully(ost)
+        if (ost != "OST ".getBytes(StandardCharsets.US_ASCII))
+            throw new IOException("Invalid POST connection")
+        handshakerThreads.execute({
+            JsonSlurper slurper = new JsonSlurper()
+            try {
+                byte uuid = new byte[36]
+                dis.readFully(uuid)
+                UUID resultsUUID = UUID.fromString(new String(uuid, StandardCharsets.US_ASCII))
+                if (!searchManager.hasLocalSearch(resultsUUID))
+                    throw new UnexpectedResultsException(resultsUUID.toString())
+
+                byte rn = new byte[2]
+                dis.readFully(rn)
+                if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
+                    throw new IOException("invalid request header")
+                
+                Persona sender = new Persona(dis)
+                int nResults = dis.readUnsignedShort()
+                for (int i = 0; i < nResults; i++) {
+                    int jsonSize = dis.readUnsignedShort()
+                    byte [] payload = new byte[jsonSize]
+                    dis.readFully(payload)
+                    def json = slurper.parse(payload)
+                    eventBus.publish(ResultsParser.parse(sender, json))
+                }
+            } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
+                log.warning(bad)
+            } finally {
+                e.closeQuietly()
+            }
+        } as Runnable)
+    }
 	
 }

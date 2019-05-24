@@ -12,6 +12,8 @@ public class SearchManager {
     private final ResultsSender resultsSender
     private final Map<UUID, Destination> responderAddress = new HashMap<>()
     
+    SearchManager(){}
+    
     SearchManager(EventBus eventBus, ResultsSender resultsSender) {
         this.eventBus = eventBus
         this.resultsSender = resultsSender
@@ -31,5 +33,9 @@ public class SearchManager {
             return
         }
         resultsSender.sendResults(event.uuid, event.results, target)
+    }
+    
+    boolean hasLocalSearch(UUID uuid) {
+        false
     }
 }

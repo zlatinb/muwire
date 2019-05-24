@@ -146,14 +146,24 @@ class Core {
 		log.info("initializing cache client")
 		CacheClient cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
 		cacheClient.start()
+        
+		log.info("initializing connector")
+		I2PConnector i2pConnector = new I2PConnector(socketManager)
+        
+		log.info "initializing results sender"
+		ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me)
+		
+		log.info "initializing search manager"
+		SearchManager searchManager = new SearchManager(eventBus, resultsSender)
+		eventBus.register(QueryEvent.class, searchManager)
+		eventBus.register(ResultsEvent.class, searchManager)
 		
 		log.info("initializing acceptor")
 		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
-		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, i2pAcceptor, hostCache, trustService)
+		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, i2pAcceptor, hostCache, trustService, searchManager)
 		acceptor.start()
 		
-		log.info("initializing connector")
-		I2PConnector i2pConnector = new I2PConnector(socketManager)
+        
 		ConnectionEstablisher connector = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 		connector.start()
         
@@ -170,13 +180,6 @@ class Core {
         eventBus.register(FileUnsharedEvent.class, fileManager)
         eventBus.register(SearchEvent.class, fileManager)
         
-        log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, me)
-        
-        log.info "initializing search manager"
-        SearchManager searchManager = new SearchManager(eventBus, resultsSender)
-        eventBus.register(QueryEvent.class, searchManager)
-        eventBus.register(ResultsEvent.class, searchManager)
 		
 		// ... at the end, sleep or execute script
 		if (args.length == 0) {
