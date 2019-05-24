@@ -171,7 +171,7 @@ class Core {
         eventBus.register(SearchEvent.class, fileManager)
         
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender()
+        ResultsSender resultsSender = new ResultsSender(eventBus, me)
         
         log.info "initializing search manager"
         SearchManager searchManager = new SearchManager(eventBus, resultsSender)
@@ -193,6 +193,7 @@ class Core {
 			def binding = new Binding()
 			def shell = new GroovyShell(binding)
 			binding.setProperty('eventBus', eventBus)
+            binding.setProperty('me', me)
 			// TOOD: other bindings?
 			def script = shell.parse(f)
 			script.run()
