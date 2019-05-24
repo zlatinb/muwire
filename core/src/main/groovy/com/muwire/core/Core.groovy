@@ -25,6 +25,7 @@ import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
+import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
@@ -167,6 +168,7 @@ class Core {
         eventBus.register(FileLoadedEvent.class, fileManager)
         eventBus.register(FileDownloadedEvent.class, fileManager)
         eventBus.register(FileUnsharedEvent.class, fileManager)
+        eventBus.register(SearchEvent.class, fileManager)
         
         log.info "initializing results sender"
         ResultsSender resultsSender = new ResultsSender()
