@@ -1,7 +1,6 @@
 package com.muwire.core.search
 
 import com.muwire.core.SharedFile
-import com.muwire.core.files.UIResultEvent
 import com.muwire.core.Persona
 import com.muwire.core.EventBus
 
