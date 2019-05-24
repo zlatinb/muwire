@@ -71,6 +71,7 @@ class ResultsSender {
                 DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
                 os.write("POST $uuid\r\n".getBytes(StandardCharsets.US_ASCII))
                 me.write(os)
+                os.writeShort((short)results.length)
                 results.each {
                     byte [] name = it.getFile().getName().getBytes(StandardCharsets.UTF_8)
                     def baos = new ByteArrayOutputStream()
