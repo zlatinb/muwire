@@ -10,7 +10,7 @@ import net.i2p.data.Base32;
 
 public class InfoHash {
 
-	private static final int SIZE = 0x1 << 5;
+	public static final int SIZE = 0x1 << 5;
 	
 	private final byte[] root;
 	private final byte[] hashList;
