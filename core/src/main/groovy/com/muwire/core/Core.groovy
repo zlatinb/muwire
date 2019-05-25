@@ -19,6 +19,7 @@ import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
+import com.muwire.core.files.PersisterService
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
@@ -180,6 +181,10 @@ class Core {
         eventBus.register(FileDownloadedEvent.class, fileManager)
         eventBus.register(FileUnsharedEvent.class, fileManager)
         eventBus.register(SearchEvent.class, fileManager)
+        
+        log.info "initializing persistence service"
+        PersisterService persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
+        persisterService.start()
         
 		
 		// ... at the end, sleep or execute script

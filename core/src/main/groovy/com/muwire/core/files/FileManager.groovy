@@ -11,7 +11,7 @@ class FileManager {
 
 	final EventBus eventBus
 	final Map<byte[], Set<SharedFile>> rootToFiles = new HashMap<>()
-	final Map<File, SharedFile> fileToSharedFile = new HashMap<>()
+	final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
 	final Map<String, Set<File>> nameToFiles = new HashMap<>()
 	final SearchIndex index = new SearchIndex()
 	
@@ -79,8 +79,9 @@ class FileManager {
 	}
 	
 	Map<File, SharedFile> getSharedFiles() {
-		// TODO: figure out locking
-		fileToSharedFile
+        synchronized(fileToSharedFile) {
+            return new HashMap<>(fileToSharedFile)
+        }
 	}
 	
 	void onSearchEvent(SearchEvent e) {

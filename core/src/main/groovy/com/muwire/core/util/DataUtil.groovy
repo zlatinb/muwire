@@ -49,4 +49,16 @@ class DataUtil {
         System.arraycopy(encoded, 2, string, 0, length)
         new String(string, StandardCharsets.UTF_8) 
     }
+    
+    static byte[] encodei18nString(String string) {
+        byte [] utf8 = string.getBytes(StandardCharsets.UTF_8)
+        if (utf8.length > Short.MAX_VALUE)
+            throw new IllegalArgumentException("String in utf8 too long $utf8.length")
+        def baos = new ByteArrayOutputStream()
+        def daos = new DataOutputStream(baos)
+        daos.writeShort((short) utf8.length)
+        daos.write(utf8) 
+        daos.close()
+        baos.toByteArray()
+    }
 }

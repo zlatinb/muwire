@@ -1,5 +1,6 @@
 package com.muwire.core.files
 
+import java.util.logging.Level
 import java.util.stream.Collectors
 
 import com.muwire.core.DownloadedFile
@@ -7,25 +8,28 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.Service
 import com.muwire.core.SharedFile
+import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
-import net.i2p.data.Base32
+import groovy.util.logging.Log
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 
+@Log
 class PersisterService extends Service {
 
 	final File location
 	final EventBus listener
 	final int interval
 	final Timer timer
-	final def fileSource
+	final FileManager fileManager
 	
-	PersisterService(File location, EventBus listener, int interval, def fileSource) {
+	PersisterService(File location, EventBus listener, int interval, FileManager fileManager) {
 		this.location = location
 		this.listener = listener
 		this.interval = interval
-		this.fileSource = fileSource
+		this.fileManager = fileManager
 		timer = new Timer("file persister", true)
 	}
 	
@@ -45,12 +49,14 @@ class PersisterService extends Service {
 					if (it.trim().length() > 0) {
 						def parsed = slurper.parseText it
 						def event = fromJson parsed
-						if (event != null)
+						if (event != null) {
+                            log.fine("loaded file $event.loadedFile.file")
 							listener.publish event
+						}
 					}
 				}
 			} catch (IllegalArgumentException|NumberFormatException e) {
-				// abort loading
+                log.log(Level.WARNING, "couldn't load files",e)
 			}
 		}
 		timer.schedule({persistFiles()} as TimerTask, 0, interval)
@@ -63,7 +69,7 @@ class PersisterService extends Service {
 		if (!(json.hashList instanceof List))
 			throw new IllegalArgumentException()
 			
-		def file = new File(json.file)
+		def file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
 		file = file.getCanonicalFile()
 		if (!file.exists() || file.isDirectory())
 			return null
@@ -74,7 +80,7 @@ class PersisterService extends Service {
 		List hashList = (List) json.hashList
 		ByteArrayOutputStream baos = new ByteArrayOutputStream()
 		hashList.each {
-			byte [] hash = Base32.decode it.toString()
+			byte [] hash = Base64.decode it.toString()
 			if (hash == null)
 				throw new IllegalArgumentException()
 			baos.write hash
@@ -82,7 +88,7 @@ class PersisterService extends Service {
 		byte[] hashListBytes = baos.toByteArray()
 		
 		InfoHash ih = InfoHash.fromHashList(hashListBytes)
-		byte [] root = Base32.decode(json.infoHash.toString())
+		byte [] root = Base64.decode(json.infoHash.toString())
 		if (root == null)
 			throw new IllegalArgumentException()
 		if (!Arrays.equals(root, ih.getRoot()))
@@ -102,7 +108,7 @@ class PersisterService extends Service {
 	
 	private void persistFiles() {
 		location.delete()
-		def sharedFiles = fileSource.getSharedFiles()
+		def sharedFiles = fileManager.getSharedFiles()
 		location.withPrintWriter { writer ->
 			sharedFiles.each { k, v ->
 				def json = toJson(k,v)
@@ -114,15 +120,15 @@ class PersisterService extends Service {
 	
 	private def toJson(File f, SharedFile sf) {
 		def json = [:]
-		json.file = f.getCanonicalFile().toString()
+		json.file = Base64.encode DataUtil.encodei18nString(f.getCanonicalFile().toString())
 		json.length = f.length()
 		InfoHash ih = sf.getInfoHash()
-		json.infoHash = Base32.encode ih.getRoot()
+		json.infoHash = Base64.encode ih.getRoot()
 		byte [] tmp = new byte [32]
 		json.hashList = []
 		for (int i = 0;i < ih.getHashList().length / 32; i++) {
 			System.arraycopy(ih.getHashList(), i * 32, tmp, 0, 32)
-			json.hashList.add Base32.encode(tmp)
+			json.hashList.add Base64.encode(tmp)
 		}
 		
 		if (sf instanceof DownloadedFile) {
