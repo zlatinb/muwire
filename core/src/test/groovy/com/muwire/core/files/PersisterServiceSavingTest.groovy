@@ -9,9 +9,11 @@ import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
+import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonSlurper
 import net.i2p.data.Base32
+import net.i2p.data.Base64
 
 class PersisterServiceSavingTest {
 
@@ -29,7 +31,7 @@ class PersisterServiceSavingTest {
 		f = new File("build.gradle")
 		f = f.getCanonicalFile()
 		ih = fh.hashFile(f)
-		fileSource = new Object() {
+		fileSource = new FileManager(eventBus) {
 					Map<File, SharedFile> getSharedFiles() {
 						Map<File, SharedFile> rv = new HashMap<>()
 						rv.put(f, sf)
@@ -45,6 +47,10 @@ class PersisterServiceSavingTest {
 	void after() {
 		ps?.stop()
 	}
+    
+    private static String fromB64(String text) {
+        DataUtil.readi18nString(Base64.decode(text))
+    }
 	
 	@Test
 	void testSavingSharedFile() {
@@ -57,10 +63,10 @@ class PersisterServiceSavingTest {
 		JsonSlurper jsonSlurper = new JsonSlurper()	
 		persisted.eachLine { 
 			def json = jsonSlurper.parseText(it)
-			assert json.file == f.toString()
+			assert fromB64(json.file) == f.toString()
 			assert json.length == f.length()
-			assert json.infoHash == Base32.encode(ih.getRoot())
-			assert json.hashList == [Base32.encode(ih.getHashList())]
+			assert json.infoHash == Base64.encode(ih.getRoot())
+			assert json.hashList == [Base64.encode(ih.getHashList())]
 		}
 	}
 	
@@ -76,10 +82,10 @@ class PersisterServiceSavingTest {
 		JsonSlurper jsonSlurper = new JsonSlurper()
 		persisted.eachLine {
 			def json = jsonSlurper.parseText(it)
-			assert json.file == f.toString()
+			assert fromB64(json.file) == f.toString()
 			assert json.length == f.length()
-			assert json.infoHash == Base32.encode(ih.getRoot())
-			assert json.hashList == [Base32.encode(ih.getHashList())]
+			assert json.infoHash == Base64.encode(ih.getRoot())
+			assert json.hashList == [Base64.encode(ih.getHashList())]
 			assert json.sources.size() == 2
 			assert json.sources.contains(dests.dest1.toBase64())
 			assert json.sources.contains(dests.dest2.toBase64())

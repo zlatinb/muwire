@@ -8,10 +8,12 @@ import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
+import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
 import groovy.util.GroovyTestCase
 import net.i2p.data.Base32
+import net.i2p.data.Base64
 
 class PersisterServiceLoadingTest {
 
@@ -65,10 +67,10 @@ class PersisterServiceLoadingTest {
 		InfoHash ih1 = fh.hashFile(sharedFile1)
 		
 		def json = [:]
-		json.file = sharedFile1.getCanonicalFile().toString()
+		json.file = getSharedFileJsonName(sharedFile1)
 		json.length = 1
-		json.infoHash = Base32.encode(ih1.getRoot())
-		json.hashList = [Base32.encode(ih1.getHashList())]
+		json.infoHash = Base64.encode(ih1.getRoot())
+		json.hashList = [Base64.encode(ih1.getHashList())]
 		
 		json = JsonOutput.toJson(json)
 		
@@ -86,6 +88,11 @@ class PersisterServiceLoadingTest {
 		assert loadedFile.infoHash == ih1
 	}
 
+    private static String getSharedFileJsonName(File sharedFile) {
+        def encoded = DataUtil.encodei18nString(sharedFile.getCanonicalFile().toString())
+        Base64.encode(encoded)
+    }
+    
 	@Test
 	public void test1SharedFile2Pieces() {
 		writeToSharedFile(sharedFile1, (0x1 << 18) + 1)
@@ -95,15 +102,15 @@ class PersisterServiceLoadingTest {
 		assert ih1.getHashList().length == 2 * 32
 		
 		def json = [:]
-		json.file = sharedFile1.getCanonicalFile().toString()
+		json.file = getSharedFileJsonName(sharedFile1)
 		json.length = sharedFile1.length()
-		json.infoHash = Base32.encode ih1.getRoot()
+		json.infoHash = Base64.encode ih1.getRoot()
 		
 		byte [] tmp = new byte[32]
 		System.arraycopy(ih1.getHashList(), 0, tmp, 0, 32)
-		String hash1 = Base32.encode(tmp)
+		String hash1 = Base64.encode(tmp)
 		System.arraycopy(ih1.getHashList(), 32, tmp, 0, 32)
-		String hash2 = Base32.encode(tmp)
+		String hash2 = Base64.encode(tmp)
 		json.hashList = [hash1, hash2]
 		
 		json = JsonOutput.toJson(json)
@@ -135,18 +142,18 @@ class PersisterServiceLoadingTest {
 		File persisted = initPersisted()
 		
 		def json1 = [:]
-		json1.file = sharedFile1.getCanonicalFile().toString()
+		json1.file = getSharedFileJsonName(sharedFile1)
 		json1.length = 1
-		json1.infoHash = Base32.encode(ih1.getRoot())
-		json1.hashList = [Base32.encode(ih1.getHashList())]
+		json1.infoHash = Base64.encode(ih1.getRoot())
+		json1.hashList = [Base64.encode(ih1.getHashList())]
 		
 		json1 = JsonOutput.toJson(json1)
 		
 		def json2 = [:]
-		json2.file = sharedFile2.getCanonicalFile().toString()
+		json2.file = getSharedFileJsonName(sharedFile2)
 		json2.length = 2
-		json2.infoHash = Base32.encode(ih2.getRoot())
-		json2.hashList = [Base32.encode(ih2.getHashList())]
+		json2.infoHash = Base64.encode(ih2.getRoot())
+		json2.hashList = [Base64.encode(ih2.getHashList())]
 		
 		json2 = JsonOutput.toJson(json2)
 		
@@ -176,10 +183,10 @@ class PersisterServiceLoadingTest {
 		
 		Destinations dests = new Destinations()
 		def json1 = [:]
-		json1.file = sharedFile1.getCanonicalFile().toString()
+		json1.file = getSharedFileJsonName(sharedFile1)
 		json1.length = 1
-		json1.infoHash = Base32.encode(ih1.getRoot())
-		json1.hashList = [Base32.encode(ih1.getHashList())]
+		json1.infoHash = Base64.encode(ih1.getRoot())
+		json1.hashList = [Base64.encode(ih1.getHashList())]
 		json1.sources = [ dests.dest1.toBase64(), dests.dest2.toBase64()]
 		
 		json1 = JsonOutput.toJson(json1)
