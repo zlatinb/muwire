@@ -77,7 +77,7 @@ class ResultsSender {
             try {
                 endpoint = connector.connect(target)
                 DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
-                os.write("POST $uuid\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("POST $uuid\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 me.write(os)
                 os.writeShort((short)results.length)
                 results.each {

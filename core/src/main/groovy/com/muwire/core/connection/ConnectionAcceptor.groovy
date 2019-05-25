@@ -182,9 +182,9 @@ class ConnectionAcceptor {
             if (!searchManager.hasLocalSearch(resultsUUID))
                 throw new UnexpectedResultsException(resultsUUID.toString())
 
-            byte[] rn = new byte[2]
+            byte[] rn = new byte[4]
             dis.readFully(rn)
-            if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (rn != "\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new IOException("invalid request header")
 
             Persona sender = new Persona(dis)
