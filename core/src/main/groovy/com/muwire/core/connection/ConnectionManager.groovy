@@ -1,6 +1,7 @@
 package com.muwire.core.connection
 
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.trust.TrustEvent
@@ -17,11 +18,13 @@ abstract class ConnectionManager {
 	private final Timer timer
 	
 	protected final HostCache hostCache
+    protected final Persona me
 	
 	ConnectionManager() {}
 	
-	ConnectionManager(EventBus eventBus, HostCache hostCache) {
+	ConnectionManager(EventBus eventBus, Persona me, HostCache hostCache) {
 		this.eventBus = eventBus
+        this.me = me
 		this.hostCache = hostCache
 		this.timer = new Timer("connections-pinger",true)
 	}
@@ -40,13 +43,6 @@ abstract class ConnectionManager {
 			drop(e.destination)
 	}
     
-    void onQueryEvent(QueryEvent e) {
-        getConnections().each {
-            if (e.getReceivedOn() != it.getEndpoint().getDestination())
-                it.sendQuery(e)
-        }
-    }
-	
 	abstract void drop(Destination d)
 	
 	abstract Collection<Connection> getConnections()

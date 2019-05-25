@@ -163,7 +163,8 @@ abstract class Connection implements Closeable {
                                             uuid : uuid)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
-                                            receivedOn : endpoint.destination )
+                                            receivedOn : endpoint.destination,
+                                            firstHop : search.firstHop )
         eventBus.publish(event)
                                             
     }

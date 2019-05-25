@@ -3,7 +3,9 @@ package com.muwire.core.connection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.search.QueryEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -15,8 +17,8 @@ class LeafConnectionManager extends ConnectionManager {
 	
 	final Map<Destination, UltrapeerConnection> connections = new ConcurrentHashMap()
 	
-	public LeafConnectionManager(EventBus eventBus, int maxConnections, HostCache hostCache) {
-		super(eventBus, hostCache)
+	public LeafConnectionManager(EventBus eventBus, Persona me, int maxConnections, HostCache hostCache) {
+		super(eventBus, me, hostCache)
 		this.maxConnections = maxConnections
 	}
 	
@@ -25,6 +27,13 @@ class LeafConnectionManager extends ConnectionManager {
 		// TODO Auto-generated method stub
 		
 	}
+    
+    void onQueryEvent(QueryEvent e) {
+        if (me.destination == e.receivedOn) {
+            connections.values().each { it.sendQuery(e) }
+        }
+            
+    }
 
 	@Override
 	public Collection<Connection> getConnections() {

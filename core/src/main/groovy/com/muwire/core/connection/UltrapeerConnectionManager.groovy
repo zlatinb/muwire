@@ -4,6 +4,7 @@ import java.util.Collection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.trust.TrustService
@@ -22,9 +23,9 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	
 	UltrapeerConnectionManager() {}
 
-	public UltrapeerConnectionManager(EventBus eventBus, int maxPeers, int maxLeafs, 
+	public UltrapeerConnectionManager(EventBus eventBus, Persona me, int maxPeers, int maxLeafs, 
         HostCache hostCache, TrustService trustService) {
-		super(eventBus, hostCache)
+		super(eventBus, me, hostCache)
 		this.maxPeers = maxPeers
 		this.maxLeafs = maxLeafs
         this.trustService = trustService
@@ -34,6 +35,19 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		// TODO Auto-generated method stub
 		
 	}
+    
+    void onQueryEvent(QueryEvent e) {
+        forwardQueryToLeafs(e)
+        if (!e.firstHop)
+            return
+        if (e.replyTo != me.destination && e.receivedOn != me.destination &&
+            !leafConnections.containsKey(e.receivedOn))
+            e.firstHop = false
+        peerConnections.values().each {
+            if (e.getReceivedOn() != it.getEndpoint().getDestination())
+                it.sendQuery(e)
+        }
+    }
 
 	@Override
 	public Collection<Connection> getConnections() {
@@ -87,7 +101,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
 			log.severe("Removed connection not present in either leaf or peer map ${e.destination.toBase32()}")
 	}
 	
-	void forwardQueryToLeaf(Destination leaf, QueryEvent e) {
+	void forwardQueryToLeafs(QueryEvent e) {
 		
 	}
 }
