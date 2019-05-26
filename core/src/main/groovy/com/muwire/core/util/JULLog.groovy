@@ -55,21 +55,21 @@ class JULLog extends Log {
 
     @Override
     public boolean shouldDebug() {
-        level.intValue().intValue() <= Level.FINE.intValue()
+        level.intValue().intValue() >= Level.FINE.intValue()
     }
 
     @Override
     public boolean shouldInfo() {
-        level.intValue().intValue() <= Level.INFO.intValue()
+        level.intValue().intValue() >= Level.INFO.intValue()
     }
 
     @Override
     public boolean shouldWarn() {
-        level.intValue().intValue() <= Level.WARNING.intValue()
+        level.intValue().intValue() >= Level.WARNING.intValue()
     }
 
     @Override
     public boolean shouldError() {
-        level.intValue().intValue() <= Level.SEVERE.intValue()
+        level.intValue().intValue() >= Level.SEVERE.intValue()
     }
 }
