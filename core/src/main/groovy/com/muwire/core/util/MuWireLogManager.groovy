@@ -6,16 +6,31 @@ import net.i2p.util.LogManager
 
 class MuWireLogManager extends LogManager {
     
+    private static final Map<Class<?>, Log> classLogs = new HashMap<>()
+    private static final Map<String, Log> stringLogs = new HashMap<>()
+    
     MuWireLogManager() {
         super(I2PAppContext.getGlobalContext())
     }
     
 
     @Override
-    public Log getLog(Class<?> cls, String name) {
-        if (cls != null)
-            return new JULLog(cls)
-        new JULLog(name)
+    public synchronized Log getLog(Class<?> cls, String name) {
+        if (cls != null) {
+            Log rv = classLogs.get(cls)
+            if (rv == null) {
+                rv = new JULLog(cls)
+                classLogs.put(cls, rv)
+            }
+            return rv
+        }
+        
+        Log rv = stringLogs.get(name)
+        if (rv == null) {
+            rv = new JULLog(name)
+            stringLogs.put(name, rv)
+        }
+        rv
     }
     
 }
