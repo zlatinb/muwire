@@ -30,8 +30,10 @@ import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.util.MuWireLogManager
 
 import groovy.util.logging.Log
+import net.i2p.I2PAppContext
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.streaming.I2PSocketManager
@@ -71,6 +73,10 @@ class Core {
             }
 		}
 		
+        log.info "Initializing I2P context"
+        I2PAppContext.getGlobalContext().logManager()
+        I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
+        
 		log.info("initializing I2P socket manager")
 		def i2pClient = new I2PClientFactory().createClient()
 		File keyDat = new File(home, "key.dat")
