@@ -17,6 +17,6 @@ class I2PAcceptor {
 	
 	Endpoint accept() {
 		def socket = serverSocket.accept()
-		new Endpoint(socket.getPeerDestination(), socket.getInputStream(), socket.getOutputStream())
+		new Endpoint(socket.getPeerDestination(), socket.getInputStream(), socket.getOutputStream(), socket)
 	}
 }

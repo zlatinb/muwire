@@ -98,7 +98,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		connectionManagerMock.demand.hasLeafSlots() { true }
@@ -136,7 +136,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		connectionManagerMock.demand.hasPeerSlots() { true }
@@ -174,7 +174,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		trustServiceMock.demand.getLevel { dest ->
@@ -210,7 +210,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		trustServiceMock.demand.getLevel { dest ->
@@ -246,7 +246,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		connectionManagerMock.demand.hasPeerSlots() { false }
@@ -288,7 +288,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		connectionManagerMock.demand.hasLeafSlots() { false }
@@ -330,7 +330,7 @@ class ConnectionAcceptorTest {
 			outputStream = new PipedOutputStream(is)
 			def os = new PipedOutputStream()
 			inputStream = new PipedInputStream(os)
-			new Endpoint(destinations.dest1, is, os)
+			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
 		connectionManagerMock.demand.hasPeerSlots() { false }

@@ -142,7 +142,7 @@ class ConnectionAcceptor {
 			log.info("accepting connection, leaf:$leaf")
 			e.outputStream.write("OK".bytes)
 			e.outputStream.flush()
-			def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true))
+			def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true), e.toClose)
 			eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.SUCCESSFUL))
 		} else {
 			log.info("rejecting connection, leaf:$leaf")

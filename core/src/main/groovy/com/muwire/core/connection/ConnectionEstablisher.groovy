@@ -110,7 +110,7 @@ class ConnectionEstablisher {
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Couldn't connect to ${toTry.toBase32()}", e)
-			def endpoint = new Endpoint(toTry, null, null)
+			def endpoint = new Endpoint(toTry, null, null, null)
 			fail(endpoint)
 		} finally {
 			inProgress.remove(toTry)
@@ -133,7 +133,7 @@ class ConnectionEstablisher {
 		log.info("connection to ${e.destination.toBase32()} established")
 		
 		// wrap into deflater / inflater streams and publish
-		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true))
+		def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true), e.toClose)
 		eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, leaf: false, status: ConnectionAttemptStatus.SUCCESSFUL))
 	}
 	

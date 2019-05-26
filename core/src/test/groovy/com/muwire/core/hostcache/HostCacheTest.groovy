@@ -143,7 +143,7 @@ class HostCacheTest {
 		initMocks()
 		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 		
-		def endpoint = new Endpoint(destinations.dest1, null, null)
+		def endpoint = new Endpoint(destinations.dest1, null, null, null)
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
@@ -161,7 +161,7 @@ class HostCacheTest {
 		initMocks()
 		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 		
-		def endpoint = new Endpoint(destinations.dest1, null, null)
+		def endpoint = new Endpoint(destinations.dest1, null, null, null)
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.FAILED))
@@ -186,7 +186,7 @@ class HostCacheTest {
 		initMocks()
 		cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 		
-		def endpoint = new Endpoint(destinations.dest1, null, null)
+		def endpoint = new Endpoint(destinations.dest1, null, null, null)
 		cache.onConnectionEvent( new ConnectionEvent(endpoint: endpoint, status: ConnectionAttemptStatus.SUCCESSFUL))
 		
 		def rv = cache.getHosts(5)

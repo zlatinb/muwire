@@ -10,13 +10,15 @@ class Endpoint implements Closeable {
 	final Destination destination
 	final InputStream inputStream
 	final OutputStream outputStream
+    final def toClose
 	
 	private final AtomicBoolean closed = new AtomicBoolean()
 	
-	Endpoint(Destination destination, InputStream inputStream, OutputStream outputStream) {
+	Endpoint(Destination destination, InputStream inputStream, OutputStream outputStream, def toClose) {
 		this.destination = destination
 		this.inputStream = inputStream
 		this.outputStream = outputStream
+        this.toClose = toClose
 	}
 	
 	@Override
@@ -31,6 +33,9 @@ class Endpoint implements Closeable {
 		if (outputStream != null) {
 			try {outputStream.close()} catch (Exception ignore) {}
 		}
+        if (toClose != null) {
+            try {toClose.close()} catch (Exception ignore) {}
+        }
 	}
 	
 	@Override

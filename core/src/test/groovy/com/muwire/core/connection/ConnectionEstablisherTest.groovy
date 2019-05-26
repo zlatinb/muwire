@@ -126,7 +126,7 @@ class ConnectionEstablisherTest {
 			inputStream = new DataInputStream(new PipedInputStream(os))
 			PipedInputStream is = new PipedInputStream()
 			outputStream = new DataOutputStream(new PipedOutputStream(is))
-			new Endpoint(dest, is, os)
+			new Endpoint(dest, is, os, null)
 		}
 		
 		initMocks()
@@ -169,7 +169,7 @@ class ConnectionEstablisherTest {
 			inputStream = new DataInputStream(new PipedInputStream(os))
 			PipedInputStream is = new PipedInputStream()
 			outputStream = new DataOutputStream(new PipedOutputStream(is))
-			new Endpoint(dest, is, os)
+			new Endpoint(dest, is, os, null)
 		}
 		
 		initMocks()
@@ -211,7 +211,7 @@ class ConnectionEstablisherTest {
 			inputStream = new DataInputStream(new PipedInputStream(os))
 			PipedInputStream is = new PipedInputStream()
 			outputStream = new DataOutputStream(new PipedOutputStream(is))
-			new Endpoint(dest, is, os)
+			new Endpoint(dest, is, os, null)
 		}
 		
 		initMocks()
@@ -254,7 +254,7 @@ class ConnectionEstablisherTest {
 			inputStream = new DataInputStream(new PipedInputStream(os))
 			PipedInputStream is = new PipedInputStream()
 			outputStream = new DataOutputStream(new PipedOutputStream(is))
-			new Endpoint(dest, is, os)
+			new Endpoint(dest, is, os, null)
 		}
 		
 		initMocks()
