@@ -14,6 +14,7 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
+import com.muwire.core.upload.UploadManager
 import com.muwire.core.search.SearchManager
 
 import groovy.json.JsonSlurper
@@ -39,6 +40,9 @@ class ConnectionAcceptorTest {
     
     def searchManagerMock
     SearchManager searchManager
+    
+    def uploadManagerMock
+    UploadManager uploadManager
 	
 	ConnectionAcceptor acceptor
 	List<ConnectionEvent> connectionEvents
@@ -52,6 +56,7 @@ class ConnectionAcceptorTest {
 		hostCacheMock = new MockFor(HostCache.class)
 		trustServiceMock = new MockFor(TrustService.class)
         searchManagerMock = new MockFor(SearchManager.class)
+        uploadManagerMock = new MockFor(UploadManager.class)
 	}
 	
 	@After
@@ -62,6 +67,7 @@ class ConnectionAcceptorTest {
 		hostCacheMock.verify hostCache
 		trustServiceMock.verify trustService
         searchManagerMock.verify searchManager
+        uploadManagerMock.verify uploadManager
 		Thread.sleep(100)
 	}
 	
@@ -80,8 +86,9 @@ class ConnectionAcceptorTest {
 		hostCache = hostCacheMock.proxyInstance()
 		trustService = trustServiceMock.proxyInstance()
         searchManager = searchManagerMock.proxyInstance()
+        uploadManager = uploadManagerMock.proxyInstance()
 		
-		acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor, hostCache, trustService, searchManager)
+		acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor, hostCache, trustService, searchManager, uploadManager)
 		acceptor.start()
 		Thread.sleep(100)
 	}

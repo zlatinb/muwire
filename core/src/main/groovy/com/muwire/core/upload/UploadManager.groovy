@@ -16,6 +16,8 @@ public class UploadManager {
     private final EventBus eventBus
     private final FileManager fileManager
     
+    public UploadManager() {}
+    
     public UploadManager(EventBus eventBus, FileManager fileManager) {
         this.eventBus = eventBus
         this.fileManager = fileManager
