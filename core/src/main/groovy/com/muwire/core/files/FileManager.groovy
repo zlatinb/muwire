@@ -56,7 +56,6 @@ class FileManager {
 	void onFileUnsharedEvent(FileUnsharedEvent e) {
 		SharedFile sf = e.unsharedFile
 		byte [] root = sf.getInfoHash().getRoot()
-        Set<SharedFile> existing
 		Set<SharedFile> existing = rootToFiles.get(root)
 		if (existing != null) {
 			existing.remove(sf)

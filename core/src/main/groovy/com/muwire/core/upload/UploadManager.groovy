@@ -48,8 +48,11 @@ public class UploadManager {
             Request request = Request.parse(new InfoHash(infoHashRoot), e.getInputStream())
             Uploader uploader = new Uploader(request, e)
             eventBus.publish(new UploadEvent(uploader))
-            uploader.respond()
-            eventBus.publish(new UploadFinishedEvent(uploader))
+            try {
+                uploader.respond()
+            } finally {
+                eventBus.publish(new UploadFinishedEvent(uploader))
+            }
         }
         
     }
