@@ -46,7 +46,7 @@ public class UploadManager {
             }
 
             Request request = Request.parse(new InfoHash(infoHashRoot), e.getInputStream())
-            Uploader uploader = new Uploader(request, e)
+            Uploader uploader = new Uploader(sharedFiles.iterator().next().file, request, e)
             eventBus.publish(new UploadEvent(uploader))
             try {
                 uploader.respond()
