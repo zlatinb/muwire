@@ -22,9 +22,21 @@ public class UploadManager {
     }
     
     public void processEndpoint(Endpoint e) throws IOException {
+        byte [] infoHashStringBytes = new byte[44]
+                DataInputStream dis = new DataInputStream(e.getInputStream())
+        boolean first = true
         while(true) {
-            byte [] infoHashStringBytes = new byte[44]
-            DataInputStream dis = new DataInputStream(e.getInputStream())
+            if (first)
+                first = false
+            else {
+                byte[] get = new byte[4]
+                dis.readFully(get)
+                if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
+                    log.warning("received a method other than GET on subsequent call")
+                    e.close()
+                    return
+                }
+            }
             dis.readFully(infoHashStringBytes)
             String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
             log.info("Responding to upload request for root $infoHashString")
