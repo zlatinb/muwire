@@ -20,4 +20,18 @@ class PiecesTest {
         pieces.markDownloaded(0)
         assert pieces.isComplete()
     }
+    
+    @Test
+    public void testTwoPieces() {
+        pieces = new Pieces(2)
+        assert !pieces.isComplete()
+        int piece = pieces.getRandomPiece()
+        assert piece == 0 || piece == 1
+        pieces.markDownloaded(piece)
+        assert !pieces.isComplete()
+        int piece2 = pieces.getRandomPiece()
+        assert piece != piece2
+        pieces.markDownloaded(piece2)
+        assert pieces.isComplete()
+    }
 }
