@@ -92,6 +92,7 @@ class RequestParsingTest {
     @Test
     public void testInvalidRange() {
         failed("Range 1-2\r\n\r\n")
+        failed("Range 2-1\r\n\r\n")
         failed("Range:\r\n\r\n")
         failed("Range: -1-2\r\n\r\n")
         failed("Range: 1-x\r\n\r\n")
@@ -105,4 +106,4 @@ class RequestParsingTest {
             sb.append("x")
         failed(sb.toString())
     }
-}
+}    
