@@ -29,7 +29,7 @@ class UploaderTest {
         file?.delete()
         file = File.createTempFile("uploadTest", "dat")
         file.deleteOnExit()
-        is = new PipedInputStream(0x1 << 14)
+        is = new PipedInputStream(0x1 << 15)
         os = new PipedOutputStream(is)
         endpoint = new Endpoint(null, is, os, null)
     }
@@ -113,5 +113,20 @@ class UploaderTest {
         assert "416 Range Not Satisfiable" == readUntilRN()
         assert "" == readUntilRN()
     }
-    
+
+    @Test
+    public void testLargeFile() {
+        final int length = 0x1 << 14
+        fillFile(length)
+        request = new Request(range : new Range(0, length - 1))
+        startUpload()
+        readUntilRN()
+        readUntilRN()
+        readUntilRN()
+        
+        byte [] data = new byte[length]
+        DataInputStream dis = new DataInputStream(is)
+        dis.readFully(data)
+        assert data == inFile
+    }    
 }
