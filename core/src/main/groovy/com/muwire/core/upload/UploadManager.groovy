@@ -35,6 +35,7 @@ public class UploadManager {
                 log.info "file not found"
                 e.getOutputStream().write("404 File Not Found".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
+                e.close()
                 return
             }
 
@@ -42,6 +43,7 @@ public class UploadManager {
             dis.readFully(rn)
             if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
                 log.warning("Malformed GET header")
+                e.close()
                 return
             }
 
