@@ -13,6 +13,7 @@ import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
+import com.muwire.core.upload.UploadManager
 import com.muwire.core.search.InvalidSearchResultException
 import com.muwire.core.search.ResultsParser
 import com.muwire.core.search.SearchManager
@@ -32,13 +33,14 @@ class ConnectionAcceptor {
 	final HostCache hostCache
 	final TrustService trustService
     final SearchManager searchManager 
+    final UploadManager uploadManager
 	
 	final ExecutorService acceptorThread
 	final ExecutorService handshakerThreads
 	
 	ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
 		MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
-		TrustService trustService, searchManager) {
+		TrustService trustService, SearchManager searchManager, UploadManager uploadManager) {
 		this.eventBus = eventBus
 		this.manager = manager
 		this.settings = settings
@@ -46,6 +48,7 @@ class ConnectionAcceptor {
 		this.hostCache = hostCache
 		this.trustService = trustService
         this.searchManager = searchManager
+        this.uploadManager = uploadManager
 		
 		acceptorThread = Executors.newSingleThreadExecutor { r -> 
 			def rv = new Thread(r)
@@ -170,7 +173,7 @@ class ConnectionAcceptor {
         dis.readFully(et)
         if (et != "ET ".getBytes(StandardCharsets.US_ASCII))
             throw new IOException("Invalid GET connection")
-		// TODO: implement
+        uploadManager.processEndpoint(e)
 	}
     
     private void processPOST(final Endpoint e) throws IOException {

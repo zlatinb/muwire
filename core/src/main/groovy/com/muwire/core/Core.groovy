@@ -30,6 +30,7 @@ import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
 
 import groovy.util.logging.Log
@@ -134,6 +135,18 @@ class Core {
 		trustService.start()
 		trustService.waitForLoad()
 		
+		log.info "initializing file manager"
+		FileManager fileManager = new FileManager(eventBus)
+		eventBus.register(FileHashedEvent.class, fileManager)
+		eventBus.register(FileLoadedEvent.class, fileManager)
+		eventBus.register(FileDownloadedEvent.class, fileManager)
+		eventBus.register(FileUnsharedEvent.class, fileManager)
+		eventBus.register(SearchEvent.class, fileManager)
+		
+		log.info "initializing persistence service"
+		PersisterService persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
+		persisterService.start()
+        
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
 		HostCache hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
@@ -166,9 +179,14 @@ class Core {
 		eventBus.register(QueryEvent.class, searchManager)
 		eventBus.register(ResultsEvent.class, searchManager)
 		
+        log.info("initializing upload manager")
+        UploadManager uploadManager = new UploadManager(eventBus, fileManager)
+        
+        
 		log.info("initializing acceptor")
 		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
-		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, i2pAcceptor, hostCache, trustService, searchManager)
+		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
+            i2pAcceptor, hostCache, trustService, searchManager, uploadManager)
 		acceptor.start()
 		
         
@@ -180,17 +198,6 @@ class Core {
         eventBus.register(FileSharedEvent.class, hasherService)
         hasherService.start()
         
-        log.info "initializing file manager"
-        FileManager fileManager = new FileManager(eventBus)
-        eventBus.register(FileHashedEvent.class, fileManager)
-        eventBus.register(FileLoadedEvent.class, fileManager)
-        eventBus.register(FileDownloadedEvent.class, fileManager)
-        eventBus.register(FileUnsharedEvent.class, fileManager)
-        eventBus.register(SearchEvent.class, fileManager)
-        
-        log.info "initializing persistence service"
-        PersisterService persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
-        persisterService.start()
         
 		
 		// ... at the end, sleep or execute script
