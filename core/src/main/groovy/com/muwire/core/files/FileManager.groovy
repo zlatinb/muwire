@@ -10,7 +10,7 @@ class FileManager {
 
 
 	final EventBus eventBus
-	final Map<byte[], Set<SharedFile>> rootToFiles = new HashMap<>()
+	final Map<byte[], Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
 	final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
 	final Map<String, Set<File>> nameToFiles = new HashMap<>()
 	final SearchIndex index = new SearchIndex()
@@ -56,6 +56,7 @@ class FileManager {
 	void onFileUnsharedEvent(FileUnsharedEvent e) {
 		SharedFile sf = e.unsharedFile
 		byte [] root = sf.getInfoHash().getRoot()
+        Set<SharedFile> existing
 		Set<SharedFile> existing = rootToFiles.get(root)
 		if (existing != null) {
 			existing.remove(sf)
@@ -83,12 +84,17 @@ class FileManager {
             return new HashMap<>(fileToSharedFile)
         }
 	}
+    
+    Set<SharedFile> getSharedFiles(byte []root) {
+            return rootToFiles.get(root)
+    }
 	
 	void onSearchEvent(SearchEvent e) {
 		// hash takes precedence
 		ResultsEvent re = null
 		if (e.searchHash != null) {
-			Set<SharedFile> found = rootToFiles.get e.searchHash
+            Set<SharedFile> found
+            found = rootToFiles.get e.searchHash
 			if (found != null && !found.isEmpty())
 				re = new ResultsEvent(results: found.asList(), uuid: e.uuid)
 		} else {

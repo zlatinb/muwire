@@ -165,6 +165,11 @@ class ConnectionAcceptor {
 	
 	
 	private void processGET(Endpoint e) {
+        byte[] et = new byte[3]
+        final DataInputStream dis = new DataInputStream(e.getInputStream())
+        dis.readFully(et)
+        if (et != "ET ".getBytes(StandardCharsets.US_ASCII))
+            throw new IOException("Invalid GET connection")
 		// TODO: implement
 	}
     
