@@ -48,6 +48,7 @@ public class Downloader {
             currentSession.request()
         }
         currentState = DownloadState.FINISHED
+        endpoint.close()
     }
     
     public long donePieces() {
