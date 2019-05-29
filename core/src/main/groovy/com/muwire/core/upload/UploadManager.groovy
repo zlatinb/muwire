@@ -63,11 +63,11 @@ public class UploadManager {
 
             Request request = Request.parse(new InfoHash(infoHashRoot), e.getInputStream())
             Uploader uploader = new Uploader(sharedFiles.iterator().next().file, request, e)
-            eventBus.publish(new UploadEvent(uploader))
+            eventBus.publish(uploader : new UploadEvent(uploader))
             try {
                 uploader.respond()
             } finally {
-                eventBus.publish(new UploadFinishedEvent(uploader))
+                eventBus.publish(uploader : new UploadFinishedEvent(uploader))
             }
         }
         
