@@ -11,6 +11,8 @@ import com.muwire.core.connection.I2PAcceptor
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.connection.LeafConnectionManager
 import com.muwire.core.connection.UltrapeerConnectionManager
+import com.muwire.core.download.DownloadManager
+import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHasher
@@ -179,6 +181,10 @@ class Core {
 		eventBus.register(QueryEvent.class, searchManager)
 		eventBus.register(ResultsEvent.class, searchManager)
 		
+        log.info("initializing download manager")
+        DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector)
+        eventBus.register(UIDownloadEvent.class, downloadManager)
+        
         log.info("initializing upload manager")
         UploadManager uploadManager = new UploadManager(eventBus, fileManager)
         

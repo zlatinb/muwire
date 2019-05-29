@@ -8,4 +8,6 @@ class Constants {
     
     public static final int MAX_HEADER_SIZE = 0x1 << 14
     public static final int MAX_HEADERS = 16
+    
+    public static final float DOWNLOAD_SEQUENTIAL_RATIO = 0.8f
 }

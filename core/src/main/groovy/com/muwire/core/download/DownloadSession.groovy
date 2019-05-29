@@ -138,4 +138,8 @@ class DownloadSession {
             try { channel?.close() } catch (IOException ignore) {}
         }
     }
+    
+    synchronized int positionInPiece() {
+        mapped.position()
+    }
 }
