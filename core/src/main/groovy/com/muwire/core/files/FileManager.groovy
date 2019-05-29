@@ -1,16 +1,20 @@
 package com.muwire.core.files
 
 import com.muwire.core.EventBus
+import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchIndex
 
+import groovy.util.logging.Log
+
+@Log
 class FileManager {
 
 
 	final EventBus eventBus
-	final Map<byte[], Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
+	final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
 	final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
 	final Map<String, Set<File>> nameToFiles = new HashMap<>()
 	final SearchIndex index = new SearchIndex()
@@ -33,11 +37,13 @@ class FileManager {
 	}
 	
 	private void addToIndex(SharedFile sf) {
-		byte [] root = sf.getInfoHash().getRoot()
-		Set<SharedFile> existing = rootToFiles.get(root)
+        log.info("Adding shared file " + sf.getFile())
+		InfoHash infoHash = sf.getInfoHash()
+		Set<SharedFile> existing = rootToFiles.get(infoHash)
 		if (existing == null) {
+            log.info("adding new root")
 			existing = new HashSet<>()
-			rootToFiles.put(root, existing);
+			rootToFiles.put(infoHash, existing);
 		}
 		existing.add(sf)
 		fileToSharedFile.put(sf.file, sf)
@@ -55,12 +61,12 @@ class FileManager {
 	
 	void onFileUnsharedEvent(FileUnsharedEvent e) {
 		SharedFile sf = e.unsharedFile
-		byte [] root = sf.getInfoHash().getRoot()
-		Set<SharedFile> existing = rootToFiles.get(root)
+		InfoHash infoHash = sf.getInfoHash()
+		Set<SharedFile> existing = rootToFiles.get(infoHash)
 		if (existing != null) {
 			existing.remove(sf)
 			if (existing.isEmpty()) {
-				rootToFiles.remove(root)
+				rootToFiles.remove(infoHash)
 			}
 		}
 		
@@ -85,7 +91,7 @@ class FileManager {
 	}
     
     Set<SharedFile> getSharedFiles(byte []root) {
-            return rootToFiles.get(root)
+            return rootToFiles.get(new InfoHash(root))
     }
 	
 	void onSearchEvent(SearchEvent e) {
@@ -93,7 +99,7 @@ class FileManager {
 		ResultsEvent re = null
 		if (e.searchHash != null) {
             Set<SharedFile> found
-            found = rootToFiles.get e.searchHash
+            found = rootToFiles.get new InfoHash(e.searchHash)
 			if (found != null && !found.isEmpty())
 				re = new ResultsEvent(results: found.asList(), uuid: e.uuid)
 		} else {
