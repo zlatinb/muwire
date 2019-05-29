@@ -1,6 +1,5 @@
 subprojects {
     apply plugin: 'groovy'
-    apply plugin: 'application'
 
     dependencies {
         compile 'net.i2p:i2p:0.9.40'

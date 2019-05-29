@@ -1,3 +1,4 @@
+apply plugin : 'application'
 mainClassName = 'com.muwire.core.Core'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 dependencies {

@@ -1,1 +1,2 @@
+apply plugin : 'application'
 mainClassName = 'com.muwire.hostcache.HostCache'
