@@ -116,8 +116,8 @@ class DownloadSessionTest {
         assert "GET $rootBase64" == readTillRN(fromDownloader)
         String range = readTillRN(fromDownloader)
         def matcher = (range =~ /^Range: (\d+)-(\d+)$/)
-        long start = Long.parseLong(matcher[0][1])
-        long end = Long.parseLong(matcher[0][2])
+        int start = Integer.parseInt(matcher[0][1])
+        int end = Integer.parseInt(matcher[0][2])
         
         assert (start == 0 && end == ((1 << pieceSize) - 1)) || 
             (start == (1 << pieceSize) && end == (1 << pieceSize))
@@ -126,7 +126,9 @@ class DownloadSessionTest {
         
         toDownloader.write("200 OK\r\n".bytes)
         toDownloader.write(("Content-Range: $start-$end\r\n\r\n").bytes)
-        toDownloader.write(source.bytes)
+        byte [] piece = new byte[end - start + 1]
+        System.arraycopy(source.bytes, start, piece, 0, piece.length)
+        toDownloader.write(piece)
         toDownloader.flush()
         
         Thread.sleep(150)
