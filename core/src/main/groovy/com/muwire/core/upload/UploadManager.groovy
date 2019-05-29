@@ -43,11 +43,11 @@ public class UploadManager {
             String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
             log.info("Responding to upload request for root $infoHashString")
 
-            byte [] infoHashRoot = Base64.decode(infoHashStringBytes)
+            byte [] infoHashRoot = Base64.decode(infoHashString)
             Set<SharedFile> sharedFiles = fileManager.getSharedFiles(infoHashRoot)
             if (sharedFiles == null || sharedFiles.isEmpty()) {
                 log.info "file not found"
-                e.getOutputStream().write("404 File Not Found".getBytes(StandardCharsets.US_ASCII))
+                e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
                 e.close()
                 return
