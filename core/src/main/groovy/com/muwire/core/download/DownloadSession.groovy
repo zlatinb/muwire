@@ -112,6 +112,8 @@ class DownloadSession {
             
             byte[] tmp = new byte[0x1 << 13]
             while(mapped.hasRemaining()) {
+                if (mapped.remaining() < tmp.length)
+                    tmp = new byte[mapped.remaining()]
                 int read = is.read(tmp)
                 if (read == -1)
                     throw new IOException()

@@ -86,4 +86,51 @@ class DownloadSessionTest {
         assert pieces.isComplete()
         assert target.bytes == source.bytes
     }
+    
+    @Test
+    public void testPieceSizeFile() {
+        int size = FileHasher.getPieceSize(1)
+        size = 1 << size
+        initSession(size)
+        
+        assert "GET $rootBase64" == readTillRN(fromDownloader)
+        readTillRN(fromDownloader)
+        assert "" == readTillRN(fromDownloader)
+        
+        toDownloader.write("200 OK\r\n".bytes)
+        toDownloader.write(("Content-Range: 0-"+(size - 1)+"\r\n\r\n").bytes)
+        toDownloader.write(source.bytes)
+        toDownloader.flush()
+        
+        Thread.sleep(150)
+        assert pieces.isComplete()
+        assert target.bytes == source.bytes
+    }
+    
+    @Test
+    public void testPieceSizePlusOne() {
+        int pieceSize = FileHasher.getPieceSize(1)
+        int size = (1 << pieceSize) + 1
+        initSession(size)
+        
+        assert "GET $rootBase64" == readTillRN(fromDownloader)
+        String range = readTillRN(fromDownloader)
+        def matcher = (range =~ /^Range: (\d+)-(\d+)$/)
+        long start = Long.parseLong(matcher[0][1])
+        long end = Long.parseLong(matcher[0][2])
+        
+        assert (start == 0 && end == ((1 << pieceSize) - 1)) || 
+            (start == (1 << pieceSize) && end == (1 << pieceSize))
+        
+        assert "" == readTillRN(fromDownloader)
+        
+        toDownloader.write("200 OK\r\n".bytes)
+        toDownloader.write(("Content-Range: $start-$end\r\n\r\n").bytes)
+        toDownloader.write(source.bytes)
+        toDownloader.flush()
+        
+        Thread.sleep(150)
+        assert !pieces.isComplete()
+        assert 1 == pieces.donePieces()
+    }
 }

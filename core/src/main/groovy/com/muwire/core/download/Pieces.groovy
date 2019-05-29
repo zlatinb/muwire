@@ -27,4 +27,8 @@ class Pieces {
     synchronized boolean isComplete() {
         bitSet.cardinality() == nPieces
     }
+    
+    synchronized int donePieces() {
+        bitSet.cardinality()
+    }
 }
