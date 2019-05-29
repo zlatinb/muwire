@@ -2,6 +2,8 @@ package com.muwire.core.util
 
 import java.nio.charset.StandardCharsets
 
+import com.muwire.core.Constants
+
 class DataUtil {
 	
 	private final static int MAX_SHORT = (0x1 << 16) - 1
@@ -60,5 +62,21 @@ class DataUtil {
         daos.write(utf8) 
         daos.close()
         baos.toByteArray()
+    }
+    
+    public static String readTillRN(InputStream is) {
+        def baos = new ByteArrayOutputStream()
+        while(baos.size() < (Constants.MAX_HEADER_SIZE)) {
+            byte read = is.read()
+            if (read == -1)
+                throw new IOException()
+            if (read == '\r') {
+                if (is.read() != '\n')
+                    throw new IOException("invalid header")
+                break
+            }
+            baos.write(read)
+        }
+        new String(baos.toByteArray(), StandardCharsets.US_ASCII)
     }
 }

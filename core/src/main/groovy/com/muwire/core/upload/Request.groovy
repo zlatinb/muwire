@@ -2,6 +2,7 @@ package com.muwire.core.upload
 
 import java.nio.charset.StandardCharsets
 
+import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 
 import groovy.util.logging.Log
@@ -19,8 +20,8 @@ class Request {
     
     static Request parse(InfoHash infoHash, InputStream is) throws IOException {
         Map<String,String> headers = new HashMap<>()
-        byte [] tmp = new byte[0x1 << 14]
-        while(true) {
+        byte [] tmp = new byte[Constants.MAX_HEADER_SIZE]
+        while(headers.size() < Constants.MAX_HEADERS) {
             boolean r = false
             boolean n = false
             int idx = 0
