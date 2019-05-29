@@ -64,7 +64,7 @@ public class Core {
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
         
-    public Core(MuWireSettings props) {		
+    public Core(MuWireSettings props, File home) {		
         log.info "Initializing I2P context"
         I2PAppContext.getGlobalContext().logManager()
         I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
@@ -221,7 +221,7 @@ public class Core {
             }
         }
         
-        Core core = new Core(props)
+        Core core = new Core(props, home)
         core.startServices()
         
         // ... at the end, sleep or execute script
