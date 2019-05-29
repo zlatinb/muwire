@@ -1,5 +1,7 @@
 package com.muwire.core.upload
 
-class UploadFinishedEvent {
+import com.muwire.core.Event
+
+class UploadFinishedEvent extends Event {
     Uploader uploader
 }
