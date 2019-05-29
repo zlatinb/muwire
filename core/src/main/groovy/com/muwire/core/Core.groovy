@@ -50,32 +50,21 @@ import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 
 @Log
-class Core {
+public class Core {
+    
+    final EventBus eventBus
+    final Persona me
 
-	static main(args) {
-		def home = System.getProperty("user.home") + File.separator + ".MuWire"
-		home = new File(home)
-		if (!home.exists()) {
-			log.info("creating home dir")
-			home.mkdir()
-		}
-		
-		def props = new Properties()
-		def propsFile = new File(home, "MuWire.properties")
-		if (propsFile.exists()) {
-			log.info("loading existing props file")
-			propsFile.withInputStream {
-				props.load(it)
-			}
-			props = new MuWireSettings(props)
-		} else {
-			log.info("creating default properties")
-            props = new MuWireSettings()
-            propsFile.withOutputStream { 
-                props.write(it)
-            }
-		}
-		
+    private final TrustService trustService
+    private final PersisterService persisterService
+    private final HostCache hostCache
+    private final ConnectionManager connectionManager
+    private final CacheClient cacheClient
+    private final ConnectionAcceptor connectionAcceptor
+    private final ConnectionEstablisher connectionEstablisher
+    private final HasherService hasherService
+        
+    public Core(MuWireSettings props) {		
         log.info "Initializing I2P context"
         I2PAppContext.getGlobalContext().logManager()
         I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
@@ -101,7 +90,6 @@ class Core {
 		socketManager.getDefaultOptions().setConnectTimeout(30000)
 		i2pSession = socketManager.getSession()
 		
-        Persona me
         def destination = new Destination()
         def spk = new SigningPrivateKey(Constants.SIG_TYPE)
         keyDat.withInputStream {
@@ -127,15 +115,14 @@ class Core {
         me = new Persona(new ByteArrayInputStream(baos.toByteArray()))
         log.info("Loaded myself as "+me.getHumanReadableName())
 
-		EventBus eventBus = new EventBus()
+		eventBus = new EventBus()
 		
 		log.info("initializing trust service")
 		File goodTrust = new File(home, "trust.good")
 		File badTrust = new File(home, "trust.bad")
-		TrustService trustService = new TrustService(goodTrust, badTrust, 5000)
+		trustService = new TrustService(goodTrust, badTrust, 5000)
 		eventBus.register(TrustEvent.class, trustService)
-		trustService.start()
-		trustService.waitForLoad()
+		
 		
 		log.info "initializing file manager"
 		FileManager fileManager = new FileManager(eventBus)
@@ -146,16 +133,13 @@ class Core {
 		eventBus.register(SearchEvent.class, fileManager)
 		
 		log.info "initializing persistence service"
-		PersisterService persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
-		persisterService.start()
+		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
         
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
 		HostCache hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
 		eventBus.register(HostDiscoveredEvent.class, hostCache)
 		eventBus.register(ConnectionEvent.class, hostCache)
-		hostCache.start()
-		hostCache.waitForLoad()
 		
 		log.info("initializing connection manager")
 		ConnectionManager connectionManager = props.isLeaf() ? 
@@ -164,11 +148,9 @@ class Core {
 		eventBus.register(ConnectionEvent.class, connectionManager)
 		eventBus.register(DisconnectionEvent.class, connectionManager)
         eventBus.register(QueryEvent.class, connectionManager)
-		connectionManager.start()
 		
 		log.info("initializing cache client")
-		CacheClient cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
-		cacheClient.start()
+		cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
         
 		log.info("initializing connector")
 		I2PConnector i2pConnector = new I2PConnector(socketManager)
@@ -191,41 +173,76 @@ class Core {
         
 		log.info("initializing acceptor")
 		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
-		ConnectionAcceptor acceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
+		connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager)
-		acceptor.start()
 		
         
-		ConnectionEstablisher connector = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
-		connector.start()
+        connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
         
         log.info("initializing hasher service")
-        HasherService hasherService = new HasherService(new FileHasher(), eventBus)
+        hasherService = new HasherService(new FileHasher(), eventBus)
         eventBus.register(FileSharedEvent.class, hasherService)
-        hasherService.start()
-        
-        
-		
-		// ... at the end, sleep or execute script
-		if (args.length == 0) {
-			log.info("initialized everything, sleeping")
-			Thread.sleep(Integer.MAX_VALUE)
-		} else {
-			log.info("executing script ${args[0]}")
-			File f = new File(args[0])
-			if (!f.exists()) {
-				log.warning("Script file doesn't exist")
-				System.exit(1)
-			}
-			
-			def binding = new Binding()
-			def shell = new GroovyShell(binding)
-			binding.setProperty('eventBus', eventBus)
-            binding.setProperty('me', me)
-			// TOOD: other bindings?
-			def script = shell.parse(f)
-			script.run()
-		}
 	}
+    
+    public void startServices() {
+        hasherService.start()
+        trustService.waitForLoad()
+        trustService.start()
+        persisterService.start()
+        hostCache.start()
+        connectionManager.start()
+        cacheClient.start()
+        connectionAcceptor.start()
+        connectionEstablisher.start()
+        hostCache.waitForLoad()
+    }
 
+    static main(args) {
+        def home = System.getProperty("user.home") + File.separator + ".MuWire"
+        home = new File(home)
+        if (!home.exists()) {
+            log.info("creating home dir")
+            home.mkdir()
+        }
+        
+        def props = new Properties()
+        def propsFile = new File(home, "MuWire.properties")
+        if (propsFile.exists()) {
+            log.info("loading existing props file")
+            propsFile.withInputStream {
+                props.load(it)
+            }
+            props = new MuWireSettings(props)
+        } else {
+            log.info("creating default properties")
+            props = new MuWireSettings()
+            propsFile.withOutputStream {
+                props.write(it)
+            }
+        }
+        
+        Core core = new Core(props)
+        core.startServices()
+        
+        // ... at the end, sleep or execute script
+        if (args.length == 0) {
+            log.info("initialized everything, sleeping")
+            Thread.sleep(Integer.MAX_VALUE)
+        } else {
+            log.info("executing script ${args[0]}")
+            File f = new File(args[0])
+            if (!f.exists()) {
+                log.warning("Script file doesn't exist")
+                System.exit(1)
+            }
+
+            def binding = new Binding()
+            def shell = new GroovyShell(binding)
+            binding.setProperty('eventBus', core.eventBus)
+            binding.setProperty('me', core.me)
+            // TOOD: other bindings?
+            def script = shell.parse(f)
+            script.run()
+        }
+    }
 }
