@@ -24,7 +24,7 @@ class EventListView {
                 gridLayout(rows: 2, cols: 1)
                 label(id: 'clickLabel', text: bind { model.clickCount },
                      horizontalAlignment: SwingConstants.CENTER)
-                button(id: 'clickButton', clickAction)
+                button(id: 'clickButton', clickAction, enabled: bind {model.coreInitialized})
             }
         }
     }

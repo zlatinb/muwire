@@ -137,12 +137,12 @@ public class Core {
         
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
-		HostCache hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
+        hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
 		eventBus.register(HostDiscoveredEvent.class, hostCache)
 		eventBus.register(ConnectionEvent.class, hostCache)
 		
 		log.info("initializing connection manager")
-		ConnectionManager connectionManager = props.isLeaf() ? 
+		connectionManager = props.isLeaf() ? 
 			new LeafConnectionManager(eventBus, me, 3, hostCache) : new UltrapeerConnectionManager(eventBus, me, 512, 512, hostCache, trustService)
 		eventBus.register(TrustEvent.class, connectionManager)
 		eventBus.register(ConnectionEvent.class, connectionManager)
@@ -186,8 +186,8 @@ public class Core {
     
     public void startServices() {
         hasherService.start()
-        trustService.waitForLoad()
         trustService.start()
+        trustService.waitForLoad()
         persisterService.start()
         hostCache.start()
         connectionManager.start()

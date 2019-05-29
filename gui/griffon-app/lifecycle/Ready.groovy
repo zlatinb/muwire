@@ -12,6 +12,8 @@ import javax.inject.Inject
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
+import java.beans.PropertyChangeEvent
+
 @Log
 class Ready extends AbstractLifecycleHandler {
     @Inject
@@ -48,6 +50,9 @@ class Ready extends AbstractLifecycleHandler {
         Core core = new Core(props, home)
         core.startServices()
         application.context.put("core",core)
+        application.getPropertyChangeListeners("core").each { 
+            it.propertyChange(new PropertyChangeEvent(this, "core", null, core)) 
+        }
     }
 }
 
