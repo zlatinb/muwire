@@ -39,7 +39,7 @@ class MainFrameView {
                 borderLayout()
                 panel (border: etchedBorder(), constraints : BorderLayout.NORTH) {
                     borderLayout()
-                    panel (border: etchedBorder(), constraints: BorderLayout.WEST) {
+                    panel (constraints: BorderLayout.WEST) {
                         gridLayout(rows:1, cols: 2)
                         button(text: "1", actionPerformed : showCard1)
                         button(text: "2", actionPerformed : showCard2)
@@ -49,11 +49,11 @@ class MainFrameView {
                         label("Enter search here:", constraints: BorderLayout.WEST)
                         textField(constraints: BorderLayout.CENTER)
                     }
-                    panel( border: etchedBorder(), constraints: BorderLayout.EAST) {
+                    panel( constraints: BorderLayout.EAST) {
                         button("Search")
                     }
                 }
-                panel (id: "cards-panel", border: etchedBorder(), constraints : BorderLayout.CENTER) {
+                panel (id: "cards-panel", constraints : BorderLayout.CENTER) {
                     cardLayout()
                     panel (constraints : "card1") {
                         label("card 1")
