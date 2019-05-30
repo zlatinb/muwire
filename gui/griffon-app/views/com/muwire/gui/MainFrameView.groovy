@@ -11,6 +11,7 @@ import javax.swing.SwingConstants
 import javax.swing.border.Border
 
 import java.awt.BorderLayout
+import java.awt.CardLayout
 import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -40,8 +41,8 @@ class MainFrameView {
                     borderLayout()
                     panel (border: etchedBorder(), constraints: BorderLayout.WEST) {
                         gridLayout(rows:1, cols: 2)
-                        button("1")
-                        button("2")
+                        button(text: "1", actionPerformed : showCard1)
+                        button(text: "2", actionPerformed : showCard2)
                     }
                     panel(constraints: BorderLayout.CENTER) {
                         borderLayout()
@@ -52,13 +53,29 @@ class MainFrameView {
                         button("Search")
                     }
                 }
-                panel (border: etchedBorder(), constraints : BorderLayout.CENTER) {
-                    
+                panel (id: "cards-panel", border: etchedBorder(), constraints : BorderLayout.CENTER) {
+                    cardLayout()
+                    panel (constraints : "card1") {
+                        label("card 1")
+                    }
+                    panel (constraints: "card2"){
+                        label("card 2")
+                    }
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     
                 }
             }
         }
+    }
+    
+    def showCard1 = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "card1")
+    }
+    
+    def showCard2 = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "card2")
     }
 }
