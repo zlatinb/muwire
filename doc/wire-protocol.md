@@ -4,7 +4,7 @@ The MuWire protocol operates over a TCP-like streaming layer offered by the I2P 
 
 ## Handshake
 
-A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf", "peer" or "results", depending on whether Alice is in a leaf, ultrapeer or responder role.  This allows Bob to immediately drop the connection without allocating any more resources.
+A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf" o "peer", depending on whether Alice is in a leaf or ultrapeer.  This allows Bob to immediately drop the connection without allocating any more resources.
 
 If Bob is an ultrapeer he responds to the handshake by either accepting it or rejecting it and optionally suggesting other ultrapeers to connect to.
 
