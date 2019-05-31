@@ -7,9 +7,12 @@ import griffon.metadata.ArtifactProviderFor
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.JFileChooser
 import javax.swing.JSplitPane
 import javax.swing.SwingConstants
 import javax.swing.border.Border
+
+import com.muwire.core.files.FileSharedEvent
 
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -109,7 +112,9 @@ class MainFrameView {
                         gridLayout(cols : 1, rows : 2)
                         panel {
                             borderLayout()
-                            label(text : "Shared files", constraints: BorderLayout.NORTH)
+                            panel (constraints : BorderLayout.NORTH) {
+                                button(text : "Shared files", actionPerformed : shareFiles)
+                            }
                             scrollPane ( constraints : BorderLayout.CENTER) {
                                 table(id : "shared-files-table") {
                                      tableModel(list : model.shared) {
@@ -160,5 +165,15 @@ class MainFrameView {
     def showUploadsWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "uploads window")
+    }
+    
+    def shareFiles = {
+        def chooser = new JFileChooser()
+        chooser.setDialogTitle("Select file or directory to share")
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
+        int rv = chooser.showOpenDialog(null)
+        if (rv == JFileChooser.APPROVE_OPTION) {
+            model.core.eventBus.publish(new FileSharedEvent(file : chooser.getSelectedFile()))
+        }
     }
 }
