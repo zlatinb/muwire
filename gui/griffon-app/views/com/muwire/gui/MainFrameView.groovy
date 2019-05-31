@@ -117,7 +117,22 @@ class MainFrameView {
                             }
                         }
                         panel {
-                            label("Uploads go here")
+                            borderLayout()
+                            label("Uploads", constraints : BorderLayout.NORTH)
+                            scrollPane (constraints : BorderLayout.CENTER) {
+                                table(id : "uploads-table") {
+                                    tableModel(list : model.uploads) {
+                                        closureColumn(header : "Name", type : String, read : {row -> row.file.getName() })
+                                        closureColumn(header : "Progress", type : String, read : { row ->
+                                            int position = row.getPosition()
+                                            def range = row.request.getRange()
+                                            int total = range.end - range.start
+                                            int percent = (int)((position * 100.0) / total)
+                                            "$percent%"
+                                        })
+                                    }
+                                }
+                            }
                         }
                     }
                 }

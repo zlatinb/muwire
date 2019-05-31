@@ -14,6 +14,8 @@ import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.search.UIResultEvent
+import com.muwire.core.upload.UploadEvent
+import com.muwire.core.upload.UploadFinishedEvent
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -31,6 +33,7 @@ class MainFrameModel {
     
     @Observable def results = []
     @Observable def downloads = []
+    @Observable def uploads = []
     @Observable def shared = []
     @Observable int connections
     @Observable String me
@@ -50,11 +53,14 @@ class MainFrameModel {
             core.eventBus.register(DisconnectionEvent.class, this)
             core.eventBus.register(FileHashedEvent.class, this)
             core.eventBus.register(FileLoadedEvent.class, this)
+            core.eventBus.register(UploadEvent.class, this)
+            core.eventBus.register(UploadFinishedEvent.class, this)
         })
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
             runInsideUIAsync {
                 builder.getVariable("downloads-table").model.fireTableDataChanged()
+                builder.getVariable("uploads-table").model.fireTableDataChanged()
             }
         }, 1000, 1000)
     }
@@ -105,6 +111,22 @@ class MainFrameModel {
         runInsideUIAsync {
             shared << e.loadedFile
             JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onUploadEvent(UploadEvent e) {
+        runInsideUIAsync {
+            uploads << e.uploader
+            JTable table = builder.getVariable("uploads-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onUploadFinishedEvent(UploadFinishedEvent e) {
+        runInsideUIAsync {
+            uploads.remove(e.uploader)
+            JTable table = builder.getVariable("uploads-table")
             table.model.fireTableDataChanged()
         }
     }
