@@ -88,7 +88,7 @@ class MainFrameView {
                                             closureColumn(header: "Progress", type: String, read: { row ->
                                                 int pieces = row.downloader.nPieces
                                                 int done = row.downloader.donePieces()
-                                                "$pieces/$done pieces"
+                                                "$done/$pieces pieces"
                                             })
                                         }
                                     }
