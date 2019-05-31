@@ -9,6 +9,8 @@ import javax.annotation.Nonnull
 import javax.inject.Inject
 
 import com.muwire.core.Core
+import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.SearchEvent
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -21,15 +23,15 @@ class MainFrameController {
 
     private volatile Core core
     
-    private initCore() {
-        if (core == null)
-            core = application.getContext().get("core")
-    }
-    
     @ControllerAction
     void search() {
-        initCore()
         def search = builder.getVariable("search-field").text
-        println "searching $search"
+        def searchEvent = new SearchEvent(searchTerms : [search], uuid : UUID.randomUUID())
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
+            replyTo: core.me.destination, receivedOn: core.me.destination))
+    }
+    
+    void mvcGroupInit(Map<String, String> args) {
+        application.addPropertyChangeListener("core", {e-> core = e.getNewValue()})
     }
 }

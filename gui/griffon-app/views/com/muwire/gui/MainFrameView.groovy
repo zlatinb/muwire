@@ -64,7 +64,7 @@ class MainFrameView {
                             panel (constraints : JSplitPane.TOP) {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER){
-                                    table() {
+                                    table(id : "results-table") {
                                         tableModel(list: model.results) {
                                             closureColumn(header: "Name", type: String, read : {row -> row.name})
                                             closureColumn(header: "Size", preferredWidth: 150, type: Long, read : {row -> row.size})
