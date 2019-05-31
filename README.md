@@ -11,21 +11,27 @@ The project is in development.  You can find technical documentation in the "doc
 You need Gradle and a JDK 8 or newer.  After installing those and setting up the appropriate paths, just type
 
 ```
+gradle assemble 
+```
+
+If you want to run the unit tests, type
+```
 gradle build
 ```
 
-And that will build the "pinger", "host-cache", "core" and "gui" sub-projects.
+Some of the UI tests will fail because they haven't been written yet :-/
 
-### Pinger sub-project
+### Running
 
-This is a simple command-line utility that sends a datagram with specified payload to a specified destination and prints out any responses
+You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside.
 
-### Host-Cache sub-project
+At the moment there are very few nodes on the network, so you will see very few connections and search results.  It is best to leave MuWire running all the time, just like I2P.
 
-This is the bootstrap server (aka "HostCache") that MuWire uses.  It listens for incoming Pings from MuWire nodes and responds with other nodes to connect to.  In addition, it "crawls" the network to discover live nodes.
 
-### Core sub-project
-This is the headless core / backend of MuWire.
+### Known bugs and limitations
 
-### GUI sub-project
-This is the Swing GUI.  It is under active development and not yet hooked up to the core.
+* There is no way to select files for sharing yet unless you want to write a groovy script.
+* Sometimes the list of shared files gets lost 
+* Many UI features you would expect are not there yet
+
+
