@@ -30,6 +30,7 @@ class MainFrameView {
     void initUI() {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
+            locationRelativeTo : null,
             title: application.configuration['application.title'],
             iconImage:   imageIcon('/griffon-icon-48x48.png').image,
             iconImages: [imageIcon('/griffon-icon-48x48.png').image,

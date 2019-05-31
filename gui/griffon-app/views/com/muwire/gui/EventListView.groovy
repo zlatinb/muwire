@@ -19,6 +19,7 @@ class EventListView {
     void initUI() {
         builder.with {
             application(size: [320, 80], id: 'event-list',
+                locationRelativeTo : null,
                 title: application.configuration['application.title'],
                 iconImage:   imageIcon('/griffon-icon-48x48.png').image,
                 iconImages: [imageIcon('/griffon-icon-48x48.png').image,
