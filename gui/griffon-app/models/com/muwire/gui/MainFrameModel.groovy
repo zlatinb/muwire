@@ -13,6 +13,9 @@ class MainFrameModel {
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
     
+    @Observable def results
+    @Observable def downloads
+    
     void mvcGroupInit(Map<String, Object> args) {
         application.addPropertyChangeListener("core", {e ->
             coreInitialized = (e.getNewValue() != null)

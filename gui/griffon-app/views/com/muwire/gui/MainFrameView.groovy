@@ -58,11 +58,19 @@ class MainFrameView {
                     cardLayout()
                     panel (constraints : "search window") {
                         borderLayout()
-                        splitPane( orientation : JSplitPane.VERTICAL_SPLIT, dividerLocation : -1,
+                        splitPane( orientation : JSplitPane.VERTICAL_SPLIT, dividerLocation : 500,
                         continuousLayout : true, constraints : BorderLayout.CENTER) {
-                            panel (constraints : JSplitPane.TOP, preferredSize : [1020, 500]) {
+                            panel (constraints : JSplitPane.TOP) {
                                 borderLayout()
-                                label(text : "results go here", constraints : BorderLayout.CENTER)
+                                scrollPane (constraints : BorderLayout.CENTER){
+                                    table() {
+                                        tableModel(list: model.results) {
+                                            closureColumn(header: "Name", type: String, read : {row -> row.name})
+                                            closureColumn(header: "Size", preferredWidth: 150, type: Long, read : {row -> row.size})
+                                            closureColumn(header: "Sender", type: String, read : {row -> row.sender.getHumanReadableName()})
+                                        }
+                                    }
+                                }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     button(text : "Download")
                                     button(text : "Trust")
@@ -71,7 +79,19 @@ class MainFrameView {
                             }
                             panel (constraints : JSplitPane.BOTTOM) {
                                 borderLayout()
-                                label(text : "downloads go here", constraints : BorderLayout.CENTER)
+                                scrollPane (constraints : BorderLayout.CENTER) {
+                                    table() {
+                                        tableModel(list: model.downloads) {
+                                            closureColumn(header: "Name", type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: "Status", type: String, read : {row -> row.downloader.getCurrentState()})
+                                            closureColumn(header: "Progress", type: String, read: { row ->
+                                                int pieces = row.downloader.nPieces
+                                                int done = row.downloader.donePieces()
+                                                "$pieces/$done pieces"
+                                            })
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

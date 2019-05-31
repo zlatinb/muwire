@@ -17,6 +17,7 @@ public class Downloader {
     private final int pieceSize
     private final I2PConnector connector
     private final Destination destination
+    private final int nPieces
     
     private Endpoint endpoint
     private volatile DownloadSession currentSession
@@ -35,6 +36,7 @@ public class Downloader {
             nPieces = length / pieceSize
         else
             nPieces = length / pieceSize + 1
+        this.nPieces = nPieces
         
         pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
         currentState = DownloadState.CONNECTING
