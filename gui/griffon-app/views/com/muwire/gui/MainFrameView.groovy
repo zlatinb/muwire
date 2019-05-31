@@ -73,7 +73,7 @@ class MainFrameView {
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
-                                    button(text : "Download")
+                                    button(text : "Download", downloadAction)
                                     button(text : "Trust")
                                     button(text : "Distrust")
                                 }

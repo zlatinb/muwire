@@ -9,6 +9,8 @@ import javax.annotation.Nonnull
 import javax.inject.Inject
 
 import com.muwire.core.Core
+import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 
@@ -31,7 +33,18 @@ class MainFrameController {
             replyTo: core.me.destination, receivedOn: core.me.destination))
     }
     
+    @ControllerAction
+    void download() {
+        def resultsTable = builder.getVariable("results-table")
+        int row = resultsTable.getSelectedRow()
+        def result = model.results[row]
+        def file = new File(System.getProperty("user.home"), result.name) // TODO: move elsewhere
+        core.eventBus.publish(new UIDownloadEvent(result : result, target : file))
+    }
+    
     void mvcGroupInit(Map<String, String> args) {
-        application.addPropertyChangeListener("core", {e-> core = e.getNewValue()})
+        application.addPropertyChangeListener("core", {e-> 
+            core = e.getNewValue()
+        })
     }
 }

@@ -5,6 +5,7 @@ import javax.inject.Inject
 import javax.swing.JTable
 
 import com.muwire.core.Core
+import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.search.UIResultEvent
 
 import griffon.core.GriffonApplication
@@ -31,6 +32,7 @@ class MainFrameModel {
             coreInitialized = (e.getNewValue() != null)
             core = e.getNewValue()
             core.eventBus.register(UIResultEvent.class, this)
+            core.eventBus.register(DownloadStartedEvent.class, this)
         })
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -45,6 +47,12 @@ class MainFrameModel {
             results << e
             JTable table = builder.getVariable("results-table")
             table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onDownloadStartedEvent(DownloadStartedEvent e) {
+        runInsideUIAsync {
+            downloads << e
         }
     }
 }
