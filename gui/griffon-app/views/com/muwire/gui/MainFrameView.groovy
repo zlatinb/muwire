@@ -81,7 +81,7 @@ class MainFrameView {
                             panel (constraints : JSplitPane.BOTTOM) {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
-                                    table() {
+                                    table(id : "downloads-table") {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", type: String, read : {row -> row.downloader.getCurrentState()})
