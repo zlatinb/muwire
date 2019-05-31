@@ -25,6 +25,8 @@ Some of the UI tests will fail because they haven't been written yet :-/
 
 You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside.  
 
+The first time you run MuWire it will ask you to select a nickname.  This nickname will be displayed with search results, so that others can verify the file was shared by you.
+
 To share files, edit $HOME/.MuWire/MuWire.properties and add the property "sharedFiles" with value a comma-separated list of absolute paths to shared files or folders.
 
 At the moment there are very few nodes on the network, so you will see very few connections and search results.  It is best to leave MuWire running all the time, just like I2P.
