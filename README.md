@@ -23,14 +23,16 @@ Some of the UI tests will fail because they haven't been written yet :-/
 
 ### Running
 
-You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside.
+You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside.  
+
+To share files, edit $HOME/.MuWire/MuWire.properties and add the property "sharedFiles" with value a comma-separated list of absolute paths to shared files or folders.
 
 At the moment there are very few nodes on the network, so you will see very few connections and search results.  It is best to leave MuWire running all the time, just like I2P.
 
 
 ### Known bugs and limitations
 
-* There is no way to select files for sharing yet unless you want to write a groovy script.
+* Any shared files get re-hashed on startup
 * Sometimes the list of shared files gets lost 
 * Many UI features you would expect are not there yet
 
