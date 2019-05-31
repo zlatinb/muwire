@@ -38,7 +38,7 @@ class MainFrameController {
         def resultsTable = builder.getVariable("results-table")
         int row = resultsTable.getSelectedRow()
         def result = model.results[row]
-        def file = new File(System.getProperty("user.home"), result.name) // TODO: move elsewhere
+        def file = new File(application.context.get("muwire-settings").downloadLocation, result.name) 
         core.eventBus.publish(new UIDownloadEvent(result : result, target : file))
     }
     

@@ -7,6 +7,7 @@ class MuWireSettings {
     final boolean isLeaf
     boolean allowUntrusted
     String nickname
+    File downloadLocation
     CrawlerResponse crawlerResponse
     
 	MuWireSettings() {
@@ -18,6 +19,8 @@ class MuWireSettings {
 		allowUntrusted = Boolean.valueOf(props.get("allowUntrusted","true"))
 		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
         nickname = props.getProperty("nickname","MuWireUser")
+        downloadLocation = new File((String)props.getProperty("downloadLocation", 
+            System.getProperty("user.home")))
 	}
     
     void write(OutputStream out) throws IOException {
@@ -26,6 +29,7 @@ class MuWireSettings {
         props.setProperty("allowUntrusted", allowUntrusted.toString())
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
+        props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
         props.store(out, "")
     }
 
