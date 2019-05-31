@@ -14,6 +14,8 @@ import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.search.UIResultEvent
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustService
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 
@@ -55,6 +57,7 @@ class MainFrameModel {
             core.eventBus.register(FileLoadedEvent.class, this)
             core.eventBus.register(UploadEvent.class, this)
             core.eventBus.register(UploadFinishedEvent.class, this)
+            core.eventBus.register(TrustEvent.class, this)
         })
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -127,6 +130,13 @@ class MainFrameModel {
         runInsideUIAsync {
             uploads.remove(e.uploader)
             JTable table = builder.getVariable("uploads-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onTrustEvent(TrustEvent e) {
+        runInsideUIAsync {
+            JTable table = builder.getVariable("results-table")
             table.model.fireTableDataChanged()
         }
     }
