@@ -8,6 +8,7 @@ import com.muwire.core.MuWireSettings
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JOptionPane
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
@@ -40,8 +41,25 @@ class Ready extends AbstractLifecycleHandler {
             }
             props = new MuWireSettings(props)
         } else {
-            log.info("creating default properties")
+            log.info("creating new properties")
             props = new MuWireSettings()
+            def nickname
+            while (true) {
+                nickname = JOptionPane.showInputDialog(null,
+                        "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
+                        "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
+                if (nickname == null || nickname.trim().length() == 0) {
+                    JOptionPane.showMessageDialog(null, "Nickname cannot be empty")
+                    continue
+                }
+                if (nickname.contains("@")) {
+                    JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another")
+                    continue
+                }
+                nickname = nickname.trim()
+                break
+            }
+            props.setNickname(nickname)
             propsFile.withOutputStream {
                 props.write(it)
             }
@@ -49,6 +67,7 @@ class Ready extends AbstractLifecycleHandler {
         
         Core core = new Core(props, home)
         core.startServices()
+        application.context.put("muwire-settings", props)
         application.context.put("core",core)
         application.getPropertyChangeListeners("core").each { 
             it.propertyChange(new PropertyChangeEvent(this, "core", null, core)) 
