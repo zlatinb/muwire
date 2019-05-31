@@ -26,7 +26,7 @@ class MainFrameView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     MainFrameModel model
-
+    
     void initUI() {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
@@ -48,10 +48,11 @@ class MainFrameView {
                     panel(constraints: BorderLayout.CENTER) {
                         borderLayout()
                         label("Enter search here:", constraints: BorderLayout.WEST)
-                        textField(constraints: BorderLayout.CENTER)
+                        textField(id: "search-field", constraints: BorderLayout.CENTER, action : searchAction)
+                        
                     }
                     panel( constraints: BorderLayout.EAST) {
-                        button("Search")
+                        button(text: "Search", searchAction)
                     }
                 }
                 panel (id: "cards-panel", constraints : BorderLayout.CENTER) {

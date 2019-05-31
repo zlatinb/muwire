@@ -13,8 +13,10 @@ class MainFrameModel {
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
     
-    @Observable def results
-    @Observable def downloads
+    @Observable def results = []
+    @Observable def downloads = []
+    
+    String currentSearch
     
     void mvcGroupInit(Map<String, Object> args) {
         application.addPropertyChangeListener("core", {e ->
