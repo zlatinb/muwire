@@ -32,8 +32,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	}
 	@Override
 	public void drop(Destination d) {
-		// TODO Auto-generated method stub
-		
+		peerConnections.get(d)?.close()
+        leafConnections.get(d)?.close()
 	}
     
     void onQueryEvent(QueryEvent e) {
