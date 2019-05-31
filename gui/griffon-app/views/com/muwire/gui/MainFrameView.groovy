@@ -90,6 +90,11 @@ class MainFrameView {
                                                 int done = row.downloader.donePieces()
                                                 "$done/$pieces pieces"
                                             })
+                                            closureColumn(header: "Piece", type: String, read: { row ->
+                                                int position = row.downloader.positionInPiece()
+                                                int pieceSize = row.downloader.pieceSize // TODO: fix for last piece
+                                                "$position/$pieceSize bytes"
+                                            })
                                         }
                                     }
                                 }

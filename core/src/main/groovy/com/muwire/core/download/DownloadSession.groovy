@@ -140,6 +140,8 @@ class DownloadSession {
     }
     
     synchronized int positionInPiece() {
+        if (mapped == null)
+            return 0
         mapped.position()
     }
 }
