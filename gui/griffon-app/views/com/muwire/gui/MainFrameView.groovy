@@ -101,6 +101,12 @@ class MainFrameView {
                     }
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
+                    borderLayout()
+                    label(text : bind {model.me}, constraints: BorderLayout.CENTER)
+                    panel (constraints : BorderLayout.EAST) {
+                        label("Connections:")
+                        label(text : bind {model.connections})
+                    }
                 }
 
             }
