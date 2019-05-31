@@ -66,14 +66,13 @@ class MainFrameModel {
     
     void onConnectionEvent(ConnectionEvent e) {
         runInsideUIAsync {
-            if (e.status == ConnectionAttemptStatus.SUCCESSFUL)
-                connections++
+            connections = core.connectionManager.getConnections().size()
         }
     }
     
     void onDisconnectionEvent(DisconnectionEvent e) {
         runInsideUIAsync {
-            connections--
+            connections = core.connectionManager.getConnections().size()
         }
     }
 }
