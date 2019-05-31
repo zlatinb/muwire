@@ -8,6 +8,7 @@ class MuWireSettings {
     boolean allowUntrusted
     String nickname
     File downloadLocation
+    String sharedFiles
     CrawlerResponse crawlerResponse
     
 	MuWireSettings() {
@@ -21,6 +22,7 @@ class MuWireSettings {
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
             System.getProperty("user.home")))
+        sharedFiles = props.getProperty("sharedFiles")
 	}
     
     void write(OutputStream out) throws IOException {
@@ -30,6 +32,8 @@ class MuWireSettings {
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
+        if (sharedFiles != null)
+            props.setProperty("sharedFiles", sharedFiles)
         props.store(out, "")
     }
 

@@ -5,6 +5,7 @@ import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.files.FileSharedEvent
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -87,6 +88,12 @@ class Ready extends AbstractLifecycleHandler {
         application.context.put("core",core)
         application.getPropertyChangeListeners("core").each { 
             it.propertyChange(new PropertyChangeEvent(this, "core", null, core)) 
+        }
+        
+        if (props.sharedFiles != null) {
+            props.sharedFiles.split(",").each {
+                core.eventBus.publish(new FileSharedEvent(file : new File(it)))
+            }
         }
     }
 }

@@ -102,7 +102,22 @@ class MainFrameView {
                         }
                     }
                     panel (constraints: "uploads window"){
-                        label("card 2")
+                        gridLayout(cols : 1, rows : 2)
+                        panel {
+                            borderLayout()
+                            label(text : "Shared files", constraints: BorderLayout.NORTH)
+                            scrollPane ( constraints : BorderLayout.CENTER) {
+                                table(id : "shared-files-table") {
+                                     tableModel(list : model.shared) {
+                                         closureColumn(header : "Name", type : String, read : {row -> row.file.getAbsolutePath()})
+                                         closureColumn(header : "Size", type : Long, read : {row -> row.file.length()})
+                                     }   
+                                }
+                            }
+                        }
+                        panel {
+                            label("Uploads go here")
+                        }
                     }
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
