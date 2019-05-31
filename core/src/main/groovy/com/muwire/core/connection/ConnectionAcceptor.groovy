@@ -140,7 +140,7 @@ class ConnectionAcceptor {
     }
 
 	private void handleIncoming(Endpoint e, boolean leaf) {
-		boolean accept = leaf ? manager.hasLeafSlots() : manager.hasPeerSlots()
+		boolean accept = !manager.isConnected(e.destination) && (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
 		if (accept) {
 			log.info("accepting connection, leaf:$leaf")
 			e.outputStream.write("OK".bytes)

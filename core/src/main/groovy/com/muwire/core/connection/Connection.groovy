@@ -83,12 +83,11 @@ abstract class Connection implements Closeable {
 			}
 		} catch (SocketTimeoutException e) {
 			close()
-		} catch (Exception e) {
-			if (running.get()) {
-				log.log(Level.WARNING,"unhandled exception in reader",e)
-				close()
-			}
-		}
+        } catch (Exception e) {
+            log.log(Level.WARNING,"unhandled exception in reader",e)
+        } finally {
+            close()
+        }
 	}
 	
 	protected abstract void read()
@@ -100,11 +99,10 @@ abstract class Connection implements Closeable {
 				write(message)
 			}
 		} catch (Exception e) {
-			if (running.get()) {
-				log.log(Level.WARNING, "unhandled exception in writer",e)
-				close()
-			}
-		}
+            log.log(Level.WARNING, "unhandled exception in writer",e)
+        } finally {
+            close()
+        }
 	}
 	
 	protected abstract void write(def message);

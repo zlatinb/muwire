@@ -108,7 +108,11 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-		connectionManagerMock.demand.hasLeafSlots() { true }
+        connectionManagerMock.demand.isConnected { dest ->
+            assert dest == destinations.dest1
+            false
+        }
+        connectionManagerMock.demand.hasLeafSlots() { true }
 		trustServiceMock.demand.getLevel { dest ->
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
@@ -146,7 +150,11 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-		connectionManagerMock.demand.hasPeerSlots() { true }
+        connectionManagerMock.demand.isConnected { dest ->
+            assert dest == destinations.dest1
+            false
+        }
+        connectionManagerMock.demand.hasPeerSlots() { true }
 		trustServiceMock.demand.getLevel { dest ->
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
@@ -242,7 +250,7 @@ class ConnectionAcceptorTest {
 	}
 	
 	@Test
-	void testPeerRejectsPeer() {
+	void testPeerRejectsPeerSlots() {
 		settings = new MuWireSettings() {
 			boolean isLeaf() {
 				false
@@ -256,7 +264,11 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-		connectionManagerMock.demand.hasPeerSlots() { false }
+        connectionManagerMock.demand.isConnected { dest ->
+            assert dest == destinations.dest1
+            false
+        }
+        connectionManagerMock.demand.hasPeerSlots() { false }
 		trustServiceMock.demand.getLevel { dest ->
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
@@ -284,7 +296,7 @@ class ConnectionAcceptorTest {
 	}
 	
 	@Test
-	void testPeerRejectsLeaf() {
+	void testPeerRejectsLeafSlots() {
 		settings = new MuWireSettings() {
 			boolean isLeaf() {
 				false
@@ -298,7 +310,11 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-		connectionManagerMock.demand.hasLeafSlots() { false }
+        connectionManagerMock.demand.isConnected { dest ->
+            assert dest == destinations.dest1
+            false
+        }
+        connectionManagerMock.demand.hasLeafSlots() { false }
 		trustServiceMock.demand.getLevel { dest ->
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
@@ -340,7 +356,11 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-		connectionManagerMock.demand.hasPeerSlots() { false }
+        connectionManagerMock.demand.isConnected { dest ->
+            assert dest == destinations.dest1
+            false
+        }
+        connectionManagerMock.demand.hasPeerSlots() { false }
 		trustServiceMock.demand.getLevel { dest ->
 			assert dest == destinations.dest1
 			TrustLevel.TRUSTED
