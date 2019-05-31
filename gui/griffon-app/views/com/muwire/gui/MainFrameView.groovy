@@ -75,8 +75,8 @@ class MainFrameView {
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     button(text : "Download", downloadAction)
-                                    button(text : "Trust")
-                                    button(text : "Distrust")
+                                    button(text : "Trust", trustAction)
+                                    button(text : "Distrust", distrustAction)
                                 }
                             }
                             panel (constraints : JSplitPane.BOTTOM) {
