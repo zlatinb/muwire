@@ -6,6 +6,7 @@ import com.muwire.core.Persona
 
 class UIResultEvent extends Event {
     Persona sender
+    UUID uuid
     String name
     long size
     InfoHash infohash

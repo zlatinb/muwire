@@ -204,7 +204,7 @@ class ConnectionAcceptor {
                 byte [] payload = new byte[jsonSize]
                 dis.readFully(payload)
                 def json = slurper.parse(payload)
-                eventBus.publish(ResultsParser.parse(sender, json))
+                eventBus.publish(ResultsParser.parse(sender, resultsUUID, json))
             }
         } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
             log.log(Level.WARNING, "failed to process POST", bad)

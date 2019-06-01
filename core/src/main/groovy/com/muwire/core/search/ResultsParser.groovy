@@ -9,7 +9,7 @@ import com.muwire.core.util.DataUtil
 import net.i2p.data.Base64
 
 class ResultsParser {
-    public static UIResultEvent parse(Persona p, def json) throws InvalidSearchResultException {
+    public static UIResultEvent parse(Persona p, UUID uuid, def json) throws InvalidSearchResultException {
         if (json.type != "Result")
             throw new InvalidSearchResultException("not a result json")
         if (json.version != 1)
@@ -46,7 +46,8 @@ class ResultsParser {
                  name : name,
                  size : size,
                  infohash : parsedIH,
-                 pieceSize : pieceSize)
+                 pieceSize : pieceSize,
+                 uuid : uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }
