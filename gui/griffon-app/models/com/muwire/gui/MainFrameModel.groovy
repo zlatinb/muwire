@@ -158,6 +158,8 @@ class MainFrameModel {
     }
     
     void onQueryEvent(QueryEvent e) {
+        if (e.replyTo == core.me.destination)
+            return
         StringBuilder sb = new StringBuilder()
         e.searchEvent.searchTerms?.each {
             sb.append(it)
