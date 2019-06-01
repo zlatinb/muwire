@@ -12,6 +12,7 @@ import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
@@ -56,6 +57,21 @@ class MainFrameModel {
     volatile Core core    
     
     void mvcGroupInit(Map<String, Object> args) {
+        
+        Timer timer = new Timer("download-pumper", true)
+        timer.schedule({
+            runInsideUIAsync {
+                if (!mvcGroup.alive)
+                    return
+                builder.getVariable("uploads-table")?.model.fireTableDataChanged()
+
+                def downloadTable = builder.getVariable("downloads-table")
+                int selectedRow = downloadTable.getSelectedRow()
+                downloadTable.model.fireTableDataChanged()
+                downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+            }
+        }, 1000, 1000)
+
         application.addPropertyChangeListener("core", {e ->
             coreInitialized = (e.getNewValue() != null)
             core = e.getNewValue()
@@ -70,20 +86,21 @@ class MainFrameModel {
             core.eventBus.register(UploadFinishedEvent.class, this)
             core.eventBus.register(TrustEvent.class, this)
             core.eventBus.register(QueryEvent.class, this)
-        })
-        Timer timer = new Timer("download-pumper", true)
-        timer.schedule({
-            runInsideUIAsync {
-                if (!mvcGroup.alive)
-                    return
-                builder.getVariable("uploads-table")?.model.fireTableDataChanged()
-                
-                def downloadTable = builder.getVariable("downloads-table")
-                int selectedRow = downloadTable.getSelectedRow()
-                downloadTable.model.fireTableDataChanged()
-                downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+            
+            int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
+            if (retryInterval > 0) {
+                retryInterval *= 60000
+                timer.schedule({
+                    runInsideUIAsync {
+                        downloads.each {
+                            if (it.downloader.currentState == Downloader.DownloadState.FAILED)
+                                it.downloader.resume()
+                        }
+                    }
+                }, retryInterval, retryInterval)
             }
-        }, 1000, 1000)
+
+        })
     }
     
     void onUIResultEvent(UIResultEvent e) {
