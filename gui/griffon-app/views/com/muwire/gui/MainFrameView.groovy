@@ -48,6 +48,7 @@ class MainFrameView {
                         gridLayout(rows:1, cols: 2)
                         button(text: "Searches", actionPerformed : showSearchWindow)
                         button(text: "Uploads", actionPerformed : showUploadsWindow)
+                        button(text: "Monitor", actionPerformed : showMonitorWindow)
                     }
                     panel(constraints: BorderLayout.CENTER) {
                         borderLayout()
@@ -132,6 +133,17 @@ class MainFrameView {
                             }
                         }
                     }
+                    panel (constraints: "monitor window") {
+                        borderLayout()
+                        label("Connections", constraints : BorderLayout.NORTH)
+                        scrollPane(constraints : BorderLayout.CENTER) {
+                            table(id : "connections-table") {
+                                tableModel(list : model.connectionList) {
+                                    closureColumn(header : "Destination", type: String, read : { row -> row.toBase32() })
+                                }
+                            }
+                        }
+                    }
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
@@ -154,6 +166,11 @@ class MainFrameView {
     def showUploadsWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "uploads window")
+    }
+    
+    def showMonitorWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel,"monitor window")
     }
     
     def shareFiles = {

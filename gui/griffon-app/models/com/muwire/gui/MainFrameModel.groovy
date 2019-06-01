@@ -27,6 +27,7 @@ import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.transform.FXObservable
 import griffon.transform.Observable
+import net.i2p.data.Destination
 import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
@@ -40,6 +41,7 @@ class MainFrameModel {
     def downloads = []
     def uploads = []
     def shared = []
+    def connectionList = []
     
     @Observable int connections
     @Observable String me
@@ -85,14 +87,23 @@ class MainFrameModel {
     }
     
     void onConnectionEvent(ConnectionEvent e) {
+        if (e.getStatus() != ConnectionAttemptStatus.SUCCESSFUL)
+            return
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
+            
+            connectionList.add(e.endpoint.destination)
+            JTable table = builder.getVariable("connections-table")
+            table.model.fireTableDataChanged()
         }
     }
     
     void onDisconnectionEvent(DisconnectionEvent e) {
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
+            connectionList.remove(e.destination)
+            JTable table = builder.getVariable("connections-table")
+            table.model.fireTableDataChanged()
         }
     }
     
