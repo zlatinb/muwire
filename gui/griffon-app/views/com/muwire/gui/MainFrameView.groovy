@@ -9,9 +9,11 @@ import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JFileChooser
 import javax.swing.JSplitPane
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.border.Border
 
+import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
 
 import java.awt.BorderLayout
@@ -95,6 +97,10 @@ class MainFrameView {
                                         }
                                     }
                                 }
+                                panel (constraints : BorderLayout.SOUTH) {
+                                    button("Cancel", enabled : bind {model.cancelButtonEnabled } )
+                                    button("Retry", enabled : bind {model.retryButtonEnabled})
+                                }
                             }
                         }
                     }
@@ -176,6 +182,30 @@ class MainFrameView {
 
             }
         }
+    }
+    
+    void mvcGroupInit(Map<String, String> args) {
+        def downloadsTable = builder.getVariable("downloads-table")
+        def selectionModel = downloadsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = downloadsTable.getSelectedRow()
+            def downloader = model.downloads[selectedRow].downloader
+            switch(downloader.getCurrentState()) {
+                case Downloader.DownloadState.CONNECTING :
+                case Downloader.DownloadState.DOWNLOADING :
+                model.cancelButtonEnabled = true
+                model.retryButtonEnabled = false
+                break
+                case Downloader.DownloadState.FAILED:
+                model.cancelButtonEnabled = false
+                model.retryButtonEnabled = true
+                break
+                default:
+                model.cancelButtonEnabled = false
+                model.retryButtonEnabled = false
+            }
+        })
     }
 
     def showSearchWindow = {

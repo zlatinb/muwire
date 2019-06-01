@@ -48,6 +48,8 @@ class MainFrameModel {
     @Observable int connections
     @Observable String me
     @Observable boolean searchButtonsEnabled
+    @Observable boolean cancelButtonEnabled
+    @Observable boolean retryButtonEnabled
     
     private final Set<InfoHash> infoHashes = new HashSet<>()
 
