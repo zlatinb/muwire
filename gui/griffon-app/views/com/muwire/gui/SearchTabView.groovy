@@ -63,7 +63,7 @@ class SearchTabView {
                 panel {
                     label(text : searchTerms, constraints : BorderLayout.CENTER)
                 }
-                button(text : "x", preferredSize : [17,17], constraints : BorderLayout.EAST, // TODO: in osx is probably WEST
+                button(icon : imageIcon("/close_tab.png"), preferredSize : [20,20], constraints : BorderLayout.EAST, // TODO: in osx is probably WEST
                     actionPerformed : closeTab )
             }
         }
