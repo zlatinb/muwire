@@ -72,6 +72,8 @@ class MainFrameModel {
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
             runInsideUIAsync {
+                if (!mvcGroup.alive)
+                    return
                 builder.getVariable("downloads-table")?.model.fireTableDataChanged()
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()
             }
