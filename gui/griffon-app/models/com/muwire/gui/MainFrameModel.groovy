@@ -74,8 +74,12 @@ class MainFrameModel {
             runInsideUIAsync {
                 if (!mvcGroup.alive)
                     return
-                builder.getVariable("downloads-table")?.model.fireTableDataChanged()
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()
+                
+                def downloadTable = builder.getVariable("downloads-table")
+                int selectedRow = downloadTable.getSelectedRow()
+                downloadTable.model.fireTableDataChanged()
+                downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
             }
         }, 1000, 1000)
     }
