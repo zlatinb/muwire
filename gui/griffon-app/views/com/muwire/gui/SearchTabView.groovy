@@ -23,8 +23,9 @@ class SearchTabView {
     
     void initUI() {
         builder.with {
+            def resultsTable
             def pane = scrollPane {
-                table(id : "results-table") {
+                resultsTable = table(id : "results-table") {
                     tableModel(list: model.results) {
                         closureColumn(header: "Name", type: String, read : {row -> row.name})
                         closureColumn(header: "Size", preferredWidth: 150, type: Long, read : {row -> row.size})
@@ -36,6 +37,8 @@ class SearchTabView {
                 }
             }
             this.pane = pane
+            this.pane.putClientProperty("mvc-group", mvcGroup)
+            this.pane.putClientProperty("results-table",resultsTable)
         }
     }
     

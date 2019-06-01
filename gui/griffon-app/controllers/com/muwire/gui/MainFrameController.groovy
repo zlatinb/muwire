@@ -45,14 +45,19 @@ class MainFrameController {
     }
     
     private def selectedResult() {
-        def resultsTable = builder.getVariable("results-table")
-        int row = resultsTable.getSelectedRow()
-        model.results[row]
+        def selected = builder.getVariable("result-tabs").getSelectedComponent()
+        def group = selected.getClientProperty("mvc-group")
+        def table = selected.getClientProperty("results-table")
+        int row = table.getSelectedRow()
+
+        group.model.results[row]        
     }
     
     @ControllerAction
     void download() {
         def result = selectedResult()
+        if (result == null)
+            return // TODO disable button
         def file = new File(application.context.get("muwire-settings").downloadLocation, result.name) 
         core.eventBus.publish(new UIDownloadEvent(result : result, target : file))
     }
@@ -60,12 +65,16 @@ class MainFrameController {
     @ControllerAction
     void trust() {
         def result = selectedResult()
+        if (result == null)
+            return // TODO disable button
         core.eventBus.publish( new TrustEvent(destination : result.sender.destination, level : TrustLevel.TRUSTED))
     }
     
     @ControllerAction
     void distrust() {
         def result = selectedResult()
+        if (result == null)
+            return // TODO disable button
         core.eventBus.publish( new TrustEvent(destination : result.sender.destination, level : TrustLevel.DISTRUSTED))
     }
     
