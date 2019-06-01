@@ -67,8 +67,8 @@ class MainFrameModel {
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
             runInsideUIAsync {
-                builder.getVariable("downloads-table").model.fireTableDataChanged()
-                builder.getVariable("uploads-table").model.fireTableDataChanged()
+                builder.getVariable("downloads-table")?.model.fireTableDataChanged()
+                builder.getVariable("uploads-table")?.model.fireTableDataChanged()
             }
         }, 1000, 1000)
     }
