@@ -20,7 +20,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	
 	final Map<Destination, PeerConnection> peerConnections = new ConcurrentHashMap()
 	final Map<Destination, LeafConnection> leafConnections = new ConcurrentHashMap()
-	
+    
 	UltrapeerConnectionManager() {}
 
 	public UltrapeerConnectionManager(EventBus eventBus, Persona me, int maxPeers, int maxLeafs, 
@@ -100,6 +100,14 @@ class UltrapeerConnectionManager extends ConnectionManager {
 		if (removed == null)
 			log.severe("Removed connection not present in either leaf or peer map ${e.destination.toBase32()}")
 	}
+    
+    @Override
+    void shutdown() {
+        peerConnections.each {k,v -> v.close() }
+        leafConnections.each {k,v -> v.close() }
+        peerConnections.clear()
+        leafConnections.clear()
+    }
 	
 	void forwardQueryToLeafs(QueryEvent e) {
 		

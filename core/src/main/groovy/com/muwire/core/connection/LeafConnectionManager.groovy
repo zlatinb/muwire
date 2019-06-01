@@ -71,4 +71,8 @@ class LeafConnectionManager extends ConnectionManager {
 			log.severe("removed destination not present in connection manager ${e.destination.toBase32()}")
 	}
 	
+    @Override
+    void shutdown() {
+        
+    }
 }

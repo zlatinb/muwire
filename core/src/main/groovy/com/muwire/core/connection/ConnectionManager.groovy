@@ -58,6 +58,8 @@ abstract class ConnectionManager {
 	abstract void onConnectionEvent(ConnectionEvent e)
 	
 	abstract void onDisconnectionEvent(DisconnectionEvent e)
+    
+    abstract void shutdown()
 	
 	protected void sendPings() {
 		final long now = System.currentTimeMillis()

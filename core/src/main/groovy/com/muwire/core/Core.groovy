@@ -196,6 +196,10 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
     }
+    
+    public void shutdown() {
+        connectionManager.shutdown()
+    }
 
     static main(args) {
         def home = System.getProperty("user.home") + File.separator + ".MuWire"
