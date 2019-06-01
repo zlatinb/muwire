@@ -1,5 +1,6 @@
 package com.muwire.core.search
 
+import com.muwire.core.Constants
 
 class SearchIndex {
 
@@ -31,7 +32,7 @@ class SearchIndex {
 	}
 	
 	private static String[] split(String source) {
-		source = source.replaceAll("[\\.,_-]", " ")
+		source = source.replaceAll(Constants.SPLIT_PATTERN, " ").toLowerCase()
 		source.split(" ")
 	}
 	

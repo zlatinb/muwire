@@ -10,4 +10,6 @@ class Constants {
     public static final int MAX_HEADERS = 16
     
     public static final float DOWNLOAD_SEQUENTIAL_RATIO = 0.8f
+    
+    public static final String SPLIT_PATTERN = "[\\.,_-]"
 }

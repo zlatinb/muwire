@@ -10,6 +10,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 import javax.inject.Inject
 
+import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadEvent
@@ -39,7 +40,9 @@ class MainFrameController {
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
         
-        def searchEvent = new SearchEvent(searchTerms : [search], uuid : uuid)
+        // this can be improved a lot
+        def terms = search.toLowerCase().trim().split(Constants.SPLIT_PATTERN)
+        def searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
             replyTo: core.me.destination, receivedOn: core.me.destination))
     }
