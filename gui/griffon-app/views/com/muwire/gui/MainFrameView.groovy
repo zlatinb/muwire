@@ -134,12 +134,26 @@ class MainFrameView {
                         }
                     }
                     panel (constraints: "monitor window") {
-                        borderLayout()
-                        label("Connections", constraints : BorderLayout.NORTH)
-                        scrollPane(constraints : BorderLayout.CENTER) {
-                            table(id : "connections-table") {
-                                tableModel(list : model.connectionList) {
-                                    closureColumn(header : "Destination", type: String, read : { row -> row.toBase32() })
+                        gridLayout(rows : 1, cols : 2)
+                        panel {
+                            borderLayout()
+                            label("Connections", constraints : BorderLayout.NORTH)
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "connections-table") {
+                                    tableModel(list : model.connectionList) {
+                                        closureColumn(header : "Destination", type: String, read : { row -> row.toBase32() })
+                                    }
+                                }
+                            }
+                        }
+                        panel {
+                            borderLayout()
+                            label("Incoming searches", constraints : BorderLayout.NORTH)
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "searches-table") {
+                                    tableModel(list : model.searches) {
+                                        closureColumn(header : "Keywords", type : String, read : { it })
+                                    }
                                 }
                             }
                         }

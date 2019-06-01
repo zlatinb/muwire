@@ -15,6 +15,7 @@ import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
@@ -42,6 +43,7 @@ class MainFrameModel {
     def uploads = []
     def shared = []
     def connectionList = []
+    def searches = new LinkedList()
     
     @Observable int connections
     @Observable String me
@@ -65,6 +67,7 @@ class MainFrameModel {
             core.eventBus.register(UploadEvent.class, this)
             core.eventBus.register(UploadFinishedEvent.class, this)
             core.eventBus.register(TrustEvent.class, this)
+            core.eventBus.register(QueryEvent.class, this)
         })
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -150,6 +153,24 @@ class MainFrameModel {
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
             JTable table = builder.getVariable("results-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onQueryEvent(QueryEvent e) {
+        StringBuilder sb = new StringBuilder()
+        e.searchEvent.searchTerms?.each {
+            sb.append(it)
+            sb.append(" ")
+        }
+        def search = sb.toString()
+        if (search.trim().size() == 0)
+            return
+        runInsideUIAsync {
+            searches.addFirst(search)
+            while(searches.size() > 200)
+                searches.removeLast()
+            JTable table = builder.getVariable("searches-table")
             table.model.fireTableDataChanged()
         }
     }
