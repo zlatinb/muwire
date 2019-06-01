@@ -127,11 +127,8 @@ class DownloadSession {
             byte [] hash = digest.digest()
             byte [] expected = new byte[32]
             System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)    
-            if (hash != expected) {
-                log.warning("hash mismatch")
-                endpoint.close()
-                return
-            }
+            if (hash != expected) 
+                throw new BadHashException()
             
             pieces.markDownloaded(piece)        
         } finally {

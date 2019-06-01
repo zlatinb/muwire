@@ -2,13 +2,18 @@ package com.muwire.core.download
 
 import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
+
+import java.util.logging.Level
+
 import com.muwire.core.Constants
 import com.muwire.core.connection.I2PConnector
 
+import groovy.util.logging.Log
 import net.i2p.data.Destination
 
+@Log
 public class Downloader {
-    public enum DownloadState { CONNECTING, DOWNLOADING, FINISHED }
+    public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, FINISHED }
     
     private final File file
     private final Pieces pieces
@@ -43,14 +48,22 @@ public class Downloader {
     }
     
     void download() {
-        Endpoint endpoint = connector.connect(destination)
-        currentState = DownloadState.DOWNLOADING
-        while(!pieces.isComplete()) {
-            currentSession = new DownloadSession(pieces, infoHash, endpoint, file, pieceSize, length)
-            currentSession.request()
+        Endpoint endpoint = null
+        try {
+            endpoint = connector.connect(destination)
+            currentState = DownloadState.DOWNLOADING
+            while(!pieces.isComplete()) {
+                currentSession = new DownloadSession(pieces, infoHash, endpoint, file, pieceSize, length)
+                currentSession.request()
+            }
+            currentState = DownloadState.FINISHED
+        } catch (Exception bad) {
+            log.log(Level.WARNING,"Exception while downloading",bad)
+            if (currentState != DownloadState.FINISHED)
+                currentState = DownloadState.FAILED
+        } finally {
+            endpoint?.close()
         }
-        currentState = DownloadState.FINISHED
-        endpoint.close()
     }
     
     public long donePieces() {
