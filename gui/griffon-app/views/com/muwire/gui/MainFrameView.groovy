@@ -67,18 +67,7 @@ class MainFrameView {
                         continuousLayout : true, constraints : BorderLayout.CENTER) {
                             panel (constraints : JSplitPane.TOP) {
                                 borderLayout()
-                                scrollPane (constraints : BorderLayout.CENTER){
-                                    table(id : "results-table") {
-                                        tableModel(list: model.results) {
-                                            closureColumn(header: "Name", type: String, read : {row -> row.name})
-                                            closureColumn(header: "Size", preferredWidth: 150, type: Long, read : {row -> row.size})
-                                            closureColumn(header: "Sender", type: String, read : {row -> row.sender.getHumanReadableName()})
-                                            closureColumn(header: "Trust", type: String, read : {row ->
-                                              model.core.trustService.getLevel(row.sender.destination)  
-                                            })
-                                        }
-                                    }
-                                }
+                                tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
                                 panel(constraints : BorderLayout.SOUTH) {
                                     button(text : "Download", downloadAction)
                                     button(text : "Trust", trustAction)

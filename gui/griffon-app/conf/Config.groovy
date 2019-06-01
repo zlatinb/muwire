@@ -16,4 +16,9 @@ mvcGroups {
         view = 'com.muwire.gui.MainFrameView'
         controller = 'com.muwire.gui.MainFrameController'
     }
+    'SearchTab' {
+        model = 'com.muwire.gui.SearchTabModel'
+        view = 'com.muwire.gui.SearchTabView'
+        controller = 'com.muwire.gui.SearchTabController'
+    }
 }

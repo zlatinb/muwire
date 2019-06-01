@@ -3,6 +3,8 @@ package com.muwire.gui
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
+import griffon.core.mvc.MVCGroup
+import griffon.core.mvc.MVCGroupConfiguration
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
@@ -30,7 +32,14 @@ class MainFrameController {
     @ControllerAction
     void search() {
         def search = builder.getVariable("search-field").text
-        def searchEvent = new SearchEvent(searchTerms : [search], uuid : UUID.randomUUID())
+        def uuid = UUID.randomUUID()
+        Map<String, Object> params = new HashMap<>()
+        params["search-terms"] = search
+        params["uuid"] = uuid.toString()
+        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
+        model.results[uuid.toString()] = group
+        
+        def searchEvent = new SearchEvent(searchTerms : [search], uuid : uuid)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
             replyTo: core.me.destination, receivedOn: core.me.destination))
     }

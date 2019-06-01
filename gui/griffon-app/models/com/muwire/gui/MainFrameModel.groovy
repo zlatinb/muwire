@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import java.util.concurrent.ConcurrentHashMap
+
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.JTable
@@ -21,6 +23,7 @@ import com.muwire.core.upload.UploadFinishedEvent
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
+import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.transform.FXObservable
 import griffon.transform.Observable
@@ -33,7 +36,7 @@ class MainFrameModel {
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
     
-    @Observable def results = []
+    def results = new ConcurrentHashMap<>()
     @Observable def downloads = []
     @Observable def uploads = []
     @Observable def shared = []
@@ -69,11 +72,8 @@ class MainFrameModel {
     }
     
     void onUIResultEvent(UIResultEvent e) {
-        runInsideUIAsync {
-            results << e
-            JTable table = builder.getVariable("results-table")
-            table.model.fireTableDataChanged()
-        }
+        MVCGroup resultsGroup = results.get(e.uuid)
+        resultsGroup?.model.handleResult(e)
     }
     
     void onDownloadStartedEvent(DownloadStartedEvent e) {

@@ -55,7 +55,8 @@ class ResultsSender {
                     name : it.getFile().getName(),
                     size : length,
                     infohash : it.getInfoHash(),
-                    pieceSize : FileHasher.getPieceSize(length)
+                    pieceSize : FileHasher.getPieceSize(length),
+                    uuid : uuid
                     )
                     eventBus.publish(uiResultEvent)
             }
