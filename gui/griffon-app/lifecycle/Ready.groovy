@@ -16,6 +16,7 @@ import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
 import java.beans.PropertyChangeEvent
+import java.util.logging.Level
 
 @Log
 class Ready extends AbstractLifecycleHandler {
@@ -81,8 +82,15 @@ class Ready extends AbstractLifecycleHandler {
                 props.write(it)
             }
         }
-        
-        Core core = new Core(props, home)
+        Core core
+        try {
+            core = new Core(props, home)
+        } catch (Exception bad) {
+            log.log(Level.SEVERE,"couldn't initialize core",bad)
+            JOptionPane.showMessageDialog(null, "Couldn't connect to I2P router.  Make sure I2P is running and restart MuWire",
+                "Can't connect to I2P router", JOptionPane.WARNING_MESSAGE)
+            System.exit(0)
+        }
         core.startServices()
         application.context.put("muwire-settings", props)
         application.context.put("core",core)
