@@ -4,6 +4,8 @@ import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 
 import java.awt.BorderLayout
@@ -39,6 +41,12 @@ class SearchTabView {
             this.pane = pane
             this.pane.putClientProperty("mvc-group", mvcGroup)
             this.pane.putClientProperty("results-table",resultsTable)
+            
+            def selectionModel = resultsTable.getSelectionModel()
+            selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+            selectionModel.addListSelectionListener( {
+                mvcGroup.parentGroup.model.searchButtonsEnabled = true
+            })
         }
     }
     
@@ -66,6 +74,7 @@ class SearchTabView {
     def closeTab = {
         int index = parent.indexOfTab(searchTerms)
         parent.removeTabAt(index)
+        mvcGroup.parentGroup.model.searchButtonsEnabled = false
         mvcGroup.destroy()
     }
 }

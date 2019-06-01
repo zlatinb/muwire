@@ -49,7 +49,8 @@ class MainFrameController {
         def group = selected.getClientProperty("mvc-group")
         def table = selected.getClientProperty("results-table")
         int row = table.getSelectedRow()
-
+        if (row == -1)
+            return
         group.model.results[row]        
     }
     

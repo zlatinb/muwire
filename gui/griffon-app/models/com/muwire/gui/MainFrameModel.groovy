@@ -37,11 +37,13 @@ class MainFrameModel {
     @Observable boolean coreInitialized = false
     
     def results = new ConcurrentHashMap<>()
-    @Observable def downloads = []
-    @Observable def uploads = []
-    @Observable def shared = []
+    def downloads = []
+    def uploads = []
+    def shared = []
+    
     @Observable int connections
     @Observable String me
+    @Observable boolean searchButtonsEnabled
     
     private final Set<InfoHash> infoHashes = new HashSet<>()
 
