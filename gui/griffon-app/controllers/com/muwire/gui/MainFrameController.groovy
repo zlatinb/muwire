@@ -54,6 +54,11 @@ class MainFrameController {
         group.model.results[row]        
     }
     
+    private def selectedDownload() {
+        def selected = builder.getVariable("downloads-table").getSelectedRow()
+        model.downloads[selected].downloader
+    }
+    
     @ControllerAction
     void download() {
         def result = selectedResult()
@@ -77,6 +82,12 @@ class MainFrameController {
         if (result == null)
             return // TODO disable button
         core.eventBus.publish( new TrustEvent(destination : result.sender.destination, level : TrustLevel.DISTRUSTED))
+    }
+    
+    @ControllerAction 
+    void cancel() {
+        def downloader = selectedDownload()
+        downloader.cancel()
     }
     
     void mvcGroupInit(Map<String, String> args) {

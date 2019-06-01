@@ -27,6 +27,8 @@ public class Downloader {
     private Endpoint endpoint
     private volatile DownloadSession currentSession
     private volatile DownloadState currentState
+    private volatile boolean cancelled
+    private volatile Thread downloadThread
     
     public Downloader(File file, long length, InfoHash infoHash, int pieceSizePow2, I2PConnector connector, Destination destination) {
         this.file = file
@@ -48,6 +50,7 @@ public class Downloader {
     }
     
     void download() {
+        downloadThread = Thread.currentThread()
         Endpoint endpoint = null
         try {
             endpoint = connector.connect(destination)
@@ -59,7 +62,9 @@ public class Downloader {
             currentState = DownloadState.FINISHED
         } catch (Exception bad) {
             log.log(Level.WARNING,"Exception while downloading",bad)
-            if (currentState != DownloadState.FINISHED)
+            if (cancelled)
+                currentState = DownloadState.CANCELLED
+            else if (currentState != DownloadState.FINISHED)
                 currentState = DownloadState.FAILED
         } finally {
             endpoint?.close()
@@ -78,5 +83,10 @@ public class Downloader {
     
     public DownloadState getCurrentState() {
         currentState
+    }
+    
+    public void cancel() {
+        cancelled = true
+        downloadThread?.interrupt()
     }
 }

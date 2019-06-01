@@ -98,7 +98,7 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    button("Cancel", enabled : bind {model.cancelButtonEnabled } )
+                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
                                     button("Retry", enabled : bind {model.retryButtonEnabled})
                                 }
                             }
