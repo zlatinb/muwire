@@ -13,7 +13,7 @@ import net.i2p.data.Destination
 
 @Log
 public class Downloader {
-    public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, FINISHED }
+    public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, CANCELLED, FINISHED }
     
     private final File file
     private final Pieces pieces
