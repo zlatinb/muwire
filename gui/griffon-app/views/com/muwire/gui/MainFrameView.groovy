@@ -103,7 +103,7 @@ class MainFrameView {
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
-                                button(text : "Shared files", actionPerformed : shareFiles)
+                                button(text : "Click here to share files", actionPerformed : shareFiles)
                             }
                             scrollPane ( constraints : BorderLayout.CENTER) {
                                 table(id : "shared-files-table") {
@@ -116,7 +116,9 @@ class MainFrameView {
                         }
                         panel {
                             borderLayout()
-                            label("Uploads", constraints : BorderLayout.NORTH)
+                            panel (constraints : BorderLayout.NORTH){
+                                label("Uploads")
+                            }
                             scrollPane (constraints : BorderLayout.CENTER) {
                                 table(id : "uploads-table") {
                                     tableModel(list : model.uploads) {
@@ -137,7 +139,9 @@ class MainFrameView {
                         gridLayout(rows : 1, cols : 2)
                         panel {
                             borderLayout()
-                            label("Connections", constraints : BorderLayout.NORTH)
+                            panel (constraints : BorderLayout.NORTH){
+                                label("Connections")
+                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "connections-table") {
                                     tableModel(list : model.connectionList) {
@@ -148,7 +152,9 @@ class MainFrameView {
                         }
                         panel {
                             borderLayout()
-                            label("Incoming searches", constraints : BorderLayout.NORTH)
+                            panel (constraints : BorderLayout.NORTH){
+                                label("Incoming searches")
+                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
