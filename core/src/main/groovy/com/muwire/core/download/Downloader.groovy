@@ -14,7 +14,8 @@ import net.i2p.data.Destination
 @Log
 public class Downloader {
     public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, CANCELLED, FINISHED }
-    
+
+    private final DownloadManager downloadManager    
     private final File file
     private final Pieces pieces
     private final long length
@@ -31,8 +32,10 @@ public class Downloader {
     private volatile boolean cancelled
     private volatile Thread downloadThread
     
-    public Downloader(File file, long length, InfoHash infoHash, int pieceSizePow2, I2PConnector connector, Destination destination,
+    public Downloader(DownloadManager downloadManager, File file, long length, InfoHash infoHash, 
+        int pieceSizePow2, I2PConnector connector, Destination destination,
         File incompletes) {
+        this.downloadManager = downloadManager
         this.file = file
         this.infoHash = infoHash
         this.length = length
@@ -111,5 +114,9 @@ public class Downloader {
     public void cancel() {
         cancelled = true
         downloadThread?.interrupt()
+    }
+    
+    public void resume() {
+        downloadManager.resume(this)
     }
 }

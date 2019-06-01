@@ -90,6 +90,12 @@ class MainFrameController {
         downloader.cancel()
     }
     
+    @ControllerAction
+    void resume() {
+        def downloader = selectedDownload()
+        downloader.resume()
+    }
+    
     void mvcGroupInit(Map<String, String> args) {
         application.addPropertyChangeListener("core", {e-> 
             core = e.getNewValue()

@@ -99,7 +99,7 @@ class MainFrameView {
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
                                     button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
-                                    button("Retry", enabled : bind {model.retryButtonEnabled})
+                                    button(text: "Retry", enabled : bind {model.retryButtonEnabled}, resumeAction)
                                 }
                             }
                         }

@@ -28,10 +28,14 @@ public class DownloadManager {
     
     
     public void onUIDownloadEvent(UIDownloadEvent e) {
-        def downloader = new Downloader(e.target, e.result.size,
+        def downloader = new Downloader(this, e.target, e.result.size,
             e.result.infohash, e.result.pieceSize, connector, e.result.sender.destination,
             incompletes)
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
+    }
+    
+    void resume(Downloader downloader) {
+        executor.execute({downloader.download() as Runnable})
     }
 }
