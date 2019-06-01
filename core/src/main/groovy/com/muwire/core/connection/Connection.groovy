@@ -165,7 +165,7 @@ abstract class Connection implements Closeable {
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
                                             receivedOn : endpoint.destination,
-                                            firstHop : Boolean.parseBoolean(search.firstHop) )
+                                            firstHop : search.firstHop )
         eventBus.publish(event)
                                             
     }
