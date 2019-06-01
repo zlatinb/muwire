@@ -33,6 +33,14 @@ class Pieces {
         }
     }
     
+    def getDownloaded() {
+        def rv = []
+        for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i+1)) {
+            rv << i
+        }
+        rv
+    }
+    
     synchronized void markDownloaded(int piece) {
         bitSet.set(piece)
     }

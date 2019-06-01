@@ -11,10 +11,13 @@ public class DownloadManager {
     private final EventBus eventBus
     private final I2PConnector connector
     private final Executor executor
+    private final File incompletes
     
-    public DownloadManager(EventBus eventBus, I2PConnector connector) {
+    public DownloadManager(EventBus eventBus, I2PConnector connector, File incompletes) {
         this.eventBus = eventBus
         this.connector = connector
+        this.incompletes = incompletes
+        incompletes.mkdir()
         this.executor = Executors.newCachedThreadPool({ r ->
             Thread rv = new Thread(r)
             rv.setName("download-worker")
@@ -26,7 +29,8 @@ public class DownloadManager {
     
     public void onUIDownloadEvent(UIDownloadEvent e) {
         def downloader = new Downloader(e.target, e.result.size,
-            e.result.infohash, e.result.pieceSize, connector, e.result.sender.destination)
+            e.result.infohash, e.result.pieceSize, connector, e.result.sender.destination,
+            incompletes)
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
     }

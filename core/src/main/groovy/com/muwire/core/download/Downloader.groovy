@@ -23,6 +23,7 @@ public class Downloader {
     private final I2PConnector connector
     private final Destination destination
     private final int nPieces
+    private final File piecesFile
     
     private Endpoint endpoint
     private volatile DownloadSession currentSession
@@ -30,12 +31,14 @@ public class Downloader {
     private volatile boolean cancelled
     private volatile Thread downloadThread
     
-    public Downloader(File file, long length, InfoHash infoHash, int pieceSizePow2, I2PConnector connector, Destination destination) {
+    public Downloader(File file, long length, InfoHash infoHash, int pieceSizePow2, I2PConnector connector, Destination destination,
+        File incompletes) {
         this.file = file
         this.infoHash = infoHash
         this.length = length
         this.connector = connector
         this.destination = destination
+        this.piecesFile = new File(incompletes, file.getName()+".pieces")
         this.pieceSize = 1 << pieceSizePow2
         
         int nPieces
@@ -50,6 +53,7 @@ public class Downloader {
     }
     
     void download() {
+        readPieces()
         downloadThread = Thread.currentThread()
         Endpoint endpoint = null
         try {
@@ -58,8 +62,10 @@ public class Downloader {
             while(!pieces.isComplete()) {
                 currentSession = new DownloadSession(pieces, infoHash, endpoint, file, pieceSize, length)
                 currentSession.request()
+                writePieces()
             }
             currentState = DownloadState.FINISHED
+            piecesFile.delete()
         } catch (Exception bad) {
             log.log(Level.WARNING,"Exception while downloading",bad)
             if (cancelled)
@@ -68,6 +74,23 @@ public class Downloader {
                 currentState = DownloadState.FAILED
         } finally {
             endpoint?.close()
+        }
+    }
+    
+    void readPieces() {
+        if (!piecesFile.exists())
+            return
+        piecesFile.withReader { 
+            int piece = Integer.parseInt(it.readLine())
+            pieces.markDownloaded(piece)
+        }
+    }
+    
+    void writePieces() {
+        piecesFile.withPrintWriter { writer ->
+            pieces.getDownloaded().each { piece -> 
+                writer.println(piece)
+            }
         }
     }
     

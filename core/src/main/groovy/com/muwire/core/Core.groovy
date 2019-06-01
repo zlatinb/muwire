@@ -54,7 +54,8 @@ public class Core {
     
     final EventBus eventBus
     final Persona me
-
+    final File home
+    
     private final TrustService trustService
     private final PersisterService persisterService
     private final HostCache hostCache
@@ -64,7 +65,8 @@ public class Core {
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
         
-    public Core(MuWireSettings props, File home) {		
+    public Core(MuWireSettings props, File home) {
+        this.home = home		
         log.info "Initializing I2P context"
         I2PAppContext.getGlobalContext().logManager()
         I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
@@ -164,7 +166,7 @@ public class Core {
 		eventBus.register(ResultsEvent.class, searchManager)
 		
         log.info("initializing download manager")
-        DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector)
+        DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector, new File(home, "incompletes"))
         eventBus.register(UIDownloadEvent.class, downloadManager)
         
         log.info("initializing upload manager")
