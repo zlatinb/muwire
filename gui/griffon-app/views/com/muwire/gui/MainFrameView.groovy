@@ -136,6 +136,9 @@ class MainFrameView {
                                             int percent = (int)((position * 100.0) / total)
                                             "$percent%"
                                         })
+                                        closureColumn(header : "Downloader", type : String, read : { row -> 
+                                            row.request.downloader?.getHumanReadableName()
+                                        })
                                     }
                                 }
                             }

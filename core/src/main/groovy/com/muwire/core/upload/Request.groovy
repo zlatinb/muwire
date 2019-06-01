@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -16,6 +17,7 @@ class Request {
     
     InfoHash infoHash
     Range range
+    Persona downloader
     Map<String, String> headers
     
     static Request parse(InfoHash infoHash, InputStream is) throws IOException {
@@ -85,7 +87,13 @@ class Request {
         if (start < 0 || end < start)
             throw new IOException("Invalid range $start - $end")
         
-        new Request( infoHash : infoHash, range : new Range(start, end), headers : headers)
+        Persona downloader = null
+        if (headers.containsKey("X-Persona")) {
+            def encoded = headers["X-Persona"].trim()
+            def decoded = Base64.decode(encoded)
+            downloader = new Persona(new ByteArrayInputStream(decoded))
+        }
+        new Request( infoHash : infoHash, range : new Range(start, end), headers : headers, downloader : downloader)
     }
     
 }

@@ -15,7 +15,8 @@ import net.i2p.data.Destination
 public class Downloader {
     public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, CANCELLED, FINISHED }
 
-    private final DownloadManager downloadManager    
+    private final DownloadManager downloadManager 
+    private final String meB64   
     private final File file
     private final Pieces pieces
     private final long length
@@ -32,9 +33,10 @@ public class Downloader {
     private volatile boolean cancelled
     private volatile Thread downloadThread
     
-    public Downloader(DownloadManager downloadManager, File file, long length, InfoHash infoHash, 
+    public Downloader(DownloadManager downloadManager, String meB64, File file, long length, InfoHash infoHash, 
         int pieceSizePow2, I2PConnector connector, Destination destination,
         File incompletes) {
+        this.meB64 = meB64
         this.downloadManager = downloadManager
         this.file = file
         this.infoHash = infoHash
@@ -63,7 +65,7 @@ public class Downloader {
             endpoint = connector.connect(destination)
             currentState = DownloadState.DOWNLOADING
             while(!pieces.isComplete()) {
-                currentSession = new DownloadSession(pieces, infoHash, endpoint, file, pieceSize, length)
+                currentSession = new DownloadSession(meB64, pieces, infoHash, endpoint, file, pieceSize, length)
                 currentSession.request()
                 writePieces()
             }

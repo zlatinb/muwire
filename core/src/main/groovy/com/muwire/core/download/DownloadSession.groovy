@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException
 @Log
 class DownloadSession {
     
+    private final String meB64
     private final Pieces pieces
     private final InfoHash infoHash
     private final Endpoint endpoint
@@ -30,8 +31,9 @@ class DownloadSession {
     
     private ByteBuffer mapped
     
-    DownloadSession(Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
+    DownloadSession(String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
         int pieceSize, long fileLength) {
+        this.meB64 = meB64
         this.pieces = pieces
         this.endpoint = endpoint
         this.infoHash = infoHash
@@ -60,7 +62,8 @@ class DownloadSession {
         FileChannel channel
         try {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
-            os.write("Range: $start-$end\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
             String code = readTillRN(is)
             if (code.startsWith("404 ")) {
