@@ -21,7 +21,11 @@ class Initialize extends AbstractLifecycleHandler {
 
     @Override
     void execute() {
-        lookAndFeel((isMacOSX ? 'system' : 'nimbus'), 'gtk', ['metal', [boldFonts: false]])
+        if (isMacOSX()) {
+            lookAndFeel('nimbus') // otherwise the file chooser doesn't open???
+        } else {
+            lookAndFeel('system', 'gtk')
+        }
     }
 }
 
