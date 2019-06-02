@@ -32,6 +32,9 @@ class MainFrameController {
     
     @ControllerAction
     void search() {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "search window")
+        
         def search = builder.getVariable("search-field").text
         def uuid = UUID.randomUUID()
         Map<String, Object> params = new HashMap<>()
