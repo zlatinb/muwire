@@ -5,14 +5,17 @@ import org.junit.Before
 import org.junit.Test
 
 import com.muwire.core.Destinations
+import com.muwire.core.Persona
+import com.muwire.core.Personas
 
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 
 class TrustServiceTest {
 
 	TrustService service
 	File persistGood, persistBad
-	Destinations dests = new Destinations()
+	Personas personas = new Personas()
 	
 	@Before
 	void before() {
@@ -33,51 +36,50 @@ class TrustServiceTest {
 	
 	@Test
 	void testEmpty() {
-		assert TrustLevel.NEUTRAL == service.getLevel(dests.dest1)
-		assert TrustLevel.NEUTRAL == service.getLevel(dests.dest2)
+		assert TrustLevel.NEUTRAL == service.getLevel(personas.persona1.destination)
+		assert TrustLevel.NEUTRAL == service.getLevel(personas.persona2.destination)
 	}
 	
 	@Test
 	void testOnEvent() {
-		service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, destination: dests.dest1)
-		service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, destination: dests.dest2)
+		service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, persona: personas.persona1)
+		service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, persona: personas.persona2)
 		
-		assert TrustLevel.TRUSTED == service.getLevel(dests.dest1)
-		assert TrustLevel.DISTRUSTED == service.getLevel(dests.dest2)
+		assert TrustLevel.TRUSTED == service.getLevel(personas.persona1.destination)
+		assert TrustLevel.DISTRUSTED == service.getLevel(personas.persona2.destination)
 	}
 	
 	@Test 
 	void testPersist() {
-		service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, destination: dests.dest1)
-		service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, destination: dests.dest2)
+		service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, persona: personas.persona1)
+		service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, persona: personas.persona2)
 		
 		Thread.sleep(250)
 		def trusted = new HashSet<>()
 		persistGood.eachLine {
-			trusted.add(new Destination(it))
+			trusted.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
 		}
 		def distrusted = new HashSet<>()
 		persistBad.eachLine {
-			distrusted.add(new Destination(it))
+			distrusted.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
 		}
 		
 		assert trusted.size() == 1
-		assert trusted.contains(dests.dest1)
+		assert trusted.contains(personas.persona1)
 		assert distrusted.size() == 1
-		assert distrusted.contains(dests.dest2)
+		assert distrusted.contains(personas.persona2)
 	}
 	
 	@Test
 	void testLoad() {
 		service.stop()
-		persistGood.append("${dests.dest1.toBase64()}\n")
-		persistBad.append("${dests.dest2.toBase64()}\n")
+		persistGood.append("${personas.persona1.toBase64()}\n")
+		persistBad.append("${personas.persona2.toBase64()}\n")
 		service = new TrustService(persistGood, persistBad, 100)
 		service.start()
-		Thread.sleep(10)
+		Thread.sleep(50)
 		
-		assert TrustLevel.TRUSTED == service.getLevel(dests.dest1)
-		assert TrustLevel.DISTRUSTED == service.getLevel(dests.dest2)
-
+		assert TrustLevel.TRUSTED == service.getLevel(personas.persona1.destination)
+		assert TrustLevel.DISTRUSTED == service.getLevel(personas.persona2.destination)
 	}
 }
