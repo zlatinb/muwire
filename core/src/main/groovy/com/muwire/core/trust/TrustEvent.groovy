@@ -1,11 +1,10 @@
 package com.muwire.core.trust
 
 import com.muwire.core.Event
-
-import net.i2p.data.Destination
+import com.muwire.core.Persona
 
 class TrustEvent extends Event {
 
-	Destination destination
+	Persona persona
 	TrustLevel level
 }

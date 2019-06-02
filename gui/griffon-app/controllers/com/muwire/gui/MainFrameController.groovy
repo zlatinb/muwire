@@ -79,7 +79,7 @@ class MainFrameController {
         def result = selectedResult()
         if (result == null)
             return // TODO disable button
-        core.eventBus.publish( new TrustEvent(destination : result.sender.destination, level : TrustLevel.TRUSTED))
+        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.TRUSTED))
     }
     
     @ControllerAction
@@ -87,7 +87,7 @@ class MainFrameController {
         def result = selectedResult()
         if (result == null)
             return // TODO disable button
-        core.eventBus.publish( new TrustEvent(destination : result.sender.destination, level : TrustLevel.DISTRUSTED))
+        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.DISTRUSTED))
     }
     
     @ControllerAction 

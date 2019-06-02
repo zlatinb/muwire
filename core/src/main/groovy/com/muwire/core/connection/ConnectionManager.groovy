@@ -40,7 +40,7 @@ abstract class ConnectionManager {
 	
 	void onTrustEvent(TrustEvent e) {
 		if (e.level == TrustLevel.DISTRUSTED)
-			drop(e.destination)
+			drop(e.persona.destination)
 	}
     
 	abstract void drop(Destination d)

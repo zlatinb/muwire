@@ -2,6 +2,7 @@ package com.muwire.core
 
 import net.i2p.crypto.DSAEngine
 import net.i2p.crypto.SigType
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 import net.i2p.data.Signature
 import net.i2p.data.SigningPublicKey
@@ -14,6 +15,7 @@ public class Persona {
     private final Destination destination
     private final byte[] sig
     private volatile String humanReadableName
+    private volatile String base64
     private volatile byte[] payload
     
     public Persona(InputStream personaStream) throws IOException, InvalidSignatureException {
@@ -57,6 +59,15 @@ public class Persona {
         if (humanReadableName == null) 
             humanReadableName = name.getName() + "@" + destination.toBase32().substring(0,32)
         humanReadableName
+    }
+    
+    public String toBase64() {
+        if (base64 == null) {
+            def baos = new ByteArrayOutputStream()
+            write(baos)
+            base64 = Base64.encode(baos.toByteArray())
+        }
+        base64
     }
     
     @Override

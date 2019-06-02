@@ -1,7 +1,11 @@
 package com.muwire.core.trust
 
+import java.util.concurrent.ConcurrentHashMap
+
+import com.muwire.core.Persona
 import com.muwire.core.Service
 
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
 
@@ -10,8 +14,8 @@ class TrustService extends Service {
 	final File persistGood, persistBad
 	final long persistInterval
 	
-	final Set<Destination> good = new ConcurrentHashSet<>()
-	final Set<Destination> bad = new ConcurrentHashSet<>()
+	final Map<Destination, Persona> good = new ConcurrentHashMap<>()
+	final Map<Destination, Persona> bad = new ConcurrentHashMap<>()
 	
 	final Timer timer
 	
@@ -35,12 +39,16 @@ class TrustService extends Service {
 	void load() {
 		if (persistGood.exists()) {
 			persistGood.eachLine {
-				good.add(new Destination(it))
+                byte [] decoded = Base64.decode(it)
+                Persona persona = new Persona(new ByteArrayInputStream(decoded))
+				good.put(persona.destination, persona)
 			}
 		}
 		if (persistBad.exists()) {
 			persistBad.eachLine {
-				bad.add(new Destination(it))
+                byte [] decoded = Base64.decode(it)
+                Persona persona = new Persona(new ByteArrayInputStream(decoded))
+                bad.put(persona.destination, persona)
 			}
 		}
 		timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
@@ -50,22 +58,22 @@ class TrustService extends Service {
 	private void persist() {
 		persistGood.delete()
 		persistGood.withPrintWriter { writer ->
-			good.each {
-				writer.println it.toBase64()
+			good.each {k,v ->
+				writer.println v.toBase64()
 			}
 		}
 		persistBad.delete()
 		persistBad.withPrintWriter { writer ->
-			bad.each { 
-				writer.println it.toBase64()
+			bad.each { k,v ->
+				writer.println v.toBase64()
 			}
 		}
 	}
 	
 	TrustLevel getLevel(Destination dest) {
-		if (good.contains(dest))
+		if (good.containsKey(dest))
 			return TrustLevel.TRUSTED
-		else if (bad.contains(dest))
+		else if (bad.containsKey(dest))
 			return TrustLevel.DISTRUSTED
 		TrustLevel.NEUTRAL
 	}
@@ -73,16 +81,16 @@ class TrustService extends Service {
 	void onTrustEvent(TrustEvent e) {
 		switch(e.level) {
 			case TrustLevel.TRUSTED:
-				bad.remove(e.destination)
-				good.add(e.destination)
+				bad.remove(e.persona.destination)
+				good.put(e.persona.destination, e.persona)
 				break
 			case TrustLevel.DISTRUSTED:
-				good.remove(e.destination)
-				bad.add(e.destination)
+				good.remove(e.persona.destination)
+				bad.put(e.persona.destination, e.persona)
 				break
 			case TrustLevel.NEUTRAL:
-				good.remove(e.destination)
-				bad.remove(e.destination)
+				good.remove(e.persona.destination)
+				bad.remove(e.persona.destination)
 				break
 		}
 	}
