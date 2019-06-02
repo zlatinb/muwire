@@ -202,8 +202,6 @@ class MainFrameModel {
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
             
-            // TODO: refresh any search tabs
-            
             trusted.clear()
             trusted.addAll(core.trustService.good.values())
             distrusted.clear()
@@ -211,6 +209,10 @@ class MainFrameModel {
             
             updateTablePreservingSelection("trusted-table")
             updateTablePreservingSelection("distrusted-table")
+            
+            results.values().each { 
+                it.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
+            }
         }
     }
     
