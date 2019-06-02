@@ -3,7 +3,7 @@ subprojects {
 
     dependencies {
         compile 'net.i2p:i2p:0.9.40'
-        compile 'org.codehaus.groovy:groovy-all:2.5.7'
+        compile 'org.codehaus.groovy:groovy-all:2.4.15'
     }
 
     compileGroovy {
