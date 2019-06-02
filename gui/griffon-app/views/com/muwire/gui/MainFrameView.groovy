@@ -54,7 +54,7 @@ class MainFrameView {
                     }
                     panel(constraints: BorderLayout.CENTER) {
                         borderLayout()
-                        label("Enter search here:", constraints: BorderLayout.WEST)
+                        label("        Enter search here:", constraints: BorderLayout.WEST) // TODO: fix this
                         textField(id: "search-field", constraints: BorderLayout.CENTER, action : searchAction)
                         
                     }
