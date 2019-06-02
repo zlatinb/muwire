@@ -187,13 +187,10 @@ class MainFrameView {
                         gridLayout(rows: 1, cols :2)
                         panel (border : etchedBorder()){
                             borderLayout()
-                            panel (constraints : BorderLayout.NORTH) {
-                                label("Trusted users")
-                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "trusted-table") {
                                     tableModel(list : model.trusted) {
-                                        closureColumn(type : String, read : { it.getHumanReadableName() } )
+                                        closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
                                     }
                                 }
                             }
@@ -205,13 +202,10 @@ class MainFrameView {
                         }
                         panel (border : etchedBorder()){
                             borderLayout()
-                            panel (constraints : BorderLayout.NORTH) {
-                                label("Distrusted users")
-                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "distrusted-table") {
                                     tableModel(list : model.distrusted) {
-                                        closureColumn(type : String, read : { it.getHumanReadableName() } )
+                                        closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
                                     }
                                 }
                             }
