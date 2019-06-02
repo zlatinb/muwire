@@ -55,7 +55,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
-        session = new DownloadSession(pieces, infoHash, endpoint, target, pieceSize, size)
+        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size)
         downloadThread = new Thread( { session.request() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
@@ -74,6 +74,7 @@ class DownloadSessionTest {
         initSession(20)
         assert "GET $rootBase64" == readTillRN(fromDownloader)
         assert "Range: 0-19" == readTillRN(fromDownloader)
+        readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
         
         toDownloader.write("200 OK\r\n".bytes)
@@ -94,6 +95,7 @@ class DownloadSessionTest {
         initSession(size)
         
         assert "GET $rootBase64" == readTillRN(fromDownloader)
+        readTillRN(fromDownloader)
         readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
         
@@ -122,6 +124,7 @@ class DownloadSessionTest {
         assert (start == 0 && end == ((1 << pieceSize) - 1)) || 
             (start == (1 << pieceSize) && end == (1 << pieceSize))
         
+        readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
         
         toDownloader.write("200 OK\r\n".bytes)
