@@ -54,9 +54,8 @@ class MainFrameView {
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
-                        panel(constraints : "top-connect-panel") {
-                            label(text : "MuWire is connecting, please wait.  You will be able to search soon.")
-                        }
+                        label(constraints : "top-connect-panel",
+                            text : "        MuWire is connecting, please wait.  You will be able to search soon.") // TODO: real padding
                         panel(constraints : "top-search-panel") {
                             borderLayout()
                             panel(constraints: BorderLayout.CENTER) {
