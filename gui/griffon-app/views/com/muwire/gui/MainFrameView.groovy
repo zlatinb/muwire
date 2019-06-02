@@ -52,14 +52,23 @@ class MainFrameView {
                         button(text: "Uploads", actionPerformed : showUploadsWindow)
                         button(text: "Monitor", actionPerformed : showMonitorWindow)
                     }
-                    panel(constraints: BorderLayout.CENTER) {
-                        borderLayout()
-                        label("        Enter search here:", constraints: BorderLayout.WEST) // TODO: fix this
-                        textField(id: "search-field", constraints: BorderLayout.CENTER, action : searchAction)
-                        
-                    }
-                    panel( constraints: BorderLayout.EAST) {
-                        button(text: "Search", searchAction)
+                    panel(id: "top-panel", constraints: BorderLayout.CENTER) {
+                        cardLayout()
+                        panel(constraints : "top-connect-panel") {
+                            label(text : "MuWire is connecting, please wait.  You will be able to search soon.")
+                        }
+                        panel(constraints : "top-search-panel") {
+                            borderLayout()
+                            panel(constraints: BorderLayout.CENTER) {
+                                borderLayout()
+                                label("        Enter search here:", constraints: BorderLayout.WEST) // TODO: fix this
+                                textField(id: "search-field", constraints: BorderLayout.CENTER, action : searchAction)
+
+                            }
+                            panel( constraints: BorderLayout.EAST) {
+                                button(text: "Search", searchAction)
+                            }
+                        }
                     }
                 }
                 panel (id: "cards-panel", constraints : BorderLayout.CENTER) {

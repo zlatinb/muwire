@@ -120,6 +120,11 @@ class MainFrameModel {
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
             
+            if (connections > 0) {
+                def topPanel = builder.getVariable("top-panel")
+                topPanel.getLayout().show(topPanel, "top-search-panel")
+            }
+            
             connectionList.add(e.endpoint.destination)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
@@ -129,6 +134,12 @@ class MainFrameModel {
     void onDisconnectionEvent(DisconnectionEvent e) {
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
+            
+            if (connections == 0) {
+                def topPanel = builder.getVariable("top-panel")
+                topPanel.getLayout().show(topPanel, "top-connect-panel")
+            }
+            
             connectionList.remove(e.destination)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
