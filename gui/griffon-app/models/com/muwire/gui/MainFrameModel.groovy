@@ -201,8 +201,8 @@ class MainFrameModel {
     
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
-            JTable table = builder.getVariable("results-table")
-            table.model.fireTableDataChanged()
+            
+            // TODO: refresh any search tabs
             
             trusted.clear()
             trusted.addAll(core.trustService.good.values())

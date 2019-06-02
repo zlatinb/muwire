@@ -22,6 +22,7 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
+import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
 
@@ -183,8 +184,8 @@ class MainFrameView {
                         }
                     }
                     panel(constraints : "trust window") {
-                        gridLayout(rows: 1, cols :3)
-                        panel {
+                        gridLayout(rows: 1, cols :2)
+                        panel (border : etchedBorder()){
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
                                 label("Trusted users")
@@ -196,9 +197,13 @@ class MainFrameView {
                                     }
                                 }
                             }
+                            panel (constraints : BorderLayout.EAST) {
+                                gridBagLayout()
+                                button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                            }
                         }
-                        panel { label("buttons go here")}
-                        panel {
+                        panel (border : etchedBorder()){
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
                                 label("Distrusted users")
@@ -209,6 +214,11 @@ class MainFrameView {
                                         closureColumn(type : String, read : { it.getHumanReadableName() } )
                                     }
                                 }
+                            }
+                            panel(constraints : BorderLayout.WEST) {
+                                gridBagLayout()
+                                button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
                             }
                         }
                     }

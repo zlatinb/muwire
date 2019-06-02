@@ -101,6 +101,33 @@ class MainFrameController {
         def downloader = selectedDownload()
         downloader.resume()
     }
+
+    private void markTrust(String tableName, TrustLevel level, def list) {
+        int row = builder.getVariable(tableName).getSelectedRow()
+        if (row < 0)
+            return
+        core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
+    }
+    
+    @ControllerAction
+    void markTrusted() {
+        markTrust("distrusted-table", TrustLevel.TRUSTED, model.distrusted)
+    }
+    
+    @ControllerAction
+    void markNeutralFromDistrusted() {
+        markTrust("distrusted-table", TrustLevel.NEUTRAL, model.distrusted)
+    }
+    
+    @ControllerAction
+    void markDistrusted() {
+        markTrust("trusted-table", TrustLevel.DISTRUSTED, model.trusted)
+    }
+    
+    @ControllerAction
+    void markNeutralFromTrusted() {
+        markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
+    }
     
     void mvcGroupInit(Map<String, String> args) {
         application.addPropertyChangeListener("core", {e-> 
