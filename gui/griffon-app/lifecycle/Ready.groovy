@@ -28,7 +28,11 @@ class Ready extends AbstractLifecycleHandler {
     @Override
     void execute() {
         log.info "starting core services"
-        def home = System.getProperty("user.home") + File.separator + ".MuWire"
+        def portableHome = System.getProperty("portable.home")
+        def home = portableHome == null ? 
+            System.getProperty("user.home") + File.separator + ".MuWire" :
+            portableHome
+            
         home = new File(home)
         if (!home.exists()) {
             log.info("creating home dir")
@@ -64,8 +68,13 @@ class Ready extends AbstractLifecycleHandler {
                 nickname = nickname.trim()
                 break
             }
+            props.setNickname(nickname)
             
-            while(true) {
+            
+            def portableDownloads = System.getProperty("portable.downloads")
+            if (portableDownloads != null) {
+                props.downloadLocation = new File(portableDownloads)
+            } else {
                 def chooser = new JFileChooser()
                 chooser.setDialogTitle("Select a directory where downloads will be saved")
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
@@ -75,9 +84,8 @@ class Ready extends AbstractLifecycleHandler {
                     System.exit(0)
                 }
                 props.downloadLocation = chooser.getSelectedFile()
-                break
             }
-            props.setNickname(nickname)
+            
             propsFile.withOutputStream {
                 props.write(it)
             }
