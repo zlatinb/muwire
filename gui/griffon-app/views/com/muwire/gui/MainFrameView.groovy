@@ -51,6 +51,7 @@ class MainFrameView {
                         button(text: "Searches", actionPerformed : showSearchWindow)
                         button(text: "Uploads", actionPerformed : showUploadsWindow)
                         button(text: "Monitor", actionPerformed : showMonitorWindow)
+                        button(text: "Trust", actionPerformed : showTrustWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
@@ -181,6 +182,36 @@ class MainFrameView {
                             }
                         }
                     }
+                    panel(constraints : "trust window") {
+                        gridLayout(rows: 1, cols :3)
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label("Trusted users")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "trusted-table") {
+                                    tableModel(list : model.trusted) {
+                                        closureColumn(type : String, read : { it.getHumanReadableName() } )
+                                    }
+                                }
+                            }
+                        }
+                        panel { label("buttons go here")}
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label("Distrusted users")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "distrusted-table") {
+                                    tableModel(list : model.distrusted) {
+                                        closureColumn(type : String, read : { it.getHumanReadableName() } )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
@@ -232,6 +263,11 @@ class MainFrameView {
     def showMonitorWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"monitor window")
+    }
+    
+    def showTrustWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel,"trust window")
     }
     
     def shareFiles = {

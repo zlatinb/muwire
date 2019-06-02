@@ -45,6 +45,8 @@ class MainFrameModel {
     def shared = []
     def connectionList = []
     def searches = new LinkedList()
+    def trusted = []
+    def distrusted = []
     
     @Observable int connections
     @Observable String me
@@ -56,6 +58,13 @@ class MainFrameModel {
 
     volatile Core core    
     
+    void updateTablePreservingSelection(String tableName) {
+        def downloadTable = builder.getVariable(tableName)
+        int selectedRow = downloadTable.getSelectedRow()
+        downloadTable.model.fireTableDataChanged()
+        downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+    }
+    
     void mvcGroupInit(Map<String, Object> args) {
         
         Timer timer = new Timer("download-pumper", true)
@@ -64,11 +73,10 @@ class MainFrameModel {
                 if (!mvcGroup.alive)
                     return
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()
-
-                def downloadTable = builder.getVariable("downloads-table")
-                int selectedRow = downloadTable.getSelectedRow()
-                downloadTable.model.fireTableDataChanged()
-                downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+                
+                updateTablePreservingSelection("downloads-table")
+                updateTablePreservingSelection("trusted-table")
+                updateTablePreservingSelection("distrusted-table")
             }
         }, 1000, 1000)
 
@@ -100,7 +108,12 @@ class MainFrameModel {
                 }, retryInterval, retryInterval)
             }
 
+            runInsideUIAsync {
+                trusted.addAll(core.trustService.good.values())
+                distrusted.addAll(core.trustService.bad.values())
+            }
         })
+        
     }
     
     void onUIResultEvent(UIResultEvent e) {
@@ -190,6 +203,14 @@ class MainFrameModel {
         runInsideUIAsync {
             JTable table = builder.getVariable("results-table")
             table.model.fireTableDataChanged()
+            
+            trusted.clear()
+            trusted.addAll(core.trustService.good.values())
+            distrusted.clear()
+            distrusted.addAll(core.trustService.bad.values())
+            
+            updateTablePreservingSelection("trusted-table")
+            updateTablePreservingSelection("distrusted-table")
         }
     }
     
