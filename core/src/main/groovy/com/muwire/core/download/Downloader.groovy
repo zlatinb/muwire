@@ -109,6 +109,12 @@ public class Downloader {
         currentSession.positionInPiece()
     }
     
+    public int speed() {
+        if (currentSession == null)
+            return 0
+        currentSession.speed()
+    }
+    
     public DownloadState getCurrentState() {
         currentState
     }

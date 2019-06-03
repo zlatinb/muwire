@@ -20,6 +20,8 @@ import java.security.NoSuchAlgorithmException
 @Log
 class DownloadSession {
     
+    private static int SAMPLES = 10
+    
     private final String meB64
     private final Pieces pieces
     private final InfoHash infoHash
@@ -28,6 +30,9 @@ class DownloadSession {
     private final int pieceSize
     private final long fileLength
     private final MessageDigest digest
+    
+    private final ArrayDeque<Long> timestamps = new ArrayDeque<>(SAMPLES)
+    private final ArrayDeque<Integer> reads = new ArrayDeque<>(SAMPLES)
     
     private ByteBuffer mapped
     
@@ -122,6 +127,13 @@ class DownloadSession {
                     throw new IOException()
                 synchronized(this) {
                     mapped.put(tmp, 0, read)
+                    
+                    if (timestamps.size() == SAMPLES) {
+                        timestamps.removeFirst()
+                        reads.removeFirst()
+                    }
+                    timestamps.addLast(System.currentTimeMillis())
+                    reads.addLast(read)
                 }
             }
             
@@ -143,5 +155,14 @@ class DownloadSession {
         if (mapped == null)
             return 0
         mapped.position()
+    }
+    
+    synchronized int speed() {
+        if (timestamps.size() < SAMPLES)
+            return 0
+        long interval = timestamps.last - timestamps.first
+        int totalRead = 0
+        reads.each { totalRead += it }
+        (int)(totalRead * 1000.0 / interval)
     }
 }
