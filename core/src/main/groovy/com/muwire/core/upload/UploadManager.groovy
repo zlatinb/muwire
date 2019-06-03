@@ -62,6 +62,11 @@ public class UploadManager {
             }
 
             Request request = Request.parse(new InfoHash(infoHashRoot), e.getInputStream())
+            if (request.downloader != null && request.downloader.destination != e.destination) {
+                log.info("Downloader persona doesn't match their destination")
+                e.close()
+                return
+            }
             Uploader uploader = new Uploader(sharedFiles.iterator().next().file, request, e)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
