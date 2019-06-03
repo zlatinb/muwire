@@ -13,7 +13,7 @@ import net.i2p.client.datagram.I2PDatagramMaker
 @Log
 class UpdateServer {
     public static void main(String[] args) {
-        def home = System.getProperty("user.hom") + "/.MuWireUpdateServer"
+        def home = System.getProperty("user.home") + "/.MuWireUpdateServer"
         home = new File(home)
         if (!home.exists())
             home.mkdirs()
