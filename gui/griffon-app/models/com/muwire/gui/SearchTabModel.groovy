@@ -21,6 +21,7 @@ class SearchTabModel {
     Core core
     String uuid
     def results = []
+    def hashCount = [:]
     
     
     void mvcGroupInit(Map<String, String> args) {
@@ -34,6 +35,12 @@ class SearchTabModel {
     
     void handleResult(UIResultEvent e) {
         runInsideUIAsync {
+            Integer count = hashCount.get(e.infohash)
+            if (count == null) 
+                count = 0
+            count++
+            hashCount[e.infohash] = count
+                            
             results << e
             JTable table = builder.getVariable("results-table")
             table.model.fireTableDataChanged()
