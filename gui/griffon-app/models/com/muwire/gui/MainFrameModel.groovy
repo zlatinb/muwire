@@ -58,7 +58,9 @@ class MainFrameModel {
     private final Set<InfoHash> infoHashes = new HashSet<>()
 
     volatile Core core    
-    
+
+    private long lastRetryTime = System.currentTimeMillis()
+        
     void updateTablePreservingSelection(String tableName) {
         def downloadTable = builder.getVariable(tableName)
         int selectedRow = downloadTable.getSelectedRow()
@@ -96,19 +98,25 @@ class MainFrameModel {
             core.eventBus.register(TrustEvent.class, this)
             core.eventBus.register(QueryEvent.class, this)
             
-            int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
-            if (retryInterval > 0) {
-                retryInterval *= 60000
-                timer.schedule({
-                    runInsideUIAsync {
-                        downloads.each {
-                            if (it.downloader.currentState == Downloader.DownloadState.FAILED)
-                                it.downloader.resume()
+            timer.schedule({
+                int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
+                if (retryInterval > 0) {
+                    retryInterval *= 60000
+                    long now = System.currentTimeMillis()
+                    if (now - lastRetryTime > retryInterval) {
+                        lastRetryTime = now
+                        runInsideUIAsync {
+                            downloads.each {
+                                if (it.downloader.currentState == Downloader.DownloadState.FAILED)
+                                    it.downloader.resume()
+                                updateTablePreservingSelection("downloads-table")
+                            }
                         }
-                    }
-                }, retryInterval, retryInterval)
-            }
 
+                    }
+                }
+            }, 60000, 60000)
+            
             runInsideUIAsync {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())

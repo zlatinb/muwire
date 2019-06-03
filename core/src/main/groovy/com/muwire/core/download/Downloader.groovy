@@ -119,6 +119,7 @@ public class Downloader {
     }
     
     public void resume() {
+        currentState = DownloadState.CONNECTING
         downloadManager.resume(this)
     }
 }
