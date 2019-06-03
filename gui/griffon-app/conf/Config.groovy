@@ -21,4 +21,9 @@ mvcGroups {
         view = 'com.muwire.gui.SearchTabView'
         controller = 'com.muwire.gui.SearchTabController'
     }
+    'Options' {
+        model = 'com.muwire.gui.OptionsModel'
+        view = 'com.muwire.gui.OptionsView'
+        controller = 'com.muwire.gui.OptionsController'
+    }
 }

@@ -44,6 +44,11 @@ class MainFrameView {
                 imageIcon('/griffon-icon-16x16.png').image],
             pack : false,
             visible : bind { model.coreInitialized }) {
+                menuBar {
+                    menu (text : "Options") {
+                        menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
+                    }
+                }
                 borderLayout()
                 panel (border: etchedBorder(), constraints : BorderLayout.NORTH) {
                     borderLayout()
