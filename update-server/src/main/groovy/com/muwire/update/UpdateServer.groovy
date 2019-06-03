@@ -76,8 +76,11 @@ class UpdateServer {
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
+                log.info("Got an update ping from "+sender.toBase32())
                 // I don't think we care about the payload at this point
                 def maker = new I2PDatagramMaker(session)
+                def response = maker.makeI2PDatagram(json.bytes)
+                session.sendMessage(sender, response, I2PSession.PROTO_DATAGRAM, 0, 0)
             } catch (Exception e) {
                 log.log(Level.WARNING, "exception responding to update request",e)
             }
