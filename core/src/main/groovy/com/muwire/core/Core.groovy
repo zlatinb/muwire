@@ -32,6 +32,7 @@ import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.update.UpdateClient
 import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
 
@@ -61,11 +62,12 @@ public class Core {
     private final HostCache hostCache
     private final ConnectionManager connectionManager
     private final CacheClient cacheClient
+    private final UpdateClient updateClient
     private final ConnectionAcceptor connectionAcceptor
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
         
-    public Core(MuWireSettings props, File home) {
+    public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
         log.info "Initializing I2P context"
         I2PAppContext.getGlobalContext().logManager()
@@ -154,6 +156,9 @@ public class Core {
 		log.info("initializing cache client")
 		cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
         
+        log.info("initializing update client")
+        updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props)
+        
 		log.info("initializing connector")
 		I2PConnector i2pConnector = new I2PConnector(socketManager)
         
@@ -197,6 +202,7 @@ public class Core {
         connectionAcceptor.start()
         connectionEstablisher.start()
         hostCache.waitForLoad()
+        updateClient.start()
     }
     
     public void shutdown() {
@@ -227,7 +233,7 @@ public class Core {
             }
         }
         
-        Core core = new Core(props, home)
+        Core core = new Core(props, home, "0.0.6")
         core.startServices()
         
         // ... at the end, sleep or execute script

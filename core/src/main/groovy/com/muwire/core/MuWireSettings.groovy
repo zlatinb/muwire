@@ -7,6 +7,7 @@ class MuWireSettings {
     final boolean isLeaf
     boolean allowUntrusted
     int downloadRetryInterval
+    int updateCheckInterval
     String nickname
     File downloadLocation
     String sharedFiles
@@ -25,6 +26,7 @@ class MuWireSettings {
             System.getProperty("user.home")))
         sharedFiles = props.getProperty("sharedFiles")
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","15"))
+        updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","36"))
 	}
     
     void write(OutputStream out) throws IOException {
@@ -35,6 +37,7 @@ class MuWireSettings {
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
+        props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         if (sharedFiles != null)
             props.setProperty("sharedFiles", sharedFiles)
         props.store(out, "")

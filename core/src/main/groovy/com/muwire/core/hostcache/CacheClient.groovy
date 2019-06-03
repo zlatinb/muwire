@@ -65,7 +65,7 @@ class CacheClient {
 		options.setSendLeaseSet(true)
 		CacheServers.getCacheServers().each {
 			log.info "Querying hostcache ${it.toBase32()}"
-			session.sendMessage(it, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 0, 0, options)
+			session.sendMessage(it, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 1, 0, options)
 		}
 	}
 	

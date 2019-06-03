@@ -80,7 +80,7 @@ class UpdateServer {
                 // I don't think we care about the payload at this point
                 def maker = new I2PDatagramMaker(session)
                 def response = maker.makeI2PDatagram(json.bytes)
-                session.sendMessage(sender, response, I2PSession.PROTO_DATAGRAM, 0, 0)
+                session.sendMessage(sender, response, I2PSession.PROTO_DATAGRAM, 0, 2)
             } catch (Exception e) {
                 log.log(Level.WARNING, "exception responding to update request",e)
             }

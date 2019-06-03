@@ -1,4 +1,5 @@
 import griffon.core.GriffonApplication
+import griffon.core.env.Metadata
 import groovy.util.logging.Log
 
 import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
@@ -20,6 +21,9 @@ import java.util.logging.Level
 
 @Log
 class Ready extends AbstractLifecycleHandler {
+    
+    @Inject Metadata metadata
+    
     @Inject
     Ready(@Nonnull GriffonApplication application) {
         super(application)
@@ -90,9 +94,10 @@ class Ready extends AbstractLifecycleHandler {
                 props.write(it)
             }
         }
+        
         Core core
         try {
-            core = new Core(props, home)
+            core = new Core(props, home, metadata["application.version"])
         } catch (Exception bad) {
             log.log(Level.SEVERE,"couldn't initialize core",bad)
             JOptionPane.showMessageDialog(null, "Couldn't connect to I2P router.  Make sure I2P is running and restart MuWire",
