@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JOptionPane
 import javax.swing.JTable
 
 import com.muwire.core.Core
@@ -21,6 +22,7 @@ import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.update.UpdateAvailableEvent
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 
@@ -97,6 +99,7 @@ class MainFrameModel {
             core.eventBus.register(UploadFinishedEvent.class, this)
             core.eventBus.register(TrustEvent.class, this)
             core.eventBus.register(QueryEvent.class, this)
+            core.eventBus.register(UpdateAvailableEvent.class, this)
             
             timer.schedule({
                 int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
@@ -249,5 +252,11 @@ class MainFrameModel {
         String search
         Destination replyTo
         Persona originator
+    }
+    
+    void onUpdateAvailableEvent(UpdateAvailableEvent e) {
+        runInsideUIAsync {
+            JOptionPane.showMessageDialog(null, "A new version of MuWire is available from $e.signer.  Please update to $e.version")
+        }
     }
 }
