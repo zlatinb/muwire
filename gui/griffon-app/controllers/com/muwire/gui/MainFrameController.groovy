@@ -47,7 +47,8 @@ class MainFrameController {
         def terms = search.toLowerCase().trim().split(Constants.SPLIT_PATTERN)
         def searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
-            replyTo: core.me.destination, receivedOn: core.me.destination))
+            replyTo: core.me.destination, receivedOn: core.me.destination,
+            originator : core.me))
     }
     
     private def selectedResult() {

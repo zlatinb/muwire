@@ -8,6 +8,7 @@ import javax.swing.JTable
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
@@ -228,7 +229,7 @@ class MainFrameModel {
         if (search.trim().size() == 0)
             return
         runInsideUIAsync {
-            searches.addFirst(new IncomingSearch(search : search, replyTo : e.replyTo))
+            searches.addFirst(new IncomingSearch(search : search, replyTo : e.replyTo, originator : e.originator))
             while(searches.size() > 200)
                 searches.removeLast()
             JTable table = builder.getVariable("searches-table")
@@ -239,5 +240,6 @@ class MainFrameModel {
     class IncomingSearch {
         String search
         Destination replyTo
+        Persona originator
     }
 }

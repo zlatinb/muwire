@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.search.QueryEvent
@@ -14,6 +15,7 @@ import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 
 @Log
@@ -122,6 +124,8 @@ abstract class Connection implements Closeable {
         query.firstHop = e.firstHop
         query.keywords = e.searchEvent.getSearchTerms()
         query.replyTo = e.replyTo.toBase64()
+        if (e.originator != null)
+            query.originator = e.originator.toBase64()
         messages.put(query)
     }
 	
@@ -157,11 +161,22 @@ abstract class Connection implements Closeable {
         }
         // TODO: add option to respond only to trusted peers
         
+        Persona originator = null
+        if (search.originator != null) {
+            originator = new Persona(new ByteArrayInputStream(Base64.decode(search.originator)))
+            if (originator.destination != replyTo) {
+                log.info("originator doesn't match destination")
+                return
+            }
+        }
+        
+        
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : search.infohash,
                                             uuid : uuid)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
+                                            originator : originator,
                                             receivedOn : endpoint.destination,
                                             firstHop : search.firstHop )
         eventBus.publish(event)

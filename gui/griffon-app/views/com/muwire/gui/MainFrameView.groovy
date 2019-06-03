@@ -178,7 +178,13 @@ class MainFrameView {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
                                         closureColumn(header : "Keywords", type : String, read : { it.search })
-                                        closureColumn(header : "From", type : String, read : {it.replyTo.toBase32()})
+                                        closureColumn(header : "From", type : String, read : {
+                                            if (it.originator != null) {
+                                                return it.originator.getHumanReadableName()
+                                            } else {
+                                                return it.replyTo.toBase32()
+                                            }
+                                        })
                                     }
                                 }
                             }
