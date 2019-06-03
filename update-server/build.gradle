@@ -1,0 +1,2 @@
+apply plugin : 'application'
+mainClassName = 'com.muwire.update.UpdateServer'
