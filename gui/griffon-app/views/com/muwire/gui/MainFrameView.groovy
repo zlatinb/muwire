@@ -177,7 +177,8 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
-                                        closureColumn(header : "Keywords", type : String, read : { it })
+                                        closureColumn(header : "Keywords", type : String, read : { it.search })
+                                        closureColumn(header : "From", type : String, read : {it.replyTo.toBase32()})
                                     }
                                 }
                             }

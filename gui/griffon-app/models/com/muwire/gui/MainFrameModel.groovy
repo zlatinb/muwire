@@ -228,11 +228,16 @@ class MainFrameModel {
         if (search.trim().size() == 0)
             return
         runInsideUIAsync {
-            searches.addFirst(search)
+            searches.addFirst(new IncomingSearch(search : search, replyTo : e.replyTo))
             while(searches.size() > 200)
                 searches.removeLast()
             JTable table = builder.getVariable("searches-table")
             table.model.fireTableDataChanged()
         }
+    }
+    
+    class IncomingSearch {
+        String search
+        Destination replyTo
     }
 }
