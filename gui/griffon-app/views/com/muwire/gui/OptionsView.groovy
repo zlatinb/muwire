@@ -22,6 +22,7 @@ class OptionsView {
     def d
     def p
     def retryField
+    def updateField
     def mainFrame
     
     void initUI() {
@@ -34,8 +35,12 @@ class OptionsView {
             retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, constraints : gbc(gridx: 1, gridy: 0))
             label(text : "minutes", constraints : gbc(gridx : 2, gridy: 0))
             
-            button(text : "Save", constraints : gbc(gridx : 1, gridy: 1), saveAction)
-            button(text : "Cancel", constraints : gbc(gridx : 2, gridy: 1), cancelAction)
+            label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 1))
+            updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))
+            label(text : "hours", constraints : gbc(gridx: 2, gridy : 1))
+            
+            button(text : "Save", constraints : gbc(gridx : 1, gridy: 2), saveAction)
+            button(text : "Cancel", constraints : gbc(gridx : 2, gridy: 2), cancelAction)
         }
     }
     

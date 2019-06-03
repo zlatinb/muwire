@@ -20,7 +20,11 @@ class OptionsController {
         
         def settings = application.context.get("muwire-settings")
         settings.downloadRetryInterval = Integer.valueOf(text)
-        
+
+        text = view.updateField.text
+        model.updateCheckInterval = text
+        settings.updateCheckInterval = Integer.valueOf(text)
+                
         File settingsFile = new File(application.context.get("core").home, "MuWire.properties")
         settingsFile.withOutputStream { 
             settings.write(it)
