@@ -10,9 +10,28 @@ import javax.annotation.Nonnull
 class OptionsController {
     @MVCMember @Nonnull
     OptionsModel model
+    @MVCMember @Nonnull
+    OptionsView view
 
     @ControllerAction
-    void click() {
-        model.clickCount++
+    void save() {
+        String text = view.retryField.text
+        model.downloadRetryInterval = text
+        
+        def settings = application.context.get("muwire-settings")
+        settings.downloadRetryInterval = Integer.valueOf(text)
+        
+        File settingsFile = new File(application.context.get("core").home, "MuWire.properties")
+        settingsFile.withOutputStream { 
+            settings.write(it)
+        }
+        
+        cancel()
+    }
+    
+    @ControllerAction
+    void cancel() {
+        view.d.setVisible(false)
+        mvcGroup.destroy()
     }
 }

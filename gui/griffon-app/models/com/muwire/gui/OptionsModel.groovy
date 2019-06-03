@@ -6,5 +6,9 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
-    @Observable int clickCount = 0
+    @Observable String downloadRetryInterval 
+    
+    void mvcGroupInit(Map<String, String> args) {
+        downloadRetryInterval = application.context.get("muwire-settings").downloadRetryInterval
+    }
 }

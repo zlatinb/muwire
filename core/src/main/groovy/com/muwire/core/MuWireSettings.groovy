@@ -34,7 +34,7 @@ class MuWireSettings {
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
-        props.setProperty("downloadRetryInterval", "15")
+        props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         if (sharedFiles != null)
             props.setProperty("sharedFiles", sharedFiles)
         props.store(out, "")
