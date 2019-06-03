@@ -6,6 +6,10 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
 import javax.swing.SwingConstants
+
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+
 import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonView)
@@ -39,6 +43,12 @@ class OptionsView {
         d.getContentPane().add(p)
         d.pack()
         d.setLocationRelativeTo(mainFrame)
+        d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
+        d.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                mvcGroup.destroy()
+            }
+        })
         d.show()
     }
 }
