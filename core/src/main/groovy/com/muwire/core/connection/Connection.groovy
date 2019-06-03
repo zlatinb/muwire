@@ -120,9 +120,8 @@ abstract class Connection implements Closeable {
         query.version = 1
         query.uuid = e.searchEvent.getUuid()
         query.firstHop = e.firstHop
-        // TODO: first hop figure out
         query.keywords = e.searchEvent.getSearchTerms()
-        query.replyTo = e.getReceivedOn().toBase64()
+        query.replyTo = e.replyTo.toBase64()
         messages.put(query)
     }
 	
