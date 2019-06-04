@@ -110,7 +110,9 @@ class MainFrameModel {
                         lastRetryTime = now
                         runInsideUIAsync {
                             downloads.each {
-                                if (it.downloader.currentState == Downloader.DownloadState.FAILED)
+                                def state = it.downloader.currentState
+                                if (state == Downloader.DownloadState.FAILED || 
+                                    state == Downloader.DownloadState.DOWNLOADING)
                                     it.downloader.resume()
                                 updateTablePreservingSelection("downloads-table")
                             }

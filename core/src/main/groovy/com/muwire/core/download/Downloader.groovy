@@ -156,7 +156,13 @@ public class Downloader {
     }
     
     public void resume() {
-        downloadManager.resume(this)
+        activeWorkers.each { destination, worker ->
+            if (worker.currentState == WorkerState.FINISHED) {
+                def newWorker = new DownloadWorker(destination)
+                activeWorkers.put(destination, newWorker)
+                executorService.submit(newWorker)
+            }
+        }
     }
     
     class DownloadWorker implements Runnable {
