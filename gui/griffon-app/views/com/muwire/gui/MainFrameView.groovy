@@ -98,15 +98,15 @@ class MainFrameView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     table(id : "downloads-table") {
                                         tableModel(list: model.downloads) {
-                                            closureColumn(header: "Name", type: String, read : {row -> row.downloader.file.getName()})
-                                            closureColumn(header: "Status", type: String, read : {row -> row.downloader.getCurrentState()})
-                                            closureColumn(header: "Progress", type: String, read: { row ->
+                                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState()})
+                                            closureColumn(header: "Progress", preferredWidth: 20, type: String, read: { row ->
                                                 int pieces = row.downloader.nPieces
                                                 int done = row.downloader.donePieces()
                                                 "$done/$pieces pieces"
                                             })
-                                            closureColumn(header: "Sources", type: Integer, read : {row -> row.downloader.activeWorkers.size()})
-                                            closureColumn(header: "Speed", type:String, read :{row -> 
+                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers.size()})
+                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
                                             })
                                         }
