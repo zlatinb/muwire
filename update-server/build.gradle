@@ -1,2 +1,3 @@
 apply plugin : 'application'
 mainClassName = 'com.muwire.update.UpdateServer'
+applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
