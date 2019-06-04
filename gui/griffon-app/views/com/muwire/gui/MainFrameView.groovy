@@ -105,7 +105,7 @@ class MainFrameView {
                                                 int done = row.downloader.donePieces()
                                                 "$done/$pieces pieces"
                                             })
-                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers.size()})
+                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
                                             })

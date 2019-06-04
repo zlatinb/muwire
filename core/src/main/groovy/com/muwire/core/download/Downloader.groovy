@@ -145,6 +145,15 @@ public class Downloader {
         }
     }
     
+    public int activeWorkers() {
+        int active = 0
+        activeWorkers.values().each { 
+            if (it.currentState != WorkerState.FINISHED)
+                active++
+        }
+        active
+    }
+    
     public void resume() {
         downloadManager.resume(this)
     }
