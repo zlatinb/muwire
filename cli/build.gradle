@@ -1,3 +1,7 @@
 apply plugin : 'application'
 
 mainClassName = 'com.muwire.cli.Cli'
+
+dependencies {
+    compile project(":core")
+}
