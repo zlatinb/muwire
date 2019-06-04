@@ -2,6 +2,8 @@ package com.muwire.cli
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileSharedEvent
 
 class Cli {
     
@@ -34,9 +36,32 @@ class Cli {
         
         // now we begin
         println "MuWire is ready"
-        println "Enter a file containing list of files to share"
-        def reader = new BufferedReader(new InputStreamReader(System.in))
-        def filesList = reader.readLine()
+        
+        def filesList
+        if (args.length == 0) {
+            println "Enter a file containing list of files to share"
+            def reader = new BufferedReader(new InputStreamReader(System.in))
+            filesList = reader.readLine()
+        } else 
+            filesList = args[0]
+        
+        println "loading shared files from $filesList"
+        
+        core.eventBus.register(FileHashedEvent.class, new Object() {
+            void onFileHashedEvent(FileHashedEvent e) {
+                if (e.error != null)
+                    println "ERROR $e.error"
+                else
+                    println "Shared file : $e.sharedFile.file"
+            }
+        })
+        
+        filesList = new File(filesList)
+        filesList.withReader { 
+            def toShare = it.readLine()
+            core.eventBus.publish(new FileSharedEvent(file : new File(toShare)))
+        }
+        
         Thread.sleep(Integer.MAX_VALUE)
     }
 }
