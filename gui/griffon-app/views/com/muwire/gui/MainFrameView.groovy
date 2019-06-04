@@ -129,8 +129,9 @@ class MainFrameView {
                             scrollPane ( constraints : BorderLayout.CENTER) {
                                 table(id : "shared-files-table") {
                                      tableModel(list : model.shared) {
-                                         closureColumn(header : "Name", type : String, read : {row -> row.file.getAbsolutePath()})
-                                         closureColumn(header : "Size", type : Long, read : {row -> row.file.length()})
+                                         closureColumn(header : "Name", preferredWidth : 550, type : String, read : {row -> row.file.getAbsolutePath()})
+                                         closureColumn(header : "Size", preferredWidth : 50, type : String, 
+                                             read : {row -> DataHelper.formatSize2Decimal(row.file.length(),false) + "B"})
                                      }   
                                 }
                             }
