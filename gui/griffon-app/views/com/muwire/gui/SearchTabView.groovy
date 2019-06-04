@@ -4,6 +4,7 @@ import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.DataHelper
 
 import javax.swing.JLabel
 import javax.swing.ListSelectionModel
@@ -33,7 +34,7 @@ class SearchTabView {
                 resultsTable = table(id : "results-table") {
                     tableModel(list: model.results) {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name})
-                        closureColumn(header: "Size", preferredWidth: 50, type: Long, read : {row -> row.size})
+                        closureColumn(header: "Size", preferredWidth: 50, type: String, read : {row -> DataHelper.formatSize2Decimal(row.size, false)+"B"})
                         closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                         closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
                         closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
@@ -80,8 +81,8 @@ class SearchTabView {
         
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+        resultsTable.columnModel.getColumn(1).setCellRenderer(centerRenderer)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
-        resultsTable.setDefaultRenderer(Long.class,centerRenderer)
         resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
     }
     
