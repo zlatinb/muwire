@@ -23,7 +23,7 @@ class DownloadSession {
     private static int SAMPLES = 10
     
     private final String meB64
-    private final Pieces pieces
+    private final Pieces downloaded, claimed
     private final InfoHash infoHash
     private final Endpoint endpoint
     private final File file
@@ -36,10 +36,11 @@ class DownloadSession {
     
     private ByteBuffer mapped
     
-    DownloadSession(String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
+    DownloadSession(String meB64, Pieces downloaded, Pieces claimed, InfoHash infoHash, Endpoint endpoint, File file, 
         int pieceSize, long fileLength) {
         this.meB64 = meB64
-        this.pieces = pieces
+        this.downloaded = downloaded
+        this.claimed = claimed
         this.endpoint = endpoint
         this.infoHash = infoHash
         this.file = file
@@ -53,11 +54,31 @@ class DownloadSession {
         }
     }
     
-    public void request() throws IOException {
+    /**
+     * @return if the request will proceed.  The only time it may not
+     * is if all the pieces have been claimed by other sessions.
+     * @throws IOException
+     */
+    public boolean request() throws IOException {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
         
-        int piece = pieces.getRandomPiece()
+        int piece
+        while(true) {
+            piece = downloaded.getRandomPiece()
+            if (claimed.isMarked(piece)) {
+                if (downloaded.donePieces() + claimed.donePieces() == downloaded.nPieces) {
+                    log.info("all pieces claimed")
+                    return false
+                }
+                continue
+            }
+            break
+        }
+        claimed.markDownloaded(piece)
+        
+        log.info("will download piece $piece")
+        
         long start = piece * pieceSize
         long end = Math.min(fileLength, start + pieceSize) - 1
         long length = end - start + 1
@@ -145,10 +166,12 @@ class DownloadSession {
             if (hash != expected) 
                 throw new BadHashException()
             
-            pieces.markDownloaded(piece)        
+            downloaded.markDownloaded(piece)        
         } finally {
+            claimed.clear(piece)
             try { channel?.close() } catch (IOException ignore) {}
         }
+        return true
     }
     
     synchronized int positionInPiece() {

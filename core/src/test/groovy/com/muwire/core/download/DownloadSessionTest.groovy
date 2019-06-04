@@ -15,7 +15,7 @@ class DownloadSessionTest {
     private File source, target
     private InfoHash infoHash
     private Endpoint endpoint
-    private Pieces pieces
+    private Pieces pieces, claimed
     private String rootBase64
     
     private DownloadSession session
@@ -24,7 +24,7 @@ class DownloadSessionTest {
     private InputStream fromDownloader, fromUploader
     private OutputStream toDownloader, toUploader
     
-    private void initSession(int size) {
+    private void initSession(int size, def claimedPieces = []) {
         Random r = new Random()
         byte [] content = new byte[size]
         r.nextBytes(content)
@@ -48,6 +48,8 @@ class DownloadSessionTest {
         else
             nPieces = size / pieceSize + 1
         pieces = new Pieces(nPieces)
+        claimed = new Pieces(nPieces)
+        claimedPieces.each {claimed.markDownloaded(it)}
         
         fromDownloader = new PipedInputStream()
         fromUploader = new PipedInputStream()
@@ -55,7 +57,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
-        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size)
+        session = new DownloadSession("",pieces, claimed, infoHash, endpoint, target, pieceSize, size)
         downloadThread = new Thread( { session.request() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
@@ -137,5 +139,30 @@ class DownloadSessionTest {
         Thread.sleep(150)
         assert !pieces.isComplete()
         assert 1 == pieces.donePieces()
+    }
+    
+    @Test
+    public void testSmallFileClaimed() {
+        initSession(20, [0])
+        long now = System.currentTimeMillis()
+        downloadThread.join(100)
+        assert 100 > (System.currentTimeMillis() - now)
+    }
+    
+    @Test
+    public void testClaimedPiecesAvoided() {
+        int pieceSize = FileHasher.getPieceSize(1)
+        int size = (1 << pieceSize) * 10
+        initSession(size, [1,2,3,4,5,6,7,8,9])
+        assert !claimed.isMarked(0)
+        
+        assert "GET $rootBase64" == readTillRN(fromDownloader)
+        String range = readTillRN(fromDownloader)
+        def matcher = (range =~ /^Range: (\d+)-(\d+)$/)
+        int start = Integer.parseInt(matcher[0][1])
+        int end = Integer.parseInt(matcher[0][2])
+        
+        assert claimed.isMarked(0)
+        assert start == 0 && end == (1 << pieceSize) - 1
     }
 }

@@ -28,7 +28,8 @@ class Pieces {
         
         while(true) {
             int start = random.nextInt(nPieces)
-            while(bitSet.get(start) && ++start < nPieces);
+            if (bitSet.get(start))
+                continue
             return start
         }
     }
@@ -45,8 +46,16 @@ class Pieces {
         bitSet.set(piece)
     }
     
+    synchronized void clear(int piece) {
+        bitSet.clear(piece)
+    }
+    
     synchronized boolean isComplete() {
         bitSet.cardinality() == nPieces
+    }
+    
+    synchronized boolean isMarked(int piece) {
+        bitSet.get(piece)
     }
     
     synchronized int donePieces() {

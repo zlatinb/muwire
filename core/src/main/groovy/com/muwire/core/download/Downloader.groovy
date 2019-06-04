@@ -18,7 +18,7 @@ public class Downloader {
     private final DownloadManager downloadManager 
     private final String meB64   
     private final File file
-    private final Pieces pieces
+    private final Pieces downloaded, claimed
     private final long length
     private final InfoHash infoHash
     private final int pieceSize
@@ -53,7 +53,8 @@ public class Downloader {
             nPieces = length / pieceSize + 1
         this.nPieces = nPieces
         
-        pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+        downloaded = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+        claimed = new Pieces(nPieces)
         currentState = DownloadState.CONNECTING
     }
     
@@ -64,13 +65,18 @@ public class Downloader {
         try {
             endpoint = connector.connect(destination)
             currentState = DownloadState.DOWNLOADING
-            while(!pieces.isComplete()) {
-                currentSession = new DownloadSession(meB64, pieces, infoHash, endpoint, file, pieceSize, length)
-                currentSession.request()
+            boolean requestPerformed
+            while(!downloaded.isComplete()) {
+                currentSession = new DownloadSession(meB64, downloaded, claimed, infoHash, endpoint, file, pieceSize, length)
+                requestPerformed = currentSession.request()
+                if (!requestPerformed)
+                    break
                 writePieces()
             }
-            currentState = DownloadState.FINISHED
-            piecesFile.delete()
+            if (requestPerformed) {
+                currentState = DownloadState.FINISHED
+                piecesFile.delete()
+            } else log.info("request not performed")
         } catch (Exception bad) {
             log.log(Level.WARNING,"Exception while downloading",bad)
             if (cancelled)
@@ -87,20 +93,20 @@ public class Downloader {
             return
         piecesFile.withReader { 
             int piece = Integer.parseInt(it.readLine())
-            pieces.markDownloaded(piece)
+            downloaded.markDownloaded(piece)
         }
     }
     
     void writePieces() {
         piecesFile.withPrintWriter { writer ->
-            pieces.getDownloaded().each { piece -> 
+            downloaded.getDownloaded().each { piece -> 
                 writer.println(piece)
             }
         }
     }
     
     public long donePieces() {
-        pieces.donePieces()
+        downloaded.donePieces()
     }
     
     public int positionInPiece() {
