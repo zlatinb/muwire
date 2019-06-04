@@ -56,6 +56,7 @@ public class Core {
     final EventBus eventBus
     final Persona me
     final File home
+    final Properties i2pOptions
     
     private final TrustService trustService
     private final PersisterService persisterService
@@ -83,12 +84,19 @@ public class Core {
 			}
 		}
 		
-		def sysProps = System.getProperties().clone()
-		sysProps["inbound.nickname"] = "MuWire"
+        i2pOptions = new Properties()
+        def i2pOptionsFile = new File(home,"i2p.properties")
+        if (i2pOptionsFile.exists()) {
+            i2pOptionsFile.withInputStream { i2pOptions.load(it) }
+        } else {
+            i2pOptions["inbound.nickname"] = "MuWire"
+        }
+        
+        // options like tunnel length and quantity
 		I2PSession i2pSession
 		I2PSocketManager socketManager
 		keyDat.withInputStream {
-			socketManager = new I2PSocketManagerFactory().createManager(it, sysProps)
+			socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions)
 		}
 		socketManager.getDefaultOptions().setReadTimeout(60000)
 		socketManager.getDefaultOptions().setConnectTimeout(30000)
