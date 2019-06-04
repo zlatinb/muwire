@@ -33,7 +33,7 @@ class SearchTabView {
             def pane = scrollPane {
                 resultsTable = table(id : "results-table") {
                     tableModel(list: model.results) {
-                        closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name})
+                        closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
                         closureColumn(header: "Size", preferredWidth: 50, type: String, read : {row -> DataHelper.formatSize2Decimal(row.size, false)+"B"})
                         closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                         closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
