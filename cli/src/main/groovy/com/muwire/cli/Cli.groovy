@@ -45,6 +45,7 @@ class Cli {
         } else 
             filesList = args[0]
         
+        Thread.sleep(1000)
         println "loading shared files from $filesList"
         
         core.eventBus.register(FileHashedEvent.class, new Object() {

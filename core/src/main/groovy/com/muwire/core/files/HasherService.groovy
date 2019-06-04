@@ -10,11 +10,13 @@ class HasherService {
 
 	final FileHasher hasher
 	final EventBus eventBus
+    final FileManager fileManager
 	Executor executor
 	
-	HasherService(FileHasher hasher, EventBus eventBus) {
+	HasherService(FileHasher hasher, EventBus eventBus, FileManager fileManager) {
 		this.hasher = hasher
 		this.eventBus = eventBus
+        this.fileManager = fileManager
 	}
 	
 	void start() {
@@ -22,6 +24,8 @@ class HasherService {
 	}
 	
 	void onFileSharedEvent(FileSharedEvent evt) {
+        if (fileManager.fileToSharedFile.containsKey(evt.file))
+            return
 		executor.execute( { -> process(evt.file) } as Runnable)
 	}
 	

@@ -199,7 +199,7 @@ public class Core {
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
         
         log.info("initializing hasher service")
-        hasherService = new HasherService(new FileHasher(), eventBus)
+        hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, hasherService)
 	}
     

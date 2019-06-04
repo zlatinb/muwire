@@ -34,7 +34,7 @@ class PersisterService extends Service {
 	}
 	
 	void start() {
-		timer.schedule({load()} as TimerTask, 1000)
+		timer.schedule({load()} as TimerTask, 1)
 	}
 	
 	void stop() {
