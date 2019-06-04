@@ -52,11 +52,11 @@ class FileHasher {
 		try {
 			MappedByteBuffer buf
 			for (int i = 0; i < numPieces - 1; i++) {
-				buf = raf.getChannel().map(MapMode.READ_ONLY, size * i, size)
+				buf = raf.getChannel().map(MapMode.READ_ONLY, ((long)size) * i, size)
 				digest.update buf
 				output.write(digest.digest(), 0, 32)
 			}
-			def lastPieceLength = length - (numPieces - 1) * size
+			def lastPieceLength = length - (numPieces - 1) * ((long)size)
 			buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength)
 			digest.update buf
 			output.write(digest.digest(), 0, 32)
