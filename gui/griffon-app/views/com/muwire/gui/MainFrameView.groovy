@@ -185,8 +185,7 @@ class MainFrameView {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
                                         closureColumn(header : "Keywords", type : String, read : { 
-                                            def sanitized = String.replaceAll(Constants.SPLIT_PATTERN,it.search)
-                                            sanitized = sanitized.replace("<", " ")
+                                            sanitized = it.search.replace('<', ' ')
                                             sanitized 
                                         })
                                         closureColumn(header : "From", type : String, read : {
