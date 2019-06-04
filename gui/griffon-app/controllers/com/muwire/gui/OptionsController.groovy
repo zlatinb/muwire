@@ -6,6 +6,8 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.Core
+
 @ArtifactProviderFor(GriffonController)
 class OptionsController {
     @MVCMember @Nonnull
@@ -15,9 +17,35 @@ class OptionsController {
 
     @ControllerAction
     void save() {
-        String text = view.retryField.text
-        model.downloadRetryInterval = text
+        String text
+        Core core = application.context.get("core")
         
+        def i2pProps = core.i2pOptions
+        
+        text = view.inboundLengthField.text
+        model.inboundLength = text
+        i2pProps["inbound.length"] = text
+        
+        text = view.inboundQuantityField.text
+        model.inboundQuantity = text
+        i2pProps["inbound.quantity"] = text
+        
+        text = view.outboundQuantityField.text
+        model.outboundQuantity = text
+        i2pProps["outbound.quantity"] = text
+        
+        text = view.outboundLengthField.text
+        model.outboundLength = text
+        i2pProps["outbound.length"] = text
+        
+        File i2pSettingsFile = new File(core.home, "i2p.properties")
+        i2pSettingsFile.withOutputStream { 
+            i2pProps.store(it,"")
+        }
+                
+        text = view.retryField.text
+        model.downloadRetryInterval = text
+
         def settings = application.context.get("muwire-settings")
         settings.downloadRetryInterval = Integer.valueOf(text)
 
@@ -25,7 +53,7 @@ class OptionsController {
         model.updateCheckInterval = text
         settings.updateCheckInterval = Integer.valueOf(text)
                 
-        File settingsFile = new File(application.context.get("core").home, "MuWire.properties")
+        File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 
             settings.write(it)
         }

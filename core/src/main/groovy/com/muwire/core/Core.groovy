@@ -90,6 +90,10 @@ public class Core {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
         } else {
             i2pOptions["inbound.nickname"] = "MuWire"
+            i2pOptions["inbound.length"] = "3"
+            i2pOptions["inbound.quantity"] = "2"
+            i2pOptions["outbound.length"] = "3"
+            i2pOptions["outbound.quantity"] = "2"
         }
         
         // options like tunnel length and quantity
