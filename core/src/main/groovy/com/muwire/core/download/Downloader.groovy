@@ -104,7 +104,8 @@ public class Downloader {
         int total = 0
         if (getCurrentState() == DownloadState.DOWNLOADING) {
             activeWorkers.values().each {
-                total += it.speed()
+                if (it.currentState == WorkerState.DOWNLOADING)
+                    total += it.speed()
             }
         }
         total
