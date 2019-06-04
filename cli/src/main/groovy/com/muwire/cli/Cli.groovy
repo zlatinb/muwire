@@ -18,7 +18,7 @@ class Cli {
         }
         
         def props = new Properties()
-        props.eachWithIndex { props.load(id) }
+        propsFile.withInputStream { props.load(it) }
         props = new MuWireSettings(props)
         
         Core core 
