@@ -1,8 +1,12 @@
 package com.muwire.core.download
 
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.logging.Level
 
 import com.muwire.core.Constants
@@ -14,35 +18,41 @@ import net.i2p.data.Destination
 @Log
 public class Downloader {
     public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, CANCELLED, FINISHED }
+    private enum WorkerState { CONNECTING, DOWNLOADING, FINISHED}
+    
+    private static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
+        Thread rv = new Thread(r)
+        rv.setName("download worker")
+        rv.setDaemon(true)
+        rv
+    })
 
     private final DownloadManager downloadManager 
-    private final String meB64   
+    private final Persona me   
     private final File file
     private final Pieces downloaded, claimed
     private final long length
     private final InfoHash infoHash
     private final int pieceSize
     private final I2PConnector connector
-    private final Destination destination
+    private final Set<Destination> destinations
     private final int nPieces
     private final File piecesFile
+    private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     
-    private Endpoint endpoint
-    private volatile DownloadSession currentSession
-    private volatile DownloadState currentState
+    
     private volatile boolean cancelled
-    private volatile Thread downloadThread
-    
-    public Downloader(DownloadManager downloadManager, String meB64, File file, long length, InfoHash infoHash, 
-        int pieceSizePow2, I2PConnector connector, Destination destination,
+
+    public Downloader(DownloadManager downloadManager, Persona me, File file, long length, InfoHash infoHash, 
+        int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
         File incompletes) {
-        this.meB64 = meB64
+        this.me = me
         this.downloadManager = downloadManager
         this.file = file
         this.infoHash = infoHash
         this.length = length
         this.connector = connector
-        this.destination = destination
+        this.destinations = destinations
         this.piecesFile = new File(incompletes, file.getName()+".pieces")
         this.pieceSize = 1 << pieceSizePow2
         
@@ -55,36 +65,16 @@ public class Downloader {
         
         downloaded = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
         claimed = new Pieces(nPieces)
-        currentState = DownloadState.CONNECTING
     }
     
     void download() {
         readPieces()
-        downloadThread = Thread.currentThread()
-        Endpoint endpoint = null
-        try {
-            endpoint = connector.connect(destination)
-            currentState = DownloadState.DOWNLOADING
-            boolean requestPerformed
-            while(!downloaded.isComplete()) {
-                currentSession = new DownloadSession(meB64, downloaded, claimed, infoHash, endpoint, file, pieceSize, length)
-                requestPerformed = currentSession.request()
-                if (!requestPerformed)
-                    break
-                writePieces()
+        destinations.each {
+            if (it != me.destination) {
+                def worker = new DownloadWorker(it)
+                activeWorkers.put(it, worker)
+                executorService.submit(worker)
             }
-            if (requestPerformed) {
-                currentState = DownloadState.FINISHED
-                piecesFile.delete()
-            } else log.info("request not performed")
-        } catch (Exception bad) {
-            log.log(Level.WARNING,"Exception while downloading",bad)
-            if (cancelled)
-                currentState = DownloadState.CANCELLED
-            else if (currentState != DownloadState.FINISHED)
-                currentState = DownloadState.FAILED
-        } finally {
-            endpoint?.close()
         }
     }
     
@@ -109,29 +99,96 @@ public class Downloader {
         downloaded.donePieces()
     }
     
-    public int positionInPiece() {
-        if (currentSession == null)
-            return 0
-        currentSession.positionInPiece()
-    }
     
     public int speed() {
-        if (currentSession == null)
-            return 0
-        currentSession.speed()
+        int total = 0
+        activeWorkers.values().each {
+            total += it.speed()
+        }
+        total
     }
     
     public DownloadState getCurrentState() {
-        currentState
+        if (cancelled)
+            return DownloadState.CANCELLED
+        boolean allFinished = true
+        activeWorkers.values().each { 
+            allFinished &= it.currentState == WorkerState.FINISHED
+        }
+        if (allFinished) {
+            if (downloaded.isComplete())
+                return DownloadState.FINISHED
+            return DownloadState.FAILED
+        }
+        
+        // if at least one is downloading...
+        boolean oneDownloading = false
+        activeWorkers.values().each { 
+            if (it.currentState == WorkerState.DOWNLOADING) {
+                oneDownloading = true
+                return 
+            }
+        }
+        
+        if (oneDownloading)
+            return DownloadState.DOWNLOADING
+        
+        return DownloadState.CONNECTING
     }
     
     public void cancel() {
         cancelled = true
-        downloadThread?.interrupt()
+        activeWorkers.values().each { 
+            it.cancel()
+        }
     }
     
     public void resume() {
-        currentState = DownloadState.CONNECTING
         downloadManager.resume(this)
+    }
+    
+    class DownloadWorker implements Runnable {
+        private final Destination destination
+        private volatile WorkerState currentState
+        private volatile Thread downloadThread
+        private Endpoint endpoint
+        private volatile DownloadSession currentSession
+                
+        DownloadWorker(Destination destination) {
+            this.destination = destination
+        }
+        
+        public void run() {
+            downloadThread = Thread.currentThread()
+            currentState = WorkerState.CONNECTING
+            Endpoint endpoint = null
+            try {
+                endpoint = connector.connect(destination)
+                currentState = WorkerState.DOWNLOADING
+                boolean requestPerformed
+                while(!downloaded.isComplete()) {
+                    currentSession = new DownloadSession(me.toBase64(), downloaded, claimed, infoHash, endpoint, file, pieceSize, length)
+                    requestPerformed = currentSession.request()
+                    if (!requestPerformed)
+                        break
+                    writePieces()
+                }
+            } catch (Exception bad) {
+                log.log(Level.WARNING,"Exception while downloading",bad)
+            } finally {
+                currentState = WorkerState.FINISHED
+                endpoint?.close()
+            }
+        }
+        
+        int speed() {
+            if (currentSession == null)
+                return 0
+            currentSession.speed()
+        }
+        
+        void cancel() {
+            downloadThread?.interrupt()
+        }
     }
 }

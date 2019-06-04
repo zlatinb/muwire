@@ -3,6 +3,7 @@ package com.muwire.core.download
 import com.muwire.core.connection.I2PConnector
 
 import net.i2p.data.Base64
+import net.i2p.data.Destination
 
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
@@ -16,16 +17,13 @@ public class DownloadManager {
     private final I2PConnector connector
     private final Executor executor
     private final File incompletes
-    private final String meB64
+    private final Persona me
     
     public DownloadManager(EventBus eventBus, I2PConnector connector, File incompletes, Persona me) {
         this.eventBus = eventBus
         this.connector = connector
         this.incompletes = incompletes
-        
-        def baos = new ByteArrayOutputStream()
-        me.write(baos)
-        this.meB64 = Base64.encode(baos.toByteArray())
+        this.me = me
         
         incompletes.mkdir()
         
@@ -39,8 +37,18 @@ public class DownloadManager {
     
     
     public void onUIDownloadEvent(UIDownloadEvent e) {
-        def downloader = new Downloader(this, meB64, e.target, e.result.size,
-            e.result.infohash, e.result.pieceSize, connector, e.result.sender.destination,
+        
+        def size = e.result[0].size
+        def infohash = e.result[0].infohash
+        def pieceSize = e.result[0].pieceSize
+        
+        Set<Destination> destinations = new HashSet<>()
+        e.result.each { 
+            destinations.add(it.sender.destination)
+        }
+        
+        def downloader = new Downloader(this, me, e.target, size,
+            infohash, pieceSize, connector, destinations,
             incompletes)
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))

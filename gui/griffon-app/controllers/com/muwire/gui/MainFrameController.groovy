@@ -71,8 +71,15 @@ class MainFrameController {
         def result = selectedResult()
         if (result == null)
             return // TODO disable button
-        def file = new File(application.context.get("muwire-settings").downloadLocation, result.name) 
-        core.eventBus.publish(new UIDownloadEvent(result : result, target : file))
+            
+        def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
+        
+        def selected = builder.getVariable("result-tabs").getSelectedComponent()
+        def group = selected.getClientProperty("mvc-group")
+        
+        def resultsBucket = group.model.hashBucket[result.infohash]
+         
+        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, target : file))
     }
     
     @ControllerAction

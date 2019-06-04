@@ -5,6 +5,6 @@ import com.muwire.core.search.UIResultEvent
 
 class UIDownloadEvent extends Event {
     
-    UIResultEvent result
+    UIResultEvent[] result
     File target
 }
