@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.DataHelper
 
 import javax.swing.BorderFactory
 import javax.swing.Box
@@ -105,7 +106,9 @@ class MainFrameView {
                                                 "$done/$pieces pieces"
                                             })
                                             closureColumn(header: "Sources", type: Integer, read : {row -> row.downloader.activeWorkers.size()})
-                                            closureColumn(header: "Speed (bytes/second)", type:Integer, read :{row -> row.downloader.speed()})
+                                            closureColumn(header: "Speed", type:String, read :{row -> 
+                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
+                                            })
                                         }
                                     }
                                 }
