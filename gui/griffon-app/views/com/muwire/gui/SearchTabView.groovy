@@ -5,8 +5,10 @@ import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.JLabel
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.table.DefaultTableCellRenderer
 
 import java.awt.BorderLayout
 
@@ -22,6 +24,7 @@ class SearchTabView {
     def pane 
     def parent
     def searchTerms
+    def resultsTable
     
     void initUI() {
         builder.with {
@@ -29,20 +32,23 @@ class SearchTabView {
             def pane = scrollPane {
                 resultsTable = table(id : "results-table") {
                     tableModel(list: model.results) {
-                        closureColumn(header: "Name", type: String, read : {row -> row.name})
-                        closureColumn(header: "Size", preferredWidth: 150, type: Long, read : {row -> row.size})
-                        closureColumn(header: "Sources", type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                        closureColumn(header: "Sender", type: String, read : {row -> row.sender.getHumanReadableName()})
-                        closureColumn(header: "Trust", type: String, read : {row ->
+                        closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name})
+                        closureColumn(header: "Size", preferredWidth: 50, type: Long, read : {row -> row.size})
+                        closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                        closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
+                        closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
                           model.core.trustService.getLevel(row.sender.destination)
                         })
                     }
                 }
             }
+            
             this.pane = pane
             this.pane.putClientProperty("mvc-group", mvcGroup)
             this.pane.putClientProperty("results-table",resultsTable)
-            
+
+            this.resultsTable = resultsTable
+                        
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
             selectionModel.addListSelectionListener( {
@@ -71,6 +77,12 @@ class SearchTabView {
         }
         
         parent.setTabComponentAt(index, tabPanel)
+        
+        def centerRenderer = new DefaultTableCellRenderer()
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+        resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
+        resultsTable.setDefaultRenderer(Long.class,centerRenderer)
+        resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
     }
     
     def closeTab = {
