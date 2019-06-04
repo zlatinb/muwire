@@ -31,8 +31,8 @@ class DownloadSession {
     private final long fileLength
     private final MessageDigest digest
     
-    private final ArrayDeque<Long> timestamps = new ArrayDeque<>(SAMPLES)
-    private final ArrayDeque<Integer> reads = new ArrayDeque<>(SAMPLES)
+    private final LinkedList<Long> timestamps = new LinkedList<>()
+    private final LinkedList<Integer> reads = new LinkedList<>()
     
     private ByteBuffer mapped
     
@@ -183,9 +183,21 @@ class DownloadSession {
     synchronized int speed() {
         if (timestamps.size() < SAMPLES)
             return 0
-        long interval = timestamps.last - timestamps.first
         int totalRead = 0
-        reads.each { totalRead += it }
+        int idx = 0
+        final long now = System.currentTimeMillis()
+        
+        while(idx < SAMPLES && timestamps.get(idx) < now - 1000)
+            idx++
+        if (idx == SAMPLES)
+            return 0
+        if (idx == SAMPLES - 1)
+            return reads[idx]
+            
+        long interval = timestamps.last - timestamps[idx]
+        
+        for (int i = idx; i < SAMPLES; i++)
+            totalRead += reads[idx]
         (int)(totalRead * 1000.0 / interval)
     }
 }
