@@ -23,7 +23,7 @@ class Cli {
         
         Core core 
         try {
-            core = new Core(props, home, "0.0.7")
+            core = new Core(props, home, "0.0.8")
         } catch (Exception bad) {
             bad.printStackTrace(System.out)
             println "Failed to initialize core, exiting"
@@ -34,6 +34,9 @@ class Cli {
         
         // now we begin
         println "MuWire is ready"
+        println "Enter a file containing list of files to share"
+        def reader = new BufferedReader(new InputStreamReader(System.in))
+        def filesList = reader.readLine()
         Thread.sleep(Integer.MAX_VALUE)
     }
 }
