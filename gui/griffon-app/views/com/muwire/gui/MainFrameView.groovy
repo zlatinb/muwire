@@ -14,6 +14,7 @@ import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.border.Border
 
+import com.muwire.core.Constants
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
 
@@ -183,7 +184,11 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
-                                        closureColumn(header : "Keywords", type : String, read : { it.search })
+                                        closureColumn(header : "Keywords", type : String, read : { 
+                                            def sanitized = String.replaceAll(Constants.SPLIT_PATTERN,it.search)
+                                            sanitized = sanitized.replace("<", " ")
+                                            sanitized 
+                                        })
                                         closureColumn(header : "From", type : String, read : {
                                             if (it.originator != null) {
                                                 return it.originator.getHumanReadableName()
