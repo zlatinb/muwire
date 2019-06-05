@@ -1,2 +1,3 @@
 apply plugin : 'application'
 mainClassName = 'com.muwire.hostcache.HostCache'
+applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']

@@ -1,9 +1,12 @@
 package com.muwire.hostcache
 
+import java.util.logging.Level
 import java.util.stream.Collectors
 
+import groovy.util.logging.Log
 import net.i2p.data.Destination
 
+@Log
 class Crawler {
 
     final def pinger
@@ -22,12 +25,14 @@ class Crawler {
     
     synchronized def handleCrawlerPong(pong, Destination source) {
         if (!inFlight.containsKey(source)) {
+            log.info("response from host that hasn't been crawled")
             return
         }
         Host host = inFlight.remove(source)
         
         if (pong.uuid == null || pong.leafSlots == null || pong.peerSlots == null || pong.peers == null) {
             hostPool.fail(host)
+            log.info("invalid crawler pong")
             return
         }
         
@@ -40,6 +45,7 @@ class Crawler {
         }
         
         if (!uuid.equals(currentUUID)) {
+            log.info("uuid mismatch")
             hostPool.fail(host)
             return
         }
@@ -50,7 +56,9 @@ class Crawler {
         def peers
         try {
             peers = pong.peers.stream().map({b64 -> new Destination(b64)}).collect(Collectors.toSet())
+            log.info("received ${peers.size()} peers")
         } catch (Exception e) {
+            log.log(Level.WARNING,"couldn't parse peers", e)
             hostPool.fail(host)
             return
         }

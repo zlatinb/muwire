@@ -1,9 +1,11 @@
 package com.muwire.hostcache
 
+import java.util.logging.Level
 import java.util.stream.Collectors
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Log
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
@@ -12,6 +14,7 @@ import net.i2p.client.datagram.I2PDatagramMaker
 import net.i2p.util.SystemVersion
 import net.i2p.data.*
 
+@Log
 public class HostCache {
 
     public static void main(String[] args) {
@@ -53,7 +56,7 @@ public class HostCache {
         myDest = session.getMyDestination()
         
 		// initialize hostpool and crawler
-		HostPool hostPool = new HostPool(3, 60 * 1000 * 1000)
+		HostPool hostPool = new HostPool(3, 60 * 60 * 1000)
 		Pinger pinger = new Pinger(session)
 		Crawler crawler = new Crawler(pinger, hostPool, 5)
 		
@@ -64,7 +67,7 @@ public class HostCache {
         session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler), 
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
-        println "INFO: connected, going to sleep"
+        log.info("connected, going to sleep")
         Thread.sleep(Integer.MAX_VALUE)
         
     }
@@ -77,16 +80,16 @@ public class HostCache {
         
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
-            println "ERROR: session disconnected, exiting"
+            log.severe("session disconnected, exiting")
             System.exit(1)
         }
         void errorOccurred(I2PSession session, String message, Throwable error) {
-            println "ERROR: ${message} ${error}"
+            log.warning("${message} ${error}")
         }
         void messageAvailable(I2PSession session, int msgId, long size, int proto,
             int fromport, int toport) {
             if (proto != I2PSession.PROTO_DATAGRAM) {
-                println "WARN: received unexpected protocol ${proto}"
+                log.warning("received unexpected protocol ${proto}")
                 return
             }
 
@@ -95,19 +98,19 @@ public class HostCache {
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
-                println "INFO: Received something from ${sender.toBase32()}"
+                def b32 = sender.toBase32()
                 
                 payload = dissector.getPayload()
                 payload = json.parse(payload)
                 if (payload.type == null) {
-                    println "WARN: type field missing"
+                    log.warning("type field missing from $b32")
                     return
                 }
                 switch(payload.type) {
-                    case "Ping" : 
-                    println "Ping"
+                    case "Ping" :
+                    log.info("ping from $b32") 
 					if (payload.leaf == null) {
-						println "WARN: ping didn't specify if leaf"
+						log.warning("ping didn't specify if leaf from $b32")
 						return
 					}
 					payload.leaf = Boolean.parseBoolean(payload.leaf.toString())
@@ -116,14 +119,14 @@ public class HostCache {
 					respond(session, sender, payload)
                     break
                     case "CrawlerPong":
-                    println "CrawlerPong"
+                    log.info("CrawlerPong from $b32")
 					crawler.handleCrawlerPong(payload, sender)
                     break
                     default:
-                    println "WARN: Unexpected message type ${payload.type}, dropping"
+                    log.warning("Unexpected message type ${payload.type}, dropping from $b32")
                 }
             } catch (Exception dfe) {
-                println "WARN: invalid datagram ${dfe}"
+                log.log(Level.WARNING,"invalid datagram", dfe)
             } 
         }
         void messageAvailable(I2PSession session, int msgId, long size) {
