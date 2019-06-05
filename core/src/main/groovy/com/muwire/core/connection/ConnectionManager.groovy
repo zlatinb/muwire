@@ -1,6 +1,7 @@
 package com.muwire.core.connection
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
@@ -19,13 +20,15 @@ abstract class ConnectionManager {
 	
 	protected final HostCache hostCache
     protected final Persona me
+    protected final MuWireSettings settings
 	
 	ConnectionManager() {}
 	
-	ConnectionManager(EventBus eventBus, Persona me, HostCache hostCache) {
+	ConnectionManager(EventBus eventBus, Persona me, HostCache hostCache, MuWireSettings settings) {
 		this.eventBus = eventBus
         this.me = me
 		this.hostCache = hostCache
+        this.settings = settings
 		this.timer = new Timer("connections-pinger",true)
 	}
 	

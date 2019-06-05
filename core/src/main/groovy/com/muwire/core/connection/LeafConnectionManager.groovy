@@ -3,6 +3,7 @@ package com.muwire.core.connection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
@@ -17,8 +18,9 @@ class LeafConnectionManager extends ConnectionManager {
 	
 	final Map<Destination, UltrapeerConnection> connections = new ConcurrentHashMap()
 	
-	public LeafConnectionManager(EventBus eventBus, Persona me, int maxConnections, HostCache hostCache) {
-		super(eventBus, me, hostCache)
+	public LeafConnectionManager(EventBus eventBus, Persona me, int maxConnections, 
+        HostCache hostCache, MuWireSettings settings) {
+		super(eventBus, me, hostCache, settings)
 		this.maxConnections = maxConnections
 	}
 	

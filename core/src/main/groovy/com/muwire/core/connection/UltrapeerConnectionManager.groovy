@@ -4,6 +4,7 @@ import java.util.Collection
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.search.QueryEvent
@@ -17,15 +18,15 @@ class UltrapeerConnectionManager extends ConnectionManager {
 	
 	final int maxPeers, maxLeafs
     final TrustService trustService
-	
+    
 	final Map<Destination, PeerConnection> peerConnections = new ConcurrentHashMap()
 	final Map<Destination, LeafConnection> leafConnections = new ConcurrentHashMap()
     
 	UltrapeerConnectionManager() {}
 
 	public UltrapeerConnectionManager(EventBus eventBus, Persona me, int maxPeers, int maxLeafs, 
-        HostCache hostCache, TrustService trustService) {
-		super(eventBus, me, hostCache)
+        HostCache hostCache, TrustService trustService, MuWireSettings settings) {
+		super(eventBus, me, hostCache, settings)
 		this.maxPeers = maxPeers
 		this.maxLeafs = maxLeafs
         this.trustService = trustService
@@ -85,8 +86,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 			return
 		
 		Connection c = e.leaf ? 
-			new LeafConnection(eventBus, e.endpoint, hostCache, trustService) : 
-			new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache, trustService)
+			new LeafConnection(eventBus, e.endpoint, hostCache, trustService, settings) : 
+			new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache, trustService, settings)
 		def map = e.leaf ? leafConnections : peerConnections
 		map.put(e.endpoint.destination, c)
 		c.start()

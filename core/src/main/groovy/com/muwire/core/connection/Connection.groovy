@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
@@ -26,7 +27,8 @@ abstract class Connection implements Closeable {
 	final boolean incoming
 	final HostCache hostCache
     final TrustService trustService
-	
+    final MuWireSettings settings
+    	
 	private final AtomicBoolean running = new AtomicBoolean()
 	private final BlockingQueue messages = new LinkedBlockingQueue()
 	private final Thread reader, writer
@@ -35,12 +37,14 @@ abstract class Connection implements Closeable {
 	
 	long lastPingSentTime, lastPongReceivedTime
 	
-	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, HostCache hostCache, TrustService trustService) {
+	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, 
+        HostCache hostCache, TrustService trustService, MuWireSettings settings) {
 		this.eventBus = eventBus
 		this.incoming = incoming
 		this.endpoint = endpoint
 		this.hostCache = hostCache
         this.trustService = trustService
+        this.settings = settings
 		
 		this.name = endpoint.destination.toBase32().substring(0,8)
 		
@@ -155,11 +159,15 @@ abstract class Connection implements Closeable {
             search.keywords = null
             
         Destination replyTo = new Destination(search.replyTo)
-        if (trustService.getLevel(replyTo) == TrustLevel.DISTRUSTED) {
+        TrustLevel trustLevel = trustService.getLevel(replyTo)
+        if (trustLevel == TrustLevel.DISTRUSTED) {
             log.info "dropping search from distrusted peer"
             return
         }
-        // TODO: add option to respond only to trusted peers
+        if (trustLevel == TrustLevel.NEUTRAL && !settings.allowUntrusted()) {
+            log.info("dropping search from neutral peer")
+            return
+        }
         
         Persona originator = null
         if (search.originator != null) {
