@@ -9,10 +9,12 @@ import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JFileChooser
+import javax.swing.JLabel
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.border.Border
+import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.Constants
 import com.muwire.core.download.Downloader
@@ -269,6 +271,10 @@ class MainFrameView {
                 model.retryButtonEnabled = false
             }
         })
+        
+        def centerRenderer = new DefaultTableCellRenderer()
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+        builder.getVariable("downloads-table").setDefaultRenderer(Integer.class, centerRenderer)
     }
 
     def showSearchWindow = {
