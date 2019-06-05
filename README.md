@@ -32,7 +32,6 @@ At the moment there are very few nodes on the network, so you will see very few 
 
 ### Known bugs and limitations
 
-* Duplicate connections appear on the Monitor tab
 * Sometimes the list of shared files gets lost 
 * Many UI features you would expect are not there yet
 
