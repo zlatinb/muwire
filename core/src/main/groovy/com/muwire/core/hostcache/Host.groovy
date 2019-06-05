@@ -30,4 +30,8 @@ class Host {
 	synchronized boolean hasSucceeded() {
 		successes > 0
 	}
+    
+    synchronized void clearFailures() {
+        failures = null
+    }
 }
