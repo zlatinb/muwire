@@ -32,6 +32,6 @@ class Host {
 	}
     
     synchronized void clearFailures() {
-        failures = null
+        failures = 0
     }
 }
