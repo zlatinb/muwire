@@ -12,6 +12,7 @@ class OptionsModel {
     @Observable String downloadRetryInterval 
     @Observable String updateCheckInterval
     @Observable boolean onlyTrusted
+    @Observable boolean shareDownloadedFiles
     
     // i2p options
     @Observable String inboundLength
@@ -24,6 +25,7 @@ class OptionsModel {
         downloadRetryInterval = settings.downloadRetryInterval
         updateCheckInterval = settings.updateCheckInterval
         onlyTrusted = !settings.allowUntrusted()
+        shareDownloadedFiles = settings.shareDownloadedFiles
         
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]

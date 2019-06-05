@@ -2,6 +2,7 @@ package com.muwire.core.files
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
@@ -14,18 +15,22 @@ class FileManager {
 
 
 	final EventBus eventBus
+    final MuWireSettings settings
 	final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
 	final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
 	final Map<String, Set<File>> nameToFiles = new HashMap<>()
 	final SearchIndex index = new SearchIndex()
 	
-	FileManager(EventBus eventBus) {
+	FileManager(EventBus eventBus, MuWireSettings settings) {
+        this.settings = settings
 		this.eventBus = eventBus
 	}
 	
 	void onFileHashedEvent(FileHashedEvent e) {
-		if (e.sharedFile != null)
-			addToIndex(e.sharedFile)
+        if (settings.shareDownloadedFiles) {
+            if (e.sharedFile != null)
+                addToIndex(e.sharedFile)
+        }
 	}
 	
 	void onFileLoadedEvent(FileLoadedEvent e) {

@@ -265,6 +265,8 @@ class MainFrameModel {
     }
     
     void onFileDownloadedEvent(FileDownloadedEvent e) {
+        if (!core.muOptions.shareDownloadedFiles)
+            return
         infoHashes.add(e.downloadedFile.infoHash)
         runInsideUIAsync {
             shared << e.downloadedFile

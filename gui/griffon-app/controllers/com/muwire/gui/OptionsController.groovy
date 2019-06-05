@@ -56,6 +56,10 @@ class OptionsController {
         boolean onlyTrusted = view.allowUntrustedCheckbox.model.isSelected()
         model.onlyTrusted = onlyTrusted
         settings.setAllowUntrusted(!onlyTrusted)
+        
+        boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
+        model.shareDownloadedFiles = shareDownloaded
+        settings.shareDownloadedFiles = shareDownloaded
                         
         File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 

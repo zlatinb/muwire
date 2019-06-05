@@ -28,6 +28,7 @@ class OptionsView {
     def retryField
     def updateField
     def allowUntrustedCheckbox
+    def shareDownloadedCheckbox
     
     def inboundLengthField
     def inboundQuantityField
@@ -54,6 +55,9 @@ class OptionsView {
 
             label(text : "Only allow trusted connections", constraints : gbc(gridx: 0, gridy : 2))
             allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 2))
+            
+            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
+            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:3))
                         
         }
         i = builder.panel {

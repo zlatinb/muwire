@@ -57,6 +57,7 @@ public class Core {
     final Persona me
     final File home
     final Properties i2pOptions
+    final MuWireSettings muOptions
     
     private final TrustService trustService
     private final PersisterService persisterService
@@ -70,6 +71,7 @@ public class Core {
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
+        this.muOptions = props
         log.info "Initializing I2P context"
         I2PAppContext.getGlobalContext().logManager()
         I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
@@ -141,7 +143,7 @@ public class Core {
 		
 		
 		log.info "initializing file manager"
-		FileManager fileManager = new FileManager(eventBus)
+		FileManager fileManager = new FileManager(eventBus, props)
 		eventBus.register(FileHashedEvent.class, fileManager)
 		eventBus.register(FileLoadedEvent.class, fileManager)
 		eventBus.register(FileDownloadedEvent.class, fileManager)
