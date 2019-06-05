@@ -11,7 +11,7 @@ import griffon.metadata.ArtifactProviderFor
 class OptionsModel {
     @Observable String downloadRetryInterval 
     @Observable String updateCheckInterval
-    @Observable boolean allowUntrusted
+    @Observable boolean onlyTrusted
     
     // i2p options
     @Observable String inboundLength
@@ -23,7 +23,7 @@ class OptionsModel {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
         updateCheckInterval = settings.updateCheckInterval
-        allowUntrusted = settings.allowUntrusted()
+        onlyTrusted = !settings.allowUntrusted()
         
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]
