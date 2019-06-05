@@ -62,7 +62,11 @@ class Cli {
             def toShare = it.readLine()
             core.eventBus.publish(new FileSharedEvent(file : new File(toShare)))
         }
-        
+        Runtime.getRuntime().addShutdownHook({
+            println "shutting down.."
+            core.shutdown()
+            println "shutdown."
+        })
         Thread.sleep(Integer.MAX_VALUE)
     }
 }
