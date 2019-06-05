@@ -15,6 +15,7 @@ import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
+import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
@@ -100,6 +101,7 @@ class MainFrameModel {
             core.eventBus.register(TrustEvent.class, this)
             core.eventBus.register(QueryEvent.class, this)
             core.eventBus.register(UpdateAvailableEvent.class, this)
+            core.eventBus.register(FileDownloadedEvent.class, this)
             
             timer.schedule({
                 int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
@@ -259,6 +261,15 @@ class MainFrameModel {
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
         runInsideUIAsync {
             JOptionPane.showMessageDialog(null, "A new version of MuWire is available from $e.signer.  Please update to $e.version")
+        }
+    }
+    
+    void onFileDownloadedEvent(FileDownloadedEvent e) {
+        infoHashes.add(e.downloadedFile.infoHash)
+        runInsideUIAsync {
+            shared << e.downloadedFile
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
         }
     }
 }

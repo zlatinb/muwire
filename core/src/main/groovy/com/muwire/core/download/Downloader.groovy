@@ -10,7 +10,10 @@ import java.util.concurrent.Executors
 import java.util.logging.Level
 
 import com.muwire.core.Constants
+import com.muwire.core.DownloadedFile
+import com.muwire.core.EventBus
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.files.FileDownloadedEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -27,6 +30,7 @@ public class Downloader {
         rv
     })
 
+    private final EventBus eventBus
     private final DownloadManager downloadManager 
     private final Persona me   
     private final File file
@@ -42,10 +46,13 @@ public class Downloader {
     
     
     private volatile boolean cancelled
+    private volatile boolean eventFired
 
-    public Downloader(DownloadManager downloadManager, Persona me, File file, long length, InfoHash infoHash, 
+    public Downloader(EventBus eventBus, DownloadManager downloadManager, 
+        Persona me, File file, long length, InfoHash infoHash, 
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
         File incompletes) {
+        this.eventBus = eventBus
         this.me = me
         this.downloadManager = downloadManager
         this.file = file
@@ -195,6 +202,10 @@ public class Downloader {
                 log.log(Level.WARNING,"Exception while downloading",bad)
             } finally {
                 currentState = WorkerState.FINISHED
+                if (downloaded.isComplete() && !eventFired) {
+                    eventFired = true
+                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, infoHash, Collections.emptySet())))
+                }
                 endpoint?.close()
             }
         }

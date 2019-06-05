@@ -47,7 +47,7 @@ public class DownloadManager {
             destinations.add(it.sender.destination)
         }
         
-        def downloader = new Downloader(this, me, e.target, size,
+        def downloader = new Downloader(eventBus, this, me, e.target, size,
             infohash, pieceSize, connector, destinations,
             incompletes)
         executor.execute({downloader.download()} as Runnable)
