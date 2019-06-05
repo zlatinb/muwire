@@ -203,6 +203,7 @@ public class Downloader {
             } finally {
                 currentState = WorkerState.FINISHED
                 if (downloaded.isComplete() && !eventFired) {
+                    piecesFile.delete()
                     eventFired = true
                     eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, infoHash, Collections.emptySet())))
                 }
