@@ -27,6 +27,7 @@ class OptionsView {
     def i
     def retryField
     def updateField
+    def allowUntrustedCheckbox
     
     def inboundLengthField
     def inboundQuantityField
@@ -50,7 +51,10 @@ class OptionsView {
             label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 1))
             updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))
             label(text : "hours", constraints : gbc(gridx: 2, gridy : 1))
-            
+
+            label(text : "Allow untrusted connections", constraints : gbc(gridx: 0, gridy : 2))
+            allowUntrustedCheckbox = checkBox(selected : bind {model.allowUntrusted}, constraints : gbc(gridx: 1, gridy : 2))
+                        
         }
         i = builder.panel {
             gridBagLayout()

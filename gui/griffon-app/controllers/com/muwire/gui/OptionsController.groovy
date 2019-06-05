@@ -52,7 +52,11 @@ class OptionsController {
         text = view.updateField.text
         model.updateCheckInterval = text
         settings.updateCheckInterval = Integer.valueOf(text)
-                
+
+        boolean allowUntrusted = view.allowUntrustedCheckbox.model.isSelected()
+        model.allowUntrusted = allowUntrusted
+        settings.setAllowUntrusted(allowUntrusted)
+                        
         File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 
             settings.write(it)

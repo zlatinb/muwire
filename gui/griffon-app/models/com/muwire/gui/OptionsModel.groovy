@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Core
+import com.muwire.core.MuWireSettings
 
 import griffon.core.artifact.GriffonModel
 import griffon.transform.Observable
@@ -10,6 +11,7 @@ import griffon.metadata.ArtifactProviderFor
 class OptionsModel {
     @Observable String downloadRetryInterval 
     @Observable String updateCheckInterval
+    @Observable boolean allowUntrusted
     
     // i2p options
     @Observable String inboundLength
@@ -18,8 +20,10 @@ class OptionsModel {
     @Observable String outboundQuantity
     
     void mvcGroupInit(Map<String, String> args) {
-        downloadRetryInterval = application.context.get("muwire-settings").downloadRetryInterval
-        updateCheckInterval = application.context.get("muwire-settings").updateCheckInterval
+        MuWireSettings settings = application.context.get("muwire-settings")
+        downloadRetryInterval = settings.downloadRetryInterval
+        updateCheckInterval = settings.updateCheckInterval
+        allowUntrusted = settings.allowUntrusted()
         
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]
