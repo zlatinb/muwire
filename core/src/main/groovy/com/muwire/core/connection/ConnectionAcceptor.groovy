@@ -34,13 +34,15 @@ class ConnectionAcceptor {
 	final TrustService trustService
     final SearchManager searchManager 
     final UploadManager uploadManager
+    final ConnectionEstablisher establisher
 	
 	final ExecutorService acceptorThread
 	final ExecutorService handshakerThreads
 	
 	ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
 		MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
-		TrustService trustService, SearchManager searchManager, UploadManager uploadManager) {
+		TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
+        ConnectionEstablisher establisher) {
 		this.eventBus = eventBus
 		this.manager = manager
 		this.settings = settings
@@ -49,7 +51,8 @@ class ConnectionAcceptor {
 		this.trustService = trustService
         this.searchManager = searchManager
         this.uploadManager = uploadManager
-		
+		this.establisher = establisher
+        
 		acceptorThread = Executors.newSingleThreadExecutor { r -> 
 			def rv = new Thread(r)
 			rv.setDaemon(true)
@@ -140,7 +143,9 @@ class ConnectionAcceptor {
     }
 
 	private void handleIncoming(Endpoint e, boolean leaf) {
-		boolean accept = !manager.isConnected(e.destination) && (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
+		boolean accept = !manager.isConnected(e.destination) && 
+            !establisher.inProgress.contains(e.destination) &&
+            (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
 		if (accept) {
 			log.info("accepting connection, leaf:$leaf")
 			e.outputStream.write("OK".bytes)

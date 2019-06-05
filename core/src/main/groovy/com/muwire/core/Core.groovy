@@ -192,14 +192,14 @@ public class Core {
         log.info("initializing upload manager")
         UploadManager uploadManager = new UploadManager(eventBus, fileManager)
         
+        log.info("initializing connection establisher")
+        connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
         
 		log.info("initializing acceptor")
 		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
 		connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
-            i2pAcceptor, hostCache, trustService, searchManager, uploadManager)
+            i2pAcceptor, hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
 		
-        
-        connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
         
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
