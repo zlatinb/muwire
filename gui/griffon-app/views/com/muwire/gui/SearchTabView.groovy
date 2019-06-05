@@ -62,7 +62,7 @@ class SearchTabView {
         searchTerms = args["search-terms"]
         parent = mvcGroup.parentGroup.view.builder.getVariable("result-tabs")
         parent.addTab(searchTerms, pane)
-        int index = parent.indexOfTab(searchTerms)
+        int index = parent.indexOfComponent(pane)
         parent.setSelectedIndex(index)
         
         def tabPanel
