@@ -46,8 +46,8 @@ class HostCache extends Service {
 	void onHostDiscoveredEvent(HostDiscoveredEvent e) {
 		if (myself == e.destination)
 			return
-		if (hosts.containsKey(e.destination))
-			return
+		if (hosts.containsKey(e.destination) && !e.fromHostcache)
+                return
 		Host host = new Host(e.destination)
 		if (allowHost(host)) {
 			hosts.put(e.destination, host)

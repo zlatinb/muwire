@@ -140,7 +140,7 @@ class CacheClient {
 		pong.pongs.asList().each { 
 			Destination dest = new Destination(it)
 			if (!session.getMyDestination().equals(dest))
-				eventBus.publish(new HostDiscoveredEvent(destination: dest)) 
+				eventBus.publish(new HostDiscoveredEvent(destination: dest, fromHostcache : true)) 
 		}
 		
 	}
