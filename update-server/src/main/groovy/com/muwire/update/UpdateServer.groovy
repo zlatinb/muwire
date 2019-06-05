@@ -2,6 +2,7 @@ package com.muwire.update
 
 import java.util.logging.Level
 
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
@@ -55,7 +56,7 @@ class UpdateServer {
     static class Listener implements I2PSessionMuxedListener {
         
         private final File json
-        
+        private final def slurper = new JsonSlurper()
         Listener(File json) {
             this.json = json
         }
@@ -76,8 +77,9 @@ class UpdateServer {
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
-                log.info("Got an update ping from "+sender.toBase32())
-                // I don't think we care about the payload at this point
+                payload = slurper.parse(dissector.getPayload())
+                log.info("Got an update ping from "+sender.toBase32() + " reported version "+payload?.myVersion)
+                
                 def maker = new I2PDatagramMaker(session)
                 def response = maker.makeI2PDatagram(json.bytes)
                 session.sendMessage(sender, response, I2PSession.PROTO_DATAGRAM, 0, 2)
