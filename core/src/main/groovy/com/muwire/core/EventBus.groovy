@@ -3,6 +3,7 @@ package com.muwire.core
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.logging.Level
 
 import com.muwire.core.files.FileSharedEvent
 
@@ -30,7 +31,11 @@ class EventBus {
 			currentHandlers = handlers.getOrDefault(clazz, [])
 		}
 		currentHandlers.each {
-			it."on${clazz.getSimpleName()}"(e)
+            try {
+                it."on${clazz.getSimpleName()}"(e)
+            } catch (Exception bad) {
+                log.log(Level.SEVERE, "exception dispatching event",bad)
+            }
 		}
 	}
 	
