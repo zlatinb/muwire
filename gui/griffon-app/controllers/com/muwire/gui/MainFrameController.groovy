@@ -7,6 +7,8 @@ import griffon.core.mvc.MVCGroup
 import griffon.core.mvc.MVCGroupConfiguration
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
+
 import javax.annotation.Nonnull
 import javax.inject.Inject
 
@@ -42,10 +44,15 @@ class MainFrameController {
         params["uuid"] = uuid.toString()
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
-        
-        // this can be improved a lot
-        def terms = search.toLowerCase().trim().split(Constants.SPLIT_PATTERN)
-        def searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid)
+
+        def searchEvent
+        if (model.hashSearch) {
+            searchEvent = new SearchEvent(searchHash : Base64.decode(search), uuid : uuid)
+        } else {
+            // this can be improved a lot
+            def terms = search.toLowerCase().trim().split(Constants.SPLIT_PATTERN)
+            searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid)
+        }
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me))
@@ -135,6 +142,16 @@ class MainFrameController {
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
+    }
+    
+    @ControllerAction
+    void keywordSearch() {
+        model.hashSearch = false
+    }
+    
+    @ControllerAction
+    void hashSearch() {
+        model.hashSearch = true
     }
     
     void mvcGroupInit(Map<String, String> args) {

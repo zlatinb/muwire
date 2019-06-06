@@ -52,6 +52,8 @@ class MainFrameModel {
     def trusted = []
     def distrusted = []
     
+    boolean hashSearch
+    
     @Observable int connections
     @Observable String me
     @Observable boolean searchButtonsEnabled
