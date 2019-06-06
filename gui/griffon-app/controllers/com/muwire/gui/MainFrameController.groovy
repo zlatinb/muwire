@@ -58,12 +58,12 @@ class MainFrameController {
             originator : core.me))
     }
     
-    void search(String infoHash) {
+    void search(String infoHash, String tabTitle) {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
         def uuid = UUID.randomUUID()
         Map<String, Object> params = new HashMap<>()
-        params["search-terms"] = infoHash
+        params["search-terms"] = tabTitle
         params["uuid"] = uuid.toString()
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group

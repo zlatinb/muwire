@@ -272,7 +272,7 @@ class MainFrameModel {
                 "New MuWire version availble", JOptionPane.OK_CANCEL_OPTION)
             if (option == JOptionPane.CANCEL_OPTION)
                 return
-            controller.search(e.infoHash)
+            controller.search(e.infoHash,"MuWire update")
         }
     }
     
