@@ -180,7 +180,7 @@ abstract class Connection implements Closeable {
         
         
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
-                                            searchHash : search.infohash,
+                                            searchHash : Base64.decode(search.infohash),
                                             uuid : uuid)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
