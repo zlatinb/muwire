@@ -36,7 +36,7 @@ class UpdateClient {
     
     void start() {
         session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 2)
-        timer.schedule({checkUpdate()} as TimerTask, 30000, 60 * 60 * 1000)
+        timer.schedule({checkUpdate()} as TimerTask, 60000, 60 * 60 * 1000)
     }
     
     void stop() {
