@@ -196,7 +196,7 @@ class DownloadSession {
             
         long interval = timestamps.last - timestamps[idx]
         if (interval == 0) 
-            interval = 0.001
+            interval = 1
         for (int i = idx; i < SAMPLES; i++)
             totalRead += reads[idx]
         (int)(totalRead * 1000.0 / interval)
