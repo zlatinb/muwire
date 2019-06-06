@@ -29,6 +29,7 @@ import com.muwire.core.upload.UploadFinishedEvent
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
+import griffon.core.env.Metadata
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.transform.FXObservable
@@ -38,8 +39,11 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class MainFrameModel {
+    @Inject Metadata metadata
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
+    @MVCMember @Nonnull
+    MainFrameController controller
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
     
@@ -262,7 +266,13 @@ class MainFrameModel {
     
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
         runInsideUIAsync {
-            JOptionPane.showMessageDialog(null, "A new version of MuWire is available from $e.signer.  Please update to $e.version")
+            
+            int option = JOptionPane.showConfirmDialog(null, 
+                "MuWire $e.version is available from $e.signer.  You have "+ metadata["application.version"]+" Update?",
+                "New MuWire version availble", JOptionPane.OK_CANCEL_OPTION)
+            if (option == JOptionPane.CANCEL_OPTION)
+                return
+            controller.search(e.infoHash)
         }
     }
     

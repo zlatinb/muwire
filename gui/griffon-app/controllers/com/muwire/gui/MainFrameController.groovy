@@ -58,6 +58,22 @@ class MainFrameController {
             originator : core.me))
     }
     
+    void search(String infoHash) {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "search window")
+        def uuid = UUID.randomUUID()
+        Map<String, Object> params = new HashMap<>()
+        params["search-terms"] = infoHash
+        params["uuid"] = uuid.toString()
+        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
+        model.results[uuid.toString()] = group
+        
+        def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid)
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
+            replyTo: core.me.destination, receivedOn: core.me.destination,
+            originator : core.me))
+    }
+    
     private def selectedResult() {
         def selected = builder.getVariable("result-tabs").getSelectedComponent()
         def group = selected.getClientProperty("mvc-group")

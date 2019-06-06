@@ -107,7 +107,7 @@ class UpdateClient {
                 }
                 
                 log.info("new version $payload.version available, publishing event")
-                eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer))
+                eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : payload.infoHash))
                 
             } catch (Exception e) {
                 log.log(Level.WARNING,"Invalid datagram",e)
