@@ -1,7 +1,10 @@
 package com.muwire.cli
 
+import java.util.concurrent.CountDownLatch
+
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileSharedEvent
 
@@ -31,8 +34,19 @@ class Cli {
             println "Failed to initialize core, exiting"
             System.exit(1)
         }
-        
+
+        def latch = new CountDownLatch(1)
+        def fileLoader = new Object() {
+            public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+                latch.countDown()
+            }
+        }
+        core.eventBus.register(AllFilesLoadedEvent.class, fileLoader)
         core.startServices()
+        
+        println "waiting for files to load"
+        latch.await()
+                
         
         // now we begin
         println "MuWire is ready"

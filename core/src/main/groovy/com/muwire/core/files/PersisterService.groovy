@@ -55,6 +55,7 @@ class PersisterService extends Service {
 						}
 					}
 				}
+                listener.publish(new AllFilesLoadedEvent())
 			} catch (IllegalArgumentException|NumberFormatException e) {
                 log.log(Level.WARNING, "couldn't load files",e)
 			}
