@@ -4,9 +4,15 @@ import java.util.concurrent.CountDownLatch
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.connection.ConnectionAttemptStatus
+import com.muwire.core.connection.ConnectionEvent
+import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.upload.UploadEvent
+import com.muwire.core.upload.UploadFinishedEvent
 
 class Cli {
     
@@ -35,21 +41,8 @@ class Cli {
             System.exit(1)
         }
 
-        def latch = new CountDownLatch(1)
-        def fileLoader = new Object() {
-            public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
-                latch.countDown()
-            }
-        }
-        core.eventBus.register(AllFilesLoadedEvent.class, fileLoader)
-        core.startServices()
-        
-        println "waiting for files to load"
-        latch.await()
                 
         
-        // now we begin
-        println "MuWire is ready"
         
         def filesList
         if (args.length == 0) {
@@ -62,14 +55,39 @@ class Cli {
         Thread.sleep(1000)
         println "loading shared files from $filesList"
         
-        core.eventBus.register(FileHashedEvent.class, new Object() {
-            void onFileHashedEvent(FileHashedEvent e) {
-                if (e.error != null)
-                    println "ERROR $e.error"
-                else
-                    println "Shared file : $e.sharedFile.file"
+        // listener for shared files
+        def sharedListener = new SharedListener()
+        core.eventBus.register(FileHashedEvent.class, sharedListener)
+        core.eventBus.register(FileLoadedEvent.class, sharedListener)
+        
+        // for connections
+        def connectionsListener = new ConnectionListener()
+        core.eventBus.register(ConnectionEvent.class, connectionsListener)
+        core.eventBus.register(DisconnectionEvent.class, connectionsListener)
+        
+        // for uploads
+        def uploadsListener = new UploadsListener()
+        core.eventBus.register(UploadEvent.class, uploadsListener)
+        core.eventBus.register(UploadFinishedEvent.class, uploadsListener)
+        
+        Timer timer = new Timer("status-printer", true)
+        timer.schedule({
+            println "Connections $connectionsListener.connections Uploads $uploadsListener.uploads Shared $sharedListener.shared"
+        } as TimerTask, 60000, 60000)
+        
+        def latch = new CountDownLatch(1)
+        def fileLoader = new Object() {
+            public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+                latch.countDown()
             }
-        })
+        }
+        core.eventBus.register(AllFilesLoadedEvent.class, fileLoader)
+        core.startServices()
+        
+        println "waiting for files to load"
+        latch.await()
+        // now we begin
+        println "MuWire is ready"
         
         filesList = new File(filesList)
         filesList.withReader { 
@@ -82,5 +100,43 @@ class Cli {
             println "shutdown."
         })
         Thread.sleep(Integer.MAX_VALUE)
+    }
+    
+    static class ConnectionListener {
+        volatile int connections
+        public void onConnectionEvent(ConnectionEvent e) {
+            if (e.status == ConnectionAttemptStatus.SUCCESSFUL)
+                connections++
+        }
+        public void onDisconnectionEvent(DisconnectionEvent e) {
+            connections--
+        }
+    }
+    
+    static class UploadsListener {
+        volatile int uploads
+        public void onUploadEvent(UploadEvent e) {
+            uploads++
+            println "Starting upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
+        }
+        public void onUploadFinishedEvent(UploadFinishedEvent e) {
+            uploads--
+            println "Finished upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
+        }
+    }
+    
+    static class SharedListener {
+        volatile int shared
+        void onFileHashedEvent(FileHashedEvent e) {
+            if (e.error != null)
+                println "ERROR $e.error"
+            else {
+                println "Shared file : $e.sharedFile.file"
+                shared++
+            }
+        }
+        void onFileLoadedEvent(FileLoadedEvent e) {
+            shared++
+        }
     }
 }
