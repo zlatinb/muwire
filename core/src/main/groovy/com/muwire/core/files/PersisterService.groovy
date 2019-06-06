@@ -1,5 +1,8 @@
 package com.muwire.core.files
 
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.logging.Level
 import java.util.stream.Collectors
 
@@ -108,15 +111,19 @@ class PersisterService extends Service {
 	}
 	
 	private void persistFiles() {
-		location.delete()
 		def sharedFiles = fileManager.getSharedFiles()
-		location.withPrintWriter { writer ->
+        
+        File tmp = File.createTempFile("muwire-files", "tmp")
+        tmp.deleteOnExit()
+		tmp.withPrintWriter { writer ->
 			sharedFiles.each { k, v ->
 				def json = toJson(k,v)
 				json = JsonOutput.toJson(json)
 				writer.println json
 			}
 		}
+        Files.copy(tmp.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        tmp.delete()
 	}
 	
 	private def toJson(File f, SharedFile sf) {
