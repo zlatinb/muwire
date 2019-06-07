@@ -1,8 +1,22 @@
-apply plugin : 'application'
+buildscript {
 
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+apply plugin : 'application'
 mainClassName = 'com.muwire.cli.Cli'
+apply plugin : 'com.github.johnrengelman.shadow'
+
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 
 dependencies {
     compile project(":core")
 }
+
