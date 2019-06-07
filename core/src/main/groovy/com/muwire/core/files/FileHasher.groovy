@@ -67,4 +67,18 @@ class FileHasher {
 		byte [] hashList = output.toByteArray()
 		InfoHash.fromHashList(hashList)
 	}
+    
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            println "This utility computes an infohash of a file"
+            println "Pass absolute path to a file as an argument"
+            System.exit(1)
+        }
+        
+        def file = new File(args[0])
+        file = file.getAbsoluteFile()
+        def hasher = new FileHasher()
+        def infohash = hasher.hashFile(file)
+        println infohash
+    }
 }
