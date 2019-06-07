@@ -43,6 +43,9 @@ class ConnectionAcceptorTest {
     
     def uploadManagerMock
     UploadManager uploadManager
+    
+    def connectionEstablisherMock
+    ConnectionEstablisher connectionEstablisher
 	
 	ConnectionAcceptor acceptor
 	List<ConnectionEvent> connectionEvents
@@ -57,6 +60,7 @@ class ConnectionAcceptorTest {
 		trustServiceMock = new MockFor(TrustService.class)
         searchManagerMock = new MockFor(SearchManager.class)
         uploadManagerMock = new MockFor(UploadManager.class)
+        connectionEstablisherMock = new MockFor(ConnectionEstablisher.class)
 	}
 	
 	@After
@@ -68,6 +72,7 @@ class ConnectionAcceptorTest {
 		trustServiceMock.verify trustService
         searchManagerMock.verify searchManager
         uploadManagerMock.verify uploadManager
+        connectionEstablisherMock.verify connectionEstablisher
 		Thread.sleep(100)
 	}
 	
@@ -87,8 +92,10 @@ class ConnectionAcceptorTest {
 		trustService = trustServiceMock.proxyInstance()
         searchManager = searchManagerMock.proxyInstance()
         uploadManager = uploadManagerMock.proxyInstance()
+        connectionEstablisher = connectionEstablisherMock.proxyInstance()
 		
-		acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor, hostCache, trustService, searchManager, uploadManager)
+		acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor, 
+            hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
 		acceptor.start()
 		Thread.sleep(100)
 	}
@@ -108,6 +115,7 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
+        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
         connectionManagerMock.demand.isConnected { dest ->
             assert dest == destinations.dest1
             false
@@ -150,6 +158,7 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
+        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
         connectionManagerMock.demand.isConnected { dest ->
             assert dest == destinations.dest1
             false
@@ -264,6 +273,7 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
+        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
         connectionManagerMock.demand.isConnected { dest ->
             assert dest == destinations.dest1
             false
@@ -310,6 +320,7 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
+        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
         connectionManagerMock.demand.isConnected { dest ->
             assert dest == destinations.dest1
             false
@@ -356,6 +367,7 @@ class ConnectionAcceptorTest {
 			new Endpoint(destinations.dest1, is, os, null)
 		}
 		i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
+        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
         connectionManagerMock.demand.isConnected { dest ->
             assert dest == destinations.dest1
             false

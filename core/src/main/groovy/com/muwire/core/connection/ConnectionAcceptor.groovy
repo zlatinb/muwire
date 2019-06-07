@@ -144,7 +144,7 @@ class ConnectionAcceptor {
 
 	private void handleIncoming(Endpoint e, boolean leaf) {
 		boolean accept = !manager.isConnected(e.destination) && 
-            !establisher.inProgress.contains(e.destination) &&
+            !establisher.isInProgress(e.destination) &&
             (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
 		if (accept) {
 			log.info("accepting connection, leaf:$leaf")

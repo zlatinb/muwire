@@ -35,6 +35,8 @@ class ConnectionEstablisher {
 	
 	final Set inProgress = new ConcurrentHashSet()
 	
+    ConnectionEstablisher(){}
+    
 	ConnectionEstablisher(EventBus eventBus, I2PConnector i2pConnector, MuWireSettings settings,
 		ConnectionManager connectionManager, HostCache hostCache) {
 		this.eventBus = eventBus
@@ -176,4 +178,8 @@ class ConnectionEstablisher {
 			e.close()
 		}
 	}
+    
+    public boolean isInProgress(Destination d) {
+        inProgress.contains(d)
+    }
 }
