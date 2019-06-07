@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 
 class HasherServiceTest {
 
@@ -24,7 +25,7 @@ class HasherServiceTest {
 	void before() {
         eventBus = new EventBus()
 		hasher = new FileHasher()
-		service = new HasherService(hasher, eventBus)
+		service = new HasherService(hasher, eventBus, new FileManager(eventBus, new MuWireSettings()))
         eventBus.register(FileHashedEvent.class, listener)
 		service.start()
 	}

@@ -8,6 +8,7 @@ import com.muwire.core.Destinations
 import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.util.DataUtil
 
@@ -31,7 +32,7 @@ class PersisterServiceSavingTest {
 		f = new File("build.gradle")
 		f = f.getCanonicalFile()
 		ih = fh.hashFile(f)
-		fileSource = new FileManager(eventBus) {
+		fileSource = new FileManager(eventBus, new MuWireSettings()) {
 					Map<File, SharedFile> getSharedFiles() {
 						Map<File, SharedFile> rv = new HashMap<>()
 						rv.put(f, sf)
