@@ -49,8 +49,6 @@ class SearchIndex {
 				
 		}
 		
-        System.out.println("rv is $rv")
-        
 		if (rv != null)
 			return rv.asList()
 		[]
