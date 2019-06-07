@@ -5,6 +5,7 @@ import org.junit.Test
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
@@ -26,7 +27,7 @@ class FileManagerTest {
 	void before() {
 		eventBus = new EventBus()
 		eventBus.register(ResultsEvent.class, listener)
-		manager = new FileManager(eventBus)
+		manager = new FileManager(eventBus, new MuWireSettings())
 		results = null
 	}
 	
