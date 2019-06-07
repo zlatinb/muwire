@@ -157,8 +157,11 @@ abstract class Connection implements Closeable {
     
     protected void handleSearch(def search) {
         UUID uuid = UUID.fromString(search.uuid)
-        if (search.infohash != null)
+        byte [] infohash = null
+        if (search.infohash != null) {
             search.keywords = null
+            infohash = Base64.decode(search.infohash)
+        }
             
         Destination replyTo = new Destination(search.replyTo)
         TrustLevel trustLevel = trustService.getLevel(replyTo)
@@ -182,7 +185,7 @@ abstract class Connection implements Closeable {
         
         
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
-                                            searchHash : Base64.decode(search.infohash),
+                                            searchHash : infohash,
                                             uuid : uuid)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
