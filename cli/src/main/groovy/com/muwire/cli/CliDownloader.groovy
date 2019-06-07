@@ -95,6 +95,21 @@ class CliDownloader {
         
         Thread.sleep(1000)
         
+        Timer timer = new Timer("stats-printer")
+        timer.schedule({
+            println "==== STATUS UPDATE ==="
+            downloaders.each {
+                int donePieces = it.donePieces()
+                int totalPieces = it.nPieces
+                int sources = it.activeWorkers.size()
+                def root = Base64.encode(it.infoHash.getRoot())
+                def state = it.getCurrentState()
+                println "file $it.file hash: $root progress: $donePieces/$totalPieces sources: $sources status: $state}"
+                it.resume()
+            }
+            println "==== END ==="
+        } as TimerTask, 60000, 60000)
+        
         println "waiting for downloads to finish"
         while(true) {
             boolean allFinished = true
@@ -124,6 +139,7 @@ class CliDownloader {
         UUID uuid
         String fileName
         public onUIResultEvent(UIResultEvent e) {
+            println "got a result for $fileName from ${e.sender.getHumanReadableName()}"
             ResultsHolder listener = resultsListeners.get(e.uuid)
             if (listener == null) {
                 listener = new ResultsHolder(fileName : fileName)
