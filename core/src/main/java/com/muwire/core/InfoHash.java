@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.i2p.data.Base32;
+import net.i2p.data.Base64;
 
 public class InfoHash {
 
@@ -76,13 +77,13 @@ public class InfoHash {
 	}
 	
 	public String toString() {
-		String rv = "InfoHash[root:"+Base32.encode(root) + " hashList:";
+		String rv = "InfoHash[root:"+Base64.encode(root) + " hashList:";
 		List<String> b64HashList = new ArrayList<>();
 		if (hashList != null) {       
 		    byte [] tmp = new byte[SIZE];
 		    for (int i = 0; i < hashList.length / SIZE; i++) {
 		        System.arraycopy(hashList, SIZE * i, tmp, 0, SIZE);
-		        b64HashList.add(Base32.encode(tmp));
+		        b64HashList.add(Base64.encode(tmp));
 		    }
 		}
 		rv += b64HashList.toString();
