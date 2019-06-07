@@ -44,9 +44,7 @@ class SearchIndex {
 			if (rv == null) {
 				rv = forWord
 			} else {
-                System.out.println("before retention $rv")
 				rv.retainAll(forWord)
-                System.out.println("after retention")
 			}
 				
 		}

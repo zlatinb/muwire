@@ -50,7 +50,8 @@ class MainFrameController {
             searchEvent = new SearchEvent(searchHash : Base64.decode(search), uuid : uuid)
         } else {
             // this can be improved a lot
-            def terms = search.toLowerCase().trim().split(Constants.SPLIT_PATTERN)
+            def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
+            def terms = replaced.split(" ")
             searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid)
         }
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
