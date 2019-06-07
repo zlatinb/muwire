@@ -53,7 +53,7 @@ class OptionsView {
             updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))
             label(text : "hours", constraints : gbc(gridx: 2, gridy : 1))
 
-            label(text : "Only allow trusted connections", constraints : gbc(gridx: 0, gridy : 2))
+            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 2))
             allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 2))
             
             label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
