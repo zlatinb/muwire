@@ -44,11 +44,15 @@ class SearchIndex {
 			if (rv == null) {
 				rv = forWord
 			} else {
+                System.out.println("before retention $rv")
 				rv.retainAll(forWord)
+                System.out.println("after retention")
 			}
 				
 		}
 		
+        System.out.println("rv is $rv")
+        
 		if (rv != null)
 			return rv.asList()
 		[]
