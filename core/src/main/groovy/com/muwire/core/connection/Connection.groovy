@@ -127,6 +127,7 @@ abstract class Connection implements Closeable {
         query.uuid = e.searchEvent.getUuid()
         query.firstHop = e.firstHop
         query.keywords = e.searchEvent.getSearchTerms()
+        query.oobInfohash = e.searchEvent.oobInfohash
         if (e.searchEvent.searchHash != null)
             query.infohash = Base64.encode(e.searchEvent.searchHash)
         query.replyTo = e.replyTo.toBase64()
@@ -183,10 +184,14 @@ abstract class Connection implements Closeable {
             }
         }
         
+        boolean oob = false
+        if (search.oobInfohash != null)
+            oob = search.oobInfohash
         
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : infohash,
-                                            uuid : uuid)
+                                            uuid : uuid,
+                                            oobInfohash : oob)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
                                             originator : originator,

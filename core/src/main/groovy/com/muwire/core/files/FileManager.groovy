@@ -105,6 +105,7 @@ class FileManager {
 		if (e.searchHash != null) {
             Set<SharedFile> found
             found = rootToFiles.get new InfoHash(e.searchHash)
+            found = filter(found, e.oobInfohash)
 			if (found != null && !found.isEmpty())
 				re = new ResultsEvent(results: found.asList(), uuid: e.uuid)
 		} else {
@@ -113,6 +114,7 @@ class FileManager {
 			names.each { files.addAll nameToFiles.getOrDefault(it, []) }
 			Set<SharedFile> sharedFiles = new HashSet<>()
 			files.each { sharedFiles.add fileToSharedFile[it] }
+            files = filter(sharedFiles, e.oobInfohash)
 			if (!sharedFiles.isEmpty())
 				re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid)
 			
@@ -121,4 +123,15 @@ class FileManager {
 		if (re != null)
 			eventBus.publish(re)
 	}
+    
+    private static Set<SharedFile> filter(Set<SharedFile> files, boolean oob) {
+        if (!oob)
+            return files
+        Set<SharedFile> rv = new HashSet<>()
+        files.each { 
+            if (it.getPieceSize() != 0)
+                rv.add(it)
+        }
+        rv
+    }
 }
