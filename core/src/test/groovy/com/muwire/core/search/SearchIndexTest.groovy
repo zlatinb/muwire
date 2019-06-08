@@ -30,7 +30,18 @@ class SearchIndexTest {
 		assert found.size() == 2
 		assert found.contains("a b.c")
 		assert found.contains("c d.e")
+        
 	}
+    
+    @Test
+    public void testDrillDownDoesNotModifyIndex() {
+        initIndex(["a b.c", "c d.e"])
+        index.search(["c","e"])
+        def found = index.search(["c"])
+        assert found.size() == 2
+        assert found.contains("a b.c")
+        assert found.contains("c d.e")
+    }
 	
 	@Test
 	void testDrillDown() {

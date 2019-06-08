@@ -42,7 +42,7 @@ class SearchIndex {
 		terms.each {
 			Set<String> forWord = keywords.getOrDefault(it,[])
 			if (rv == null) {
-				rv = forWord
+				rv = new HashSet<>(forWord)
 			} else {
 				rv.retainAll(forWord)
 			}
