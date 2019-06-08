@@ -9,8 +9,8 @@ public class DownloadedFile extends SharedFile {
 	
 	private final Set<Destination> sources;
 
-	public DownloadedFile(File file, InfoHash infoHash, Set<Destination> sources) {
-		super(file, infoHash);
+	public DownloadedFile(File file, InfoHash infoHash, int pieceSize, Set<Destination> sources) {
+		super(file, infoHash, pieceSize);
 		this.sources = sources;
 	}
 	

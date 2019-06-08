@@ -6,10 +6,12 @@ public class SharedFile {
 
 	private final File file;
 	private final InfoHash infoHash;
+	private final int pieceSize;
 	
-	public SharedFile(File file, InfoHash infoHash) {
+	public SharedFile(File file, InfoHash infoHash, int pieceSize) {
 		this.file = file;
 		this.infoHash = infoHash;
+		this.pieceSize = pieceSize;
 	}
 
 	public File getFile() {
@@ -20,4 +22,7 @@ public class SharedFile {
 		return infoHash;
 	}
 	
+	public int getPieceSize() {
+	    return pieceSize;
+	}
 }

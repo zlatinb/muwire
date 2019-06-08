@@ -35,7 +35,7 @@ class FileManagerTest {
 	void testHash1Result() {
 		File f = new File("a b.c")
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf = new SharedFile(f,ih)
+		SharedFile sf = new SharedFile(f,ih, 0)
 		FileHashedEvent fhe = new FileHashedEvent(sharedFile: sf)
 		manager.onFileHashedEvent(fhe)
 		
@@ -54,8 +54,8 @@ class FileManagerTest {
 	@Test
 	void testHash2Results() {
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf1 = new SharedFile(new File("a b.c"), ih)
-		SharedFile sf2 = new SharedFile(new File("d e.f"), ih)
+		SharedFile sf1 = new SharedFile(new File("a b.c"), ih, 0)
+		SharedFile sf2 = new SharedFile(new File("d e.f"), ih, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf1)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf2)
 
@@ -76,7 +76,7 @@ class FileManagerTest {
 	void testHash0Results() {
 		File f = new File("a b.c")
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf = new SharedFile(f,ih)
+		SharedFile sf = new SharedFile(f,ih, 0)
 		FileHashedEvent fhe = new FileHashedEvent(sharedFile: sf)
 		manager.onFileHashedEvent(fhe)
 		
@@ -90,7 +90,7 @@ class FileManagerTest {
 	void testKeyword1Result() {
 		File f = new File("a b.c")
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf = new SharedFile(f,ih)
+		SharedFile sf = new SharedFile(f,ih,0)
 		FileHashedEvent fhe = new FileHashedEvent(sharedFile: sf)
 		manager.onFileHashedEvent(fhe)
 		
@@ -108,12 +108,12 @@ class FileManagerTest {
 	void testKeyword2Results() {
 		File f1 = new File("a b.c")
 		InfoHash ih1 = InfoHash.fromHashList(new byte[32])
-		SharedFile sf1 = new SharedFile(f1, ih1)
+		SharedFile sf1 = new SharedFile(f1, ih1, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf1)
 		
 		File f2 = new File("c d.e")
 		InfoHash ih2 = InfoHash.fromHashList(new byte[64])
-		SharedFile sf2 = new SharedFile(f2, ih2)
+		SharedFile sf2 = new SharedFile(f2, ih2, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
 		
 		UUID uuid = UUID.randomUUID()
@@ -131,7 +131,7 @@ class FileManagerTest {
 	void testKeyword0Results() {
 		File f = new File("a b.c")
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf = new SharedFile(f,ih)
+		SharedFile sf = new SharedFile(f,ih,0)
 		FileHashedEvent fhe = new FileHashedEvent(sharedFile: sf)
 		manager.onFileHashedEvent(fhe)
 		
@@ -144,8 +144,8 @@ class FileManagerTest {
 	@Test
 	void testRemoveFileExistingHash() {
 		InfoHash ih = InfoHash.fromHashList(new byte[32])
-		SharedFile sf1 = new SharedFile(new File("a b.c"), ih)
-		SharedFile sf2 = new SharedFile(new File("d e.f"), ih)
+		SharedFile sf1 = new SharedFile(new File("a b.c"), ih, 0)
+		SharedFile sf2 = new SharedFile(new File("d e.f"), ih, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf1)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf2)
 		
@@ -162,12 +162,12 @@ class FileManagerTest {
 	void testRemoveFile() {
 		File f1 = new File("a b.c")
 		InfoHash ih1 = InfoHash.fromHashList(new byte[32])
-		SharedFile sf1 = new SharedFile(f1, ih1)
+		SharedFile sf1 = new SharedFile(f1, ih1, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf1)
 		
 		File f2 = new File("c d.e")
 		InfoHash ih2 = InfoHash.fromHashList(new byte[64])
-		SharedFile sf2 = new SharedFile(f2, ih2)
+		SharedFile sf2 = new SharedFile(f2, ih2, 0)
 		manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
 		
 		manager.onFileUnsharedEvent new FileUnsharedEvent(unsharedFile: sf2)

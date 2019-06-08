@@ -98,14 +98,19 @@ class PersisterService extends Service {
 		if (!Arrays.equals(root, ih.getRoot()))
 			return null
 			
-		if (json.sources != null) {
+        int pieceSize = 0
+        if (json.pieceSize != null)
+            pieceSize = json.pieceSize
+            
+        if (json.sources != null) {
 			List sources = (List)json.sources
 			Set<Destination> sourceSet = sources.stream().map({d -> new Destination(d.toString())}).collect Collectors.toSet()
-			DownloadedFile df = new DownloadedFile(file, ih, sourceSet)
+			DownloadedFile df = new DownloadedFile(file, ih, pieceSize, sourceSet)
 			return new FileLoadedEvent(loadedFile : df)
 		}
+        
 		 
-		SharedFile sf = new SharedFile(file, ih)
+		SharedFile sf = new SharedFile(file, ih, pieceSize)
 		return new FileLoadedEvent(loadedFile: sf)
 		
 	}
@@ -132,6 +137,7 @@ class PersisterService extends Service {
 		json.length = f.length()
 		InfoHash ih = sf.getInfoHash()
 		json.infoHash = Base64.encode ih.getRoot()
+        json.pieceSize = sf.getPieceSize()
 		byte [] tmp = new byte [32]
 		json.hashList = []
 		for (int i = 0;i < ih.getHashList().length / 32; i++) {

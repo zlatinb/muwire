@@ -51,11 +51,14 @@ class ResultsSender {
         if (target.equals(me.destination)) {
             results.each { 
                 long length = it.getFile().length()
+                int pieceSize = it.getPieceSize()
+                if (pieceSize == 0)
+                    pieceSize = FileHasher.getPieceSize(length)
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
                     infohash : it.getInfoHash(),
-                    pieceSize : FileHasher.getPieceSize(length),
+                    pieceSize : pieceSize,
                     uuid : uuid
                     )
                     eventBus.publish(uiResultEvent)
@@ -95,7 +98,7 @@ class ResultsSender {
                     obj.name = encodedName
                     obj.infohash = Base64.encode(it.getInfoHash().getRoot())
                     obj.size = it.getFile().length()
-                    obj.pieceSize = FileHasher.getPieceSize(it.getFile().length())
+                    obj.pieceSize = it.getPieceSize()
                     byte [] hashList = it.getInfoHash().getHashList()
                     def hashListB64 = []
                     for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {

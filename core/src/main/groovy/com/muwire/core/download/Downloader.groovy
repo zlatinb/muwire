@@ -205,7 +205,7 @@ public class Downloader {
                 if (downloaded.isComplete() && !eventFired) {
                     piecesFile.delete()
                     eventFired = true
-                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, infoHash, Collections.emptySet())))
+                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, infoHash, pieceSize, Collections.emptySet())))
                 }
                 endpoint?.close()
             }
