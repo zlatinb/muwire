@@ -37,6 +37,9 @@ class MainFrameView {
     @MVCMember @Nonnull
     MainFrameModel model
     
+    def downloadsTable
+    def lastDownloadSortEvent
+    
     void initUI() {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
@@ -105,7 +108,7 @@ class MainFrameView {
                             panel (constraints : JSplitPane.BOTTOM) {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
-                                    table(id : "downloads-table", autoCreateRowSorter : true) {
+                                    downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState()})
@@ -280,7 +283,9 @@ class MainFrameView {
         
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
-        builder.getVariable("downloads-table").setDefaultRenderer(Integer.class, centerRenderer)
+        downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        
+        downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
     }
 
     def showSearchWindow = {

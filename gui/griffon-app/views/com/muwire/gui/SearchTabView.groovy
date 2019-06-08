@@ -26,6 +26,7 @@ class SearchTabView {
     def parent
     def searchTerms
     def resultsTable
+    def lastSortEvent
     
     void initUI() {
         builder.with {
@@ -84,6 +85,8 @@ class SearchTabView {
         resultsTable.columnModel.getColumn(1).setCellRenderer(centerRenderer)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
+        
+        resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
     }
     
     def closeTab = {

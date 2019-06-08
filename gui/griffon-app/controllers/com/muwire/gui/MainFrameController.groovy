@@ -82,11 +82,18 @@ class MainFrameController {
         int row = table.getSelectedRow()
         if (row == -1)
             return
+        def sortEvt = group.view.lastSortEvent
+        if (sortEvt != null) {
+            row = sortEvt.convertPreviousRowIndexToModel(row)
+        }
         group.model.results[row]        
     }
     
     private def selectedDownload() {
         def selected = builder.getVariable("downloads-table").getSelectedRow()
+        def sortEvt = mvcGroup.view.lastDownloadSortEvent
+        if (sortEvt != null)
+            selected = sortEvt.convertPreviousRowIndexToModel(selected)
         model.downloads[selected].downloader
     }
     
