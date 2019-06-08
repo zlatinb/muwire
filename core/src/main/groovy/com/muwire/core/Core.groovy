@@ -90,6 +90,10 @@ public class Core {
         def i2pOptionsFile = new File(home,"i2p.properties")
         if (i2pOptionsFile.exists()) {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
+            if (!i2pOptions.hasProperty("inbound.nickname"))
+                i2pOptions["inbound.nickname"] = "MuWire"
+            if (!i2pOptions.hasProperty("outbound.nickname"))
+                i2pOptions["outbound.nickname"] = "MuWire"
         } else {
             i2pOptions["inbound.nickname"] = "MuWire"
             i2pOptions["outbound.nickname"] = "MuWire"
