@@ -31,8 +31,8 @@ class SearchTabView {
         builder.with {
             def resultsTable
             def pane = scrollPane {
-                resultsTable = table(id : "results-table") {
-                    tableModel(list: model.results, autoCreateRowSorter : true) {
+                resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
+                    tableModel(list: model.results) {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
                         closureColumn(header: "Size", preferredWidth: 50, type: String, read : {row -> DataHelper.formatSize2Decimal(row.size, false)+"B"})
                         closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
