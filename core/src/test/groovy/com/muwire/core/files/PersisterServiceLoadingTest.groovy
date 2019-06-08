@@ -99,7 +99,7 @@ class PersisterServiceLoadingTest {
 		FileHasher fh = new FileHasher()
 		InfoHash ih1 = fh.hashFile(sharedFile1)
 		
-		assert ih1.getHashList().length == 2 * 32
+		assert ih1.getHashList().length == 96
 		
 		def json = [:]
 		json.file = getSharedFileJsonName(sharedFile1)
@@ -111,7 +111,9 @@ class PersisterServiceLoadingTest {
 		String hash1 = Base64.encode(tmp)
 		System.arraycopy(ih1.getHashList(), 32, tmp, 0, 32)
 		String hash2 = Base64.encode(tmp)
-		json.hashList = [hash1, hash2]
+        System.arraycopy(ih1.getHashList(), 64, tmp, 0, 32)
+        String hash3 = Base64.encode(tmp)
+		json.hashList = [hash1, hash2, hash3]
 		
 		json = JsonOutput.toJson(json)
 		

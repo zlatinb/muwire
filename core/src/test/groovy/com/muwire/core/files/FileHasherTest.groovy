@@ -24,9 +24,9 @@ class FileHasherTest extends GroovyTestCase {
 	
 	@Test
 	void testPieceSize() {
-		assert 18 == FileHasher.getPieceSize(1000000)
-		assert 20 == FileHasher.getPieceSize(100000000)
-		assert 30 == FileHasher.getPieceSize(FileHasher.MAX_SIZE)
+		assert 17 == FileHasher.getPieceSize(1000000)
+		assert 17 == FileHasher.getPieceSize(100000000)
+		assert 27 == FileHasher.getPieceSize(FileHasher.MAX_SIZE)
 		shouldFail IllegalArgumentException, {
 			FileHasher.getPieceSize(Long.MAX_VALUE)
 		}
@@ -48,7 +48,7 @@ class FileHasherTest extends GroovyTestCase {
 		fos.write b
 		fos.close()
 		def ih = hasher.hashFile tmp
-		assert ih.getHashList().length == 32
+		assert ih.getHashList().length == 64
 	}
 	
 	@Test
@@ -58,7 +58,7 @@ class FileHasherTest extends GroovyTestCase {
 		fos.write b
 		fos.close()
 		def ih = hasher.hashFile tmp
-		assert ih.getHashList().length == 64
+		assert ih.getHashList().length == 96
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ class FileHasherTest extends GroovyTestCase {
 		fos.write b
 		fos.close()
 		def ih = hasher.hashFile tmp
-		assert ih.getHashList().length == 64
+		assert ih.getHashList().length == 128
 	}
 	
 	@Test
@@ -78,6 +78,6 @@ class FileHasherTest extends GroovyTestCase {
 		fos.write b
 		fos.close()
 		def ih = hasher.hashFile tmp
-		assert ih.getHashList().length == 32 * 3
+		assert ih.getHashList().length == 160
 	}
 }
