@@ -26,20 +26,20 @@ class FileManager {
 		this.eventBus = eventBus
 	}
 	
-	void onFileHashedEvent(FileHashedEvent e) {
-        if (settings.shareDownloadedFiles) {
-            if (e.sharedFile != null)
-                addToIndex(e.sharedFile)
-        }
-	}
+    void onFileHashedEvent(FileHashedEvent e) {
+        if (e.sharedFile != null)
+            addToIndex(e.sharedFile)
+    }
 	
 	void onFileLoadedEvent(FileLoadedEvent e) {
 		addToIndex(e.loadedFile)
 	}
 	
-	void onFileDownloadedEvent(FileDownloadedEvent e) {
-		addToIndex(e.downloadedFile)
-	}
+    void onFileDownloadedEvent(FileDownloadedEvent e) {
+        if (settings.shareDownloadedFiles) {
+            addToIndex(e.downloadedFile)
+        }
+    }
 	
 	private void addToIndex(SharedFile sf) {
         log.info("Adding shared file " + sf.getFile())
