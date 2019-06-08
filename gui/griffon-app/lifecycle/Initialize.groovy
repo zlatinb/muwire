@@ -8,6 +8,7 @@ import com.muwire.core.MuWireSettings
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JTable
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel

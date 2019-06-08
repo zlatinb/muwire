@@ -105,7 +105,7 @@ class MainFrameView {
                             panel (constraints : JSplitPane.BOTTOM) {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
-                                    table(id : "downloads-table") {
+                                    table(id : "downloads-table", autoCreateRowSorter : true) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState()})
@@ -136,7 +136,7 @@ class MainFrameView {
                                 button(text : "Click here to share files", actionPerformed : shareFiles)
                             }
                             scrollPane ( constraints : BorderLayout.CENTER) {
-                                table(id : "shared-files-table") {
+                                table(id : "shared-files-table", autoCreateRowSorter: true) {
                                      tableModel(list : model.shared) {
                                          closureColumn(header : "Name", preferredWidth : 550, type : String, read : {row -> row.file.getAbsolutePath()})
                                          closureColumn(header : "Size", preferredWidth : 50, type : String, 
@@ -213,7 +213,7 @@ class MainFrameView {
                         panel (border : etchedBorder()){
                             borderLayout()
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "trusted-table") {
+                                table(id : "trusted-table", autoCreateRowSorter : true) {
                                     tableModel(list : model.trusted) {
                                         closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
                                     }
@@ -228,7 +228,7 @@ class MainFrameView {
                         panel (border : etchedBorder()){
                             borderLayout()
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "distrusted-table") {
+                                table(id : "distrusted-table", autoCreateRowSorter : true) {
                                     tableModel(list : model.distrusted) {
                                         closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
                                     }
