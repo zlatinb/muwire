@@ -39,7 +39,7 @@ class SearchTabView {
                         closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                         closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
                         closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
-                          model.core.trustService.getLevel(row.sender.destination)
+                          model.core.trustService.getLevel(row.sender.destination).toString()
                         })
                     }
                 }

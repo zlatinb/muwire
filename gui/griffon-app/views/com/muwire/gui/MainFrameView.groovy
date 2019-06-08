@@ -111,7 +111,7 @@ class MainFrameView {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.downloader.file.getName()})
-                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState()})
+                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
                                             closureColumn(header: "Progress", preferredWidth: 20, type: String, read: { row ->
                                                 int pieces = row.downloader.nPieces
                                                 int done = row.downloader.donePieces()
@@ -263,7 +263,7 @@ class MainFrameView {
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
-            int selectedRow = downloadsTable.getSelectedRow()
+            int selectedRow = selectedDownloaderRow()
             def downloader = model.downloads[selectedRow].downloader
             switch(downloader.getCurrentState()) {
                 case Downloader.DownloadState.CONNECTING :
@@ -288,6 +288,13 @@ class MainFrameView {
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
     }
 
+    int selectedDownloaderRow() {
+        int selected = builder.getVariable("downloads-table").getSelectedRow()
+        if (lastDownloadSortEvent != null)
+            selected = lastDownloadSortEvent.convertPreviousRowIndexToModel(selected)
+        selected
+    }
+    
     def showSearchWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")

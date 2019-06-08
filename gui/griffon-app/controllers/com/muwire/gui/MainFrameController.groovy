@@ -89,12 +89,12 @@ class MainFrameController {
         group.model.results[row]        
     }
     
-    private def selectedDownload() {
+    private int selectedDownload() {
         def selected = builder.getVariable("downloads-table").getSelectedRow()
         def sortEvt = mvcGroup.view.lastDownloadSortEvent
         if (sortEvt != null)
             selected = sortEvt.convertPreviousRowIndexToModel(selected)
-        model.downloads[selected].downloader
+        selected
     }
     
     @ControllerAction
@@ -131,13 +131,13 @@ class MainFrameController {
     
     @ControllerAction 
     void cancel() {
-        def downloader = selectedDownload()
+        def downloader = model.downloads[selectedDownload()].downloader
         downloader.cancel()
     }
     
     @ControllerAction
     void resume() {
-        def downloader = selectedDownload()
+        def downloader = model.downloads[selectedDownload()].downloader
         downloader.resume()
     }
 
