@@ -131,11 +131,17 @@ Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to per
     firstHop: false,
     keywords : ["keyword1","keyword2"...]
     infohash: "asdfasdf...",
-    replyTo : "asdfasf...b64"
+    replyTo : "asdfasf...b64",
+    originator : "asfasdf...",
+    "oobHashlist" : true
 }
 ```
 
 A search can contain either the query entered by the user in the UI or the infohash if the user is looking for a specific file.  If both are present, the infohash takes precedence and the keyword query is ignored.
+
+The "originator" field contains the Base64-encoded persona of the originator of the query.  It is used for display purposes only.  The I2P destination in that persona must match the one in the "replyTo" field.
+
+The oobHashlist flag indicates support for out-of-band hashlist delivery, which is not yet implemented.  Nevertheless, this flag gets propagated through the network for future-proofing.
 
 ### Ultrapeer to leaf
 
