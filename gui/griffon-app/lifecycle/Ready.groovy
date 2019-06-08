@@ -1,6 +1,7 @@
 import griffon.core.GriffonApplication
 import griffon.core.env.Metadata
 import groovy.util.logging.Log
+import net.i2p.util.SystemVersion
 
 import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
@@ -34,13 +35,13 @@ class Ready extends AbstractLifecycleHandler {
         log.info "starting core services"
         def portableHome = System.getProperty("portable.home")
         def home = portableHome == null ? 
-            System.getProperty("user.home") + File.separator + ".MuWire" :
+            selectHome() :
             portableHome
             
         home = new File(home)
         if (!home.exists()) {
-            log.info("creating home dir")
-            home.mkdir()
+            log.info("creating home dir $home")
+            home.mkdirs()
         }
         
         def props = new Properties()
@@ -116,6 +117,26 @@ class Ready extends AbstractLifecycleHandler {
                 core.eventBus.publish(new FileSharedEvent(file : new File(it)))
             }
         }
+    }
+    
+    private static String selectHome() {
+        def home = new File(System.properties["user.home"])
+        def defaultHome = new File(home, ".MuWire")
+        if (defaultHome.exists())
+            return defaultHome.getAbsolutePath()
+        if (SystemVersion.isMac()) { 
+            def library = new File(home, "Library")
+            def appSupport = new File(library, "Application Support")
+            def muwire = new File(appSupport,"MuWire")
+            return muwire.getAbsolutePath()
+        }
+        if (SystemVersion.isWindows()) {
+            def appData = new File(home,"AppData")
+            def roaming = new File(appData, "Roaming")
+            def muwire = new File(roaming, "MuWire")
+            return muwire.getAbsolutePath()
+        }
+        defaultHome.getAbsolutePath()
     }
 }
 
