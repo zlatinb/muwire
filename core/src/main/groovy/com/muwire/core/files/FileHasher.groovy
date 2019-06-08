@@ -1,6 +1,9 @@
 package com.muwire.core.files
 
 import com.muwire.core.InfoHash
+
+import net.i2p.data.Base64
+
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode
@@ -79,6 +82,6 @@ class FileHasher {
         file = file.getAbsoluteFile()
         def hasher = new FileHasher()
         def infohash = hasher.hashFile(file)
-        println infohash
+        println Base64.encode(infohash.getRoot())
     }
 }
