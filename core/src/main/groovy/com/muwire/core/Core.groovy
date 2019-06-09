@@ -194,6 +194,7 @@ public class Core {
         DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector, new File(home, "incompletes"), me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
+        eventBus.register(FileDownloadedEvent.class, downloadManager)
         
         log.info("initializing upload manager")
         UploadManager uploadManager = new UploadManager(eventBus, fileManager)
