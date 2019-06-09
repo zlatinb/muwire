@@ -135,8 +135,4 @@ class FileManager {
         }
         rv
     }
-    
-    void onUILoadedEvent(UILoadedEvent e) {
-        // TODO: resume downloads
-    }
 }

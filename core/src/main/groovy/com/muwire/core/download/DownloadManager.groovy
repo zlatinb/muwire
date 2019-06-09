@@ -7,6 +7,7 @@ import net.i2p.data.Destination
 
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
+import com.muwire.core.UILoadedEvent
 
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -56,5 +57,9 @@ public class DownloadManager {
     
     void resume(Downloader downloader) {
         executor.execute({downloader.download() as Runnable})
+    }
+    
+    void onUILoadedEvent(UILoadedEvent e) {
+        // TODO: load downloads here
     }
 }

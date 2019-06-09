@@ -154,7 +154,6 @@ public class Core {
 		eventBus.register(FileDownloadedEvent.class, fileManager)
 		eventBus.register(FileUnsharedEvent.class, fileManager)
 		eventBus.register(SearchEvent.class, fileManager)
-        eventBus.register(UILoadedEvent.class, fileManager)
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
@@ -194,6 +193,7 @@ public class Core {
         log.info("initializing download manager")
         DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector, new File(home, "incompletes"), me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
+        eventBus.register(UILoadedEvent.class, downloadManager)
         
         log.info("initializing upload manager")
         UploadManager uploadManager = new UploadManager(eventBus, fileManager)
