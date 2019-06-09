@@ -154,6 +154,7 @@ public class Core {
 		eventBus.register(FileDownloadedEvent.class, fileManager)
 		eventBus.register(FileUnsharedEvent.class, fileManager)
 		eventBus.register(SearchEvent.class, fileManager)
+        eventBus.register(UILoadedEvent.class, fileManager)
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)

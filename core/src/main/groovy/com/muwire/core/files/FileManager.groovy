@@ -4,6 +4,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+import com.muwire.core.UILoadedEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchIndex
@@ -133,5 +134,9 @@ class FileManager {
                 rv.add(it)
         }
         rv
+    }
+    
+    void onUILoadedEvent(UILoadedEvent e) {
+        // TODO: resume downloads
     }
 }

@@ -7,6 +7,7 @@ import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
 
 import javax.annotation.Nonnull
@@ -117,6 +118,8 @@ class Ready extends AbstractLifecycleHandler {
                 core.eventBus.publish(new FileSharedEvent(file : new File(it)))
             }
         }
+        
+        core.eventBus.publish(new UILoadedEvent())
     }
     
     private static String selectHome() {
