@@ -68,6 +68,11 @@ public class DownloadManager {
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
     }
     
+    public void onUIDownloadCancelledEvent(UIDownloadCancelledEvent e) {
+        downloaders.remove(e.downloader)
+        persistDownloaders()
+    }
+    
     void resume(Downloader downloader) {
         executor.execute({downloader.download() as Runnable})
     }

@@ -15,6 +15,7 @@ import javax.inject.Inject
 import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
@@ -133,6 +134,7 @@ class MainFrameController {
     void cancel() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.cancel()
+        core.eventBus.publish(new UIDownloadCancelledEvent(downloader : downloader))
     }
     
     @ControllerAction
