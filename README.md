@@ -31,5 +31,4 @@ The first time you run MuWire it will ask you to select a nickname.  This nickna
 ### Known bugs and limitations
 
 * Many UI features you would expect are not there yet
-* Downloads in progress do not get remembered between restarts
 

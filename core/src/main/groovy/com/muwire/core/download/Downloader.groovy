@@ -42,6 +42,7 @@ public class Downloader {
     private final Set<Destination> destinations
     private final int nPieces
     private final File piecesFile
+    final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     
     
@@ -61,6 +62,7 @@ public class Downloader {
         this.connector = connector
         this.destinations = destinations
         this.piecesFile = new File(incompletes, file.getName()+".pieces")
+        this.pieceSizePow2 = pieceSizePow2
         this.pieceSize = 1 << pieceSizePow2
         
         int nPieces
@@ -88,8 +90,8 @@ public class Downloader {
     void readPieces() {
         if (!piecesFile.exists())
             return
-        piecesFile.withReader { 
-            int piece = Integer.parseInt(it.readLine())
+        piecesFile.eachLine { 
+            int piece = Integer.parseInt(it)
             downloaded.markDownloaded(piece)
         }
     }
@@ -163,11 +165,18 @@ public class Downloader {
     }
     
     public void resume() {
-        activeWorkers.each { destination, worker ->
-            if (worker.currentState == WorkerState.FINISHED) {
-                def newWorker = new DownloadWorker(destination)
-                activeWorkers.put(destination, newWorker)
-                executorService.submit(newWorker)
+        destinations.each { destination ->
+            def worker = activeWorkers.get(destination)
+            if (worker != null) {
+                if (worker.currentState == WorkerState.FINISHED) {
+                    def newWorker = new DownloadWorker(destination)
+                    activeWorkers.put(destination, newWorker)
+                    executorService.submit(newWorker)
+                }
+            } else {
+                worker = new DownloadWorker(destination)
+                activeWorkers.put(destination, worker)
+                executorService.submit(worker)
             }
         }
     }
