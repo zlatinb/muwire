@@ -4,11 +4,11 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The first stable release - 0.1.0 is avaiable for download at http://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.1.5 is avaiable for download at http://muwire.com.  You can find technical documentation in the "doc" folder.
 
 ### Building
 
-You need JDK 8 or newer.  After installing that and setting up the appropriate paths, just type
+You need JRE 8 or newer.  After installing that and setting up the appropriate paths, just type
 
 ```
 ./gradlew assemble 
