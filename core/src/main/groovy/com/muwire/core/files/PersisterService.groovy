@@ -62,7 +62,9 @@ class PersisterService extends Service {
 			} catch (IllegalArgumentException|NumberFormatException e) {
                 log.log(Level.WARNING, "couldn't load files",e)
 			}
-		}
+		} else {
+            listener.publish(new AllFilesLoadedEvent())
+        }
 		timer.schedule({persistFiles()} as TimerTask, 0, interval)
 		loaded = true
 	}
