@@ -103,6 +103,8 @@ public class Core {
             i2pOptions["inbound.quantity"] = "2"
             i2pOptions["outbound.length"] = "3"
             i2pOptions["outbound.quantity"] = "2"
+            i2pOptions["i2cp.tcp.host"] = "127.0.0.1"
+            i2pOptions["i2cp.tcp.port"] = "7654"
         }
         
         // options like tunnel length and quantity
