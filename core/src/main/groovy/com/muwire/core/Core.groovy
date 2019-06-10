@@ -91,6 +91,8 @@ public class Core {
         def i2pOptionsFile = new File(home,"i2p.properties")
         if (i2pOptionsFile.exists()) {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
+            println "$i2pOptions"
+
             if (!i2pOptions.hasProperty("inbound.nickname"))
                 i2pOptions["inbound.nickname"] = "MuWire"
             if (!i2pOptions.hasProperty("outbound.nickname"))
@@ -108,7 +110,7 @@ public class Core {
 		I2PSession i2pSession
 		I2PSocketManager socketManager
 		keyDat.withInputStream {
-			socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions)
+			socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
 		}
 		socketManager.getDefaultOptions().setReadTimeout(60000)
 		socketManager.getDefaultOptions().setConnectTimeout(30000)
