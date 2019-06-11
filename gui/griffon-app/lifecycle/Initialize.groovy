@@ -6,10 +6,12 @@ import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.gui.UISettings
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.JTable
+import javax.swing.LookAndFeel
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
@@ -38,19 +40,29 @@ class Initialize extends AbstractLifecycleHandler {
         application.context.put("muwire-home", home.getAbsolutePath())
         
         def guiPropsFile = new File(home, "gui.properties")
+        UISettings uiSettings
         if (guiPropsFile.exists()) {
             Properties props = new Properties()
             guiPropsFile.withInputStream { props.load(it) }
-            log.info("settting user-specified lnf ${props['lnf']}")
-            lookAndFeel(props["lnf"])
+            uiSettings = new UISettings(props)
+            
+            log.info("settting user-specified lnf $uiSettings.lnf")
+            lookAndFeel(uiSettings.lnf)
         } else {
+            Properties props = new Properties()
+            uiSettings = new UISettings(props)
             log.info "will try default lnfs"
             if (isMacOSX()) {
+                uiSettings.lnf = "nimbus"
                 lookAndFeel('nimbus') // otherwise the file chooser doesn't open???
             } else {
-                lookAndFeel('system', 'gtk')
+                LookAndFeel chosen = lookAndFeel('system', 'gtk')
+                uiSettings.lnf = chosen.name
+                log.info("ended up applying $chosen.name")
             }
         }
+        
+        application.context.put("ui-settings", uiSettings)
     }
     
     private static String selectHome() {
