@@ -34,17 +34,8 @@ class Ready extends AbstractLifecycleHandler {
     @Override
     void execute() {
         log.info "starting core services"
-        def portableHome = System.getProperty("portable.home")
-        def home = portableHome == null ? 
-            selectHome() :
-            portableHome
-            
-        home = new File(home)
-        if (!home.exists()) {
-            log.info("creating home dir $home")
-            home.mkdirs()
-        }
         
+        def home = new File(application.getContext().getAsString("muwire-home"))
         def props = new Properties()
         def propsFile = new File(home, "MuWire.properties")
         if (propsFile.exists()) {
@@ -120,26 +111,6 @@ class Ready extends AbstractLifecycleHandler {
         }
         
         core.eventBus.publish(new UILoadedEvent())
-    }
-    
-    private static String selectHome() {
-        def home = new File(System.properties["user.home"])
-        def defaultHome = new File(home, ".MuWire")
-        if (defaultHome.exists())
-            return defaultHome.getAbsolutePath()
-        if (SystemVersion.isMac()) { 
-            def library = new File(home, "Library")
-            def appSupport = new File(library, "Application Support")
-            def muwire = new File(appSupport,"MuWire")
-            return muwire.getAbsolutePath()
-        }
-        if (SystemVersion.isWindows()) {
-            def appData = new File(home,"AppData")
-            def roaming = new File(appData, "Roaming")
-            def muwire = new File(roaming, "MuWire")
-            return muwire.getAbsolutePath()
-        }
-        defaultHome.getAbsolutePath()
     }
 }
 
