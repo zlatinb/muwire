@@ -124,10 +124,11 @@ public class DownloadManager {
                     }
                     json.destinations = destinations
                     
-                    if (downloader.infoHash.hashList != null)
-                        json.hashList = Base64.encode(downloader.infoHash.hashList)
+                    InfoHash infoHash = downloader.getInfoHash()
+                    if (infoHash.hashList != null)
+                        json.hashList = Base64.encode(infoHash.hashList)
                     else
-                        json.hashRoot = Base64.encode(downloader.infoHash.getRoot())
+                        json.hashRoot = Base64.encode(infoHash.getRoot())
                     writer.println(JsonOutput.toJson(json))
                 }
             }

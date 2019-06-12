@@ -76,7 +76,7 @@ public class Downloader {
         claimed = new Pieces(nPieces)
     }
     
-    private synchronized InfoHash getInfoHash() {
+    public synchronized InfoHash getInfoHash() {
         infoHash
     }
     
