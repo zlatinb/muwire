@@ -107,7 +107,7 @@ public class DownloadManager {
         File downloadsFile = new File(home,"downloads.json")
         downloadsFile.withPrintWriter { writer -> 
             downloaders.each { downloader ->
-                if (!downloader.cancelled) {
+                if (!downloader.cancelled && downloader.infoHash.hashList != null) {
                     def json = [:]
                     json.file = Base64.encode(DataUtil.encodei18nString(downloader.file.getAbsolutePath()))
                     json.length = downloader.length
