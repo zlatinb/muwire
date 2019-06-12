@@ -12,8 +12,19 @@ class ResultsParser {
     public static UIResultEvent parse(Persona p, UUID uuid, def json) throws InvalidSearchResultException {
         if (json.type != "Result")
             throw new InvalidSearchResultException("not a result json")
-        if (json.version != 1)
-            throw new InvalidSearchResultException("unknown version $json.version")
+        switch(json.version) {
+            case 1:
+                return parseV1(p, uuid, json)
+            case 2:
+                return parseV2(p, uuid, json)
+            default:
+                throw new InvalidSearchResultException("unknown version $json.version")
+
+        }
+
+    }
+    
+    private static parseV1(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
         if (json.size == null)
@@ -48,6 +59,35 @@ class ResultsParser {
                  infohash : parsedIH,
                  pieceSize : pieceSize,
                  uuid : uuid)
+        } catch (Exception e) {
+            throw new InvalidSearchResultException("parsing search result failed",e)
+        }
+    }
+    
+    private static UIResultEvent parseV2(Persona p, UUID uuid, def json) {
+        if (json.name == null)
+            throw new InvalidSearchResultException("name missing")
+        if (json.size == null)
+            throw new InvalidSearchResultException("length missing")
+        if (json.infohash == null)
+            throw new InvalidSearchResultException("infohash missing")
+        if (json.pieceSize == null)
+            throw new InvalidSearchResultException("pieceSize missing")
+        if (json.hashList != null)
+            throw new InvalidSearchResultException("V2 result with hashlist")
+        try {
+            String name = DataUtil.readi18nString(Base64.decode(json.name))
+            long size = json.size
+            byte [] infoHash = Base64.decode(json.infohash)
+            if (infoHash.length != InfoHash.SIZE)
+                throw new InvalidSearchResultException("invalid infohash size $infoHash.length")
+            int pieceSize = json.pieceSize
+            return new UIResultEvent( sender : p,
+                name : name,
+                size : size,
+                infohash : new InfoHash(infoHash),
+                pieceSize : pieceSize,
+                uuid: uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }

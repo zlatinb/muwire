@@ -53,7 +53,7 @@ class MainFrameController {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
             def terms = replaced.split(" ")
-            searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid, oobInfohash: false)
+            searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid, oobInfohash: true)
         }
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
             replyTo: core.me.destination, receivedOn: core.me.destination,
@@ -70,7 +70,8 @@ class MainFrameController {
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
         
-        def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid)
+        def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
+            oobInfohash: true)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me))

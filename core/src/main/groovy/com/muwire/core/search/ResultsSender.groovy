@@ -46,8 +46,8 @@ class ResultsSender {
         this.me = me
     }
     
-    void sendResults(UUID uuid, SharedFile[] results, Destination target) {
-        log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()}")
+    void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash) {
+        log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()} oobInfohash : $oobInfohash")
         if (target.equals(me.destination)) {
             results.each { 
                 long length = it.getFile().length()
@@ -64,7 +64,8 @@ class ResultsSender {
                     eventBus.publish(uiResultEvent)
             }
         } else {
-            executor.execute(new ResultSendJob(uuid : uuid, results : results, target: target))
+            executor.execute(new ResultSendJob(uuid : uuid, results : results, 
+                target: target, oobInfohash : oobInfohash))
         }
     }
     
@@ -72,6 +73,7 @@ class ResultsSender {
         UUID uuid
         SharedFile [] results
         Destination target
+        boolean oobInfohash
         
         @Override
         public void run() {
@@ -94,19 +96,20 @@ class ResultsSender {
                     String encodedName = Base64.encode(baos.toByteArray())
                     def obj = [:]
                     obj.type = "Result"
-                    obj.version = 1
+                    obj.version = oobInfohash ? 2 : 1
                     obj.name = encodedName
                     obj.infohash = Base64.encode(it.getInfoHash().getRoot())
                     obj.size = it.getFile().length()
                     obj.pieceSize = it.getPieceSize()
-                    byte [] hashList = it.getInfoHash().getHashList()
-                    def hashListB64 = []
-                    for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {
-                        System.arraycopy(hashList, InfoHash.SIZE * i, tmp, 0, InfoHash.SIZE)
-                        hashListB64 << Base64.encode(tmp)
+                    if (!oobInfohash) {
+                        byte [] hashList = it.getInfoHash().getHashList()
+                        def hashListB64 = []
+                        for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {
+                            System.arraycopy(hashList, InfoHash.SIZE * i, tmp, 0, InfoHash.SIZE)
+                            hashListB64 << Base64.encode(tmp)
+                        }
+                        obj.hashList = hashListB64
                     }
-                    obj.hashList = hashListB64
-
                     def json = jsonOutput.toJson(obj)
                     os.writeShort((short)json.length())
                     os.write(json.getBytes(StandardCharsets.US_ASCII))

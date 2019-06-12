@@ -108,7 +108,7 @@ class FileManager {
             found = rootToFiles.get new InfoHash(e.searchHash)
             found = filter(found, e.oobInfohash)
 			if (found != null && !found.isEmpty())
-				re = new ResultsEvent(results: found.asList(), uuid: e.uuid)
+				re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
 		} else {
 			def names = index.search e.searchTerms
 			Set<File> files = new HashSet<>()
@@ -117,7 +117,7 @@ class FileManager {
 			files.each { sharedFiles.add fileToSharedFile[it] }
             files = filter(sharedFiles, e.oobInfohash)
 			if (!sharedFiles.isEmpty())
-				re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid)
+				re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
 			
 		}
 		
