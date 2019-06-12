@@ -59,6 +59,10 @@ class Initialize extends AbstractLifecycleHandler {
                 defaults.put("Button.font", font)
                 defaults.put("RadioButton.font", font)
                 defaults.put("Label.font", font)
+                defaults.put("CheckBox.font", font)
+                defaults.put("Table.font", font)
+                defaults.put("TableHeader.font", font)
+                // TODO: add others
             }
         } else {
             Properties props = new Properties()
