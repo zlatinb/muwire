@@ -108,6 +108,9 @@ class ConnectionAcceptor {
 				case (byte)'G':
 					processGET(e)
 					break
+                case (byte)'H':
+                    processHashList(e)
+                    break
                 case (byte)'P':
                     processPOST(e)
                     break
@@ -178,8 +181,17 @@ class ConnectionAcceptor {
         dis.readFully(et)
         if (et != "ET ".getBytes(StandardCharsets.US_ASCII))
             throw new IOException("Invalid GET connection")
-        uploadManager.processEndpoint(e)
+        uploadManager.processGET(e)
 	}
+    
+    private void processHashList(Endpoint e) {
+        byte[] ashList = new byte[8]
+        final DataInputStream dis = new DataInputStream(e.getInputStream())
+        dis.readFully(ashList)
+        if (ashList != "ASHLIST ".getBytes(StandardCharsets.US_ASCII))
+            throw new IOException("Invalid HASHLIST connection")
+        uploadManager.processHashList(e)
+    }
     
     private void processPOST(final Endpoint e) throws IOException {
         byte [] ost = new byte[4]

@@ -16,57 +16,12 @@ class Request {
     private static final byte N = "\n".getBytes(StandardCharsets.US_ASCII)[0]
     
     InfoHash infoHash
-    Range range
     Persona downloader
     Map<String, String> headers
     
-    static Request parse(InfoHash infoHash, InputStream is) throws IOException {
-        Map<String,String> headers = new HashMap<>()
-        byte [] tmp = new byte[Constants.MAX_HEADER_SIZE]
-        while(headers.size() < Constants.MAX_HEADERS) {
-            boolean r = false
-            boolean n = false
-            int idx = 0
-            while (true) {
-                byte read = is.read()
-                if (read == -1)
-                    throw new IOException("Stream closed")
-                    
-                if (!r && read == N)
-                    throw new IOException("Received N before R")
-                if (read == R) {
-                    if (r) 
-                        throw new IOException("double R")
-                    r = true
-                    continue
-                }
-                
-                if (r && !n) {
-                    if (read != N) 
-                        throw new IOException("R not followed by N")
-                    n = true
-                    break
-                }
-                if (idx == 0x1 << 14)
-                    throw new IOException("Header too long")    
-                tmp[idx++] = read
-            }
-            
-            if (idx == 0)
-                break
-                
-            String header = new String(tmp, 0, idx, StandardCharsets.US_ASCII)
-            log.fine("Read header $header")
-            
-            int keyIdx = header.indexOf(":")
-            if (keyIdx < 1)
-                throw new IOException("Header key not found")
-            if (keyIdx == header.length())
-                throw new IOException("Header value not found")
-            String key = header.substring(0, keyIdx)
-            String value = header.substring(keyIdx + 1)
-            headers.put(key, value)
-        }
+    static Request parseContentRequest(InfoHash infoHash, InputStream is) throws IOException {
+        
+        Map<String, String> headers = parseHeaders(is)
         
         if (!headers.containsKey("Range"))
             throw new IOException("Range header not found")
@@ -93,7 +48,69 @@ class Request {
             def decoded = Base64.decode(encoded)
             downloader = new Persona(new ByteArrayInputStream(decoded))
         }
-        new Request( infoHash : infoHash, range : new Range(start, end), headers : headers, downloader : downloader)
+        new ContentRequest( infoHash : infoHash, range : new Range(start, end), 
+            headers : headers, downloader : downloader)
+    }
+    
+    static Request parseHashListRequest(InfoHash infoHash, InputStream is) throws IOException {
+        Map<String,String> headers = parseHeaders(is)
+        Persona downloader = null
+        if (headers.containsKey("X-Persona")) {
+            def encoded = headers["X-Persona"].trim()
+            def decoded = Base64.decode(encoded)
+            downloader = new Persona(new ByteArrayInputStream(decoded))
+        }
+        new HashListRequest(infoHash : infoHash, headers : headers, downloader : downloader)
+    }
+    
+    private static Map<String, String> parseHeaders(InputStream is) {
+        Map<String,String> headers = new HashMap<>()
+        byte [] tmp = new byte[Constants.MAX_HEADER_SIZE]
+        while(headers.size() < Constants.MAX_HEADERS) {
+            boolean r = false
+            boolean n = false
+            int idx = 0
+            while (true) {
+                byte read = is.read()
+                if (read == -1)
+                    throw new IOException("Stream closed")
+                    
+                if (!r && read == N)
+                    throw new IOException("Received N before R")
+                if (read == R) {
+                    if (r)
+                        throw new IOException("double R")
+                    r = true
+                    continue
+                }
+                
+                if (r && !n) {
+                    if (read != N)
+                        throw new IOException("R not followed by N")
+                    n = true
+                    break
+                }
+                if (idx == 0x1 << 14)
+                    throw new IOException("Header too long")
+                tmp[idx++] = read
+            }
+            
+            if (idx == 0)
+                break
+                
+            String header = new String(tmp, 0, idx, StandardCharsets.US_ASCII)
+            log.fine("Read header $header")
+            
+            int keyIdx = header.indexOf(":")
+            if (keyIdx < 1)
+                throw new IOException("Header key not found")
+            if (keyIdx == header.length())
+                throw new IOException("Header value not found")
+            String key = header.substring(0, keyIdx)
+            String value = header.substring(keyIdx + 1)
+            headers.put(key, value)
+        }
+        headers
     }
     
 }
