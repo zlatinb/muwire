@@ -108,7 +108,7 @@ public class UploadManager {
             e.close()
             return
         }
-        Uploader uploader = new HashListUploader(e, sharedFiles.iterator().next().infoHash, request, request)
+        Uploader uploader = new HashListUploader(e, sharedFiles.iterator().next().infoHash, request)
         eventBus.publish(new UploadEvent(uploader : uploader))
         try {
             uploader.respond()

@@ -106,7 +106,7 @@ class DownloadSession {
             if (!code.startsWith("200 ")) {
                 log.warning("unknown code $code")
                 endpoint.close()
-                return
+                return false
             }
 
             // parse all headers
@@ -131,7 +131,7 @@ class DownloadSession {
             if (receivedStart != start || receivedEnd != end) {
                 log.warning("We don't support mismatching ranges yet")
                 endpoint.close()
-                return
+                return false
             }
             
             // start the download

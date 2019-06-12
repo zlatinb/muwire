@@ -20,8 +20,8 @@ import net.i2p.data.Destination
 
 @Log
 public class Downloader {
-    public enum DownloadState { CONNECTING, DOWNLOADING, FAILED, CANCELLED, FINISHED }
-    private enum WorkerState { CONNECTING, DOWNLOADING, FINISHED}
+    public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, FINISHED }
+    private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
     
     private static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
         Thread rv = new Thread(r)
@@ -36,7 +36,7 @@ public class Downloader {
     private final File file
     private final Pieces downloaded, claimed
     private final long length
-    private final InfoHash infoHash
+    private InfoHash infoHash
     private final int pieceSize
     private final I2PConnector connector
     private final Set<Destination> destinations
@@ -74,6 +74,14 @@ public class Downloader {
         
         downloaded = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
         claimed = new Pieces(nPieces)
+    }
+    
+    private synchronized InfoHash getInfoHash() {
+        infoHash
+    }
+    
+    private synchronized void setInfoHash(InfoHash infoHash) {
+        this.infoHash = infoHash
     }
     
     void download() {
@@ -145,6 +153,17 @@ public class Downloader {
         if (oneDownloading)
             return DownloadState.DOWNLOADING
         
+        // at least one is requesting hashlist
+        boolean oneHashlist = false
+        activeWorkers.values().each { 
+            if (it.currentState == WorkerState.HASHLIST) {
+                oneHashlist = true
+                return
+            }
+        }
+        if (oneHashlist)
+            return DownloadState.HASHLIST
+            
         return DownloadState.CONNECTING
     }
     
@@ -198,10 +217,16 @@ public class Downloader {
             Endpoint endpoint = null
             try {
                 endpoint = connector.connect(destination)
+                while(getInfoHash().hashList == null) {
+                    currentState = WorkerState.HASHLIST
+                    HashListSession session = new HashListSession(me.toBase64(), infoHash, endpoint)
+                    InfoHash received = session.request()
+                    setInfoHash(received)
+                }
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!downloaded.isComplete()) {
-                    currentSession = new DownloadSession(me.toBase64(), downloaded, claimed, infoHash, endpoint, file, pieceSize, length)
+                    currentSession = new DownloadSession(me.toBase64(), downloaded, claimed, getInfoHash(), endpoint, file, pieceSize, length)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
@@ -214,7 +239,7 @@ public class Downloader {
                 if (downloaded.isComplete() && !eventFired) {
                     piecesFile.delete()
                     eventFired = true
-                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, infoHash, pieceSizePow2, Collections.emptySet())),
+                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, Collections.emptySet())),
                         downloader : Downloader.this)
                 }
                 endpoint?.close()

@@ -19,7 +19,7 @@ class HashListUploader extends Uploader {
     void respond() {
         OutputStream os = endpoint.getOutputStream()
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
-        os.write("Content-Range: 0-${mapped.remaining()}")
+        os.write("Content-Range: 0-${mapped.remaining()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
         
         byte[]tmp = new byte[0x1 << 13]
         while(mapped.hasRemaining()) {
