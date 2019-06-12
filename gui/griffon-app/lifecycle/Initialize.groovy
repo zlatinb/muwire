@@ -12,9 +12,12 @@ import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.JTable
 import javax.swing.LookAndFeel
+import javax.swing.UIManager
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
+
+import java.awt.Font
 
 @Log
 class Initialize extends AbstractLifecycleHandler {
@@ -48,6 +51,15 @@ class Initialize extends AbstractLifecycleHandler {
             
             log.info("settting user-specified lnf $uiSettings.lnf")
             lookAndFeel(uiSettings.lnf)
+            
+            if (uiSettings.font != null) {
+                log.info("setting user-specified font $uiSettings.font")
+                Font font = new Font(uiSettings.font, Font.PLAIN, 12)
+                def defaults = UIManager.getDefaults()
+                defaults.put("Button.font", font)
+                defaults.put("RadioButton.font", font)
+                defaults.put("Label.font", font)
+            }
         } else {
             Properties props = new Properties()
             uiSettings = new UISettings(props)
