@@ -89,8 +89,14 @@ public class DownloadManager {
             json.destinations.each { destination -> 
                 destinations.add new Destination(destination)
             }
-            byte[] hashList = Base64.decode(json.hashList)
-            InfoHash infoHash = InfoHash.fromHashList(hashList)
+            InfoHash infoHash
+            if (json.hashList != null) {
+                byte[] hashList = Base64.decode(json.hashList)
+                infoHash = InfoHash.fromHashList(hashList)
+            } else {
+                byte [] root = Base64.decode(json.hashRoot)
+                infoHash = new InfoHash(root)
+            }
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes)
             downloader.download()
@@ -107,7 +113,7 @@ public class DownloadManager {
         File downloadsFile = new File(home,"downloads.json")
         downloadsFile.withPrintWriter { writer -> 
             downloaders.each { downloader ->
-                if (!downloader.cancelled && downloader.infoHash.hashList != null) {
+                if (!downloader.cancelled) {
                     def json = [:]
                     json.file = Base64.encode(DataUtil.encodei18nString(downloader.file.getAbsolutePath()))
                     json.length = downloader.length
@@ -118,8 +124,10 @@ public class DownloadManager {
                     }
                     json.destinations = destinations
                     
-                    json.hashList = Base64.encode(downloader.infoHash.hashList)
-                    
+                    if (downloader.infoHash.hashList != null)
+                        json.hashList = Base64.encode(downloader.infoHash.hashList)
+                    else
+                        json.hashRoot = Base64.encode(downloader.infoHash.getRoot())
                     writer.println(JsonOutput.toJson(json))
                 }
             }
