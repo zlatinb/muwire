@@ -11,4 +11,9 @@ class UIResultEvent extends Event {
     long size
     InfoHash infohash
     int pieceSize
+    
+    @Override
+    public String toString() {
+        super.toString() + "name:$name size:$size sender:${sender.getHumanReadableName()} pieceSize $pieceSize"
+    }
 }
