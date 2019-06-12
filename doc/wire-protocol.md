@@ -181,6 +181,8 @@ Search results are sent through and HTTP POST method from the responder to the o
 * The "altlocs" list contains list of alternate personas that the responder thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
 
+Results version 1 contain the full hashlist, version 2 does not contain that list.  See the "infohash-upgrade" document for more information.
+
 ### "Who do you trust" query - any node to any node
 (See the "web-of-trust" document for more info on this query)
 
