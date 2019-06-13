@@ -160,7 +160,7 @@ public class Core {
 		eventBus.register(SearchEvent.class, fileManager)
 		
 		log.info "initializing persistence service"
-		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 5000, fileManager)
+		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
         
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
