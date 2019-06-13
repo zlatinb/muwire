@@ -239,9 +239,12 @@ public class Downloader {
                 if (downloaded.isComplete() && !eventFired) {
                     piecesFile.delete()
                     eventFired = true
-                    eventBus.publish(new FileDownloadedEvent(downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, Collections.emptySet())),
-                        downloader : Downloader.this)
-                }
+                    eventBus.publish(
+                        new FileDownloadedEvent(
+                            downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, Collections.emptySet()),
+                        downloader : Downloader.this))
+                            
+                } 
                 endpoint?.close()
             }
         }
