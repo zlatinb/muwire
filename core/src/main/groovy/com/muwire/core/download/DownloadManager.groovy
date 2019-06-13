@@ -99,6 +99,7 @@ public class DownloadManager {
             }
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes)
+            downloaders.add(downloader)
             downloader.download()
             eventBus.publish(new DownloadStartedEvent(downloader : downloader))
         }
