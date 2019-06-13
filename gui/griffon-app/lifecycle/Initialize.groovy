@@ -69,8 +69,13 @@ class Initialize extends AbstractLifecycleHandler {
             uiSettings = new UISettings(props)
             log.info "will try default lnfs"
             if (isMacOSX()) {
-                uiSettings.lnf = "nimbus"
-                lookAndFeel('nimbus') // otherwise the file chooser doesn't open???
+                if (SystemVersion.isJava9()) {
+                    uiSettings.lnf = "metal"
+                    lookAndFeel("metal")
+                } else {
+                    uiSettings.lnf = "nimbus"
+                    lookAndFeel('nimbus') // otherwise the file chooser doesn't open???
+                }
             } else {
                 LookAndFeel chosen = lookAndFeel('system', 'gtk')
                 uiSettings.lnf = chosen.name
