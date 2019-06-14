@@ -269,8 +269,11 @@ class MainFrameView {
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
             int selectedRow = selectedDownloaderRow()
-            if (selectedRow < 0)
+            if (selectedRow < 0) {
+                model.cancelButtonEnabled = false
+                model.retryButtonEnabled = false
                 return
+            }
             def downloader = model.downloads[selectedRow]?.downloader
             if (downloader == null)
                 return
