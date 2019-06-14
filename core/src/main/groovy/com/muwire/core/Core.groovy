@@ -234,9 +234,13 @@ public class Core {
     }
     
     public void shutdown() {
+        log.info("shutting down connection manager")
         connectionManager.shutdown()
+        log.info("shutting down download manageer")
         downloadManager.shutdown()
+        log.info("shutting down connection acceeptor")
         connectionAcceptor.stop()
+        log.info("shutting down connection establisher")
         connectionEstablisher.stop()
     }
 

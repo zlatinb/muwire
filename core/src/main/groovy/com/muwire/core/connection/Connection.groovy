@@ -76,9 +76,9 @@ abstract class Connection implements Closeable {
 			return
 		}
         log.info("closing $name")
-        endpoint.close()
 		reader.interrupt()
 		writer.interrupt()
+		endpoint.close()
 		eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
 	}
 	
