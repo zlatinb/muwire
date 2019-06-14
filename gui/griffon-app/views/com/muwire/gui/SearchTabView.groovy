@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableCellRenderer
 import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
+import java.awt.Color
 
 import javax.annotation.Nonnull
 
@@ -96,7 +97,15 @@ class SearchTabView {
                 boolean isSelected, boolean hasFocus, int row, int column) {
                 Long l = (Long) value
                 String formatted = DataHelper.formatSize2Decimal(l, false)+"B"
-                return new JLabel(formatted)
+                setText(formatted)
+                if (isSelected) {
+                    setForeground(table.getSelectionForeground())
+                    setBackground(table.getSelectionBackground())
+                } else {
+                    setForeground(table.getForeground())
+                    setBackground(table.getBackground())
+                }
+                this
             }
         }
         sizeRenderer.setHorizontalAlignment(JLabel.CENTER)
