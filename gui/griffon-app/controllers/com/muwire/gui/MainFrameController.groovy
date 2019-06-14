@@ -181,6 +181,10 @@ class MainFrameController {
         model.hashSearch = true
     }
     
+    void unshareSelectedFiles() {
+        println "unsharing selected files"
+    }
+    
     void mvcGroupInit(Map<String, String> args) {
         application.addPropertyChangeListener("core", {e-> 
             core = e.getNewValue()

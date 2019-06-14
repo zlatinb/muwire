@@ -10,6 +10,8 @@ import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JFileChooser
 import javax.swing.JLabel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -26,6 +28,8 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
@@ -293,6 +297,27 @@ class MainFrameView {
         // shared files table
         def sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+        
+        JPopupMenu sharedFilesMenu = new JPopupMenu()
+        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
+        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFiles()})
+        sharedFilesMenu.add(unshareSelectedFiles)
+        sharedFilesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(sharedFilesMenu, e)
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(sharedFilesMenu, e)
+            }
+        })
+    }
+    
+    def showPopupMenu(JPopupMenu menu, MouseEvent event) {
+        menu.show(event.getComponent(), event.getX(), event.getY())
     }
 
     int selectedDownloaderRow() {
