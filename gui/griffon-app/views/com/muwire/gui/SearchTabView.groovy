@@ -17,6 +17,8 @@ import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 
 import javax.annotation.Nonnull
 
@@ -95,6 +97,14 @@ class SearchTabView {
         
         
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
+        
+        resultsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
+                    mvcGroup.parentGroup.controller.download()
+            }
+        })
     }
     
     def closeTab = {
