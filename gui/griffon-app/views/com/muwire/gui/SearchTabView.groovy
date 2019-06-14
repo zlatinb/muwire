@@ -6,10 +6,14 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
 
+import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
+
+import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
 
@@ -35,7 +39,7 @@ class SearchTabView {
                 resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
                     tableModel(list: model.results) {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                        closureColumn(header: "Size", preferredWidth: 50, type: String, read : {row -> DataHelper.formatSize2Decimal(row.size, false)+"B"})
+                        closureColumn(header: "Size", preferredWidth: 50, type: Long, read : {row -> row.size})
                         closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                         closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
                         closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
@@ -85,6 +89,19 @@ class SearchTabView {
         resultsTable.columnModel.getColumn(1).setCellRenderer(centerRenderer)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
+        
+        def sizeRenderer = new DefaultTableCellRenderer() {
+            @Override
+            JComponent getTableCellRendererComponent(JTable table, Object value, 
+                boolean isSelected, boolean hasFocus, int row, int column) {
+                Long l = (Long) value
+                String formatted = DataHelper.formatSize2Decimal(l, false)+"B"
+                return new JLabel(formatted)
+            }
+        }
+        sizeRenderer.setHorizontalAlignment(JLabel.CENTER)
+        resultsTable.columnModel.getColumn(1).setCellRenderer(sizeRenderer)
+        
         
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
     }
