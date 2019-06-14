@@ -135,4 +135,8 @@ public class DownloadManager {
             }
         }
     }
+    
+    public void shutdown() {
+        downloaders.each { it.stop() }
+    }
 }

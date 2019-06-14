@@ -69,6 +69,7 @@ public class Core {
     private final ConnectionAcceptor connectionAcceptor
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
+    private final DownloadManager downloadManager
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
@@ -195,7 +196,7 @@ public class Core {
 		eventBus.register(ResultsEvent.class, searchManager)
 		
         log.info("initializing download manager")
-        DownloadManager downloadManager = new DownloadManager(eventBus, i2pConnector, home, me)
+        downloadManager = new DownloadManager(eventBus, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
         eventBus.register(FileDownloadedEvent.class, downloadManager)
@@ -234,6 +235,9 @@ public class Core {
     
     public void shutdown() {
         connectionManager.shutdown()
+        downloadManager.shutdown()
+        connectionAcceptor.stop()
+        connectionEstablisher.stop()
     }
 
     static main(args) {

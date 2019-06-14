@@ -169,11 +169,15 @@ public class Downloader {
     
     public void cancel() {
         cancelled = true
+        stop()
+        file.delete()
+        piecesFile.delete()
+    }
+    
+    void stop() {
         activeWorkers.values().each { 
             it.cancel()
         }
-        file.delete()
-        piecesFile.delete()
     }
     
     public int activeWorkers() {
