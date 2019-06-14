@@ -91,25 +91,7 @@ class SearchTabView {
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
         
-        def sizeRenderer = new DefaultTableCellRenderer() {
-            @Override
-            JComponent getTableCellRendererComponent(JTable table, Object value, 
-                boolean isSelected, boolean hasFocus, int row, int column) {
-                Long l = (Long) value
-                String formatted = DataHelper.formatSize2Decimal(l, false)+"B"
-                setText(formatted)
-                if (isSelected) {
-                    setForeground(table.getSelectionForeground())
-                    setBackground(table.getSelectionBackground())
-                } else {
-                    setForeground(table.getForeground())
-                    setBackground(table.getBackground())
-                }
-                this
-            }
-        }
-        sizeRenderer.setHorizontalAlignment(JLabel.CENTER)
-        resultsTable.columnModel.getColumn(1).setCellRenderer(sizeRenderer)
+        resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
         
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})

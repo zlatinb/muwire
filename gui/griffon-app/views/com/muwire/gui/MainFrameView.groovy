@@ -144,8 +144,7 @@ class MainFrameView {
                                 table(id : "shared-files-table", autoCreateRowSorter: true) {
                                      tableModel(list : model.shared) {
                                          closureColumn(header : "Name", preferredWidth : 550, type : String, read : {row -> row.file.getAbsolutePath()})
-                                         closureColumn(header : "Size", preferredWidth : 50, type : String, 
-                                             read : {row -> DataHelper.formatSize2Decimal(row.file.length(),false) + "B"})
+                                         closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.file.length() })
                                      }   
                                 }
                             }
@@ -290,6 +289,10 @@ class MainFrameView {
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
         
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
+        
+        // shared files table
+        def sharedFilesTable = builder.getVariable("shared-files-table")
+        sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
     }
 
     int selectedDownloaderRow() {
