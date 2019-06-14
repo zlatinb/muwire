@@ -20,6 +20,13 @@ class OptionsModel {
     @Observable String outboundLength
     @Observable String outboundQuantity
     
+    // gui options
+    @Observable boolean showMonitor
+    @Observable String lnf
+    @Observable String font
+    @Observable boolean clearCancelledDownloads
+    @Observable boolean clearFinishedDownloads
+    
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
@@ -32,5 +39,12 @@ class OptionsModel {
         inboundQuantity = core.i2pOptions["inbound.quantity"]
         outboundLength = core.i2pOptions["outbound.length"]
         outboundQuantity = core.i2pOptions["outbound.quantity"]
+        
+        UISettings uiSettings = application.context.get("ui-settings")
+        showMonitor = uiSettings.showMonitor
+        lnf = uiSettings.lnf
+        font = uiSettings.font
+        clearCancelledDownloads = uiSettings.clearCancelledDownloads
+        clearFinishedDownloads = uiSettings.clearFinishedDownloads
     }
 }

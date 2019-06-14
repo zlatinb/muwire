@@ -66,6 +66,34 @@ class OptionsController {
             settings.write(it)
         }
         
+        // UI Setttings
+        
+        UISettings uiSettings = application.context.get("ui-settings")
+        text = view.lnfField.text
+        model.lnf = text
+        uiSettings.lnf = text
+        
+        text = view.fontField.text
+        model.font = text
+        uiSettings.font = text
+        
+        boolean showMonitor = view.monitorCheckbox.model.isSelected()
+        model.showMonitor = showMonitor
+        uiSettings.showMonitor = showMonitor
+        
+        boolean clearCancelledDownloads = view.clearCancelledDownloadsCheckbox.model.isSelected()
+        model.clearCancelledDownloads = clearCancelledDownloads
+        uiSettings.clearCancelledDownloads = clearCancelledDownloads
+        
+        boolean clearFinishedDownloads = view.clearFinishedDownloadsCheckbox.model.isSelected()
+        model.clearFinishedDownloads = clearFinishedDownloads
+        uiSettings.clearFinishedDownloads = clearFinishedDownloads
+        
+        File uiSettingsFile = new File(core.home, "gui.properties")
+        uiSettingsFile.withOutputStream { 
+            uiSettings.write(it)
+        }
+        
         cancel()
     }
     

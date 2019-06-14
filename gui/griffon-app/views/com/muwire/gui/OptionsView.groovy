@@ -25,6 +25,8 @@ class OptionsView {
     def d
     def p
     def i
+    def u
+    
     def retryField
     def updateField
     def allowUntrustedCheckbox
@@ -35,6 +37,12 @@ class OptionsView {
     def outboundLengthField
     def outboundQuantityField
 
+    def lnfField
+    def monitorCheckbox
+    def fontField
+    def clearCancelledDownloadsCheckbox
+    def clearFinishedDownloadsCheckbox
+    
     def buttonsPanel    
     
     def mainFrame
@@ -72,6 +80,20 @@ class OptionsView {
             label(text : "Outbound Quantity", constraints : gbc(gridx:0, gridy:4))
             outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:4))
         }
+        u = builder.panel {
+            gridBagLayout()
+            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
+            label(text : "Look And Feel", constraints : gbc(gridx: 0, gridy:1))
+            lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 1, gridy : 1))
+            label(text : "Font", constraints : gbc(gridx: 0, gridy : 2))
+            fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 1, gridy:2))
+            label(text : "Show Monitor", constraints : gbc(gridx :0, gridy: 3))
+            monitorCheckbox = checkBox(selected : bind {model.showMonitor}, constraints : gbc(gridx : 1, gridy: 3))
+            label(text : "Clear Cancelled Downloads", constraints: gbc(gridx: 0, gridy:4))
+            clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads}, constraints : gbc(gridx : 1, gridy:4))
+            label(text : "Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:5))
+            clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, constraints : gbc(gridx : 1, gridy:5))
+        }
         buttonsPanel = builder.panel {
             gridBagLayout()
             button(text : "Save", constraints : gbc(gridx : 1, gridy: 2), saveAction)
@@ -81,8 +103,9 @@ class OptionsView {
     
     void mvcGroupInit(Map<String,String> args) {
         def tabbedPane = new JTabbedPane()
-        tabbedPane.addTab("MuWire Options", p)
-        tabbedPane.addTab("I2P Options", i)
+        tabbedPane.addTab("MuWire", p)
+        tabbedPane.addTab("I2P", i)
+        tabbedPane.addTab("GUI", u)
                 
         JPanel panel = new JPanel()
         panel.setLayout(new BorderLayout())
