@@ -266,7 +266,9 @@ class MainFrameView {
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
             int selectedRow = selectedDownloaderRow()
-            def downloader = model.downloads[selectedRow].downloader
+            def downloader = model.downloads[selectedRow]?.downloader
+            if (downloader == null)
+                return
             switch(downloader.getCurrentState()) {
                 case Downloader.DownloadState.CONNECTING :
                 case Downloader.DownloadState.DOWNLOADING :

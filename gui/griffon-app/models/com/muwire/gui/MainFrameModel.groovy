@@ -79,11 +79,28 @@ class MainFrameModel {
     
     void mvcGroupInit(Map<String, Object> args) {
         
+        UISettings uiSettings = application.context.get("ui-settings")
+        
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
             runInsideUIAsync {
                 if (!mvcGroup.alive)
                     return
+                
+                // remove cancelled or finished downloads
+                def toRemove = []    
+                downloads.each {
+                    if (uiSettings.clearCancelledDownloads &&
+                        it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED)
+                        toRemove << it
+                    if (uiSettings.clearFinishedDownloads &&
+                        it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED)
+                        toRemove << it
+                }
+                toRemove.each {
+                    downloads.remove(it)
+                }    
+                
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()
                 
                 updateTablePreservingSelection("downloads-table")
