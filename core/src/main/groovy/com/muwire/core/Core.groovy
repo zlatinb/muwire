@@ -92,9 +92,9 @@ public class Core {
         if (i2pOptionsFile.exists()) {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
 
-            if (!i2pOptions.hasProperty("inbound.nickname"))
+            if (!i2pOptions.containsKey("inbound.nickname"))
                 i2pOptions["inbound.nickname"] = "MuWire"
-            if (!i2pOptions.hasProperty("outbound.nickname"))
+            if (!i2pOptions.containsKey("outbound.nickname"))
                 i2pOptions["outbound.nickname"] = "MuWire"
         } else {
             i2pOptions["inbound.nickname"] = "MuWire"
