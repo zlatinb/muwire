@@ -172,6 +172,8 @@ public class Downloader {
         activeWorkers.values().each { 
             it.cancel()
         }
+        file.delete()
+        piecesFile.delete()
     }
     
     public int activeWorkers() {
