@@ -38,6 +38,8 @@ class ConnectionAcceptor {
 	
 	final ExecutorService acceptorThread
 	final ExecutorService handshakerThreads
+    
+    private volatile shutdown
 	
 	ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
 		MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
@@ -73,11 +75,13 @@ class ConnectionAcceptor {
 	}
 	
 	void stop() {
+        shutdown = true
 		acceptorThread.shutdownNow()
 		handshakerThreads.shutdownNow()
 	}
 	
 	private void acceptLoop() {
+        try {
 		while(true) {
 			def incoming = acceptor.accept()
 			log.info("accepted connection from ${incoming.destination.toBase32()}")
@@ -93,6 +97,11 @@ class ConnectionAcceptor {
 			}
 			handshakerThreads.execute({processIncoming(incoming)} as Runnable)
 		}
+        } catch (Exception e) {
+            log.log(Level.WARNING, "exception in accept loop",e)
+            if (!shutdown)
+                throw e
+        }
 	}
 	
 	private void processIncoming(Endpoint e) {
