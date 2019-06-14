@@ -18,6 +18,7 @@ import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
 import java.awt.Font
+import java.util.logging.Level
 
 @Log
 class Initialize extends AbstractLifecycleHandler {
@@ -50,7 +51,12 @@ class Initialize extends AbstractLifecycleHandler {
             uiSettings = new UISettings(props)
             
             log.info("settting user-specified lnf $uiSettings.lnf")
-            lookAndFeel(uiSettings.lnf)
+            try {
+                lookAndFeel(uiSettings.lnf)
+            } catch (Throwable bad) {
+                log.log(Level.WARNING,"couldn't set desired look and feeel, switching to defaults", bad)
+                uiSettings.lnf = lookAndFeel("system","gtk","metal").getID()
+            }
             
             if (uiSettings.font != null) {
                 log.info("setting user-specified font $uiSettings.font")
@@ -78,7 +84,7 @@ class Initialize extends AbstractLifecycleHandler {
                 }
             } else {
                 LookAndFeel chosen = lookAndFeel('system', 'gtk')
-                uiSettings.lnf = chosen.name
+                uiSettings.lnf = chosen.getID()
                 log.info("ended up applying $chosen.name")
             }
         }
