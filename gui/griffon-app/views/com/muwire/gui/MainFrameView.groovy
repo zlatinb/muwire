@@ -284,7 +284,7 @@ class MainFrameView {
                 model.retryButtonEnabled = false
                 break
                 case Downloader.DownloadState.FAILED:
-                model.cancelButtonEnabled = false
+                model.cancelButtonEnabled = true
                 model.retryButtonEnabled = true
                 break
                 default:
