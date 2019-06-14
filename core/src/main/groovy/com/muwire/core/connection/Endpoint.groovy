@@ -34,7 +34,7 @@ class Endpoint implements Closeable {
 			try {outputStream.close()} catch (Exception ignore) {}
 		}
         if (toClose != null) {
-            try {toClose.close()} catch (Exception ignore) {}
+            try {toClose.reset()} catch (Exception ignore) {}
         }
 	}
 	
