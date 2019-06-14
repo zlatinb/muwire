@@ -19,6 +19,7 @@ class SearchTabModel {
     FactoryBuilderSupport builder
     
     Core core
+    UISettings uiSettings
     String uuid
     def results = []
     def hashBucket = [:]
@@ -26,6 +27,7 @@ class SearchTabModel {
     
     void mvcGroupInit(Map<String, String> args) {
         core = mvcGroup.parentGroup.model.core
+        uiSettings = application.context.get("ui-settings")
         mvcGroup.parentGroup.model.results[UUID.fromString(uuid)] = mvcGroup
     }
     
@@ -34,6 +36,9 @@ class SearchTabModel {
     }
     
     void handleResult(UIResultEvent e) {
+        if (uiSettings.excludeLocalResult &&
+            e.sender == core.me)
+            return
         runInsideUIAsync {
             def bucket = hashBucket.get(e.infohash)
             if (bucket == null) {

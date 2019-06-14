@@ -89,6 +89,10 @@ class OptionsController {
         model.clearFinishedDownloads = clearFinishedDownloads
         uiSettings.clearFinishedDownloads = clearFinishedDownloads
         
+        boolean excludeLocalResult = view.excludeLocalResultCheckbox.model.isSelected()
+        model.excludeLocalResult = excludeLocalResult
+        uiSettings.excludeLocalResult = excludeLocalResult
+        
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream { 
             uiSettings.write(it)

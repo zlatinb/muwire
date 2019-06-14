@@ -7,6 +7,7 @@ class UISettings {
     String font
     boolean clearCancelledDownloads
     boolean clearFinishedDownloads
+    boolean excludeLocalResult
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -14,6 +15,7 @@ class UISettings {
         font = props.getProperty("font",null)
         clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","false"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
+        excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","false"))
     }
     
     void write(OutputStream out) throws IOException {
@@ -22,6 +24,7 @@ class UISettings {
         props.setProperty("showMonitor", String.valueOf(showMonitor))
         props.setProperty("clearCancelledDownloads", String.valueOf(clearCancelledDownloads))
         props.setProperty("clearFinishedDownloads", String.valueOf(clearFinishedDownloads))
+        props.setProperty("excludeLocalResult", String.valueOf(excludeLocalResult))
         if (font != null)
             props.setProperty("font", font)
             

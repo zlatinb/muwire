@@ -26,6 +26,7 @@ class OptionsModel {
     @Observable String font
     @Observable boolean clearCancelledDownloads
     @Observable boolean clearFinishedDownloads
+    @Observable boolean excludeLocalResult
     
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
@@ -46,5 +47,6 @@ class OptionsModel {
         font = uiSettings.font
         clearCancelledDownloads = uiSettings.clearCancelledDownloads
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
+        excludeLocalResult = uiSettings.excludeLocalResult
     }
 }

@@ -42,6 +42,7 @@ class OptionsView {
     def fontField
     def clearCancelledDownloadsCheckbox
     def clearFinishedDownloadsCheckbox
+    def excludeLocalResultCheckbox
     
     def buttonsPanel    
     
@@ -93,6 +94,8 @@ class OptionsView {
             clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads}, constraints : gbc(gridx : 1, gridy:4))
             label(text : "Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:5))
             clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, constraints : gbc(gridx : 1, gridy:5))
+            label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:6))
+            excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, constraints : gbc(gridx: 1, gridy : 6))
         }
         buttonsPanel = builder.panel {
             gridBagLayout()
