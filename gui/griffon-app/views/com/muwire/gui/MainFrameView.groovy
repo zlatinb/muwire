@@ -41,6 +41,7 @@ class MainFrameView {
     def lastDownloadSortEvent
     
     void initUI() {
+        UISettings settings = application.context.get("ui-settings")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
@@ -63,7 +64,8 @@ class MainFrameView {
                         gridLayout(rows:1, cols: 2)
                         button(text: "Searches", actionPerformed : showSearchWindow)
                         button(text: "Uploads", actionPerformed : showUploadsWindow)
-                        button(text: "Monitor", actionPerformed : showMonitorWindow)
+                        if (settings.showMonitor)
+                            button(text: "Monitor", actionPerformed : showMonitorWindow)
                         button(text: "Trust", actionPerformed : showTrustWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
