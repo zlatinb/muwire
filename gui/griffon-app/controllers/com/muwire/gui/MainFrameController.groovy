@@ -39,6 +39,9 @@ class MainFrameController {
         cardsPanel.getLayout().show(cardsPanel, "search window")
         
         def search = builder.getVariable("search-field").text
+        search = search.trim()
+        if (search.length() == 0)
+            return
         def uuid = UUID.randomUUID()
         Map<String, Object> params = new HashMap<>()
         params["search-terms"] = search
