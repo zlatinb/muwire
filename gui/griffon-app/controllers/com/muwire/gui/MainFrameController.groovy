@@ -95,10 +95,11 @@ class MainFrameController {
     }
     
     private int selectedDownload() {
-        def selected = builder.getVariable("downloads-table").getSelectedRow()
+        def downloadsTable = builder.getVariable("downloads-table")
+        def selected = downloadsTable.getSelectedRow()
         def sortEvt = mvcGroup.view.lastDownloadSortEvent
         if (sortEvt != null)
-            selected = sortEvt.convertPreviousRowIndexToModel(selected)
+            selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
         selected
     }
     
