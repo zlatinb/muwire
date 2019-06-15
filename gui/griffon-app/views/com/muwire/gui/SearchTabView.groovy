@@ -97,6 +97,7 @@ class SearchTabView {
         
         
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
+        resultsTable.rowSorter.setSortsOnUpdates(true)
         
         resultsTable.addMouseListener(new MouseAdapter() {
             @Override
