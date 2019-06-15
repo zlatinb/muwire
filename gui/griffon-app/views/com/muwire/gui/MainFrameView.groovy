@@ -299,6 +299,7 @@ class MainFrameView {
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
         
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
+        downloadsTable.rowSorter.setSortsOnUpdates(true)
         
         // shared files table
         def sharedFilesTable = builder.getVariable("shared-files-table")
