@@ -280,6 +280,7 @@ class MainFrameView {
             switch(downloader.getCurrentState()) {
                 case Downloader.DownloadState.CONNECTING :
                 case Downloader.DownloadState.DOWNLOADING :
+                case Downloader.DownloadState.HASHLIST:
                 model.cancelButtonEnabled = true
                 model.retryButtonEnabled = false
                 break
