@@ -324,7 +324,7 @@ class MainFrameView {
     }
     
     def showPopupMenu(JPopupMenu menu, MouseEvent event) {
-        menu.show(event.getComponent(), event.getX(), event.getY())
+       // menu.show(event.getComponent(), event.getX(), event.getY())
     }
 
     int selectedDownloaderRow() {
