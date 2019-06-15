@@ -86,8 +86,8 @@ class MainFrameController {
             return
         def sortEvt = group.view.lastSortEvent
         if (sortEvt != null) {
-            row = sortEvt.convertPreviousRowIndexToModel(row)
-        }
+            row = group.view.resultsTable.rowSorter.convertRowIndexToModel(row)
+        } 
         group.model.results[row]        
     }
     
