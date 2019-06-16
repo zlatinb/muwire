@@ -17,6 +17,8 @@ import com.muwire.core.upload.UploadManager
 import com.muwire.core.search.InvalidSearchResultException
 import com.muwire.core.search.ResultsParser
 import com.muwire.core.search.SearchManager
+import com.muwire.core.search.UIResultBatchEvent
+import com.muwire.core.search.UIResultEvent
 import com.muwire.core.search.UnexpectedResultsException
 
 import groovy.json.JsonOutput
@@ -225,13 +227,15 @@ class ConnectionAcceptor {
             if (sender.destination != e.getDestination())
                 throw new IOException("Sender destination mismatch expected $e.getDestination(), got $sender.destination")
             int nResults = dis.readUnsignedShort()
+            UIResultEvent[] results = new UIResultEvent[nResults]
             for (int i = 0; i < nResults; i++) {
                 int jsonSize = dis.readUnsignedShort()
                 byte [] payload = new byte[jsonSize]
                 dis.readFully(payload)
                 def json = slurper.parse(payload)
-                eventBus.publish(ResultsParser.parse(sender, resultsUUID, json))
+                results[i] = ResultsParser.parse(sender, resultsUUID, json)
             }
+            eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
         } catch (IOException | UnexpectedResultsException | InvalidSearchResultException bad) {
             log.log(Level.WARNING, "failed to process POST", bad)
         } finally {

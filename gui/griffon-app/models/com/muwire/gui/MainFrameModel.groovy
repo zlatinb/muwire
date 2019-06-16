@@ -20,6 +20,7 @@ import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
@@ -115,6 +116,7 @@ class MainFrameModel {
             core = e.getNewValue()
             me = core.me.getHumanReadableName()
             core.eventBus.register(UIResultEvent.class, this)
+            core.eventBus.register(UIResultBatchEvent.class, this)
             core.eventBus.register(DownloadStartedEvent.class, this)
             core.eventBus.register(ConnectionEvent.class, this)
             core.eventBus.register(DisconnectionEvent.class, this)
@@ -159,6 +161,11 @@ class MainFrameModel {
     void onUIResultEvent(UIResultEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model.handleResult(e)
+    }
+    
+    void onUIResultBatchEvent(UIResultBatchEvent e) {
+        MVCGroup resultsGroup = results.get(e.uuid)
+        resultsGroup?.model.handleResultBatch(e.results)
     }
     
     void onDownloadStartedEvent(DownloadStartedEvent e) {

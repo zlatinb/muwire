@@ -52,4 +52,22 @@ class SearchTabModel {
             table.model.fireTableDataChanged()
         }
     }
+    
+    void handleResultBatch(UIResultEvent[] batch) {
+        runInsideUIAsync {
+            batch.each { 
+                if (uiSettings.excludeLocalResult && e.sender == core.me)
+                    return
+                def bucket = hashBucket.get(it.infohash)
+                if (bucket == null) {
+                    bucket = []
+                    hashBucket[it.infohash] = bucket
+                }
+                bucket << it
+                results << it
+            }
+            JTable table = builder.getVariable("results-table")
+            table.model.fireTableDataChanged()
+        }
+    }
 }
