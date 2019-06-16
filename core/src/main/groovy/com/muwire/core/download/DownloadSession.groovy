@@ -66,6 +66,8 @@ class DownloadSession {
         int piece
         while(true) {
             piece = downloaded.getRandomPiece()
+            if (piece == -1)
+                return false
             if (claimed.isMarked(piece)) {
                 if (downloaded.donePieces() + claimed.donePieces() == downloaded.nPieces) {
                     log.info("all pieces claimed")
@@ -85,7 +87,6 @@ class DownloadSession {
         
         String root = Base64.encode(infoHash.getRoot())
                 
-        FileChannel channel
         try {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -135,41 +136,44 @@ class DownloadSession {
             }
             
             // start the download
-            channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ, StandardOpenOption.WRITE, 
-                StandardOpenOption.SPARSE, StandardOpenOption.CREATE)) // TODO: double-check, maybe CREATE_NEW
-            mapped = channel.map(FileChannel.MapMode.READ_WRITE, start, end - start + 1)
-            
-            byte[] tmp = new byte[0x1 << 13]
-            while(mapped.hasRemaining()) {
-                if (mapped.remaining() < tmp.length)
-                    tmp = new byte[mapped.remaining()]
-                int read = is.read(tmp)
-                if (read == -1)
-                    throw new IOException()
-                synchronized(this) {
-                    mapped.put(tmp, 0, read)
-                    
-                    if (timestamps.size() == SAMPLES) {
-                        timestamps.removeFirst()
-                        reads.removeFirst()
+            FileChannel channel
+            try {
+                channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ, StandardOpenOption.WRITE,
+                        StandardOpenOption.SPARSE, StandardOpenOption.CREATE)) // TODO: double-check, maybe CREATE_NEW
+                mapped = channel.map(FileChannel.MapMode.READ_WRITE, start, end - start + 1)
+
+                byte[] tmp = new byte[0x1 << 13]
+                while(mapped.hasRemaining()) {
+                    if (mapped.remaining() < tmp.length)
+                        tmp = new byte[mapped.remaining()]
+                    int read = is.read(tmp)
+                    if (read == -1)
+                        throw new IOException()
+                    synchronized(this) {
+                        mapped.put(tmp, 0, read)
+
+                        if (timestamps.size() == SAMPLES) {
+                            timestamps.removeFirst()
+                            reads.removeFirst()
+                        }
+                        timestamps.addLast(System.currentTimeMillis())
+                        reads.addLast(read)
                     }
-                    timestamps.addLast(System.currentTimeMillis())
-                    reads.addLast(read)
                 }
+
+                mapped.clear()
+                digest.update(mapped)
+                byte [] hash = digest.digest()
+                byte [] expected = new byte[32]
+                System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)
+                if (hash != expected)
+                    throw new BadHashException()
+            } finally {
+                try { channel?.close() } catch (IOException ignore) {}
             }
-            
-            mapped.clear()
-            digest.update(mapped)
-            byte [] hash = digest.digest()
-            byte [] expected = new byte[32]
-            System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)    
-            if (hash != expected) 
-                throw new BadHashException()
-            
-            downloaded.markDownloaded(piece)        
+            downloaded.markDownloaded(piece)
         } finally {
             claimed.clear(piece)
-            try { channel?.close() } catch (IOException ignore) {}
         }
         return true
     }
