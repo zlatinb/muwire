@@ -37,3 +37,4 @@ Basically any non-gui non-cli user interface
 * Download file sequentially
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
+* Automatic sharing of new files in shared directories (more like medium item)
