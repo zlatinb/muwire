@@ -34,6 +34,8 @@ Basically any non-gui non-cli user interface
 
 ### Small Items
 
+* Detect if router is dead and show warning or exit
+* Wrapper of some kind for in-place upgrades
 * Download file sequentially
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
