@@ -145,7 +145,7 @@ class SearchTabView {
         if (selected < 0)
             return
         if (lastSortEvent != null)
-            selected = resultsTable.rowSorter.convertRowIndexToModel(row)
+            selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
         String hash = Base64.encode(model.results[selected].infohash.getRoot())
         StringSelection selection = new StringSelection(hash)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
