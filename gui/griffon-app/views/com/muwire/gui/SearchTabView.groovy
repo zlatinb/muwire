@@ -4,10 +4,13 @@ import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
 import net.i2p.data.DataHelper
 
 import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -17,6 +20,8 @@ import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
@@ -99,11 +104,26 @@ class SearchTabView {
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
         
+        
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem download = new JMenuItem("Download")
+        download.addActionListener({mvcGroup.parentGroup.controller.download()})
+        menu.add(download)
+        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
+        menu.add(copyHashToClipboard)
         resultsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
+                if (e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(menu, e)
+                else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
                     mvcGroup.parentGroup.controller.download()
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(menu, e)
             }
         })
     }
@@ -113,5 +133,22 @@ class SearchTabView {
         parent.removeTabAt(index)
         mvcGroup.parentGroup.model.searchButtonsEnabled = false
         mvcGroup.destroy()
+    }
+    
+    def showPopupMenu(JPopupMenu menu, MouseEvent e) {
+        println "showing popup menu"
+        menu.show(e.getComponent(), e.getX(), e.getY())
+    }
+    
+    def copyHashToClipboard() {
+        int selected = resultsTable.getSelectedRow()
+        if (selected < 0)
+            return
+        if (lastSortEvent != null)
+            selected = resultsTable.rowSorter.convertRowIndexToModel(row)
+        String hash = Base64.encode(model.results[selected].infohash.getRoot())
+        StringSelection selection = new StringSelection(hash)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
     }
 }
