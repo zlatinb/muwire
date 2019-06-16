@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
 import net.i2p.data.DataHelper
 
 import javax.swing.BorderFactory
@@ -13,6 +14,7 @@ import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
+import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.border.Border
@@ -28,6 +30,8 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.nio.charset.StandardCharsets
@@ -43,6 +47,7 @@ class MainFrameView {
     
     def downloadsTable
     def lastDownloadSortEvent
+    def lastSharedSortEvent
     
     void initUI() {
         UISettings settings = application.context.get("ui-settings")
@@ -311,10 +316,15 @@ class MainFrameView {
         def sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
+        sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
+        sharedFilesTable.rowSorter.setSortsOnUpdates(true)
+        
         JPopupMenu sharedFilesMenu = new JPopupMenu()
-        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
-        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFiles()})
-        sharedFilesMenu.add(unshareSelectedFiles)
+//        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
+//        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFiles()})
+        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard(sharedFilesTable)})
+        sharedFilesMenu.add(copyHashToClipboard)
         sharedFilesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -330,7 +340,19 @@ class MainFrameView {
     }
     
     def showPopupMenu(JPopupMenu menu, MouseEvent event) {
-       // menu.show(event.getComponent(), event.getX(), event.getY())
+        menu.show(event.getComponent(), event.getX(), event.getY())
+    }
+    
+    def copyHashToClipboard(JTable sharedFilesTable) {
+        int selected = sharedFilesTable.getSelectedRow()
+        if (selected < 0)
+            return
+        if (lastSharedSortEvent != null) 
+            selected = sharedFilesTable.rowSorter.convertRowIndexToModel(selected)
+        String root = Base64.encode(model.shared[selected].infoHash.getRoot())
+        StringSelection selection = new StringSelection(root)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
     }
 
     int selectedDownloaderRow() {
