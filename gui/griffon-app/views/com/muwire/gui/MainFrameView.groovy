@@ -187,7 +187,13 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "connections-table") {
                                     tableModel(list : model.connectionList) {
-                                        closureColumn(header : "Destination", type: String, read : { row -> row.toBase32() })
+                                        closureColumn(header : "Destination", preferredWidth: 250, type: String, read : { row -> row.destination.toBase32() })
+                                        closureColumn(header : "Direction", preferredWidth: 20, type: String, read : { row ->
+                                            if (row.incoming)
+                                                return "In"
+                                            else 
+                                                return "Out"
+                                        })
                                     }
                                 }
                             }

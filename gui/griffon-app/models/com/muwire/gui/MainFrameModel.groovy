@@ -177,7 +177,8 @@ class MainFrameModel {
                 topPanel.getLayout().show(topPanel, "top-search-panel")
             }
             
-            connectionList.add(e.endpoint.destination)
+            UIConnection con = new UIConnection(destination : e.endpoint.destination, incoming : e.incoming)
+            connectionList.add(con)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
         }
@@ -192,7 +193,8 @@ class MainFrameModel {
                 topPanel.getLayout().show(topPanel, "top-connect-panel")
             }
             
-            connectionList.remove(e.destination)
+            UIConnection con = new UIConnection(destination : e.destination)
+            connectionList.remove(con)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
         }
@@ -301,6 +303,24 @@ class MainFrameModel {
             shared << e.downloadedFile
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
+        }
+    }
+    
+    private static class UIConnection {
+        Destination destination
+        boolean incoming
+        
+        @Override
+        public int hashCode() {
+            destination.hashCode()
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof UIConnection))
+                return false
+            UIConnection other = (UIConnection) o
+            return destination == other.destination
         }
     }
 }
