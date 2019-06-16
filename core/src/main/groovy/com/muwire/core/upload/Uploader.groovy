@@ -23,4 +23,13 @@ abstract class Uploader {
             return -1
         mapped.position()
     }
+    
+    abstract String getName();
+    
+    /**
+     * @return an integer between 0 and 100
+     */
+    abstract int getProgress();
+    
+    abstract String getDownloader();
 }

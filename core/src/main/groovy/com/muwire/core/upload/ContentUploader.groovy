@@ -51,4 +51,23 @@ class ContentUploader extends Uploader {
         }
     }
 
+    @Override
+    public String getName() {
+        return file.getName();
+    }
+
+    @Override
+    public synchronized int getProgress() {
+        if (mapped == null)
+            return 0
+        int position = mapped.position()
+        int total = request.getRange().end - request.getRange().start
+        (int)(position * 100.0 / total)
+    }
+
+    @Override
+    public String getDownloader() {
+        request.downloader.getHumanReadableName()
+    }
+
 }

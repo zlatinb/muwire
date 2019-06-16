@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets
 import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
 
+import net.i2p.data.Base64
+
 class HashListUploader extends Uploader {
     private final InfoHash infoHash
     private final HashListRequest request
@@ -14,6 +16,7 @@ class HashListUploader extends Uploader {
         super(endpoint)
         this.infoHash = infoHash
         mapped = ByteBuffer.wrap(infoHash.getHashList())
+        this.request = request
     }
     
     void respond() {
@@ -32,4 +35,21 @@ class HashListUploader extends Uploader {
         }
         endpoint.getOutputStream().flush()
     }
+
+    @Override
+    public String getName() {
+        return "Hash list for " + Base64.encode(infoHash.getRoot());
+    }
+
+    @Override
+    public synchronized int getProgress() {
+        (int)(mapped.position() * 100.0 / mapped.capacity())
+    }
+
+    @Override
+    public String getDownloader() {
+        request.downloader.getHumanReadableName()
+    }
+    
+    
 }
