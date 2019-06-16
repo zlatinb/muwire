@@ -306,6 +306,19 @@ class MainFrameView {
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
         downloadsTable.rowSorter.setSortsOnUpdates(true)
         
+        downloadsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showDownloadsMenu(e)
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showDownloadsMenu(e)
+            }
+        })
+        
         // shared files table
         def sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
@@ -353,7 +366,7 @@ class MainFrameView {
         
     }
     
-    def showPopupMenu(JPopupMenu menu, MouseEvent event) {
+    private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
         menu.show(event.getComponent(), event.getX(), event.getY())
     }
     
@@ -384,6 +397,54 @@ class MainFrameView {
         if (lastDownloadSortEvent != null)
             selected = lastDownloadSortEvent.convertPreviousRowIndexToModel(selected)
         selected
+    }
+    
+    def showDownloadsMenu(MouseEvent e) {
+        int selected = selectedDownloaderRow()
+        if (selected < 0)
+            return
+        boolean cancelEnabled = false
+        boolean retryEnabled = false
+        Downloader downloader = model.downloads[selected].downloader
+        switch(downloader.currentState) {
+            case Downloader.DownloadState.DOWNLOADING:
+            case Downloader.DownloadState.HASHLIST:
+            case Downloader.DownloadState.CONNECTING:
+                cancelEnabled = true
+                retryEnabled = false
+                break
+            case Downloader.DownloadState.FAILED:
+                cancelEnabled = true
+                retryEnabled = true
+                break
+            default :
+                cancelEnabled = false
+                retryEnabled = false
+        }
+        
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        copyHashToClipboard.addActionListener({
+            String hash = Base64.encode(downloader.infoHash.getRoot())
+            StringSelection selection = new StringSelection(hash)
+            def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+            clipboard.setContents(selection, null)
+        })
+        menu.add(copyHashToClipboard)
+        
+        if (cancelEnabled) {
+            JMenuItem cancel = new JMenuItem("Cancel")
+            cancel.addActionListener({mvcGroup.controller.cancel()})
+            menu.add(cancel)
+        }
+        
+        if (retryEnabled) {
+            JMenuItem retry = new JMenuItem("Retry")
+            retry.addActionListener({mvcGroup.controller.resume()})
+            menu.add(resume)
+        }
+        
+        showPopupMenu(menu, e)
     }
     
     def showSearchWindow = {
