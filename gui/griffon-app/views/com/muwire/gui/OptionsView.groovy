@@ -43,6 +43,7 @@ class OptionsView {
     def clearCancelledDownloadsCheckbox
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
+    def showSearchHashesCheckbox
     
     def buttonsPanel    
     
@@ -96,6 +97,8 @@ class OptionsView {
             clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, constraints : gbc(gridx : 1, gridy:5))
             label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:6))
             excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, constraints : gbc(gridx: 1, gridy : 6))
+            label(text : "Show Hash Searches In Monitor", constraints: gbc(gridx:0, gridy:7))
+            showSearchHashesCheckbox = checkBox(selected : bind {model.showSearchHashes}, constraints : gbc(gridx: 1, gridy: 7))
         }
         buttonsPanel = builder.panel {
             gridBagLayout()

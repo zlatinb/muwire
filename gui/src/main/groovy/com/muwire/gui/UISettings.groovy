@@ -8,6 +8,7 @@ class UISettings {
     boolean clearCancelledDownloads
     boolean clearFinishedDownloads
     boolean excludeLocalResult
+    boolean showSearchHashes
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -16,6 +17,7 @@ class UISettings {
         clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","false"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
         excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","false"))
+        showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","false"))
     }
     
     void write(OutputStream out) throws IOException {
@@ -25,6 +27,7 @@ class UISettings {
         props.setProperty("clearCancelledDownloads", String.valueOf(clearCancelledDownloads))
         props.setProperty("clearFinishedDownloads", String.valueOf(clearFinishedDownloads))
         props.setProperty("excludeLocalResult", String.valueOf(excludeLocalResult))
+        props.setProperty("showSearchHashes", String.valueOf(showSearchHashes))
         if (font != null)
             props.setProperty("font", font)
             

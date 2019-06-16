@@ -34,6 +34,7 @@ import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.transform.FXObservable
 import griffon.transform.Observable
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 import griffon.metadata.ArtifactProviderFor
 
@@ -67,6 +68,8 @@ class MainFrameModel {
     volatile Core core    
 
     private long lastRetryTime = System.currentTimeMillis()
+    
+    UISettings uiSettings
         
     void updateTablePreservingSelection(String tableName) {
         def downloadTable = builder.getVariable(tableName)
@@ -77,7 +80,7 @@ class MainFrameModel {
     
     void mvcGroupInit(Map<String, Object> args) {
         
-        UISettings uiSettings = application.context.get("ui-settings")
+        uiSettings = application.context.get("ui-settings")
         
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -258,14 +261,23 @@ class MainFrameModel {
     void onQueryEvent(QueryEvent e) {
         if (e.replyTo == core.me.destination)
             return
-        StringBuilder sb = new StringBuilder()
-        e.searchEvent.searchTerms?.each {
-            sb.append(it)
-            sb.append(" ")
+        
+        def search
+        if (e.searchEvent.searchHash != null) {
+            if (!uiSettings.showSearchHashes) {
+                return
+            }
+            search = Base64.encode(e.searchEvent.searchHash)
+        } else {
+            StringBuilder sb = new StringBuilder()
+            e.searchEvent.searchTerms?.each {
+                sb.append(it)
+                sb.append(" ")
+            }
+            search = sb.toString()
+            if (search.trim().size() == 0)
+                return
         }
-        def search = sb.toString()
-        if (search.trim().size() == 0)
-            return
         runInsideUIAsync {
             searches.addFirst(new IncomingSearch(search : search, replyTo : e.replyTo, originator : e.originator))
             while(searches.size() > 200)

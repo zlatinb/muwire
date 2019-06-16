@@ -93,6 +93,10 @@ class OptionsController {
         model.excludeLocalResult = excludeLocalResult
         uiSettings.excludeLocalResult = excludeLocalResult
         
+        boolean showSearchHashes = view.showSearchHashesCheckbox.model.isSelected()
+        model.showSearchHashes = showSearchHashes
+        uiSettings.showSearchHashes = showSearchHashes
+        
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream { 
             uiSettings.write(it)
