@@ -28,6 +28,10 @@ To allow every user to not route queries for content they do not like.  This is 
 
 For ease of deployment for new users, and so that users do not need to run a separate I2P router
 
+##### Web UI, REST Interface, etc.
+
+Basically any non-gui non-cli user interface
+
 ### Small Items
 
 * Download file sequentially
