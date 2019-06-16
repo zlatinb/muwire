@@ -34,7 +34,6 @@ Basically any non-gui non-cli user interface
 
 ### Small Items
 
-* Detect if a query is hash, get rid of radio buttons
 * Detect if router is dead and show warning or exit
 * Wrapper of some kind for in-place upgrades
 * Download file sequentially

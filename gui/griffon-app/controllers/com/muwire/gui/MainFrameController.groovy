@@ -49,9 +49,20 @@ class MainFrameController {
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
+        boolean hashSearch = false
+        byte [] root = null
+        if (search.length() == 44 && search.indexOf(" ") < 0) {
+            try {
+                root = Base64.decode(search)
+                hashSearch = true
+            } catch (Exception e) {
+                // not a hash search
+            }
+        }
+        
         def searchEvent
-        if (model.hashSearch) {
-            searchEvent = new SearchEvent(searchHash : Base64.decode(search), uuid : uuid)
+        if (hashSearch) {
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid)
         } else {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
@@ -173,16 +184,6 @@ class MainFrameController {
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
-    }
-    
-    @ControllerAction
-    void keywordSearch() {
-        model.hashSearch = false
-    }
-    
-    @ControllerAction
-    void hashSearch() {
-        model.hashSearch = true
     }
     
     void unshareSelectedFiles() {

@@ -90,12 +90,6 @@ class MainFrameView {
 
                             }
                             panel( constraints: BorderLayout.EAST) {
-                                panel {
-                                    buttonGroup(id : "searchButtonGroup") 
-                                    radioButton(text : "Keywords", selected : true, buttonGroup : searchButtonGroup, keywordSearchAction)
-                                    radioButton(text : "Hash", selected : false, buttonGroup : searchButtonGroup, hashSearchAction)
-                                    
-                                }
                                 button(text: "Search", searchAction)
                             }
                         }
