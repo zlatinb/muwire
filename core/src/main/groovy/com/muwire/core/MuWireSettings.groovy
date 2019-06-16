@@ -13,6 +13,7 @@ class MuWireSettings {
     String sharedFiles
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
+    boolean watchSharedDirectories
     
 	MuWireSettings() {
         this(new Properties())
@@ -29,6 +30,7 @@ class MuWireSettings {
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","15"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","36"))
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
+        watchSharedDirectories = Boolean.parseBoolean(props.getProperty("watchSharedDirectories","true"))
 	}
     
     void write(OutputStream out) throws IOException {
@@ -41,6 +43,7 @@ class MuWireSettings {
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
+        props.setProperty("watchSharedDirectories", String.valueOf(watchSharedDirectories))
         if (sharedFiles != null)
             props.setProperty("sharedFiles", sharedFiles)
         props.store(out, "")
