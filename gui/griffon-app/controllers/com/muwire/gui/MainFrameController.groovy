@@ -62,7 +62,7 @@ class MainFrameController {
         
         def searchEvent
         if (hashSearch) {
-            searchEvent = new SearchEvent(searchHash : root, uuid : uuid)
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true)
         } else {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
