@@ -441,7 +441,7 @@ class MainFrameView {
         if (retryEnabled) {
             JMenuItem retry = new JMenuItem("Retry")
             retry.addActionListener({mvcGroup.controller.resume()})
-            menu.add(resume)
+            menu.add(retry)
         }
         
         showPopupMenu(menu, e)
