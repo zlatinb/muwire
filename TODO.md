@@ -35,6 +35,5 @@ Basically any non-gui non-cli user interface
 ### Small Items
 
 * Download file sequentially
-* Show incoming/outgoing in monitor tab
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
