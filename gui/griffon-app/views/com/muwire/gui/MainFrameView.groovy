@@ -120,7 +120,7 @@ class MainFrameView {
                                             closureColumn(header: "Progress", preferredWidth: 20, type: String, read: { row ->
                                                 int pieces = row.downloader.nPieces
                                                 int done = row.downloader.donePieces()
-                                                "$done/$pieces pieces"
+                                                "$done/$pieces pieces".toString()
                                             })
                                             closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
