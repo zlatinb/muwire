@@ -25,4 +25,17 @@ public class SharedFile {
 	public int getPieceSize() {
 	    return pieceSize;
 	}
+	
+	@Override
+	public int hashCode() {
+	    return file.hashCode() ^ infoHash.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (!(o instanceof SharedFile))
+	        return false;
+	    SharedFile other = (SharedFile)o;
+	    return file.equals(other.file) && infoHash.equals(other.infoHash);
+	}
 }
