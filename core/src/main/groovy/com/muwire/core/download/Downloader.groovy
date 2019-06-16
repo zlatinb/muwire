@@ -7,6 +7,7 @@ import com.muwire.core.connection.Endpoint
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
 import com.muwire.core.Constants
@@ -47,7 +48,8 @@ public class Downloader {
     
     
     private volatile boolean cancelled
-    private volatile boolean eventFired
+    private final AtomicBoolean eventFired = new AtomicBoolean()
+    private boolean piecesFileClosed
 
     public Downloader(EventBus eventBus, DownloadManager downloadManager, 
         Persona me, File file, long length, InfoHash infoHash, 
@@ -105,9 +107,13 @@ public class Downloader {
     }
     
     void writePieces() {
-        piecesFile.withPrintWriter { writer ->
-            downloaded.getDownloaded().each { piece -> 
-                writer.println(piece)
+        synchronized(piecesFile) {
+            if (piecesFileClosed)
+                return
+            piecesFile.withPrintWriter { writer ->
+                downloaded.getDownloaded().each { piece ->
+                    writer.println(piece)
+                }
             }
         }
     }
@@ -171,7 +177,10 @@ public class Downloader {
         cancelled = true
         stop()
         file.delete()
-        piecesFile.delete()
+        synchronized(piecesFile) {
+            piecesFileClosed = true
+            piecesFile.delete()
+        }
     }
     
     void stop() {
@@ -242,9 +251,11 @@ public class Downloader {
                 log.log(Level.WARNING,"Exception while downloading",bad)
             } finally {
                 currentState = WorkerState.FINISHED
-                if (downloaded.isComplete() && !eventFired) {
-                    piecesFile.delete()
-                    eventFired = true
+                if (downloaded.isComplete() && eventFired.compareAndSet(false, true)) {
+                    synchronized(piecesFile) {
+                        piecesFileClosed = true
+                        piecesFile.delete()
+                    }
                     eventBus.publish(
                         new FileDownloadedEvent(
                             downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, Collections.emptySet()),
