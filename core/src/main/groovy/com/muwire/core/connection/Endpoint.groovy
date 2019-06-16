@@ -1,6 +1,7 @@
 package com.muwire.core.connection
 
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Level
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -24,7 +25,7 @@ class Endpoint implements Closeable {
 	@Override
 	public void close() {
 		if (!closed.compareAndSet(false, true)) {
-			log.warning("Close loop detected for ${destination.toBase32()}", new Exception())
+			log.log(Level.WARNING,"Close loop detected for ${destination.toBase32()}", new Exception())
 			return
 		}
 		if (inputStream != null) {
