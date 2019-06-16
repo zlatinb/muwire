@@ -56,7 +56,7 @@ class SearchTabModel {
     void handleResultBatch(UIResultEvent[] batch) {
         runInsideUIAsync {
             batch.each { 
-                if (uiSettings.excludeLocalResult && e.sender == core.me)
+                if (uiSettings.excludeLocalResult && it.sender == core.me)
                     return
                 def bucket = hashBucket.get(it.infohash)
                 if (bucket == null) {
