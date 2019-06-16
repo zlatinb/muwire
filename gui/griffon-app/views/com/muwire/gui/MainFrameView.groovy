@@ -331,6 +331,26 @@ class MainFrameView {
                     showPopupMenu(sharedFilesMenu, e)
             }
         })
+        
+        // searches table
+        def searchesTable = builder.getVariable("searches-table")
+        JPopupMenu searchTableMenu = new JPopupMenu()
+        JMenuItem copySearchToClipboard = new JMenuItem("Copy search to clipboard")
+        copySearchToClipboard.addActionListener({mvcGroup.view.copySearchToClipboard(searchesTable)})
+        searchTableMenu.add(copySearchToClipboard)
+        searchesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(searchTableMenu, e)
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(searchTableMenu, e)
+            }
+        })
+        
     }
     
     def showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -345,6 +365,16 @@ class MainFrameView {
             selected = sharedFilesTable.rowSorter.convertRowIndexToModel(selected)
         String root = Base64.encode(model.shared[selected].infoHash.getRoot())
         StringSelection selection = new StringSelection(root)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
+    }
+    
+    def copySearchToClipboard(JTable searchesTable) {
+        int selected = searchesTable.getSelectedRow()
+        if (selected < 0)
+            return
+        String search = model.searches[selected].search
+        StringSelection selection = new StringSelection(search)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
     }
