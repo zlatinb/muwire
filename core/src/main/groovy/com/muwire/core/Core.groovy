@@ -246,9 +246,10 @@ public class Core {
         connectionAcceptor.stop()
         log.info("shutting down connection establisher")
         connectionEstablisher.stop()
+        log.info("shutting down directory watcher")
+        directoryWatcher.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
-        directoryWatcher.stop()
     }
 
     static main(args) {
