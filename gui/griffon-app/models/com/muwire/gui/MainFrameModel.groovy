@@ -60,11 +60,14 @@ class MainFrameModel {
     
     @Observable int connections
     @Observable String me
-    @Observable boolean searchButtonsEnabled
+    @Observable boolean downloadActionEnabled
+    @Observable boolean trustButtonsEnabled
     @Observable boolean cancelButtonEnabled
     @Observable boolean retryButtonEnabled
     
     private final Set<InfoHash> infoHashes = new HashSet<>()
+    
+    private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
 
     volatile Core core    
 
@@ -171,6 +174,7 @@ class MainFrameModel {
     void onDownloadStartedEvent(DownloadStartedEvent e) {
         runInsideUIAsync {
             downloads << e
+            downloadInfoHashes.add(e.downloader.infoHash)
         }
     }
     
@@ -339,5 +343,9 @@ class MainFrameModel {
             UIConnection other = (UIConnection) o
             return destination == other.destination
         }
+    }
+    
+    boolean canDownload(InfoHash hash) {
+        !downloadInfoHashes.contains(hash)
     }
 }

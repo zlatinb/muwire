@@ -66,7 +66,11 @@ class SearchTabView {
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
             selectionModel.addListSelectionListener( {
-                mvcGroup.parentGroup.model.searchButtonsEnabled = true
+                mvcGroup.parentGroup.model.trustButtonsEnabled = true
+                int row = resultsTable.getSelectedRow()
+                if (lastSortEvent != null)
+                    row = resultsTable.rowSorter.convertRowIndexToModel(row)
+                mvcGroup.parentGroup.model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
             })
         }
     }
@@ -105,25 +109,18 @@ class SearchTabView {
         resultsTable.rowSorter.setSortsOnUpdates(true)
         
         
-        JPopupMenu menu = new JPopupMenu()
-        JMenuItem download = new JMenuItem("Download")
-        download.addActionListener({mvcGroup.parentGroup.controller.download()})
-        menu.add(download)
-        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
-        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
-        menu.add(copyHashToClipboard)
         resultsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(menu, e)
+                    showPopupMenu(e)
                 else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
                     mvcGroup.parentGroup.controller.download()
             }
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(menu, e)
+                    showPopupMenu(e)
             }
         })
     }
@@ -135,8 +132,16 @@ class SearchTabView {
         mvcGroup.destroy()
     }
     
-    def showPopupMenu(JPopupMenu menu, MouseEvent e) {
-        println "showing popup menu"
+    def showPopupMenu(MouseEvent e) {
+        JPopupMenu menu = new JPopupMenu()
+        if (mvcGroup.parentGroup.model.downloadActionEnabled) {
+            JMenuItem download = new JMenuItem("Download")
+            download.addActionListener({mvcGroup.parentGroup.controller.download()})
+            menu.add(download)
+        }
+        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
+        menu.add(copyHashToClipboard)
         menu.show(e.getComponent(), e.getX(), e.getY())
     }
     

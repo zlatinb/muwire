@@ -105,9 +105,9 @@ class MainFrameView {
                                 borderLayout()
                                 tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
                                 panel(constraints : BorderLayout.SOUTH) {
-                                    button(text : "Download", enabled : bind {model.searchButtonsEnabled}, downloadAction)
-                                    button(text : "Trust", enabled: bind {model.searchButtonsEnabled }, trustAction)
-                                    button(text : "Distrust", enabled : bind {model.searchButtonsEnabled}, distrustAction)
+                                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                    button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                 }
                             }
                             panel (constraints : JSplitPane.BOTTOM) {

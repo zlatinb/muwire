@@ -118,8 +118,11 @@ class MainFrameController {
     void download() {
         def result = selectedResult()
         if (result == null)
-            return // TODO disable button
-            
+            return
+        
+        if (!model.canDownload(result.infohash))
+            return   
+             
         def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
         
         def selected = builder.getVariable("result-tabs").getSelectedComponent()
@@ -150,6 +153,7 @@ class MainFrameController {
     void cancel() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.cancel()
+        model.downloadInfoHashes.remove(downloader.getInfoHash())
         core.eventBus.publish(new UIDownloadCancelledEvent(downloader : downloader))
     }
     
