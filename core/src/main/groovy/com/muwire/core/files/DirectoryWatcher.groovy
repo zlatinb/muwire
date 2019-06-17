@@ -23,6 +23,7 @@ class DirectoryWatcher {
     DirectoryWatcher(EventBus eventBus) {
         this.eventBus = eventBus
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
+        watcherThread.setDaemon(true)
     }
     
     void start() {
