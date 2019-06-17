@@ -4,6 +4,9 @@ import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -43,6 +46,7 @@ public class Downloader {
     private final Set<Destination> destinations
     private final int nPieces
     private final File piecesFile
+    private final File incompleteFile
     final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     
@@ -64,6 +68,7 @@ public class Downloader {
         this.connector = connector
         this.destinations = destinations
         this.piecesFile = new File(incompletes, file.getName()+".pieces")
+        this.incompleteFile = new File(incompletes, file.getName()+".part")
         this.pieceSizePow2 = pieceSizePow2
         this.pieceSize = 1 << pieceSizePow2
         
@@ -240,7 +245,7 @@ public class Downloader {
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(me.toBase64(), pieces, getInfoHash(), endpoint, file, pieceSize, length)
+                    currentSession = new DownloadSession(me.toBase64(), pieces, getInfoHash(), endpoint, incompleteFile, pieceSize, length)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
@@ -254,6 +259,12 @@ public class Downloader {
                     synchronized(piecesFile) {
                         piecesFileClosed = true
                         piecesFile.delete()
+                    }
+                    try {
+                        Files.move(incompleteFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Files.copy(incompleteFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                        incompleteFile.delete()
                     }
                     eventBus.publish(
                         new FileDownloadedEvent(
