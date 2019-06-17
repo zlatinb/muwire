@@ -1,3 +1,4 @@
+
 import griffon.core.GriffonApplication
 import griffon.core.env.Metadata
 import groovy.util.logging.Log
@@ -102,12 +103,6 @@ class Ready extends AbstractLifecycleHandler {
         application.context.put("core",core)
         application.getPropertyChangeListeners("core").each { 
             it.propertyChange(new PropertyChangeEvent(this, "core", null, core)) 
-        }
-        
-        if (props.sharedFiles != null) {
-            props.sharedFiles.split(",").each {
-                core.eventBus.publish(new FileSharedEvent(file : new File(it)))
-            }
         }
         
         core.eventBus.publish(new UILoadedEvent())

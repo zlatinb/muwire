@@ -9,6 +9,7 @@ import javax.swing.JTable
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
@@ -53,6 +54,7 @@ class MainFrameModel {
     def downloads = []
     def uploads = []
     def shared = []
+    def watched = []
     def connectionList = []
     def searches = new LinkedList()
     def trusted = []
@@ -133,7 +135,7 @@ class MainFrameModel {
             core.eventBus.register(FileDownloadedEvent.class, this)
             
             timer.schedule({
-                int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
+                int retryInterval = core.muOptions.downloadRetryInterval
                 if (retryInterval > 0) {
                     retryInterval *= 60000
                     long now = System.currentTimeMillis()
@@ -156,6 +158,10 @@ class MainFrameModel {
             runInsideUIAsync {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
+                
+                watched.addAll(core.muOptions.watchedDirectories)
+                builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+                watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
             }
         })
         

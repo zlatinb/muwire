@@ -194,6 +194,13 @@ class MainFrameController {
         println "unsharing selected files"
     }
     
+    void saveMuWireSettings() {
+        File f = new File(core.home, "MuWire.properties")
+        f.withOutputStream { 
+            core.muOptions.write(it)
+        }
+    }
+    
     void mvcGroupInit(Map<String, String> args) {
         application.addPropertyChangeListener("core", {e-> 
             core = e.getNewValue()

@@ -1,6 +1,11 @@
 package com.muwire.core
 
+import java.util.stream.Collectors
+
 import com.muwire.core.hostcache.CrawlerResponse
+import com.muwire.core.util.DataUtil
+
+import net.i2p.data.Base64
 
 class MuWireSettings {
 	
@@ -10,10 +15,9 @@ class MuWireSettings {
     int updateCheckInterval
     String nickname
     File downloadLocation
-    String sharedFiles
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
-    boolean watchSharedDirectories
+    Set<String> watchedDirectories
     
 	MuWireSettings() {
         this(new Properties())
@@ -26,11 +30,16 @@ class MuWireSettings {
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
             System.getProperty("user.home")))
-        sharedFiles = props.getProperty("sharedFiles")
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","15"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","36"))
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
-        watchSharedDirectories = Boolean.parseBoolean(props.getProperty("watchSharedDirectories","true"))
+        
+        watchedDirectories = new HashSet<>()
+        if (props.containsKey("watchedDirectories")) {
+            String[] encoded = props.getProperty("watchedDirectories").split(",")
+            encoded.each { watchedDirectories << DataUtil.readi18nString(Base64.decode(it)) }
+        }
+        
 	}
     
     void write(OutputStream out) throws IOException {
@@ -43,9 +52,14 @@ class MuWireSettings {
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
-        props.setProperty("watchSharedDirectories", String.valueOf(watchSharedDirectories))
-        if (sharedFiles != null)
-            props.setProperty("sharedFiles", sharedFiles)
+        
+        if (!watchedDirectories.isEmpty()) {
+            String encoded = watchedDirectories.stream().
+                map({Base64.encode(DataUtil.encodei18nString(it))}).
+                collect(Collectors.joining(","))
+            props.setProperty("watchedDirectories", encoded)
+        }
+        
         props.store(out, "")
     }
 
