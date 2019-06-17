@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.UILoadedEvent
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
@@ -83,7 +84,8 @@ class Cli {
         }
         core.eventBus.register(AllFilesLoadedEvent.class, fileLoader)
         core.startServices()
-        
+
+        core.eventBus.publish(new UILoadedEvent())        
         println "waiting for files to load"
         latch.await()
         // now we begin

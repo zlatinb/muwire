@@ -164,6 +164,7 @@ public class Core {
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
+        eventBus.register(UILoadedEvent.class, persisterService)
         
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
@@ -229,7 +230,6 @@ public class Core {
         directoryWatcher.start()
         trustService.start()
         trustService.waitForLoad()
-        persisterService.start()
         hostCache.start()
         connectionManager.start()
         cacheClient.start()

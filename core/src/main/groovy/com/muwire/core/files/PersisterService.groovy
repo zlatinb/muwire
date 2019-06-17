@@ -11,6 +11,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.Service
 import com.muwire.core.SharedFile
+import com.muwire.core.UILoadedEvent
 import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
@@ -36,14 +37,14 @@ class PersisterService extends Service {
 		timer = new Timer("file persister", true)
 	}
 	
-	void start() {
-		timer.schedule({load()} as TimerTask, 1)
-	}
-	
 	void stop() {
 		timer.cancel()
 	}
-	
+
+    void onUILoadedEvent(UILoadedEvent e) {
+        timer.schedule({load()} as TimerTask, 1)
+    }
+    	
 	void load() {
 		if (location.exists() && location.isFile()) {
 			def slurper = new JsonSlurper()
