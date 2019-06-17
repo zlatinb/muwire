@@ -180,11 +180,11 @@ public class Downloader {
     public void cancel() {
         cancelled = true
         stop()
-        file.delete()
         synchronized(piecesFile) {
             piecesFileClosed = true
             piecesFile.delete()
         }
+        incompleteFile.delete()
     }
     
     void stop() {
