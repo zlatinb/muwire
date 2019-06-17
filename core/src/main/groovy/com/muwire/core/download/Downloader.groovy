@@ -35,7 +35,7 @@ public class Downloader {
     private final DownloadManager downloadManager 
     private final Persona me   
     private final File file
-    private final Pieces downloaded, claimed
+    private final Pieces pieces
     private final long length
     private InfoHash infoHash
     private final int pieceSize
@@ -74,8 +74,7 @@ public class Downloader {
             nPieces = length / pieceSize + 1
         this.nPieces = nPieces
         
-        downloaded = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
-        claimed = new Pieces(nPieces)
+        pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
     }
     
     public synchronized InfoHash getInfoHash() {
@@ -102,7 +101,7 @@ public class Downloader {
             return
         piecesFile.eachLine { 
             int piece = Integer.parseInt(it)
-            downloaded.markDownloaded(piece)
+            pieces.markDownloaded(piece)
         }
     }
     
@@ -111,7 +110,7 @@ public class Downloader {
             if (piecesFileClosed)
                 return
             piecesFile.withPrintWriter { writer ->
-                downloaded.getDownloaded().each { piece ->
+                pieces.getDownloaded().each { piece ->
                     writer.println(piece)
                 }
             }
@@ -119,7 +118,7 @@ public class Downloader {
     }
     
     public long donePieces() {
-        downloaded.donePieces()
+        pieces.donePieces()
     }
     
     
@@ -142,7 +141,7 @@ public class Downloader {
             allFinished &= it.currentState == WorkerState.FINISHED
         }
         if (allFinished) {
-            if (downloaded.isComplete())
+            if (pieces.isComplete())
                 return DownloadState.FINISHED
             return DownloadState.FAILED
         }
@@ -240,8 +239,8 @@ public class Downloader {
                 }
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
-                while(!downloaded.isComplete()) {
-                    currentSession = new DownloadSession(me.toBase64(), downloaded, claimed, getInfoHash(), endpoint, file, pieceSize, length)
+                while(!pieces.isComplete()) {
+                    currentSession = new DownloadSession(me.toBase64(), pieces, getInfoHash(), endpoint, file, pieceSize, length)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
@@ -251,7 +250,7 @@ public class Downloader {
                 log.log(Level.WARNING,"Exception while downloading",bad)
             } finally {
                 currentState = WorkerState.FINISHED
-                if (downloaded.isComplete() && eventFired.compareAndSet(false, true)) {
+                if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
                     synchronized(piecesFile) {
                         piecesFileClosed = true
                         piecesFile.delete()

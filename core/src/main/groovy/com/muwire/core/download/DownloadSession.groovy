@@ -16,6 +16,7 @@ import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.logging.Level
 
 @Log
 class DownloadSession {
@@ -23,7 +24,7 @@ class DownloadSession {
     private static int SAMPLES = 10
     
     private final String meB64
-    private final Pieces downloaded, claimed
+    private final Pieces pieces
     private final InfoHash infoHash
     private final Endpoint endpoint
     private final File file
@@ -36,11 +37,10 @@ class DownloadSession {
     
     private ByteBuffer mapped
     
-    DownloadSession(String meB64, Pieces downloaded, Pieces claimed, InfoHash infoHash, Endpoint endpoint, File file, 
+    DownloadSession(String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
         int pieceSize, long fileLength) {
         this.meB64 = meB64
-        this.downloaded = downloaded
-        this.claimed = claimed
+        this.pieces = pieces
         this.endpoint = endpoint
         this.infoHash = infoHash
         this.file = file
@@ -63,22 +63,11 @@ class DownloadSession {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
         
-        int piece
-        while(true) {
-            piece = downloaded.getRandomPiece()
-            if (piece == -1)
-                return false
-            if (claimed.isMarked(piece)) {
-                if (downloaded.donePieces() + claimed.donePieces() == downloaded.nPieces) {
-                    log.info("all pieces claimed")
-                    return false
-                }
-                continue
-            }
-            break
-        }
-        claimed.markDownloaded(piece)
-        
+        int piece = pieces.claim()
+        if (piece == -1)
+            return false
+        boolean unclaim = true
+            
         log.info("will download piece $piece")
         
         long start = piece * pieceSize
@@ -171,9 +160,11 @@ class DownloadSession {
             } finally {
                 try { channel?.close() } catch (IOException ignore) {}
             }
-            downloaded.markDownloaded(piece)
+            pieces.markDownloaded(piece)
+            unclaim = false
         } finally {
-            claimed.clear(piece)
+            if (unclaim)
+                pieces.unclaim(piece)
         }
         return true
     }
