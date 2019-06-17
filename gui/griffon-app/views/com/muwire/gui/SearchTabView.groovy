@@ -66,10 +66,12 @@ class SearchTabView {
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
             selectionModel.addListSelectionListener( {
-                mvcGroup.parentGroup.model.trustButtonsEnabled = true
                 int row = resultsTable.getSelectedRow()
+                if (row < 0)
+                    return
                 if (lastSortEvent != null)
                     row = resultsTable.rowSorter.convertRowIndexToModel(row)
+                mvcGroup.parentGroup.model.trustButtonsEnabled = true
                 mvcGroup.parentGroup.model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
             })
         }
