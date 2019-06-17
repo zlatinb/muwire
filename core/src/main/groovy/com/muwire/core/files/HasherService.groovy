@@ -32,7 +32,7 @@ class HasherService {
 	private void process(File f) {
 		f = f.getCanonicalFile()
 		if (f.isDirectory()) {
-			f.listFiles().each {onFileSharedEvent new FileSharedEvent(file: it) }
+			f.listFiles().each {eventBus.publish new FileSharedEvent(file: it) }
 		} else {
 			if (f.length() == 0) {
 				eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
