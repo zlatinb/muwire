@@ -130,7 +130,8 @@ class SearchTabView {
     def closeTab = {
         int index = parent.indexOfTab(searchTerms)
         parent.removeTabAt(index)
-        mvcGroup.parentGroup.model.searchButtonsEnabled = false
+        mvcGroup.parentGroup.model.trustButtonsEnabled = false
+        mvcGroup.parentGroup.model.downloadActionEnabled = false
         mvcGroup.destroy()
     }
     
