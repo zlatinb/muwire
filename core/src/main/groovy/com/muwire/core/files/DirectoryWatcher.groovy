@@ -19,6 +19,7 @@ class DirectoryWatcher {
     private final EventBus eventBus
     private final Thread watcherThread
     private WatchService watchService
+    private volatile boolean shutdown
     
     DirectoryWatcher(EventBus eventBus) {
         this.eventBus = eventBus
@@ -32,6 +33,7 @@ class DirectoryWatcher {
     }
     
     void stop() {
+        shutdown = true
         watcherThread.interrupt()
         watchService.close()
     }
@@ -45,15 +47,20 @@ class DirectoryWatcher {
             StandardWatchEventKinds.ENTRY_DELETE)
         
     }
-    
+
     private void watch() {
-        while(true) {
-            WatchKey key = watchService.take()
-            key.pollEvents().each {
-                if (it.kind() == StandardWatchEventKinds.ENTRY_MODIFY)
-                    processModified(key.watchable(), it.context()) 
+        try {
+            while(!shutdown) {
+                WatchKey key = watchService.take()
+                key.pollEvents().each {
+                    if (it.kind() == StandardWatchEventKinds.ENTRY_MODIFY)
+                        processModified(key.watchable(), it.context())
+                }
+                key.reset()
             }
-            key.reset()
+        } catch (InterruptedException e) {
+            if (!shutdown)
+                throw e
         }
     }
     
