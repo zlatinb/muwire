@@ -4,7 +4,7 @@ import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardWatchEventKinds
+import static java.nio.file.StandardWatchEventKinds.*
 import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
@@ -14,11 +14,20 @@ import com.muwire.core.EventBus
 import com.muwire.core.SharedFile
 
 import groovy.util.logging.Log
+import net.i2p.util.SystemVersion
 
 @Log
 class DirectoryWatcher {
     
     private static final long WAIT_TIME = 1000
+    
+    private static final WatchEvent.Kind[] kinds
+    static {
+        if (SystemVersion.isMac())
+            kinds = [ENTRY_MODIFY, ENTRY_DELETE]
+        else
+            kinds = [ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE]
+    }
     
     private final EventBus eventBus
     private final FileManager fileManager
@@ -53,9 +62,7 @@ class DirectoryWatcher {
         if (!e.file.isDirectory())
             return
         Path path = e.file.getCanonicalFile().toPath()
-        path.register(watchService, 
-            StandardWatchEventKinds.ENTRY_MODIFY, 
-            StandardWatchEventKinds.ENTRY_DELETE)
+        path.register(watchService, kinds)
         
     }
 
@@ -64,10 +71,11 @@ class DirectoryWatcher {
             while(!shutdown) {
                 WatchKey key = watchService.take()
                 key.pollEvents().each {
-                    if (it.kind() == StandardWatchEventKinds.ENTRY_MODIFY)
-                        processModified(key.watchable(), it.context())
-                    if (it.kind() == StandardWatchEventKinds.ENTRY_DELETE)
-                        processDeleted(key.watchable(), it.context())
+                    switch(it.kind()) {
+                        case ENTRY_CREATE: processCreated(key.watchable(), it.context()); break
+                        case ENTRY_MODIFY: processModified(key.watchable(), it.context()); break
+                        case ENTRY_DELETE: processDeleted(key.watchable(), it.context()); break
+                    }
                 }
                 key.reset()
             }
@@ -77,14 +85,21 @@ class DirectoryWatcher {
         }
     }
     
-    
+
+    private void processCreated(Path parent, Path path) {
+        File f= join(parent, path)
+        log.fine("created entry $f")
+    }
+        
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
+        log.fine("modified entry $f")
         waitingFiles.put(f, System.currentTimeMillis())
     }
     
     private void processDeleted(Path parent, Path path) {
         File f = join(parent, path)
+        log.fine("deleted entry $f")
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
@@ -103,6 +118,7 @@ class DirectoryWatcher {
                 def published = []
                 waitingFiles.each { file, timestamp ->
                     if (now - timestamp > WAIT_TIME) {
+                        log.info("publishing file $file")
                         eventBus.publish new FileSharedEvent(file : file)
                         published << file
                     }
