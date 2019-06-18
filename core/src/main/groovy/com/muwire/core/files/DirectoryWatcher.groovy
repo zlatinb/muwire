@@ -5,6 +5,8 @@ import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
 import static java.nio.file.StandardWatchEventKinds.*
+
+import java.nio.file.ClosedWatchServiceException
 import java.nio.file.WatchEvent
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
@@ -79,7 +81,7 @@ class DirectoryWatcher {
                 }
                 key.reset()
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException|ClosedWatchServiceException e) {
             if (!shutdown)
                 throw e
         }
