@@ -89,6 +89,8 @@ class DirectoryWatcher {
     private void processCreated(Path parent, Path path) {
         File f= join(parent, path)
         log.fine("created entry $f")
+        if (f.isDirectory())
+            f.toPath().register(watchService, kinds)
     }
         
     private void processModified(Path parent, Path path) {
