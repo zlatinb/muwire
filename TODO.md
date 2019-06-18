@@ -32,6 +32,10 @@ For ease of deployment for new users, and so that users do not need to run a sep
 
 Basically any non-gui non-cli user interface
 
+##### Metadata editing and search
+
+To enable parsing of metadata from known file types and the user editing it or adding manual metadata
+
 ### Small Items
 
 * Detect if router is dead and show warning or exit
@@ -39,4 +43,3 @@ Basically any non-gui non-cli user interface
 * Download file sequentially
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
-* Automatic sharing of new files in shared directories (more like medium item)
