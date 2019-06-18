@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.1.5 is avaiable for download at http://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.2.5 is avaiable for download at http://muwire.com.  You can find technical documentation in the "doc" folder.
 
 ### Building
 
@@ -23,7 +23,7 @@ Some of the UI tests will fail because they haven't been written yet :-/
 
 ### Running
 
-You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside by typing "java -jar MuWire-x.y.z.jar" in a terminal or command prompt.  If you use a custom I2CP host and port, create a file $HOME/.MuWire/i2p.properties and put "i2cp.tcp.host=<host>" and "i2cp.tcp.post=<port>" in there.
+You need to have an I2P router up and running on the same machine.  After you build the application, look inside "gui/build/distributions".  Untar/unzip one of the "shadow" files and then run the jar contained inside by typing "java -jar MuWire-x.y.z.jar" in a terminal or command prompt.  If you use a custom I2CP host and port, create a file $HOME/.MuWire/i2p.properties and put "i2cp.tcp.host=<host>" and "i2cp.tcp.port=<port>" in there.
 
 The first time you run MuWire it will ask you to select a nickname.  This nickname will be displayed with search results, so that others can verify the file was shared by you.  It is best to leave MuWire running all the time, just like I2P.
 
