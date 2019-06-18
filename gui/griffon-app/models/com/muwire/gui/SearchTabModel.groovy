@@ -23,6 +23,7 @@ class SearchTabModel {
     String uuid
     def results = []
     def hashBucket = [:]
+    def sourcesBucket = [:]
     
     
     void mvcGroupInit(Map<String, String> args) {
@@ -46,6 +47,13 @@ class SearchTabModel {
                 hashBucket[e.infohash] = bucket
             }
             bucket << e
+            
+            Set sourceBucket = sourcesBucket.get(e.infohash)
+            if (sourceBucket == null) {
+                sourceBucket = new HashSet()
+                sourcesBucket.put(e.infohash, sourceBucket)
+            }
+            sourceBucket.addAll(e.sources)
                             
             results << e
             JTable table = builder.getVariable("results-table")
@@ -63,6 +71,14 @@ class SearchTabModel {
                     bucket = []
                     hashBucket[it.infohash] = bucket
                 }
+                
+                Set sourceBucket = sourcesBucket.get(it.infohash)
+                if (sourceBucket == null) {
+                    sourceBucket = new HashSet()
+                    sourcesBucket.put(it.infohash, sourceBucket)
+                }
+                sourceBucket.addAll(it.sources)
+                
                 bucket << it
                 results << it
             }

@@ -1,5 +1,7 @@
 package com.muwire.core.search
 
+import java.util.stream.Collectors
+
 import javax.naming.directory.InvalidSearchControlsException
 
 import com.muwire.core.InfoHash
@@ -7,6 +9,7 @@ import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
+import net.i2p.data.Destination
 
 class ResultsParser {
     public static UIResultEvent parse(Persona p, UUID uuid, def json) throws InvalidSearchResultException {
@@ -58,6 +61,7 @@ class ResultsParser {
                  size : size,
                  infohash : parsedIH,
                  pieceSize : pieceSize,
+                 sources : Collections.emptySet(),
                  uuid : uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
@@ -82,11 +86,17 @@ class ResultsParser {
             if (infoHash.length != InfoHash.SIZE)
                 throw new InvalidSearchResultException("invalid infohash size $infoHash.length")
             int pieceSize = json.pieceSize
+            
+            Set<Destination> sources = Collections.emptySet()
+            if (json.sources != null) 
+                sources = json.sources.stream().map({new Destination(it)}).collect(Collectors.toSet())
+            
             return new UIResultEvent( sender : p,
                 name : name,
                 size : size,
                 infohash : new InfoHash(infoHash),
                 pieceSize : pieceSize,
+                sources : sources,
                 uuid: uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)

@@ -58,6 +58,8 @@ public class DownloadManager {
         e.result.each { 
             destinations.add(it.sender.destination)
         }
+        destinations.addAll(e.sources)
+        destinations.remove(me.destination)
         
         def downloader = new Downloader(eventBus, this, me, e.target, size,
             infohash, pieceSize, connector, destinations,

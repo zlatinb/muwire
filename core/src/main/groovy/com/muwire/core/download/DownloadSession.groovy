@@ -85,7 +85,7 @@ class DownloadSession {
             if (code.startsWith("404 ")) {
                 log.warning("file not found")
                 endpoint.close()
-                return
+                return false
             }
                 
             if (code.startsWith("416 ")) {
