@@ -91,6 +91,8 @@ class DirectoryWatcher {
         log.fine("created entry $f")
         if (f.isDirectory())
             f.toPath().register(watchService, kinds)
+        else
+            waitingFiles.put(f, System.currentTimeMillis())
     }
         
     private void processModified(Path parent, Path path) {
