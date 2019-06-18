@@ -120,7 +120,7 @@ class DirectoryWatcher {
                 def published = []
                 waitingFiles.each { file, timestamp ->
                     if (now - timestamp > WAIT_TIME) {
-                        log.info("publishing file $file")
+                        log.fine("publishing file $file")
                         eventBus.publish new FileSharedEvent(file : file)
                         published << file
                     }
