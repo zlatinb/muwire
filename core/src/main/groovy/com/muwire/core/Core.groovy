@@ -23,6 +23,7 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
+import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
@@ -70,6 +71,7 @@ public class Core {
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
     private final DownloadManager downloadManager
+    private final DirectoryWatcher directoryWatcher
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
@@ -162,6 +164,7 @@ public class Core {
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
+        eventBus.register(UILoadedEvent.class, persisterService)
         
 		log.info("initializing host cache")
 		File hostStorage = new File(home, "hosts.json")
@@ -213,6 +216,9 @@ public class Core {
 		connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
 		
+        log.info("initializing directory watcher")
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager)
+        eventBus.register(FileSharedEvent.class, directoryWatcher)
         
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
@@ -221,9 +227,9 @@ public class Core {
     
     public void startServices() {
         hasherService.start()
+        directoryWatcher.start()
         trustService.start()
         trustService.waitForLoad()
-        persisterService.start()
         hostCache.start()
         connectionManager.start()
         cacheClient.start()
@@ -240,6 +246,8 @@ public class Core {
         connectionAcceptor.stop()
         log.info("shutting down connection establisher")
         connectionEstablisher.stop()
+        log.info("shutting down directory watcher")
+        directoryWatcher.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
     }

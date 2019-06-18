@@ -139,16 +139,32 @@ class MainFrameView {
                     panel (constraints: "uploads window"){
                         gridLayout(cols : 1, rows : 2)
                         panel {
-                            borderLayout()
-                            panel (constraints : BorderLayout.NORTH) {
-                                button(text : "Click here to share files", actionPerformed : shareFiles)
+                            gridLayout(cols : 2, rows : 1) 
+                            panel {
+                                borderLayout()
+                                panel (constraints : BorderLayout.NORTH) {
+                                    button(text : "Add directories to watch", actionPerformed : watchDirectories)
+                                }
+                                scrollPane (constraints : BorderLayout.CENTER) {
+                                    table(id : "watched-directories-table", autoCreateRowSorter: true) {
+                                        tableModel(list : model.watched) {
+                                            closureColumn(header: "Watched Directories", type : String, read : { it })
+                                        }
+                                    }
+                                }
                             }
-                            scrollPane ( constraints : BorderLayout.CENTER) {
-                                table(id : "shared-files-table", autoCreateRowSorter: true) {
-                                     tableModel(list : model.shared) {
-                                         closureColumn(header : "Name", preferredWidth : 550, type : String, read : {row -> row.file.getAbsolutePath()})
-                                         closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.file.length() })
-                                     }   
+                            panel {
+                                borderLayout()
+                                panel (constraints : BorderLayout.NORTH) {
+                                    button(text : "Share files", actionPerformed : shareFiles)
+                                }
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    table(id : "shared-files-table", autoCreateRowSorter: true) {
+                                        tableModel(list : model.shared) {
+                                            closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.file.getAbsolutePath()})
+                                            closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.file.length() })
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -466,11 +482,26 @@ class MainFrameView {
     
     def shareFiles = {
         def chooser = new JFileChooser()
-        chooser.setDialogTitle("Select file or directory to share")
-        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
+        chooser.setDialogTitle("Select file to share")
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
             model.core.eventBus.publish(new FileSharedEvent(file : chooser.getSelectedFile()))
+        }
+    }
+    
+    def watchDirectories = {
+        def chooser = new JFileChooser()
+        chooser.setDialogTitle("Select directory to watch")
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        int rv = chooser.showOpenDialog(null)
+        if (rv == JFileChooser.APPROVE_OPTION) {
+            File f = chooser.getSelectedFile()
+            model.watched << f.getAbsolutePath()
+            application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
+            mvcGroup.controller.saveMuWireSettings()
+            builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+            model.core.eventBus.publish(new FileSharedEvent(file : f))
         }
     }
 }

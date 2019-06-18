@@ -9,6 +9,7 @@ import javax.swing.JTable
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
@@ -19,6 +20,7 @@ import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
@@ -53,6 +55,7 @@ class MainFrameModel {
     def downloads = []
     def uploads = []
     def shared = []
+    def watched = []
     def connectionList = []
     def searches = new LinkedList()
     def trusted = []
@@ -131,9 +134,10 @@ class MainFrameModel {
             core.eventBus.register(QueryEvent.class, this)
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
+            core.eventBus.register(FileUnsharedEvent.class, this)
             
             timer.schedule({
-                int retryInterval = application.context.get("muwire-settings").downloadRetryInterval
+                int retryInterval = core.muOptions.downloadRetryInterval
                 if (retryInterval > 0) {
                     retryInterval *= 60000
                     long now = System.currentTimeMillis()
@@ -156,6 +160,10 @@ class MainFrameModel {
             runInsideUIAsync {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
+                
+                watched.addAll(core.muOptions.watchedDirectories)
+                builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+                watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
             }
         })
         
@@ -231,6 +239,17 @@ class MainFrameModel {
         infoHashes.add(e.loadedFile.infoHash)
         runInsideUIAsync {
             shared << e.loadedFile
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onFileUnsharedEvent(FileUnsharedEvent e) {
+        InfoHash infohash = e.unsharedFile.infoHash
+        if (!infoHashes.remove(infohash))
+            return
+        runInsideUIAsync {
+            shared.remove(e.unsharedFile)
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
         }
