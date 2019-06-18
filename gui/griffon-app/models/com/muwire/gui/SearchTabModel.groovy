@@ -38,7 +38,7 @@ class SearchTabModel {
     
     void handleResult(UIResultEvent e) {
         if (uiSettings.excludeLocalResult &&
-            e.sender == core.me)
+            core.fileManager.rootToFiles.containsKey(e.infohash))
             return
         runInsideUIAsync {
             def bucket = hashBucket.get(e.infohash)
@@ -64,7 +64,8 @@ class SearchTabModel {
     void handleResultBatch(UIResultEvent[] batch) {
         runInsideUIAsync {
             batch.each { 
-                if (uiSettings.excludeLocalResult && it.sender == core.me)
+                if (uiSettings.excludeLocalResult && 
+                    core.fileManager.rootToFiles.containsKey(it.infohash))
                     return
                 def bucket = hashBucket.get(it.infohash)
                 if (bucket == null) {

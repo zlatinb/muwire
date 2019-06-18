@@ -72,6 +72,7 @@ public class Core {
     private final HasherService hasherService
     private final DownloadManager downloadManager
     private final DirectoryWatcher directoryWatcher
+    final FileManager fileManager
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
@@ -155,7 +156,7 @@ public class Core {
 		
 		
 		log.info "initializing file manager"
-		FileManager fileManager = new FileManager(eventBus, props)
+		fileManager = new FileManager(eventBus, props)
 		eventBus.register(FileHashedEvent.class, fileManager)
 		eventBus.register(FileLoadedEvent.class, fileManager)
 		eventBus.register(FileDownloadedEvent.class, fileManager)
