@@ -11,6 +11,7 @@ import java.nio.file.WatchService
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.SharedFile
 
 import groovy.util.logging.Log
 
@@ -20,13 +21,15 @@ class DirectoryWatcher {
     private static final long WAIT_TIME = 1000
     
     private final EventBus eventBus
+    private final FileManager fileManager
     private final Thread watcherThread, publisherThread
     private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
     
-    DirectoryWatcher(EventBus eventBus) {
+    DirectoryWatcher(EventBus eventBus, FileManager fileManager) {
         this.eventBus = eventBus
+        this.fileManager = fileManager
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
         watcherThread.setDaemon(true)
         this.publisherThread = new Thread({publish()} as Runnable, "watched-files-publisher")
@@ -63,6 +66,8 @@ class DirectoryWatcher {
                 key.pollEvents().each {
                     if (it.kind() == StandardWatchEventKinds.ENTRY_MODIFY)
                         processModified(key.watchable(), it.context())
+                    if (it.kind() == StandardWatchEventKinds.ENTRY_DELETE)
+                        processDeleted(key.watchable(), it.context())
                 }
                 key.reset()
             }
@@ -76,6 +81,13 @@ class DirectoryWatcher {
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
         waitingFiles.put(f, System.currentTimeMillis())
+    }
+    
+    private void processDeleted(Path parent, Path path) {
+        File f = join(parent, path)
+        SharedFile sf = fileManager.fileToSharedFile.get(f)
+        if (sf != null)
+            eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
     }
     
     private static File join(Path parent, Path path) {

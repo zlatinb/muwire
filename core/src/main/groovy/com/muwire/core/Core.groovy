@@ -217,7 +217,7 @@ public class Core {
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
 		
         log.info("initializing directory watcher")
-        directoryWatcher = new DirectoryWatcher(eventBus)
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, directoryWatcher)
         
         log.info("initializing hasher service")

@@ -20,6 +20,7 @@ import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
@@ -133,6 +134,7 @@ class MainFrameModel {
             core.eventBus.register(QueryEvent.class, this)
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
+            core.eventBus.register(FileUnsharedEvent.class, this)
             
             timer.schedule({
                 int retryInterval = core.muOptions.downloadRetryInterval
@@ -237,6 +239,17 @@ class MainFrameModel {
         infoHashes.add(e.loadedFile.infoHash)
         runInsideUIAsync {
             shared << e.loadedFile
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+        }
+    }
+    
+    void onFileUnsharedEvent(FileUnsharedEvent e) {
+        InfoHash infohash = e.unsharedFile.infoHash
+        if (!infoHashes.remove(infohash))
+            return
+        runInsideUIAsync {
+            shared.remove(e.unsharedFile)
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
         }
