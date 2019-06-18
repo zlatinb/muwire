@@ -73,7 +73,7 @@ class Cli {
         
         Timer timer = new Timer("status-printer", true)
         timer.schedule({
-            println "Connections $connectionsListener.connections Uploads $uploadsListener.uploads Shared $sharedListener.shared"
+            println new Date() + " Connections $connectionsListener.connections Uploads $uploadsListener.uploads Shared $sharedListener.shared"
         } as TimerTask, 60000, 60000)
         
         def latch = new CountDownLatch(1)
@@ -119,11 +119,11 @@ class Cli {
         volatile int uploads
         public void onUploadEvent(UploadEvent e) {
             uploads++
-            println "Starting upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
+            println new Date() + " Starting upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
         }
         public void onUploadFinishedEvent(UploadFinishedEvent e) {
             uploads--
-            println "Finished upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
+            println new Date() + " Finished upload of ${e.uploader.file.getName()} to ${e.uploader.request.downloader.getHumanReadableName()}"
         }
     }
     
