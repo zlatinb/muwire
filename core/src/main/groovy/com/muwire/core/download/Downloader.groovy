@@ -21,6 +21,7 @@ import com.muwire.core.files.FileDownloadedEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
+import net.i2p.util.ConcurrentHashSet
 
 @Log
 public class Downloader {
@@ -49,6 +50,7 @@ public class Downloader {
     private final File incompleteFile
     final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
+    private final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
     
     
     private volatile boolean cancelled
@@ -249,6 +251,7 @@ public class Downloader {
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
+                    successfulDestinations.add(endpoint.destination)
                     writePieces()
                 }
             } catch (Exception bad) {
@@ -268,7 +271,7 @@ public class Downloader {
                     }
                     eventBus.publish(
                         new FileDownloadedEvent(
-                            downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, Collections.emptySet()),
+                            downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, successfulDestinations),
                         downloader : Downloader.this))
                             
                 } 

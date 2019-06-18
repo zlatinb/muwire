@@ -47,8 +47,9 @@ class SearchTabView {
                 resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
                     tableModel(list: model.results) {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                        closureColumn(header: "Size", preferredWidth: 50, type: Long, read : {row -> row.size})
-                        closureColumn(header: "Sources", preferredWidth: 10, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                        closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
+                        closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                        closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
                         closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
                         closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
                           model.core.trustService.getLevel(row.sender.destination).toString()

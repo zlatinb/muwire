@@ -11,7 +11,9 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.Collectors
 
+import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 
@@ -54,12 +56,16 @@ class ResultsSender {
                 int pieceSize = it.getPieceSize()
                 if (pieceSize == 0)
                     pieceSize = FileHasher.getPieceSize(length)
+                Set<Destination> suggested = Collections.emptySet()
+                if (it instanceof DownloadedFile) 
+                    suggested = it.sources
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
                     infohash : it.getInfoHash(),
                     pieceSize : pieceSize,
-                    uuid : uuid
+                    uuid : uuid,
+                    sources : suggested
                     )
                     eventBus.publish(uiResultEvent)
             }
@@ -110,6 +116,10 @@ class ResultsSender {
                         }
                         obj.hashList = hashListB64
                     }
+                    
+                    if (it instanceof DownloadedFile)
+                        obj.sources = it.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
+                    
                     def json = jsonOutput.toJson(obj)
                     os.writeShort((short)json.length())
                     os.write(json.getBytes(StandardCharsets.US_ASCII))

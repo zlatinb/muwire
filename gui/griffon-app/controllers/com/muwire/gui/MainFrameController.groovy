@@ -129,8 +129,9 @@ class MainFrameController {
         def group = selected.getClientProperty("mvc-group")
         
         def resultsBucket = group.model.hashBucket[result.infohash]
+        def sources = group.model.sourcesBucket[result.infohash]
          
-        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, target : file))
+        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, target : file))
     }
     
     @ControllerAction
