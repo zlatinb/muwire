@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import griffon.core.env.Metadata
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
@@ -37,6 +38,7 @@ import java.awt.event.MouseEvent
 import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 
 @ArtifactProviderFor(GriffonView)
 class MainFrameView {
@@ -44,6 +46,8 @@ class MainFrameView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     MainFrameModel model
+    
+    @Inject Metadata metadata
     
     def downloadsTable
     def lastDownloadSortEvent
@@ -54,7 +58,7 @@ class MainFrameView {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
-            title: application.configuration['application.title'],
+            title: application.configuration['application.title'] + " " + metadata["application.version"],
             iconImage:   imageIcon('/griffon-icon-48x48.png').image,
             iconImages: [imageIcon('/griffon-icon-48x48.png').image,
                 imageIcon('/griffon-icon-32x32.png').image,
