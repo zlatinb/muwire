@@ -104,9 +104,9 @@ public class Core {
             i2pOptions["inbound.nickname"] = "MuWire"
             i2pOptions["outbound.nickname"] = "MuWire"
             i2pOptions["inbound.length"] = "3"
-            i2pOptions["inbound.quantity"] = "2"
+            i2pOptions["inbound.quantity"] = "4"
             i2pOptions["outbound.length"] = "3"
-            i2pOptions["outbound.quantity"] = "2"
+            i2pOptions["outbound.quantity"] = "4"
             i2pOptions["i2cp.tcp.host"] = "127.0.0.1"
             i2pOptions["i2cp.tcp.port"] = "7654"
         }
