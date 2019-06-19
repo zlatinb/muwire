@@ -109,6 +109,8 @@ class HostCache extends Service {
 				Host host = new Host(dest)
 				host.failures = Integer.valueOf(String.valueOf(entry.failures))
 				host.successes = Integer.valueOf(String.valueOf(entry.successes))
+                if (entry.lastAttempt != null)
+                    host.lastAttempt = entry.lastAttempt
 				if (allowHost(host))
 					hosts.put(dest, host)
 			}
@@ -118,7 +120,7 @@ class HostCache extends Service {
 	}
 	
 	private boolean allowHost(Host host) {
-		if (host.isFailed())
+		if (host.isFailed() && !host.canTryAgain())
 			return false
 		if (host.destination == myself)
 			return false
@@ -143,6 +145,7 @@ class HostCache extends Service {
 					map.destination = dest.toBase64()
 					map.failures = host.failures
 					map.successes = host.successes
+                    map.lastAttempt = host.lastAttempt
 					def json = JsonOutput.toJson(map)
 					writer.println json
 				}
