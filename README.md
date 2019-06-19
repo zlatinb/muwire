@@ -11,12 +11,12 @@ The current stable release - 0.2.5 is avaiable for download at http://muwire.com
 You need JRE 8 or newer.  After installing that and setting up the appropriate paths, just type
 
 ```
-./gradlew assemble 
+./gradlew clean assemble 
 ```
 
 If you want to run the unit tests, type
 ```
-./gradlew build
+./gradlew clean build
 ```
 
 Some of the UI tests will fail because they haven't been written yet :-/
