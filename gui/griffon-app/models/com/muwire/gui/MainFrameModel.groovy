@@ -282,8 +282,10 @@ class MainFrameModel {
             updateTablePreservingSelection("trusted-table")
             updateTablePreservingSelection("distrusted-table")
             
-            results.values().each { 
-                it.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
+            results.values().each { MVCGroup group -> 
+                if (group.alive) {
+                    group.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
+                }
             }
         }
     }
