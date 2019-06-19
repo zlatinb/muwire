@@ -58,7 +58,8 @@ class MainFrameView {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
-            title: application.configuration['application.title'] + " " + metadata["application.version"],
+            title: application.configuration['application.title'] + " " + 
+                metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/griffon-icon-48x48.png').image,
             iconImages: [imageIcon('/griffon-icon-48x48.png').image,
                 imageIcon('/griffon-icon-32x32.png').image,
