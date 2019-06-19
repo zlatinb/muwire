@@ -15,7 +15,7 @@ class DownloadSessionTest {
     private File source, target
     private InfoHash infoHash
     private Endpoint endpoint
-    private Pieces pieces, claimed
+    private Pieces pieces
     private String rootBase64
     
     private DownloadSession session
@@ -48,8 +48,7 @@ class DownloadSessionTest {
         else
             nPieces = size / pieceSize + 1
         pieces = new Pieces(nPieces)
-        claimed = new Pieces(nPieces)
-        claimedPieces.each {claimed.markDownloaded(it)}
+        claimedPieces.each {pieces.claimed.set(it)}
         
         fromDownloader = new PipedInputStream()
         fromUploader = new PipedInputStream()
@@ -57,7 +56,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
-        session = new DownloadSession("",pieces, claimed, infoHash, endpoint, target, pieceSize, size)
+        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size)
         downloadThread = new Thread( { session.request() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
@@ -154,7 +153,7 @@ class DownloadSessionTest {
         int pieceSize = FileHasher.getPieceSize(1)
         int size = (1 << pieceSize) * 10
         initSession(size, [1,2,3,4,5,6,7,8,9])
-        assert !claimed.isMarked(0)
+        assert !pieces.claimed.get(0)
         
         assert "GET $rootBase64" == readTillRN(fromDownloader)
         String range = readTillRN(fromDownloader)
@@ -162,7 +161,7 @@ class DownloadSessionTest {
         int start = Integer.parseInt(matcher[0][1])
         int end = Integer.parseInt(matcher[0][2])
         
-        assert claimed.isMarked(0)
+        assert pieces.claimed.get(0)
         assert start == 0 && end == (1 << pieceSize) - 1
     }
 }

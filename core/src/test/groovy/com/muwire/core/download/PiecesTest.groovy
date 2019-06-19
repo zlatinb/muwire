@@ -16,7 +16,7 @@ class PiecesTest {
     public void testSinglePiece() {
         pieces = new Pieces(1)
         assert !pieces.isComplete()
-        assert pieces.getRandomPiece() == 0
+        assert pieces.claim() == 0
         pieces.markDownloaded(0)
         assert pieces.isComplete()
     }
@@ -25,11 +25,11 @@ class PiecesTest {
     public void testTwoPieces() {
         pieces = new Pieces(2)
         assert !pieces.isComplete()
-        int piece = pieces.getRandomPiece()
+        int piece = pieces.claim()
         assert piece == 0 || piece == 1
         pieces.markDownloaded(piece)
         assert !pieces.isComplete()
-        int piece2 = pieces.getRandomPiece()
+        int piece2 = pieces.claim()
         assert piece != piece2
         pieces.markDownloaded(piece2)
         assert pieces.isComplete()

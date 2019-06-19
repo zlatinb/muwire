@@ -27,6 +27,7 @@ class HasherServiceTest {
 		hasher = new FileHasher()
 		service = new HasherService(hasher, eventBus, new FileManager(eventBus, new MuWireSettings()))
         eventBus.register(FileHashedEvent.class, listener)
+        eventBus.register(FileSharedEvent.class, service)
 		service.start()
 	}
 	

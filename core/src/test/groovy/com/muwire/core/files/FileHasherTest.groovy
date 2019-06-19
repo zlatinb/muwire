@@ -26,7 +26,7 @@ class FileHasherTest extends GroovyTestCase {
 	void testPieceSize() {
 		assert 17 == FileHasher.getPieceSize(1000000)
 		assert 17 == FileHasher.getPieceSize(100000000)
-		assert 27 == FileHasher.getPieceSize(FileHasher.MAX_SIZE)
+		assert 24 == FileHasher.getPieceSize(FileHasher.MAX_SIZE)
 		shouldFail IllegalArgumentException, {
 			FileHasher.getPieceSize(Long.MAX_VALUE)
 		}

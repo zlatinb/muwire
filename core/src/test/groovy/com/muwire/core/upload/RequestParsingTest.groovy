@@ -9,18 +9,18 @@ import com.muwire.core.InfoHash
 
 class RequestParsingTest {
     
-    Request request
+    ContentRequest request
     
     private void fromString(String requestString) {
         def is = new ByteArrayInputStream(requestString.getBytes(StandardCharsets.US_ASCII))
-        request = Request.parse(new InfoHash(new byte[InfoHash.SIZE]), is)
+        request = Request.parseContentRequest(new InfoHash(new byte[InfoHash.SIZE]), is)
     }
 
     
     private static void failed(String requestString) {
         try {
             def is = new ByteArrayInputStream(requestString.getBytes(StandardCharsets.US_ASCII))
-            Request.parse(new InfoHash(new byte[InfoHash.SIZE]), is)
+            Request.parseContentRequest(new InfoHash(new byte[InfoHash.SIZE]), is)
             assert false
         } catch (IOException expected) {}
     }

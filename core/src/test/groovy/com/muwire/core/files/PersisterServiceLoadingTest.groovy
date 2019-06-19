@@ -78,7 +78,7 @@ class PersisterServiceLoadingTest {
 		persisted.write json
 		
 		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(2000)
 		
 		assert listener.publishedFiles.size() == 1
@@ -121,7 +121,7 @@ class PersisterServiceLoadingTest {
 		persisted.write json
 		
 		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(2000)
 		
 		assert listener.publishedFiles.size() == 1
@@ -163,7 +163,7 @@ class PersisterServiceLoadingTest {
 		persisted.append "$json2\n"
 		
 		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(2000)
 		
 		assert listener.publishedFiles.size() == 2
@@ -195,7 +195,7 @@ class PersisterServiceLoadingTest {
 		persisted.write json1
 		
 		PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(2000)
 		
 		assert listener.publishedFiles.size() == 1

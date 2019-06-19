@@ -19,7 +19,7 @@ class UploaderTest {
     InputStream is
     OutputStream os
     
-    Request request
+    ContentRequest request
     Uploader uploader
     
     byte[] inFile
@@ -52,7 +52,7 @@ class UploaderTest {
     }
     
     private void startUpload() {
-        uploader = new Uploader(file, request, endpoint)
+        uploader = new ContentUploader(file, request, endpoint)
         uploadThread = new Thread(uploader.respond() as Runnable)
         uploadThread.setDaemon(true)
         uploadThread.start()
@@ -77,7 +77,7 @@ class UploaderTest {
     @Test
     public void testSmallFile() {
         fillFile(20)
-        request = new Request(range : new Range(0,19))
+        request = new ContentRequest(range : new Range(0,19))
         startUpload()
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 0-19" == readUntilRN()
@@ -92,7 +92,7 @@ class UploaderTest {
     @Test
     public void testRequestMiddle() {
         fillFile(20)
-        request = new Request(range : new Range(5,15))
+        request = new ContentRequest(range : new Range(5,15))
         startUpload()
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 5-15" == readUntilRN()
@@ -108,7 +108,7 @@ class UploaderTest {
     @Test
     public void testOutOfRange() {
         fillFile(20)
-        request = new Request(range : new Range(0,20))
+        request = new ContentRequest(range : new Range(0,20))
         startUpload()
         assert "416 Range Not Satisfiable" == readUntilRN()
         assert "" == readUntilRN()
@@ -118,7 +118,7 @@ class UploaderTest {
     public void testLargeFile() {
         final int length = 0x1 << 14
         fillFile(length)
-        request = new Request(range : new Range(0, length - 1))
+        request = new ContentRequest(range : new Range(0, length - 1))
         startUpload()
         readUntilRN()
         readUntilRN()

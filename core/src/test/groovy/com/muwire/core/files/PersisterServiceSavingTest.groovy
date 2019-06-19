@@ -58,7 +58,7 @@ class PersisterServiceSavingTest {
 		sf = new SharedFile(f, ih, 0)
 		
 		ps = new PersisterService(persisted, eventBus, 100, fileSource)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(1500)
 	
 		JsonSlurper jsonSlurper = new JsonSlurper()	
@@ -77,7 +77,7 @@ class PersisterServiceSavingTest {
 		sf = new DownloadedFile(f, ih, 0, new HashSet([dests.dest1, dests.dest2]))
 		
 		ps = new PersisterService(persisted, eventBus, 100, fileSource)
-		ps.start()
+		ps.onUILoadedEvent(null)
 		Thread.sleep(1500)
 	
 		JsonSlurper jsonSlurper = new JsonSlurper()
