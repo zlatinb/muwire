@@ -11,5 +11,5 @@ class Constants {
     
     public static final float DOWNLOAD_SEQUENTIAL_RATIO = 0.8f
     
-    public static final String SPLIT_PATTERN = "[\\+-,\\.:;\\(\\)=_/\\\\\\!\\\"\\\'\\\$%\\|]"
+    public static final String SPLIT_PATTERN = "[\\+\\-,\\.:;\\(\\)=_/\\\\\\!\\\"\\\'\\\$%\\|]"
 }

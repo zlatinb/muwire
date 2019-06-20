@@ -83,4 +83,11 @@ class SearchIndexTest {
 		assert found.size() == 1
 		assert found.contains("b c.d")
 	}
+    
+    @Test
+    void testDuplicateTerm() {
+        initIndex(["MuWire-0.3.3.jar"])
+        def found = index.search(["muwire", "0", "3", "jar"])
+        assert found.size() == 1
+    }
 }
