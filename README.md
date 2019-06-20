@@ -31,3 +31,19 @@ The first time you run MuWire it will ask you to select a nickname.  This nickna
 ### Known bugs and limitations
 
 * Many UI features you would expect are not there yet
+
+### Quick FAQ
+
+* why is MuWire slow ?
+  
+  - too few sources you're downloading from
+  - you can increse the number of tunnels by using more tunnels via Options->I2P Inbound/Outbound Quantity 
+    the default is 4 and you could raise it and even can go up as high as 16 ( Caution !!!!)
+
+* my search is not returning (enough) results !
+
+  - search is keyword or hash based
+  - keywords and hash(es) are NOT regexed or wildcarded so they have to be complete
+    so searching for 'musi' will not return results with 'music' - you have to search for 'music'
+  - ALL keywords have to match 
+  - only use <SPACE> for keyword separation
