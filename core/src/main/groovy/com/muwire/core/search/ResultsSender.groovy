@@ -11,6 +11,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.logging.Level
 import java.util.stream.Collectors
 
 import com.muwire.core.DownloadedFile
@@ -83,50 +84,54 @@ class ResultsSender {
         
         @Override
         public void run() {
-            byte [] tmp = new byte[InfoHash.SIZE]
-            JsonOutput jsonOutput = new JsonOutput()
-            Endpoint endpoint = null;
             try {
-                endpoint = connector.connect(target)
-                DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
-                os.write("POST $uuid\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                me.write(os)
-                os.writeShort((short)results.length)
-                results.each {
-                    byte [] name = it.getFile().getName().getBytes(StandardCharsets.UTF_8)
-                    def baos = new ByteArrayOutputStream()
-                    def daos = new DataOutputStream(baos)
-                    daos.writeShort((short) name.length)
-                    daos.write(name)
-                    daos.flush()
-                    String encodedName = Base64.encode(baos.toByteArray())
-                    def obj = [:]
-                    obj.type = "Result"
-                    obj.version = oobInfohash ? 2 : 1
-                    obj.name = encodedName
-                    obj.infohash = Base64.encode(it.getInfoHash().getRoot())
-                    obj.size = it.getFile().length()
-                    obj.pieceSize = it.getPieceSize()
-                    if (!oobInfohash) {
-                        byte [] hashList = it.getInfoHash().getHashList()
-                        def hashListB64 = []
-                        for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {
-                            System.arraycopy(hashList, InfoHash.SIZE * i, tmp, 0, InfoHash.SIZE)
-                            hashListB64 << Base64.encode(tmp)
+                byte [] tmp = new byte[InfoHash.SIZE]
+                JsonOutput jsonOutput = new JsonOutput()
+                Endpoint endpoint = null;
+                try {
+                    endpoint = connector.connect(target)
+                    DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
+                    os.write("POST $uuid\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                    me.write(os)
+                    os.writeShort((short)results.length)
+                    results.each {
+                        byte [] name = it.getFile().getName().getBytes(StandardCharsets.UTF_8)
+                        def baos = new ByteArrayOutputStream()
+                        def daos = new DataOutputStream(baos)
+                        daos.writeShort((short) name.length)
+                        daos.write(name)
+                        daos.flush()
+                        String encodedName = Base64.encode(baos.toByteArray())
+                        def obj = [:]
+                        obj.type = "Result"
+                        obj.version = oobInfohash ? 2 : 1
+                        obj.name = encodedName
+                        obj.infohash = Base64.encode(it.getInfoHash().getRoot())
+                        obj.size = it.getFile().length()
+                        obj.pieceSize = it.getPieceSize()
+                        if (!oobInfohash) {
+                            byte [] hashList = it.getInfoHash().getHashList()
+                            def hashListB64 = []
+                            for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {
+                                System.arraycopy(hashList, InfoHash.SIZE * i, tmp, 0, InfoHash.SIZE)
+                                hashListB64 << Base64.encode(tmp)
+                            }
+                            obj.hashList = hashListB64
                         }
-                        obj.hashList = hashListB64
+
+                        if (it instanceof DownloadedFile)
+                            obj.sources = it.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
+
+                        def json = jsonOutput.toJson(obj)
+                        os.writeShort((short)json.length())
+                        os.write(json.getBytes(StandardCharsets.US_ASCII))
                     }
-                    
-                    if (it instanceof DownloadedFile)
-                        obj.sources = it.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
-                    
-                    def json = jsonOutput.toJson(obj)
-                    os.writeShort((short)json.length())
-                    os.write(json.getBytes(StandardCharsets.US_ASCII))
+                    os.flush()
+                } finally {
+                    endpoint?.close()
                 }
-                os.flush()
-            } finally {
-                endpoint?.close()
+            } catch (Exception e) {
+                log.log(Level.WARNING, "problem sending results",e)
             }
         }
     }
