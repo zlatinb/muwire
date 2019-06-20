@@ -35,7 +35,7 @@ class Cli {
         
         Core core 
         try {
-            core = new Core(props, home, "0.3.0")
+            core = new Core(props, home, "0.3.1")
         } catch (Exception bad) {
             bad.printStackTrace(System.out)
             println "Failed to initialize core, exiting"
