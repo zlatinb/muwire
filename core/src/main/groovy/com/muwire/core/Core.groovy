@@ -75,7 +75,7 @@ public class Core {
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
     
-    private final AtomicBoolean shutdown = new AtomicBoolean()
+    final AtomicBoolean shutdown = new AtomicBoolean()
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		

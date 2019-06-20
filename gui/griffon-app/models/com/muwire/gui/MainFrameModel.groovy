@@ -137,6 +137,8 @@ class MainFrameModel {
             core.eventBus.register(FileUnsharedEvent.class, this)
             
             timer.schedule({
+                if (core.shutdown.get())
+                    return
                 int retryInterval = core.muOptions.downloadRetryInterval
                 if (retryInterval > 0) {
                     retryInterval *= 60000
