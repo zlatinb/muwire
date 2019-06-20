@@ -33,9 +33,9 @@ class SearchIndex {
 	
 	private static String[] split(String source) {
 		source = source.replaceAll(Constants.SPLIT_PATTERN, " ").toLowerCase()
-		source.split(" ")
+		String [] split = source.split(" ")
         def rv = []
-        source.each { if (it.length() > 0) rv << it }
+        split.each { if (it.length() > 0) rv << it }
         rv.toArray(new String[0])
 	}
 	
