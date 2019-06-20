@@ -67,7 +67,9 @@ class MainFrameController {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
             def terms = replaced.split(" ")
-            searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid, oobInfohash: true)
+            def nonEmpty = []
+            terms.each { if (it.length() > 0) nonEmpty << it }
+            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true)
         }
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
             replyTo: core.me.destination, receivedOn: core.me.destination,
