@@ -1,6 +1,7 @@
 package com.muwire.core
 
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.atomic.AtomicBoolean
 
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
@@ -73,6 +74,8 @@ public class Core {
     private final DownloadManager downloadManager
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
+    
+    private final AtomicBoolean shutdown = new AtomicBoolean()
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
@@ -241,6 +244,10 @@ public class Core {
     }
     
     public void shutdown() {
+        if (!shutdown.compareAndSet(false, true)) {
+            log.info("already shutting down")
+            return
+        }
         log.info("shutting down download manageer")
         downloadManager.shutdown()
         log.info("shutting down connection acceeptor")

@@ -98,6 +98,9 @@ class Ready extends AbstractLifecycleHandler {
                 "Can't connect to I2P router", JOptionPane.WARNING_MESSAGE)
             System.exit(0)
         }
+        Runtime.getRuntime().addShutdownHook({
+            core.shutdown() 
+        })
         core.startServices()
         application.context.put("muwire-settings", props)
         application.context.put("core",core)
