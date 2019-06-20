@@ -49,7 +49,7 @@ Files are transferred over HTTP1.1 protocol with some custom headers added for d
 
 ### Mesh management
 
-Download mesh management is identical to Gnutella, except instead of ip addresses MuWire personas are used.  [More information](http://rfc-gnutella.sourceforge.net/developer/tmp/download-mesh.html) 
+Download mesh management is a simplified version of Gnutella's "Alternate Location" system.  For more information see the "download-mesh" document.
 
 ### In-Network updates
 
