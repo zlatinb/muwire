@@ -6,6 +6,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
 
 import groovy.util.logging.Log
@@ -61,12 +62,16 @@ public class UploadManager {
                 return
             }
 
-            Request request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
+            ContentRequest request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
             if (request.downloader != null && request.downloader.destination != e.destination) {
                 log.info("Downloader persona doesn't match their destination")
                 e.close()
                 return
             }
+            
+            if (request.have) 
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
+            
             Uploader uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
@@ -153,6 +158,10 @@ public class UploadManager {
                 e.close()
                 return
             }
+            
+            if (request.have)
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
+                
             uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
