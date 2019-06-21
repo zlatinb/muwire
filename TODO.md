@@ -4,10 +4,6 @@ Not in any particular order yet
 
 ### Big Items
 
-##### Alternate Locations
-
-This helps peers discover new sources for a file while the download is in progress.  Also makes sharing of partial files possible.
-
 ##### Bloom Filters
 
 This reduces query traffic by not sending last hop queries to peers that definitely do not have the file
