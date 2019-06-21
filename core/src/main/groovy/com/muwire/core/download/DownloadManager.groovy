@@ -17,6 +17,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
 
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -28,7 +29,7 @@ public class DownloadManager {
     private final File incompletes, home
     private final Persona me
     
-    private final Set<Downloader> downloaders = new ConcurrentHashSet<>()
+    private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
     
     public DownloadManager(EventBus eventBus, I2PConnector connector, File home, Persona me) {
         this.eventBus = eventBus
@@ -64,14 +65,14 @@ public class DownloadManager {
         def downloader = new Downloader(eventBus, this, me, e.target, size,
             infohash, pieceSize, connector, destinations,
             incompletes)
-        downloaders.add(downloader)
+        downloaders.put(infohash, downloader)
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
     }
     
     public void onUIDownloadCancelledEvent(UIDownloadCancelledEvent e) {
-        downloaders.remove(e.downloader)
+        downloaders.remove(e.downloader.infoHash)
         persistDownloaders()
     }
     
@@ -101,21 +102,21 @@ public class DownloadManager {
             }
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes)
-            downloaders.add(downloader)
+            downloaders.put(infoHash, downloader)
             downloader.download()
             eventBus.publish(new DownloadStartedEvent(downloader : downloader))
         }
     }
     
     void onFileDownloadedEvent(FileDownloadedEvent e) {
-        downloaders.remove(e.downloader)
+        downloaders.remove(e.downloader.infoHash)
         persistDownloaders()
     }
     
     private void persistDownloaders() {
         File downloadsFile = new File(home,"downloads.json")
         downloadsFile.withPrintWriter { writer -> 
-            downloaders.each { downloader ->
+            downloaders.values().each { downloader ->
                 if (!downloader.cancelled) {
                     def json = [:]
                     json.file = Base64.encode(DataUtil.encodei18nString(downloader.file.getAbsolutePath()))
@@ -139,7 +140,7 @@ public class DownloadManager {
     }
     
     public void shutdown() {
-        downloaders.each { it.stop() }
+        downloaders.values().each { it.stop() }
         Downloader.executorService.shutdownNow()
     }
 }
