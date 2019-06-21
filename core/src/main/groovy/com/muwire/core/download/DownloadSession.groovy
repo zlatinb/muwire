@@ -97,7 +97,8 @@ class DownloadSession {
             os.flush()
             String codeString = readTillRN(is)
             int space = codeString.indexOf(' ')
-            codeString = codeString.substring(0, space)
+            if (space > 0)
+                codeString = codeString.substring(0, space)
             
             int code = Integer.parseInt(codeString.trim())
             
