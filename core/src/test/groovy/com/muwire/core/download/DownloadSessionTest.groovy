@@ -114,6 +114,8 @@ class DownloadSessionTest {
         Thread.sleep(150)
         assert pieces.isComplete()
         assert target.bytes == source.bytes
+        assert performed
+        assert available.isEmpty()
     }
     
     @Test
@@ -144,6 +146,8 @@ class DownloadSessionTest {
         Thread.sleep(150)
         assert !pieces.isComplete()
         assert 1 == pieces.donePieces()
+        assert performed
+        assert available.isEmpty()
     }
     
     @Test
@@ -151,7 +155,9 @@ class DownloadSessionTest {
         initSession(20, [0])
         long now = System.currentTimeMillis()
         downloadThread.join(100)
-        assert 100 > (System.currentTimeMillis() - now)
+        assert 100 >= (System.currentTimeMillis() - now)
+        assert !performed
+        assert available.isEmpty()
     }
     
     @Test
