@@ -43,6 +43,7 @@ public class DownloadManager {
         I2PConnector connector, File home, Persona me) {
         this.eventBus = eventBus
         this.trustService = trustService
+        this.meshManager = meshManager
         this.muSettings = muSettings
         this.connector = connector
         this.incompletes = new File(home,"incompletes")
