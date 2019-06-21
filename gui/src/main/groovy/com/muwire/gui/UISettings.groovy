@@ -16,7 +16,7 @@ class UISettings {
         font = props.getProperty("font",null)
         clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","false"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
-        excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","false"))
+        excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","true"))
         showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","false"))
     }
     
