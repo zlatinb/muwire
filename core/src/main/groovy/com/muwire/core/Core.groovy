@@ -13,6 +13,7 @@ import com.muwire.core.connection.I2PConnector
 import com.muwire.core.connection.LeafConnectionManager
 import com.muwire.core.connection.UltrapeerConnectionManager
 import com.muwire.core.download.DownloadManager
+import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.files.FileDownloadedEvent
@@ -28,6 +29,7 @@ import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.mesh.MeshManager
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
@@ -165,6 +167,10 @@ public class Core {
 		eventBus.register(FileDownloadedEvent.class, fileManager)
 		eventBus.register(FileUnsharedEvent.class, fileManager)
 		eventBus.register(SearchEvent.class, fileManager)
+        
+        log.info("initializing mesh manager")
+        MeshManager meshManager = new MeshManager(fileManager)
+        eventBus.register(SourceDiscoveredEvent.class, meshManager)
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
@@ -203,14 +209,15 @@ public class Core {
 		eventBus.register(ResultsEvent.class, searchManager)
 		
         log.info("initializing download manager")
-        downloadManager = new DownloadManager(eventBus, i2pConnector, home, me)
+        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
         eventBus.register(FileDownloadedEvent.class, downloadManager)
         eventBus.register(UIDownloadCancelledEvent.class, downloadManager)
+        eventBus.register(SourceDiscoveredEvent.class, downloadManager)
         
         log.info("initializing upload manager")
-        UploadManager uploadManager = new UploadManager(eventBus, fileManager)
+        UploadManager uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager)
         
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)

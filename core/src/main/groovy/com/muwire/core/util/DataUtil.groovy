@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets
 
 import com.muwire.core.Constants
 
+import net.i2p.data.Base64
+
 class DataUtil {
 	
 	private final static int MAX_SHORT = (0x1 << 16) - 1
@@ -78,5 +80,33 @@ class DataUtil {
             baos.write(read)
         }
         new String(baos.toByteArray(), StandardCharsets.US_ASCII)
+    }
+    
+    public static String encodeXHave(List<Integer> pieces, int totalPieces) {
+        int bytes = totalPieces / 8
+        if (totalPieces % 8 != 0)
+            bytes++
+        byte[] raw = new byte[bytes]
+        pieces.each {
+            int byteIdx = it / 8
+            int offset = it % 8
+            int mask = 0x80 >>> offset
+            raw[byteIdx] |= mask
+        }
+        Base64.encode(raw)
+    }
+    
+    public static List<Integer> decodeXHave(String xHave) {
+        byte [] availablePieces = Base64.decode(xHave)
+        List<Integer> available = new ArrayList<>()
+        availablePieces.eachWithIndex {b, i ->
+            for (int j = 0; j < 8 ; j++) {
+                byte mask = 0x80 >>> j
+                if ((b & mask) == mask) {
+                    available.add(i * 8 + j)
+                }
+            }
+        }
+        available
     }
 }

@@ -60,7 +60,7 @@ public class Downloader {
     public Downloader(EventBus eventBus, DownloadManager downloadManager, 
         Persona me, File file, long length, InfoHash infoHash, 
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
-        File incompletes) {
+        File incompletes, Pieces pieces) {
         this.eventBus = eventBus
         this.me = me
         this.downloadManager = downloadManager
@@ -73,15 +73,8 @@ public class Downloader {
         this.incompleteFile = new File(incompletes, file.getName()+".part")
         this.pieceSizePow2 = pieceSizePow2
         this.pieceSize = 1 << pieceSizePow2
-        
-        int nPieces
-        if (length % pieceSize == 0)
-            nPieces = length / pieceSize
-        else
-            nPieces = length / pieceSize + 1
-        this.nPieces = nPieces
-        
-        pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+        this.pieces = pieces
+        this.nPieces = pieces.nPieces
     }
     
     public synchronized InfoHash getInfoHash() {
@@ -187,6 +180,7 @@ public class Downloader {
             piecesFile.delete()
         }
         incompleteFile.delete()
+        pieces.clearAll()
     }
     
     void stop() {
@@ -221,12 +215,21 @@ public class Downloader {
         }
     }
     
+    void addSource(Destination d) {
+        if (activeWorkers.containsKey(d))
+            return
+        DownloadWorker newWorker = new DownloadWorker(d)
+        activeWorkers.put(d, newWorker)
+        executorService.submit(newWorker)
+    }
+    
     class DownloadWorker implements Runnable {
         private final Destination destination
         private volatile WorkerState currentState
         private volatile Thread downloadThread
         private Endpoint endpoint
         private volatile DownloadSession currentSession
+        private final Set<Integer> available = new HashSet<>()
                 
         DownloadWorker(Destination destination) {
             this.destination = destination
@@ -247,7 +250,8 @@ public class Downloader {
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(me.toBase64(), pieces, getInfoHash(), endpoint, incompleteFile, pieceSize, length)
+                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(), 
+                        endpoint, incompleteFile, pieceSize, length, available)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break

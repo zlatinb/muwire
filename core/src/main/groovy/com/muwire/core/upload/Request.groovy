@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
+import com.muwire.core.util.DataUtil
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -48,8 +49,14 @@ class Request {
             def decoded = Base64.decode(encoded)
             downloader = new Persona(new ByteArrayInputStream(decoded))
         }
+        
+        boolean have = false
+        if (headers.containsKey("X-Have")) {
+            def encoded = headers["X-Have"].trim()
+            have = DataUtil.decodeXHave(encoded).size() > 0
+        }
         new ContentRequest( infoHash : infoHash, range : new Range(start, end), 
-            headers : headers, downloader : downloader)
+            headers : headers, downloader : downloader, have : have)
     }
     
     static Request parseHashListRequest(InfoHash infoHash, InputStream is) throws IOException {

@@ -26,6 +26,15 @@ public class SharedFile {
 	    return pieceSize;
 	}
 	
+	public int getNPieces() {
+	    long length = file.length();
+	    int rawPieceSize = 0x1 << pieceSize;
+	    int rv = (int) (length / rawPieceSize);
+	    if (length % pieceSize != 0)
+	        rv++;
+	    return rv;
+	}
+	
 	@Override
 	public int hashCode() {
 	    return file.hashCode() ^ infoHash.hashCode();

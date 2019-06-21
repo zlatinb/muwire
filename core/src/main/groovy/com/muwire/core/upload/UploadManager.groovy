@@ -6,7 +6,12 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.download.DownloadManager
+import com.muwire.core.download.Downloader
+import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.mesh.Mesh
+import com.muwire.core.mesh.MeshManager
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -15,12 +20,17 @@ import net.i2p.data.Base64
 public class UploadManager {
     private final EventBus eventBus
     private final FileManager fileManager
+    private final MeshManager meshManager
+    private final DownloadManager downloadManager
     
     public UploadManager() {}
     
-    public UploadManager(EventBus eventBus, FileManager fileManager) {
+    public UploadManager(EventBus eventBus, FileManager fileManager, 
+        MeshManager meshManager, DownloadManager downloadManager) {
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.meshManager = meshManager
+        this.downloadManager = downloadManager
     }
     
     public void processGET(Endpoint e) throws IOException {
@@ -44,8 +54,10 @@ public class UploadManager {
             log.info("Responding to upload request for root $infoHashString")
 
             byte [] infoHashRoot = Base64.decode(infoHashString)
+            InfoHash infoHash = new InfoHash(infoHashRoot)
             Set<SharedFile> sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-            if (sharedFiles == null || sharedFiles.isEmpty()) {
+            Downloader downloader = downloadManager.downloaders.get(infoHash)
+            if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
                 log.info "file not found"
                 e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
@@ -61,13 +73,31 @@ public class UploadManager {
                 return
             }
 
-            Request request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
+            ContentRequest request = Request.parseContentRequest(infoHash, e.getInputStream())
             if (request.downloader != null && request.downloader.destination != e.destination) {
                 log.info("Downloader persona doesn't match their destination")
                 e.close()
                 return
             }
-            Uploader uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
+            
+            if (request.have) 
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
+            
+            Mesh mesh
+            File file
+            int pieceSize
+            if (downloader != null) {
+                mesh = meshManager.get(infoHash)
+                file = downloader.incompleteFile
+                pieceSize = downloader.pieceSizePow2
+            } else {
+                SharedFile sharedFile = sharedFiles.iterator().next();
+                mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces)
+                file = sharedFile.file
+                pieceSize = sharedFile.pieceSize
+            }
+                
+            Uploader uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
@@ -85,8 +115,10 @@ public class UploadManager {
         log.info("Responding to hashlist request for root $infoHashString")
         
         byte [] infoHashRoot = Base64.decode(infoHashString)
+        InfoHash infoHash = new InfoHash(infoHashRoot)
+        Downloader downloader = downloadManager.downloaders.get(infoHash)
         Set<SharedFile> sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-        if (sharedFiles == null || sharedFiles.isEmpty()) {
+        if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
             log.info "file not found"
             e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             e.getOutputStream().flush()
@@ -102,13 +134,30 @@ public class UploadManager {
             return
         }
         
-        Request request = Request.parseHashListRequest(new InfoHash(infoHashRoot), e.getInputStream())
+        Request request = Request.parseHashListRequest(infoHash, e.getInputStream())
         if (request.downloader != null && request.downloader.destination != e.destination) {
             log.info("Downloader persona doesn't match their destination")
             e.close()
             return
         }
-        Uploader uploader = new HashListUploader(e, sharedFiles.iterator().next().infoHash, request)
+        
+        InfoHash fullInfoHash
+        if (downloader == null) {
+            fullInfoHash = sharedFiles.iterator().next().infoHash
+        } else {
+            byte [] hashList = downloader.getInfoHash().getHashList()
+            if (hashList != null && hashList.length > 0)
+                fullInfoHash = downloader.getInfoHash()
+            else {
+                log.info("infohash not found in downloader")
+                e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                e.getOutputStream().flush()
+                e.close()
+                return
+            }
+        }
+        
+        Uploader uploader = new HashListUploader(e, fullInfoHash, request)
         eventBus.publish(new UploadEvent(uploader : uploader))
         try {
             uploader.respond()
@@ -130,8 +179,10 @@ public class UploadManager {
             log.info("Responding to upload request for root $infoHashString")
 
             infoHashRoot = Base64.decode(infoHashString)
+            infoHash = new InfoHash(infoHashRoot)
             sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-            if (sharedFiles == null || sharedFiles.isEmpty()) {
+            downloader = downloadManager.downloaders.get(infoHash)
+            if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
                 log.info "file not found"
                 e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
@@ -153,7 +204,25 @@ public class UploadManager {
                 e.close()
                 return
             }
-            uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
+            
+            if (request.have)
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
+            
+            Mesh mesh
+            File file
+            int pieceSize
+            if (downloader != null) {
+                mesh = meshManager.get(infoHash)
+                file = downloader.incompleteFile
+                pieceSize = downloader.pieceSizePow2
+            } else {
+                SharedFile sharedFile = sharedFiles.iterator().next();
+                mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces)
+                file = sharedFile.file
+                pieceSize = sharedFile.pieceSize
+            }
+
+            uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
