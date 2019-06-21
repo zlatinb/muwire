@@ -217,7 +217,7 @@ public class Core {
         eventBus.register(SourceDiscoveredEvent.class, downloadManager)
         
         log.info("initializing upload manager")
-        UploadManager uploadManager = new UploadManager(eventBus, fileManager, meshManager)
+        UploadManager uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager)
         
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
