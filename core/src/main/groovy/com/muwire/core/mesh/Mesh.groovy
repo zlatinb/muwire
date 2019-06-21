@@ -16,4 +16,13 @@ class Mesh {
         this.infoHash = infoHash
         this.pieces = pieces
     }
+    
+    Set<Destination> getRandom(int n, Destination exclude) {
+        List<Destination> tmp = new ArrayList<>(sources)
+        tmp.remove(exclude)
+        Collections.shuffle(tmp)
+        if (tmp.size() < n)
+            return tmp
+        tmp[0..n-1]
+    }
 }

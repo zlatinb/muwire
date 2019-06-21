@@ -8,6 +8,8 @@ import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.mesh.Mesh
+import com.muwire.core.mesh.MeshManager
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -16,12 +18,14 @@ import net.i2p.data.Base64
 public class UploadManager {
     private final EventBus eventBus
     private final FileManager fileManager
+    private final MeshManager meshManager
     
     public UploadManager() {}
     
-    public UploadManager(EventBus eventBus, FileManager fileManager) {
+    public UploadManager(EventBus eventBus, FileManager fileManager, MeshManager meshManager) {
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.meshManager = meshManager
     }
     
     public void processGET(Endpoint e) throws IOException {
@@ -72,7 +76,10 @@ public class UploadManager {
             if (request.have) 
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
             
-            Uploader uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
+            SharedFile file = sharedFiles.iterator().next();
+            Mesh mesh = meshManager.getOrCreate(request.infoHash, file.NPieces)    
+                
+            Uploader uploader = new ContentUploader(file.file, request, e, mesh)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
@@ -162,7 +169,10 @@ public class UploadManager {
             if (request.have)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
                 
-            uploader = new ContentUploader(sharedFiles.iterator().next().file, request, e)
+            SharedFile file = sharedFiles.iterator().next();
+            Mesh mesh = meshManager.getOrCreate(request.infoHash, file.NPieces)
+                
+            uploader = new ContentUploader(file.file, request, e, mesh)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()

@@ -5,18 +5,25 @@ import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
+import java.util.stream.Collectors
 
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.mesh.Mesh
+import com.muwire.core.util.DataUtil
+
+import net.i2p.data.Destination
 
 class ContentUploader extends Uploader {
     
     private final File file
     private final ContentRequest request
+    private final Mesh mesh
     
-    ContentUploader(File file, ContentRequest request, Endpoint endpoint) {
+    ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh) {
         super(endpoint)
         this.file = file
         this.request = request
+        this.mesh = mesh
     }
     
     @Override
@@ -24,14 +31,18 @@ class ContentUploader extends Uploader {
         OutputStream os = endpoint.getOutputStream()
         Range range = request.getRange()
         if (range.start >= file.length() || range.end >= file.length()) {
-            os.write("416 Range Not Satisfiable\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("416 Range Not Satisfiable\r\n".getBytes(StandardCharsets.US_ASCII))
+            writeMesh()
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
             return
         }
 
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
-        os.write("Content-Range: $range.start-$range.end\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-
+        os.write("Content-Range: $range.start-$range.end\r\n".getBytes(StandardCharsets.US_ASCII))
+        writeMesh()
+        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+        
         FileChannel channel
         try {
             channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ))
@@ -49,6 +60,15 @@ class ContentUploader extends Uploader {
             try {channel?.close() } catch (IOException ignored) {}
             endpoint.getOutputStream().flush()
         }
+    }
+    
+    private void writeMesh() {
+        String xHave = DataUtil.encodeXHave(mesh.pieces.getDownloaded(), mesh.pieces.nPieces)
+        endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
+        
+        Set<Destination> sources = mesh.getRandom(3, endpoint.destination)
+        String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
+        endpoint.getOutputStream().write("X-Alt: $xAlts\r\n".getBytes(StandardCharsets.US_ASCII))
     }
 
     @Override
