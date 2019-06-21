@@ -30,6 +30,7 @@ class DownloadSession {
     private final File file
     private final int pieceSize
     private final long fileLength
+    private final Set<Integer> available
     private final MessageDigest digest
     
     private final LinkedList<Long> timestamps = new LinkedList<>()
@@ -38,7 +39,7 @@ class DownloadSession {
     private ByteBuffer mapped
     
     DownloadSession(String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
-        int pieceSize, long fileLength) {
+        int pieceSize, long fileLength, Set<Integer> available) {
         this.meB64 = meB64
         this.pieces = pieces
         this.endpoint = endpoint
@@ -46,6 +47,7 @@ class DownloadSession {
         this.file = file
         this.pieceSize = pieceSize
         this.fileLength = fileLength
+        this.available = available
         try {
             digest = MessageDigest.getInstance("SHA-256")
         } catch (NoSuchAlgorithmException impossible) {
@@ -63,7 +65,11 @@ class DownloadSession {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
         
-        int piece = pieces.claim()
+        int piece
+        if (available.isEmpty())
+            piece = pieces.claim()
+        else
+            piece = pieces.claim(available)
         if (piece == -1)
             return false
         boolean unclaim = true
@@ -81,43 +87,60 @@ class DownloadSession {
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
-            String code = readTillRN(is)
-            if (code.startsWith("404 ")) {
+            String codeString = readTillRN(is)
+            codeString = codeString.substring(codeString.indexOf(' '))
+            
+            int code = Integer.parseInt(codeString.trim())
+            
+            if (code == 404) {
                 log.warning("file not found")
                 endpoint.close()
                 return false
             }
                 
-            if (code.startsWith("416 ")) {
-                log.warning("range $start-$end cannot be satisfied")
-                return // leave endpoint open
-            }
-            
-            if (!code.startsWith("200 ")) {
+            if (!(code == 200 || code == 416)) {
                 log.warning("unknown code $code")
                 endpoint.close()
                 return false
             }
 
             // parse all headers
-            Set<String> headers = new HashSet<>()
+            Map<String,String> headers = new HashMap<>()
             String header
-            while((header = readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) 
-                headers.add(header)
+            while((header = readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) {
+                int colon = header.indexOf(':')
+                if (colon == -1 || colon == header.length() - 1)
+                    throw new IOException("invalid header $header")
+                String key = header.substring(0, colon)
+                String value = header.substring(colon + 1) 
+                headers[key] = value
+            }
 
-            long receivedStart = -1
-            long receivedEnd = -1
-            for (String receivedHeader : headers) {
-                def group = (receivedHeader =~ /^Content-Range: (\d+)-(\d+)$/)
-                if (group.size() != 1) {
-                    log.info("ignoring header $receivedHeader")
-                    continue
-                } 
-
-                receivedStart = Long.parseLong(group[0][1])
-                receivedEnd = Long.parseLong(group[0][2])
+            // parse X-Have if present
+            if (headers.containsKey("X-Have")) { 
+                updateAvailablePieces(headers["X-Have"])
+                if (!available.contains(piece))
+                    return true // try again next time
+            } else {
+                if (code != 200)
+                    throw new IOException("Code $code but no X-Have")
+                available.clear()
             }
             
+            if (code != 200)
+                return true
+            
+            String range = headers["Content-Range"]
+            if (range == null) 
+                throw new IOException("Code 200 but no Content-Range")
+            
+            def group = (range =~ /^ (\d+)-(\d+)$/)
+            if (group.size() != 1) 
+                throw new IOException("invalid Content-Range header $range")
+
+            long receivedStart = Long.parseLong(group[0][1])
+            long receivedEnd = Long.parseLong(group[0][2])
+
             if (receivedStart != start || receivedEnd != end) {
                 log.warning("We don't support mismatching ranges yet")
                 endpoint.close()
@@ -195,5 +218,16 @@ class DownloadSession {
         for (int i = idx; i < SAMPLES; i++)
             totalRead += reads[idx]
         (int)(totalRead * 1000.0 / interval)
+    }
+    
+    private void updateAvailablePieces(String xHave) {
+        byte [] availablePieces = Base64.decode(xHave)
+        availablePieces.eachWithIndex {b, i -> 
+            for (int j = 0; j < 8 ; j++) {
+                int mask = 0x80 >> j
+                if ((b & mask) == mask)
+                    available.add(i * 8 + j)
+            }
+        }
     }
 }
