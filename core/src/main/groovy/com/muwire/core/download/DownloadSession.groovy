@@ -127,10 +127,12 @@ class DownloadSession {
             
             // prase X-Alt if present
             if (headers.containsKey("X-Alt")) {
-                headers["X-Alt"].split(",").each { 
-                    byte [] raw = Base64.decode(it)
-                    Persona source = new Persona(new ByteArrayInputStream(raw))
-                    eventBus.publish(new SourceDiscoveredEvent(infoHash : infoHash, source : source))
+                headers["X-Alt"].split(",").each {
+                    if (it.length() > 0) {
+                        byte [] raw = Base64.decode(it)
+                        Persona source = new Persona(new ByteArrayInputStream(raw))
+                        eventBus.publish(new SourceDiscoveredEvent(infoHash : infoHash, source : source))
+                    }
                 }
             }
 

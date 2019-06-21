@@ -68,8 +68,10 @@ class ContentUploader extends Uploader {
         endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
         
         Set<Persona> sources = mesh.getRandom(3, toExclude)
-        String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
-        endpoint.getOutputStream().write("X-Alt: $xAlts\r\n".getBytes(StandardCharsets.US_ASCII))
+        if (!sources.isEmpty()) {
+            String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
+            endpoint.getOutputStream().write("X-Alt: $xAlts\r\n".getBytes(StandardCharsets.US_ASCII))
+        }
     }
 
     @Override
