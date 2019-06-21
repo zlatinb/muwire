@@ -228,6 +228,7 @@ public class Downloader {
         private volatile Thread downloadThread
         private Endpoint endpoint
         private volatile DownloadSession currentSession
+        private final Set<Integer> available = new HashSet<>()
                 
         DownloadWorker(Destination destination) {
             this.destination = destination
@@ -248,7 +249,8 @@ public class Downloader {
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(), endpoint, incompleteFile, pieceSize, length)
+                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(), 
+                        endpoint, incompleteFile, pieceSize, length, available)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
