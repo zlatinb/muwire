@@ -85,16 +85,19 @@ public class UploadManager {
             
             Mesh mesh
             File file
+            int pieceSize
             if (downloader != null) {
                 mesh = meshManager.get(infoHash)
                 file = downloader.incompleteFile
+                pieceSize = downloader.pieceSizePow2
             } else {
                 SharedFile sharedFile = sharedFiles.iterator().next();
                 mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces)
                 file = sharedFile.file
+                pieceSize = sharedFile.pieceSize
             }
                 
-            Uploader uploader = new ContentUploader(file, request, e, mesh)
+            Uploader uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
@@ -207,16 +210,19 @@ public class UploadManager {
             
             Mesh mesh
             File file
+            int pieceSize
             if (downloader != null) {
                 mesh = meshManager.get(infoHash)
                 file = downloader.incompleteFile
+                pieceSize = downloader.pieceSizePow2
             } else {
                 SharedFile sharedFile = sharedFiles.iterator().next();
                 mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces)
                 file = sharedFile.file
+                pieceSize = sharedFile.pieceSize
             }
 
-            uploader = new ContentUploader(file, request, e, mesh)
+            uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()

@@ -38,8 +38,8 @@ class ContentUploader extends Uploader {
         if (range.start >= length || range.end >= length)
             satisfiable = false
         if (satisfiable) {
-            int startPiece = length / range.start
-            int endPiece = length / range.end
+            int startPiece = range.start / (0x1 << pieceSize)
+            int endPiece = range.end / (0x1 << pieceSize)
             for (int i = startPiece; i < endPiece; i++)
                 satisfiable &= mesh.pieces.isDownloaded(i)
         }
