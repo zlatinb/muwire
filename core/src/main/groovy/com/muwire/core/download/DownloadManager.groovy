@@ -3,6 +3,8 @@ package com.muwire.core.download
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHasher
+import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonBuilder
@@ -14,6 +16,7 @@ import net.i2p.util.ConcurrentHashSet
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
 
@@ -24,6 +27,8 @@ import java.util.concurrent.Executors
 public class DownloadManager {
     
     private final EventBus eventBus
+    private final TrustService trustService
+    private final MuWireSettings muSettings
     private final I2PConnector connector
     private final Executor executor
     private final File incompletes, home
@@ -31,8 +36,11 @@ public class DownloadManager {
     
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
     
-    public DownloadManager(EventBus eventBus, I2PConnector connector, File home, Persona me) {
+    public DownloadManager(EventBus eventBus, TrustService trustService, MuWireSettings muSettings,
+        I2PConnector connector, File home, Persona me) {
         this.eventBus = eventBus
+        this.trustService = trustService
+        this.muSettings = muSettings
         this.connector = connector
         this.incompletes = new File(home,"incompletes")
         this.home = home
@@ -106,6 +114,21 @@ public class DownloadManager {
             downloader.download()
             eventBus.publish(new DownloadStartedEvent(downloader : downloader))
         }
+    }
+    
+    void onSourceDiscoveredEvent(SourceDiscoveredEvent e) {
+        Downloader downloader = downloaders.get(e.infoHash)
+        if (downloader == null)
+            return
+        boolean ok = false
+        switch(trustService.getLevel(e.source.destination)) {
+            case TrustLevel.TRUSTED: ok = true; break
+            case TrustLevel.NEUTRAL: ok = muSettings.allowUntrusted; break
+            case TrustLevel.DISTRUSTED: ok = false; break
+        }
+        
+        if (ok)
+            downloader.addSource(e.source.destination)
     }
     
     void onFileDownloadedEvent(FileDownloadedEvent e) {

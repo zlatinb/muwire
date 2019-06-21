@@ -221,6 +221,14 @@ public class Downloader {
         }
     }
     
+    void addSource(Destination d) {
+        if (activeWorkers.containsKey(d))
+            return
+        DownloadWorker newWorker = new DownloadWorker(d)
+        activeWorkers.put(d, newWorker)
+        executorService.submit(newWorker)
+    }
+    
     class DownloadWorker implements Runnable {
         private final Destination destination
         private volatile WorkerState currentState
