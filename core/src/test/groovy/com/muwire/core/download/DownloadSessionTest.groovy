@@ -201,11 +201,57 @@ class DownloadSessionTest {
         assert thrown != null
     }
     
+    @Test
+    public void test416Have() {
+        initSession(20)
+        readAllHeaders(fromDownloader)
+        
+        toDownloader.write("416 don't have it\r\n".bytes)
+        toDownloader.write("X-Have: ${encodeXHave([0], 1)}\r\n\r\n".bytes)
+        toDownloader.flush()
+        
+        Thread.sleep(150)
+        assert performed
+        assert available.contains(0)
+        assert thrown == null
+    }
+    
+    @Test
+    public void test416Have2Pieces() {
+        int pieceSize = FileHasher.getPieceSize(1)
+        int size = (1 << pieceSize) + 1
+        initSession(size)
+        readAllHeaders(fromDownloader)
+        
+        toDownloader.write("416 don't have it\r\n".bytes)
+        toDownloader.write("X-Have: ${encodeXHave([1], 2)}\r\n\r\n".bytes)
+        toDownloader.flush()
+        
+        Thread.sleep(150)
+        assert performed
+        assert available.contains(1)
+        assert thrown == null
+    }
+    
     private static Set<String> readAllHeaders(InputStream is) {
         Set<String> rv = new HashSet<>()
         String header
         while((header = readTillRN(is)) != "")
             rv.add(header)
         rv
+    }
+    
+    private static String encodeXHave(List<Integer> pieces, int totalPieces) {
+        int bytes = totalPieces / 8
+        if (totalPieces % 8 != 0)
+            bytes++
+        byte[] raw = new byte[bytes]
+        pieces.each { 
+            int byteIdx = it / 8
+            int offset = it % 8
+            int mask = 0x80 >>> offset
+            raw[byteIdx] |= mask
+        }
+        Base64.encode(raw)
     }
 }

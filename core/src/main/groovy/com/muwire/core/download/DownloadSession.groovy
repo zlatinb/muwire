@@ -114,7 +114,7 @@ class DownloadSession {
                     throw new IOException("invalid header $header")
                 String key = header.substring(0, colon)
                 String value = header.substring(colon + 1) 
-                headers[key] = value
+                headers[key] = value.trim()
             }
 
             // parse X-Have if present
@@ -135,7 +135,7 @@ class DownloadSession {
             if (range == null) 
                 throw new IOException("Code 200 but no Content-Range")
             
-            def group = (range =~ /^ (\d+)-(\d+)$/)
+            def group = (range =~ /^(\d+)-(\d+)$/)
             if (group.size() != 1) 
                 throw new IOException("invalid Content-Range header $range")
 
@@ -225,9 +225,10 @@ class DownloadSession {
         byte [] availablePieces = Base64.decode(xHave)
         availablePieces.eachWithIndex {b, i -> 
             for (int j = 0; j < 8 ; j++) {
-                int mask = 0x80 >> j
-                if ((b & mask) == mask)
+                byte mask = 0x80 >>> j
+                if ((b & mask) == mask) {
                     available.add(i * 8 + j)
+                }
             }
         }
     }
