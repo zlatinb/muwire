@@ -7,6 +7,7 @@ import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import java.util.stream.Collectors
 
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.util.DataUtil
@@ -32,7 +33,7 @@ class ContentUploader extends Uploader {
         Range range = request.getRange()
         if (range.start >= file.length() || range.end >= file.length()) {
             os.write("416 Range Not Satisfiable\r\n".getBytes(StandardCharsets.US_ASCII))
-            writeMesh()
+            writeMesh(request.downloader)
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
             return
@@ -40,7 +41,7 @@ class ContentUploader extends Uploader {
 
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Content-Range: $range.start-$range.end\r\n".getBytes(StandardCharsets.US_ASCII))
-        writeMesh()
+        writeMesh(request.downloader)
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         
         FileChannel channel
@@ -62,11 +63,11 @@ class ContentUploader extends Uploader {
         }
     }
     
-    private void writeMesh() {
+    private void writeMesh(Persona toExclude) {
         String xHave = DataUtil.encodeXHave(mesh.pieces.getDownloaded(), mesh.pieces.nPieces)
         endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
         
-        Set<Destination> sources = mesh.getRandom(3, endpoint.destination)
+        Set<Persona> sources = mesh.getRandom(3, toExclude)
         String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
         endpoint.getOutputStream().write("X-Alt: $xAlts\r\n".getBytes(StandardCharsets.US_ASCII))
     }

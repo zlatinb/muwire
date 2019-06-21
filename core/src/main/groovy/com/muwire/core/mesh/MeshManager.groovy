@@ -38,6 +38,6 @@ class MeshManager {
         Mesh mesh = meshes.get(e.infoHash)
         if (mesh == null)
             return
-        mesh.sources.add(e.source.destination)
+        mesh.sources.add(e.source)
     }
 }
