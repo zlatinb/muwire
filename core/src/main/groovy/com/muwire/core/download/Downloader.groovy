@@ -247,7 +247,7 @@ public class Downloader {
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(me.toBase64(), pieces, getInfoHash(), endpoint, incompleteFile, pieceSize, length)
+                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(), endpoint, incompleteFile, pieceSize, length)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break

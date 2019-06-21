@@ -3,9 +3,13 @@ package com.muwire.core.download
 import static org.junit.Assert.fail
 
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
+import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
+import com.muwire.core.Personas
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.files.FileHasher
 import static com.muwire.core.util.DataUtil.readTillRN
@@ -16,6 +20,7 @@ import net.i2p.util.ConcurrentHashSet
 
 class DownloadSessionTest {
     
+    private EventBus eventBus
     private File source, target
     private InfoHash infoHash
     private Endpoint endpoint
@@ -31,6 +36,12 @@ class DownloadSessionTest {
     private volatile boolean performed
     private Set<Integer> available = new ConcurrentHashSet<>()
     private volatile IOException thrown
+    
+    
+    @Before
+    public void setUp() {
+        eventBus = new EventBus()
+    }
     
     private void initSession(int size, def claimedPieces = []) {
         Random r = new Random()
@@ -64,7 +75,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
-        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size, available)
+        session = new DownloadSession(eventBus, "",pieces, infoHash, endpoint, target, pieceSize, size, available)
         downloadThread = new Thread( { perform() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
@@ -287,6 +298,29 @@ class DownloadSessionTest {
         start = Integer.parseInt(matcher[0][1])
         end = Integer.parseInt(matcher[0][2])
         assert start == 0
+    }
+    
+    @Test
+    public void testXAlt() throws Exception {
+        Personas personas = new Personas()
+        def sources = []
+        def listener = new Object() {
+            public void onSourceDiscoveredEvent(SourceDiscoveredEvent e) {
+                sources << e.source
+            }
+        }
+        eventBus.register(SourceDiscoveredEvent.class, listener)
+        
+        initSession(20)
+        readAllHeaders(fromDownloader)
+        toDownloader.write("416 don't have it\r\n".bytes)
+        toDownloader.write("X-Alt: ${personas.persona1.toBase64()},${personas.persona2.toBase64()}\r\n\r\n".bytes)
+        toDownloader.flush()
+        
+        Thread.sleep(150)
+        assert sources.contains(personas.persona1)
+        assert sources.contains(personas.persona2)
+        assert 2 == sources.size()
     }
     
     private static Set<String> readAllHeaders(InputStream is) {

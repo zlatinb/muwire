@@ -3,7 +3,9 @@ package com.muwire.core.download;
 import net.i2p.data.Base64
 
 import com.muwire.core.Constants
+import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.util.DataUtil
 
@@ -25,6 +27,7 @@ class DownloadSession {
     
     private static int SAMPLES = 10
     
+    private final EventBus eventBus
     private final String meB64
     private final Pieces pieces
     private final InfoHash infoHash
@@ -40,8 +43,9 @@ class DownloadSession {
     
     private ByteBuffer mapped
     
-    DownloadSession(String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
+    DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
         int pieceSize, long fileLength, Set<Integer> available) {
+        this.eventBus = eventBus
         this.meB64 = meB64
         this.pieces = pieces
         this.endpoint = endpoint
@@ -119,6 +123,15 @@ class DownloadSession {
                 String key = header.substring(0, colon)
                 String value = header.substring(colon + 1) 
                 headers[key] = value.trim()
+            }
+            
+            // prase X-Alt if present
+            if (headers.containsKey("X-Alt")) {
+                headers["X-Alt"].split(",").each { 
+                    byte [] raw = Base64.decode(it)
+                    Persona source = new Persona(new ByteArrayInputStream(raw))
+                    eventBus.publish(new SourceDiscoveredEvent(infoHash : infoHash, source : source))
+                }
             }
 
             // parse X-Have if present
