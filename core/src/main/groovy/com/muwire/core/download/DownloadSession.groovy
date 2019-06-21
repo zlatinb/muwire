@@ -5,6 +5,8 @@ import net.i2p.data.Base64
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.util.DataUtil
+
 import static com.muwire.core.util.DataUtil.readTillRN
 
 import groovy.util.logging.Log
@@ -85,7 +87,9 @@ class DownloadSession {
         try {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
-            os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
+            String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
+            os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII)) 
             os.flush()
             String codeString = readTillRN(is)
             int space = codeString.indexOf(' ')

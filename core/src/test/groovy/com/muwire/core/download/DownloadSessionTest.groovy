@@ -9,6 +9,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.files.FileHasher
 import static com.muwire.core.util.DataUtil.readTillRN
+import static com.muwire.core.util.DataUtil.encodeXHave
 
 import net.i2p.data.Base64
 import net.i2p.util.ConcurrentHashSet
@@ -91,6 +92,7 @@ class DownloadSessionTest {
         assert "GET $rootBase64" == readTillRN(fromDownloader)
         assert "Range: 0-19" == readTillRN(fromDownloader)
         readTillRN(fromDownloader)
+        readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
         
         toDownloader.write("200 OK\r\n".bytes)
@@ -114,6 +116,7 @@ class DownloadSessionTest {
         initSession(size)
         
         assert "GET $rootBase64" == readTillRN(fromDownloader)
+        readTillRN(fromDownloader)
         readTillRN(fromDownloader)
         readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
@@ -146,6 +149,7 @@ class DownloadSessionTest {
         assert (start == 0 && end == ((1 << pieceSize) - 1)) || 
             (start == (1 << pieceSize) && end == (1 << pieceSize))
         
+        readTillRN(fromDownloader)
         readTillRN(fromDownloader)
         assert "" == readTillRN(fromDownloader)
         
@@ -291,19 +295,5 @@ class DownloadSessionTest {
         while((header = readTillRN(is)) != "")
             rv.add(header)
         rv
-    }
-    
-    private static String encodeXHave(List<Integer> pieces, int totalPieces) {
-        int bytes = totalPieces / 8
-        if (totalPieces % 8 != 0)
-            bytes++
-        byte[] raw = new byte[bytes]
-        pieces.each { 
-            int byteIdx = it / 8
-            int offset = it % 8
-            int mask = 0x80 >>> offset
-            raw[byteIdx] |= mask
-        }
-        Base64.encode(raw)
     }
 }
