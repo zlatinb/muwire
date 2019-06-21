@@ -81,7 +81,7 @@ public class UploadManager {
             }
             
             if (request.have) 
-                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
             
             Mesh mesh
             File file
@@ -206,7 +206,7 @@ public class UploadManager {
             }
             
             if (request.have)
-                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : e.destination))
+                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
             
             Mesh mesh
             File file
