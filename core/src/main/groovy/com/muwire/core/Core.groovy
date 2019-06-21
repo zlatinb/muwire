@@ -209,7 +209,7 @@ public class Core {
 		eventBus.register(ResultsEvent.class, searchManager)
 		
         log.info("initializing download manager")
-        downloadManager = new DownloadManager(eventBus, trustService, props, i2pConnector, home, me)
+        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
         eventBus.register(FileDownloadedEvent.class, downloadManager)

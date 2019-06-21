@@ -60,7 +60,7 @@ public class Downloader {
     public Downloader(EventBus eventBus, DownloadManager downloadManager, 
         Persona me, File file, long length, InfoHash infoHash, 
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
-        File incompletes) {
+        File incompletes, Pieces pieces) {
         this.eventBus = eventBus
         this.me = me
         this.downloadManager = downloadManager
@@ -73,15 +73,8 @@ public class Downloader {
         this.incompleteFile = new File(incompletes, file.getName()+".part")
         this.pieceSizePow2 = pieceSizePow2
         this.pieceSize = 1 << pieceSizePow2
-        
-        int nPieces
-        if (length % pieceSize == 0)
-            nPieces = length / pieceSize
-        else
-            nPieces = length / pieceSize + 1
-        this.nPieces = nPieces
-        
-        pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+        this.pieces = pieces
+        this.nPieces = pieces.nPieces
     }
     
     public synchronized InfoHash getInfoHash() {
