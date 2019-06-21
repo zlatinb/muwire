@@ -29,6 +29,7 @@ import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.mesh.MeshManager
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
@@ -166,6 +167,10 @@ public class Core {
 		eventBus.register(FileDownloadedEvent.class, fileManager)
 		eventBus.register(FileUnsharedEvent.class, fileManager)
 		eventBus.register(SearchEvent.class, fileManager)
+        
+        log.info("initializing mesh manager")
+        MeshManager meshManager = new MeshManager(fileManager)
+        eventBus.register(SourceDiscoveredEvent.class, meshManager)
 		
 		log.info "initializing persistence service"
 		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
