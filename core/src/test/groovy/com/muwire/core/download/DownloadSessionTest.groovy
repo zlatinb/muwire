@@ -27,6 +27,7 @@ class DownloadSessionTest {
     
     private volatile boolean performed
     private Set<Integer> available = new ConcurrentHashSet<>()
+    private volatile IOException thrown
     
     private void initSession(int size, def claimedPieces = []) {
         Random r = new Random()
@@ -61,7 +62,13 @@ class DownloadSessionTest {
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
         session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size, available)
-        downloadThread = new Thread( { performed = session.request() } as Runnable)
+        downloadThread = new Thread( {
+            try { 
+                performed = session.request()
+            } catch (IOException e) {
+                thrown = e
+            }
+        } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
     }
@@ -93,6 +100,7 @@ class DownloadSessionTest {
         assert target.bytes == source.bytes
         assert performed
         assert available.isEmpty()
+        assert thrown == null
     }
     
     @Test
@@ -116,6 +124,7 @@ class DownloadSessionTest {
         assert target.bytes == source.bytes
         assert performed
         assert available.isEmpty()
+        assert thrown == null
     }
     
     @Test
@@ -148,6 +157,7 @@ class DownloadSessionTest {
         assert 1 == pieces.donePieces()
         assert performed
         assert available.isEmpty()
+        assert thrown == null
     }
     
     @Test
@@ -158,6 +168,7 @@ class DownloadSessionTest {
         assert 100 >= (System.currentTimeMillis() - now)
         assert !performed
         assert available.isEmpty()
+        assert thrown == null
     }
     
     @Test
@@ -175,5 +186,26 @@ class DownloadSessionTest {
         
         assert pieces.claimed.get(0)
         assert start == 0 && end == (1 << pieceSize) - 1
+    }
+    
+    @Test
+    public void test416NoHave() {
+        initSession(20)
+        readAllHeaders(fromDownloader)
+        
+        toDownloader.write("416 don't have it\r\n\r\n".bytes)
+        toDownloader.flush()
+        Thread.sleep(150)
+        assert !performed
+        assert available.isEmpty()
+        assert thrown != null
+    }
+    
+    private static Set<String> readAllHeaders(InputStream is) {
+        Set<String> rv = new HashSet<>()
+        String header
+        while((header = readTillRN(is)) != "")
+            rv.add(header)
+        rv
     }
 }
