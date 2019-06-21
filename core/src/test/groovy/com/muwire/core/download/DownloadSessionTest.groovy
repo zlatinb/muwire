@@ -1,5 +1,7 @@
 package com.muwire.core.download
 
+import static org.junit.Assert.fail
+
 import org.junit.After
 import org.junit.Test
 
@@ -62,15 +64,17 @@ class DownloadSessionTest {
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
         session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size, available)
-        downloadThread = new Thread( {
-            try { 
-                performed = session.request()
-            } catch (IOException e) {
-                thrown = e
-            }
-        } as Runnable)
+        downloadThread = new Thread( { perform() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
+    }
+    
+    private void perform() {
+        try { 
+            performed = session.request()
+        } catch (IOException e) {
+            thrown = e
+        }
     }
     
     @After
@@ -231,6 +235,54 @@ class DownloadSessionTest {
         assert performed
         assert available.contains(1)
         assert thrown == null
+    }
+    
+    @Test
+    public void test200TwoPieces1Available() {
+        int pieceSize = FileHasher.getPieceSize(1)
+        int size = (1 << pieceSize) * 9 + 1
+        initSession(size)
+        
+        Set<String> headers = readAllHeaders(fromDownloader)
+        def matcher = null
+        headers.each {
+            if (it.startsWith("Range"))
+                matcher = (it =~ /^Range: (\d+)-(\d+)$/)
+        }
+        assert matcher.groupCount() > 0
+        int start = Integer.parseInt(matcher[0][1])
+        int end = Integer.parseInt(matcher[0][2])
+        
+        if (start == 0) 
+            fail("inconlcusive")
+        
+        toDownloader.write("416 don't have it \r\n".bytes)
+        toDownloader.write("X-Have: ${encodeXHave([0],2)}\r\n\r\n".bytes)
+        toDownloader.flush()
+        downloadThread.join()
+        
+        assert performed
+        performed = false
+        assert available.contains(0)
+        assert thrown == null
+        
+        // request same session
+        downloadThread = new Thread( { perform() } as Runnable)
+        downloadThread.setDaemon(true)
+        downloadThread.start()
+        
+        Thread.sleep(150)
+        
+        headers = readAllHeaders(fromDownloader)
+        matcher = null
+        headers.each {
+            if (it.startsWith("Range"))
+            matcher = (it =~ /^Range: (\d+)-(\d+)$/)
+        }
+        assert matcher.groupCount() > 0
+        start = Integer.parseInt(matcher[0][1])
+        end = Integer.parseInt(matcher[0][2])
+        assert start == 0
     }
     
     private static Set<String> readAllHeaders(InputStream is) {
