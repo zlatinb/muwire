@@ -95,4 +95,18 @@ class DataUtil {
         }
         Base64.encode(raw)
     }
+    
+    public static List<Integer> decodeXHave(String xHave) {
+        byte [] availablePieces = Base64.decode(xHave)
+        List<Integer> available = new ArrayList<>()
+        availablePieces.eachWithIndex {b, i ->
+            for (int j = 0; j < 8 ; j++) {
+                byte mask = 0x80 >>> j
+                if ((b & mask) == mask) {
+                    available.add(i * 8 + j)
+                }
+            }
+        }
+        available
+    }
 }

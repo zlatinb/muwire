@@ -123,7 +123,9 @@ class DownloadSession {
 
             // parse X-Have if present
             if (headers.containsKey("X-Have")) { 
-                updateAvailablePieces(headers["X-Have"])
+                DataUtil.decodeXHave(headers["X-Have"]).each {
+                    available.add(it)
+                }
                 if (!available.contains(piece))
                     return true // try again next time
             } else {
@@ -223,17 +225,5 @@ class DownloadSession {
         for (int i = idx; i < SAMPLES; i++)
             totalRead += reads[idx]
         (int)(totalRead * 1000.0 / interval)
-    }
-    
-    private void updateAvailablePieces(String xHave) {
-        byte [] availablePieces = Base64.decode(xHave)
-        availablePieces.eachWithIndex {b, i -> 
-            for (int j = 0; j < 8 ; j++) {
-                byte mask = 0x80 >>> j
-                if ((b & mask) == mask) {
-                    available.add(i * 8 + j)
-                }
-            }
-        }
     }
 }
