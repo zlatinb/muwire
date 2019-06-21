@@ -88,7 +88,8 @@ class DownloadSession {
             os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
             String codeString = readTillRN(is)
-            codeString = codeString.substring(codeString.indexOf(' '))
+            int space = codeString.indexOf(' ')
+            codeString = codeString.substring(0, space)
             
             int code = Integer.parseInt(codeString.trim())
             

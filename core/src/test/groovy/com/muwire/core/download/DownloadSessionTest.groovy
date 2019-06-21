@@ -9,6 +9,7 @@ import com.muwire.core.files.FileHasher
 import static com.muwire.core.util.DataUtil.readTillRN
 
 import net.i2p.data.Base64
+import net.i2p.util.ConcurrentHashSet
 
 class DownloadSessionTest {
     
@@ -23,6 +24,9 @@ class DownloadSessionTest {
     
     private InputStream fromDownloader, fromUploader
     private OutputStream toDownloader, toUploader
+    
+    private volatile boolean performed
+    private Set<Integer> available = new ConcurrentHashSet<>()
     
     private void initSession(int size, def claimedPieces = []) {
         Random r = new Random()
@@ -56,8 +60,8 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
         
-        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size)
-        downloadThread = new Thread( { session.request() } as Runnable)
+        session = new DownloadSession("",pieces, infoHash, endpoint, target, pieceSize, size, available)
+        downloadThread = new Thread( { performed = session.request() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
     }
@@ -87,6 +91,8 @@ class DownloadSessionTest {
         
         assert pieces.isComplete()
         assert target.bytes == source.bytes
+        assert performed
+        assert available.isEmpty()
     }
     
     @Test
