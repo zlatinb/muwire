@@ -34,4 +34,19 @@ class PiecesTest {
         pieces.markDownloaded(piece2)
         assert pieces.isComplete()
     }
+    
+    @Test
+    public void testClaimAvailable() {
+        pieces = new Pieces(2)
+        int claimed = pieces.claim([0].toSet())
+        assert claimed == 0
+        assert -1 == pieces.claim([0].toSet())
+    }
+    
+    @Test
+    public void testClaimNoneAvailable() {
+        pieces = new Pieces(20)
+        int claimed = pieces.claim()
+        assert -1 == pieces.claim([claimed].toSet())
+    }
 }

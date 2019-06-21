@@ -38,6 +38,18 @@ class Pieces {
         }
     }
     
+    synchronized int claim(Set<Integer> available) {
+        for (int i = claimed.nextSetBit(0); i >= 0; i = claimed.nextSetBit(i+1))
+            available.remove(i)
+        if (available.isEmpty())
+            return -1
+        List<Integer> toList = available.toList()
+        Collections.shuffle(toList)
+        int rv = toList[0]
+        claimed.set(rv)
+        rv
+    }
+    
     synchronized def getDownloaded() {
         def rv = []
         for (int i = done.nextSetBit(0); i >= 0; i = done.nextSetBit(i+1)) {
