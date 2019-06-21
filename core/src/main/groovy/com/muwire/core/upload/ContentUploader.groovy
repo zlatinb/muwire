@@ -19,19 +19,31 @@ class ContentUploader extends Uploader {
     private final File file
     private final ContentRequest request
     private final Mesh mesh
+    private final int pieceSize
     
-    ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh) {
+    ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize) {
         super(endpoint)
         this.file = file
         this.request = request
         this.mesh = mesh
+        this.pieceSize = pieceSize
     }
     
     @Override
     void respond() {
         OutputStream os = endpoint.getOutputStream()
         Range range = request.getRange()
-        if (range.start >= file.length() || range.end >= file.length()) {
+        boolean satisfiable = true
+        final long length = file.length()
+        if (range.start >= length || range.end >= length)
+            satisfiable = false
+        if (satisfiable) {
+            int startPiece = length / range.start
+            int endPiece = length / range.end
+            for (int i = startPiece; i < endPiece; i++)
+                satisfiable &= mesh.pieces.isDownloaded(i)
+        }
+        if (!satisfiable) {
             os.write("416 Range Not Satisfiable\r\n".getBytes(StandardCharsets.US_ASCII))
             writeMesh(request.downloader)
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))

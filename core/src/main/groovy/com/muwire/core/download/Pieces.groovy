@@ -74,4 +74,8 @@ class Pieces {
     synchronized int donePieces() {
         done.cardinality()
     }
+    
+    synchronized boolean isDownloaded(int piece) {
+        done.get(piece)
+    }
 }
