@@ -180,6 +180,7 @@ public class Downloader {
             piecesFile.delete()
         }
         incompleteFile.delete()
+        pieces.clearAll()
     }
     
     void stop() {

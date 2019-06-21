@@ -78,4 +78,9 @@ class Pieces {
     synchronized boolean isDownloaded(int piece) {
         done.get(piece)
     }
+    
+    synchronized void clearAll() {
+        done.clear()
+        claimed.clear()
+    }
 }
