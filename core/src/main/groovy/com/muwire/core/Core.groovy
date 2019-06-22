@@ -48,6 +48,7 @@ import net.i2p.client.I2PSession
 import net.i2p.client.streaming.I2PSocketManager
 import net.i2p.client.streaming.I2PSocketManagerFactory
 import net.i2p.client.streaming.I2PSocketOptions
+import net.i2p.client.streaming.I2PSocketManager.DisconnectListener
 import net.i2p.crypto.DSAEngine
 import net.i2p.crypto.SigType
 import net.i2p.data.Destination
@@ -124,6 +125,7 @@ public class Core {
 		}
 		socketManager.getDefaultOptions().setReadTimeout(60000)
 		socketManager.getDefaultOptions().setConnectTimeout(30000)
+        socketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
 		i2pSession = socketManager.getSession()
 		
         def destination = new Destination()

@@ -11,6 +11,7 @@ import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
@@ -135,6 +136,7 @@ class MainFrameModel {
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
             core.eventBus.register(FileUnsharedEvent.class, this)
+            core.eventBus.register(RouterDisconnectedEvent.class, this)
             
             timer.schedule({
                 if (core.shutdown.get())
@@ -336,6 +338,14 @@ class MainFrameModel {
             if (option == JOptionPane.CANCEL_OPTION)
                 return
             controller.search(e.infoHash,"MuWire update")
+        }
+    }
+    
+    void onRouterDisconnectedEvent(RouterDisconnectedEvent e) {
+        runInsideUIAsync {
+            JOptionPane.showMessageDialog(null, "MuWire lost connection to the I2P router and will now exit.",
+                "Connection to I2P router lost", JOptionPane.WARNING_MESSAGE)
+            System.exit(0)
         }
     }
     
