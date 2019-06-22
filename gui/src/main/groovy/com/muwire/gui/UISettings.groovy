@@ -12,7 +12,7 @@ class UISettings {
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
-        showMonitor = Boolean.parseBoolean(props.getProperty("showMonitor", "true"))
+        showMonitor = Boolean.parseBoolean(props.getProperty("showMonitor", "false"))
         font = props.getProperty("font",null)
         clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","true"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
