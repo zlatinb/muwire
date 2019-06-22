@@ -30,8 +30,8 @@ class MuWireSettings {
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
             System.getProperty("user.home")))
-        downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","5"))
-        updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","36"))
+        downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","1"))
+        updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
         
         watchedDirectories = new HashSet<>()

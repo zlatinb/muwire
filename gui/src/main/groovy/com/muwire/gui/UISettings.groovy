@@ -14,10 +14,10 @@ class UISettings {
         lnf = props.getProperty("lnf", "system")
         showMonitor = Boolean.parseBoolean(props.getProperty("showMonitor", "true"))
         font = props.getProperty("font",null)
-        clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","false"))
+        clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","true"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
         excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","true"))
-        showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","false"))
+        showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","true"))
     }
     
     void write(OutputStream out) throws IOException {
