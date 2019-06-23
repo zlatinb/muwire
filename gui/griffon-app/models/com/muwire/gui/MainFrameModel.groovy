@@ -68,6 +68,8 @@ class MainFrameModel {
     @Observable boolean trustButtonsEnabled
     @Observable boolean cancelButtonEnabled
     @Observable boolean retryButtonEnabled
+    @Observable boolean pauseButtonEnabled
+    @Observable String resumeButtonText
     
     private final Set<InfoHash> infoHashes = new HashSet<>()
     
@@ -168,6 +170,8 @@ class MainFrameModel {
                 watched.addAll(core.muOptions.watchedDirectories)
                 builder.getVariable("watched-directories-table").model.fireTableDataChanged()
                 watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
+                
+                resumeButtonText = "Retry"
             }
         })
         

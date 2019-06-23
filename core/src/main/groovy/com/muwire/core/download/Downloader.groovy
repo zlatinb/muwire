@@ -25,7 +25,7 @@ import net.i2p.util.ConcurrentHashSet
 
 @Log
 public class Downloader {
-    public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, FINISHED }
+    public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, PAUSED, FINISHED }
     private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
     
     private static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
@@ -53,7 +53,7 @@ public class Downloader {
     private final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
     
     
-    private volatile boolean cancelled
+    private volatile boolean cancelled, paused
     private final AtomicBoolean eventFired = new AtomicBoolean()
     private boolean piecesFileClosed
 
@@ -136,6 +136,9 @@ public class Downloader {
     public DownloadState getCurrentState() {
         if (cancelled)
             return DownloadState.CANCELLED
+        if (paused)
+            return DownloadState.PAUSED
+            
         boolean allFinished = true
         activeWorkers.values().each { 
             allFinished &= it.currentState == WorkerState.FINISHED
@@ -183,6 +186,11 @@ public class Downloader {
         pieces.clearAll()
     }
     
+    public void pause() {
+        paused = true
+        stop()
+    }
+    
     void stop() {
         activeWorkers.values().each { 
             it.cancel()
@@ -203,6 +211,7 @@ public class Downloader {
             def worker = activeWorkers.get(destination)
             if (worker != null) {
                 if (worker.currentState == WorkerState.FINISHED) {
+                    paused = false
                     def newWorker = new DownloadWorker(destination)
                     activeWorkers.put(destination, newWorker)
                     executorService.submit(newWorker)

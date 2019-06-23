@@ -135,8 +135,9 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
+                                    button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
                                     button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
-                                    button(text: "Retry", enabled : bind {model.retryButtonEnabled}, resumeAction)
+                                    button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
                                 }
                             }
                         }
@@ -295,6 +296,7 @@ class MainFrameView {
             if (selectedRow < 0) {
                 model.cancelButtonEnabled = false
                 model.retryButtonEnabled = false
+                model.pauseButtonEnabled = false
                 return
             }
             def downloader = model.downloads[selectedRow]?.downloader
@@ -305,15 +307,25 @@ class MainFrameView {
                 case Downloader.DownloadState.DOWNLOADING :
                 case Downloader.DownloadState.HASHLIST:
                 model.cancelButtonEnabled = true
+                model.pauseButtonEnabled = true
                 model.retryButtonEnabled = false
                 break
                 case Downloader.DownloadState.FAILED:
                 model.cancelButtonEnabled = true
                 model.retryButtonEnabled = true
+                model.resumeButtonText = "Retry"
+                model.pauseButtonEnabled = false
+                break
+                case Downloader.DownloadState.PAUSED:
+                model.cancelButtonEnabled = true
+                model.retryButtonEnabled = true
+                model.resumeButtonText = "Resume"
+                model.pauseButtonEnabled = false
                 break
                 default:
                 model.cancelButtonEnabled = false
                 model.retryButtonEnabled = false
+                model.pauseButtonEnabled = false
             }
         })
         
@@ -421,21 +433,32 @@ class MainFrameView {
         int selected = selectedDownloaderRow()
         if (selected < 0)
             return
+        boolean pauseEnabled = false
         boolean cancelEnabled = false
         boolean retryEnabled = false
+        String resumeText = "Retry"
         Downloader downloader = model.downloads[selected].downloader
         switch(downloader.currentState) {
             case Downloader.DownloadState.DOWNLOADING:
             case Downloader.DownloadState.HASHLIST:
             case Downloader.DownloadState.CONNECTING:
+                pauseEnabled = true
                 cancelEnabled = true
                 retryEnabled = false
                 break
             case Downloader.DownloadState.FAILED:
+                pauseEnabled = false
                 cancelEnabled = true
                 retryEnabled = true
                 break
+            case Downloader.DownloadState.PAUSED:
+                pauseEnabled = false
+                cancelEnabled = true
+                retryEnabled = true
+                resumeText = "Resume"
+                break
             default :
+                pauseEnabled = false
                 cancelEnabled = false
                 retryEnabled = false
         }
@@ -450,6 +473,12 @@ class MainFrameView {
         })
         menu.add(copyHashToClipboard)
         
+        if (pauseEnabled) {
+            JMenuItem pause = new JMenuItem("Pause")
+            pause.addActionListener({mvcGroup.controller.pause()})
+            menu.add(pause)
+        }
+        
         if (cancelEnabled) {
             JMenuItem cancel = new JMenuItem("Cancel")
             cancel.addActionListener({mvcGroup.controller.cancel()})
@@ -457,7 +486,7 @@ class MainFrameView {
         }
         
         if (retryEnabled) {
-            JMenuItem retry = new JMenuItem("Retry")
+            JMenuItem retry = new JMenuItem(resumeText)
             retry.addActionListener({mvcGroup.controller.resume()})
             menu.add(retry)
         }

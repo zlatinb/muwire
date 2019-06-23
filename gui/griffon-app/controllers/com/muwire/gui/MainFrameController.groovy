@@ -165,6 +165,12 @@ class MainFrameController {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.resume()
     }
+    
+    @ControllerAction
+    void pause() {
+        def downloader = model.downloads[selectedDownload()].downloader
+        downloader.pause()
+    }
 
     private void markTrust(String tableName, TrustLevel level, def list) {
         int row = builder.getVariable(tableName).getSelectedRow()
