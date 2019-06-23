@@ -75,7 +75,7 @@ class DownloadSession {
         if (available.isEmpty())
             piece = pieces.claim()
         else
-            piece = pieces.claim(available)
+            piece = pieces.claim(new HashSet<>(available))
         if (piece == -1)
             return false
         boolean unclaim = true
