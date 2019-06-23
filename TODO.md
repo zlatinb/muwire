@@ -38,4 +38,3 @@ To enable parsing of metadata from known file types and the user editing it or a
 * Download file sequentially
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
-* Pause/Resume downloads
