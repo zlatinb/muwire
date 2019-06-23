@@ -34,8 +34,8 @@ To enable parsing of metadata from known file types and the user editing it or a
 
 ### Small Items
 
-* Detect if router is dead and show warning or exit
 * Wrapper of some kind for in-place upgrades
 * Download file sequentially
 * Unsharing of files
 * Multiple-selection download, Ctrl-A
+* Pause/Resume downloads
