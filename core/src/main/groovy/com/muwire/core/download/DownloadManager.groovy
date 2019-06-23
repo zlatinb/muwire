@@ -90,6 +90,10 @@ public class DownloadManager {
         persistDownloaders()
     }
     
+    public void onUIDownloadPausedEvent(UIDownloadPausedEvent e) {
+        persistDownloaders()
+    }
+    
     void resume(Downloader downloader) {
         executor.execute({downloader.download() as Runnable})
     }
@@ -119,7 +123,10 @@ public class DownloadManager {
             
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
-            downloaders.put(infoHash, downloader)
+            if (json.paused != null)
+                downloader.paused = json.paused
+            if (!downloader.paused)
+                downloaders.put(infoHash, downloader)
             downloader.download()
             eventBus.publish(new DownloadStartedEvent(downloader : downloader))
         }
@@ -174,6 +181,8 @@ public class DownloadManager {
                         json.hashList = Base64.encode(infoHash.hashList)
                     else
                         json.hashRoot = Base64.encode(infoHash.getRoot())
+                        
+                    json.paused = downloader.paused
                     writer.println(JsonOutput.toJson(json))
                 }
             }
