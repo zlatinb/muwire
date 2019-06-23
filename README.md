@@ -37,8 +37,8 @@ The first time you run MuWire it will ask you to select a nickname.  This nickna
 * why is MuWire slow ?
   
   - too few sources you're downloading from
-  - you can increse the number of tunnels by using more tunnels via Options->I2P Inbound/Outbound Quantity 
-    the default is 4 and you could raise it and even can go up as high as 16 ( Caution !!!!)
+  - you can increase the number of tunnels by using more tunnels via Options->I2P Inbound/Outbound Quantity 
+    the default is 4 and you could raise up to as high as 16 ( Caution !!!!)
 
 * my search is not returning (enough) results !
 
@@ -47,3 +47,10 @@ The first time you run MuWire it will ask you to select a nickname.  This nickna
     so searching for 'musi' will not return results with 'music' - you have to search for 'music'
   - ALL keywords have to match 
   - only use <SPACE> for keyword separation
+  - if you already have the file in question it is not displayed ( can be changed via Options )
+
+* what's this right click -> 'Copy hash to clipboard' for ?
+
+  - if you have a specific file you wish to share or download you can use the hash as a unique identifier
+    to make sure you have exactly the right file.
+  - you can share this hash with others to ensure they are getting the right file
