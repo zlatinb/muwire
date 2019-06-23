@@ -77,9 +77,9 @@ class OptionsController {
         model.font = text
         uiSettings.font = text
         
-        boolean showMonitor = view.monitorCheckbox.model.isSelected()
-        model.showMonitor = showMonitor
-        uiSettings.showMonitor = showMonitor
+//        boolean showMonitor = view.monitorCheckbox.model.isSelected()
+//        model.showMonitor = showMonitor
+//        uiSettings.showMonitor = showMonitor
         
         boolean clearCancelledDownloads = view.clearCancelledDownloadsCheckbox.model.isSelected()
         model.clearCancelledDownloads = clearCancelledDownloads
@@ -93,9 +93,9 @@ class OptionsController {
         model.excludeLocalResult = excludeLocalResult
         uiSettings.excludeLocalResult = excludeLocalResult
         
-        boolean showSearchHashes = view.showSearchHashesCheckbox.model.isSelected()
-        model.showSearchHashes = showSearchHashes
-        uiSettings.showSearchHashes = showSearchHashes
+//        boolean showSearchHashes = view.showSearchHashesCheckbox.model.isSelected()
+//        model.showSearchHashes = showSearchHashes
+//        uiSettings.showSearchHashes = showSearchHashes
         
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream { 
