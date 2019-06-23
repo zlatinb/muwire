@@ -89,7 +89,8 @@ class MeshManager {
                 mesh.sources.add(persona)
             }
             
-            meshes.put(infoHash, mesh)
+            if (!mesh.sources.isEmpty())
+                meshes.put(infoHash, mesh)
         }
     }
 }
