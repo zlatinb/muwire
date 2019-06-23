@@ -5,7 +5,6 @@ import java.util.stream.Collectors
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
-import com.muwire.core.Personas
 import com.muwire.core.download.Pieces
 import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
@@ -15,6 +14,8 @@ import groovy.json.JsonSlurper
 import net.i2p.data.Base64
 
 class MeshManager {
+    
+    private static final int EXPIRATION = 60 * 60 * 1000
     
     private final Map<InfoHash, Mesh> meshes = Collections.synchronizedMap(new HashMap<>())
     private final FileManager fileManager
@@ -59,6 +60,7 @@ class MeshManager {
             meshFile.withPrintWriter { writer ->
                 meshes.values().each { mesh ->
                     def json = [:]
+                    json.timestamp = System.currentTimeMillis()
                     json.infoHash = Base64.encode(mesh.infoHash.getRoot())
                     json.sources = mesh.sources.stream().map({it.toBase64()}).collect(Collectors.toList())
                     json.nPieces = mesh.pieces.nPieces
@@ -72,9 +74,12 @@ class MeshManager {
         File meshFile = new File(home, "mesh.json")
         if (!meshFile.exists())
             return
+        long now = System.currentTimeMillis()
         JsonSlurper slurper = new JsonSlurper()
         meshFile.eachLine { 
             def json = slurper.parseText(it)
+            if (now - json.timestamp > EXPIRATION)
+                return
             InfoHash infoHash = new InfoHash(Base64.decode(json.infoHash))
             Pieces pieces = new Pieces(json.nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
             
