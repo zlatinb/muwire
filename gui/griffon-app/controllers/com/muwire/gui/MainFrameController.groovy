@@ -18,6 +18,7 @@ import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
+import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.TrustEvent
@@ -165,6 +166,7 @@ class MainFrameController {
     void resume() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.resume()
+        core.eventBus.publish(new UIDownloadResumedEvent())
     }
     
     @ControllerAction

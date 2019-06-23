@@ -94,6 +94,10 @@ public class DownloadManager {
         persistDownloaders()
     }
     
+    public void onUIDownloadResumedEvent(UIDownloadResumedEvent e) {
+        persistDownloaders()
+    }
+    
     void resume(Downloader downloader) {
         executor.execute({downloader.download() as Runnable})
     }
@@ -125,9 +129,10 @@ public class DownloadManager {
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
             if (json.paused != null)
                 downloader.paused = json.paused
+            downloaders.put(infoHash, downloader)
+            downloader.readPieces()
             if (!downloader.paused)
-                downloaders.put(infoHash, downloader)
-            downloader.download()
+                downloader.download()
             eventBus.publish(new DownloadStartedEvent(downloader : downloader))
         }
     }

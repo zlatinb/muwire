@@ -207,11 +207,12 @@ public class Downloader {
     }
     
     public void resume() {
+        paused = false
+        readPieces()
         destinations.each { destination ->
             def worker = activeWorkers.get(destination)
             if (worker != null) {
                 if (worker.currentState == WorkerState.FINISHED) {
-                    paused = false
                     def newWorker = new DownloadWorker(destination)
                     activeWorkers.put(destination, newWorker)
                     executorService.submit(newWorker)
