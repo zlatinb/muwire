@@ -109,4 +109,10 @@ class DataUtil {
         }
         available
     }
+    
+    public static Exception findRoot(Exception e) {
+        while(e.getCause() != null)
+            e = e.getCause()
+        e
+    }
 }

@@ -18,6 +18,7 @@ import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.files.FileDownloadedEvent
+import com.muwire.core.util.DataUtil
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -269,7 +270,7 @@ public class Downloader {
                     writePieces()
                 }
             } catch (Exception bad) {
-                log.log(Level.WARNING,"Exception while downloading",bad)
+                log.log(Level.WARNING,"Exception while downloading",DataUtil.findRoot(bad))
             } finally {
                 currentState = WorkerState.FINISHED
                 if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
