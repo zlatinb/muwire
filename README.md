@@ -46,7 +46,7 @@ The first time you run MuWire it will ask you to select a nickname.  This nickna
   - keywords and hash(es) are NOT regexed or wildcarded so they have to be complete
     so searching for 'musi' will not return results with 'music' - you have to search for 'music'
   - ALL keywords have to match 
-  - only use <SPACE> for keyword separation
+  - only use space for keyword separation
   - if you already have the file in question it is not displayed ( can be changed via Options )
 
 * what's this right click -> 'Copy hash to clipboard' for ?
