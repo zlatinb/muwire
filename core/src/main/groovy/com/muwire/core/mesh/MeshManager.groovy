@@ -84,7 +84,7 @@ class MeshManager {
             Pieces pieces = new Pieces(json.nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
             
             Mesh mesh = new Mesh(infoHash, pieces)
-            json.sources.split(",").each { source -> 
+            json.sources.each { source -> 
                 Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(source)))
                 mesh.sources.add(persona)
             }
