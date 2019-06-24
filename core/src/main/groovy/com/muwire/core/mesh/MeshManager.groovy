@@ -51,8 +51,8 @@ class MeshManager {
         Mesh mesh = meshes.get(e.infoHash)
         if (mesh == null)
             return
-       if (mesh.sources.add(e.source))
-            save()
+       mesh.sources.add(e.source)
+       save()
     }
     
     private void save() {
