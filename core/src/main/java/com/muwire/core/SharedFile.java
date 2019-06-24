@@ -30,7 +30,7 @@ public class SharedFile {
 	    long length = file.length();
 	    int rawPieceSize = 0x1 << pieceSize;
 	    int rv = (int) (length / rawPieceSize);
-	    if (length % pieceSize != 0)
+	    if (length % rawPieceSize != 0)
 	        rv++;
 	    return rv;
 	}
