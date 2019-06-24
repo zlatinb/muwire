@@ -43,6 +43,8 @@ class Initialize extends AbstractLifecycleHandler {
         
         application.context.put("muwire-home", home.getAbsolutePath())
         
+        System.getProperties().setProperty("awt.useSystemAAFontSettings", "true")
+        
         def guiPropsFile = new File(home, "gui.properties")
         UISettings uiSettings
         if (guiPropsFile.exists()) {
