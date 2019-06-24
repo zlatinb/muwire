@@ -60,10 +60,10 @@ class MainFrameView {
             locationRelativeTo : null,
             title: application.configuration['application.title'] + " " + 
                 metadata["application.version"] + " revision " + metadata["build.revision"],
-            iconImage:   imageIcon('/griffon-icon-48x48.png').image,
-            iconImages: [imageIcon('/griffon-icon-48x48.png').image,
-                imageIcon('/griffon-icon-32x32.png').image,
-                imageIcon('/griffon-icon-16x16.png').image],
+            iconImage:   imageIcon('/MuWire-48x48.png').image,
+            iconImages: [imageIcon('/MuWire-48x48.png').image,
+                imageIcon('/MuWire-32x32.png').image,
+                imageIcon('/MuWire-16x16.png').image],
             pack : false,
             visible : bind { model.coreInitialized }) {
                 menuBar {
