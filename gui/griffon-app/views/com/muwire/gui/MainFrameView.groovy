@@ -516,6 +516,7 @@ class MainFrameView {
     
     def shareFiles = {
         def chooser = new JFileChooser()
+        chooser.setFileHidingEnabled(false)
         chooser.setDialogTitle("Select file to share")
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
         int rv = chooser.showOpenDialog(null)
@@ -526,6 +527,7 @@ class MainFrameView {
     
     def watchDirectories = {
         def chooser = new JFileChooser()
+        chooser.setFileHidingEnabled(false)
         chooser.setDialogTitle("Select directory to watch")
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         int rv = chooser.showOpenDialog(null)

@@ -74,6 +74,7 @@ class Ready extends AbstractLifecycleHandler {
                 props.downloadLocation = new File(portableDownloads)
             } else {
                 def chooser = new JFileChooser()
+                chooser.setFileHidingEnabled(false)
                 chooser.setDialogTitle("Select a directory where downloads will be saved")
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
                 int rv = chooser.showOpenDialog(null)
