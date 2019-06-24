@@ -8,6 +8,7 @@ import com.muwire.core.Persona
 import com.muwire.core.download.Pieces
 import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -64,6 +65,7 @@ class MeshManager {
                     json.infoHash = Base64.encode(mesh.infoHash.getRoot())
                     json.sources = mesh.sources.stream().map({it.toBase64()}).collect(Collectors.toList())
                     json.nPieces = mesh.pieces.nPieces
+                    json.xHave = DataUtil.encodeXHave(mesh.pieces.downloaded, mesh.pieces.nPieces)
                     writer.println(JsonOutput.toJson(json))
                 }
             }
@@ -89,6 +91,9 @@ class MeshManager {
                 mesh.sources.add(persona)
             }
             
+            if (json.xHave != null) 
+                DataUtil.decodeXHave(json.xHave).each { pieces.markDownloaded(it) }
+                
             if (!mesh.sources.isEmpty())
                 meshes.put(infoHash, mesh)
         }
