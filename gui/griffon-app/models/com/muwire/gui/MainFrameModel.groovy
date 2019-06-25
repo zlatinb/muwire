@@ -17,6 +17,7 @@ import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
+import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
@@ -139,6 +140,7 @@ class MainFrameModel {
             core.eventBus.register(FileDownloadedEvent.class, this)
             core.eventBus.register(FileUnsharedEvent.class, this)
             core.eventBus.register(RouterDisconnectedEvent.class, this)
+            core.eventBus.register(AllFilesLoadedEvent.class, this)
             
             timer.schedule({
                 if (core.shutdown.get())
@@ -167,9 +169,6 @@ class MainFrameModel {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
                 
-                watched.addAll(core.muOptions.watchedDirectories)
-                builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-                watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
                 
                 resumeButtonText = "Retry"
             }
@@ -177,6 +176,13 @@ class MainFrameModel {
         
     }
     
+    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+        runInsideUIAsync {
+            watched.addAll(core.muOptions.watchedDirectories)
+            builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+            watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
+        }
+    }
     void onUIResultEvent(UIResultEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model.handleResult(e)
