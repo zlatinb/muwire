@@ -47,7 +47,7 @@ class DirectoryWatcher {
         publisherThread.setDaemon(true)
     }
     
-    void start() {
+    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         watchService = FileSystems.getDefault().newWatchService()
         watcherThread.start()
         publisherThread.start()
@@ -55,9 +55,9 @@ class DirectoryWatcher {
     
     void stop() {
         shutdown = true
-        watcherThread.interrupt()
-        publisherThread.interrupt()
-        watchService.close()
+        watcherThread?.interrupt()
+        publisherThread?.interrupt()
+        watchService?.close()
     }
     
     void onFileSharedEvent(FileSharedEvent e) {

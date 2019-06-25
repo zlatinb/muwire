@@ -27,6 +27,7 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
+import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
@@ -236,6 +237,7 @@ public class Core {
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, directoryWatcher)
+        eventBus.register(AllFilesLoadedEvent.class, directoryWatcher)
         
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
@@ -244,7 +246,6 @@ public class Core {
     
     public void startServices() {
         hasherService.start()
-        directoryWatcher.start()
         trustService.start()
         trustService.waitForLoad()
         hostCache.start()
