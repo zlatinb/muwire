@@ -50,10 +50,10 @@ class Request {
             downloader = new Persona(new ByteArrayInputStream(decoded))
         }
         
-        boolean have = false
+        int have = 0
         if (headers.containsKey("X-Have")) {
             def encoded = headers["X-Have"].trim()
-            have = DataUtil.decodeXHave(encoded).size() > 0
+            have = DataUtil.decodeXHave(encoded).size()
         }
         new ContentRequest( infoHash : infoHash, range : new Range(start, end), 
             headers : headers, downloader : downloader, have : have)

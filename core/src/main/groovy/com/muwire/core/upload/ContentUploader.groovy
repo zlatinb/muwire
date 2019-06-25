@@ -105,4 +105,14 @@ class ContentUploader extends Uploader {
         request.downloader.getHumanReadableName()
     }
 
+    @Override
+    public int getDonePieces() {
+        return request.have;
+    }
+
+    @Override
+    public int getTotalPieces() {
+        return mesh.pieces.nPieces;
+    }
+
 }

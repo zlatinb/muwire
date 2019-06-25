@@ -32,4 +32,8 @@ abstract class Uploader {
     abstract int getProgress();
     
     abstract String getDownloader();
+    
+    abstract int getDonePieces();
+    
+    abstract int getTotalPieces()
 }

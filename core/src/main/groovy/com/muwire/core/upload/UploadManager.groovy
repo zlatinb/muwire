@@ -80,7 +80,7 @@ public class UploadManager {
                 return
             }
             
-            if (request.have) 
+            if (request.have > 0) 
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
             
             Mesh mesh
@@ -205,7 +205,7 @@ public class UploadManager {
                 return
             }
             
-            if (request.have)
+            if (request.have > 0)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
             
             Mesh mesh

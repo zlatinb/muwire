@@ -50,6 +50,16 @@ class HashListUploader extends Uploader {
     public String getDownloader() {
         request.downloader.getHumanReadableName()
     }
+
+    @Override
+    public int getDonePieces() {
+        return 0;
+    }
+
+    @Override
+    public int getTotalPieces() {
+        return 1;
+    }
     
     
 }
