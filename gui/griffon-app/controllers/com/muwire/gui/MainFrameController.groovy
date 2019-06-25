@@ -44,6 +44,8 @@ class MainFrameController {
         search = search.trim()
         if (search.length() == 0)
             return
+        if (search.length() > 128)
+            search = search.substring(0,128)
         def uuid = UUID.randomUUID()
         Map<String, Object> params = new HashMap<>()
         params["search-terms"] = search
