@@ -19,6 +19,7 @@ class MuWireSettings {
     boolean shareDownloadedFiles
     Set<String> watchedDirectories
     float downloadSequentialRatio
+    int hostClearInterval
     
 	MuWireSettings() {
         this(new Properties())
@@ -35,6 +36,7 @@ class MuWireSettings {
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
+        hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","60"))
         
         watchedDirectories = new HashSet<>()
         if (props.containsKey("watchedDirectories")) {
@@ -55,6 +57,7 @@ class MuWireSettings {
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
+        props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         
         if (!watchedDirectories.isEmpty()) {
             String encoded = watchedDirectories.stream().

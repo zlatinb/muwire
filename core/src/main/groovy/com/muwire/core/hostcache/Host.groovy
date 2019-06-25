@@ -5,9 +5,9 @@ import net.i2p.data.Destination
 class Host {
 
 	private static final int MAX_FAILURES = 3
-    private static final int CLEAR_INTERVAL = 60 * 60 * 1000
 	
 	final Destination destination
+    private final int clearInterval
 	int failures,successes
     long lastAttempt
 	
@@ -40,6 +40,6 @@ class Host {
     }
     
     synchronized void canTryAgain() {
-        System.currentTimeMillis() - lastAttempt > CLEAR_INTERVAL
+        System.currentTimeMillis() - lastAttempt > (clearInterval * 60 * 1000)
     }
 }

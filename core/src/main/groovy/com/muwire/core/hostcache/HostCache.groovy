@@ -52,7 +52,7 @@ class HostCache extends Service {
             hosts.get(e.destination).clearFailures()
             return
 		}
-		Host host = new Host(e.destination)
+		Host host = new Host(e.destination, settings.hostClearInterval)
 		if (allowHost(host)) {
 			hosts.put(e.destination, host)
 		}
@@ -64,7 +64,7 @@ class HostCache extends Service {
 		Destination dest = e.endpoint.destination
 		Host host = hosts.get(dest)
 		if (host == null) {
-			host = new Host(dest)
+			host = new Host(dest, settings.hostClearInterval)
 			hosts.put(dest, host)
 		}
 
@@ -106,7 +106,7 @@ class HostCache extends Service {
 			storage.eachLine {
 				def entry = slurper.parseText(it)
 				Destination dest = new Destination(entry.destination)
-				Host host = new Host(dest)
+				Host host = new Host(dest, settings.hostClearInterval)
 				host.failures = Integer.valueOf(String.valueOf(entry.failures))
 				host.successes = Integer.valueOf(String.valueOf(entry.successes))
                 if (entry.lastAttempt != null)
