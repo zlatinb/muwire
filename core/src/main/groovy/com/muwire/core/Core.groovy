@@ -173,7 +173,7 @@ public class Core {
 		eventBus.register(SearchEvent.class, fileManager)
         
         log.info("initializing mesh manager")
-        MeshManager meshManager = new MeshManager(fileManager, home)
+        MeshManager meshManager = new MeshManager(fileManager, home, props)
         eventBus.register(SourceDiscoveredEvent.class, meshManager)
 		
 		log.info "initializing persistence service"

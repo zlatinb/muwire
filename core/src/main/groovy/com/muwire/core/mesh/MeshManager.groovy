@@ -4,6 +4,7 @@ import java.util.stream.Collectors
 
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.download.Pieces
 import com.muwire.core.download.SourceDiscoveredEvent
@@ -21,10 +22,12 @@ class MeshManager {
     private final Map<InfoHash, Mesh> meshes = Collections.synchronizedMap(new HashMap<>())
     private final FileManager fileManager
     private final File home
+    private final MuWireSettings settings
     
-    MeshManager(FileManager fileManager, File home) {
+    MeshManager(FileManager fileManager, File home, MuWireSettings settings) {
         this.fileManager = fileManager
         this.home = home
+        this.settings = settings
         load()
     }
     
@@ -36,7 +39,7 @@ class MeshManager {
         synchronized(meshes) {
             if (meshes.containsKey(infoHash))
                 return meshes.get(infoHash)
-            Pieces pieces = new Pieces(nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+            Pieces pieces = new Pieces(nPieces, settings.downloadSequentialRatio)
             if (fileManager.rootToFiles.containsKey(infoHash)) {
                 for (int i = 0; i < nPieces; i++)
                     pieces.markDownloaded(i)
@@ -83,7 +86,7 @@ class MeshManager {
             if (now - json.timestamp > EXPIRATION)
                 return
             InfoHash infoHash = new InfoHash(Base64.decode(json.infoHash))
-            Pieces pieces = new Pieces(json.nPieces, Constants.DOWNLOAD_SEQUENTIAL_RATIO)
+            Pieces pieces = new Pieces(json.nPieces, settings.downloadSequentialRatio)
             
             Mesh mesh = new Mesh(infoHash, pieces)
             json.sources.each { source -> 
