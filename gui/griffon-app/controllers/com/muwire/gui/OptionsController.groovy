@@ -5,6 +5,7 @@ import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
+import javax.swing.JFileChooser
 
 import com.muwire.core.Core
 
@@ -60,6 +61,9 @@ class OptionsController {
         boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
         model.shareDownloadedFiles = shareDownloaded
         settings.shareDownloadedFiles = shareDownloaded
+        
+        String downloadLocation = model.downloadLocation
+        settings.downloadLocation = new File(downloadLocation)
                         
         File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 
@@ -109,5 +113,16 @@ class OptionsController {
     void cancel() {
         view.d.setVisible(false)
         mvcGroup.destroy()
+    }
+    
+    @ControllerAction
+    void downloadLocation() {
+        def chooser = new JFileChooser()
+        chooser.setFileHidingEnabled(false)
+        chooser.setDialogTitle("Select location for downloaded files")
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        int rv = chooser.showOpenDialog(null)
+        if (rv == JFileChooser.APPROVE_OPTION)
+            model.downloadLocation = chooser.getSelectedFile().getAbsolutePath()
     }
 }

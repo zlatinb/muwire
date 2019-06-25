@@ -68,6 +68,10 @@ class OptionsView {
             
             label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
             shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:3))
+            
+            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:4, gridwidth : 2))
+            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:5))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:5), downloadLocationAction)
                         
         }
         i = builder.panel {
