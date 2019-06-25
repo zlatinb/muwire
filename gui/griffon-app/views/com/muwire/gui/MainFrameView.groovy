@@ -185,7 +185,7 @@ class MainFrameView {
                                         closureColumn(header : "Name", type : String, read : {row -> row.getName() })
                                         closureColumn(header : "Progress", type : String, read : { row ->
                                             int percent = row.getProgress()
-                                            "$percent%"
+                                            "$percent% of piece"
                                         })
                                         closureColumn(header : "Downloader", type : String, read : { row -> 
                                             row.getDownloader()
