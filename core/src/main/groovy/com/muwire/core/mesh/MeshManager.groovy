@@ -17,8 +17,6 @@ import net.i2p.data.Base64
 
 class MeshManager {
     
-    private static final int EXPIRATION = 60 * 60 * 1000
-    
     private final Map<InfoHash, Mesh> meshes = Collections.synchronizedMap(new HashMap<>())
     private final FileManager fileManager
     private final File home
@@ -83,7 +81,7 @@ class MeshManager {
         JsonSlurper slurper = new JsonSlurper()
         meshFile.eachLine { 
             def json = slurper.parseText(it)
-            if (now - json.timestamp > EXPIRATION)
+            if (now - json.timestamp > settings.meshExpiration * 60 * 1000)
                 return
             InfoHash infoHash = new InfoHash(Base64.decode(json.infoHash))
             Pieces pieces = new Pieces(json.nPieces, settings.downloadSequentialRatio)
