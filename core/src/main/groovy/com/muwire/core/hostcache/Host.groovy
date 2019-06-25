@@ -11,8 +11,9 @@ class Host {
 	int failures,successes
     long lastAttempt
 	
-	public Host(Destination destination) {
+	public Host(Destination destination, int clearInterval) {
 		this.destination = destination
+        this.clearInterval = clearInterval
 	}
 
 	synchronized void onConnect() {
