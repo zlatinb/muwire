@@ -21,6 +21,7 @@ class MuWireSettings {
     float downloadSequentialRatio
     int hostClearInterval
     int meshExpiration
+    boolean embeddedRouter
     
 	MuWireSettings() {
         this(new Properties())
@@ -39,6 +40,7 @@ class MuWireSettings {
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","60"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
+        embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
         
         watchedDirectories = new HashSet<>()
         if (props.containsKey("watchedDirectories")) {
@@ -61,6 +63,7 @@ class MuWireSettings {
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
+        props.setProperty("embeddedRouter", String.valueOf(embeddedRouter))
         
         if (!watchedDirectories.isEmpty()) {
             String encoded = watchedDirectories.stream().

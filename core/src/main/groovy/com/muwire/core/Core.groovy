@@ -59,6 +59,8 @@ import net.i2p.data.PrivateKey
 import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 
+import net.i2p.router.Router
+
 @Log
 public class Core {
     
@@ -81,14 +83,28 @@ public class Core {
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
     
+    private final Router router
+    
     final AtomicBoolean shutdown = new AtomicBoolean()
         
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home		
         this.muOptions = props
-        log.info "Initializing I2P context"
-        I2PAppContext.getGlobalContext().logManager()
-        I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
+        
+        if (!props.embeddedRouter) {
+            log.info "Initializing I2P context"
+            I2PAppContext.getGlobalContext().logManager()
+            I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
+            router = null
+        } else {
+            log.info("launching embedded router")
+            Properties routerProps = new Properties()
+            props.putAt("i2p.dir.config", home.getAbsolutePath())
+            router = new Router(routerProps)
+            router.getContext().logManager()
+            router.getContext()._logManager = new MuWireLogManager()
+            router.runRouter()
+        }
         
 		log.info("initializing I2P socket manager")
 		def i2pClient = new I2PClientFactory().createClient()
@@ -245,6 +261,10 @@ public class Core {
 	}
     
     public void startServices() {
+        if (router != null) {
+            while(!router.isRunning())
+                Thread.sleep(100)
+        }
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
@@ -272,6 +292,10 @@ public class Core {
         directoryWatcher.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
+        if (router != null) {
+            log.info("shutting down embedded router")
+            router.shutdown(0)
+        }
     }
 
     static main(args) {
