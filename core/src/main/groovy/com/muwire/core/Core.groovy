@@ -60,6 +60,7 @@ import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 
 import net.i2p.router.Router
+import net.i2p.router.RouterContext
 
 @Log
 public class Core {
@@ -99,11 +100,12 @@ public class Core {
         } else {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
-            props.putAt("i2p.dir.config", home.getAbsolutePath())
+            routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
             router = new Router(routerProps)
-            router.getContext().logManager()
-            router.getContext()._logManager = new MuWireLogManager()
+            I2PAppContext.getGlobalContext().metaClass = new RouterContextMetaClass()
             router.runRouter()
+            while(!router.isRunning())
+                Thread.sleep(100)
         }
         
 		log.info("initializing I2P socket manager")
@@ -261,10 +263,6 @@ public class Core {
 	}
     
     public void startServices() {
-        if (router != null) {
-            while(!router.isRunning())
-                Thread.sleep(100)
-        }
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
@@ -298,6 +296,19 @@ public class Core {
         }
     }
 
+    static class RouterContextMetaClass extends DelegatingMetaClass {
+        private final Object logManager = new MuWireLogManager()
+        RouterContextMetaClass() {
+            super(RouterContext.class)
+        }
+        
+        Object invokeMethod(Object object, String name, Object[] args) {
+            if (name == "logManager")
+                return logManager
+            super.invokeMethod(object, name, args)
+        }
+    }
+    
     static main(args) {
         def home = System.getProperty("user.home") + File.separator + ".MuWire"
         home = new File(home)
