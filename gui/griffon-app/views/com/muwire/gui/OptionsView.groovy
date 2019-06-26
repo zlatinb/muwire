@@ -9,6 +9,8 @@ import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.SwingConstants
 
+import com.muwire.core.Core
+
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -26,6 +28,7 @@ class OptionsView {
     def p
     def i
     def u
+    def bandwidth
     
     def retryField
     def updateField
@@ -44,6 +47,10 @@ class OptionsView {
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
     def showSearchHashesCheckbox
+    
+    
+    def inBwField
+    def outBwField
     
     def buttonsPanel    
     
@@ -104,6 +111,16 @@ class OptionsView {
 //            label(text : "Show Hash Searches In Monitor", constraints: gbc(gridx:0, gridy:7))
 //            showSearchHashesCheckbox = checkBox(selected : bind {model.showSearchHashes}, constraints : gbc(gridx: 1, gridy: 7))
         }
+        bandwidth = builder.panel {
+            gridBagLayout()
+            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
+            label(text : "Inbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 1))
+            inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1))
+            label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 2))
+            outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 2))
+        }
+       
+        
         buttonsPanel = builder.panel {
             gridBagLayout()
             button(text : "Save", constraints : gbc(gridx : 1, gridy: 2), saveAction)
@@ -116,6 +133,10 @@ class OptionsView {
         tabbedPane.addTab("MuWire", p)
         tabbedPane.addTab("I2P", i)
         tabbedPane.addTab("GUI", u)
+        Core core = application.context.get("core")
+        if (core.router != null) {
+            tabbedPane.addTab("Bandwidth", bandwidth)
+        }
                 
         JPanel panel = new JPanel()
         panel.setLayout(new BorderLayout())

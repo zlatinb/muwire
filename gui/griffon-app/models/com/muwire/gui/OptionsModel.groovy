@@ -30,6 +30,10 @@ class OptionsModel {
     @Observable boolean excludeLocalResult
     @Observable boolean showSearchHashes
     
+    // bw options
+    @Observable String inBw
+    @Observable String outBw
+    
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
@@ -52,5 +56,10 @@ class OptionsModel {
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult
         showSearchHashes = uiSettings.showSearchHashes
+        
+        if (core.router != null) {
+            inBw = String.valueOf(settings.inBw)
+            outBw = String.valueOf(settings.outBw)
+        }
     }
 }

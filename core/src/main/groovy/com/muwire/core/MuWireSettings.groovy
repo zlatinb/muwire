@@ -22,6 +22,7 @@ class MuWireSettings {
     int hostClearInterval
     int meshExpiration
     boolean embeddedRouter
+    int inBw, outBw
     
 	MuWireSettings() {
         this(new Properties())
@@ -41,6 +42,8 @@ class MuWireSettings {
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","60"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
+        inBw = Integer.valueOf(props.getProperty("inBw","256"))
+        outBw = Integer.valueOf(props.getProperty("outBw","128"))
         
         watchedDirectories = new HashSet<>()
         if (props.containsKey("watchedDirectories")) {
@@ -64,6 +67,8 @@ class MuWireSettings {
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
         props.setProperty("embeddedRouter", String.valueOf(embeddedRouter))
+        props.setProperty("inBw", String.valueOf(inBw))
+        props.setProperty("outBw", String.valueOf(outBw))
         
         if (!watchedDirectories.isEmpty()) {
             String encoded = watchedDirectories.stream().

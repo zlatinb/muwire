@@ -101,6 +101,8 @@ public class Core {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
+            routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
+            routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
             router = new Router(routerProps)
             I2PAppContext.getGlobalContext().metaClass = new RouterContextMetaClass()
             router.runRouter()

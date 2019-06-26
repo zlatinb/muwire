@@ -4,10 +4,15 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import groovy.util.logging.Log
+
+import java.util.logging.Level
+
 import javax.annotation.Nonnull
 import javax.swing.JFileChooser
 
 import com.muwire.core.Core
+import com.muwire.core.MuWireSettings
 
 @ArtifactProviderFor(GriffonController)
 class OptionsController {
@@ -47,7 +52,7 @@ class OptionsController {
         text = view.retryField.text
         model.downloadRetryInterval = text
 
-        def settings = application.context.get("muwire-settings")
+        MuWireSettings settings = application.context.get("muwire-settings")
         settings.downloadRetryInterval = Integer.valueOf(text)
 
         text = view.updateField.text
@@ -64,7 +69,16 @@ class OptionsController {
         
         String downloadLocation = model.downloadLocation
         settings.downloadLocation = new File(downloadLocation)
-                        
+
+        if (settings.embeddedRouter) {
+            text = view.inBwField.text
+            model.inBw = text
+            settings.inBw = Integer.valueOf(text)
+            text = view.outBwField.text
+            model.outBw = text
+            settings.outBw = Integer.valueOf(text)
+        }
+                                
         File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 
             settings.write(it)
