@@ -103,6 +103,7 @@ public class Core {
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
+            routerProps.setProperty("i2cp.disableInterface", "true")
             router = new Router(routerProps)
             I2PAppContext.getGlobalContext().metaClass = new RouterContextMetaClass()
             router.runRouter()
