@@ -1,6 +1,7 @@
 package com.muwire.core;
 
 import java.io.File;
+import java.io.IOException;
 
 public class SharedFile {
 
@@ -8,10 +9,15 @@ public class SharedFile {
 	private final InfoHash infoHash;
 	private final int pieceSize;
 	
-	public SharedFile(File file, InfoHash infoHash, int pieceSize) {
+	private final String cachedPath;
+	private final long cachedLength;
+	
+	public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
 		this.file = file;
 		this.infoHash = infoHash;
 		this.pieceSize = pieceSize;
+		this.cachedPath = file.getAbsolutePath();
+		this.cachedLength = file.length();
 	}
 
 	public File getFile() {
@@ -33,6 +39,14 @@ public class SharedFile {
 	    if (length % rawPieceSize != 0)
 	        rv++;
 	    return rv;
+	}
+	
+	public String getCachedPath() {
+	    return cachedPath;
+	}
+	
+	public long getCachedLength() {
+	    return cachedLength;
 	}
 	
 	@Override

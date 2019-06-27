@@ -167,8 +167,8 @@ class MainFrameView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     table(id : "shared-files-table", autoCreateRowSorter: true) {
                                         tableModel(list : model.shared) {
-                                            closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.file.getAbsolutePath()})
-                                            closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.file.length() })
+                                            closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
+                                            closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
                                         }
                                     }
                                 }
