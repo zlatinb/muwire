@@ -52,6 +52,7 @@ class MainFrameView {
     def downloadsTable
     def lastDownloadSortEvent
     def lastSharedSortEvent
+    def lastWatchedSortEvent
     
     void initUI() {
         UISettings settings = application.context.get("ui-settings")
@@ -397,6 +398,27 @@ class MainFrameView {
             }
         })
         
+        // watched directories table
+        def watchedTable = builder.getVariable("watched-directories-table")
+        watchedTable.rowSorter.addRowSorterListener({evt -> lastWatchedSortEvent = evt})
+        watchedTable.rowSorter.setSortsOnUpdates(true)
+        JPopupMenu watchedMenu = new JPopupMenu()
+        JMenuItem stopWatching = new JMenuItem("Stop sharing")
+        stopWatching.addActionListener({mvcGroup.controller.stopWatchingDirectory()})
+        watchedMenu.add(stopWatching)
+        watchedTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(watchedMenu, e)
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(watchedMenu, e)
+            }
+        })
+        
     }
     
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -542,5 +564,15 @@ class MainFrameView {
             builder.getVariable("watched-directories-table").model.fireTableDataChanged()
             model.core.eventBus.publish(new FileSharedEvent(file : f))
         }
+    }
+    
+    String getSelectedWatchedDirectory() {
+        def watchedTable = builder.getVariable("watched-directories-table")
+        int selectedRow = watchedTable.getSelectedRow()
+        if (selectedRow < 0)
+            return null
+        if (lastWatchedSortEvent != null)
+            selectedRow = watchedTable.rowSorter.convertRowIndexToModel(selectedRow)
+        model.watched[selectedRow]
     }
 }

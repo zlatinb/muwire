@@ -135,4 +135,16 @@ class FileManager {
         }
         rv
     }
+    
+    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        e.directory.listFiles().each { 
+            if (it.isDirectory())
+                eventBus.publish(new DirectoryUnsharedEvent(directory : it))
+            else {
+                SharedFile sf = fileToSharedFile.get(it)
+                if (sf != null)
+                    eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+            }
+        }
+    }
 }

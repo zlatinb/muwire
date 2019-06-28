@@ -19,6 +19,7 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.TrustEvent
@@ -207,6 +208,18 @@ class MainFrameController {
     
     void unshareSelectedFiles() {
         println "unsharing selected files"
+    }
+    
+    void stopWatchingDirectory() {
+        String directory = mvcGroup.view.getSelectedWatchedDirectory()
+        if (directory == null)
+            return
+        core.muOptions.watchedDirectories.remove(directory)
+        saveMuWireSettings()    
+        core.eventBus.publish(new DirectoryUnsharedEvent(directory : new File(directory)))
+                
+        model.watched.remove(directory)
+        builder.getVariable("watched-directories-table").model.fireTableDataChanged()
     }
     
     void saveMuWireSettings() {

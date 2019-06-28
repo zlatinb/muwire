@@ -28,6 +28,7 @@ import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.AllFilesLoadedEvent
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
@@ -193,6 +194,7 @@ public class Core {
 		eventBus.register(FileDownloadedEvent.class, fileManager)
 		eventBus.register(FileUnsharedEvent.class, fileManager)
 		eventBus.register(SearchEvent.class, fileManager)
+        eventBus.register(DirectoryUnsharedEvent.class, fileManager)
         
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)
@@ -259,6 +261,7 @@ public class Core {
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, directoryWatcher)
         eventBus.register(AllFilesLoadedEvent.class, directoryWatcher)
+        eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
         
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager)

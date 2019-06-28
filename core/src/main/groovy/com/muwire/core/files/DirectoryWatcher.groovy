@@ -35,6 +35,7 @@ class DirectoryWatcher {
     private final FileManager fileManager
     private final Thread watcherThread, publisherThread
     private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
+    private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
     
@@ -64,8 +65,14 @@ class DirectoryWatcher {
         if (!e.file.isDirectory())
             return
         Path path = e.file.getCanonicalFile().toPath()
-        path.register(watchService, kinds)
+        WatchKey wk = path.register(watchService, kinds)
+        watchedDirectories.put(e.file, wk)
         
+    }
+    
+    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        WatchKey wk = watchedDirectories.remove(e.directory)
+        wk?.cancel()
     }
 
     private void watch() {
