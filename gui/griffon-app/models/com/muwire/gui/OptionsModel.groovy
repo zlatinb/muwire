@@ -20,6 +20,8 @@ class OptionsModel {
     @Observable String inboundQuantity
     @Observable String outboundLength
     @Observable String outboundQuantity
+    @Observable String i2pUDPPort
+    @Observable String i2pNTCPPort
     
     // gui options
     @Observable boolean showMonitor
@@ -47,6 +49,8 @@ class OptionsModel {
         inboundQuantity = core.i2pOptions["inbound.quantity"]
         outboundLength = core.i2pOptions["outbound.length"]
         outboundQuantity = core.i2pOptions["outbound.quantity"]
+        i2pUDPPort = core.i2pOptions["i2np.udp.port"]
+        i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
         
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor

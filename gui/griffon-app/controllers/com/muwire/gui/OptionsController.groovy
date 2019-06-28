@@ -25,6 +25,7 @@ class OptionsController {
     void save() {
         String text
         Core core = application.context.get("core")
+        MuWireSettings settings = application.context.get("muwire-settings")
         
         def i2pProps = core.i2pOptions
         
@@ -44,6 +45,17 @@ class OptionsController {
         model.outboundLength = text
         i2pProps["outbound.length"] = text
         
+        if (settings.embeddedRouter) {
+            text = view.i2pNTCPPortField.text
+            model.i2pNTCPPort = text
+            i2pProps["i2np.ntcp.port"] = text
+            
+            text = view.i2pUDPPortField.text
+            model.i2pUDPPort = text
+            i2pProps["i2np.udp.port"] = text
+        }
+        
+        
         File i2pSettingsFile = new File(core.home, "i2p.properties")
         i2pSettingsFile.withOutputStream { 
             i2pProps.store(it,"")
@@ -52,7 +64,6 @@ class OptionsController {
         text = view.retryField.text
         model.downloadRetryInterval = text
 
-        MuWireSettings settings = application.context.get("muwire-settings")
         settings.downloadRetryInterval = Integer.valueOf(text)
 
         text = view.updateField.text

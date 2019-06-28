@@ -39,6 +39,8 @@ class OptionsView {
     def inboundQuantityField
     def outboundLengthField
     def outboundQuantityField
+    def i2pUDPPortField
+    def i2pNTCPPortField
 
     def lnfField
     def monitorCheckbox
@@ -92,6 +94,15 @@ class OptionsView {
             outboundLengthField = textField(text : bind {model.outboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:3))
             label(text : "Outbound Quantity", constraints : gbc(gridx:0, gridy:4))
             outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:4))
+            
+            Core core = application.context.get("core")
+            if (core.router != null) {
+                label(text : "TCP Port", constraints : gbc(gridx :0, gridy: 5))
+                i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:5))
+                label(text : "UDP Port", constraints : gbc(gridx :0, gridy: 6))
+                i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:6))
+            }
+            
         }
         u = builder.panel {
             gridBagLayout()

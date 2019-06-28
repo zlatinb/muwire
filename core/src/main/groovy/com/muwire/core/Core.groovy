@@ -93,6 +93,31 @@ public class Core {
         this.home = home		
         this.muOptions = props
         
+        i2pOptions = new Properties()
+        def i2pOptionsFile = new File(home,"i2p.properties")
+        if (i2pOptionsFile.exists()) {
+            i2pOptionsFile.withInputStream { i2pOptions.load(it) }
+            
+            if (!i2pOptions.containsKey("inbound.nickname"))
+                i2pOptions["inbound.nickname"] = "MuWire"
+                if (!i2pOptions.containsKey("outbound.nickname"))
+                    i2pOptions["outbound.nickname"] = "MuWire"
+        } else {
+            i2pOptions["inbound.nickname"] = "MuWire"
+            i2pOptions["outbound.nickname"] = "MuWire"
+            i2pOptions["inbound.length"] = "3"
+            i2pOptions["inbound.quantity"] = "4"
+            i2pOptions["outbound.length"] = "3"
+            i2pOptions["outbound.quantity"] = "4"
+            i2pOptions["i2cp.tcp.host"] = "127.0.0.1"
+            i2pOptions["i2cp.tcp.port"] = "7654"
+            Random r = new Random()
+            int port = r.nextInt(60000) + 4000
+            i2pOptions["i2np.ntcp.port"] = String.valueOf(port)
+            i2pOptions["i2np.udp.port"] = String.valueOf(port)
+            i2pOptionsFile.withOutputStream { i2pOptions.store(it, "") }
+        }
+        
         if (!props.embeddedRouter) {
             log.info "Initializing I2P context"
             I2PAppContext.getGlobalContext().logManager()
@@ -105,6 +130,9 @@ public class Core {
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
             routerProps.setProperty("i2cp.disableInterface", "true")
+            routerProps.setProperty("i2np.ntcp.port", i2pOptions["i2np.ntcp.port"])
+            routerProps.setProperty("i2np.udp.port", i2pOptions["i2np.udp.port"])
+            routerProps.setProperty("i2np.udp.internalPort", i2pOptions["i2np.udp.port"])
             router = new Router(routerProps)
             I2PAppContext.getGlobalContext().metaClass = new RouterContextMetaClass()
             router.runRouter()
@@ -122,25 +150,6 @@ public class Core {
 			}
 		}
 		
-        i2pOptions = new Properties()
-        def i2pOptionsFile = new File(home,"i2p.properties")
-        if (i2pOptionsFile.exists()) {
-            i2pOptionsFile.withInputStream { i2pOptions.load(it) }
-
-            if (!i2pOptions.containsKey("inbound.nickname"))
-                i2pOptions["inbound.nickname"] = "MuWire"
-            if (!i2pOptions.containsKey("outbound.nickname"))
-                i2pOptions["outbound.nickname"] = "MuWire"
-        } else {
-            i2pOptions["inbound.nickname"] = "MuWire"
-            i2pOptions["outbound.nickname"] = "MuWire"
-            i2pOptions["inbound.length"] = "3"
-            i2pOptions["inbound.quantity"] = "4"
-            i2pOptions["outbound.length"] = "3"
-            i2pOptions["outbound.quantity"] = "4"
-            i2pOptions["i2cp.tcp.host"] = "127.0.0.1"
-            i2pOptions["i2cp.tcp.port"] = "7654"
-        }
         
         // options like tunnel length and quantity
 		I2PSession i2pSession
