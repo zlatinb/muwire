@@ -11,6 +11,7 @@ import griffon.metadata.ArtifactProviderFor
 class OptionsModel {
     @Observable String downloadRetryInterval 
     @Observable String updateCheckInterval
+    @Observable boolean autoDownloadUpdate
     @Observable boolean onlyTrusted
     @Observable boolean shareDownloadedFiles
     @Observable String downloadLocation
@@ -40,6 +41,7 @@ class OptionsModel {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
         updateCheckInterval = settings.updateCheckInterval
+        autoDownloadUpdate = settings.autoDownloadUpdate
         onlyTrusted = !settings.allowUntrusted()
         shareDownloadedFiles = settings.shareDownloadedFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()

@@ -29,6 +29,7 @@ import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
 import com.muwire.core.update.UpdateAvailableEvent
+import com.muwire.core.update.UpdateDownloadedEvent
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 
@@ -143,6 +144,7 @@ class MainFrameModel {
             core.eventBus.register(FileUnsharedEvent.class, this)
             core.eventBus.register(RouterDisconnectedEvent.class, this)
             core.eventBus.register(AllFilesLoadedEvent.class, this)
+            core.eventBus.register(UpdateDownloadedEvent.class, this)
             
             timer.schedule({
                 if (core.shutdown.get())
@@ -185,6 +187,14 @@ class MainFrameModel {
             watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
         }
     }
+    
+    void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
+        runInsideUIAsync {
+            JOptionPane.showMessageDialog(null, "MuWire $e.version has been downloaded.  You can update now", 
+                "Update Downloaded", JOptionPane.INFORMATION_MESSAGE)
+        }
+    }
+    
     void onUIResultEvent(UIResultEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model.handleResult(e)

@@ -70,6 +70,10 @@ class OptionsController {
         model.updateCheckInterval = text
         settings.updateCheckInterval = Integer.valueOf(text)
 
+        boolean autoDownloadUpdate = view.autoDownloadUpdateCheckbox.model.isSelected()
+        model.autoDownloadUpdate = autoDownloadUpdate
+        settings.autoDownloadUpdate = autoDownloadUpdate
+        
         boolean onlyTrusted = view.allowUntrustedCheckbox.model.isSelected()
         model.onlyTrusted = onlyTrusted
         settings.setAllowUntrusted(!onlyTrusted)

@@ -32,6 +32,7 @@ class OptionsView {
     
     def retryField
     def updateField
+    def autoDownloadUpdateCheckbox
     def allowUntrustedCheckbox
     def shareDownloadedCheckbox
     
@@ -71,16 +72,19 @@ class OptionsView {
             label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 1))
             updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))
             label(text : "hours", constraints : gbc(gridx: 2, gridy : 1))
+            
+            label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 2))
+            autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, constraints : gbc(gridx:1, gridy : 2))
 
-            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 2))
-            allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 2))
+            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 3))
+            allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 3))
             
-            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
-            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:3))
+            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:4))
+            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:4))
             
-            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:4))
-            button(text : "Choose", constraints : gbc(gridx : 1, gridy:4), downloadLocationAction)
-            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:5, gridwidth:2))
+            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:5))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:5), downloadLocationAction)
+            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:6, gridwidth:2))
                         
         }
         i = builder.panel {

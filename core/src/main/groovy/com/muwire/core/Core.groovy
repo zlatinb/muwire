@@ -39,6 +39,7 @@ import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
+import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
 import com.muwire.core.update.UpdateClient
@@ -233,7 +234,9 @@ public class Core {
 		cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
         
         log.info("initializing update client")
-        updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props)
+        updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me)
+        eventBus.register(FileDownloadedEvent.class, updateClient)
+        eventBus.register(UIResultBatchEvent.class, updateClient)
         
 		log.info("initializing connector")
 		I2PConnector i2pConnector = new I2PConnector(socketManager)
