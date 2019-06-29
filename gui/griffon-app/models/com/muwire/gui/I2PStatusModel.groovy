@@ -15,6 +15,11 @@ class I2PStatusModel {
     @Observable int ntcpConnections
     @Observable int ssuConnections
     @Observable String networkStatus
+    @Observable int participatingTunnels
+    @Observable int activePeers
+    @Observable int receiveBps
+    @Observable int sendBps
+    @Observable int participatingBW
     
     void mvcGroupInit(Map<String,String> args) {
         controller.refresh()

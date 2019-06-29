@@ -39,6 +39,16 @@ class I2PStatusView {
             label(text : bind {model.ntcpConnections}, constraints : gbc(gridx: 1, gridy:1))
             label(text : "SSU Connections", constraints : gbc(gridx:0, gridy:2))
             label(text : bind {model.ssuConnections}, constraints : gbc(gridx: 1, gridy:2))
+            label(text : "Participating Tunnels", constraints : gbc(gridx:0, gridy:3))
+            label(text : bind {model.participatingTunnels}, constraints : gbc(gridx: 1, gridy:3))
+            label(text : "Participating Bandwidth", constraints : gbc(gridx:0, gridy:4))
+            label(text : bind {model.participatingBW}, constraints : gbc(gridx: 1, gridy:4))
+            label(text : "Active Peers", constraints : gbc(gridx:0, gridy:5))
+            label(text : bind {model.activePeers}, constraints : gbc(gridx: 1, gridy:5))
+            label(text : "Receive Bps (15 seconds)", constraints : gbc(gridx:0, gridy:6))
+            label(text : bind {model.receiveBps}, constraints : gbc(gridx: 1, gridy:6))
+            label(text : "Send Bps (15 seconds)", constraints : gbc(gridx:0, gridy:7))
+            label(text : bind {model.sendBps}, constraints : gbc(gridx: 1, gridy:7))
         }
         
         buttonsPanel = builder.panel {
