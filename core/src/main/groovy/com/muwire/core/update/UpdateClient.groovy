@@ -145,7 +145,7 @@ class UpdateClient {
                     eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : payload.infoHash))
                 } else {
                     log.info("new version $payload.version available")
-                    updateInfoHash = new InfoHash(Base64.decode($payload.infoHash))
+                    updateInfoHash = new InfoHash(Base64.decode(payload.infoHash))
                     if (fileManager.rootToFiles.containsKey(updateInfoHash))
                         eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer))
                     else {
