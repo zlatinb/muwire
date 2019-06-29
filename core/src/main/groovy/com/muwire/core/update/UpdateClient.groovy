@@ -140,13 +140,20 @@ class UpdateClient {
                     log.info("no new version available")
                     return
                 }
+                
+                String infoHash
+                if (settings.updateType == "jar") {
+                    infoHash = payload.infoHash
+                } else
+                    infoHash = payload[settings.updateType]
+                
               
                 if (!settings.autoDownloadUpdate) {
                     log.info("new version $payload.version available, publishing event")
-                    eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : payload.infoHash))
+                    eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : infoHash))
                 } else {
                     log.info("new version $payload.version available")
-                    updateInfoHash = new InfoHash(Base64.decode(payload.infoHash))
+                    updateInfoHash = new InfoHash(Base64.decode(infoHash))
                     if (fileManager.rootToFiles.containsKey(updateInfoHash))
                         eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer))
                     else {

@@ -14,6 +14,7 @@ class MuWireSettings {
     int downloadRetryInterval
     int updateCheckInterval
     boolean autoDownloadUpdate
+    String updateType
     String nickname
     File downloadLocation
     CrawlerResponse crawlerResponse
@@ -39,6 +40,7 @@ class MuWireSettings {
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","1"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
+        updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","60"))
@@ -65,6 +67,7 @@ class MuWireSettings {
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))
+        props.setProperty("updateType",updateType)
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))

@@ -49,6 +49,7 @@ class Ready extends AbstractLifecycleHandler {
             log.info("creating new properties")
             props = new MuWireSettings()
             props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
+            props.updateType = System.getProperty("updateType")
             def nickname
             while (true) {
                 nickname = JOptionPane.showInputDialog(null,
