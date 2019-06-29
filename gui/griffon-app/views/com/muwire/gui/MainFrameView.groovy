@@ -71,6 +71,9 @@ class MainFrameView {
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
                     }
+                    menu (text : "Status") {
+                        menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
+                    }
                 }
                 borderLayout()
                 panel (border: etchedBorder(), constraints : BorderLayout.NORTH) {

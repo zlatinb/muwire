@@ -26,4 +26,14 @@ mvcGroups {
         view = 'com.muwire.gui.OptionsView'
         controller = 'com.muwire.gui.OptionsController'
     }
+    "mu-wire-status" {
+        model = 'com.muwire.gui.MuWireStatusModel'
+        view = 'com.muwire.gui.MuWireStatusView'
+        controller = 'com.muwire.gui.MuWireStatusController'
+    }
+    'i-2-p-status' {
+        model = 'com.muwire.gui.I2PStatusModel'
+        view = 'com.muwire.gui.I2PStatusView'
+        controller = 'com.muwire.gui.I2PStatusController'
+    }
 }

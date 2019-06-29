@@ -84,6 +84,7 @@ public class Core {
     private final DownloadManager downloadManager
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
+    final UploadManager uploadManager
     
     private final Router router
     
@@ -256,7 +257,7 @@ public class Core {
         eventBus.register(UIDownloadResumedEvent.class, downloadManager)
                 
         log.info("initializing upload manager")
-        UploadManager uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager)
+        uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager)
         
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
