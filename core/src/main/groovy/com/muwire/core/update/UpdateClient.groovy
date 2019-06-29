@@ -38,6 +38,7 @@ class UpdateClient {
     private long lastUpdateCheckTime
     
     private volatile InfoHash updateInfoHash
+    private volatile String version, signer
     private volatile boolean updateDownloading
     
     UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, FileManager fileManager, Persona me) {
@@ -74,7 +75,7 @@ class UpdateClient {
         if (e.downloadedFile.infoHash != updateInfoHash)
             return
         updateDownloading = false
-        eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer))
+        eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer))
     }
     
     private void checkUpdate() {
@@ -150,6 +151,8 @@ class UpdateClient {
                         eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer))
                     else {
                         updateDownloading = false
+                        version = payload.version
+                        signer = payload.signer
                         log.info("starting search for new version hash $payload.infoHash")
                         def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : UUID.randomUUID(), oobInfohash : true)
                         def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, replyTo : me.destination,
