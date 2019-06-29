@@ -22,6 +22,7 @@ import javax.swing.border.Border
 import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.Constants
+import com.muwire.core.MuWireSettings
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
 
@@ -73,6 +74,8 @@ class MainFrameView {
                     }
                     menu (text : "Status") {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
+                        MuWireSettings muSettings = application.context.get("muwire-settings")
+                        menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status")})
                     }
                 }
                 borderLayout()

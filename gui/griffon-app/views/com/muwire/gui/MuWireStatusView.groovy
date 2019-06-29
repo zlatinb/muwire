@@ -30,7 +30,6 @@ class MuWireStatusView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        Core core = application.context.get("core")
         
         dialog = new JDialog(mainFrame, "MuWire Status", true)
         

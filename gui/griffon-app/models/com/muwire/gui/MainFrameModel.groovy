@@ -52,6 +52,7 @@ class MainFrameModel {
     MainFrameController controller
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
+    @Observable boolean routerPresent
     
     def results = new ConcurrentHashMap<>()
     def downloads = []
@@ -76,7 +77,7 @@ class MainFrameModel {
     
     private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
 
-    volatile Core core    
+    @Observable volatile Core core    
 
     private long lastRetryTime = System.currentTimeMillis()
     
@@ -124,6 +125,7 @@ class MainFrameModel {
         application.addPropertyChangeListener("core", {e ->
             coreInitialized = (e.getNewValue() != null)
             core = e.getNewValue()
+            routerPresent = core.router != null
             me = core.me.getHumanReadableName()
             core.eventBus.register(UIResultEvent.class, this)
             core.eventBus.register(UIResultBatchEvent.class, this)
