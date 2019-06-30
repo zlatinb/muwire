@@ -82,4 +82,13 @@ public class Persona {
         Persona other = (Persona)o
         name.equals(other.name) && destination.equals(other.destination)
     }
+    
+    public static void main(String []args) {
+        if (args.length != 1) {
+            println "This utility decodes a bas64-encoded persona"
+            System.exit(1)
+        }
+        Persona p = new Persona(new ByteArrayInputStream(Base64.decode(args[0])))
+        println p.getHumanReadableName()
+    }
 }
