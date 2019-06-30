@@ -24,7 +24,7 @@ class HasherService {
 	}
 	
 	void onFileSharedEvent(FileSharedEvent evt) {
-        if (fileManager.fileToSharedFile.containsKey(evt.file))
+        if (fileManager.fileToSharedFile.containsKey(evt.file.getCanonicalFile()))
             return
 		executor.execute( { -> process(evt.file) } as Runnable)
 	}

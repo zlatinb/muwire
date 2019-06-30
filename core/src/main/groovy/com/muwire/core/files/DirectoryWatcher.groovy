@@ -120,7 +120,7 @@ class DirectoryWatcher {
     
     private static File join(Path parent, Path path) {
         File parentFile = parent.toFile().getCanonicalFile()
-        new File(parentFile, path.toFile().getName())
+        new File(parentFile, path.toFile().getName()).getCanonicalFile()
     }
     
     private void publish() {
