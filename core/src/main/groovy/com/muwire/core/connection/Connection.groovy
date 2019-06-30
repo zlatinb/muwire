@@ -162,8 +162,10 @@ abstract class Connection implements Closeable {
     
     private boolean throttleSearch() {
         final long now = System.currentTimeMillis()
-        if (searchTimestamps.size() < SEARCHES)
+        if (searchTimestamps.size() < SEARCHES) {
+            searchTimestamps.addLast(now)
             return false
+        }
         Long oldest = searchTimestamps.getFirst()
         if (now - oldest.longValue() < INTERVAL)
             return true
