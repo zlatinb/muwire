@@ -202,7 +202,7 @@ class MainFrameModel {
     
     void onUIResultBatchEvent(UIResultBatchEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
-        resultsGroup?.model.handleResultBatch(e.results)
+        resultsGroup?.model?.handleResultBatch(e.results)
     }
     
     void onDownloadStartedEvent(DownloadStartedEvent e) {
