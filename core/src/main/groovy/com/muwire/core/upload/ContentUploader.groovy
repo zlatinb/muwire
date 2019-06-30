@@ -56,7 +56,7 @@ class ContentUploader extends Uploader {
         writeMesh(request.downloader)
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         
-        FileChannel channel
+        FileChannel channel = null
         try {
             channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ))
             mapped = channel.map(FileChannel.MapMode.READ_ONLY, range.start, range.end - range.start + 1)
@@ -72,6 +72,10 @@ class ContentUploader extends Uploader {
         } finally {
             try {channel?.close() } catch (IOException ignored) {}
             endpoint.getOutputStream().flush()
+            synchronized(this) {
+                DataUtil.tryUnmap(mapped)
+                mapped = null
+            }
         }
     }
     

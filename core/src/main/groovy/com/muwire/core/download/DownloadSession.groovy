@@ -198,6 +198,7 @@ class DownloadSession {
 
                 mapped.clear()
                 digest.update(mapped)
+                DataUtil.tryUnmap(mapped)
                 byte [] hash = digest.digest()
                 byte [] expected = new byte[32]
                 System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)

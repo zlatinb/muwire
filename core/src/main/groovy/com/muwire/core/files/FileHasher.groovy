@@ -1,6 +1,7 @@
 package com.muwire.core.files
 
 import com.muwire.core.InfoHash
+import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
 
@@ -59,6 +60,7 @@ class FileHasher {
 			for (int i = 0; i < numPieces - 1; i++) {
 				buf = raf.getChannel().map(MapMode.READ_ONLY, ((long)size) * i, size)
 				digest.update buf
+                DataUtil.tryUnmap(buf)
 				output.write(digest.digest(), 0, 32)
 			}
 			def lastPieceLength = length - (numPieces - 1) * ((long)size)
