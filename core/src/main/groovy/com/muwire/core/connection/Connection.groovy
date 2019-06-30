@@ -21,6 +21,9 @@ import net.i2p.data.Destination
 
 @Log
 abstract class Connection implements Closeable {
+    
+    private static final int SEARCHES = 10
+    private static final long INTERVAL = 1000
 
 	final EventBus eventBus
 	final Endpoint endpoint
@@ -32,6 +35,7 @@ abstract class Connection implements Closeable {
 	private final AtomicBoolean running = new AtomicBoolean()
 	private final BlockingQueue messages = new LinkedBlockingQueue()
 	private final Thread reader, writer
+    private final LinkedList<Long> searchTimestamps = new LinkedList<>()
 	
 	protected final String name
 	
@@ -156,7 +160,23 @@ abstract class Connection implements Closeable {
 		}
 	}
     
+    private boolean throttleSearch() {
+        final long now = System.currentTimeMillis()
+        if (searchTimestamps.size() < SEARCHES)
+            return false
+        Long oldest = searchTimestamps.getFirst()
+        if (now - oldest.longValue() < INTERVAL)
+            return true
+        searchTimestamps.addLast(now)
+        searchTimestamps.removeFirst()
+        false
+    }
+    
     protected void handleSearch(def search) {
+        if (throttleSearch()) {
+            log.info("dropping excessive search")
+            return
+        } 
         UUID uuid = UUID.fromString(search.uuid)
         byte [] infohash = null
         if (search.infohash != null) {
