@@ -367,11 +367,12 @@ class MainFrameView {
         sharedFilesTable.rowSorter.setSortsOnUpdates(true)
         
         JPopupMenu sharedFilesMenu = new JPopupMenu()
-//        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
-//        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFiles()})
         JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
-        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard(sharedFilesTable)})
+        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
         sharedFilesMenu.add(copyHashToClipboard)
+        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
+        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
+        sharedFilesMenu.add(unshareSelectedFiles)
         sharedFilesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -431,13 +432,21 @@ class MainFrameView {
         menu.show(event.getComponent(), event.getX(), event.getY())
     }
     
-    def copyHashToClipboard(JTable sharedFilesTable) {
+    def selectedSharedFile() {
+        def sharedFilesTable = builder.getVariable("shared-files-table")
         int selected = sharedFilesTable.getSelectedRow()
         if (selected < 0)
-            return
-        if (lastSharedSortEvent != null) 
+            return null
+        if (lastSharedSortEvent != null)
             selected = sharedFilesTable.rowSorter.convertRowIndexToModel(selected)
-        String root = Base64.encode(model.shared[selected].infoHash.getRoot())
+        model.shared[selected]
+    }
+    
+    def copyHashToClipboard() {
+        def selected = selectedSharedFile()
+        if (selected == null)
+            return
+        String root = Base64.encode(selected.infoHash.getRoot())
         StringSelection selection = new StringSelection(root)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)

@@ -14,12 +14,14 @@ import javax.inject.Inject
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
+import com.muwire.core.SharedFile
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
+import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.TrustEvent
@@ -33,6 +35,8 @@ class MainFrameController {
     
     @MVCMember @Nonnull
     MainFrameModel model
+    @MVCMember @Nonnull
+    MainFrameView view
 
     private volatile Core core
     
@@ -206,8 +210,11 @@ class MainFrameController {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
     }
     
-    void unshareSelectedFiles() {
-        println "unsharing selected files"
+    void unshareSelectedFile() {
+        SharedFile sf = view.selectedSharedFile()
+        if (sf == null)
+            return
+        core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
     }
     
     void stopWatchingDirectory() {
