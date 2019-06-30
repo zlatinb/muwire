@@ -18,6 +18,8 @@ class FileHasher {
 	/**
 	 * @param size of the file to be shared
 	 * @return the size of each piece in power of 2
+     * piece size is minimum 128 KBytees and maximum 16 MBytes in power of 2 steps (2^17 - 2^24)
+     * there can be up to 8192 pieces maximum per file
 	 */
 	static int getPieceSize(long size) {
 		if (size <= 0x1 << 30)
