@@ -42,6 +42,8 @@ import com.muwire.core.search.SearchManager
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.trust.TrustSubscriber
+import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.update.UpdateClient
 import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
@@ -74,6 +76,7 @@ public class Core {
     final MuWireSettings muOptions
     
     private final TrustService trustService
+    private final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
     private final HostCache hostCache
     private final ConnectionManager connectionManager
@@ -280,6 +283,11 @@ public class Core {
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, hasherService)
+        
+        log.info("initializing trust subscriber")
+        trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
+        eventBus.register(UILoadedEvent.class, trustSubscriber)
+        eventBus.register(TrustSubscriptionEvent.class, trustSubscriber)
 	}
     
     public void startServices() {
@@ -300,6 +308,8 @@ public class Core {
             log.info("already shutting down")
             return
         }
+        log.info("shutting down trust subscriber")
+        trustSubscriber.stop()
         log.info("shutting down download manageer")
         downloadManager.shutdown()
         log.info("shutting down connection acceeptor")

@@ -1,14 +1,21 @@
 package com.muwire.core.trust
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
+import java.util.logging.Level
 
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
+import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.util.DataUtil
 
+import groovy.util.logging.Log
 import net.i2p.data.Destination
 
+@Log
 class TrustSubscriber {
     private final EventBus eventBus
     private final I2PConnector i2pConnector
@@ -62,6 +69,7 @@ class TrustSubscriber {
                     if (now - trustList.timestamp < settings.trustListInterval * 60 * 60 * 1000)
                         return
                     check(trustList, now)
+                    eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
                 }
             }
         } catch (InterruptedException e) {
@@ -71,6 +79,53 @@ class TrustSubscriber {
     }
     
     private void check(RemoteTrustList trustList, long now) {
-        // TODO: fetch trustlist and update timestamp
+        log.info("fetching trust list from ${trustList.persona.getHumanReadableName()}")
+        Endpoint endpoint = null
+        try {
+            endpoint = i2pConnector.connect(trustList.persona.destination)
+            OutputStream os = endpoint.getOutputStream()
+            InputStream is = endpoint.getInputStream()
+            os.write("TRUST\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.flush()
+            
+            String codeString = DataUtil.readTillRN(is)
+            int space = codeString.indexOf(' ')
+            if (space > 0)
+                codeString = codeString.substring(0,space)
+            int code = Integer.parseInt(codeString.trim())
+            
+            if (code != 200) {
+                log.info("couldn't fetch trust list, code $code")
+                return
+            }
+            
+            DataInputStream dis = new DataInputStream(is)
+            
+            Set<Persona> good = new HashSet<>()
+            int nGood = dis.readUnsignedShort()
+            for (int i = 0; i < nGood; i++) {
+                Persona p = new Persona(dis)
+                good.add(p)
+            }
+            
+            Set<Persona> bad = new HashSet<>()
+            int nBad = dis.readUnsignedShort()
+            for (int i = 0; i < nBad; i++) {
+                Persona p = new Persona(dis)
+                bad.add(p)
+            }
+            
+            trustList.timestamp = now
+            trustList.good.clear()
+            trustList.good.addAll(good)
+            trustList.bad.clear()
+            trustList.bad.addAll(bad)
+            
+        } catch (Exception e) {
+            log.log(Level.WARNING,"exception fetching trust list from ${trustList.persona.getHumanReadableName()}",e)
+        } finally {
+            endpoint?.close()
+        }
+        
     }
 }
