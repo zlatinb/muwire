@@ -129,6 +129,7 @@ public class Core {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
+            routerProps.setProperty("router.excludePeerCaps", "KLM")
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
             routerProps.setProperty("i2cp.disableInterface", "true")
