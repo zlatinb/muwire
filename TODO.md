@@ -32,5 +32,4 @@ To enable parsing of metadata from known file types and the user editing it or a
 
 * Wrapper of some kind for in-place upgrades
 * Download file sequentially
-* Unsharing of files (half done)
 * Multiple-selection download, Ctrl-A
