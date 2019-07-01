@@ -11,6 +11,7 @@ class MuWireSettings {
 	
     final boolean isLeaf
     boolean allowUntrusted
+    boolean allowTrustLists
     int downloadRetryInterval
     int updateCheckInterval
     boolean autoDownloadUpdate
@@ -33,6 +34,7 @@ class MuWireSettings {
 	MuWireSettings(Properties props) {
 		isLeaf = Boolean.valueOf(props.get("leaf","false"))
 		allowUntrusted = Boolean.valueOf(props.get("allowUntrusted","true"))
+        allowTrustLists = Boolean.valueOf(props.get("allowTrustLists","true"))
 		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
@@ -61,6 +63,7 @@ class MuWireSettings {
         Properties props = new Properties()
         props.setProperty("leaf", isLeaf.toString())
         props.setProperty("allowUntrusted", allowUntrusted.toString())
+        props.setProperty("allowTrustLists", String.valueOf(allowTrustLists))
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
