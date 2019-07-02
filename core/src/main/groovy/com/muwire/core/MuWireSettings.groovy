@@ -67,7 +67,7 @@ class MuWireSettings {
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))
-        props.setProperty("updateType",updateType)
+        props.setProperty("updateType",String.valueOf(updateType))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
