@@ -11,6 +11,7 @@ import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
 import net.i2p.client.datagram.I2PDatagramDissector
 import net.i2p.client.datagram.I2PDatagramMaker
+import net.i2p.crypto.SigType
 import net.i2p.util.SystemVersion
 import net.i2p.data.*
 
@@ -43,7 +44,7 @@ public class HostCache {
         def session
         if (!keyfile.exists()) {
             def os = new FileOutputStream(keyfile);
-            myDest = i2pClient.createDestination(os)
+            myDest = i2pClient.createDestination(os, SigType.EdDSA_SHA512_Ed25519)
             os.close()
             println "No key.dat file was found, so creating a new destination."
             println "This is the destination you want to give out for your new HostCache"
