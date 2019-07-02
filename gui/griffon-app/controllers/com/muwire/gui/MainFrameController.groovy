@@ -14,6 +14,7 @@ import javax.inject.Inject
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
@@ -26,6 +27,7 @@ import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustSubscriptionEvent
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -184,7 +186,7 @@ class MainFrameController {
     }
 
     private void markTrust(String tableName, TrustLevel level, def list) {
-        int row = builder.getVariable(tableName).getSelectedRow()
+        int row = view.getSelectedTrustTablesRow(tableName)
         if (row < 0)
             return
         core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
@@ -208,6 +210,15 @@ class MainFrameController {
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
+    }
+    
+    @ControllerAction
+    void subscribe() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        Persona p = model.trusted[row]
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
     }
     
     void unshareSelectedFile() {

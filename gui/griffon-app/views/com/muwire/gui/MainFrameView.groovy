@@ -54,6 +54,7 @@ class MainFrameView {
     def lastDownloadSortEvent
     def lastSharedSortEvent
     def lastWatchedSortEvent
+    def trustTablesSortEvents = [:]
     
     void initUI() {
         UISettings settings = application.context.get("ui-settings")
@@ -267,6 +268,7 @@ class MainFrameView {
                                     gridBagLayout()
                                     button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
                                     button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                                    button(text : "Subscribe", constraints : gbc(gridx: 0, gridy : 2), subscribeAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -298,7 +300,10 @@ class MainFrameView {
                                         closureColumn(header : "Distrusted", type: Integer, read : {it.bad.size()})
                                         closureColumn(header : "Status", type: String, read : {it.status.toString()})
                                         closureColumn(header : "Last Updated", type : String, read : {
-                                            String.valueOf(new Date(it.timestamp))
+                                            if (it.timestamp == 0)
+                                                return "Never"
+                                            else
+                                                return String.valueOf(new Date(it.timestamp))
                                         })
                                     }
                                 }
@@ -453,6 +458,20 @@ class MainFrameView {
             }
         })
         
+        // subscription table
+        def subscriptionTable = builder.getVariable("subscription-table")
+        subscriptionTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["subscription-table"] = evt})
+        subscriptionTable.rowSorter.setSortsOnUpdates(true)
+                
+        // trusted table
+        def trustedTable = builder.getVariable("trusted-table")
+        trustedTable.rowSorter.addRowSortListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
+        trustedTable.rowSorter.setSortsOnUpdates(true)
+        
+        // distrusted table
+        def distrustedTable = builder.getVariable("distrusted-table")
+        distrustedTable.rowSorter.addRowSortListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
+        distrustedTable.rowSorter.setSortsOnUpdates(true)
     }
     
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -616,5 +635,15 @@ class MainFrameView {
         if (lastWatchedSortEvent != null)
             selectedRow = watchedTable.rowSorter.convertRowIndexToModel(selectedRow)
         model.watched[selectedRow]
+    }
+    
+    int getSelectedTrustTablesRow(String tableName) {
+        def table = builder.getVariable(tableName)
+        int selectedRow = table.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (trustTablesSortEvents.get(tableName) != null)
+            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
     }
 }
