@@ -236,9 +236,7 @@ class DownloadSession {
         if (idx == SAMPLES - 1)
             return reads[idx]
             
-        long interval = timestamps.last - timestamps[idx]
-        if (interval == 0) 
-            interval = 1
+        long interval = Math.max(1000,timestamps.last - timestamps[idx])
         for (int i = idx; i < SAMPLES; i++)
             totalRead += reads[idx]
         (int)(totalRead * 1000.0 / interval)
