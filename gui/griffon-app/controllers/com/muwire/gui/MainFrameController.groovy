@@ -227,7 +227,12 @@ class MainFrameController {
     
     @ControllerAction
     void review() {
-        println "review action"
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        Map<String,Object> env = new HashMap<>()
+        env["trustList"] = list
+        mvcGroup.createMVCGroup("trust-list", env)
     }
     
     @ControllerAction

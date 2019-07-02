@@ -36,4 +36,9 @@ mvcGroups {
         view = 'com.muwire.gui.I2PStatusView'
         controller = 'com.muwire.gui.I2PStatusController'
     }
+    'trust-list' {
+        model = 'com.muwire.gui.TrustListModel'
+        view = 'com.muwire.gui.TrustListView'
+        controller = 'com.muwire.gui.TrustListController'
+    }
 }
