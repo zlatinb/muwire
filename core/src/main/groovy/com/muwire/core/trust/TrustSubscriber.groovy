@@ -53,7 +53,7 @@ class TrustSubscriber {
             remoteTrustLists.remove(e.persona.destination)
         } else {
             RemoteTrustList trustList = remoteTrustLists.putIfAbsent(e.persona.destination, new RemoteTrustList(e.persona))
-            trustList?.timestamp = 0
+            trustList?.forceUpdate = true
             synchronized(waitLock) {
                 waitLock.notify()
             }
@@ -68,8 +68,12 @@ class TrustSubscriber {
                 }
                 final long now = System.currentTimeMillis()
                 remoteTrustLists.values().each { trustList ->
-                    if (now - trustList.timestamp < settings.trustListInterval * 60 * 60 * 1000)
+                    if (trustList.status == RemoteTrustList.Status.UPDATING)
                         return
+                    if (!trustList.forceUpdate &&
+                        now - trustList.timestamp < settings.trustListInterval * 60 * 60 * 1000)
+                        return
+                    trustList.forceUpdate = false
                     updateThreads.submit(new UpdateJob(trustList))
                 }
             }

@@ -11,7 +11,8 @@ class RemoteTrustList {
     
     private final Persona persona
     private final Set<Persona> good, bad
-    long timestamp
+    volatile long timestamp
+    volatile boolean forceUpdate
     Status status = Status.NEW
     
     RemoteTrustList(Persona persona) {
