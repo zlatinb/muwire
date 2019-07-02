@@ -7,6 +7,7 @@ import com.muwire.core.connection.Endpoint
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -58,6 +59,11 @@ public class Downloader {
     private final AtomicBoolean eventFired = new AtomicBoolean()
     private boolean piecesFileClosed
 
+    private ArrayList speedArr = new ArrayList<Integer>()
+    private int speedPos = 0
+    private int speedAvg = 0
+    private long timestamp = Instant.now().toEpochMilli()
+
     public Downloader(EventBus eventBus, DownloadManager downloadManager, 
         Persona me, File file, long length, InfoHash infoHash, 
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
@@ -76,6 +82,10 @@ public class Downloader {
         this.pieceSize = 1 << pieceSizePow2
         this.pieces = pieces
         this.nPieces = pieces.nPieces
+
+        // default size suitable for an average of 5 seconds / 5 elements / 5 interval units
+        // it's easily adjustable by resizing the size of speedArr
+        this.speedArr = [ 0, 0, 0, 0, 0 ]
     }
     
     public synchronized InfoHash getInfoHash() {
@@ -124,14 +134,35 @@ public class Downloader {
     
     
     public int speed() {
-        int total = 0
+        int currSpeed = 0
         if (getCurrentState() == DownloadState.DOWNLOADING) {
             activeWorkers.values().each {
                 if (it.currentState == WorkerState.DOWNLOADING)
-                    total += it.speed()
+                    currSpeed += it.speed()
             }
         }
-        total
+
+        // normalize to speedArr.size
+        currSpeed /= speedArr.size()
+
+        // compute new speedAvg and update speedArr
+        if ( speedArr[speedPos] > speedAvg ) {
+            speedAvg = 0
+        } else {
+            speedAvg -= speedArr[speedPos]
+        }
+        speedAvg += currSpeed
+        speedArr[speedPos] = currSpeed
+        // this might be necessary due to rounding errors
+        if (speedAvg < 0)
+            speedAvg = 0
+
+        // rolling index over the speedArr
+        speedPos++
+        if (speedPos >= speedArr.size())
+            speedPos=0
+
+        speedAvg
     }
     
     public DownloadState getCurrentState() {
