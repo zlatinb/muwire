@@ -29,11 +29,11 @@ class OptionsView {
     def i
     def u
     def bandwidth
+    def trust
     
     def retryField
     def updateField
     def autoDownloadUpdateCheckbox
-    def allowUntrustedCheckbox
     def shareDownloadedCheckbox
     
     def inboundLengthField
@@ -50,10 +50,13 @@ class OptionsView {
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
     def showSearchHashesCheckbox
-    
-    
+        
     def inBwField
     def outBwField
+    
+    def allowUntrustedCheckbox
+    def allowTrustListsCheckbox
+    def trustListIntervalField
     
     def buttonsPanel    
     
@@ -76,15 +79,12 @@ class OptionsView {
             label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 2))
             autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, constraints : gbc(gridx:1, gridy : 2))
 
-            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 3))
-            allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 3))
+            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
+            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:3))
             
-            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:4))
-            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:4))
-            
-            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:5))
-            button(text : "Choose", constraints : gbc(gridx : 1, gridy:5), downloadLocationAction)
-            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:6, gridwidth:2))
+            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:4))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:4), downloadLocationAction)
+            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:5, gridwidth:2))
                         
         }
         i = builder.panel {
@@ -134,6 +134,16 @@ class OptionsView {
             label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 2))
             outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 2))
         }
+        trust = builder.panel {
+            gridBagLayout()
+            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 0))
+            allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0))
+            label(text : "Allow others to view my trust list", constraints : gbc(gridx: 0, gridy : 1))
+            allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 1))
+            label(text : "Update trust lists every ", constraints : gbc(gridx:0, gridy:2))
+            trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:2))
+            label(text : "hours", constraints : gbc(gridx: 2, gridy:2))
+        }
        
         
         buttonsPanel = builder.panel {
@@ -152,6 +162,7 @@ class OptionsView {
         if (core.router != null) {
             tabbedPane.addTab("Bandwidth", bandwidth)
         }
+        tabbedPane.addTab("Trust", trust)
                 
         JPanel panel = new JPanel()
         panel.setLayout(new BorderLayout())

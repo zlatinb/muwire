@@ -74,9 +74,6 @@ class OptionsController {
         model.autoDownloadUpdate = autoDownloadUpdate
         settings.autoDownloadUpdate = autoDownloadUpdate
         
-        boolean onlyTrusted = view.allowUntrustedCheckbox.model.isSelected()
-        model.onlyTrusted = onlyTrusted
-        settings.setAllowUntrusted(!onlyTrusted)
         
         boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
         model.shareDownloadedFiles = shareDownloaded
@@ -93,7 +90,20 @@ class OptionsController {
             model.outBw = text
             settings.outBw = Integer.valueOf(text)
         }
-                                
+        
+        
+        boolean onlyTrusted = view.allowUntrustedCheckbox.model.isSelected()
+        model.onlyTrusted = onlyTrusted
+        settings.setAllowUntrusted(!onlyTrusted)
+        
+        boolean trustLists = view.allowTrustListsCheckbox.model.isSelected()
+        model.trustLists = trustLists
+        settings.allowTrustLists = trustLists
+        
+        String trustListInterval = view.trustListIntervalField.text
+        model.trustListInterval = trustListInterval
+        settings.trustListInterval = Integer.parseInt(trustListInterval)
+
         File settingsFile = new File(core.home, "MuWire.properties")
         settingsFile.withOutputStream { 
             settings.write(it)

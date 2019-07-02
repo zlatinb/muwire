@@ -11,9 +11,11 @@ import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JTable
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
@@ -24,8 +26,10 @@ import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
+import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustSubscriptionEvent
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -184,7 +188,7 @@ class MainFrameController {
     }
 
     private void markTrust(String tableName, TrustLevel level, def list) {
-        int row = builder.getVariable(tableName).getSelectedRow()
+        int row = view.getSelectedTrustTablesRow(tableName)
         if (row < 0)
             return
         core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
@@ -208,6 +212,58 @@ class MainFrameController {
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
+    }
+    
+    @ControllerAction
+    void subscribe() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        Persona p = model.trusted[row]
+        core.muOptions.trustSubscriptions.add(p)
+        saveMuWireSettings()
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
+    }
+    
+    @ControllerAction
+    void review() {
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        Map<String,Object> env = new HashMap<>()
+        env["trustList"] = list
+        env["trustService"] = core.trustService
+        env["eventBus"] = core.eventBus
+        mvcGroup.createMVCGroup("trust-list", env)
+        
+    }
+    
+    @ControllerAction
+    void update() {
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : true))
+    }
+    
+    @ControllerAction
+    void unsubscribe() {
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        core.muOptions.trustSubscriptions.remove(list.persona)
+        saveMuWireSettings()
+        model.subscriptions.remove(list)
+        JTable table = builder.getVariable("subscription-table")
+        table.model.fireTableDataChanged()
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : false))
+    }
+    
+    private RemoteTrustList getSelectedTrustList() {
+        int row = view.getSelectedTrustTablesRow("subscription-table")
+        if (row < 0)
+            return null
+        model.subscriptions[row]
     }
     
     void unshareSelectedFile() {

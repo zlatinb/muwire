@@ -14,6 +14,7 @@ import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 import com.muwire.core.upload.UploadManager
+import com.muwire.core.util.DataUtil
 import com.muwire.core.search.InvalidSearchResultException
 import com.muwire.core.search.ResultsParser
 import com.muwire.core.search.SearchManager
@@ -124,6 +125,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'P':
                     processPOST(e)
+                    break
+                case (byte)'T':
+                    processTRUST(e)
                     break
 				default:
 					throw new Exception("Invalid read $read")
@@ -241,6 +245,45 @@ class ConnectionAcceptor {
         } finally {
             e.close()
         }
+    }
+    
+    private void processTRUST(Endpoint e) {
+        byte[] RUST = new byte[6]
+        DataInputStream dis = new DataInputStream(e.getInputStream())
+        dis.readFully(RUST)
+        if (RUST != "RUST\r\n".getBytes(StandardCharsets.US_ASCII))
+            throw new IOException("Invalid TRUST connection")
+        String header
+        while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
+        
+        OutputStream os = e.getOutputStream()
+        if (!settings.allowTrustLists) {
+            os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.flush()
+            e.close()
+            return
+        }
+        
+        os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+        List<Persona> good = new ArrayList<>(trustService.good.values())
+        int size = Math.min(Short.MAX_VALUE * 2, good.size())
+        good = good.subList(0, size)
+        DataOutputStream dos = new DataOutputStream(os)
+        dos.writeShort(size)
+        good.each {
+            it.write(dos)
+        }
+        
+        List<Persona> bad = new ArrayList<>(trustService.bad.values())
+        size = Math.min(Short.MAX_VALUE * 2, bad.size())
+        bad = bad.subList(0, size)
+        dos.writeShort(size)
+        bad.each {
+            it.write(dos)
+        }
+        
+        dos.flush()
+        e.close()
     }
 	
 }

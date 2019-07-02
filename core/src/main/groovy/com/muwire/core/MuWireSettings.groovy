@@ -11,6 +11,9 @@ class MuWireSettings {
 	
     final boolean isLeaf
     boolean allowUntrusted
+    boolean allowTrustLists
+    int trustListInterval
+    Set<Persona> trustSubscriptions
     int downloadRetryInterval
     int updateCheckInterval
     boolean autoDownloadUpdate
@@ -32,7 +35,9 @@ class MuWireSettings {
 	
 	MuWireSettings(Properties props) {
 		isLeaf = Boolean.valueOf(props.get("leaf","false"))
-		allowUntrusted = Boolean.valueOf(props.get("allowUntrusted","true"))
+		allowUntrusted = Boolean.valueOf(props.getProperty("allowUntrusted","true"))
+        allowTrustLists = Boolean.valueOf(props.getProperty("allowTrustLists","true"))
+        trustListInterval = Integer.valueOf(props.getProperty("trustListInterval","1"))
 		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
@@ -55,12 +60,20 @@ class MuWireSettings {
             encoded.each { watchedDirectories << DataUtil.readi18nString(Base64.decode(it)) }
         }
         
+        trustSubscriptions = new HashSet<>()
+        if (props.containsKey("trustSubscriptions")) {
+            props.getProperty("trustSubscriptions").split(",").each { 
+                trustSubscriptions.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
+            }
+        }
 	}
     
     void write(OutputStream out) throws IOException {
         Properties props = new Properties()
         props.setProperty("leaf", isLeaf.toString())
         props.setProperty("allowUntrusted", allowUntrusted.toString())
+        props.setProperty("allowTrustLists", String.valueOf(allowTrustLists))
+        props.setProperty("trustListInterval", String.valueOf(trustListInterval))
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
@@ -81,6 +94,13 @@ class MuWireSettings {
                 map({Base64.encode(DataUtil.encodei18nString(it))}).
                 collect(Collectors.joining(","))
             props.setProperty("watchedDirectories", encoded)
+        }
+        
+        if (!trustSubscriptions.isEmpty()) {
+            String encoded = trustSubscriptions.stream().
+                map({it.toBase64()}).
+                collect(Collectors.joining(","))
+            props.setProperty("trustSubscriptions", encoded)
         }
         
         props.store(out, "")

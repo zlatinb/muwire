@@ -25,6 +25,7 @@ import com.muwire.core.Constants
 import com.muwire.core.MuWireSettings
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.trust.RemoteTrustList
 
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -54,6 +55,7 @@ class MainFrameView {
     def lastDownloadSortEvent
     def lastSharedSortEvent
     def lastWatchedSortEvent
+    def trustTablesSortEvents = [:]
     
     void initUI() {
         UISettings settings = application.context.get("ui-settings")
@@ -251,35 +253,66 @@ class MainFrameView {
                         }
                     }
                     panel(constraints : "trust window") {
-                        gridLayout(rows: 1, cols :2)
-                        panel (border : etchedBorder()){
-                            borderLayout()
-                            scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "trusted-table", autoCreateRowSorter : true) {
-                                    tableModel(list : model.trusted) {
-                                        closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
+                        gridLayout(rows : 2, cols : 1)
+                        panel {
+                            gridLayout(rows: 1, cols :2)
+                            panel (border : etchedBorder()){
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    table(id : "trusted-table", autoCreateRowSorter : true) {
+                                        tableModel(list : model.trusted) {
+                                            closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
+                                        }
                                     }
                                 }
+                                panel (constraints : BorderLayout.EAST) {
+                                    gridBagLayout()
+                                    button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                    button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                                    button(text : "Subscribe", constraints : gbc(gridx: 0, gridy : 2), subscribeAction)
+                                }
                             }
-                            panel (constraints : BorderLayout.EAST) {
-                                gridBagLayout()
-                                button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
-                                button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                            panel (border : etchedBorder()){
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    table(id : "distrusted-table", autoCreateRowSorter : true) {
+                                        tableModel(list : model.distrusted) {
+                                            closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
+                                        }
+                                    }
+                                }
+                                panel(constraints : BorderLayout.WEST) {
+                                    gridBagLayout()
+                                    button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                    button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
+                                }
                             }
                         }
-                        panel (border : etchedBorder()){
+                        panel {
                             borderLayout()
+                            panel (constraints : BorderLayout.NORTH){
+                                label(text : "Trust List Subscriptions")
+                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "distrusted-table", autoCreateRowSorter : true) {
-                                    tableModel(list : model.distrusted) {
-                                        closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
+                                table(id : "subscription-table", autoCreateRowSorter : true) {
+                                    tableModel(list : model.subscriptions) {
+                                        closureColumn(header : "Name", type: String, read : {it.persona.getHumanReadableName()})
+                                        closureColumn(header : "Trusted", type: Integer, read : {it.good.size()})
+                                        closureColumn(header : "Distrusted", type: Integer, read : {it.bad.size()})
+                                        closureColumn(header : "Status", type: String, read : {it.status.toString()})
+                                        closureColumn(header : "Last Updated", type : String, read : {
+                                            if (it.timestamp == 0)
+                                                return "Never"
+                                            else
+                                                return String.valueOf(new Date(it.timestamp))
+                                        })
                                     }
                                 }
                             }
-                            panel(constraints : BorderLayout.WEST) {
-                                gridBagLayout()
-                                button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
-                                button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : "Review", enabled : bind {model.reviewButtonEnabled}, reviewAction)
+                                button(text : "Update", enabled : bind {model.updateButtonEnabled}, updateAction)
+                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
                             }
                         }
                     }
@@ -426,6 +459,47 @@ class MainFrameView {
             }
         })
         
+        // subscription table
+        def subscriptionTable = builder.getVariable("subscription-table")
+        subscriptionTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["subscription-table"] = evt})
+        subscriptionTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = subscriptionTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedTrustTablesRow("subscription-table")
+            if (selectedRow < 0) {
+                model.reviewButtonEnabled = false
+                model.updateButtonEnabled = false
+                model.unsubscribeButtonEnabled = false
+                return
+            }
+            def trustList = model.subscriptions[selectedRow]
+            if (trustList == null)
+                return
+            switch(trustList.status) {
+                case RemoteTrustList.Status.NEW:
+                case RemoteTrustList.Status.UPDATING:
+                model.reviewButtonEnabled = false
+                model.updateButtonEnabled = false
+                model.unsubscribeButtonEnabled = false
+                break
+                case RemoteTrustList.Status.UPDATED:
+                model.reviewButtonEnabled = true
+                model.updateButtonEnabled = true
+                model.unsubscribeButtonEnabled = true
+                break
+            }
+        })
+                
+        // trusted table
+        def trustedTable = builder.getVariable("trusted-table")
+        trustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
+        trustedTable.rowSorter.setSortsOnUpdates(true)
+        
+        // distrusted table
+        def distrustedTable = builder.getVariable("distrusted-table")
+        distrustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
+        distrustedTable.rowSorter.setSortsOnUpdates(true)
     }
     
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -589,5 +663,15 @@ class MainFrameView {
         if (lastWatchedSortEvent != null)
             selectedRow = watchedTable.rowSorter.convertRowIndexToModel(selectedRow)
         model.watched[selectedRow]
+    }
+    
+    int getSelectedTrustTablesRow(String tableName) {
+        def table = builder.getVariable(tableName)
+        int selectedRow = table.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (trustTablesSortEvents.get(tableName) != null)
+            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
     }
 }
