@@ -44,7 +44,7 @@ class I2PStatusView {
             label(text : "Participating Tunnels", constraints : gbc(gridx:0, gridy:4))
             label(text : bind {model.participatingTunnels}, constraints : gbc(gridx: 1, gridy:4))
             label(text : "Participating Bandwidth", constraints : gbc(gridx:0, gridy:5))
-            label(text : bind {model.participatingBW}, constraints : gbc(gridx: 1, gridy:6))
+            label(text : bind {model.participatingBW}, constraints : gbc(gridx: 1, gridy:5))
             label(text : "Active Peers", constraints : gbc(gridx:0, gridy:6))
             label(text : bind {model.activePeers}, constraints : gbc(gridx: 1, gridy:6))
             label(text : "Receive Bps (15 seconds)", constraints : gbc(gridx:0, gridy:7))
