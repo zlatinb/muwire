@@ -12,7 +12,6 @@ class OptionsModel {
     @Observable String downloadRetryInterval 
     @Observable String updateCheckInterval
     @Observable boolean autoDownloadUpdate
-    @Observable boolean onlyTrusted
     @Observable boolean shareDownloadedFiles
     @Observable String downloadLocation
     
@@ -37,12 +36,17 @@ class OptionsModel {
     @Observable String inBw
     @Observable String outBw
     
+    // trust options
+    @Observable boolean onlyTrusted
+    @Observable boolean trustLists
+    @Observable String trustListInterval
+    
+    
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
         updateCheckInterval = settings.updateCheckInterval
         autoDownloadUpdate = settings.autoDownloadUpdate
-        onlyTrusted = !settings.allowUntrusted()
         shareDownloadedFiles = settings.shareDownloadedFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         
@@ -67,5 +71,9 @@ class OptionsModel {
             inBw = String.valueOf(settings.inBw)
             outBw = String.valueOf(settings.outBw)
         }
+        
+        onlyTrusted = !settings.allowUntrusted()
+        trustLists = settings.allowTrustLists
+        trustListInterval = String.valueOf(settings.trustListInterval)
     }
 }
