@@ -51,7 +51,7 @@ class TrustSubscriber {
         } else {
             settings.trustSubscriptions.add(e.persona)
             RemoteTrustList trustList = remoteTrustLists.putIfAbsent(e.persona.destination, new RemoteTrustList(e.persona))
-            trustList.timestamp = 0
+            trustList?.timestamp = 0
             synchronized(waitLock) {
                 waitLock.notify()
             }
