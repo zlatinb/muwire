@@ -251,35 +251,62 @@ class MainFrameView {
                         }
                     }
                     panel(constraints : "trust window") {
-                        gridLayout(rows: 1, cols :2)
-                        panel (border : etchedBorder()){
-                            borderLayout()
-                            scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "trusted-table", autoCreateRowSorter : true) {
-                                    tableModel(list : model.trusted) {
-                                        closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
+                        gridLayout(rows : 2, cols : 1)
+                        panel {
+                            gridLayout(rows: 1, cols :2)
+                            panel (border : etchedBorder()){
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    table(id : "trusted-table", autoCreateRowSorter : true) {
+                                        tableModel(list : model.trusted) {
+                                            closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
+                                        }
                                     }
                                 }
+                                panel (constraints : BorderLayout.EAST) {
+                                    gridBagLayout()
+                                    button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                    button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                                }
                             }
-                            panel (constraints : BorderLayout.EAST) {
-                                gridBagLayout()
-                                button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
-                                button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
+                            panel (border : etchedBorder()){
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    table(id : "distrusted-table", autoCreateRowSorter : true) {
+                                        tableModel(list : model.distrusted) {
+                                            closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
+                                        }
+                                    }
+                                }
+                                panel(constraints : BorderLayout.WEST) {
+                                    gridBagLayout()
+                                    button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                    button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
+                                }
                             }
                         }
-                        panel (border : etchedBorder()){
+                        panel {
                             borderLayout()
+                            panel (constraints : BorderLayout.NORTH){
+                                label(text : "Trust List Subscriptions")
+                            }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "distrusted-table", autoCreateRowSorter : true) {
-                                    tableModel(list : model.distrusted) {
-                                        closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
+                                table(id : "subscription-table", autoCreateRowSorter : true) {
+                                    tableModel(list : model.subscriptions) {
+                                        closureColumn(header : "Name", type: String, read : {it.persona.getHumanReadableName()})
+                                        closureColumn(header : "Trusted", type: Integer, read : {it.good.size()})
+                                        closureColumn(header : "Distrusted", type: Integer, read : {it.bad.size()})
+                                        closureColumn(header : "Status", type: String, read : {it.status.toString()})
+                                        closureColumn(header : "Last Updated", type : String, read : {
+                                            String.valueOf(new Date(it.timestamp))
+                                        })
                                     }
                                 }
                             }
-                            panel(constraints : BorderLayout.WEST) {
-                                gridBagLayout()
-                                button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
-                                button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : "Review")
+                                button(text : "Update")
+                                button(text : "Unsubscribe")
                             }
                         }
                     }

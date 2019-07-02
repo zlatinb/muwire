@@ -28,6 +28,8 @@ import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
+import com.muwire.core.trust.TrustSubscriptionEvent
+import com.muwire.core.trust.TrustSubscriptionUpdatedEvent
 import com.muwire.core.update.UpdateAvailableEvent
 import com.muwire.core.update.UpdateDownloadedEvent
 import com.muwire.core.upload.UploadEvent
@@ -64,6 +66,7 @@ class MainFrameModel {
     def searches = new LinkedList()
     def trusted = []
     def distrusted = []
+    def subscriptions = []
     
     @Observable int connections
     @Observable String me
@@ -145,6 +148,7 @@ class MainFrameModel {
             core.eventBus.register(RouterDisconnectedEvent.class, this)
             core.eventBus.register(AllFilesLoadedEvent.class, this)
             core.eventBus.register(UpdateDownloadedEvent.class, this)
+            core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
             
             timer.schedule({
                 if (core.shutdown.get())
@@ -173,7 +177,6 @@ class MainFrameModel {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
                 
-                
                 resumeButtonText = "Retry"
             }
         })
@@ -185,6 +188,10 @@ class MainFrameModel {
             watched.addAll(core.muOptions.watchedDirectories)
             builder.getVariable("watched-directories-table").model.fireTableDataChanged()
             watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
+            
+            core.muOptions.trustSubscriptions.each {
+                core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
+            }
         }
     }
     
@@ -313,6 +320,14 @@ class MainFrameModel {
                     group.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
                 }
             }
+        }
+    }
+    
+    void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
+        runInsideUIAsync {
+            if (!subscriptions.contains(e.trustList))
+                subscriptions << e.trustList
+            updateTablePreservingSelection("subscription-table")
         }
     }
     
