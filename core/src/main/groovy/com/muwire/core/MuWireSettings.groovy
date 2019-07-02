@@ -98,7 +98,7 @@ class MuWireSettings {
         
         if (!trustSubscriptions.isEmpty()) {
             String encoded = trustSubscriptions.stream().
-                map(it.toBase64()).
+                map({it.toBase64()}).
                 collect(Collectors.joining(","))
             props.setProperty("trustSubscriptions", encoded)
         }

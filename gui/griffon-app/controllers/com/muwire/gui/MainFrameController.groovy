@@ -218,6 +218,8 @@ class MainFrameController {
         if (row < 0)
             return
         Persona p = model.trusted[row]
+        core.muOptions.trustSubscriptions.add(p)
+        saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
     }
     

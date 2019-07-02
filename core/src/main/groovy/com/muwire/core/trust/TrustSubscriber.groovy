@@ -46,10 +46,8 @@ class TrustSubscriber {
     
     void onTrustSubscriptionEvent(TrustSubscriptionEvent e) {
         if (!e.subscribe) {
-            settings.trustSubscriptions.remove(e.persona)
             remoteTrustLists.remove(e.persona.destination)
         } else {
-            settings.trustSubscriptions.add(e.persona)
             RemoteTrustList trustList = remoteTrustLists.putIfAbsent(e.persona.destination, new RemoteTrustList(e.persona))
             trustList?.timestamp = 0
             synchronized(waitLock) {
