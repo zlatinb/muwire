@@ -25,6 +25,7 @@ import com.muwire.core.Constants
 import com.muwire.core.MuWireSettings
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.trust.RemoteTrustList
 
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -309,9 +310,9 @@ class MainFrameView {
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : "Review")
-                                button(text : "Update")
-                                button(text : "Unsubscribe")
+                                button(text : "Review", enabled : bind {model.reviewButtonEnabled}, reviewAction)
+                                button(text : "Update", enabled : bind {model.updateButtonEnabled}, updateAction)
+                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
                             }
                         }
                     }
@@ -462,6 +463,33 @@ class MainFrameView {
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["subscription-table"] = evt})
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = subscriptionTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedTrustTablesRow("subscription-table")
+            if (selectedRow < 0) {
+                model.reviewButtonEnabled = false
+                model.updateButtonEnabled = false
+                model.unsubscribeButtonEnabled = false
+                return
+            }
+            def trustList = model.subscriptions[selectedRow]
+            if (trustList == null)
+                return
+            switch(trustList.status) {
+                case RemoteTrustList.Status.NEW:
+                case RemoteTrustList.Status.UPDATING:
+                model.reviewButtonEnabled = false
+                model.updateButtonEnabled = false
+                model.unsubscribeButtonEnabled = false
+                break
+                case RemoteTrustList.Status.UPDATED:
+                model.reviewButtonEnabled = true
+                model.updateButtonEnabled = true
+                model.unsubscribeButtonEnabled = true
+                break
+            }
+        })
                 
         // trusted table
         def trustedTable = builder.getVariable("trusted-table")

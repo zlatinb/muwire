@@ -76,6 +76,9 @@ class MainFrameModel {
     @Observable boolean retryButtonEnabled
     @Observable boolean pauseButtonEnabled
     @Observable String resumeButtonText
+    @Observable boolean reviewButtonEnabled
+    @Observable boolean updateButtonEnabled
+    @Observable boolean unsubscribeButtonEnabled
     
     private final Set<InfoHash> infoHashes = new HashSet<>()
     

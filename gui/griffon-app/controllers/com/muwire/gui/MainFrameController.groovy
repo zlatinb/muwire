@@ -11,6 +11,7 @@ import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JTable
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
@@ -25,6 +26,7 @@ import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
+import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustSubscriptionEvent
@@ -221,6 +223,39 @@ class MainFrameController {
         core.muOptions.trustSubscriptions.add(p)
         saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
+    }
+    
+    @ControllerAction
+    void review() {
+        println "review action"
+    }
+    
+    @ControllerAction
+    void update() {
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : true))
+    }
+    
+    @ControllerAction
+    void unsubscribe() {
+        RemoteTrustList list = getSelectedTrustList()
+        if (list == null)
+            return
+        core.muOptions.trustSubscriptions.remove(list.persona)
+        saveMuWireSettings()
+        model.subscriptions.remove(list)
+        JTable table = builder.getVariable("subscription-table")
+        table.model.fireTableDataChanged()
+        core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : false))
+    }
+    
+    private RemoteTrustList getSelectedTrustList() {
+        int row = view.getSelectedTrustTablesRow("subscription-table")
+        if (row < 0)
+            return null
+        model.subscriptions[row]
     }
     
     void unshareSelectedFile() {
