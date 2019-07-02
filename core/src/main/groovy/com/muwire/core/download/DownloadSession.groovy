@@ -25,8 +25,6 @@ import java.util.logging.Level
 @Log
 class DownloadSession {
     
-    private static int SAMPLES = 10
-    
     private final EventBus eventBus
     private final String meB64
     private final Pieces pieces
@@ -37,9 +35,9 @@ class DownloadSession {
     private final long fileLength
     private final Set<Integer> available
     private final MessageDigest digest
-    
-    private final LinkedList<Long> timestamps = new LinkedList<>()
-    private final LinkedList<Integer> reads = new LinkedList<>()
+
+    private long lastSpeedRead = System.currentTimeMillis()
+    private long dataSinceLastRead    
     
     private ByteBuffer mapped
     
@@ -186,13 +184,7 @@ class DownloadSession {
                         throw new IOException()
                     synchronized(this) {
                         mapped.put(tmp, 0, read)
-
-                        if (timestamps.size() == SAMPLES) {
-                            timestamps.removeFirst()
-                            reads.removeFirst()
-                        }
-                        timestamps.addLast(System.currentTimeMillis())
-                        reads.addLast(read)
+                        dataSinceLastRead += read
                     }
                 }
 
@@ -223,22 +215,11 @@ class DownloadSession {
     }
     
     synchronized int speed() {
-        if (timestamps.size() < SAMPLES)
-            return 0
-        int totalRead = 0
-        int idx = 0
         final long now = System.currentTimeMillis()
-        
-        while(idx < SAMPLES && timestamps.get(idx) < now - 1000)
-            idx++
-        if (idx == SAMPLES)
-            return 0
-        if (idx == SAMPLES - 1)
-            return reads[idx]
-            
-        long interval = Math.max(1000,timestamps.last - timestamps[idx])
-        for (int i = idx; i < SAMPLES; i++)
-            totalRead += reads[idx]
-        (int)(totalRead * 1000.0 / interval)
+        long interval = Math.max(1000, now - lastSpeedRead)
+        lastSpeedRead = now;
+        int rv = (int) (dataSinceLastRead * 1000.0 / interval)
+        dataSinceLastRead = 0
+        rv
     }
 }
