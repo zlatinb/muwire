@@ -465,12 +465,12 @@ class MainFrameView {
                 
         // trusted table
         def trustedTable = builder.getVariable("trusted-table")
-        trustedTable.rowSorter.addRowSortListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
+        trustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
         trustedTable.rowSorter.setSortsOnUpdates(true)
         
         // distrusted table
         def distrustedTable = builder.getVariable("distrusted-table")
-        distrustedTable.rowSorter.addRowSortListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
+        distrustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
         distrustedTable.rowSorter.setSortsOnUpdates(true)
     }
     
