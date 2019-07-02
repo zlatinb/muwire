@@ -68,7 +68,10 @@ class TrustSubscriber {
                 remoteTrustLists.values().each { trustList ->
                     if (now - trustList.timestamp < settings.trustListInterval * 60 * 60 * 1000)
                         return
+                    trustList.status = RemoteTrustList.Status.UPDATING
+                    eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
                     check(trustList, now)
+                    trustList.status = RemoteTrustList.Status.UPDATED
                     eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
                 }
             }
