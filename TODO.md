@@ -12,10 +12,6 @@ This reduces query traffic by not sending last hop queries to peers that definit
 
 This helps with scalability
 
-##### Trust List Sharing
-
-For helping users make better decisions whom to trust
-
 ##### Content Control Panel
 
 To allow every user to not route queries for content they do not like.  This is mostly GUI work, the backend part is simple
