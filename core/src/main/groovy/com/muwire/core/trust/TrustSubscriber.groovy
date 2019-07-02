@@ -2,6 +2,8 @@ package com.muwire.core.trust
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
@@ -26,6 +28,7 @@ class TrustSubscriber {
     private final Object waitLock = new Object()
     private volatile boolean shutdown
     private volatile Thread thread    
+    private final ExecutorService updateThreads = Executors.newCachedThreadPool()
     
     TrustSubscriber(EventBus eventBus, I2PConnector i2pConnector, MuWireSettings settings) {
         this.eventBus = eventBus
@@ -42,6 +45,7 @@ class TrustSubscriber {
     void stop() {
         shutdown = true
         thread?.interrupt()
+        updateThreads.shutdownNow()
     }
     
     void onTrustSubscriptionEvent(TrustSubscriptionEvent e) {
@@ -66,11 +70,7 @@ class TrustSubscriber {
                 remoteTrustLists.values().each { trustList ->
                     if (now - trustList.timestamp < settings.trustListInterval * 60 * 60 * 1000)
                         return
-                    trustList.status = RemoteTrustList.Status.UPDATING
-                    eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
-                    check(trustList, now)
-                    trustList.status = RemoteTrustList.Status.UPDATED
-                    eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
+                    updateThreads.submit(new UpdateJob(trustList))
                 }
             }
         } catch (InterruptedException e) {
@@ -79,6 +79,23 @@ class TrustSubscriber {
         }
     }
     
+    private class UpdateJob implements Runnable {
+        
+        private final RemoteTrustList trustList
+        
+        UpdateJob(RemoteTrustList trustList) {
+            this.trustList = trustList
+        }
+        
+        public void run() {
+            trustList.status = RemoteTrustList.Status.UPDATING
+            eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
+            check(trustList, System.currentTimeMillis())
+            trustList.status = RemoteTrustList.Status.UPDATED
+            eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
+        }
+    }
+
     private void check(RemoteTrustList trustList, long now) {
         log.info("fetching trust list from ${trustList.persona.getHumanReadableName()}")
         Endpoint endpoint = null
