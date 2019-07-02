@@ -102,6 +102,10 @@ class TrustSubscriber {
                 return
             }
             
+            // swallow any headers
+            String header
+            while (( header = DataUtil.readTillRN(is)) != "");
+            
             DataInputStream dis = new DataInputStream(is)
             
             Set<Persona> good = new HashSet<>()
