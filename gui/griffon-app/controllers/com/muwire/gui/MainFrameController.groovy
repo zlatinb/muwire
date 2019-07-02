@@ -232,7 +232,10 @@ class MainFrameController {
             return
         Map<String,Object> env = new HashMap<>()
         env["trustList"] = list
+        env["trustService"] = core.trustService
+        env["eventBus"] = core.eventBus
         mvcGroup.createMVCGroup("trust-list", env)
+        
     }
     
     @ControllerAction
