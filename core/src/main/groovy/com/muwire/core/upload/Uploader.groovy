@@ -35,5 +35,7 @@ abstract class Uploader {
     
     abstract int getDonePieces();
     
-    abstract int getTotalPieces()
+    abstract int getTotalPieces();
+    
+    abstract long getTotalSize();
 }

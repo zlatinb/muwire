@@ -61,5 +61,8 @@ class HashListUploader extends Uploader {
         return 1;
     }
     
-    
+    @Override
+    public long getTotalSize() {
+        return -1;
+    }
 }

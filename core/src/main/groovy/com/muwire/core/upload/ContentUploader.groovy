@@ -119,4 +119,8 @@ class ContentUploader extends Uploader {
         return mesh.pieces.nPieces;
     }
 
+    @Override
+    public long getTotalSize() {
+        return file.length();
+    }
 }

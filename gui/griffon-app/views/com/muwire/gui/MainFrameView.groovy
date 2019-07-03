@@ -129,12 +129,19 @@ class MainFrameView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
                                         tableModel(list: model.downloads) {
-                                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
-                                            closureColumn(header: "Progress", preferredWidth: 20, type: String, read: { row ->
+                                            closureColumn(header: "Progress", preferredWidth: 70, type: String, read: { row ->
                                                 int pieces = row.downloader.nPieces
                                                 int done = row.downloader.donePieces()
-                                                "$done/$pieces pieces".toString()
+                                                int percent = -1
+                                                if ( row.downloader.nPieces != 0 ) {
+                                                    percent = (done * 100) / pieces
+                                                }
+                                                long size = row.downloader.pieceSize
+                                                size *= pieces
+                                                String totalSize = DataHelper.formatSize2Decimal(size, false) + "B"
+                                                "${percent}% of " + totalSize + " ($done/$pieces pcs)"
                                             })
                                             closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
@@ -200,7 +207,18 @@ class MainFrameView {
                                             row.getDownloader()
                                         })
                                         closureColumn(header : "Remote Pieces", type : String, read : { row ->
-                                            "${row.getDonePieces()}/${row.getTotalPieces()}".toString()
+                                            int pieces = row.getTotalPieces()
+                                            int done = row.getDonePieces()
+                                            int percent = -1
+                                            if ( pieces != 0 ) {
+                                                percent = (done * 100) / pieces
+                                            }
+                                            long size = row.getTotalSize()
+                                            String totalSize = ""
+                                            if (size >= 0 ) {
+                                                totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
+                                            }
+                                            "${percent}%" + totalSize + " ($done/$pieces pcs)"
                                         })
                                     }
                                 }
