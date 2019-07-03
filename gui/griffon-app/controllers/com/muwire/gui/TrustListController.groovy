@@ -27,6 +27,7 @@ class TrustListController {
             return
         Persona p = model.trusted[selectedRow]
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
+        view.fireUpdate("trusted-table")
     }
     
     @ControllerAction
@@ -36,6 +37,7 @@ class TrustListController {
             return
         Persona p = model.distrusted[selectedRow]
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
+        view.fireUpdate("distrusted-table")
     }
     
     @ControllerAction
@@ -45,6 +47,7 @@ class TrustListController {
             return
         Persona p = model.trusted[selectedRow]
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED))
+        view.fireUpdate("trusted-table")
     }
     
     @ControllerAction
@@ -54,5 +57,6 @@ class TrustListController {
             return
         Persona p = model.distrusted[selectedRow]
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED))
+        view.fireUpdate("distrusted-table")
     }
 }

@@ -83,10 +83,12 @@ class TrustListView {
         
         def trustedTable = builder.getVariable("trusted-table")
         trustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["trusted-table"] = evt})
+        trustedTable.rowSorter.setSortsOnUpdates(true)
         trustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         
         def distrustedTable = builder.getVariable("distrusted-table")
         distrustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["distrusted-table"] = evt})
+        distrustedTable.rowSorter.setSortsOnUpdates(true)
         distrustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         
         dialog.getContentPane().add(mainPanel)
@@ -109,5 +111,10 @@ class TrustListView {
         if (sortEvents.get(tableName) != null)
             selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
+    }
+    
+    void fireUpdate(String tableName) {
+        def table = builder.getVariable(tableName)
+        table.model.fireTableDataChanged()
     }
 }
