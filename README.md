@@ -28,29 +28,4 @@ You need to have an I2P router up and running on the same machine.  After you bu
 The first time you run MuWire it will ask you to select a nickname.  This nickname will be displayed with search results, so that others can verify the file was shared by you.  It is best to leave MuWire running all the time, just like I2P.
 
 
-### Known bugs and limitations
 
-* Many UI features you would expect are not there yet
-
-### Quick FAQ
-
-* why is MuWire slow ?
-  
-  - too few sources you're downloading from
-  - you can increase the number of tunnels by using more tunnels via Options->I2P Inbound/Outbound Quantity 
-    the default is 4 and you could raise up to as high as 16 ( Caution !!!!)
-
-* my search is not returning (enough) results !
-
-  - search is keyword or hash based
-  - keywords and hash(es) are NOT regexed or wildcarded so they have to be complete
-    so searching for 'musi' will not return results with 'music' - you have to search for 'music'
-  - ALL keywords have to match 
-  - only use space for keyword separation
-  - if you already have the file in question it is not displayed ( can be changed via Options )
-
-* what's this right click -> 'Copy hash to clipboard' for ?
-
-  - if you have a specific file you wish to share or download you can use the hash as a unique identifier
-    to make sure you have exactly the right file.
-  - you can share this hash with others to ensure they are getting the right file
