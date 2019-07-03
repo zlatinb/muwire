@@ -2,6 +2,8 @@ package com.muwire.hostcache
 
 import java.util.stream.Collectors
 
+import groovy.json.JsonOutput
+
 class HostPool {
     
     final def maxFailures
@@ -72,6 +74,27 @@ class HostPool {
             if (host.verificationFailures >= maxFailures) {
                 iter.remove()
             }
+        }
+    }
+    
+    synchronized void serialize(File verifiedFile, File unverifiedFile) {
+        write(verifiedFile, verified.values())
+        write(unverifiedFile, unverified.values())
+    }
+    
+    private void write(File target, Collection hosts) {
+        JsonOutput jsonOutput = new JsonOutput()
+        target.withPrintWriter { writer ->
+            hosts.each { 
+                def json = [:]
+                json.destination = it.destination.toBase64()
+                json.verifyTime = it.verifyTime
+                json.leafSlots = it.leafSlots
+                json.peerSlots = it.peerSlots
+                json.verificationFailures = it.verificationFailures
+                def str = jsonOutput.toJson(json)
+                writer.println(str)
+            } 
         }
     }
 }
