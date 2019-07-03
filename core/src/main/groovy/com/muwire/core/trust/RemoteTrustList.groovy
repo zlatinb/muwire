@@ -7,7 +7,7 @@ import com.muwire.core.Persona
 import net.i2p.util.ConcurrentHashSet
 
 class RemoteTrustList {
-    public enum Status { NEW, UPDATING, UPDATED }
+    public enum Status { NEW, UPDATING, UPDATED, UPDATE_FAILED }
     
     private final Persona persona
     private final Set<Persona> good, bad

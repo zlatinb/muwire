@@ -94,13 +94,15 @@ class TrustSubscriber {
         public void run() {
             trustList.status = RemoteTrustList.Status.UPDATING
             eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
-            check(trustList, System.currentTimeMillis())
-            trustList.status = RemoteTrustList.Status.UPDATED
+            if (check(trustList, System.currentTimeMillis()))
+                trustList.status = RemoteTrustList.Status.UPDATED
+            else
+                trustList.status = RemoteTrustList.Status.UPDATE_FAILED
             eventBus.publish(new TrustSubscriptionUpdatedEvent(trustList : trustList))
         }
     }
 
-    private void check(RemoteTrustList trustList, long now) {
+    private boolean check(RemoteTrustList trustList, long now) {
         log.info("fetching trust list from ${trustList.persona.getHumanReadableName()}")
         Endpoint endpoint = null
         try {
@@ -118,7 +120,7 @@ class TrustSubscriber {
             
             if (code != 200) {
                 log.info("couldn't fetch trust list, code $code")
-                return
+                return false
             }
             
             // swallow any headers
@@ -147,8 +149,10 @@ class TrustSubscriber {
             trustList.bad.clear()
             trustList.bad.addAll(bad)
             
+            return true
         } catch (Exception e) {
             log.log(Level.WARNING,"exception fetching trust list from ${trustList.persona.getHumanReadableName()}",e)
+            return false
         } finally {
             endpoint?.close()
         }

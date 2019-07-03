@@ -488,6 +488,11 @@ class MainFrameView {
                 model.updateButtonEnabled = true
                 model.unsubscribeButtonEnabled = true
                 break
+                case RemoteTrustList.Status.UPDATE_FAILED:
+                model.reviewButtonEnabled = false
+                model.updateButtonEnabled = true
+                model.unsubscribeButtonEnabled = true
+                break
             }
         })
                 
