@@ -296,11 +296,11 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "subscription-table", autoCreateRowSorter : true) {
                                     tableModel(list : model.subscriptions) {
-                                        closureColumn(header : "Name", type: String, read : {it.persona.getHumanReadableName()})
-                                        closureColumn(header : "Trusted", type: Integer, read : {it.good.size()})
-                                        closureColumn(header : "Distrusted", type: Integer, read : {it.bad.size()})
-                                        closureColumn(header : "Status", type: String, read : {it.status.toString()})
-                                        closureColumn(header : "Last Updated", type : String, read : {
+                                        closureColumn(header : "Name", preferredWidth: 200, type: String, read : {it.persona.getHumanReadableName()})
+                                        closureColumn(header : "Trusted", preferredWidth : 20, type: Integer, read : {it.good.size()})
+                                        closureColumn(header : "Distrusted", preferredWidth: 20, type: Integer, read : {it.bad.size()})
+                                        closureColumn(header : "Status", preferredWidth: 30, type: String, read : {it.status.toString()})
+                                        closureColumn(header : "Last Updated", preferredWidth: 200, type : String, read : {
                                             if (it.timestamp == 0)
                                                 return "Never"
                                             else
@@ -461,6 +461,7 @@ class MainFrameView {
         
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
+        subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
         subscriptionTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["subscription-table"] = evt})
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = subscriptionTable.getSelectionModel()
