@@ -267,9 +267,9 @@ class MainFrameView {
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text : "Subscribe", constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
-                                    button(text : "Mark Neutral", constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
-                                    button(text : "Mark Distrusted", constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
+                                    button(text : "Subscribe", enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
+                                    button(text : "Mark Neutral", enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
+                                    button(text : "Mark Distrusted", enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -283,8 +283,8 @@ class MainFrameView {
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
-                                    button(text: "Mark Trusted", constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
+                                    button(text: "Mark Neutral", enabled : bind {model.markNeutralFromDistrustedButtonEnabled}, constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                    button(text: "Mark Trusted", enabled : bind {model.markTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
                                 }
                             }
                         }
@@ -500,11 +500,37 @@ class MainFrameView {
         def trustedTable = builder.getVariable("trusted-table")
         trustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
         trustedTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = trustedTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedTrustTablesRow("trusted-table")
+            if (selectedRow < 0) {
+                model.subscribeButtonEnabled = false
+                model.markDistrustedButtonEnabled = false
+                model.markNeutralFromTrustedButtonEnabled = false
+            } else {
+                model.subscribeButtonEnabled = true
+                model.markDistrustedButtonEnabled = true
+                model.markNeutralFromTrustedButtonEnabled = true
+            }
+        })
         
         // distrusted table
         def distrustedTable = builder.getVariable("distrusted-table")
         distrustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
         distrustedTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = distrustedTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedTrustTablesRow("distrusted-table")
+            if (selectedRow < 0) {
+                model.markTrustedButtonEnabled = false
+                model.markNeutralFromDistrustedButtonEnabled = false
+            } else {
+                model.markTrustedButtonEnabled = true
+                model.markNeutralFromDistrustedButtonEnabled = true
+            }
+        })
     }
     
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
