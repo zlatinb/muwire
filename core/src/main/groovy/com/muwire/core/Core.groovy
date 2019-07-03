@@ -318,6 +318,8 @@ public class Core {
         connectionEstablisher.stop()
         log.info("shutting down directory watcher")
         directoryWatcher.stop()
+        log.info("shutting down cache client")
+        cacheClient.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         if (router != null) {
