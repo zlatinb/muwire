@@ -265,11 +265,11 @@ class MainFrameView {
                                         }
                                     }
                                 }
-                                panel (constraints : BorderLayout.EAST) {
+                                panel (constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text : "Mark Neutral", constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
-                                    button(text : "Mark Distrusted", constraints : gbc(gridx: 0, gridy:1), markDistrustedAction)
-                                    button(text : "Subscribe", constraints : gbc(gridx: 0, gridy : 2), subscribeAction)
+                                    button(text : "Subscribe", constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
+                                    button(text : "Mark Neutral", constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
+                                    button(text : "Mark Distrusted", constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -281,10 +281,10 @@ class MainFrameView {
                                         }
                                     }
                                 }
-                                panel(constraints : BorderLayout.WEST) {
+                                panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
                                     button(text: "Mark Neutral", constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
-                                    button(text: "Mark Trusted", constraints : gbc(gridx: 0, gridy : 1), markTrustedAction)
+                                    button(text: "Mark Trusted", constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
                                 }
                             }
                         }
