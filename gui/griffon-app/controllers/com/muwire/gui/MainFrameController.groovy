@@ -191,27 +191,38 @@ class MainFrameController {
         int row = view.getSelectedTrustTablesRow(tableName)
         if (row < 0)
             return
+        builder.getVariable(tableName).model.fireTableDataChanged()
         core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
     }
     
     @ControllerAction
     void markTrusted() {
         markTrust("distrusted-table", TrustLevel.TRUSTED, model.distrusted)
+        model.markTrustedButtonEnabled = false
+        model.markNeutralFromDistrustedButtonEnabled = false
     }
     
     @ControllerAction
     void markNeutralFromDistrusted() {
         markTrust("distrusted-table", TrustLevel.NEUTRAL, model.distrusted)
+        model.markTrustedButtonEnabled = false
+        model.markNeutralFromDistrustedButtonEnabled = false
     }
     
     @ControllerAction
     void markDistrusted() {
         markTrust("trusted-table", TrustLevel.DISTRUSTED, model.trusted)
+        model.subscribeButtonEnabled = false
+        model.markDistrustedButtonEnabled = false
+        model.markNeutralFromTrustedButtonEnabled = false
     }
     
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
+        model.subscribeButtonEnabled = false
+        model.markDistrustedButtonEnabled = false
+        model.markNeutralFromTrustedButtonEnabled = false
     }
     
     @ControllerAction
@@ -223,6 +234,9 @@ class MainFrameController {
         core.muOptions.trustSubscriptions.add(p)
         saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
+        model.subscribeButtonEnabled = false
+        model.markDistrustedButtonEnabled = false
+        model.markNeutralFromTrustedButtonEnabled = false
     }
     
     @ControllerAction
