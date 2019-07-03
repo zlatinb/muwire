@@ -27,5 +27,5 @@ After you build the application, look inside `gui/build/distributions`.  Untar/u
 
 If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `$HOME/.MuWire/i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.
 
-If you do not have an I2P router, edit $HOME/.MuWire/MuWire.properties and add the following line: `embeddedRouter=true`.  This will launch MuWire's embedded router.  Be aware that this causes startup to take a lot longer.
+If you do not have an I2P router, pass the following switch to the Java process: `-DembeddedRouter=true`.  This will launch MuWire's embedded router.  Be aware that this causes startup to take a lot longer.
 
