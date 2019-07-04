@@ -377,6 +377,7 @@ class MainFrameModel {
                     searchEle.count++
                     searchEle.timestamp = Calendar.getInstance()
                     searches.addFirst(searchEle)
+                    break
                 }
             }
 
