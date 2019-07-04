@@ -141,7 +141,7 @@ class MainFrameView {
                                                 long size = row.downloader.pieceSize
                                                 size *= pieces
                                                 String totalSize = DataHelper.formatSize2Decimal(size, false) + "B"
-                                                "${percent}% of " + totalSize + " ($done/$pieces pcs)"
+                                                String.format("%02d", percent) + "% of ${totalSize} ($done/$pieces pcs)".toString()
                                             })
                                             closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
@@ -218,7 +218,7 @@ class MainFrameView {
                                             if (size >= 0 ) {
                                                 totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
                                             }
-                                            "${percent}%" + totalSize + " ($done/$pieces pcs)"
+                                            String.format("%02d", percent) + "% ${totalSize} ($done/$pieces pcs)".toString()
                                         })
                                     }
                                 }
