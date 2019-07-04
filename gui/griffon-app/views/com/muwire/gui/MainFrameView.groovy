@@ -265,6 +265,14 @@ class MainFrameView {
                                                 return it.replyTo.toBase32()
                                             }
                                         })
+                                        closureColumn(header : "Count", type : String, read : {
+                                            it.count.toString()
+                                        })
+                                        closureColumn(header : "Timestamp", type : String, read : {
+                                            String.format("%02d", it.timestamp.get(Calendar.HOUR_OF_DAY)) + ":" +
+                                            String.format("%02d", it.timestamp.get(Calendar.MINUTE)) + ":" +
+                                            String.format("%02d", it.timestamp.get(Calendar.SECOND))
+                                        })
                                     }
                                 }
                             }

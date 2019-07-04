@@ -1,6 +1,8 @@
 package com.muwire.gui
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.Calendar
+import java.util.UUID
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -360,10 +362,31 @@ class MainFrameModel {
                 return
         }
         runInsideUIAsync {
-            searches.addFirst(new IncomingSearch(search : search, replyTo : e.replyTo, originator : e.originator))
+            JTable table = builder.getVariable("searches-table")
+
+            Boolean searchFound = false
+            Iterator searchIter = searches.iterator()
+            while ( searchIter.hasNext() ) {
+                IncomingSearch searchEle = searchIter.next()
+                if ( searchEle.search == search
+                        && searchEle.originator == e.originator
+                        && searchEle.uuid == e.searchEvent.getUuid() ) {
+                    searchIter.remove()
+                    table.model.fireTableDataChanged()
+                    searchFound = true
+                    searchEle.count++
+                    searchEle.timestamp = Calendar.getInstance()
+                    searches.addFirst(searchEle)
+                }
+            }
+
+            if (!searchFound) {
+                searches.addFirst(new IncomingSearch(search, e.replyTo, e.originator, e.searchEvent.getUuid()))
+            }
+
             while(searches.size() > 200)
                 searches.removeLast()
-            JTable table = builder.getVariable("searches-table")
+
             table.model.fireTableDataChanged()
         }
     }
@@ -372,6 +395,18 @@ class MainFrameModel {
         String search
         Destination replyTo
         Persona originator
+        long count
+        UUID uuid
+        Calendar timestamp
+
+        IncomingSearch( String search, Destination replyTo, Persona originator, UUID uuid ) {
+            this.search = search
+            this.replyTo = replyTo
+            this.originator = originator
+            this.uuid = uuid
+            this.count = 1
+            this.timestamp = Calendar.getInstance()
+        }
     }
     
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
