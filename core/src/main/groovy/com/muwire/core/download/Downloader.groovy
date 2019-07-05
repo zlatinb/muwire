@@ -307,6 +307,7 @@ public class Downloader {
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Exception while downloading",DataUtil.findRoot(bad))
             } finally {
+                writePieces()
                 currentState = WorkerState.FINISHED
                 if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
                     synchronized(piecesFile) {
