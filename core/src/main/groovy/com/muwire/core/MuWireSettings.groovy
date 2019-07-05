@@ -8,7 +8,7 @@ import com.muwire.core.util.DataUtil
 import net.i2p.data.Base64
 
 class MuWireSettings {
-	
+    
     final boolean isLeaf
     boolean allowUntrusted
     boolean allowTrustLists
@@ -29,16 +29,16 @@ class MuWireSettings {
     boolean embeddedRouter
     int inBw, outBw
     
-	MuWireSettings() {
+    MuWireSettings() {
         this(new Properties())
     }
-	
-	MuWireSettings(Properties props) {
-		isLeaf = Boolean.valueOf(props.get("leaf","false"))
-		allowUntrusted = Boolean.valueOf(props.getProperty("allowUntrusted","true"))
+    
+    MuWireSettings(Properties props) {
+        isLeaf = Boolean.valueOf(props.get("leaf","false"))
+        allowUntrusted = Boolean.valueOf(props.getProperty("allowUntrusted","true"))
         allowTrustLists = Boolean.valueOf(props.getProperty("allowTrustLists","true"))
         trustListInterval = Integer.valueOf(props.getProperty("trustListInterval","1"))
-		crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
+        crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation", 
             System.getProperty("user.home")))
@@ -66,7 +66,7 @@ class MuWireSettings {
                 trustSubscriptions.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
             }
         }
-	}
+    }
     
     void write(OutputStream out) throws IOException {
         Properties props = new Properties()
@@ -106,25 +106,25 @@ class MuWireSettings {
         props.store(out, "")
     }
 
-	boolean isLeaf() {
-		isLeaf
-	}
-	
-	boolean allowUntrusted() {
-		allowUntrusted
-	} 
-	
-	void setAllowUntrusted(boolean allowUntrusted) {
-		this.allowUntrusted = allowUntrusted
-	}
-	
-	CrawlerResponse getCrawlerResponse() {
-		crawlerResponse
-	}
-	
-	void setCrawlerResponse(CrawlerResponse crawlerResponse) {
-		this.crawlerResponse = crawlerResponse
-	}
+    boolean isLeaf() {
+        isLeaf
+    }
+    
+    boolean allowUntrusted() {
+        allowUntrusted
+    } 
+    
+    void setAllowUntrusted(boolean allowUntrusted) {
+        this.allowUntrusted = allowUntrusted
+    }
+    
+    CrawlerResponse getCrawlerResponse() {
+        crawlerResponse
+    }
+    
+    void setCrawlerResponse(CrawlerResponse crawlerResponse) {
+        this.crawlerResponse = crawlerResponse
+    }
     
     String getNickname() {
         nickname

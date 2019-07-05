@@ -6,5 +6,5 @@ package com.muwire.core.hostcache;
  *
  */
 public enum CrawlerResponse {
-	ALL, REGISTERED, NONE
+    ALL, REGISTERED, NONE
 }

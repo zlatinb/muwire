@@ -4,7 +4,7 @@ import com.muwire.core.Event
 
 class FileSharedEvent extends Event {
 
-	File file
+    File file
     
     @Override
     public String toString() {

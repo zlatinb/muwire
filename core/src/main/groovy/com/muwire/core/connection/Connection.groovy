@@ -25,104 +25,104 @@ abstract class Connection implements Closeable {
     private static final int SEARCHES = 10
     private static final long INTERVAL = 1000
 
-	final EventBus eventBus
-	final Endpoint endpoint
-	final boolean incoming
-	final HostCache hostCache
+    final EventBus eventBus
+    final Endpoint endpoint
+    final boolean incoming
+    final HostCache hostCache
     final TrustService trustService
     final MuWireSettings settings
-    	
-	private final AtomicBoolean running = new AtomicBoolean()
-	private final BlockingQueue messages = new LinkedBlockingQueue()
-	private final Thread reader, writer
+        
+    private final AtomicBoolean running = new AtomicBoolean()
+    private final BlockingQueue messages = new LinkedBlockingQueue()
+    private final Thread reader, writer
     private final LinkedList<Long> searchTimestamps = new LinkedList<>()
-	
-	protected final String name
-	
-	long lastPingSentTime, lastPongReceivedTime
-	
-	Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, 
+    
+    protected final String name
+    
+    long lastPingSentTime, lastPongReceivedTime
+    
+    Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, 
         HostCache hostCache, TrustService trustService, MuWireSettings settings) {
-		this.eventBus = eventBus
-		this.incoming = incoming
-		this.endpoint = endpoint
-		this.hostCache = hostCache
+        this.eventBus = eventBus
+        this.incoming = incoming
+        this.endpoint = endpoint
+        this.hostCache = hostCache
         this.trustService = trustService
         this.settings = settings
-		
-		this.name = endpoint.destination.toBase32().substring(0,8)
-		
-		this.reader = new Thread({readLoop()} as Runnable)
-		this.reader.setName("reader-$name")
-		this.reader.setDaemon(true)
-		
-		this.writer = new Thread({writeLoop()} as Runnable)
-		this.writer.setName("writer-$name")
-		this.writer.setDaemon(true)
-	}
-	
-	/**
-	 * starts the connection threads
-	 */
-	void start() {
-		if (!running.compareAndSet(false, true)) {
-			log.log(Level.WARNING,"$name already running", new Exception())
-			return
-		}
-		reader.start()
-		writer.start()
-	}
-	
-	@Override
-	public void close() {
-		if (!running.compareAndSet(true, false)) {
-			log.log(Level.WARNING, "$name already closed", new Exception() )
-			return
-		}
+        
+        this.name = endpoint.destination.toBase32().substring(0,8)
+        
+        this.reader = new Thread({readLoop()} as Runnable)
+        this.reader.setName("reader-$name")
+        this.reader.setDaemon(true)
+        
+        this.writer = new Thread({writeLoop()} as Runnable)
+        this.writer.setName("writer-$name")
+        this.writer.setDaemon(true)
+    }
+    
+    /**
+     * starts the connection threads
+     */
+    void start() {
+        if (!running.compareAndSet(false, true)) {
+            log.log(Level.WARNING,"$name already running", new Exception())
+            return
+        }
+        reader.start()
+        writer.start()
+    }
+    
+    @Override
+    public void close() {
+        if (!running.compareAndSet(true, false)) {
+            log.log(Level.WARNING, "$name already closed", new Exception() )
+            return
+        }
         log.info("closing $name")
-		reader.interrupt()
-		writer.interrupt()
-		endpoint.close()
-		eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
-	}
-	
-	protected void readLoop() {
-		try {
-			while(running.get()) {
-				read()
-			}
-		} catch (SocketTimeoutException e) {
+        reader.interrupt()
+        writer.interrupt()
+        endpoint.close()
+        eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
+    }
+    
+    protected void readLoop() {
+        try {
+            while(running.get()) {
+                read()
+            }
+        } catch (SocketTimeoutException e) {
         } catch (Exception e) {
             log.log(Level.WARNING,"unhandled exception in reader",e)
         } finally {
             close()
         }
-	}
-	
-	protected abstract void read()
-	
-	protected void writeLoop() {
-		try {
-			while(running.get()) {
-				def message = messages.take()
-				write(message)
-			}
-		} catch (Exception e) {
+    }
+    
+    protected abstract void read()
+    
+    protected void writeLoop() {
+        try {
+            while(running.get()) {
+                def message = messages.take()
+                write(message)
+            }
+        } catch (Exception e) {
             log.log(Level.WARNING, "unhandled exception in writer",e)
         } finally {
             close()
         }
-	}
-	
-	protected abstract void write(def message);
-	
-	void sendPing() {
-		def ping = [:]
-		ping.type = "Ping"
-		ping.version = 1
-		messages.put(ping)
-		lastPingSentTime = System.currentTimeMillis()
-	}
+    }
+    
+    protected abstract void write(def message);
+    
+    void sendPing() {
+        def ping = [:]
+        ping.type = "Ping"
+        ping.version = 1
+        messages.put(ping)
+        lastPingSentTime = System.currentTimeMillis()
+    }
     
     void sendQuery(QueryEvent e) {
         def query = [:]
@@ -139,26 +139,26 @@ abstract class Connection implements Closeable {
             query.originator = e.originator.toBase64()
         messages.put(query)
     }
-	
-	protected void handlePing() {
-		log.fine("$name received ping")
-		def pong = [:]
-		pong.type = "Pong"
-		pong.version = 1
-		pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
-		messages.put(pong)
-	}
-	
-	protected void handlePong(def pong) {
-		log.fine("$name received pong")
-		lastPongReceivedTime = System.currentTimeMillis()
-		if (pong.pongs == null)
-			throw new Exception("Pong doesn't have pongs")
-		pong.pongs.each { 
-			def dest = new Destination(it)
-			eventBus.publish(new HostDiscoveredEvent(destination: dest))
-		}
-	}
+    
+    protected void handlePing() {
+        log.fine("$name received ping")
+        def pong = [:]
+        pong.type = "Pong"
+        pong.version = 1
+        pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
+        messages.put(pong)
+    }
+    
+    protected void handlePong(def pong) {
+        log.fine("$name received pong")
+        lastPongReceivedTime = System.currentTimeMillis()
+        if (pong.pongs == null)
+            throw new Exception("Pong doesn't have pongs")
+        pong.pongs.each { 
+            def dest = new Destination(it)
+            eventBus.publish(new HostDiscoveredEvent(destination: dest))
+        }
+    }
     
     private boolean throttleSearch() {
         final long now = System.currentTimeMillis()

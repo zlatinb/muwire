@@ -8,5 +8,5 @@ import net.i2p.data.Destination
 
 class FileDownloadedEvent extends Event {
     Downloader downloader
-	DownloadedFile downloadedFile
+    DownloadedFile downloadedFile
 }

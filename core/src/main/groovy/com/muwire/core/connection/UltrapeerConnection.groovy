@@ -17,30 +17,30 @@ import net.i2p.data.Destination
  */
 class UltrapeerConnection extends Connection {
 
-	public UltrapeerConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache, TrustService trustService) {
-		super(eventBus, endpoint, false, hostCache, trustService)
-	}
+    public UltrapeerConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache, TrustService trustService) {
+        super(eventBus, endpoint, false, hostCache, trustService)
+    }
 
-	@Override
-	protected void read() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void read() {
+        // TODO Auto-generated method stub
+        
+    }
 
-	@Override
-	protected void write(Object message) {
-		if (message instanceof Map) {
-			writeJsonMessage(message)
-		} else {
-			writeBinaryMessage(message)
-		}
-	}
+    @Override
+    protected void write(Object message) {
+        if (message instanceof Map) {
+            writeJsonMessage(message)
+        } else {
+            writeBinaryMessage(message)
+        }
+    }
 
-	private void writeJsonMessage(def message) {
-		
-	}
-	
-	private void writeBinaryMessage(def message) {
-		
-	}
+    private void writeJsonMessage(def message) {
+        
+    }
+    
+    private void writeBinaryMessage(def message) {
+        
+    }
 }

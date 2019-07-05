@@ -5,6 +5,6 @@ import com.muwire.core.Persona
 
 class TrustEvent extends Event {
 
-	Persona persona
-	TrustLevel level
+    Persona persona
+    TrustLevel level
 }

@@ -5,9 +5,9 @@ import com.muwire.core.InfoHash
 
 class SearchEvent extends Event {
 
-	List<String> searchTerms
-	byte [] searchHash
-	UUID uuid
+    List<String> searchTerms
+    byte [] searchHash
+    UUID uuid
     boolean oobInfohash
     
     String toString() {

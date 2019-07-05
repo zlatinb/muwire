@@ -12,7 +12,7 @@ class HostPool {
     def verified = new HashMap()
     def unverified = new HashMap()
     
-	HostPool() {}
+    HostPool() {}
     HostPool(maxFailures, maxAge) {
         this.maxAge = maxAge
         this.maxFailures = maxFailures
@@ -53,7 +53,7 @@ class HostPool {
     
     synchronized def fail(host) {
         if (!unverified.containsKey(host.destination))
-			return
+            return
         host.verificationFailures++
     }
     

@@ -15,115 +15,115 @@ import groovy.util.logging.Log
 class FileManager {
 
 
-	final EventBus eventBus
+    final EventBus eventBus
     final MuWireSettings settings
-	final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
-	final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
-	final Map<String, Set<File>> nameToFiles = new HashMap<>()
-	final SearchIndex index = new SearchIndex()
-	
-	FileManager(EventBus eventBus, MuWireSettings settings) {
+    final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
+    final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
+    final Map<String, Set<File>> nameToFiles = new HashMap<>()
+    final SearchIndex index = new SearchIndex()
+    
+    FileManager(EventBus eventBus, MuWireSettings settings) {
         this.settings = settings
-		this.eventBus = eventBus
-	}
-	
+        this.eventBus = eventBus
+    }
+    
     void onFileHashedEvent(FileHashedEvent e) {
         if (e.sharedFile != null)
             addToIndex(e.sharedFile)
     }
-	
-	void onFileLoadedEvent(FileLoadedEvent e) {
-		addToIndex(e.loadedFile)
-	}
-	
+    
+    void onFileLoadedEvent(FileLoadedEvent e) {
+        addToIndex(e.loadedFile)
+    }
+    
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         if (settings.shareDownloadedFiles) {
             addToIndex(e.downloadedFile)
         }
     }
-	
-	private void addToIndex(SharedFile sf) {
+    
+    private void addToIndex(SharedFile sf) {
         log.info("Adding shared file " + sf.getFile())
-		InfoHash infoHash = sf.getInfoHash()
-		Set<SharedFile> existing = rootToFiles.get(infoHash)
-		if (existing == null) {
+        InfoHash infoHash = sf.getInfoHash()
+        Set<SharedFile> existing = rootToFiles.get(infoHash)
+        if (existing == null) {
             log.info("adding new root")
-			existing = new HashSet<>()
-			rootToFiles.put(infoHash, existing);
-		}
-		existing.add(sf)
-		fileToSharedFile.put(sf.file, sf)
-		
-		String name = sf.getFile().getName()
-		Set<File> existingFiles = nameToFiles.get(name)
-		if (existingFiles == null) {
-			existingFiles = new HashSet<>()
-			nameToFiles.put(name, existingFiles)
-		}
-		existingFiles.add(sf.getFile())
-		
-		index.add(name)
-	}
-	
-	void onFileUnsharedEvent(FileUnsharedEvent e) {
-		SharedFile sf = e.unsharedFile
-		InfoHash infoHash = sf.getInfoHash()
-		Set<SharedFile> existing = rootToFiles.get(infoHash)
-		if (existing != null) {
-			existing.remove(sf)
-			if (existing.isEmpty()) {
-				rootToFiles.remove(infoHash)
-			}
-		}
-		
-		fileToSharedFile.remove(sf.file)
-		
-		String name = sf.getFile().getName()
-		Set<File> existingFiles = nameToFiles.get(name)
-		if (existingFiles != null) {
-			existingFiles.remove(sf.file)
-			if (existingFiles.isEmpty()) {
-				nameToFiles.remove(name)
-			}
-		}
-		
-		index.remove(name)
-	}
-	
-	Map<File, SharedFile> getSharedFiles() {
+            existing = new HashSet<>()
+            rootToFiles.put(infoHash, existing);
+        }
+        existing.add(sf)
+        fileToSharedFile.put(sf.file, sf)
+        
+        String name = sf.getFile().getName()
+        Set<File> existingFiles = nameToFiles.get(name)
+        if (existingFiles == null) {
+            existingFiles = new HashSet<>()
+            nameToFiles.put(name, existingFiles)
+        }
+        existingFiles.add(sf.getFile())
+        
+        index.add(name)
+    }
+    
+    void onFileUnsharedEvent(FileUnsharedEvent e) {
+        SharedFile sf = e.unsharedFile
+        InfoHash infoHash = sf.getInfoHash()
+        Set<SharedFile> existing = rootToFiles.get(infoHash)
+        if (existing != null) {
+            existing.remove(sf)
+            if (existing.isEmpty()) {
+                rootToFiles.remove(infoHash)
+            }
+        }
+        
+        fileToSharedFile.remove(sf.file)
+        
+        String name = sf.getFile().getName()
+        Set<File> existingFiles = nameToFiles.get(name)
+        if (existingFiles != null) {
+            existingFiles.remove(sf.file)
+            if (existingFiles.isEmpty()) {
+                nameToFiles.remove(name)
+            }
+        }
+        
+        index.remove(name)
+    }
+    
+    Map<File, SharedFile> getSharedFiles() {
         synchronized(fileToSharedFile) {
             return new HashMap<>(fileToSharedFile)
         }
-	}
+    }
     
     Set<SharedFile> getSharedFiles(byte []root) {
             return rootToFiles.get(new InfoHash(root))
     }
-	
-	void onSearchEvent(SearchEvent e) {
-		// hash takes precedence
-		ResultsEvent re = null
-		if (e.searchHash != null) {
+    
+    void onSearchEvent(SearchEvent e) {
+        // hash takes precedence
+        ResultsEvent re = null
+        if (e.searchHash != null) {
             Set<SharedFile> found
             found = rootToFiles.get new InfoHash(e.searchHash)
             found = filter(found, e.oobInfohash)
-			if (found != null && !found.isEmpty())
-				re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
-		} else {
-			def names = index.search e.searchTerms
-			Set<File> files = new HashSet<>()
-			names.each { files.addAll nameToFiles.getOrDefault(it, []) }
-			Set<SharedFile> sharedFiles = new HashSet<>()
-			files.each { sharedFiles.add fileToSharedFile[it] }
+            if (found != null && !found.isEmpty())
+                re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
+        } else {
+            def names = index.search e.searchTerms
+            Set<File> files = new HashSet<>()
+            names.each { files.addAll nameToFiles.getOrDefault(it, []) }
+            Set<SharedFile> sharedFiles = new HashSet<>()
+            files.each { sharedFiles.add fileToSharedFile[it] }
             files = filter(sharedFiles, e.oobInfohash)
-			if (!sharedFiles.isEmpty())
-				re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
-			
-		}
-		
-		if (re != null)
-			eventBus.publish(re)
-	}
+            if (!sharedFiles.isEmpty())
+                re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
+            
+        }
+        
+        if (re != null)
+            eventBus.publish(re)
+    }
     
     private static Set<SharedFile> filter(Set<SharedFile> files, boolean oob) {
         if (!oob)

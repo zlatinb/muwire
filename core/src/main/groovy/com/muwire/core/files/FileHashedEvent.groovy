@@ -5,8 +5,8 @@ import com.muwire.core.SharedFile
 
 class FileHashedEvent extends Event {
 
-	SharedFile sharedFile
-	String error
+    SharedFile sharedFile
+    String error
     
     @Override
     public String toString() {

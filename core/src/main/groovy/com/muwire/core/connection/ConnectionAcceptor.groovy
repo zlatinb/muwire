@@ -29,97 +29,97 @@ import groovy.util.logging.Log
 @Log
 class ConnectionAcceptor {
 
-	final EventBus eventBus
-	final UltrapeerConnectionManager manager
-	final MuWireSettings settings
-	final I2PAcceptor acceptor
-	final HostCache hostCache
-	final TrustService trustService
+    final EventBus eventBus
+    final UltrapeerConnectionManager manager
+    final MuWireSettings settings
+    final I2PAcceptor acceptor
+    final HostCache hostCache
+    final TrustService trustService
     final SearchManager searchManager 
     final UploadManager uploadManager
     final ConnectionEstablisher establisher
-	
-	final ExecutorService acceptorThread
-	final ExecutorService handshakerThreads
+    
+    final ExecutorService acceptorThread
+    final ExecutorService handshakerThreads
     
     private volatile shutdown
-	
-	ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
-		MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
-		TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
+    
+    ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
+        MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
+        TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
         ConnectionEstablisher establisher) {
-		this.eventBus = eventBus
-		this.manager = manager
-		this.settings = settings
-		this.acceptor = acceptor
-		this.hostCache = hostCache
-		this.trustService = trustService
+        this.eventBus = eventBus
+        this.manager = manager
+        this.settings = settings
+        this.acceptor = acceptor
+        this.hostCache = hostCache
+        this.trustService = trustService
         this.searchManager = searchManager
         this.uploadManager = uploadManager
-		this.establisher = establisher
+        this.establisher = establisher
         
-		acceptorThread = Executors.newSingleThreadExecutor { r -> 
-			def rv = new Thread(r)
-			rv.setDaemon(true)
-			rv.setName("acceptor")
-			rv
-		}
-		
-		handshakerThreads = Executors.newCachedThreadPool { r ->
-			def rv = new Thread(r)
-			rv.setDaemon(true)
-			rv.setName("acceptor-processor-${System.currentTimeMillis()}")
-			rv
-		}
-	}
-	
-	void start() {
-		acceptorThread.execute({acceptLoop()} as Runnable)
-	}
-	
-	void stop() {
+        acceptorThread = Executors.newSingleThreadExecutor { r -> 
+            def rv = new Thread(r)
+            rv.setDaemon(true)
+            rv.setName("acceptor")
+            rv
+        }
+        
+        handshakerThreads = Executors.newCachedThreadPool { r ->
+            def rv = new Thread(r)
+            rv.setDaemon(true)
+            rv.setName("acceptor-processor-${System.currentTimeMillis()}")
+            rv
+        }
+    }
+    
+    void start() {
+        acceptorThread.execute({acceptLoop()} as Runnable)
+    }
+    
+    void stop() {
         shutdown = true
-		acceptorThread.shutdownNow()
-		handshakerThreads.shutdownNow()
-	}
-	
-	private void acceptLoop() {
+        acceptorThread.shutdownNow()
+        handshakerThreads.shutdownNow()
+    }
+    
+    private void acceptLoop() {
         try {
-		while(true) {
-			def incoming = acceptor.accept()
-			log.info("accepted connection from ${incoming.destination.toBase32()}")
-			switch(trustService.getLevel(incoming.destination)) {
-				case TrustLevel.TRUSTED : break
-				case TrustLevel.NEUTRAL :
-					if (settings.allowUntrusted())
-						break
-				case TrustLevel.DISTRUSTED :
-					log.info("Disallowing distrusted connection")
-					incoming.close()
-					continue
-			}
-			handshakerThreads.execute({processIncoming(incoming)} as Runnable)
-		}
+        while(true) {
+            def incoming = acceptor.accept()
+            log.info("accepted connection from ${incoming.destination.toBase32()}")
+            switch(trustService.getLevel(incoming.destination)) {
+                case TrustLevel.TRUSTED : break
+                case TrustLevel.NEUTRAL :
+                    if (settings.allowUntrusted())
+                        break
+                case TrustLevel.DISTRUSTED :
+                    log.info("Disallowing distrusted connection")
+                    incoming.close()
+                    continue
+            }
+            handshakerThreads.execute({processIncoming(incoming)} as Runnable)
+        }
         } catch (Exception e) {
             log.log(Level.WARNING, "exception in accept loop",e)
             if (!shutdown)
                 throw e
         }
-	}
-	
-	private void processIncoming(Endpoint e) {
-		InputStream is = e.inputStream
-		try {
-			int read = is.read()
-			switch(read) {
-				case (byte)'M':
+    }
+    
+    private void processIncoming(Endpoint e) {
+        InputStream is = e.inputStream
+        try {
+            int read = is.read()
+            switch(read) {
+                case (byte)'M':
                     if (settings.isLeaf())
                         throw new IOException("Incoming connection as leaf")
-					processMuWire(e)
-					break
-				case (byte)'G':
-					processGET(e)
-					break
+                    processMuWire(e)
+                    break
+                case (byte)'G':
+                    processGET(e)
+                    break
                 case (byte)'H':
                     processHashList(e)
                     break
@@ -129,28 +129,28 @@ class ConnectionAcceptor {
                 case (byte)'T':
                     processTRUST(e)
                     break
-				default:
-					throw new Exception("Invalid read $read")
-			}
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "incoming connection failed",ex)
-			e.close()
-			eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, leaf: null, status: ConnectionAttemptStatus.FAILED)
-		}
-	}
-	
-	private void processMuWire(Endpoint e) {
-		byte[] uWire = "uWire ".bytes
-		for (int i = 0; i < uWire.length; i++) {
-			int read = e.inputStream.read()
-			if (read != uWire[i]) {
-				throw new IOException("unexpected value $read at position $i")
-			}
-		}
+                default:
+                    throw new Exception("Invalid read $read")
+            }
+        } catch (Exception ex) {
+            log.log(Level.WARNING, "incoming connection failed",ex)
+            e.close()
+            eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, leaf: null, status: ConnectionAttemptStatus.FAILED)
+        }
+    }
+    
+    private void processMuWire(Endpoint e) {
+        byte[] uWire = "uWire ".bytes
+        for (int i = 0; i < uWire.length; i++) {
+            int read = e.inputStream.read()
+            if (read != uWire[i]) {
+                throw new IOException("unexpected value $read at position $i")
+            }
+        }
         
-		byte[] type = new byte[4]
-		DataInputStream dis = new DataInputStream(e.inputStream)
-		dis.readFully(type)
+        byte[] type = new byte[4]
+        DataInputStream dis = new DataInputStream(e.inputStream)
+        dis.readFully(type)
                 
         if (type == "leaf".bytes)
             handleIncoming(e, true)
@@ -160,44 +160,44 @@ class ConnectionAcceptor {
             throw new IOException("unknown connection type $type")
     }
 
-	private void handleIncoming(Endpoint e, boolean leaf) {
-		boolean accept = !manager.isConnected(e.destination) && 
+    private void handleIncoming(Endpoint e, boolean leaf) {
+        boolean accept = !manager.isConnected(e.destination) && 
             !establisher.isInProgress(e.destination) &&
             (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
-		if (accept) {
-			log.info("accepting connection, leaf:$leaf")
-			e.outputStream.write("OK".bytes)
-			e.outputStream.flush()
-			def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true), e.toClose)
-			eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.SUCCESSFUL))
-		} else {
-			log.info("rejecting connection, leaf:$leaf")
-			e.outputStream.write("REJECT".bytes)
-			def hosts = hostCache.getGoodHosts(10)
-			if (!hosts.isEmpty()) {
-				def json = [:]
-				json.tryHosts = hosts.collect { d -> d.toBase64() }
-				json = JsonOutput.toJson(json)
-				def os = new DataOutputStream(e.outputStream)
-				os.writeShort(json.bytes.length)
-				os.write(json.bytes)
-			}
-			e.outputStream.flush()
-			e.close()
-			eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.REJECTED))
-		}
-	}
-	
-	
-	
-	private void processGET(Endpoint e) {
+        if (accept) {
+            log.info("accepting connection, leaf:$leaf")
+            e.outputStream.write("OK".bytes)
+            e.outputStream.flush()
+            def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true), e.toClose)
+            eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.SUCCESSFUL))
+        } else {
+            log.info("rejecting connection, leaf:$leaf")
+            e.outputStream.write("REJECT".bytes)
+            def hosts = hostCache.getGoodHosts(10)
+            if (!hosts.isEmpty()) {
+                def json = [:]
+                json.tryHosts = hosts.collect { d -> d.toBase64() }
+                json = JsonOutput.toJson(json)
+                def os = new DataOutputStream(e.outputStream)
+                os.writeShort(json.bytes.length)
+                os.write(json.bytes)
+            }
+            e.outputStream.flush()
+            e.close()
+            eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.REJECTED))
+        }
+    }
+    
+    
+    
+    private void processGET(Endpoint e) {
         byte[] et = new byte[3]
         final DataInputStream dis = new DataInputStream(e.getInputStream())
         dis.readFully(et)
         if (et != "ET ".getBytes(StandardCharsets.US_ASCII))
             throw new IOException("Invalid GET connection")
         uploadManager.processGET(e)
-	}
+    }
     
     private void processHashList(Endpoint e) {
         byte[] ashList = new byte[8]
@@ -285,5 +285,5 @@ class ConnectionAcceptor {
         dos.flush()
         e.close()
     }
-	
+    
 }

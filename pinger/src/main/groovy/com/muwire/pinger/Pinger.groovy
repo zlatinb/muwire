@@ -34,52 +34,52 @@ public class Pinger {
         
         def session = i2pClient.createSession(bais, props)
         
-		session.addMuxedSessionListener(new Listener(),
-			I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
+        session.addMuxedSessionListener(new Listener(),
+            I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         
         def maker = new I2PDatagramMaker(session)
         payload = maker.makeI2PDatagram(payload)
         session.sendMessage(target, payload, I2PSession.PROTO_DATAGRAM, 0, 0)
-		println "Sent message, going to sleep"
-		Thread.sleep(Integer.MAX_VALUE)
+        println "Sent message, going to sleep"
+        Thread.sleep(Integer.MAX_VALUE)
     }
-	
-	static class Listener implements I2PSessionMuxedListener {
+    
+    static class Listener implements I2PSessionMuxedListener {
 
-		@Override
-		public void messageAvailable(I2PSession session, int msgId, long size) {
-			
-		}
+        @Override
+        public void messageAvailable(I2PSession session, int msgId, long size) {
+            
+        }
 
-		@Override
-		public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromport, int toport) {
-			def payload = session.receiveMessage(msgId)
-			def dissector = new I2PDatagramDissector()
-			try {
-				dissector.loadI2PDatagram(payload)
-				def sender = dissector.getSender().toBase32()
-				payload = new String(dissector.getPayload())
-				println "From $sender received $payload"
-			} catch (Exception e) {
-				e.printStackTrace()
-			}
-		}
+        @Override
+        public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromport, int toport) {
+            def payload = session.receiveMessage(msgId)
+            def dissector = new I2PDatagramDissector()
+            try {
+                dissector.loadI2PDatagram(payload)
+                def sender = dissector.getSender().toBase32()
+                payload = new String(dissector.getPayload())
+                println "From $sender received $payload"
+            } catch (Exception e) {
+                e.printStackTrace()
+            }
+        }
 
-		@Override
-		public void reportAbuse(I2PSession session, int severity) {
-			println "abuse $severity"
-		}
+        @Override
+        public void reportAbuse(I2PSession session, int severity) {
+            println "abuse $severity"
+        }
 
-		@Override
-		public void disconnected(I2PSession session) {
-			println "disconnected"
-		}
+        @Override
+        public void disconnected(I2PSession session) {
+            println "disconnected"
+        }
 
-		@Override
-		public void errorOccurred(I2PSession session, String message, Throwable error) {
-			println "Error $message $error"
-		}
-		
-	}
+        @Override
+        public void errorOccurred(I2PSession session, String message, Throwable error) {
+            println "Error $message $error"
+        }
+        
+    }
 }

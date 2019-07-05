@@ -11,7 +11,7 @@ class Crawler {
 
     final def pinger
     final def hostPool
-	final int parallel
+    final int parallel
     
     final Map<Destination, Host> inFlight = new HashMap<>()
     
@@ -20,7 +20,7 @@ class Crawler {
     Crawler(pinger, hostPool, int parallel) {
         this.pinger = pinger
         this.hostPool = hostPool
-		this.parallel = parallel
+        this.parallel = parallel
     }
     
     synchronized def handleCrawlerPong(pong, Destination source) {
@@ -73,16 +73,16 @@ class Crawler {
     private static boolean parseBoolean(value) {
         return Boolean.parseBoolean(value.toString())
     }
-	
-	synchronized def startCrawl() {
-		if (!inFlight.isEmpty()) {
-			inFlight.values().each { hostPool.fail(it) }
-			inFlight.clear()
-		}
-		currentUUID = UUID.randomUUID()
-		hostPool.getUnverified(parallel).each { 
-			inFlight.put(it.destination, it)
-			pinger.ping(it, currentUUID)
-		}
-	}
+    
+    synchronized def startCrawl() {
+        if (!inFlight.isEmpty()) {
+            inFlight.values().each { hostPool.fail(it) }
+            inFlight.clear()
+        }
+        currentUUID = UUID.randomUUID()
+        hostPool.getUnverified(parallel).each { 
+            inFlight.put(it.destination, it)
+            pinger.ping(it, currentUUID)
+        }
+    }
 }

@@ -12,7 +12,7 @@ class Pinger {
     }
     
     def ping(host, uuid) {
-    	def maker = new I2PDatagramMaker(session)
+        def maker = new I2PDatagramMaker(session)
         def payload = new HashMap()
         payload.type = "CrawlerPing"
         payload.version = 1

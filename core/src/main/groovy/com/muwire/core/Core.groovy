@@ -96,7 +96,7 @@ public class Core {
     final AtomicBoolean shutdown = new AtomicBoolean()
         
     public Core(MuWireSettings props, File home, String myVersion) {
-        this.home = home		
+        this.home = home        
         this.muOptions = props
         
         i2pOptions = new Properties()
@@ -147,28 +147,28 @@ public class Core {
                 Thread.sleep(100)
         }
         
-		log.info("initializing I2P socket manager")
-		def i2pClient = new I2PClientFactory().createClient()
-		File keyDat = new File(home, "key.dat")
-		if (!keyDat.exists()) {
-			log.info("Creating new key.dat")
-			keyDat.withOutputStream { 
-				i2pClient.createDestination(it, Constants.SIG_TYPE)
-			}
-		}
-		
+        log.info("initializing I2P socket manager")
+        def i2pClient = new I2PClientFactory().createClient()
+        File keyDat = new File(home, "key.dat")
+        if (!keyDat.exists()) {
+            log.info("Creating new key.dat")
+            keyDat.withOutputStream { 
+                i2pClient.createDestination(it, Constants.SIG_TYPE)
+            }
+        }
+        
         
         // options like tunnel length and quantity
-		I2PSession i2pSession
-		I2PSocketManager socketManager
-		keyDat.withInputStream {
-			socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
-		}
-		socketManager.getDefaultOptions().setReadTimeout(60000)
-		socketManager.getDefaultOptions().setConnectTimeout(30000)
+        I2PSession i2pSession
+        I2PSocketManager socketManager
+        keyDat.withInputStream {
+            socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
+        }
+        socketManager.getDefaultOptions().setReadTimeout(60000)
+        socketManager.getDefaultOptions().setConnectTimeout(30000)
         socketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
-		i2pSession = socketManager.getSession()
-		
+        i2pSession = socketManager.getSession()
+        
         def destination = new Destination()
         def spk = new SigningPrivateKey(Constants.SIG_TYPE)
         keyDat.withInputStream {
@@ -176,7 +176,7 @@ public class Core {
             def privateKey = new PrivateKey()
             privateKey.readBytes(it)
             spk.readBytes(it)
-		}
+        }
             
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
@@ -194,66 +194,66 @@ public class Core {
         me = new Persona(new ByteArrayInputStream(baos.toByteArray()))
         log.info("Loaded myself as "+me.getHumanReadableName())
 
-		eventBus = new EventBus()
-		
-		log.info("initializing trust service")
-		File goodTrust = new File(home, "trusted")
-		File badTrust = new File(home, "distrusted")
-		trustService = new TrustService(goodTrust, badTrust, 5000)
-		eventBus.register(TrustEvent.class, trustService)
-		
-		
-		log.info "initializing file manager"
-		fileManager = new FileManager(eventBus, props)
-		eventBus.register(FileHashedEvent.class, fileManager)
-		eventBus.register(FileLoadedEvent.class, fileManager)
-		eventBus.register(FileDownloadedEvent.class, fileManager)
-		eventBus.register(FileUnsharedEvent.class, fileManager)
-		eventBus.register(SearchEvent.class, fileManager)
+        eventBus = new EventBus()
+        
+        log.info("initializing trust service")
+        File goodTrust = new File(home, "trusted")
+        File badTrust = new File(home, "distrusted")
+        trustService = new TrustService(goodTrust, badTrust, 5000)
+        eventBus.register(TrustEvent.class, trustService)
+        
+        
+        log.info "initializing file manager"
+        fileManager = new FileManager(eventBus, props)
+        eventBus.register(FileHashedEvent.class, fileManager)
+        eventBus.register(FileLoadedEvent.class, fileManager)
+        eventBus.register(FileDownloadedEvent.class, fileManager)
+        eventBus.register(FileUnsharedEvent.class, fileManager)
+        eventBus.register(SearchEvent.class, fileManager)
         eventBus.register(DirectoryUnsharedEvent.class, fileManager)
         
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)
         eventBus.register(SourceDiscoveredEvent.class, meshManager)
-		
-		log.info "initializing persistence service"
-		persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
+        
+        log.info "initializing persistence service"
+        persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
         eventBus.register(UILoadedEvent.class, persisterService)
         
-		log.info("initializing host cache")
-		File hostStorage = new File(home, "hosts.json")
+        log.info("initializing host cache")
+        File hostStorage = new File(home, "hosts.json")
         hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
-		eventBus.register(HostDiscoveredEvent.class, hostCache)
-		eventBus.register(ConnectionEvent.class, hostCache)
-		
-		log.info("initializing connection manager")
-		connectionManager = props.isLeaf() ? 
-			new LeafConnectionManager(eventBus, me, 3, hostCache, props) : 
+        eventBus.register(HostDiscoveredEvent.class, hostCache)
+        eventBus.register(ConnectionEvent.class, hostCache)
+        
+        log.info("initializing connection manager")
+        connectionManager = props.isLeaf() ? 
+            new LeafConnectionManager(eventBus, me, 3, hostCache, props) : 
             new UltrapeerConnectionManager(eventBus, me, 512, 512, hostCache, trustService, props)
-		eventBus.register(TrustEvent.class, connectionManager)
-		eventBus.register(ConnectionEvent.class, connectionManager)
-		eventBus.register(DisconnectionEvent.class, connectionManager)
+        eventBus.register(TrustEvent.class, connectionManager)
+        eventBus.register(ConnectionEvent.class, connectionManager)
+        eventBus.register(DisconnectionEvent.class, connectionManager)
         eventBus.register(QueryEvent.class, connectionManager)
-		
-		log.info("initializing cache client")
-		cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
+        
+        log.info("initializing cache client")
+        cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
         
         log.info("initializing update client")
         updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me)
         eventBus.register(FileDownloadedEvent.class, updateClient)
         eventBus.register(UIResultBatchEvent.class, updateClient)
         
-		log.info("initializing connector")
-		I2PConnector i2pConnector = new I2PConnector(socketManager)
+        log.info("initializing connector")
+        I2PConnector i2pConnector = new I2PConnector(socketManager)
         
-		log.info "initializing results sender"
-		ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me)
-		
-		log.info "initializing search manager"
-		SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
-		eventBus.register(QueryEvent.class, searchManager)
-		eventBus.register(ResultsEvent.class, searchManager)
-		
+        log.info "initializing results sender"
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me)
+        
+        log.info "initializing search manager"
+        SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
+        eventBus.register(QueryEvent.class, searchManager)
+        eventBus.register(ResultsEvent.class, searchManager)
+        
         log.info("initializing download manager")
         downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
@@ -270,11 +270,11 @@ public class Core {
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
         
-		log.info("initializing acceptor")
-		I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
-		connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
+        log.info("initializing acceptor")
+        I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
+        connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props, 
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
-		
+        
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager)
         eventBus.register(FileSharedEvent.class, directoryWatcher)
@@ -289,7 +289,7 @@ public class Core {
         trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
         eventBus.register(UILoadedEvent.class, trustSubscriber)
         eventBus.register(TrustSubscriptionEvent.class, trustSubscriber)
-	}
+    }
     
     public void startServices() {
         hasherService.start()

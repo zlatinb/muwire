@@ -7,17 +7,17 @@ import java.util.Set;
 import net.i2p.data.Destination;
 
 public class DownloadedFile extends SharedFile {
-	
-	private final Set<Destination> sources;
+    
+    private final Set<Destination> sources;
 
-	public DownloadedFile(File file, InfoHash infoHash, int pieceSize, Set<Destination> sources) 
-	throws IOException {
-		super(file, infoHash, pieceSize);
-		this.sources = sources;
-	}
-	
-	public Set<Destination> getSources() {
-		return sources;
-	}
+    public DownloadedFile(File file, InfoHash infoHash, int pieceSize, Set<Destination> sources) 
+    throws IOException {
+        super(file, infoHash, pieceSize);
+        this.sources = sources;
+    }
+    
+    public Set<Destination> getSources() {
+        return sources;
+    }
 
 }

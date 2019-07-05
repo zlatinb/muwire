@@ -6,12 +6,12 @@ import com.muwire.core.Persona
 import net.i2p.data.Destination
 
 class QueryEvent extends Event {
-	
+    
     SearchEvent searchEvent
-	boolean firstHop
-	Destination replyTo
+    boolean firstHop
+    Destination replyTo
     Persona originator
-	Destination receivedOn
+    Destination receivedOn
 
     String toString() {
         "searchEvent: $searchEvent firstHop:$firstHop, replyTo:${replyTo.toBase32()}" +

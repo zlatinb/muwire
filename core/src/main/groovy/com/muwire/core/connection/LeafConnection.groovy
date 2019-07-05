@@ -17,21 +17,21 @@ import net.i2p.data.Destination
  */
 class LeafConnection extends Connection {
 
-	public LeafConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache, 
+    public LeafConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache, 
         TrustService trustService, MuWireSettings settings) {
-		super(eventBus, endpoint, true, hostCache, trustService, settings);
-	}
+        super(eventBus, endpoint, true, hostCache, trustService, settings);
+    }
 
-	@Override
-	protected void read() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void read() {
+        // TODO Auto-generated method stub
+        
+    }
 
-	@Override
-	protected void write(Object message) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected void write(Object message) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

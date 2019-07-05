@@ -56,18 +56,18 @@ public class HostCache {
         session = i2pClient.createSession(new FileInputStream(keyfile), props)
         myDest = session.getMyDestination()
         
-		// initialize hostpool and crawler
-		HostPool hostPool = new HostPool(3, 60 * 60 * 1000)
-		Pinger pinger = new Pinger(session)
-		Crawler crawler = new Crawler(pinger, hostPool, 5)
-		
-		Timer timer = new Timer("timer", true)
-		timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
-		timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
+        // initialize hostpool and crawler
+        HostPool hostPool = new HostPool(3, 60 * 60 * 1000)
+        Pinger pinger = new Pinger(session)
+        Crawler crawler = new Crawler(pinger, hostPool, 5)
+        
+        Timer timer = new Timer("timer", true)
+        timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
+        timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
         File verified = new File("verified.json")
         File unverified = new File("unverified.json")
         timer.schedule({hostPool.serialize(verified, unverified)} as TimerTask, 10000, 60 * 60 * 1000)
-		
+        
         session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler), 
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
@@ -78,9 +78,9 @@ public class HostCache {
     
     static class Listener implements I2PSessionMuxedListener {
         final def json = new JsonSlurper()
-		def hostPool
-		int toReturn
-		def crawler
+        def hostPool
+        int toReturn
+        def crawler
         
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
@@ -113,18 +113,18 @@ public class HostCache {
                 switch(payload.type) {
                     case "Ping" :
                     log.info("ping from $b32") 
-					if (payload.leaf == null) {
-						log.warning("ping didn't specify if leaf from $b32")
-						return
-					}
-					payload.leaf = Boolean.parseBoolean(payload.leaf.toString())
-					if (!payload.leaf)
-					    hostPool.addUnverified(new Host(destination: sender))
-					respond(session, sender, payload)
+                    if (payload.leaf == null) {
+                        log.warning("ping didn't specify if leaf from $b32")
+                        return
+                    }
+                    payload.leaf = Boolean.parseBoolean(payload.leaf.toString())
+                    if (!payload.leaf)
+                        hostPool.addUnverified(new Host(destination: sender))
+                    respond(session, sender, payload)
                     break
                     case "CrawlerPong":
                     log.info("CrawlerPong from $b32")
-					crawler.handleCrawlerPong(payload, sender)
+                    crawler.handleCrawlerPong(payload, sender)
                     break
                     default:
                     log.warning("Unexpected message type ${payload.type}, dropping from $b32")
@@ -135,17 +135,17 @@ public class HostCache {
         }
         void messageAvailable(I2PSession session, int msgId, long size) {
         }
-		
-		def respond(session, destination, ping) {
+        
+        def respond(session, destination, ping) {
 
-			def pongs = hostPool.getVerified(toReturn, ping.leaf)
-			pongs = pongs.stream().map({ x -> x.destination.toBase64() }).collect(Collectors.toList())
-			
-			def pong = [type:"Pong", version: 1, pongs: pongs]
-			pong = JsonOutput.toJson(pong)
-			def maker = new I2PDatagramMaker(session)
-			pong = maker.makeI2PDatagram(pong.bytes)
-			session.sendMessage(destination, pong, I2PSession.PROTO_DATAGRAM, 0, 0)
-		}
+            def pongs = hostPool.getVerified(toReturn, ping.leaf)
+            pongs = pongs.stream().map({ x -> x.destination.toBase64() }).collect(Collectors.toList())
+            
+            def pong = [type:"Pong", version: 1, pongs: pongs]
+            pong = JsonOutput.toJson(pong)
+            def maker = new I2PDatagramMaker(session)
+            pong = maker.makeI2PDatagram(pong.bytes)
+            session.sendMessage(destination, pong, I2PSession.PROTO_DATAGRAM, 0, 0)
+        }
     }
 }
