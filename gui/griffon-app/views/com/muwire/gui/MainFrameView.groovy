@@ -196,14 +196,14 @@ class MainFrameView {
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                borderLayout()
-                                panel (constraints : BorderLayout.EAST) {
-                                    label("Shared:")
-                                    label(text : bind {model.loadedFiles.toString()})
-                                }
-                                panel (constraints : BorderLayout.WEST) {
+                                gridLayout(rows:1, cols:2)
+                                panel {
                                     button(text : "Add directories to watch", actionPerformed : watchDirectories)
                                     button(text : "Share files", actionPerformed : shareFiles)
+                                }
+                                panel {
+                                    label("Shared:")
+                                    label(text : bind {model.loadedFiles.toString()})
                                 }
                             }
                         }
