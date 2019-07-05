@@ -2,9 +2,9 @@ apply plugin : 'application'
 mainClassName = 'com.muwire.core.Core'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 dependencies {
-    compile 'net.i2p:router:0.9.40'
-    compile 'net.i2p.client:mstreaming:0.9.40'
-    compile 'net.i2p.client:streaming:0.9.40'
+    compile 'net.i2p:router:0.9.41'
+    compile 'net.i2p.client:mstreaming:0.9.41'
+    compile 'net.i2p.client:streaming:0.9.41'
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
     testCompile 'junit:junit:4.12'
