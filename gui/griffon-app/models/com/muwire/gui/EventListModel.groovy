@@ -17,10 +17,10 @@ import griffon.metadata.ArtifactProviderFor
 class EventListModel {
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
-    
+
     void mvcGroupInit(Map<String, Object> args) {
-        application.addPropertyChangeListener("core", {e -> 
-            coreInitialized = (e.getNewValue() != null) 
+        application.addPropertyChangeListener("core", {e ->
+            coreInitialized = (e.getNewValue() != null)
         })
     }
 }

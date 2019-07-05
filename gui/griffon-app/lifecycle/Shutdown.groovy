@@ -15,7 +15,7 @@ class Shutdown extends AbstractLifecycleHandler {
     Shutdown(@Nonnull GriffonApplication application) {
         super(application)
     }
-    
+
     @Override
     void execute() {
         log.info("shutting down")

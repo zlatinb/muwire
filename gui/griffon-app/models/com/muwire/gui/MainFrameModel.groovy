@@ -59,7 +59,7 @@ class MainFrameModel {
     @Inject @Nonnull GriffonApplication application
     @Observable boolean coreInitialized = false
     @Observable boolean routerPresent
-    
+
     def results = new ConcurrentHashMap<>()
     def downloads = []
     def uploads = []
@@ -70,7 +70,7 @@ class MainFrameModel {
     def trusted = []
     def distrusted = []
     def subscriptions = []
-    
+
     @Observable int connections
     @Observable String me
     @Observable int loadedFiles
@@ -91,34 +91,34 @@ class MainFrameModel {
     @Observable boolean unsubscribeButtonEnabled
 
     private final Set<InfoHash> infoHashes = new HashSet<>()
-    
+
     private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
 
-    @Observable volatile Core core    
+    @Observable volatile Core core
 
     private long lastRetryTime = System.currentTimeMillis()
-    
+
     UISettings uiSettings
-        
+
     void updateTablePreservingSelection(String tableName) {
         def downloadTable = builder.getVariable(tableName)
         int selectedRow = downloadTable.getSelectedRow()
         downloadTable.model.fireTableDataChanged()
         downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
     }
-    
+
     void mvcGroupInit(Map<String, Object> args) {
-        
+
         uiSettings = application.context.get("ui-settings")
-        
+
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
             runInsideUIAsync {
                 if (!mvcGroup.alive)
                     return
-                
+
                 // remove cancelled or finished downloads
-                def toRemove = []    
+                def toRemove = []
                 downloads.each {
                     if (uiSettings.clearCancelledDownloads &&
                         it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED)
@@ -129,10 +129,10 @@ class MainFrameModel {
                 }
                 toRemove.each {
                     downloads.remove(it)
-                }    
-                
+                }
+
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()
-                
+
                 updateTablePreservingSelection("downloads-table")
                 updateTablePreservingSelection("trusted-table")
                 updateTablePreservingSelection("distrusted-table")
@@ -163,7 +163,7 @@ class MainFrameModel {
             core.eventBus.register(AllFilesLoadedEvent.class, this)
             core.eventBus.register(UpdateDownloadedEvent.class, this)
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
-            
+
             timer.schedule({
                 if (core.shutdown.get())
                     return
@@ -176,7 +176,7 @@ class MainFrameModel {
                         runInsideUIAsync {
                             downloads.each {
                                 def state = it.downloader.currentState
-                                if (state == Downloader.DownloadState.FAILED || 
+                                if (state == Downloader.DownloadState.FAILED ||
                                     state == Downloader.DownloadState.DOWNLOADING)
                                     it.downloader.resume()
                                 updateTablePreservingSelection("downloads-table")
@@ -186,87 +186,87 @@ class MainFrameModel {
                     }
                 }
             }, 60000, 60000)
-            
+
             runInsideUIAsync {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
-                
+
                 resumeButtonText = "Retry"
             }
         })
-        
+
     }
-    
+
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
             watched.addAll(core.muOptions.watchedDirectories)
             builder.getVariable("watched-directories-table").model.fireTableDataChanged()
             watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
-            
+
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
         }
     }
-    
+
     void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
         runInsideUIAsync {
-            JOptionPane.showMessageDialog(null, "MuWire $e.version has been downloaded.  You can update now", 
+            JOptionPane.showMessageDialog(null, "MuWire $e.version has been downloaded.  You can update now",
                 "Update Downloaded", JOptionPane.INFORMATION_MESSAGE)
         }
     }
-    
+
     void onUIResultEvent(UIResultEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model.handleResult(e)
     }
-    
+
     void onUIResultBatchEvent(UIResultBatchEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model?.handleResultBatch(e.results)
     }
-    
+
     void onDownloadStartedEvent(DownloadStartedEvent e) {
         runInsideUIAsync {
             downloads << e
             downloadInfoHashes.add(e.downloader.infoHash)
         }
     }
-    
+
     void onConnectionEvent(ConnectionEvent e) {
         if (e.getStatus() != ConnectionAttemptStatus.SUCCESSFUL)
             return
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
-            
+
             if (connections > 0) {
                 def topPanel = builder.getVariable("top-panel")
                 topPanel.getLayout().show(topPanel, "top-search-panel")
             }
-            
+
             UIConnection con = new UIConnection(destination : e.endpoint.destination, incoming : e.incoming)
             connectionList.add(con)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onDisconnectionEvent(DisconnectionEvent e) {
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
-            
+
             if (connections == 0) {
                 def topPanel = builder.getVariable("top-panel")
                 topPanel.getLayout().show(topPanel, "top-connect-panel")
             }
-            
+
             UIConnection con = new UIConnection(destination : e.destination)
             connectionList.remove(con)
             JTable table = builder.getVariable("connections-table")
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onFileHashingEvent(FileHashingEvent e) {
         runInsideUIAsync {
             loadedFiles = shared.size()
@@ -281,7 +281,7 @@ class MainFrameModel {
         if (e.error != null)
             return // TODO do something
         if (infoHashes.contains(e.sharedFile.infoHash))
-            return    
+            return
         infoHashes.add(e.sharedFile.infoHash)
         runInsideUIAsync {
             shared << e.sharedFile
@@ -290,7 +290,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onFileLoadedEvent(FileLoadedEvent e) {
         if (infoHashes.contains(e.loadedFile.infoHash))
             return
@@ -302,7 +302,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         InfoHash infohash = e.unsharedFile.infoHash
         if (!infoHashes.remove(infohash))
@@ -314,7 +314,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
             uploads << e.uploader
@@ -322,7 +322,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onUploadFinishedEvent(UploadFinishedEvent e) {
         runInsideUIAsync {
             uploads.remove(e.uploader)
@@ -330,26 +330,26 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
-            
+
             trusted.clear()
             trusted.addAll(core.trustService.good.values())
             distrusted.clear()
             distrusted.addAll(core.trustService.bad.values())
-            
+
             updateTablePreservingSelection("trusted-table")
             updateTablePreservingSelection("distrusted-table")
-            
-            results.values().each { MVCGroup group -> 
+
+            results.values().each { MVCGroup group ->
                 if (group.alive) {
                     group.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
                 }
             }
         }
     }
-    
+
     void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
         runInsideUIAsync {
             if (!subscriptions.contains(e.trustList))
@@ -357,11 +357,11 @@ class MainFrameModel {
             updateTablePreservingSelection("subscription-table")
         }
     }
-    
+
     void onQueryEvent(QueryEvent e) {
         if (e.replyTo == core.me.destination)
             return
-        
+
         def search
         if (e.searchEvent.searchHash != null) {
             if (!uiSettings.showSearchHashes) {
@@ -408,7 +408,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     class IncomingSearch {
         String search
         Destination replyTo
@@ -426,11 +426,11 @@ class MainFrameModel {
             this.timestamp = Calendar.getInstance()
         }
     }
-    
+
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
         runInsideUIAsync {
-            
-            int option = JOptionPane.showConfirmDialog(null, 
+
+            int option = JOptionPane.showConfirmDialog(null,
                 "MuWire $e.version is available from $e.signer.  You have "+ metadata["application.version"]+" Update?",
                 "New MuWire version availble", JOptionPane.OK_CANCEL_OPTION)
             if (option == JOptionPane.CANCEL_OPTION)
@@ -438,7 +438,7 @@ class MainFrameModel {
             controller.search(e.infoHash,"MuWire update")
         }
     }
-    
+
     void onRouterDisconnectedEvent(RouterDisconnectedEvent e) {
         runInsideUIAsync {
             JOptionPane.showMessageDialog(null, "MuWire lost connection to the I2P router and will now exit.",
@@ -446,7 +446,7 @@ class MainFrameModel {
             System.exit(0)
         }
     }
-    
+
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         if (!core.muOptions.shareDownloadedFiles)
             return
@@ -457,16 +457,16 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-    
+
     private static class UIConnection {
         Destination destination
         boolean incoming
-        
+
         @Override
         public int hashCode() {
             destination.hashCode()
         }
-        
+
         @Override
         public boolean equals(Object o) {
             if (!(o instanceof UIConnection))
@@ -475,7 +475,7 @@ class MainFrameModel {
             return destination == other.destination
         }
     }
-    
+
     boolean canDownload(InfoHash hash) {
         !downloadInfoHashes.contains(hash)
     }

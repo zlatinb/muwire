@@ -8,10 +8,10 @@ public class SharedFile {
     private final File file;
     private final InfoHash infoHash;
     private final int pieceSize;
-    
+
     private final String cachedPath;
     private final long cachedLength;
-    
+
     public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
         this.file = file;
         this.infoHash = infoHash;
@@ -27,11 +27,11 @@ public class SharedFile {
     public InfoHash getInfoHash() {
         return infoHash;
     }
-    
+
     public int getPieceSize() {
         return pieceSize;
     }
-    
+
     public int getNPieces() {
         long length = file.length();
         int rawPieceSize = 0x1 << pieceSize;
@@ -40,20 +40,20 @@ public class SharedFile {
             rv++;
         return rv;
     }
-    
+
     public String getCachedPath() {
         return cachedPath;
     }
-    
+
     public long getCachedLength() {
         return cachedLength;
     }
-    
+
     @Override
     public int hashCode() {
         return file.hashCode() ^ infoHash.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof SharedFile))

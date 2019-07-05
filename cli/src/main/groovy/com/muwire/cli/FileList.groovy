@@ -11,10 +11,10 @@ class FileList {
             println "pass files.json as argument"
             System.exit(1)
         }
-        
+
         def slurper = new JsonSlurper()
         File filesJson = new File(args[0])
-        filesJson.eachLine { 
+        filesJson.eachLine {
             def json = slurper.parseText(it)
             String name = DataUtil.readi18nString(Base64.decode(json.file))
             println "$name,$json.length,$json.pieceSize,$json.infoHash"

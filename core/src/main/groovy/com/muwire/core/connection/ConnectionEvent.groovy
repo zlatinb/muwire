@@ -10,7 +10,7 @@ class ConnectionEvent extends Event {
     boolean incoming
     Boolean leaf // can be null if uknown
     ConnectionAttemptStatus status
-    
+
     @Override
     public String toString() {
         "ConnectionEvent ${super.toString()} endpoint: $endpoint incoming: $incoming leaf : $leaf status : $status"

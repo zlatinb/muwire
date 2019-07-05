@@ -21,27 +21,27 @@ class FileManager {
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
     final SearchIndex index = new SearchIndex()
-    
+
     FileManager(EventBus eventBus, MuWireSettings settings) {
         this.settings = settings
         this.eventBus = eventBus
     }
-    
+
     void onFileHashedEvent(FileHashedEvent e) {
         if (e.sharedFile != null)
             addToIndex(e.sharedFile)
     }
-    
+
     void onFileLoadedEvent(FileLoadedEvent e) {
         addToIndex(e.loadedFile)
     }
-    
+
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         if (settings.shareDownloadedFiles) {
             addToIndex(e.downloadedFile)
         }
     }
-    
+
     private void addToIndex(SharedFile sf) {
         log.info("Adding shared file " + sf.getFile())
         InfoHash infoHash = sf.getInfoHash()
@@ -53,7 +53,7 @@ class FileManager {
         }
         existing.add(sf)
         fileToSharedFile.put(sf.file, sf)
-        
+
         String name = sf.getFile().getName()
         Set<File> existingFiles = nameToFiles.get(name)
         if (existingFiles == null) {
@@ -61,10 +61,10 @@ class FileManager {
             nameToFiles.put(name, existingFiles)
         }
         existingFiles.add(sf.getFile())
-        
+
         index.add(name)
     }
-    
+
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         SharedFile sf = e.unsharedFile
         InfoHash infoHash = sf.getInfoHash()
@@ -75,9 +75,9 @@ class FileManager {
                 rootToFiles.remove(infoHash)
             }
         }
-        
+
         fileToSharedFile.remove(sf.file)
-        
+
         String name = sf.getFile().getName()
         Set<File> existingFiles = nameToFiles.get(name)
         if (existingFiles != null) {
@@ -86,20 +86,20 @@ class FileManager {
                 nameToFiles.remove(name)
             }
         }
-        
+
         index.remove(name)
     }
-    
+
     Map<File, SharedFile> getSharedFiles() {
         synchronized(fileToSharedFile) {
             return new HashMap<>(fileToSharedFile)
         }
     }
-    
+
     Set<SharedFile> getSharedFiles(byte []root) {
             return rootToFiles.get(new InfoHash(root))
     }
-    
+
     void onSearchEvent(SearchEvent e) {
         // hash takes precedence
         ResultsEvent re = null
@@ -118,26 +118,26 @@ class FileManager {
             files = filter(sharedFiles, e.oobInfohash)
             if (!sharedFiles.isEmpty())
                 re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
-            
+
         }
-        
+
         if (re != null)
             eventBus.publish(re)
     }
-    
+
     private static Set<SharedFile> filter(Set<SharedFile> files, boolean oob) {
         if (!oob)
             return files
         Set<SharedFile> rv = new HashSet<>()
-        files.each { 
+        files.each {
             if (it.getPieceSize() != 0)
                 rv.add(it)
         }
         rv
     }
-    
+
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        e.directory.listFiles().each { 
+        e.directory.listFiles().each {
             if (it.isDirectory())
                 eventBus.publish(new DirectoryUnsharedEvent(directory : it))
             else {

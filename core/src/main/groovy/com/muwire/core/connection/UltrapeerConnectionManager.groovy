@@ -15,16 +15,16 @@ import net.i2p.data.Destination
 
 @Log
 class UltrapeerConnectionManager extends ConnectionManager {
-    
+
     final int maxPeers, maxLeafs
     final TrustService trustService
-    
+
     final Map<Destination, PeerConnection> peerConnections = new ConcurrentHashMap()
     final Map<Destination, LeafConnection> leafConnections = new ConcurrentHashMap()
-    
+
     UltrapeerConnectionManager() {}
 
-    public UltrapeerConnectionManager(EventBus eventBus, Persona me, int maxPeers, int maxLeafs, 
+    public UltrapeerConnectionManager(EventBus eventBus, Persona me, int maxPeers, int maxLeafs,
         HostCache hostCache, TrustService trustService, MuWireSettings settings) {
         super(eventBus, me, hostCache, settings)
         this.maxPeers = maxPeers
@@ -36,7 +36,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
         peerConnections.get(d)?.close()
         leafConnections.get(d)?.close()
     }
-    
+
     void onQueryEvent(QueryEvent e) {
         forwardQueryToLeafs(e)
         if (!e.firstHop)
@@ -57,15 +57,15 @@ class UltrapeerConnectionManager extends ConnectionManager {
         rv.addAll(leafConnections.values())
         rv
     }
-    
+
     boolean hasLeafSlots() {
         leafConnections.size() < maxLeafs
     }
-    
+
     boolean hasPeerSlots() {
         peerConnections.size() < maxPeers
     }
-    
+
     @Override
     protected int getDesiredConnections() {
         return maxPeers / 2;
@@ -81,18 +81,18 @@ class UltrapeerConnectionManager extends ConnectionManager {
             log.severe("Inconsistent event $e")
             return
         }
-        
+
         if (e.status != ConnectionAttemptStatus.SUCCESSFUL)
             return
-        
-        Connection c = e.leaf ? 
-            new LeafConnection(eventBus, e.endpoint, hostCache, trustService, settings) : 
+
+        Connection c = e.leaf ?
+            new LeafConnection(eventBus, e.endpoint, hostCache, trustService, settings) :
             new PeerConnection(eventBus, e.endpoint, e.incoming, hostCache, trustService, settings)
         def map = e.leaf ? leafConnections : peerConnections
         map.put(e.endpoint.destination, c)
         c.start()
     }
-    
+
     @Override
     public void onDisconnectionEvent(DisconnectionEvent e) {
         def removed = peerConnections.remove(e.destination)
@@ -101,7 +101,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
         if (removed == null)
             log.severe("Removed connection not present in either leaf or peer map ${e.destination.toBase32()}")
     }
-    
+
     @Override
     void shutdown() {
         peerConnections.values().stream().parallel().forEach({v -> v.close()})
@@ -109,8 +109,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
         peerConnections.clear()
         leafConnections.clear()
     }
-    
+
     void forwardQueryToLeafs(QueryEvent e) {
-        
+
     }
 }

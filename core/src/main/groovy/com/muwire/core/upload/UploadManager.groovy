@@ -22,17 +22,17 @@ public class UploadManager {
     private final FileManager fileManager
     private final MeshManager meshManager
     private final DownloadManager downloadManager
-    
+
     public UploadManager() {}
-    
-    public UploadManager(EventBus eventBus, FileManager fileManager, 
+
+    public UploadManager(EventBus eventBus, FileManager fileManager,
         MeshManager meshManager, DownloadManager downloadManager) {
         this.eventBus = eventBus
         this.fileManager = fileManager
         this.meshManager = meshManager
         this.downloadManager = downloadManager
     }
-    
+
     public void processGET(Endpoint e) throws IOException {
         byte [] infoHashStringBytes = new byte[44]
         DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -79,10 +79,10 @@ public class UploadManager {
                 e.close()
                 return
             }
-            
-            if (request.have > 0) 
+
+            if (request.have > 0)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
-            
+
             Mesh mesh
             File file
             int pieceSize
@@ -96,7 +96,7 @@ public class UploadManager {
                 file = sharedFile.file
                 pieceSize = sharedFile.pieceSize
             }
-                
+
             Uploader uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
@@ -106,14 +106,14 @@ public class UploadManager {
             }
         }
     }
-    
+
     public void processHashList(Endpoint e) {
         byte [] infoHashStringBytes = new byte[44]
         DataInputStream dis = new DataInputStream(e.getInputStream())
         dis.readFully(infoHashStringBytes)
         String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
         log.info("Responding to hashlist request for root $infoHashString")
-        
+
         byte [] infoHashRoot = Base64.decode(infoHashString)
         InfoHash infoHash = new InfoHash(infoHashRoot)
         Downloader downloader = downloadManager.downloaders.get(infoHash)
@@ -125,7 +125,7 @@ public class UploadManager {
             e.close()
             return
         }
-        
+
         byte [] rn = new byte[2]
         dis.readFully(rn)
         if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
@@ -133,14 +133,14 @@ public class UploadManager {
             e.close()
             return
         }
-        
+
         Request request = Request.parseHashListRequest(infoHash, e.getInputStream())
         if (request.downloader != null && request.downloader.destination != e.destination) {
             log.info("Downloader persona doesn't match their destination")
             e.close()
             return
         }
-        
+
         InfoHash fullInfoHash
         if (downloader == null) {
             fullInfoHash = sharedFiles.iterator().next().infoHash
@@ -156,7 +156,7 @@ public class UploadManager {
                 return
             }
         }
-        
+
         Uploader uploader = new HashListUploader(e, fullInfoHash, request)
         eventBus.publish(new UploadEvent(uploader : uploader))
         try {
@@ -164,7 +164,7 @@ public class UploadManager {
         } finally {
             eventBus.publish(new UploadFinishedEvent(uploader : uploader))
         }
-        
+
         // proceed with content
         while(true) {
             byte[] get = new byte[4]
@@ -204,10 +204,10 @@ public class UploadManager {
                 e.close()
                 return
             }
-            
+
             if (request.have > 0)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
-            
+
             Mesh mesh
             File file
             int pieceSize

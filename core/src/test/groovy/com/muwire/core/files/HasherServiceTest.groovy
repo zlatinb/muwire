@@ -20,7 +20,7 @@ class HasherServiceTest {
             offer evt
         }
     }
-    
+
     @Before
     void before() {
         eventBus = new EventBus()
@@ -30,12 +30,12 @@ class HasherServiceTest {
         eventBus.register(FileSharedEvent.class, service)
         service.start()
     }
-    
+
     @After
     void after() {
         listener.clear()
     }
-    
+
     @Test
     void testSingleFile() {
         File f = new File("build.gradle")
@@ -47,7 +47,7 @@ class HasherServiceTest {
         assert hashed.sharedFile.infoHash != null
         assert listener.isEmpty()
     }
-    
+
     @Test
     void testDirectory() {
         File f = new File(".")

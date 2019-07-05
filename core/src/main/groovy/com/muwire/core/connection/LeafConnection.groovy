@@ -11,13 +11,13 @@ import com.muwire.core.trust.TrustService
 import net.i2p.data.Destination
 
 /**
- * Connection where the other side is a leaf. 
+ * Connection where the other side is a leaf.
  * Such connections can only be incoming.
  * @author zab
  */
 class LeafConnection extends Connection {
 
-    public LeafConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache, 
+    public LeafConnection(EventBus eventBus, Endpoint endpoint, HostCache hostCache,
         TrustService trustService, MuWireSettings settings) {
         super(eventBus, endpoint, true, hostCache, trustService, settings);
     }
@@ -25,13 +25,13 @@ class LeafConnection extends Connection {
     @Override
     protected void read() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     protected void write(Object message) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

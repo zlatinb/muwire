@@ -15,12 +15,12 @@ import com.muwire.core.util.DataUtil
 import net.i2p.data.Destination
 
 class ContentUploader extends Uploader {
-    
+
     private final File file
     private final ContentRequest request
     private final Mesh mesh
     private final int pieceSize
-    
+
     ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize) {
         super(endpoint)
         this.file = file
@@ -28,7 +28,7 @@ class ContentUploader extends Uploader {
         this.mesh = mesh
         this.pieceSize = pieceSize
     }
-    
+
     @Override
     void respond() {
         OutputStream os = endpoint.getOutputStream()
@@ -55,7 +55,7 @@ class ContentUploader extends Uploader {
         os.write("Content-Range: $range.start-$range.end\r\n".getBytes(StandardCharsets.US_ASCII))
         writeMesh(request.downloader)
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-        
+
         FileChannel channel = null
         try {
             channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ))
@@ -78,11 +78,11 @@ class ContentUploader extends Uploader {
             }
         }
     }
-    
+
     private void writeMesh(Persona toExclude) {
         String xHave = DataUtil.encodeXHave(mesh.pieces.getDownloaded(), mesh.pieces.nPieces)
         endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
-        
+
         Set<Persona> sources = mesh.getRandom(3, toExclude)
         if (!sources.isEmpty()) {
             String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))

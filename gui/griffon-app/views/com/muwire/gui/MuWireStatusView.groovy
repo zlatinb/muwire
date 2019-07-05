@@ -27,12 +27,12 @@ class MuWireStatusView {
     def dialog
     def panel
     def buttonsPanel
-    
+
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        
+
         dialog = new JDialog(mainFrame, "MuWire Status", true)
-        
+
         panel = builder.panel {
             gridBagLayout()
             label(text : "Incoming connections", constraints : gbc(gridx:0, gridy:0))
@@ -52,13 +52,13 @@ class MuWireStatusView {
             button(text : "Close", constraints : gbc(gridx : 1, gridy :0), closeAction)
         }
     }
-    
+
     void mvcGroupInit(Map<String,String> args) {
         JPanel statusPanel = new JPanel()
         statusPanel.setLayout(new BorderLayout())
         statusPanel.add(panel, BorderLayout.CENTER)
         statusPanel.add(buttonsPanel, BorderLayout.SOUTH)
-        
+
         dialog.getContentPane().add(statusPanel)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)

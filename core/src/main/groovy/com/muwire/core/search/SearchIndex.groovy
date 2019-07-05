@@ -5,7 +5,7 @@ import com.muwire.core.Constants
 class SearchIndex {
 
     final Map<String, Set<String>> keywords = new HashMap<>()
-    
+
     void add(String string) {
         String [] split = split(string)
         split.each {
@@ -17,7 +17,7 @@ class SearchIndex {
             existing.add(string)
         }
     }
-    
+
     void remove(String string) {
         String [] split = split(string)
         split.each {
@@ -30,7 +30,7 @@ class SearchIndex {
             }
         }
     }
-    
+
     private static String[] split(String source) {
         source = source.replaceAll(Constants.SPLIT_PATTERN, " ").toLowerCase()
         String [] split = source.split(" ")
@@ -38,10 +38,10 @@ class SearchIndex {
         split.each { if (it.length() > 0) rv << it }
         rv.toArray(new String[0])
     }
-    
+
     String[] search(List<String> terms) {
         Set<String> rv = null;
-        
+
         terms.each {
             Set<String> forWord = keywords.getOrDefault(it,[])
             if (rv == null) {
@@ -49,9 +49,9 @@ class SearchIndex {
             } else {
                 rv.retainAll(forWord)
             }
-                
+
         }
-        
+
         if (rv != null)
             return rv.asList()
         []

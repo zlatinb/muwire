@@ -35,15 +35,15 @@ class ConnectionAcceptor {
     final I2PAcceptor acceptor
     final HostCache hostCache
     final TrustService trustService
-    final SearchManager searchManager 
+    final SearchManager searchManager
     final UploadManager uploadManager
     final ConnectionEstablisher establisher
-    
+
     final ExecutorService acceptorThread
     final ExecutorService handshakerThreads
-    
+
     private volatile shutdown
-    
+
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
@@ -57,14 +57,14 @@ class ConnectionAcceptor {
         this.searchManager = searchManager
         this.uploadManager = uploadManager
         this.establisher = establisher
-        
-        acceptorThread = Executors.newSingleThreadExecutor { r -> 
+
+        acceptorThread = Executors.newSingleThreadExecutor { r ->
             def rv = new Thread(r)
             rv.setDaemon(true)
             rv.setName("acceptor")
             rv
         }
-        
+
         handshakerThreads = Executors.newCachedThreadPool { r ->
             def rv = new Thread(r)
             rv.setDaemon(true)
@@ -72,17 +72,17 @@ class ConnectionAcceptor {
             rv
         }
     }
-    
+
     void start() {
         acceptorThread.execute({acceptLoop()} as Runnable)
     }
-    
+
     void stop() {
         shutdown = true
         acceptorThread.shutdownNow()
         handshakerThreads.shutdownNow()
     }
-    
+
     private void acceptLoop() {
         try {
         while(true) {
@@ -106,7 +106,7 @@ class ConnectionAcceptor {
                 throw e
         }
     }
-    
+
     private void processIncoming(Endpoint e) {
         InputStream is = e.inputStream
         try {
@@ -138,7 +138,7 @@ class ConnectionAcceptor {
             eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, leaf: null, status: ConnectionAttemptStatus.FAILED)
         }
     }
-    
+
     private void processMuWire(Endpoint e) {
         byte[] uWire = "uWire ".bytes
         for (int i = 0; i < uWire.length; i++) {
@@ -147,21 +147,21 @@ class ConnectionAcceptor {
                 throw new IOException("unexpected value $read at position $i")
             }
         }
-        
+
         byte[] type = new byte[4]
         DataInputStream dis = new DataInputStream(e.inputStream)
         dis.readFully(type)
-                
+
         if (type == "leaf".bytes)
             handleIncoming(e, true)
         else if (type == "peer".bytes)
             handleIncoming(e, false)
-        else 
+        else
             throw new IOException("unknown connection type $type")
     }
 
     private void handleIncoming(Endpoint e, boolean leaf) {
-        boolean accept = !manager.isConnected(e.destination) && 
+        boolean accept = !manager.isConnected(e.destination) &&
             !establisher.isInProgress(e.destination) &&
             (leaf ? manager.hasLeafSlots() : manager.hasPeerSlots())
         if (accept) {
@@ -187,9 +187,9 @@ class ConnectionAcceptor {
             eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.REJECTED))
         }
     }
-    
-    
-    
+
+
+
     private void processGET(Endpoint e) {
         byte[] et = new byte[3]
         final DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -198,7 +198,7 @@ class ConnectionAcceptor {
             throw new IOException("Invalid GET connection")
         uploadManager.processGET(e)
     }
-    
+
     private void processHashList(Endpoint e) {
         byte[] ashList = new byte[8]
         final DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -207,7 +207,7 @@ class ConnectionAcceptor {
             throw new IOException("Invalid HASHLIST connection")
         uploadManager.processHashList(e)
     }
-    
+
     private void processPOST(final Endpoint e) throws IOException {
         byte [] ost = new byte[4]
         final DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -246,7 +246,7 @@ class ConnectionAcceptor {
             e.close()
         }
     }
-    
+
     private void processTRUST(Endpoint e) {
         byte[] RUST = new byte[6]
         DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -255,7 +255,7 @@ class ConnectionAcceptor {
             throw new IOException("Invalid TRUST connection")
         String header
         while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
-        
+
         OutputStream os = e.getOutputStream()
         if (!settings.allowTrustLists) {
             os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -263,7 +263,7 @@ class ConnectionAcceptor {
             e.close()
             return
         }
-        
+
         os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
         List<Persona> good = new ArrayList<>(trustService.good.values())
         int size = Math.min(Short.MAX_VALUE * 2, good.size())
@@ -273,7 +273,7 @@ class ConnectionAcceptor {
         good.each {
             it.write(dos)
         }
-        
+
         List<Persona> bad = new ArrayList<>(trustService.bad.values())
         size = Math.min(Short.MAX_VALUE * 2, bad.size())
         bad = bad.subList(0, size)
@@ -281,9 +281,9 @@ class ConnectionAcceptor {
         bad.each {
             it.write(dos)
         }
-        
+
         dos.flush()
         e.close()
     }
-    
+
 }

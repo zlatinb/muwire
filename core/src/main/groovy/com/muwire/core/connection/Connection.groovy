@@ -21,7 +21,7 @@ import net.i2p.data.Destination
 
 @Log
 abstract class Connection implements Closeable {
-    
+
     private static final int SEARCHES = 10
     private static final long INTERVAL = 1000
 
@@ -31,17 +31,17 @@ abstract class Connection implements Closeable {
     final HostCache hostCache
     final TrustService trustService
     final MuWireSettings settings
-        
+
     private final AtomicBoolean running = new AtomicBoolean()
     private final BlockingQueue messages = new LinkedBlockingQueue()
     private final Thread reader, writer
     private final LinkedList<Long> searchTimestamps = new LinkedList<>()
-    
+
     protected final String name
-    
+
     long lastPingSentTime, lastPongReceivedTime
-    
-    Connection(EventBus eventBus, Endpoint endpoint, boolean incoming, 
+
+    Connection(EventBus eventBus, Endpoint endpoint, boolean incoming,
         HostCache hostCache, TrustService trustService, MuWireSettings settings) {
         this.eventBus = eventBus
         this.incoming = incoming
@@ -49,18 +49,18 @@ abstract class Connection implements Closeable {
         this.hostCache = hostCache
         this.trustService = trustService
         this.settings = settings
-        
+
         this.name = endpoint.destination.toBase32().substring(0,8)
-        
+
         this.reader = new Thread({readLoop()} as Runnable)
         this.reader.setName("reader-$name")
         this.reader.setDaemon(true)
-        
+
         this.writer = new Thread({writeLoop()} as Runnable)
         this.writer.setName("writer-$name")
         this.writer.setDaemon(true)
     }
-    
+
     /**
      * starts the connection threads
      */
@@ -72,7 +72,7 @@ abstract class Connection implements Closeable {
         reader.start()
         writer.start()
     }
-    
+
     @Override
     public void close() {
         if (!running.compareAndSet(true, false)) {
@@ -85,7 +85,7 @@ abstract class Connection implements Closeable {
         endpoint.close()
         eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
     }
-    
+
     protected void readLoop() {
         try {
             while(running.get()) {
@@ -98,9 +98,9 @@ abstract class Connection implements Closeable {
             close()
         }
     }
-    
+
     protected abstract void read()
-    
+
     protected void writeLoop() {
         try {
             while(running.get()) {
@@ -113,9 +113,9 @@ abstract class Connection implements Closeable {
             close()
         }
     }
-    
+
     protected abstract void write(def message);
-    
+
     void sendPing() {
         def ping = [:]
         ping.type = "Ping"
@@ -123,7 +123,7 @@ abstract class Connection implements Closeable {
         messages.put(ping)
         lastPingSentTime = System.currentTimeMillis()
     }
-    
+
     void sendQuery(QueryEvent e) {
         def query = [:]
         query.type = "Search"
@@ -139,7 +139,7 @@ abstract class Connection implements Closeable {
             query.originator = e.originator.toBase64()
         messages.put(query)
     }
-    
+
     protected void handlePing() {
         log.fine("$name received ping")
         def pong = [:]
@@ -148,18 +148,18 @@ abstract class Connection implements Closeable {
         pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
         messages.put(pong)
     }
-    
+
     protected void handlePong(def pong) {
         log.fine("$name received pong")
         lastPongReceivedTime = System.currentTimeMillis()
         if (pong.pongs == null)
             throw new Exception("Pong doesn't have pongs")
-        pong.pongs.each { 
+        pong.pongs.each {
             def dest = new Destination(it)
             eventBus.publish(new HostDiscoveredEvent(destination: dest))
         }
     }
-    
+
     private boolean throttleSearch() {
         final long now = System.currentTimeMillis()
         if (searchTimestamps.size() < SEARCHES) {
@@ -173,19 +173,19 @@ abstract class Connection implements Closeable {
         searchTimestamps.removeFirst()
         false
     }
-    
+
     protected void handleSearch(def search) {
         if (throttleSearch()) {
             log.info("dropping excessive search")
             return
-        } 
+        }
         UUID uuid = UUID.fromString(search.uuid)
         byte [] infohash = null
         if (search.infohash != null) {
             search.keywords = null
             infohash = Base64.decode(search.infohash)
         }
-            
+
         Destination replyTo = new Destination(search.replyTo)
         TrustLevel trustLevel = trustService.getLevel(replyTo)
         if (trustLevel == TrustLevel.DISTRUSTED) {
@@ -196,7 +196,7 @@ abstract class Connection implements Closeable {
             log.info("dropping search from neutral peer")
             return
         }
-        
+
         Persona originator = null
         if (search.originator != null) {
             originator = new Persona(new ByteArrayInputStream(Base64.decode(search.originator)))
@@ -205,11 +205,11 @@ abstract class Connection implements Closeable {
                 return
             }
         }
-        
+
         boolean oob = false
         if (search.oobInfohash != null)
             oob = search.oobInfohash
-        
+
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : infohash,
                                             uuid : uuid,
@@ -220,6 +220,6 @@ abstract class Connection implements Closeable {
                                             receivedOn : endpoint.destination,
                                             firstHop : search.firstHop )
         eventBus.publish(event)
-                                            
+
     }
 }

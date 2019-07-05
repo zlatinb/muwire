@@ -16,23 +16,23 @@ import groovy.json.JsonSlurper
 import net.i2p.data.Base64
 
 class MeshManager {
-    
+
     private final Map<InfoHash, Mesh> meshes = Collections.synchronizedMap(new HashMap<>())
     private final FileManager fileManager
     private final File home
     private final MuWireSettings settings
-    
+
     MeshManager(FileManager fileManager, File home, MuWireSettings settings) {
         this.fileManager = fileManager
         this.home = home
         this.settings = settings
         load()
     }
-    
+
     Mesh get(InfoHash infoHash) {
         meshes.get(infoHash)
     }
-    
+
     Mesh getOrCreate(InfoHash infoHash, int nPieces) {
         synchronized(meshes) {
             if (meshes.containsKey(infoHash))
@@ -47,7 +47,7 @@ class MeshManager {
             return rv
         }
     }
-    
+
     void onSourceDiscoveredEvent(SourceDiscoveredEvent e) {
         Mesh mesh = meshes.get(e.infoHash)
         if (mesh == null)
@@ -55,7 +55,7 @@ class MeshManager {
        mesh.sources.add(e.source)
        save()
     }
-    
+
     private void save() {
         File meshFile = new File(home, "mesh.json")
         synchronized(meshes) {
@@ -72,29 +72,29 @@ class MeshManager {
             }
         }
     }
-    
+
     private void load() {
         File meshFile = new File(home, "mesh.json")
         if (!meshFile.exists())
             return
         long now = System.currentTimeMillis()
         JsonSlurper slurper = new JsonSlurper()
-        meshFile.eachLine { 
+        meshFile.eachLine {
             def json = slurper.parseText(it)
             if (now - json.timestamp > settings.meshExpiration * 60 * 1000)
                 return
             InfoHash infoHash = new InfoHash(Base64.decode(json.infoHash))
             Pieces pieces = new Pieces(json.nPieces, settings.downloadSequentialRatio)
-            
+
             Mesh mesh = new Mesh(infoHash, pieces)
-            json.sources.each { source -> 
+            json.sources.each { source ->
                 Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(source)))
                 mesh.sources.add(persona)
             }
-            
-            if (json.xHave != null) 
+
+            if (json.xHave != null)
                 DataUtil.decodeXHave(json.xHave).each { pieces.markDownloaded(it) }
-                
+
             if (!mesh.sources.isEmpty())
                 meshes.put(infoHash, mesh)
         }

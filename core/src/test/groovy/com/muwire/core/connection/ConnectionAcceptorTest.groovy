@@ -25,33 +25,33 @@ class ConnectionAcceptorTest {
     EventBus eventBus
     final Destinations destinations = new Destinations()
     def settings
-    
+
     def connectionManagerMock
     UltrapeerConnectionManager connectionManager
-    
+
     def i2pAcceptorMock
     I2PAcceptor i2pAcceptor
-    
+
     def hostCacheMock
     HostCache hostCache
-    
+
     def trustServiceMock
     TrustService trustService
-    
+
     def searchManagerMock
     SearchManager searchManager
-    
+
     def uploadManagerMock
     UploadManager uploadManager
-    
+
     def connectionEstablisherMock
     ConnectionEstablisher connectionEstablisher
-    
+
     ConnectionAcceptor acceptor
     List<ConnectionEvent> connectionEvents
     InputStream inputStream
     OutputStream outputStream
-    
+
     @Before
     void before() {
         connectionManagerMock = new MockFor(UltrapeerConnectionManager.class)
@@ -62,7 +62,7 @@ class ConnectionAcceptorTest {
         uploadManagerMock = new MockFor(UploadManager.class)
         connectionEstablisherMock = new MockFor(ConnectionEstablisher.class)
     }
-    
+
     @After
     void after() {
         acceptor?.stop()
@@ -75,7 +75,7 @@ class ConnectionAcceptorTest {
         connectionEstablisherMock.verify connectionEstablisher
         Thread.sleep(100)
     }
-    
+
     private void initMocks() {
         connectionEvents = new CopyOnWriteArrayList()
         eventBus = new EventBus()
@@ -85,7 +85,7 @@ class ConnectionAcceptorTest {
             }
         }
         eventBus.register(ConnectionEvent.class, listener)
-        
+
         connectionManager = connectionManagerMock.proxyInstance()
         i2pAcceptor = i2pAcceptorMock.proxyInstance()
         hostCache = hostCacheMock.proxyInstance()
@@ -93,13 +93,13 @@ class ConnectionAcceptorTest {
         searchManager = searchManagerMock.proxyInstance()
         uploadManager = uploadManagerMock.proxyInstance()
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
-        
-        acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor, 
+
+        acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor,
             hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
         acceptor.start()
         Thread.sleep(100)
     }
-    
+
     @Test
     void testSuccessfulLeaf() {
         settings = new MuWireSettings() {
@@ -125,15 +125,15 @@ class ConnectionAcceptorTest {
             assert dest == destinations.dest1
             TrustLevel.TRUSTED
         }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire leaf".bytes)
         byte [] OK = new byte[2]
         def dis = new DataInputStream(inputStream)
         dis.readFully(OK)
         assert OK == "OK".bytes
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -142,7 +142,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == true
     }
-    
+
     @Test
     void testSuccessfulPeer() {
         settings = new MuWireSettings() {
@@ -168,15 +168,15 @@ class ConnectionAcceptorTest {
             assert dest == destinations.dest1
             TrustLevel.TRUSTED
         }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire peer".bytes)
         byte [] OK = new byte[2]
         def dis = new DataInputStream(inputStream)
         dis.readFully(OK)
         assert OK == "OK".bytes
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -185,7 +185,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == false
     }
-    
+
     @Test
     void testLeafRejectsLeaf() {
         settings = new MuWireSettings() {
@@ -205,14 +205,14 @@ class ConnectionAcceptorTest {
             assert dest == destinations.dest1
             TrustLevel.TRUSTED
         }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire leaf".bytes)
         outputStream.flush()
         Thread.sleep(50)
         assert inputStream.read() == -1
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -221,7 +221,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == null
     }
-    
+
     @Test
     void testLeafRejectsPeer() {
         settings = new MuWireSettings() {
@@ -241,14 +241,14 @@ class ConnectionAcceptorTest {
             assert dest == destinations.dest1
             TrustLevel.TRUSTED
         }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire peer".bytes)
         outputStream.flush()
         Thread.sleep(50)
         assert inputStream.read() == -1
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -257,7 +257,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == null
     }
-    
+
     @Test
     void testPeerRejectsPeerSlots() {
         settings = new MuWireSettings() {
@@ -284,18 +284,18 @@ class ConnectionAcceptorTest {
             TrustLevel.TRUSTED
         }
         hostCacheMock.ignore.getGoodHosts { n -> [] }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire peer".bytes)
         byte [] OK = new byte[6]
         def dis = new DataInputStream(inputStream)
         dis.readFully(OK)
         assert OK == "REJECT".bytes
-        
+
         Thread.sleep(50)
         assert dis.read() == -1
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -304,7 +304,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == false
     }
-    
+
     @Test
     void testPeerRejectsLeafSlots() {
         settings = new MuWireSettings() {
@@ -331,18 +331,18 @@ class ConnectionAcceptorTest {
             TrustLevel.TRUSTED
         }
         hostCacheMock.ignore.getGoodHosts { n -> [] }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire leaf".bytes)
         byte [] OK = new byte[6]
         def dis = new DataInputStream(inputStream)
         dis.readFully(OK)
         assert OK == "REJECT".bytes
-        
+
         Thread.sleep(50)
         assert dis.read() == -1
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
@@ -351,7 +351,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == true
     }
-    
+
     @Test
     void testPeerRejectsPeerSuggests() {
         settings = new MuWireSettings() {
@@ -378,26 +378,26 @@ class ConnectionAcceptorTest {
             TrustLevel.TRUSTED
         }
         hostCacheMock.ignore.getGoodHosts { n -> [destinations.dest2] }
-        
+
         initMocks()
-        
+
         outputStream.write("MuWire peer".bytes)
         byte [] OK = new byte[6]
         def dis = new DataInputStream(inputStream)
         dis.readFully(OK)
         assert OK == "REJECT".bytes
-        
+
         short payloadSize = dis.readUnsignedShort()
         byte[] payload = new byte[payloadSize]
         dis.readFully(payload)
         assert dis.read() == -1
-        
+
         def json = new JsonSlurper()
         json = json.parse(payload)
         assert json.tryHosts != null
         assert json.tryHosts.size() == 1
         assert json.tryHosts.contains(destinations.dest2.toBase64())
-        
+
         Thread.sleep(50)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]

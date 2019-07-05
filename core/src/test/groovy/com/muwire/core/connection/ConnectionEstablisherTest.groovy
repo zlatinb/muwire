@@ -23,21 +23,21 @@ class ConnectionEstablisherTest {
     List<HostDiscoveredEvent> discoveredEvents
     DataInputStream inputStream
     DataOutputStream outputStream
-    
+
     def i2pConnectorMock
     I2PConnector i2pConnector
-    
+
     MuWireSettings settings
-    
+
     def connectionManagerMock
     ConnectionManager connectionManager
-    
+
     def hostCacheMock
     HostCache hostCache
-    
+
     ConnectionEstablisher establisher
-    
-    
+
+
     @Before
     void before() {
         connectionEvents = new CopyOnWriteArrayList()
@@ -57,7 +57,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock = new MockFor(ConnectionManager.class)
         hostCacheMock = new MockFor(HostCache.class)
     }
-    
+
     @After
     void after() {
         establisher?.stop()
@@ -66,7 +66,7 @@ class ConnectionEstablisherTest {
         hostCacheMock.verify hostCache
         Thread.sleep(100)
     }
-    
+
     private void initMocks() {
         i2pConnector = i2pConnectorMock.proxyInstance()
         connectionManager = connectionManagerMock.proxyInstance()
@@ -75,13 +75,13 @@ class ConnectionEstablisherTest {
         establisher.start()
         Thread.sleep(250)
     }
-    
-    
+
+
     @Test
     void testConnectFails() {
         settings = new MuWireSettings()
         connectionManagerMock.ignore.needsConnections {
-            true 
+            true
         }
         hostCacheMock.ignore.getHosts { num ->
             assert num == 1
@@ -95,16 +95,16 @@ class ConnectionEstablisherTest {
             assert dest == destinations.dest1
             throw new IOException()
         }
-        
+
         initMocks()
-        
+
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
         assert event.incoming == false
         assert event.status == ConnectionAttemptStatus.FAILED
     }
-    
+
     @Test
     void testConnectionSucceedsPeer() {
         settings = new MuWireSettings() {
@@ -128,26 +128,26 @@ class ConnectionEstablisherTest {
             outputStream = new DataOutputStream(new PipedOutputStream(is))
             new Endpoint(dest, is, os, null)
         }
-        
+
         initMocks()
-        
+
         byte [] header = new byte[11]
         inputStream.readFully(header)
         assert header == "MuWire peer".bytes
-        
+
         outputStream.write("OK".bytes)
         outputStream.flush()
-        
+
         Thread.sleep(100)
-        
+
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
         assert event.incoming == false
         assert event.status == ConnectionAttemptStatus.SUCCESSFUL
-        
+
     }
-    
+
     @Test
     void testConnectionSucceedsLeaf() {
         settings = new MuWireSettings() {
@@ -171,25 +171,25 @@ class ConnectionEstablisherTest {
             outputStream = new DataOutputStream(new PipedOutputStream(is))
             new Endpoint(dest, is, os, null)
         }
-        
+
         initMocks()
-        
+
         byte [] header = new byte[11]
         inputStream.readFully(header)
         assert header == "MuWire leaf".bytes
-        
+
         outputStream.write("OK".bytes)
         outputStream.flush()
-        
+
         Thread.sleep(100)
-        
+
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
         assert event.incoming == false
         assert event.status == ConnectionAttemptStatus.SUCCESSFUL
     }
-    
+
     @Test
     void testConnectionRejected() {
         settings = new MuWireSettings() {
@@ -213,18 +213,18 @@ class ConnectionEstablisherTest {
             outputStream = new DataOutputStream(new PipedOutputStream(is))
             new Endpoint(dest, is, os, null)
         }
-        
+
         initMocks()
-        
+
         byte [] header = new byte[11]
         inputStream.readFully(header)
         assert header == "MuWire peer".bytes
-        
+
         outputStream.write("REJECT".bytes)
         outputStream.flush()
-        
+
         Thread.sleep(100)
-        
+
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
@@ -232,7 +232,7 @@ class ConnectionEstablisherTest {
         assert event.status == ConnectionAttemptStatus.REJECTED
         assert discoveredEvents.isEmpty()
     }
-    
+
     @Test
     void testConnectionRejectedSuggestions() {
         settings = new MuWireSettings() {
@@ -256,16 +256,16 @@ class ConnectionEstablisherTest {
             outputStream = new DataOutputStream(new PipedOutputStream(is))
             new Endpoint(dest, is, os, null)
         }
-        
+
         initMocks()
-        
+
         byte [] header = new byte[11]
         inputStream.readFully(header)
         assert header == "MuWire peer".bytes
-        
+
         outputStream.write("REJECT".bytes)
         outputStream.flush()
-        
+
         def json = [:]
         json.tryHosts = [destinations.dest2.toBase64()]
         json = JsonOutput.toJson(json)
@@ -273,13 +273,13 @@ class ConnectionEstablisherTest {
         outputStream.write(json.bytes)
         outputStream.flush()
         Thread.sleep(100)
-        
+
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
         assert event.incoming == false
         assert event.status == ConnectionAttemptStatus.REJECTED
-        
+
         assert discoveredEvents.size() == 1
         event = discoveredEvents[0]
         assert event.destination == destinations.dest2

@@ -13,5 +13,5 @@ class InvalidSignatureException extends Exception {
     public InvalidSignatureException(Throwable cause) {
         super(cause);
     }
-    
+
 }

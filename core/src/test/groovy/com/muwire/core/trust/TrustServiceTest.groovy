@@ -16,7 +16,7 @@ class TrustServiceTest {
     TrustService service
     File persistGood, persistBad
     Personas personas = new Personas()
-    
+
     @Before
     void before() {
         persistGood = new File("good.trust")
@@ -28,32 +28,32 @@ class TrustServiceTest {
         service = new TrustService(persistGood, persistBad, 100)
         service.start()
     }
-    
+
     @After
     void after() {
         service.stop()
     }
-    
+
     @Test
     void testEmpty() {
         assert TrustLevel.NEUTRAL == service.getLevel(personas.persona1.destination)
         assert TrustLevel.NEUTRAL == service.getLevel(personas.persona2.destination)
     }
-    
+
     @Test
     void testOnEvent() {
         service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, persona: personas.persona1)
         service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, persona: personas.persona2)
-        
+
         assert TrustLevel.TRUSTED == service.getLevel(personas.persona1.destination)
         assert TrustLevel.DISTRUSTED == service.getLevel(personas.persona2.destination)
     }
-    
-    @Test 
+
+    @Test
     void testPersist() {
         service.onTrustEvent new TrustEvent(level: TrustLevel.TRUSTED, persona: personas.persona1)
         service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, persona: personas.persona2)
-        
+
         Thread.sleep(250)
         def trusted = new HashSet<>()
         persistGood.eachLine {
@@ -63,13 +63,13 @@ class TrustServiceTest {
         persistBad.eachLine {
             distrusted.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
         }
-        
+
         assert trusted.size() == 1
         assert trusted.contains(personas.persona1)
         assert distrusted.size() == 1
         assert distrusted.contains(personas.persona2)
     }
-    
+
     @Test
     void testLoad() {
         service.stop()
@@ -78,7 +78,7 @@ class TrustServiceTest {
         service = new TrustService(persistGood, persistBad, 100)
         service.start()
         Thread.sleep(50)
-        
+
         assert TrustLevel.TRUSTED == service.getLevel(personas.persona1.destination)
         assert TrustLevel.DISTRUSTED == service.getLevel(personas.persona2.destination)
     }

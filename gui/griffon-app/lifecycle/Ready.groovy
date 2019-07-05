@@ -24,9 +24,9 @@ import java.util.logging.Level
 
 @Log
 class Ready extends AbstractLifecycleHandler {
-    
+
     @Inject Metadata metadata
-    
+
     @Inject
     Ready(@Nonnull GriffonApplication application) {
         super(application)
@@ -35,7 +35,7 @@ class Ready extends AbstractLifecycleHandler {
     @Override
     void execute() {
         log.info "starting core services"
-        
+
         def home = new File(application.getContext().getAsString("muwire-home"))
         def props = new Properties()
         def propsFile = new File(home, "MuWire.properties")
@@ -56,12 +56,12 @@ class Ready extends AbstractLifecycleHandler {
                         "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
                         "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
                 if (nickname == null || nickname.trim().length() == 0) {
-                    JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname", 
+                    JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
                         JOptionPane.WARNING_MESSAGE)
                     continue
                 }
                 if (nickname.contains("@")) {
-                    JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another", 
+                    JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another",
                         "Select another nickname", JOptionPane.WARNING_MESSAGE)
                     continue
                 }
@@ -69,8 +69,8 @@ class Ready extends AbstractLifecycleHandler {
                 break
             }
             props.setNickname(nickname)
-            
-            
+
+
             def portableDownloads = System.getProperty("portable.downloads")
             if (portableDownloads != null) {
                 props.downloadLocation = new File(portableDownloads)
@@ -86,12 +86,12 @@ class Ready extends AbstractLifecycleHandler {
                 }
                 props.downloadLocation = chooser.getSelectedFile()
             }
-            
+
             propsFile.withOutputStream {
                 props.write(it)
             }
         }
-        
+
         Core core
         try {
             core = new Core(props, home, metadata["application.version"])
@@ -102,15 +102,15 @@ class Ready extends AbstractLifecycleHandler {
             System.exit(0)
         }
         Runtime.getRuntime().addShutdownHook({
-            core.shutdown() 
+            core.shutdown()
         })
         core.startServices()
         application.context.put("muwire-settings", props)
         application.context.put("core",core)
-        application.getPropertyChangeListeners("core").each { 
-            it.propertyChange(new PropertyChangeEvent(this, "core", null, core)) 
+        application.getPropertyChangeListeners("core").each {
+            it.propertyChange(new PropertyChangeEvent(this, "core", null, core))
         }
-        
+
         core.eventBus.publish(new UILoadedEvent())
     }
 }

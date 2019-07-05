@@ -5,12 +5,12 @@ import net.i2p.client.I2PSession
 import net.i2p.client.datagram.I2PDatagramMaker
 
 class Pinger {
-    
+
     final def session
     Pinger(session) {
         this.session = session
     }
-    
+
     def ping(host, uuid) {
         def maker = new I2PDatagramMaker(session)
         def payload = new HashMap()

@@ -15,7 +15,7 @@ class FileHasher {
 
     /** max size of shared file is 128 GB */
     public static final long MAX_SIZE = 0x1L << 37
-    
+
     /**
      * @param size of the file to be shared
      * @return the size of each piece in power of 2
@@ -25,18 +25,18 @@ class FileHasher {
     static int getPieceSize(long size) {
         if (size <= 0x1 << 30)
             return 17
-        
+
         for (int i = 31; i <= 37; i++) {
             if (size <= 0x1L << i) {
                 return i-13
             }
         }
-        
+
         throw new IllegalArgumentException("File too large $size")
     }
-    
+
     final MessageDigest digest
-    
+
     FileHasher() {
         try {
             digest = MessageDigest.getInstance("SHA-256")
@@ -45,14 +45,14 @@ class FileHasher {
             System.exit(1)
         }
     }
-    
+
     InfoHash hashFile(File file) {
         final long length = file.length()
         final int size = 0x1 << getPieceSize(length)
         int numPieces = (int) (length / size)
         if (numPieces * size < length)
             numPieces++
-            
+
         def output = new ByteArrayOutputStream()
         RandomAccessFile raf = new RandomAccessFile(file, "r")
         try {
@@ -70,18 +70,18 @@ class FileHasher {
         } finally {
             raf.close()
         }
-        
+
         byte [] hashList = output.toByteArray()
         InfoHash.fromHashList(hashList)
     }
-    
+
     public static void main(String[] args) {
         if (args.length != 1) {
             println "This utility computes an infohash of a file"
             println "Pass absolute path to a file as an argument"
             System.exit(1)
         }
-        
+
         def file = new File(args[0])
         file = file.getAbsoluteFile()
         def hasher = new FileHasher()

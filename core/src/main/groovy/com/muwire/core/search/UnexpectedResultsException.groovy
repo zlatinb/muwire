@@ -18,5 +18,5 @@ class UnexpectedResultsException extends Exception {
     public UnexpectedResultsException(String message) {
         super(message);
     }
-    
+
 }

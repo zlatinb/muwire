@@ -29,7 +29,7 @@ import net.i2p.util.ConcurrentHashSet
 public class Downloader {
     public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, PAUSED, FINISHED }
     private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
-    
+
     private static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
         Thread rv = new Thread(r)
         rv.setName("download worker")
@@ -38,8 +38,8 @@ public class Downloader {
     })
 
     private final EventBus eventBus
-    private final DownloadManager downloadManager 
-    private final Persona me   
+    private final DownloadManager downloadManager
+    private final Persona me
     private final File file
     private final Pieces pieces
     private final long length
@@ -53,8 +53,8 @@ public class Downloader {
     final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     private final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
-    
-    
+
+
     private volatile boolean cancelled, paused
     private final AtomicBoolean eventFired = new AtomicBoolean()
     private boolean piecesFileClosed
@@ -64,8 +64,8 @@ public class Downloader {
     private int speedAvg = 0
     private long timestamp = Instant.now().toEpochMilli()
 
-    public Downloader(EventBus eventBus, DownloadManager downloadManager, 
-        Persona me, File file, long length, InfoHash infoHash, 
+    public Downloader(EventBus eventBus, DownloadManager downloadManager,
+        Persona me, File file, long length, InfoHash infoHash,
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
         File incompletes, Pieces pieces) {
         this.eventBus = eventBus
@@ -87,15 +87,15 @@ public class Downloader {
         // it's easily adjustable by resizing the size of speedArr
         this.speedArr = [ 0, 0, 0, 0, 0 ]
     }
-    
+
     public synchronized InfoHash getInfoHash() {
         infoHash
     }
-    
+
     private synchronized void setInfoHash(InfoHash infoHash) {
         this.infoHash = infoHash
     }
-    
+
     void download() {
         readPieces()
         destinations.each {
@@ -106,16 +106,16 @@ public class Downloader {
             }
         }
     }
-    
+
     void readPieces() {
         if (!piecesFile.exists())
             return
-        piecesFile.eachLine { 
+        piecesFile.eachLine {
             int piece = Integer.parseInt(it)
             pieces.markDownloaded(piece)
         }
     }
-    
+
     void writePieces() {
         synchronized(piecesFile) {
             if (piecesFileClosed)
@@ -127,12 +127,12 @@ public class Downloader {
             }
         }
     }
-    
+
     public long donePieces() {
         pieces.donePieces()
     }
-    
-    
+
+
     public int speed() {
         int currSpeed = 0
         if (getCurrentState() == DownloadState.DOWNLOADING) {
@@ -164,15 +164,15 @@ public class Downloader {
 
         speedAvg
     }
-    
+
     public DownloadState getCurrentState() {
         if (cancelled)
             return DownloadState.CANCELLED
         if (paused)
             return DownloadState.PAUSED
-            
+
         boolean allFinished = true
-        activeWorkers.values().each { 
+        activeWorkers.values().each {
             allFinished &= it.currentState == WorkerState.FINISHED
         }
         if (allFinished) {
@@ -180,22 +180,22 @@ public class Downloader {
                 return DownloadState.FINISHED
             return DownloadState.FAILED
         }
-        
+
         // if at least one is downloading...
         boolean oneDownloading = false
-        activeWorkers.values().each { 
+        activeWorkers.values().each {
             if (it.currentState == WorkerState.DOWNLOADING) {
                 oneDownloading = true
-                return 
+                return
             }
         }
-        
+
         if (oneDownloading)
             return DownloadState.DOWNLOADING
-        
+
         // at least one is requesting hashlist
         boolean oneHashlist = false
-        activeWorkers.values().each { 
+        activeWorkers.values().each {
             if (it.currentState == WorkerState.HASHLIST) {
                 oneHashlist = true
                 return
@@ -203,10 +203,10 @@ public class Downloader {
         }
         if (oneHashlist)
             return DownloadState.HASHLIST
-            
+
         return DownloadState.CONNECTING
     }
-    
+
     public void cancel() {
         cancelled = true
         stop()
@@ -217,27 +217,27 @@ public class Downloader {
         incompleteFile.delete()
         pieces.clearAll()
     }
-    
+
     public void pause() {
         paused = true
         stop()
     }
-    
+
     void stop() {
-        activeWorkers.values().each { 
+        activeWorkers.values().each {
             it.cancel()
         }
     }
-    
+
     public int activeWorkers() {
         int active = 0
-        activeWorkers.values().each { 
+        activeWorkers.values().each {
             if (it.currentState != WorkerState.FINISHED)
                 active++
         }
         active
     }
-    
+
     public void resume() {
         paused = false
         readPieces()
@@ -256,7 +256,7 @@ public class Downloader {
             }
         }
     }
-    
+
     void addSource(Destination d) {
         if (activeWorkers.containsKey(d))
             return
@@ -264,7 +264,7 @@ public class Downloader {
         activeWorkers.put(d, newWorker)
         executorService.submit(newWorker)
     }
-    
+
     class DownloadWorker implements Runnable {
         private final Destination destination
         private volatile WorkerState currentState
@@ -272,11 +272,11 @@ public class Downloader {
         private Endpoint endpoint
         private volatile DownloadSession currentSession
         private final Set<Integer> available = new HashSet<>()
-                
+
         DownloadWorker(Destination destination) {
             this.destination = destination
         }
-        
+
         public void run() {
             downloadThread = Thread.currentThread()
             currentState = WorkerState.CONNECTING
@@ -292,7 +292,7 @@ public class Downloader {
                 currentState = WorkerState.DOWNLOADING
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(), 
+                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                         endpoint, incompleteFile, pieceSize, length, available)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
@@ -319,18 +319,18 @@ public class Downloader {
                         new FileDownloadedEvent(
                             downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, successfulDestinations),
                         downloader : Downloader.this))
-                            
-                } 
+
+                }
                 endpoint?.close()
             }
         }
-        
+
         int speed() {
             if (currentSession == null)
                 return 0
             currentSession.speed()
         }
-        
+
         void cancel() {
             downloadThread?.interrupt()
         }

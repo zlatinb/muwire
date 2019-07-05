@@ -17,25 +17,25 @@ import griffon.metadata.ArtifactProviderFor
 class SearchTabModel {
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
-    
+
     Core core
     UISettings uiSettings
     String uuid
     def results = []
     def hashBucket = [:]
     def sourcesBucket = [:]
-    
-    
+
+
     void mvcGroupInit(Map<String, String> args) {
         core = mvcGroup.parentGroup.model.core
         uiSettings = application.context.get("ui-settings")
         mvcGroup.parentGroup.model.results[UUID.fromString(uuid)] = mvcGroup
     }
-    
+
     void mvcGroupDestroy() {
         mvcGroup.parentGroup.model.results.remove(uuid)
     }
-    
+
     void handleResult(UIResultEvent e) {
         if (uiSettings.excludeLocalResult &&
             core.fileManager.rootToFiles.containsKey(e.infohash))
@@ -47,24 +47,24 @@ class SearchTabModel {
                 hashBucket[e.infohash] = bucket
             }
             bucket << e
-            
+
             Set sourceBucket = sourcesBucket.get(e.infohash)
             if (sourceBucket == null) {
                 sourceBucket = new HashSet()
                 sourcesBucket.put(e.infohash, sourceBucket)
             }
             sourceBucket.addAll(e.sources)
-                            
+
             results << e
             JTable table = builder.getVariable("results-table")
             table.model.fireTableDataChanged()
         }
     }
-    
+
     void handleResultBatch(UIResultEvent[] batch) {
         runInsideUIAsync {
-            batch.each { 
-                if (uiSettings.excludeLocalResult && 
+            batch.each {
+                if (uiSettings.excludeLocalResult &&
                     core.fileManager.rootToFiles.containsKey(it.infohash))
                     return
                 def bucket = hashBucket.get(it.infohash)
@@ -72,14 +72,14 @@ class SearchTabModel {
                     bucket = []
                     hashBucket[it.infohash] = bucket
                 }
-                
+
                 Set sourceBucket = sourcesBucket.get(it.infohash)
                 if (sourceBucket == null) {
                     sourceBucket = new HashSet()
                     sourcesBucket.put(it.infohash, sourceBucket)
                 }
                 sourceBucket.addAll(it.sources)
-                
+
                 bucket << it
                 results << it
             }

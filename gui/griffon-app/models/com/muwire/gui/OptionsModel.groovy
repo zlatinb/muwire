@@ -9,12 +9,12 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
-    @Observable String downloadRetryInterval 
+    @Observable String downloadRetryInterval
     @Observable String updateCheckInterval
     @Observable boolean autoDownloadUpdate
     @Observable boolean shareDownloadedFiles
     @Observable String downloadLocation
-    
+
     // i2p options
     @Observable String inboundLength
     @Observable String inboundQuantity
@@ -22,7 +22,7 @@ class OptionsModel {
     @Observable String outboundQuantity
     @Observable String i2pUDPPort
     @Observable String i2pNTCPPort
-    
+
     // gui options
     @Observable boolean showMonitor
     @Observable String lnf
@@ -31,17 +31,17 @@ class OptionsModel {
     @Observable boolean clearFinishedDownloads
     @Observable boolean excludeLocalResult
     @Observable boolean showSearchHashes
-    
+
     // bw options
     @Observable String inBw
     @Observable String outBw
-    
+
     // trust options
     @Observable boolean onlyTrusted
     @Observable boolean trustLists
     @Observable String trustListInterval
-    
-    
+
+
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
@@ -49,7 +49,7 @@ class OptionsModel {
         autoDownloadUpdate = settings.autoDownloadUpdate
         shareDownloadedFiles = settings.shareDownloadedFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
-        
+
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]
         inboundQuantity = core.i2pOptions["inbound.quantity"]
@@ -57,7 +57,7 @@ class OptionsModel {
         outboundQuantity = core.i2pOptions["outbound.quantity"]
         i2pUDPPort = core.i2pOptions["i2np.udp.port"]
         i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
-        
+
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor
         lnf = uiSettings.lnf
@@ -66,12 +66,12 @@ class OptionsModel {
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult
         showSearchHashes = uiSettings.showSearchHashes
-        
+
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)
             outBw = String.valueOf(settings.outBw)
         }
-        
+
         onlyTrusted = !settings.allowUntrusted()
         trustLists = settings.allowTrustLists
         trustListInterval = String.valueOf(settings.trustListInterval)

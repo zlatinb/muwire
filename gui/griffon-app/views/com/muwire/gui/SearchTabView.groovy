@@ -34,12 +34,12 @@ class SearchTabView {
     @MVCMember @Nonnull
     SearchTabModel model
 
-    def pane 
+    def pane
     def parent
     def searchTerms
     def resultsTable
     def lastSortEvent
-    
+
     void initUI() {
         builder.with {
             def resultsTable
@@ -57,13 +57,13 @@ class SearchTabView {
                     }
                 }
             }
-            
+
             this.pane = pane
             this.pane.putClientProperty("mvc-group", mvcGroup)
             this.pane.putClientProperty("results-table",resultsTable)
 
             this.resultsTable = resultsTable
-                        
+
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
             selectionModel.addListSelectionListener( {
@@ -77,16 +77,16 @@ class SearchTabView {
             })
         }
     }
-    
+
     void mvcGroupInit(Map<String, String> args) {
         searchTerms = args["search-terms"]
         parent = mvcGroup.parentGroup.view.builder.getVariable("result-tabs")
         parent.addTab(searchTerms, pane)
         int index = parent.indexOfComponent(pane)
         parent.setSelectedIndex(index)
-        
+
         def tabPanel
-        builder.with { 
+        builder.with {
             tabPanel = panel {
                 borderLayout()
                 panel {
@@ -96,22 +96,22 @@ class SearchTabView {
                     actionPerformed : closeTab )
             }
         }
-        
+
         parent.setTabComponentAt(index, tabPanel)
-        
+
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.columnModel.getColumn(1).setCellRenderer(centerRenderer)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
-        
+
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
-        
-        
+
+
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
-        
-        
+
+
         resultsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -127,7 +127,7 @@ class SearchTabView {
             }
         })
     }
-    
+
     def closeTab = {
         int index = parent.indexOfTab(searchTerms)
         parent.removeTabAt(index)
@@ -135,7 +135,7 @@ class SearchTabView {
         mvcGroup.parentGroup.model.downloadActionEnabled = false
         mvcGroup.destroy()
     }
-    
+
     def showPopupMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
         if (mvcGroup.parentGroup.model.downloadActionEnabled) {
@@ -148,7 +148,7 @@ class SearchTabView {
         menu.add(copyHashToClipboard)
         menu.show(e.getComponent(), e.getX(), e.getY())
     }
-    
+
     def copyHashToClipboard() {
         int selected = resultsTable.getSelectedRow()
         if (selected < 0)

@@ -11,10 +11,10 @@ import griffon.metadata.ArtifactProviderFor
 class TrustListModel {
     RemoteTrustList trustList
     TrustService trustService
-    
+
     def trusted
     def distrusted
-    
+
     void mvcGroupInit(Map<String,String> args) {
         trusted = new ArrayList<>(trustList.good)
         distrusted = new ArrayList<>(trustList.bad)

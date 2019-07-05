@@ -32,15 +32,15 @@ class UpdateClient {
     final MuWireSettings settings
     final FileManager fileManager
     final Persona me
-    
+
     private final Timer timer
-    
+
     private long lastUpdateCheckTime
-    
+
     private volatile InfoHash updateInfoHash
     private volatile String version, signer
     private volatile boolean updateDownloading
-    
+
     UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, FileManager fileManager, Persona me) {
         this.eventBus = eventBus
         this.session = session
@@ -50,16 +50,16 @@ class UpdateClient {
         this.me = me
         timer = new Timer("update-client",true)
     }
-    
+
     void start() {
         session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 2)
         timer.schedule({checkUpdate()} as TimerTask, 60000, 60 * 60 * 1000)
     }
-    
+
     void stop() {
         timer.cancel()
     }
-    
+
     void onUIResultBatchEvent(UIResultBatchEvent results) {
         if (results.results[0].infohash != updateInfoHash)
             return
@@ -70,14 +70,14 @@ class UpdateClient {
         def downloadEvent = new UIDownloadEvent(result: results.results[0], sources : results.results[0].sources, target : file)
         eventBus.publish(downloadEvent)
     }
- 
+
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         if (e.downloadedFile.infoHash != updateInfoHash)
             return
         updateDownloading = false
         eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer))
     }
-    
+
     private void checkUpdate() {
         final long now = System.currentTimeMillis()
         if (lastUpdateCheckTime > 0) {
@@ -85,20 +85,20 @@ class UpdateClient {
                 return
         }
         lastUpdateCheckTime = now
-    
+
         log.info("checking for update")
-        
+
         def ping = [version : 1, myVersion : myVersion]
         ping = JsonOutput.toJson(ping)
         def maker = new I2PDatagramMaker(session)
         ping = maker.makeI2PDatagram(ping.bytes)
-        def options = new SendMessageOptions() 
+        def options = new SendMessageOptions()
         options.setSendLeaseSet(true)
-        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 2, 0, options)   
+        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 2, 0, options)
     }
-    
+
     class Listener implements I2PSessionMuxedListener {
-        
+
         final JsonSlurper slurper = new JsonSlurper()
 
         @Override
@@ -111,7 +111,7 @@ class UpdateClient {
                 log.warning "Received unexpected protocol $proto"
                 return
             }
-            
+
             def payload = session.receiveMessage(msgId)
             def dissector = new I2PDatagramDissector()
             try {
@@ -121,33 +121,33 @@ class UpdateClient {
                     log.warning("received something not from update server " + sender.toBase32())
                     return
                 }
-                
+
                 log.info("Received something from update server")
-                
+
                 payload = dissector.getPayload()
                 payload = slurper.parse(payload)
-                
+
                 if (payload.version == null) {
                     log.warning("version missing")
                     return
                 }
-                
+
                 if (payload.signer == null) {
                     log.warning("signer missing")
                 }
-                
+
                 if (VersionComparator.comp(myVersion, payload.version) >= 0) {
                     log.info("no new version available")
                     return
                 }
-                
+
                 String infoHash
                 if (settings.updateType == "jar") {
                     infoHash = payload.infoHash
                 } else
                     infoHash = payload[settings.updateType]
-                
-              
+
+
                 if (!settings.autoDownloadUpdate) {
                     log.info("new version $payload.version available, publishing event")
                     eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : infoHash))
@@ -167,7 +167,7 @@ class UpdateClient {
                         eventBus.publish(queryEvent)
                     }
                 }
-                
+
             } catch (Exception e) {
                 log.log(Level.WARNING,"Invalid datagram",e)
             }
@@ -186,6 +186,6 @@ class UpdateClient {
         public void errorOccurred(I2PSession session, String message, Throwable error) {
             log.log(Level.SEVERE, message, error)
         }
-        
+
     }
 }

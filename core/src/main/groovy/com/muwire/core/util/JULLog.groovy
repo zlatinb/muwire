@@ -16,10 +16,10 @@ class JULLog extends Log {
         I2P_TO_JUL.put(Log.ERROR, Level.SEVERE)
         I2P_TO_JUL.put(Log.CRIT, Level.SEVERE)
     }
-    
+
     private final Logger delegate
     private final Level level
-    
+
     public JULLog(Class<?> cls) {
         super(cls)
         delegate = Logger.getLogger(cls.getName())
@@ -31,7 +31,7 @@ class JULLog extends Log {
         delegate = Logger.getLogger(name)
         level = findLevel(delegate)
     }
-    
+
     private static Level findLevel(Logger log) {
         while (log.getLevel() == null)
             log = log.getParent()

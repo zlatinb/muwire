@@ -17,9 +17,9 @@ import net.i2p.data.Destination
 
 @Log
 class CacheClient {
-    
+
     private static final int CRAWLER_RETURN = 10
-    
+
     final EventBus eventBus
     final HostCache cache
     final ConnectionManager manager
@@ -28,7 +28,7 @@ class CacheClient {
     final MuWireSettings settings
     final Timer timer
 
-    public CacheClient(EventBus eventBus, HostCache cache, 
+    public CacheClient(EventBus eventBus, HostCache cache,
         ConnectionManager manager, I2PSession session,
         MuWireSettings settings, long interval) {
         this.eventBus = eventBus
@@ -39,24 +39,24 @@ class CacheClient {
         this.interval = interval
         this.timer = new Timer("hostcache-client",true)
     }
-    
+
     void start() {
         session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
         timer.schedule({queryIfNeeded()} as TimerTask, 1, interval)
     }
-    
+
     void stop() {
         timer.cancel()
     }
-    
+
     private void queryIfNeeded() {
         if (!manager.getConnections().isEmpty())
             return
         if (!cache.getHosts(1).isEmpty())
             return
-        
-        log.info "Will query hostcaches"    
-        
+
+        log.info "Will query hostcaches"
+
         def ping = [type: "Ping", version: 1, leaf: settings.isLeaf()]
         ping = JsonOutput.toJson(ping)
         def maker = new I2PDatagramMaker(session)
@@ -68,9 +68,9 @@ class CacheClient {
             session.sendMessage(it, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 1, 0, options)
         }
     }
-    
+
     class Listener implements I2PSessionMuxedListener {
-        
+
         private final JsonSlurper slurper = new JsonSlurper()
 
         @Override
@@ -79,27 +79,27 @@ class CacheClient {
 
         @Override
         public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromport, int toport) {
-            
+
             if (proto != I2PSession.PROTO_DATAGRAM) {
                 log.warning "Received unexpected protocol $proto"
                 return
             }
-            
+
             def payload = session.receiveMessage(msgId)
             def dissector = new I2PDatagramDissector()
             try {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
                 log.info("Received something from ${sender.toBase32()}")
-                
+
                 payload = dissector.getPayload()
                 payload = slurper.parse(payload)
-                
+
                 if (payload.type == null) {
                     log.warning("type missing")
                     return
                 }
-                
+
                 switch(payload.type) {
                     case "Pong" : handlePong(sender, payload); break
                     case "CrawlerPing": handleCrawlerPing(session, sender, payload); break
@@ -123,34 +123,34 @@ class CacheClient {
         public void errorOccurred(I2PSession session, String message, Throwable error) {
             log.severe "I2P error occured $message $error"
         }
-        
+
     }
-    
+
     private void handlePong(Destination from, def pong) {
         if (!CacheServers.isRegistered(from)) {
             log.warning("received pong from non-registered destination")
             return
         }
-        
+
         if (pong.pongs == null) {
             log.warning("malformed pong - no pongs")
             return
         }
-        
-        pong.pongs.asList().each { 
+
+        pong.pongs.asList().each {
             Destination dest = new Destination(it)
             if (!session.getMyDestination().equals(dest))
-                eventBus.publish(new HostDiscoveredEvent(destination: dest, fromHostcache : true)) 
+                eventBus.publish(new HostDiscoveredEvent(destination: dest, fromHostcache : true))
         }
-        
+
     }
-    
+
     private void handleCrawlerPing(I2PSession session, Destination from, def ping) {
         if (settings.isLeaf()) {
             log.warning("Received crawler ping but I'm a leaf")
             return
         }
-        
+
         switch(settings.getCrawlerResponse()) {
             case CrawlerResponse.NONE:
                 log.info("Responding to crawlers is disabled by user")
@@ -166,15 +166,15 @@ class CacheClient {
                 break
         }
     }
-    
+
     private void respondToCrawler(I2PSession session, Destination from, def ping) {
         log.info "responding to crawler ping"
-        
+
         def neighbors = manager.getConnections().collect { c -> c.endpoint.destination.toBase64() }
         Collections.shuffle(neighbors)
         if (neighbors.size() > CRAWLER_RETURN)
             neighbors = neighbors[0..CRAWLER_RETURN - 1]
-        
+
         def upManager = (UltrapeerConnectionManager) manager;
         def pong = [:]
         pong.peers = neighbors
@@ -184,7 +184,7 @@ class CacheClient {
         pong.leafSlots = upManager.hasLeafSlots()
         pong.peerSlots = upManager.hasPeerSlots()
         pong = JsonOutput.toJson(pong)
-        
+
         def maker = new I2PDatagramMaker(session)
         pong = maker.makeI2PDatagram(pong.bytes)
         session.sendMessage(from, pong, I2PSession.PROTO_DATAGRAM, 0, 0)

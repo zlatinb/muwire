@@ -18,38 +18,38 @@ public class Pinger {
             println "Pass b64 destination as argument 1 and file with contents to send as argument 2"
             System.exit(1)
         }
-        
+
         def target = new Destination(args[0])
         def payload = (new File(args[1])).getBytes()
-        
+
         def i2pClientFactory = new I2PClientFactory()
         def i2pClient = i2pClientFactory.createClient()
-        
+
         def props = System.getProperties().clone()
         props.putAt("outbound.nickname", "MuWire Pinger")
-        
+
         def baos = new ByteArrayOutputStream()
         def myDest = i2pClient.createDestination(baos)
         def bais = new ByteArrayInputStream(baos.toByteArray())
-        
+
         def session = i2pClient.createSession(bais, props)
-        
+
         session.addMuxedSessionListener(new Listener(),
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
-        
+
         def maker = new I2PDatagramMaker(session)
         payload = maker.makeI2PDatagram(payload)
         session.sendMessage(target, payload, I2PSession.PROTO_DATAGRAM, 0, 0)
         println "Sent message, going to sleep"
         Thread.sleep(Integer.MAX_VALUE)
     }
-    
+
     static class Listener implements I2PSessionMuxedListener {
 
         @Override
         public void messageAvailable(I2PSession session, int msgId, long size) {
-            
+
         }
 
         @Override
@@ -80,6 +80,6 @@ public class Pinger {
         public void errorOccurred(I2PSession session, String message, Throwable error) {
             println "Error $message $error"
         }
-        
+
     }
 }

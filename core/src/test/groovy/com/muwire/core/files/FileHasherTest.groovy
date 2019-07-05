@@ -10,18 +10,18 @@ class FileHasherTest extends GroovyTestCase {
 
     def hasher = new FileHasher()
     File tmp
-    
+
     @Before
     void setUp() {
         tmp = File.createTempFile("testFile", "test")
         tmp.deleteOnExit()
     }
-    
+
     @After
     void tearDown() {
         tmp?.delete()
     }
-    
+
     @Test
     void testPieceSize() {
         assert 17 == FileHasher.getPieceSize(1000000)
@@ -31,7 +31,7 @@ class FileHasherTest extends GroovyTestCase {
             FileHasher.getPieceSize(Long.MAX_VALUE)
         }
     }
-    
+
     @Test
     void testHash1Byte() {
         def fos = new FileOutputStream(tmp)
@@ -40,7 +40,7 @@ class FileHasherTest extends GroovyTestCase {
         def ih = hasher.hashFile(tmp)
         assert ih.getHashList().length == 32
     }
-    
+
     @Test
     void testHash1PieceExact() {
         def fos = new FileOutputStream(tmp)
@@ -50,7 +50,7 @@ class FileHasherTest extends GroovyTestCase {
         def ih = hasher.hashFile tmp
         assert ih.getHashList().length == 64
     }
-    
+
     @Test
     void testHash1Piece1Byte() {
         def fos = new FileOutputStream(tmp)
@@ -60,7 +60,7 @@ class FileHasherTest extends GroovyTestCase {
         def ih = hasher.hashFile tmp
         assert ih.getHashList().length == 96
     }
-    
+
     @Test
     void testHash2Pieces() {
         def fos = new FileOutputStream(tmp)
@@ -70,7 +70,7 @@ class FileHasherTest extends GroovyTestCase {
         def ih = hasher.hashFile tmp
         assert ih.getHashList().length == 128
     }
-    
+
     @Test
     void testHash2Pieces2Bytes() {
         def fos = new FileOutputStream(tmp)

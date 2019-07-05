@@ -22,10 +22,10 @@ class HostCache extends Service {
     final MuWireSettings settings
     final Destination myself
     final Map<Destination, Host> hosts = new ConcurrentHashMap<>()
-    
+
     HostCache(){}
-    
-    public HostCache(TrustService trustService, File storage, int interval, 
+
+    public HostCache(TrustService trustService, File storage, int interval,
         MuWireSettings settings, Destination myself) {
         this.trustService = trustService
         this.storage = storage
@@ -38,11 +38,11 @@ class HostCache extends Service {
     void start() {
         timer.schedule({load()} as TimerTask, 1)
     }
-    
+
     void stop() {
         timer.cancel()
     }
-    
+
     void onHostDiscoveredEvent(HostDiscoveredEvent e) {
         if (myself == e.destination)
             return
@@ -57,7 +57,7 @@ class HostCache extends Service {
             hosts.put(e.destination, host)
         }
     }
-    
+
     void onConnectionEvent(ConnectionEvent e) {
         if (e.leaf)
             return
@@ -78,7 +78,7 @@ class HostCache extends Service {
                 break
         }
     }
-    
+
     List<Destination> getHosts(int n) {
         List<Destination> rv = new ArrayList<>(hosts.keySet())
         rv.retainAll {allowHost(hosts[it])}
@@ -87,7 +87,7 @@ class HostCache extends Service {
         Collections.shuffle(rv)
         rv[0..n-1]
     }
-    
+
     List<Destination> getGoodHosts(int n) {
         List<Destination> rv = new ArrayList<>(hosts.keySet())
         rv.retainAll {
@@ -99,7 +99,7 @@ class HostCache extends Service {
         Collections.shuffle(rv)
         rv[0..n-1]
     }
-    
+
     void load() {
         if (storage.exists()) {
             JsonSlurper slurper = new JsonSlurper()
@@ -118,7 +118,7 @@ class HostCache extends Service {
         timer.schedule({save()} as TimerTask, interval, interval)
         loaded = true
     }
-    
+
     private boolean allowHost(Host host) {
         if (host.isFailed() && !host.canTryAgain())
             return false
@@ -135,7 +135,7 @@ class HostCache extends Service {
         }
         false
     }
-    
+
     private void save() {
         storage.delete()
         storage.withPrintWriter { writer ->

@@ -21,5 +21,5 @@ class BadHashException extends Exception {
     public BadHashException(Throwable cause) {
         super(cause);
     }
-    
+
 }

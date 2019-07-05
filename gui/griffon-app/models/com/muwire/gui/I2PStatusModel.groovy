@@ -11,7 +11,7 @@ import griffon.metadata.ArtifactProviderFor
 class I2PStatusModel {
     @MVCMember @Nonnull
     I2PStatusController controller
-    
+
     @Observable int ntcpConnections
     @Observable int ssuConnections
     @Observable String networkStatus
@@ -21,7 +21,7 @@ class I2PStatusModel {
     @Observable int receiveBps
     @Observable int sendBps
     @Observable int participatingBW
-    
+
     void mvcGroupInit(Map<String,String> args) {
         controller.refresh()
     }

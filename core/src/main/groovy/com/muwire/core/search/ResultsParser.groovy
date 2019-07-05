@@ -26,7 +26,7 @@ class ResultsParser {
         }
 
     }
-    
+
     private static parseV1(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
@@ -55,7 +55,7 @@ class ResultsParser {
             InfoHash parsedIH = InfoHash.fromHashList(hashList)
             if (parsedIH.getRoot() != infoHash)
                 throw new InvalidSearchControlsException("infohash root doesn't match")
-            
+
              return new UIResultEvent( sender : p,
                  name : name,
                  size : size,
@@ -67,7 +67,7 @@ class ResultsParser {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }
     }
-    
+
     private static UIResultEvent parseV2(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
@@ -86,11 +86,11 @@ class ResultsParser {
             if (infoHash.length != InfoHash.SIZE)
                 throw new InvalidSearchResultException("invalid infohash size $infoHash.length")
             int pieceSize = json.pieceSize
-            
+
             Set<Destination> sources = Collections.emptySet()
-            if (json.sources != null) 
+            if (json.sources != null)
                 sources = json.sources.stream().map({new Destination(it)}).collect(Collectors.toSet())
-            
+
             return new UIResultEvent( sender : p,
                 name : name,
                 size : size,

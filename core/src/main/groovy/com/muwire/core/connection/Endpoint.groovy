@@ -12,16 +12,16 @@ class Endpoint implements Closeable {
     final InputStream inputStream
     final OutputStream outputStream
     final def toClose
-    
+
     private final AtomicBoolean closed = new AtomicBoolean()
-    
+
     Endpoint(Destination destination, InputStream inputStream, OutputStream outputStream, def toClose) {
         this.destination = destination
         this.inputStream = inputStream
         this.outputStream = outputStream
         this.toClose = toClose
     }
-    
+
     @Override
     public void close() {
         if (!closed.compareAndSet(false, true)) {
@@ -38,9 +38,9 @@ class Endpoint implements Closeable {
             try {toClose.reset()} catch (Exception ignore) {}
         }
     }
-    
+
     @Override
     public String toString() {
         "destination: ${destination.toBase32()}"
     }
-} 
+}

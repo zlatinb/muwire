@@ -26,7 +26,7 @@ class PersisterServiceSavingTest {
     EventBus eventBus = new EventBus()
     File persisted
     PersisterService ps
-    
+
     @Before
     void before() {
         f = new File("build.gradle")
@@ -43,26 +43,26 @@ class PersisterServiceSavingTest {
         persisted.delete()
         persisted.deleteOnExit()
     }
-    
+
     @After
     void after() {
         ps?.stop()
     }
-    
+
     private static String fromB64(String text) {
         DataUtil.readi18nString(Base64.decode(text))
     }
-    
+
     @Test
     void testSavingSharedFile() {
         sf = new SharedFile(f, ih, 0)
-        
+
         ps = new PersisterService(persisted, eventBus, 100, fileSource)
         ps.onUILoadedEvent(null)
         Thread.sleep(1500)
-    
-        JsonSlurper jsonSlurper = new JsonSlurper()    
-        persisted.eachLine { 
+
+        JsonSlurper jsonSlurper = new JsonSlurper()
+        persisted.eachLine {
             def json = jsonSlurper.parseText(it)
             assert fromB64(json.file) == f.toString()
             assert json.length == f.length()
@@ -70,16 +70,16 @@ class PersisterServiceSavingTest {
             assert json.hashList == [Base64.encode(ih.getHashList())]
         }
     }
-    
+
     @Test
     void testSavingDownloadedFile() {
         Destinations dests = new Destinations()
         sf = new DownloadedFile(f, ih, 0, new HashSet([dests.dest1, dests.dest2]))
-        
+
         ps = new PersisterService(persisted, eventBus, 100, fileSource)
         ps.onUILoadedEvent(null)
         Thread.sleep(1500)
-    
+
         JsonSlurper jsonSlurper = new JsonSlurper()
         persisted.eachLine {
             def json = jsonSlurper.parseText(it)

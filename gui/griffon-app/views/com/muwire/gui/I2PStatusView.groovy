@@ -25,12 +25,12 @@ class I2PStatusView {
     def dialog
     def panel
     def buttonsPanel
-    
+
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        
+
         dialog = new JDialog(mainFrame, "I2P Status", true)
-        
+
         panel = builder.panel {
             gridBagLayout()
             label(text : "Network status", constraints : gbc(gridx:0, gridy:0))
@@ -52,20 +52,20 @@ class I2PStatusView {
             label(text : "Send Bps (15 seconds)", constraints : gbc(gridx:0, gridy:8))
             label(text : bind {model.sendBps}, constraints : gbc(gridx: 1, gridy:8))
         }
-        
+
         buttonsPanel = builder.panel {
             gridBagLayout()
             button(text : "Refresh", constraints: gbc(gridx: 0, gridy: 0), refreshAction)
             button(text : "Close", constraints : gbc(gridx : 1, gridy :0), closeAction)
         }
     }
-    
+
     void mvcGroupInit(Map<String,String> args) {
         JPanel statusPanel = new JPanel()
         statusPanel.setLayout(new BorderLayout())
         statusPanel.add(panel, BorderLayout.CENTER)
         statusPanel.add(buttonsPanel, BorderLayout.SOUTH)
-        
+
         dialog.getContentPane().add(statusPanel)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)

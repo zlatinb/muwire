@@ -28,7 +28,7 @@ class PersisterService extends Service {
     final int interval
     final Timer timer
     final FileManager fileManager
-    
+
     PersisterService(File location, EventBus listener, int interval, FileManager fileManager) {
         this.location = location
         this.listener = listener
@@ -36,7 +36,7 @@ class PersisterService extends Service {
         this.fileManager = fileManager
         timer = new Timer("file persister", true)
     }
-    
+
     void stop() {
         timer.cancel()
     }
@@ -44,7 +44,7 @@ class PersisterService extends Service {
     void onUILoadedEvent(UILoadedEvent e) {
         timer.schedule({load()} as TimerTask, 1)
     }
-        
+
     void load() {
         if (location.exists() && location.isFile()) {
             def slurper = new JsonSlurper()
@@ -69,13 +69,13 @@ class PersisterService extends Service {
         timer.schedule({persistFiles()} as TimerTask, 0, interval)
         loaded = true
     }
-    
+
     private static FileLoadedEvent fromJson(def json) {
         if (json.file == null || json.length == null || json.infoHash == null || json.hashList == null)
             throw new IllegalArgumentException()
         if (!(json.hashList instanceof List))
             throw new IllegalArgumentException()
-            
+
         def file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
         file = file.getCanonicalFile()
         if (!file.exists() || file.isDirectory())
@@ -83,7 +83,7 @@ class PersisterService extends Service {
         long length = Long.valueOf(json.length)
         if (length != file.length())
             return null
-        
+
         List hashList = (List) json.hashList
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         hashList.each {
@@ -93,34 +93,34 @@ class PersisterService extends Service {
             baos.write hash
         }
         byte[] hashListBytes = baos.toByteArray()
-        
+
         InfoHash ih = InfoHash.fromHashList(hashListBytes)
         byte [] root = Base64.decode(json.infoHash.toString())
         if (root == null)
             throw new IllegalArgumentException()
         if (!Arrays.equals(root, ih.getRoot()))
             return null
-            
+
         int pieceSize = 0
         if (json.pieceSize != null)
             pieceSize = json.pieceSize
-            
+
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({d -> new Destination(d.toString())}).collect Collectors.toSet()
             DownloadedFile df = new DownloadedFile(file, ih, pieceSize, sourceSet)
             return new FileLoadedEvent(loadedFile : df)
         }
-        
-         
+
+
         SharedFile sf = new SharedFile(file, ih, pieceSize)
         return new FileLoadedEvent(loadedFile: sf)
-        
+
     }
-    
+
     private void persistFiles() {
         def sharedFiles = fileManager.getSharedFiles()
-        
+
         File tmp = File.createTempFile("muwire-files", "tmp")
         tmp.deleteOnExit()
         tmp.withPrintWriter { writer ->
@@ -133,7 +133,7 @@ class PersisterService extends Service {
         Files.copy(tmp.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
         tmp.delete()
     }
-    
+
     private def toJson(File f, SharedFile sf) {
         def json = [:]
         json.file = Base64.encode DataUtil.encodei18nString(f.getCanonicalFile().toString())
@@ -147,11 +147,11 @@ class PersisterService extends Service {
             System.arraycopy(ih.getHashList(), i * 32, tmp, 0, 32)
             json.hashList.add Base64.encode(tmp)
         }
-        
+
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())
         }
-        
+
         json
     }
 }

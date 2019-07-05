@@ -17,31 +17,31 @@ import com.muwire.core.search.UIResultEvent
 import net.i2p.data.Base64
 
 class CliDownloader {
-    
+
     private static final List<Downloader> downloaders = Collections.synchronizedList(new ArrayList<>())
     private static final Map<UUID,ResultsHolder> resultsListeners = new ConcurrentHashMap<>()
-    
+
     public static void main(String []args) {
         def home = System.getProperty("user.home") + File.separator + ".MuWire"
         home = new File(home)
         if (!home.exists())
             home.mkdirs()
-        
+
         def propsFile = new File(home,"MuWire.properties")
         if (!propsFile.exists()) {
             println "create props file ${propsFile.getAbsoluteFile()} before launching MuWire"
             System.exit(1)
         }
-        
+
         def props = new Properties()
         propsFile.withInputStream { props.load(it) }
         props = new MuWireSettings(props)
-        
+
         def filesList
         int connections
         int resultWait
         if (args.length != 3) {
-            println "Enter a file containing list of hashes of files to download, " + 
+            println "Enter a file containing list of hashes of files to download, " +
                 "how many connections you want before searching" +
                 "and how long to wait for results to arrive"
                 System.exit(1)
@@ -59,18 +59,18 @@ class CliDownloader {
             println "Failed to initialize core, exiting"
             System.exit(1)
         }
-        
-        
+
+
         def latch = new CountDownLatch(connections)
         def connectionListener = new ConnectionWaiter(latch : latch)
         core.eventBus.register(ConnectionEvent.class, connectionListener)
-        
+
         core.startServices()
         println "starting to wait until there are $connections connections"
         latch.await()
-        
+
         println "connected, searching for files"
-        
+
         def file = new File(filesList)
         file.eachLine {
             String[] split = it.split(",")
@@ -79,22 +79,22 @@ class CliDownloader {
             def hash = Base64.decode(split[0])
             def searchEvent = new SearchEvent(searchHash : hash, uuid : uuid)
             core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop:true,
-                replyTo: core.me.destination, receivedOn : core.me.destination, originator: core.me)) 
+                replyTo: core.me.destination, receivedOn : core.me.destination, originator: core.me))
         }
-        
+
         println "waiting for results to arrive"
         Thread.sleep(resultWait * 1000)
-        
+
         core.eventBus.register(DownloadStartedEvent.class, new DownloadListener())
         resultsListeners.each { uuid, resultsListener ->
             println "starting download of $resultsListener.fileName from ${resultsListener.getResults().size()} hosts"
             File target = new File(resultsListener.fileName)
-            
+
             core.eventBus.publish(new UIDownloadEvent(target : target, result : resultsListener.getResults()))
         }
-        
+
         Thread.sleep(1000)
-        
+
         Timer timer = new Timer("stats-printer")
         timer.schedule({
             println "==== STATUS UPDATE ==="
@@ -109,7 +109,7 @@ class CliDownloader {
             }
             println "==== END ==="
         } as TimerTask, 60000, 60000)
-        
+
         println "waiting for downloads to finish"
         while(true) {
             boolean allFinished = true
@@ -120,10 +120,10 @@ class CliDownloader {
                 break
             Thread.sleep(1000)
         }
-        
+
         println "all downloads finished"
     }
-    
+
     static class ResultsHolder {
         final List<UIResultEvent> results = Collections.synchronizedList(new ArrayList<>())
         String fileName
@@ -134,7 +134,7 @@ class CliDownloader {
             results
         }
     }
-    
+
     static class ResultsListener {
         UUID uuid
         String fileName
@@ -148,7 +148,7 @@ class CliDownloader {
             listener.add(e)
         }
     }
-    
+
     static class ConnectionWaiter {
         CountDownLatch latch
         public void onConnectionEvent(ConnectionEvent e) {
@@ -156,7 +156,7 @@ class CliDownloader {
                 latch.countDown()
         }
     }
-    
+
 
     static class DownloadListener {
         public void onDownloadStartedEvent(DownloadStartedEvent e) {

@@ -13,29 +13,29 @@ class TrustService extends Service {
 
     final File persistGood, persistBad
     final long persistInterval
-    
+
     final Map<Destination, Persona> good = new ConcurrentHashMap<>()
     final Map<Destination, Persona> bad = new ConcurrentHashMap<>()
-    
+
     final Timer timer
-    
+
     TrustService() {}
-    
+
     TrustService(File persistGood, File persistBad, long persistInterval) {
         this.persistBad = persistBad
         this.persistGood = persistGood
         this.persistInterval = persistInterval
         this.timer = new Timer("trust-persister",true)
     }
-    
+
     void start() {
         timer.schedule({load()} as TimerTask, 1)
     }
-    
+
     void stop() {
         timer.cancel()
     }
-    
+
     void load() {
         if (persistGood.exists()) {
             persistGood.eachLine {
@@ -54,7 +54,7 @@ class TrustService extends Service {
         timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
         loaded = true
     }
-    
+
     private void persist() {
         persistGood.delete()
         persistGood.withPrintWriter { writer ->
@@ -69,7 +69,7 @@ class TrustService extends Service {
             }
         }
     }
-    
+
     TrustLevel getLevel(Destination dest) {
         if (good.containsKey(dest))
             return TrustLevel.TRUSTED
@@ -77,7 +77,7 @@ class TrustService extends Service {
             return TrustLevel.DISTRUSTED
         TrustLevel.NEUTRAL
     }
-    
+
     void onTrustEvent(TrustEvent e) {
         switch(e.level) {
             case TrustLevel.TRUSTED:

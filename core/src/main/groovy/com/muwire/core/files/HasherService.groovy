@@ -12,23 +12,23 @@ class HasherService {
     final EventBus eventBus
     final FileManager fileManager
     Executor executor
-    
+
     HasherService(FileHasher hasher, EventBus eventBus, FileManager fileManager) {
         this.hasher = hasher
         this.eventBus = eventBus
         this.fileManager = fileManager
     }
-    
+
     void start() {
         executor = Executors.newSingleThreadExecutor()
     }
-    
+
     void onFileSharedEvent(FileSharedEvent evt) {
         if (fileManager.fileToSharedFile.containsKey(evt.file.getCanonicalFile()))
             return
         executor.execute( { -> process(evt.file) } as Runnable)
     }
-    
+
     private void process(File f) {
         f = f.getCanonicalFile()
         if (f.isDirectory()) {

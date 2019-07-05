@@ -17,9 +17,9 @@ class TrustListController {
     TrustListModel model
     @MVCMember @Nonnull
     TrustListView view
-    
+
     EventBus eventBus
-    
+
     @ControllerAction
     void trustFromTrusted() {
         int selectedRow = view.getSelectedRow("trusted-table")
@@ -29,7 +29,7 @@ class TrustListController {
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
         view.fireUpdate("trusted-table")
     }
-    
+
     @ControllerAction
     void trustFromDistrusted() {
         int selectedRow = view.getSelectedRow("distrusted-table")
@@ -39,7 +39,7 @@ class TrustListController {
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
         view.fireUpdate("distrusted-table")
     }
-    
+
     @ControllerAction
     void distrustFromTrusted() {
         int selectedRow = view.getSelectedRow("trusted-table")
@@ -49,7 +49,7 @@ class TrustListController {
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED))
         view.fireUpdate("trusted-table")
     }
-    
+
     @ControllerAction
     void distrustFromDistrusted() {
         int selectedRow = view.getSelectedRow("distrusted-table")

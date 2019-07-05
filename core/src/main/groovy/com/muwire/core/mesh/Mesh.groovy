@@ -11,12 +11,12 @@ class Mesh {
     private final InfoHash infoHash
     private final Set<Persona> sources = new ConcurrentHashSet<>()
     private final Pieces pieces
-    
+
     Mesh(InfoHash infoHash, Pieces pieces) {
         this.infoHash = infoHash
         this.pieces = pieces
     }
-    
+
     Set<Persona> getRandom(int n, Persona exclude) {
         List<Persona> tmp = new ArrayList<>(sources)
         tmp.remove(exclude)

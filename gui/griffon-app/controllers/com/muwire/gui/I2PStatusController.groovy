@@ -30,9 +30,9 @@ class I2PStatusController {
         model.receiveBps = router._context.bandwidthLimiter().getReceiveBps15s()
         model.sendBps = router._context.bandwidthLimiter().getSendBps15s()
         model.participatingBW = router._context.bandwidthLimiter().getCurrentParticipatingBandwidth()
-        
+
     }
-    
+
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)

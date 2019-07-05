@@ -11,19 +11,19 @@ import net.i2p.data.Base64
 class HashListUploader extends Uploader {
     private final InfoHash infoHash
     private final HashListRequest request
-    
+
     HashListUploader(Endpoint endpoint, InfoHash infoHash, HashListRequest request) {
         super(endpoint)
         this.infoHash = infoHash
         mapped = ByteBuffer.wrap(infoHash.getHashList())
         this.request = request
     }
-    
+
     void respond() {
         OutputStream os = endpoint.getOutputStream()
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Content-Range: 0-${mapped.remaining()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-        
+
         byte[]tmp = new byte[0x1 << 13]
         while(mapped.hasRemaining()) {
             int start = mapped.position()
@@ -60,7 +60,7 @@ class HashListUploader extends Uploader {
     public int getTotalPieces() {
         return 1;
     }
-    
+
     @Override
     public long getTotalSize() {
         return -1;

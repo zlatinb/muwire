@@ -20,13 +20,13 @@ import net.i2p.data.Destination
  */
 @Log
 class PeerConnection extends Connection {
-    
+
     private final DataInputStream dis
     private final DataOutputStream dos
-    
+
     private final byte[] readHeader = new byte[3]
     private final byte[] writeHeader = new byte[3]
-    
+
     private final JsonSlurper slurper = new JsonSlurper()
 
     public PeerConnection(EventBus eventBus, Endpoint endpoint,
@@ -42,10 +42,10 @@ class PeerConnection extends Connection {
         dis.readFully(readHeader)
         int length = DataUtil.readLength(readHeader)
         log.fine("$name read length $length")
-        
+
         byte[] payload = new byte[length]
         dis.readFully(payload)
-        
+
         if ((readHeader[0] & (byte)0x80) == 0x80) {
             // TODO process binary
         } else {
@@ -73,7 +73,7 @@ class PeerConnection extends Connection {
         } else {
             // TODO: write binary
         }
-        
+
         dos.write(writeHeader)
         dos.write(payload)
         dos.flush()

@@ -11,19 +11,19 @@ import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
 
 class UploaderTest {
-    
+
     Endpoint endpoint
     File file
     Thread uploadThread
-    
+
     InputStream is
     OutputStream os
-    
+
     ContentRequest request
     Uploader uploader
-    
+
     byte[] inFile
-    
+
     @Before
     public void setup() {
         file?.delete()
@@ -33,14 +33,14 @@ class UploaderTest {
         os = new PipedOutputStream(is)
         endpoint = new Endpoint(null, is, os, null)
     }
-    
+
     @After
     public void teardown() {
         file?.delete()
         uploadThread?.interrupt()
         Thread.sleep(50)
     }
-    
+
     private void fillFile(int length) {
         byte [] data = new byte[length]
         def random = new Random()
@@ -50,14 +50,14 @@ class UploaderTest {
         fos.close()
         inFile = data
     }
-    
+
     private void startUpload() {
         uploader = new ContentUploader(file, request, endpoint)
         uploadThread = new Thread(uploader.respond() as Runnable)
         uploadThread.setDaemon(true)
         uploadThread.start()
     }
-    
+
     private String readUntilRN() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         while(true) {
@@ -73,7 +73,7 @@ class UploaderTest {
         }
         new String(baos.toByteArray(), StandardCharsets.US_ASCII)
     }
-    
+
     @Test
     public void testSmallFile() {
         fillFile(20)
@@ -82,13 +82,13 @@ class UploaderTest {
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 0-19" == readUntilRN()
         assert "" == readUntilRN()
-        
+
         byte [] data = new byte[20]
         DataInputStream dis = new DataInputStream(is)
         dis.readFully(data)
         assert inFile == data
     }
-    
+
     @Test
     public void testRequestMiddle() {
         fillFile(20)
@@ -97,14 +97,14 @@ class UploaderTest {
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 5-15" == readUntilRN()
         assert "" == readUntilRN()
-        
+
         byte [] data = new byte[11]
         DataInputStream dis = new DataInputStream(is)
         dis.readFully(data)
         for (int i = 0; i < data.length; i++)
             assert inFile[i+5] == data[i]
     }
-    
+
     @Test
     public void testOutOfRange() {
         fillFile(20)
@@ -123,10 +123,10 @@ class UploaderTest {
         readUntilRN()
         readUntilRN()
         readUntilRN()
-        
+
         byte [] data = new byte[length]
         DataInputStream dis = new DataInputStream(is)
         dis.readFully(data)
         assert data == inFile
-    }    
+    }
 }

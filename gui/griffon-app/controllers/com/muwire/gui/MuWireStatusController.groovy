@@ -18,7 +18,7 @@ class MuWireStatusController {
     @ControllerAction
     void refresh() {
         Core core = application.context.get("core")
-        
+
         int incoming = 0
         int outgoing = 0
         core.connectionManager.getConnections().each {
@@ -29,14 +29,14 @@ class MuWireStatusController {
         }
         model.incomingConnections = incoming
         model.outgoingConnections = outgoing
-        
+
         model.knownHosts = core.hostCache.hosts.size()
-        
+
         model.sharedFiles = core.fileManager.fileToSharedFile.size()
-        
+
         model.downloads = core.downloadManager.downloaders.size()
     }
-    
+
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)

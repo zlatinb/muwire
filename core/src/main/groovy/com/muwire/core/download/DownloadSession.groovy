@@ -24,7 +24,7 @@ import java.util.logging.Level
 
 @Log
 class DownloadSession {
-    
+
     private final EventBus eventBus
     private final String meB64
     private final Pieces pieces
@@ -37,11 +37,11 @@ class DownloadSession {
     private final MessageDigest digest
 
     private long lastSpeedRead = System.currentTimeMillis()
-    private long dataSinceLastRead    
-    
+    private long dataSinceLastRead
+
     private ByteBuffer mapped
-    
-    DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file, 
+
+    DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available) {
         this.eventBus = eventBus
         this.meB64 = meB64
@@ -59,7 +59,7 @@ class DownloadSession {
             System.exit(1)
         }
     }
-    
+
     /**
      * @return if the request will proceed.  The only time it may not
      * is if all the pieces have been claimed by other sessions.
@@ -68,7 +68,7 @@ class DownloadSession {
     public boolean request() throws IOException {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
-        
+
         int piece
         if (available.isEmpty())
             piece = pieces.claim()
@@ -77,35 +77,35 @@ class DownloadSession {
         if (piece == -1)
             return false
         boolean unclaim = true
-            
+
         log.info("will download piece $piece")
-        
+
         long start = piece * pieceSize
         long end = Math.min(fileLength, start + pieceSize) - 1
         long length = end - start + 1
-        
+
         String root = Base64.encode(infoHash.getRoot())
-                
+
         try {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
             String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
-            os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII)) 
+            os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
             String codeString = readTillRN(is)
             int space = codeString.indexOf(' ')
             if (space > 0)
                 codeString = codeString.substring(0, space)
-            
+
             int code = Integer.parseInt(codeString.trim())
-            
+
             if (code == 404) {
                 log.warning("file not found")
                 endpoint.close()
                 return false
             }
-                
+
             if (!(code == 200 || code == 416)) {
                 log.warning("unknown code $code")
                 endpoint.close()
@@ -120,10 +120,10 @@ class DownloadSession {
                 if (colon == -1 || colon == header.length() - 1)
                     throw new IOException("invalid header $header")
                 String key = header.substring(0, colon)
-                String value = header.substring(colon + 1) 
+                String value = header.substring(colon + 1)
                 headers[key] = value.trim()
             }
-            
+
             // prase X-Alt if present
             if (headers.containsKey("X-Alt")) {
                 headers["X-Alt"].split(",").each {
@@ -136,7 +136,7 @@ class DownloadSession {
             }
 
             // parse X-Have if present
-            if (headers.containsKey("X-Have")) { 
+            if (headers.containsKey("X-Have")) {
                 DataUtil.decodeXHave(headers["X-Have"]).each {
                     available.add(it)
                 }
@@ -147,16 +147,16 @@ class DownloadSession {
                     throw new IOException("Code $code but no X-Have")
                 available.clear()
             }
-            
+
             if (code != 200)
                 return true
-            
+
             String range = headers["Content-Range"]
-            if (range == null) 
+            if (range == null)
                 throw new IOException("Code 200 but no Content-Range")
-            
+
             def group = (range =~ /^(\d+)-(\d+)$/)
-            if (group.size() != 1) 
+            if (group.size() != 1)
                 throw new IOException("invalid Content-Range header $range")
 
             long receivedStart = Long.parseLong(group[0][1])
@@ -167,7 +167,7 @@ class DownloadSession {
                 endpoint.close()
                 return false
             }
-            
+
             // start the download
             FileChannel channel
             try {
@@ -207,13 +207,13 @@ class DownloadSession {
         }
         return true
     }
-    
+
     synchronized int positionInPiece() {
         if (mapped == null)
             return 0
         mapped.position()
     }
-    
+
     synchronized int speed() {
         final long now = System.currentTimeMillis()
         long interval = Math.max(1000, now - lastSpeedRead)

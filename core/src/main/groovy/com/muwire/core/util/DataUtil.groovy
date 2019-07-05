@@ -10,42 +10,42 @@ import com.muwire.core.Constants
 import net.i2p.data.Base64
 
 class DataUtil {
-    
+
     private final static int MAX_SHORT = (0x1 << 16) - 1
 
     static void writeUnsignedShort(int value, OutputStream os) {
         if (value > MAX_SHORT || value < 0)
             throw new IllegalArgumentException("$value invalid")
-        
+
         byte lsb = (byte) (value & 0xFF)
         byte msb = (byte) (value >> 8)
-        
+
         os.write(msb)
-        os.write(lsb)    
+        os.write(lsb)
     }
-    
+
     private final static int MAX_HEADER = 0x7FFFFF
-    
+
     static void packHeader(int length, byte [] header) {
         if (header.length != 3)
             throw new IllegalArgumentException("header length $header.length")
         if (length < 0 || length > MAX_HEADER)
             throw new IllegalArgumentException("length $length")
-        
+
         header[2] = (byte) (length & 0xFF)
         header[1] = (byte) ((length >> 8) & 0xFF)
         header[0] = (byte) ((length >> 16) & 0x7F)
     }
-    
+
     static int readLength(byte [] header) {
         if (header.length != 3)
             throw new IllegalArgumentException("header length $header.length")
-            
+
         return (((int)(header[0] & 0x7F)) << 16) |
                 (((int)(header[1] & 0xFF) << 8)) |
                 ((int)header[2] & 0xFF)
     }
-    
+
     static String readi18nString(byte [] encoded) {
         if (encoded.length < 2)
             throw new IllegalArgumentException("encoding too short $encoded.length")
@@ -54,9 +54,9 @@ class DataUtil {
             throw new IllegalArgumentException("encoding doesn't match length, expected $length found $encoded.length")
         byte [] string = new byte[length]
         System.arraycopy(encoded, 2, string, 0, length)
-        new String(string, StandardCharsets.UTF_8) 
+        new String(string, StandardCharsets.UTF_8)
     }
-    
+
     static byte[] encodei18nString(String string) {
         byte [] utf8 = string.getBytes(StandardCharsets.UTF_8)
         if (utf8.length > Short.MAX_VALUE)
@@ -64,11 +64,11 @@ class DataUtil {
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
         daos.writeShort((short) utf8.length)
-        daos.write(utf8) 
+        daos.write(utf8)
         daos.close()
         baos.toByteArray()
     }
-    
+
     public static String readTillRN(InputStream is) {
         def baos = new ByteArrayOutputStream()
         while(baos.size() < (Constants.MAX_HEADER_SIZE)) {
@@ -84,7 +84,7 @@ class DataUtil {
         }
         new String(baos.toByteArray(), StandardCharsets.US_ASCII)
     }
-    
+
     public static String encodeXHave(List<Integer> pieces, int totalPieces) {
         int bytes = totalPieces / 8
         if (totalPieces % 8 != 0)
@@ -98,7 +98,7 @@ class DataUtil {
         }
         Base64.encode(raw)
     }
-    
+
     public static List<Integer> decodeXHave(String xHave) {
         byte [] availablePieces = Base64.decode(xHave)
         List<Integer> available = new ArrayList<>()
@@ -112,19 +112,19 @@ class DataUtil {
         }
         available
     }
-    
+
     public static Exception findRoot(Exception e) {
         while(e.getCause() != null)
             e = e.getCause()
         e
     }
-    
+
     public static void tryUnmap(ByteBuffer cb) {
         if (cb==null || !cb.isDirect()) return;
         // we could use this type cast and call functions without reflection code,
         // but static import from sun.* package is risky for non-SUN virtual machine.
         //try { ((sun.nio.ch.DirectBuffer)cb).cleaner().clean(); } catch (Exception ex) { }
-    
+
         // JavaSpecVer: 1.6, 1.7, 1.8, 9, 10
         boolean isOldJDK = System.getProperty("java.specification.version","99").startsWith("1.");
         try {

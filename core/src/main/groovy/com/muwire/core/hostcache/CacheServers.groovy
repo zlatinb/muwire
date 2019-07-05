@@ -17,7 +17,7 @@ class CacheServers {
             return allCaches
         allCaches[0..TO_GIVE-1]
     }
-    
+
     static boolean isRegistered(Destination d) {
         return CACHES.contains(d)
     }

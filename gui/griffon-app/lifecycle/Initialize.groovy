@@ -34,24 +34,24 @@ class Initialize extends AbstractLifecycleHandler {
         def home = portableHome == null ?
             selectHome() :
             portableHome
-            
+
         home = new File(home)
         if (!home.exists()) {
             log.info("creating home dir $home")
             home.mkdirs()
         }
-        
+
         application.context.put("muwire-home", home.getAbsolutePath())
-        
+
         System.getProperties().setProperty("awt.useSystemAAFontSettings", "true")
-        
+
         def guiPropsFile = new File(home, "gui.properties")
         UISettings uiSettings
         if (guiPropsFile.exists()) {
             Properties props = new Properties()
             guiPropsFile.withInputStream { props.load(it) }
             uiSettings = new UISettings(props)
-            
+
             log.info("settting user-specified lnf $uiSettings.lnf")
             try {
                 lookAndFeel(uiSettings.lnf)
@@ -59,7 +59,7 @@ class Initialize extends AbstractLifecycleHandler {
                 log.log(Level.WARNING,"couldn't set desired look and feeel, switching to defaults", bad)
                 uiSettings.lnf = lookAndFeel("system","gtk","metal").getID()
             }
-            
+
             if (uiSettings.font != null) {
                 log.info("setting user-specified font $uiSettings.font")
                 Font font = new Font(uiSettings.font, Font.PLAIN, 12)
@@ -90,10 +90,10 @@ class Initialize extends AbstractLifecycleHandler {
                 log.info("ended up applying $chosen.name")
             }
         }
-        
+
         application.context.put("ui-settings", uiSettings)
     }
-    
+
     private static String selectHome() {
         def home = new File(System.properties["user.home"])
         def defaultHome = new File(home, ".MuWire")

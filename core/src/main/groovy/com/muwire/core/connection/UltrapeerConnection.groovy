@@ -24,7 +24,7 @@ class UltrapeerConnection extends Connection {
     @Override
     protected void read() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -37,10 +37,10 @@ class UltrapeerConnection extends Connection {
     }
 
     private void writeJsonMessage(def message) {
-        
+
     }
-    
+
     private void writeBinaryMessage(def message) {
-        
+
     }
 }

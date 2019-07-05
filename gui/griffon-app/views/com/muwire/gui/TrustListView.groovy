@@ -25,8 +25,8 @@ class TrustListView {
     def mainFrame
     def mainPanel
 
-    def sortEvents = [:]    
-    
+    def sortEvents = [:]
+
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         dialog = new JDialog(mainFrame, model.trustList.persona.getHumanReadableName(), true)
@@ -78,19 +78,19 @@ class TrustListView {
             }
         }
     }
-    
+
     void mvcGroupInit(Map<String,String> args) {
-        
+
         def trustedTable = builder.getVariable("trusted-table")
         trustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["trusted-table"] = evt})
         trustedTable.rowSorter.setSortsOnUpdates(true)
         trustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        
+
         def distrustedTable = builder.getVariable("distrusted-table")
         distrustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["distrusted-table"] = evt})
         distrustedTable.rowSorter.setSortsOnUpdates(true)
         distrustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        
+
         dialog.getContentPane().add(mainPanel)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)
@@ -102,7 +102,7 @@ class TrustListView {
         })
         dialog.show()
     }
-    
+
     int getSelectedRow(String tableName) {
         def table = builder.getVariable(tableName)
         int selectedRow = table.getSelectedRow()
@@ -112,7 +112,7 @@ class TrustListView {
             selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
     }
-    
+
     void fireUpdate(String tableName) {
         def table = builder.getVariable(tableName)
         table.model.fireTableDataChanged()

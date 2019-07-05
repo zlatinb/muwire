@@ -36,19 +36,19 @@ class MainFrameController {
     @Inject @Nonnull GriffonApplication application
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
-    
+
     @MVCMember @Nonnull
     MainFrameModel model
     @MVCMember @Nonnull
     MainFrameView view
 
     private volatile Core core
-    
+
     @ControllerAction
     void search() {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
-        
+
         def search = builder.getVariable("search-field").text
         search = search.trim()
         if (search.length() == 0)
@@ -72,7 +72,7 @@ class MainFrameController {
                 // not a hash search
             }
         }
-        
+
         def searchEvent
         if (hashSearch) {
             searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true)
@@ -84,11 +84,11 @@ class MainFrameController {
             terms.each { if (it.length() > 0) nonEmpty << it }
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true)
         }
-        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, 
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me))
     }
-    
+
     void search(String infoHash, String tabTitle) {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
@@ -98,14 +98,14 @@ class MainFrameController {
         params["uuid"] = uuid.toString()
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
-        
+
         def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
             oobInfohash: true)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me))
     }
-    
+
     private def selectedResult() {
         def selected = builder.getVariable("result-tabs").getSelectedComponent()
         def group = selected.getClientProperty("mvc-group")
@@ -116,10 +116,10 @@ class MainFrameController {
         def sortEvt = group.view.lastSortEvent
         if (sortEvt != null) {
             row = group.view.resultsTable.rowSorter.convertRowIndexToModel(row)
-        } 
-        group.model.results[row]        
+        }
+        group.model.results[row]
     }
-    
+
     private int selectedDownload() {
         def downloadsTable = builder.getVariable("downloads-table")
         def selected = downloadsTable.getSelectedRow()
@@ -128,27 +128,27 @@ class MainFrameController {
             selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
         selected
     }
-    
+
     @ControllerAction
     void download() {
         def result = selectedResult()
         if (result == null)
             return
-        
+
         if (!model.canDownload(result.infohash))
-            return   
-             
+            return
+
         def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
-        
+
         def selected = builder.getVariable("result-tabs").getSelectedComponent()
         def group = selected.getClientProperty("mvc-group")
-        
+
         def resultsBucket = group.model.hashBucket[result.infohash]
         def sources = group.model.sourcesBucket[result.infohash]
-         
+
         core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, target : file))
     }
-    
+
     @ControllerAction
     void trust() {
         def result = selectedResult()
@@ -156,7 +156,7 @@ class MainFrameController {
             return // TODO disable button
         core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.TRUSTED))
     }
-    
+
     @ControllerAction
     void distrust() {
         def result = selectedResult()
@@ -164,22 +164,22 @@ class MainFrameController {
             return // TODO disable button
         core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.DISTRUSTED))
     }
-    
-    @ControllerAction 
+
+    @ControllerAction
     void cancel() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.cancel()
         model.downloadInfoHashes.remove(downloader.getInfoHash())
         core.eventBus.publish(new UIDownloadCancelledEvent(downloader : downloader))
     }
-    
+
     @ControllerAction
     void resume() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.resume()
         core.eventBus.publish(new UIDownloadResumedEvent())
     }
-    
+
     @ControllerAction
     void pause() {
         def downloader = model.downloads[selectedDownload()].downloader
@@ -194,21 +194,21 @@ class MainFrameController {
         builder.getVariable(tableName).model.fireTableDataChanged()
         core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
     }
-    
+
     @ControllerAction
     void markTrusted() {
         markTrust("distrusted-table", TrustLevel.TRUSTED, model.distrusted)
         model.markTrustedButtonEnabled = false
         model.markNeutralFromDistrustedButtonEnabled = false
     }
-    
+
     @ControllerAction
     void markNeutralFromDistrusted() {
         markTrust("distrusted-table", TrustLevel.NEUTRAL, model.distrusted)
         model.markTrustedButtonEnabled = false
         model.markNeutralFromDistrustedButtonEnabled = false
     }
-    
+
     @ControllerAction
     void markDistrusted() {
         markTrust("trusted-table", TrustLevel.DISTRUSTED, model.trusted)
@@ -216,7 +216,7 @@ class MainFrameController {
         model.markDistrustedButtonEnabled = false
         model.markNeutralFromTrustedButtonEnabled = false
     }
-    
+
     @ControllerAction
     void markNeutralFromTrusted() {
         markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
@@ -224,7 +224,7 @@ class MainFrameController {
         model.markDistrustedButtonEnabled = false
         model.markNeutralFromTrustedButtonEnabled = false
     }
-    
+
     @ControllerAction
     void subscribe() {
         int row = view.getSelectedTrustTablesRow("trusted-table")
@@ -238,7 +238,7 @@ class MainFrameController {
         model.markDistrustedButtonEnabled = false
         model.markNeutralFromTrustedButtonEnabled = false
     }
-    
+
     @ControllerAction
     void review() {
         RemoteTrustList list = getSelectedTrustList()
@@ -249,9 +249,9 @@ class MainFrameController {
         env["trustService"] = core.trustService
         env["eventBus"] = core.eventBus
         mvcGroup.createMVCGroup("trust-list", env)
-        
+
     }
-    
+
     @ControllerAction
     void update() {
         RemoteTrustList list = getSelectedTrustList()
@@ -259,7 +259,7 @@ class MainFrameController {
             return
         core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : true))
     }
-    
+
     @ControllerAction
     void unsubscribe() {
         RemoteTrustList list = getSelectedTrustList()
@@ -272,42 +272,42 @@ class MainFrameController {
         table.model.fireTableDataChanged()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : false))
     }
-    
+
     private RemoteTrustList getSelectedTrustList() {
         int row = view.getSelectedTrustTablesRow("subscription-table")
         if (row < 0)
             return null
         model.subscriptions[row]
     }
-    
+
     void unshareSelectedFile() {
         SharedFile sf = view.selectedSharedFile()
         if (sf == null)
             return
         core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
     }
-    
+
     void stopWatchingDirectory() {
         String directory = mvcGroup.view.getSelectedWatchedDirectory()
         if (directory == null)
             return
         core.muOptions.watchedDirectories.remove(directory)
-        saveMuWireSettings()    
+        saveMuWireSettings()
         core.eventBus.publish(new DirectoryUnsharedEvent(directory : new File(directory)))
-                
+
         model.watched.remove(directory)
         builder.getVariable("watched-directories-table").model.fireTableDataChanged()
     }
-    
+
     void saveMuWireSettings() {
         File f = new File(core.home, "MuWire.properties")
-        f.withOutputStream { 
+        f.withOutputStream {
             core.muOptions.write(it)
         }
     }
-    
+
     void mvcGroupInit(Map<String, String> args) {
-        application.addPropertyChangeListener("core", {e-> 
+        application.addPropertyChangeListener("core", {e->
             core = e.getNewValue()
         })
     }

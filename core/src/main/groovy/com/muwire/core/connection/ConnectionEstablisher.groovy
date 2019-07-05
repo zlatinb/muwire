@@ -21,7 +21,7 @@ import net.i2p.util.ConcurrentHashSet
 
 @Log
 class ConnectionEstablisher {
-    
+
     private static final int CONCURRENT = 4
 
     final EventBus eventBus
@@ -29,14 +29,14 @@ class ConnectionEstablisher {
     final MuWireSettings settings
     final ConnectionManager connectionManager
     final HostCache hostCache
-    
+
     final Timer timer
     final ExecutorService executor
-    
+
     final Set inProgress = new ConcurrentHashSet()
-    
+
     ConnectionEstablisher(){}
-    
+
     ConnectionEstablisher(EventBus eventBus, I2PConnector i2pConnector, MuWireSettings settings,
         ConnectionManager connectionManager, HostCache hostCache) {
         this.eventBus = eventBus
@@ -45,23 +45,23 @@ class ConnectionEstablisher {
         this.connectionManager = connectionManager
         this.hostCache = hostCache
         timer = new Timer("connection-timer",true)
-        executor = Executors.newFixedThreadPool(CONCURRENT, { r -> 
+        executor = Executors.newFixedThreadPool(CONCURRENT, { r ->
             def rv = new Thread(r)
             rv.setDaemon(true)
             rv.setName("connector-${System.currentTimeMillis()}")
-            rv 
+            rv
         } as ThreadFactory)
     }
-    
+
     void start() {
         timer.schedule({connectIfNeeded()} as TimerTask, 100, 1000)
     }
-    
+
     void stop() {
         timer.cancel()
         executor.shutdownNow()
     }
-    
+
     private void connectIfNeeded() {
         if (!connectionManager.needsConnections())
             return
@@ -84,19 +84,19 @@ class ConnectionEstablisher {
         if (!connectionManager.isConnected(toTry) && inProgress.add(toTry))
             executor.execute({connect(toTry)} as Runnable)
     }
-    
+
     private void connect(Destination toTry) {
         log.info("starting connect to ${toTry.toBase32()}")
         try {
             def endpoint = i2pConnector.connect(toTry)
             log.info("successful transport connect to ${toTry.toBase32()}")
-            
+
             // outgoing handshake
             endpoint.outputStream.write("MuWire ".bytes)
             def type = settings.isLeaf() ? "leaf" : "peer"
             endpoint.outputStream.write(type.bytes)
             endpoint.outputStream.flush()
-            
+
             InputStream is = endpoint.inputStream
             int read = is.read()
             if (read == -1) {
@@ -118,12 +118,12 @@ class ConnectionEstablisher {
             inProgress.remove(toTry)
         }
     }
-    
+
     private void fail(Endpoint endpoint) {
         endpoint.close()
         eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
     }
-    
+
     private void readK(Endpoint e) {
         int read = e.inputStream.read()
         if (read != 'K') {
@@ -131,14 +131,14 @@ class ConnectionEstablisher {
             fail e
             return
         }
-        
+
         log.info("connection to ${e.destination.toBase32()} established")
-        
+
         // wrap into deflater / inflater streams and publish
         def wrapped = new Endpoint(e.destination, new InflaterInputStream(e.inputStream), new DeflaterOutputStream(e.outputStream, true), e.toClose)
         eventBus.publish(new ConnectionEvent(endpoint: wrapped, incoming: false, leaf: false, status: ConnectionAttemptStatus.SUCCESSFUL))
     }
-    
+
     private void readEJECT(Endpoint e) {
         byte[] eject = "EJECT".bytes
         for (int i = 0; i < eject.length; i++) {
@@ -150,8 +150,8 @@ class ConnectionEstablisher {
             }
         }
         log.info("connection to ${e.destination.toBase32()} rejected")
-        
-        
+
+
         eventBus.publish(new ConnectionEvent(endpoint: e, incoming: false, leaf: false, status: ConnectionAttemptStatus.REJECTED))
         try {
             DataInputStream dais = new DataInputStream(e.inputStream)
@@ -178,7 +178,7 @@ class ConnectionEstablisher {
             e.close()
         }
     }
-    
+
     public boolean isInProgress(Destination d) {
         inProgress.contains(d)
     }

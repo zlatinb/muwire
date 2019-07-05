@@ -3,15 +3,15 @@ package com.muwire.core.download
 import org.junit.Test
 
 class PiecesTest {
-    
+
     Pieces pieces
-    
+
     @Test
     public void testEmpty() {
         pieces = new Pieces(20)
         assert !pieces.isComplete()
     }
-    
+
     @Test
     public void testSinglePiece() {
         pieces = new Pieces(1)
@@ -20,7 +20,7 @@ class PiecesTest {
         pieces.markDownloaded(0)
         assert pieces.isComplete()
     }
-    
+
     @Test
     public void testTwoPieces() {
         pieces = new Pieces(2)
@@ -34,7 +34,7 @@ class PiecesTest {
         pieces.markDownloaded(piece2)
         assert pieces.isComplete()
     }
-    
+
     @Test
     public void testClaimAvailable() {
         pieces = new Pieces(2)
@@ -42,7 +42,7 @@ class PiecesTest {
         assert claimed == 0
         assert -1 == pieces.claim([0].toSet())
     }
-    
+
     @Test
     public void testClaimNoneAvailable() {
         pieces = new Pieces(20)

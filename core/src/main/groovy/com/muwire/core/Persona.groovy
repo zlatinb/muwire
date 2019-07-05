@@ -9,7 +9,7 @@ import net.i2p.data.SigningPublicKey
 
 public class Persona {
     private static final int SIG_LEN = Constants.SIG_TYPE.getSigLen()
-    
+
     private final byte version
     private final Name name
     private final Destination destination
@@ -17,12 +17,12 @@ public class Persona {
     private volatile String humanReadableName
     private volatile String base64
     private volatile byte[] payload
-    
+
     public Persona(InputStream personaStream) throws IOException, InvalidSignatureException {
         version = (byte) (personaStream.read() & 0xFF)
         if (version != Constants.PERSONA_VERSION)
             throw new IOException("Unknown version "+version)
-            
+
         name = new Name(personaStream)
         destination = Destination.create(personaStream)
         sig = new byte[SIG_LEN]
@@ -31,7 +31,7 @@ public class Persona {
         if (!verify(version, name, destination, sig))
             throw new InvalidSignatureException(getHumanReadableName() + " didn't verify")
     }
-    
+
     private static boolean verify(byte version, Name name, Destination destination, byte [] sig) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         baos.write(version)
@@ -42,7 +42,7 @@ public class Persona {
         Signature signature = new Signature(Constants.SIG_TYPE, sig)
         DSAEngine.getInstance().verifySignature(signature, payload, spk)
     }
-    
+
     public void write(OutputStream out) throws IOException {
         if (payload == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream()
@@ -54,13 +54,13 @@ public class Persona {
         }
         out.write(payload)
     }
-    
+
     public String getHumanReadableName() {
-        if (humanReadableName == null) 
+        if (humanReadableName == null)
             humanReadableName = name.getName() + "@" + destination.toBase32().substring(0,32)
         humanReadableName
     }
-    
+
     public String toBase64() {
         if (base64 == null) {
             def baos = new ByteArrayOutputStream()
@@ -69,12 +69,12 @@ public class Persona {
         }
         base64
     }
-    
+
     @Override
     public int hashCode() {
         name.hashCode() ^ destination.hashCode()
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Persona))
@@ -82,7 +82,7 @@ public class Persona {
         Persona other = (Persona)o
         name.equals(other.name) && destination.equals(other.destination)
     }
-    
+
     public static void main(String []args) {
         if (args.length != 1) {
             println "This utility decodes a bas64-encoded persona"

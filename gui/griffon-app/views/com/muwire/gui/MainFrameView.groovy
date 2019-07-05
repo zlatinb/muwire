@@ -48,21 +48,21 @@ class MainFrameView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     MainFrameModel model
-    
+
     @Inject Metadata metadata
-    
+
     def downloadsTable
     def lastDownloadSortEvent
     def lastSharedSortEvent
     def lastWatchedSortEvent
     def trustTablesSortEvents = [:]
-    
+
     void initUI() {
         UISettings settings = application.context.get("ui-settings")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
-            title: application.configuration['application.title'] + " " + 
+            title: application.configuration['application.title'] + " " +
                 metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
             iconImages: [imageIcon('/MuWire-48x48.png').image,
@@ -144,7 +144,7 @@ class MainFrameView {
                                                 String.format("%02d", percent) + "% of ${totalSize} ($done/$pieces pcs)".toString()
                                             })
                                             closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
-                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row -> 
+                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
                                             })
                                         }
@@ -172,7 +172,7 @@ class MainFrameView {
                                     })
                             }
                             panel (border : etchedBorder(), constraints : BorderLayout.CENTER) {
-                                gridLayout(cols : 2, rows : 1) 
+                                gridLayout(cols : 2, rows : 1)
                                 panel (constraints : BorderLayout.WEST) {
                                     borderLayout()
                                     scrollPane (constraints : BorderLayout.CENTER) {
@@ -220,7 +220,7 @@ class MainFrameView {
                                             int percent = row.getProgress()
                                             "$percent% of piece".toString()
                                         })
-                                        closureColumn(header : "Downloader", type : String, read : { row -> 
+                                        closureColumn(header : "Downloader", type : String, read : { row ->
                                             row.getDownloader()
                                         })
                                         closureColumn(header : "Remote Pieces", type : String, read : { row ->
@@ -256,7 +256,7 @@ class MainFrameView {
                                         closureColumn(header : "Direction", preferredWidth: 20, type: String, read : { row ->
                                             if (row.incoming)
                                                 return "In"
-                                            else 
+                                            else
                                                 return "Out"
                                         })
                                     }
@@ -271,9 +271,9 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "searches-table") {
                                     tableModel(list : model.searches) {
-                                        closureColumn(header : "Keywords", type : String, read : { 
+                                        closureColumn(header : "Keywords", type : String, read : {
                                             sanitized = it.search.replace('<', ' ')
-                                            sanitized 
+                                            sanitized
                                         })
                                         closureColumn(header : "From", type : String, read : {
                                             if (it.originator != null) {
@@ -372,7 +372,7 @@ class MainFrameView {
             }
         }
     }
-    
+
     void mvcGroupInit(Map<String, String> args) {
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
@@ -414,14 +414,14 @@ class MainFrameView {
                 model.pauseButtonEnabled = false
             }
         })
-        
+
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
-        
+
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
         downloadsTable.rowSorter.setSortsOnUpdates(true)
-        
+
         downloadsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -434,14 +434,14 @@ class MainFrameView {
                     showDownloadsMenu(e)
             }
         })
-        
+
         // shared files table
         def sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
-        
+
         sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
         sharedFilesTable.rowSorter.setSortsOnUpdates(true)
-        
+
         JPopupMenu sharedFilesMenu = new JPopupMenu()
         JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
         copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
@@ -461,7 +461,7 @@ class MainFrameView {
                     showPopupMenu(sharedFilesMenu, e)
             }
         })
-        
+
         // searches table
         def searchesTable = builder.getVariable("searches-table")
         JPopupMenu searchTableMenu = new JPopupMenu()
@@ -480,7 +480,7 @@ class MainFrameView {
                     showPopupMenu(searchTableMenu, e)
             }
         })
-        
+
         // watched directories table
         def watchedTable = builder.getVariable("watched-directories-table")
         watchedTable.rowSorter.addRowSorterListener({evt -> lastWatchedSortEvent = evt})
@@ -501,7 +501,7 @@ class MainFrameView {
                     showPopupMenu(watchedMenu, e)
             }
         })
-        
+
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -539,7 +539,7 @@ class MainFrameView {
                 break
             }
         })
-                
+
         // trusted table
         def trustedTable = builder.getVariable("trusted-table")
         trustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["trusted-table"] = evt})
@@ -558,7 +558,7 @@ class MainFrameView {
                 model.markNeutralFromTrustedButtonEnabled = true
             }
         })
-        
+
         // distrusted table
         def distrustedTable = builder.getVariable("distrusted-table")
         distrustedTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["distrusted-table"] = evt})
@@ -576,11 +576,11 @@ class MainFrameView {
             }
         })
     }
-    
+
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
         menu.show(event.getComponent(), event.getX(), event.getY())
     }
-    
+
     def selectedSharedFile() {
         def sharedFilesTable = builder.getVariable("shared-files-table")
         int selected = sharedFilesTable.getSelectedRow()
@@ -590,7 +590,7 @@ class MainFrameView {
             selected = sharedFilesTable.rowSorter.convertRowIndexToModel(selected)
         model.shared[selected]
     }
-    
+
     def copyHashToClipboard() {
         def selected = selectedSharedFile()
         if (selected == null)
@@ -600,7 +600,7 @@ class MainFrameView {
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
     }
-    
+
     def copySearchToClipboard(JTable searchesTable) {
         int selected = searchesTable.getSelectedRow()
         if (selected < 0)
@@ -617,7 +617,7 @@ class MainFrameView {
             selected = lastDownloadSortEvent.convertPreviousRowIndexToModel(selected)
         selected
     }
-    
+
     def showDownloadsMenu(MouseEvent e) {
         int selected = selectedDownloaderRow()
         if (selected < 0)
@@ -651,7 +651,7 @@ class MainFrameView {
                 cancelEnabled = false
                 retryEnabled = false
         }
-        
+
         JPopupMenu menu = new JPopupMenu()
         JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
         copyHashToClipboard.addActionListener({
@@ -661,28 +661,28 @@ class MainFrameView {
             clipboard.setContents(selection, null)
         })
         menu.add(copyHashToClipboard)
-        
+
         if (pauseEnabled) {
             JMenuItem pause = new JMenuItem("Pause")
             pause.addActionListener({mvcGroup.controller.pause()})
             menu.add(pause)
         }
-        
+
         if (cancelEnabled) {
             JMenuItem cancel = new JMenuItem("Cancel")
             cancel.addActionListener({mvcGroup.controller.cancel()})
             menu.add(cancel)
         }
-        
+
         if (retryEnabled) {
             JMenuItem retry = new JMenuItem(resumeText)
             retry.addActionListener({mvcGroup.controller.resume()})
             menu.add(retry)
         }
-        
+
         showPopupMenu(menu, e)
     }
-    
+
     def showSearchWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
@@ -692,17 +692,17 @@ class MainFrameView {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "uploads window")
     }
-    
+
     def showMonitorWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"monitor window")
     }
-    
+
     def showTrustWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"trust window")
     }
-    
+
     def shareFiles = {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(false)
@@ -713,7 +713,7 @@ class MainFrameView {
             model.core.eventBus.publish(new FileSharedEvent(file : chooser.getSelectedFile()))
         }
     }
-    
+
     def watchDirectories = {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(false)
@@ -729,7 +729,7 @@ class MainFrameView {
             model.core.eventBus.publish(new FileSharedEvent(file : f))
         }
     }
-    
+
     String getSelectedWatchedDirectory() {
         def watchedTable = builder.getVariable("watched-directories-table")
         int selectedRow = watchedTable.getSelectedRow()
@@ -739,7 +739,7 @@ class MainFrameView {
             selectedRow = watchedTable.rowSorter.convertRowIndexToModel(selectedRow)
         model.watched[selectedRow]
     }
-    
+
     int getSelectedTrustTablesRow(String tableName) {
         def table = builder.getVariable(tableName)
         int selectedRow = table.getSelectedRow()

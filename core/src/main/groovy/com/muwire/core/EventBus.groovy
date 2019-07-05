@@ -10,7 +10,7 @@ import com.muwire.core.files.FileSharedEvent
 import groovy.util.logging.Log
 @Log
 class EventBus {
-    
+
     private Map handlers = new HashMap()
     private final Executor executor = Executors.newSingleThreadExecutor {r ->
         def rv = new Thread(r)
@@ -22,7 +22,7 @@ class EventBus {
     void publish(Event e) {
         executor.execute({publishInternal(e)} as Runnable)
     }
-    
+
     private void publishInternal(Event e) {
         log.fine "publishing event $e of type ${e.getClass().getSimpleName()} event $e"
         def currentHandlers
@@ -38,7 +38,7 @@ class EventBus {
             }
         }
     }
-    
+
     synchronized void register(Class<? extends Event> eventType, def handler) {
         log.info "Registering $handler for type $eventType"
         def currentHandlers = handlers.get(eventType)

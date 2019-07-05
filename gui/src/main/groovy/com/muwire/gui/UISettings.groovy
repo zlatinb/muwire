@@ -1,7 +1,7 @@
 package com.muwire.gui
 
 class UISettings {
-    
+
     String lnf
     boolean showMonitor
     String font
@@ -9,7 +9,7 @@ class UISettings {
     boolean clearFinishedDownloads
     boolean excludeLocalResult
     boolean showSearchHashes
-    
+
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
         showMonitor = Boolean.parseBoolean(props.getProperty("showMonitor", "false"))
@@ -19,7 +19,7 @@ class UISettings {
         excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","true"))
         showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","true"))
     }
-    
+
     void write(OutputStream out) throws IOException {
         Properties props = new Properties()
         props.setProperty("lnf", lnf)
@@ -30,8 +30,8 @@ class UISettings {
         props.setProperty("showSearchHashes", String.valueOf(showSearchHashes))
         if (font != null)
             props.setProperty("font", font)
-            
-            
+
+
         props.store(out, "UI Properties")
     }
 }

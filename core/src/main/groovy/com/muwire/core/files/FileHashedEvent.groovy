@@ -7,10 +7,10 @@ class FileHashedEvent extends Event {
 
     SharedFile sharedFile
     String error
-    
+
     @Override
     public String toString() {
         super.toString() + " sharedFile " + sharedFile?.file.getAbsolutePath() + " error: $error"
     }
-    
+
 }

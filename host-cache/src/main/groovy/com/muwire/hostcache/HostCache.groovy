@@ -23,23 +23,23 @@ public class HostCache {
             println "This will likely not run on windows"
             System.exit(1)
         }
-            
+
         def home = System.getProperty("user.home") + "/.MuWireHostCache"
         home = new File(home)
         if (home.exists() && !home.isDirectory()) {
             println "${home} exists but not a directory?  Delete it or make it a directory"
             System.exit(1)
         }
-        
+
         if (!home.exists()) {
             home.mkdir()
         }
-        
+
         def keyfile = new File(home, "key.dat")
-        
+
         def i2pClientFactory = new I2PClientFactory()
         def i2pClient = i2pClientFactory.createClient()
-        
+
         def myDest
         def session
         if (!keyfile.exists()) {
@@ -49,39 +49,39 @@ public class HostCache {
             println "No key.dat file was found, so creating a new destination."
             println "This is the destination you want to give out for your new HostCache"
             println myDest.toBase64()
-        } 
-        
+        }
+
         def props = System.getProperties().clone()
         props.putAt("inbound.nickname", "MuWire HostCache")
         session = i2pClient.createSession(new FileInputStream(keyfile), props)
         myDest = session.getMyDestination()
-        
+
         // initialize hostpool and crawler
         HostPool hostPool = new HostPool(3, 60 * 60 * 1000)
         Pinger pinger = new Pinger(session)
         Crawler crawler = new Crawler(pinger, hostPool, 5)
-        
+
         Timer timer = new Timer("timer", true)
         timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
         timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
         File verified = new File("verified.json")
         File unverified = new File("unverified.json")
         timer.schedule({hostPool.serialize(verified, unverified)} as TimerTask, 10000, 60 * 60 * 1000)
-        
-        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler), 
+
+        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler),
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         log.info("connected, going to sleep")
         Thread.sleep(Integer.MAX_VALUE)
-        
+
     }
-    
+
     static class Listener implements I2PSessionMuxedListener {
         final def json = new JsonSlurper()
         def hostPool
         int toReturn
         def crawler
-        
+
         void reportAbuse(I2PSession sesison, int severity) {}
         void disconnected(I2PSession session) {
             log.severe("session disconnected, exiting")
@@ -103,7 +103,7 @@ public class HostCache {
                 dissector.loadI2PDatagram(payload)
                 def sender = dissector.getSender()
                 def b32 = sender.toBase32()
-                
+
                 payload = dissector.getPayload()
                 payload = json.parse(payload)
                 if (payload.type == null) {
@@ -112,7 +112,7 @@ public class HostCache {
                 }
                 switch(payload.type) {
                     case "Ping" :
-                    log.info("ping from $b32") 
+                    log.info("ping from $b32")
                     if (payload.leaf == null) {
                         log.warning("ping didn't specify if leaf from $b32")
                         return
@@ -131,16 +131,16 @@ public class HostCache {
                 }
             } catch (Exception dfe) {
                 log.log(Level.WARNING,"invalid datagram", dfe)
-            } 
+            }
         }
         void messageAvailable(I2PSession session, int msgId, long size) {
         }
-        
+
         def respond(session, destination, ping) {
 
             def pongs = hostPool.getVerified(toReturn, ping.leaf)
             pongs = pongs.stream().map({ x -> x.destination.toBase64() }).collect(Collectors.toList())
-            
+
             def pong = [type:"Pong", version: 1, pongs: pongs]
             pong = JsonOutput.toJson(pong)
             def maker = new I2PDatagramMaker(session)

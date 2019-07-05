@@ -6,7 +6,7 @@ import org.junit.Test
 
 class DataUtilTest {
 
-    
+
     private static void usVal(int value) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         DataUtil.writeUnsignedShort(value, baos)
@@ -20,19 +20,19 @@ class DataUtilTest {
         usVal(Short.MAX_VALUE)
         usVal(Short.MAX_VALUE + 1)
         usVal(0xFFFF)
-        
+
         try {
             usVal(0xFFFF + 1)
             fail()
         } catch (IllegalArgumentException expected) {}
     }
-    
+
     private static header(int value) {
         byte [] header = new byte[3]
         DataUtil.packHeader(value, header)
         assert value == DataUtil.readLength(header)
     }
-    
+
     @Test
     void testHeader() {
         header(0)

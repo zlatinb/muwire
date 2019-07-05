@@ -25,9 +25,9 @@ import net.i2p.data.Destination
 
 @Log
 class ResultsSender {
-    
+
     private static final AtomicInteger THREAD_NO = new AtomicInteger()
-    
+
     private final Executor executor = Executors.newCachedThreadPool(
         new ThreadFactory() {
             @Override
@@ -38,27 +38,27 @@ class ResultsSender {
                 rv
             }
         })
-    
+
     private final I2PConnector connector
     private final Persona me
     private final EventBus eventBus
-    
+
     ResultsSender(EventBus eventBus, I2PConnector connector, Persona me) {
         this.connector = connector;
         this.eventBus = eventBus
         this.me = me
     }
-    
+
     void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash) {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()} oobInfohash : $oobInfohash")
         if (target.equals(me.destination)) {
-            results.each { 
+            results.each {
                 long length = it.getFile().length()
                 int pieceSize = it.getPieceSize()
                 if (pieceSize == 0)
                     pieceSize = FileHasher.getPieceSize(length)
                 Set<Destination> suggested = Collections.emptySet()
-                if (it instanceof DownloadedFile) 
+                if (it instanceof DownloadedFile)
                     suggested = it.sources
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
@@ -71,17 +71,17 @@ class ResultsSender {
                     eventBus.publish(uiResultEvent)
             }
         } else {
-            executor.execute(new ResultSendJob(uuid : uuid, results : results, 
+            executor.execute(new ResultSendJob(uuid : uuid, results : results,
                 target: target, oobInfohash : oobInfohash))
         }
     }
-    
+
     private class ResultSendJob implements Runnable {
         UUID uuid
         SharedFile [] results
         Destination target
         boolean oobInfohash
-        
+
         @Override
         public void run() {
             try {

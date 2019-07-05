@@ -18,12 +18,12 @@ class UpdateServer {
         home = new File(home)
         if (!home.exists())
             home.mkdirs()
-        
+
         def keyFile = new File(home, "key.dat")
-        
+
         def i2pClientFactory = new I2PClientFactory()
         def i2pClient = i2pClientFactory.createClient()
-        
+
         def myDest
         def session
         if (!keyFile.exists()) {
@@ -34,27 +34,27 @@ class UpdateServer {
             log.info "This is the destination you want to give out for your new UpdateServer"
             log.info myDest.toBase64()
         }
-        
+
         def update = new File(home, "update.json")
         if (!update.exists()) {
             log.warning("update file doesn't exist, exiting")
             System.exit(1)
         }
-        
+
         def props = System.getProperties().clone()
         props.putAt("inbound.nickname", "MuWire UpdateServer")
         session = i2pClient.createSession(new FileInputStream(keyFile), props)
         myDest = session.getMyDestination()
-        
+
         session.addMuxedSessionListener(new Listener(update), I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         log.info("Connected, going to sleep")
         Thread.sleep(Integer.MAX_VALUE)
-        
+
     }
-    
+
     static class Listener implements I2PSessionMuxedListener {
-        
+
         private final File json
         private final def slurper = new JsonSlurper()
         Listener(File json) {
@@ -71,7 +71,7 @@ class UpdateServer {
                 log.warning("received uknown protocol $proto")
                 return
             }
-            
+
             def payload = session.receiveMessage(msgId)
             def dissector = new I2PDatagramDissector()
             try {
@@ -79,7 +79,7 @@ class UpdateServer {
                 def sender = dissector.getSender()
                 payload = slurper.parse(dissector.getPayload())
                 log.info("Got an update ping from "+sender.toBase32() + " reported version "+payload?.myVersion)
-                
+
                 def maker = new I2PDatagramMaker(session)
                 def response = maker.makeI2PDatagram(json.bytes)
                 session.sendMessage(sender, response, I2PSession.PROTO_DATAGRAM, 0, 2)
@@ -102,6 +102,6 @@ class UpdateServer {
         public void errorOccurred(I2PSession session, String message, Throwable error) {
             log.log(Level.SEVERE, message, error)
         }
-        
+
     }
 }

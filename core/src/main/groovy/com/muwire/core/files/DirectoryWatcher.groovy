@@ -20,9 +20,9 @@ import net.i2p.util.SystemVersion
 
 @Log
 class DirectoryWatcher {
-    
+
     private static final long WAIT_TIME = 1000
-    
+
     private static final WatchEvent.Kind[] kinds
     static {
         if (SystemVersion.isMac())
@@ -30,7 +30,7 @@ class DirectoryWatcher {
         else
             kinds = [ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE]
     }
-    
+
     private final EventBus eventBus
     private final FileManager fileManager
     private final Thread watcherThread, publisherThread
@@ -38,7 +38,7 @@ class DirectoryWatcher {
     private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
-    
+
     DirectoryWatcher(EventBus eventBus, FileManager fileManager) {
         this.eventBus = eventBus
         this.fileManager = fileManager
@@ -47,29 +47,29 @@ class DirectoryWatcher {
         this.publisherThread = new Thread({publish()} as Runnable, "watched-files-publisher")
         publisherThread.setDaemon(true)
     }
-    
+
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         watchService = FileSystems.getDefault().newWatchService()
         watcherThread.start()
         publisherThread.start()
     }
-    
+
     void stop() {
         shutdown = true
         watcherThread?.interrupt()
         publisherThread?.interrupt()
         watchService?.close()
     }
-    
+
     void onFileSharedEvent(FileSharedEvent e) {
         if (!e.file.isDirectory())
             return
         Path path = e.file.getCanonicalFile().toPath()
         WatchKey wk = path.register(watchService, kinds)
         watchedDirectories.put(e.file, wk)
-        
+
     }
-    
+
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         WatchKey wk = watchedDirectories.remove(e.directory)
         wk?.cancel()
@@ -93,7 +93,7 @@ class DirectoryWatcher {
                 throw e
         }
     }
-    
+
 
     private void processCreated(Path parent, Path path) {
         File f= join(parent, path)
@@ -103,13 +103,13 @@ class DirectoryWatcher {
         else
             waitingFiles.put(f, System.currentTimeMillis())
     }
-        
+
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
         log.fine("modified entry $f")
         waitingFiles.put(f, System.currentTimeMillis())
     }
-    
+
     private void processDeleted(Path parent, Path path) {
         File f = join(parent, path)
         log.fine("deleted entry $f")
@@ -117,12 +117,12 @@ class DirectoryWatcher {
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
     }
-    
+
     private static File join(Path parent, Path path) {
         File parentFile = parent.toFile().getCanonicalFile()
         new File(parentFile, path.toFile().getName()).getCanonicalFile()
     }
-    
+
     private void publish() {
         try {
             while(!shutdown) {

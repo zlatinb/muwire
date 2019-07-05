@@ -9,7 +9,7 @@ class SearchEvent extends Event {
     byte [] searchHash
     UUID uuid
     boolean oobInfohash
-    
+
     String toString() {
         def infoHash = null
         if (searchHash != null)
