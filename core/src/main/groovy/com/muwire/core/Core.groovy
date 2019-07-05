@@ -20,6 +20,7 @@ import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileHashingEvent
 import com.muwire.core.files.FileHasher
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileManager

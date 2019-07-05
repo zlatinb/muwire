@@ -22,6 +22,7 @@ import com.muwire.core.download.Downloader
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileHashingEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
@@ -72,6 +73,8 @@ class MainFrameModel {
     
     @Observable int connections
     @Observable String me
+    @Observable int loadedFiles
+    @Observable File hashingFile
     @Observable boolean downloadActionEnabled
     @Observable boolean trustButtonsEnabled
     @Observable boolean cancelButtonEnabled
@@ -86,7 +89,7 @@ class MainFrameModel {
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
     @Observable boolean unsubscribeButtonEnabled
-    
+
     private final Set<InfoHash> infoHashes = new HashSet<>()
     
     private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
@@ -147,6 +150,7 @@ class MainFrameModel {
             core.eventBus.register(ConnectionEvent.class, this)
             core.eventBus.register(DisconnectionEvent.class, this)
             core.eventBus.register(FileHashedEvent.class, this)
+            core.eventBus.register(FileHashingEvent.class, this)
             core.eventBus.register(FileLoadedEvent.class, this)
             core.eventBus.register(UploadEvent.class, this)
             core.eventBus.register(UploadFinishedEvent.class, this)
@@ -263,7 +267,17 @@ class MainFrameModel {
         }
     }
     
+    void onFileHashingEvent(FileHashingEvent e) {
+        runInsideUIAsync {
+            loadedFiles = shared.size()
+            hashingFile = e.hashingFile
+        }
+    }
+
     void onFileHashedEvent(FileHashedEvent e) {
+        runInsideUIAsync {
+            hashingFile = null
+        }
         if (e.error != null)
             return // TODO do something
         if (infoHashes.contains(e.sharedFile.infoHash))
@@ -271,6 +285,7 @@ class MainFrameModel {
         infoHashes.add(e.sharedFile.infoHash)
         runInsideUIAsync {
             shared << e.sharedFile
+            loadedFiles = shared.size()
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
         }
@@ -282,6 +297,7 @@ class MainFrameModel {
         infoHashes.add(e.loadedFile.infoHash)
         runInsideUIAsync {
             shared << e.loadedFile
+            loadedFiles = shared.size()
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
         }
@@ -293,6 +309,7 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             shared.remove(e.unsharedFile)
+            loadedFiles = shared.size()
             JTable table = builder.getVariable("shared-files-table")
             table.model.fireTableDataChanged()
         }

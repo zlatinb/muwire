@@ -39,6 +39,7 @@ class HasherService {
 			} else if (f.length() > FileHasher.MAX_SIZE) {
 				eventBus.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
 			} else {
+                eventBus.publish new FileHashingEvent(hashingFile: f)
 				def hash = hasher.hashFile f
 				eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash, FileHasher.getPieceSize(f.length())))
 			}

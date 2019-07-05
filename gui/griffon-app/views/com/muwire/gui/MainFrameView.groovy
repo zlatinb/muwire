@@ -161,36 +161,53 @@ class MainFrameView {
                     panel (constraints: "uploads window"){
                         gridLayout(cols : 1, rows : 2)
                         panel {
-                            gridLayout(cols : 2, rows : 1) 
-                            panel {
-                                borderLayout()
-                                panel (constraints : BorderLayout.NORTH) {
-                                    button(text : "Add directories to watch", actionPerformed : watchDirectories)
-                                }
-                                scrollPane (constraints : BorderLayout.CENTER) {
-                                    table(id : "watched-directories-table", autoCreateRowSorter: true) {
-                                        tableModel(list : model.watched) {
-                                            closureColumn(header: "Watched Directories", type : String, read : { it })
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text : bind {
+                                        if (model.hashingFile == null) {
+                                            ""
+                                        } else {
+                                            "hashing: " + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + "B)"
+                                        }
+                                    })
+                            }
+                            panel (border : etchedBorder(), constraints : BorderLayout.CENTER) {
+                                gridLayout(cols : 2, rows : 1) 
+                                panel (constraints : BorderLayout.WEST) {
+                                    borderLayout()
+                                    scrollPane (constraints : BorderLayout.CENTER) {
+                                        table(id : "watched-directories-table", autoCreateRowSorter: true) {
+                                            tableModel(list : model.watched) {
+                                                closureColumn(header: "Watched Directories", type : String, read : { it })
+                                            }
                                         }
                                     }
+                                    panel (constraints : BorderLayout.SOUTH) {
+                                        button(text : "Add directories to watch", actionPerformed : watchDirectories)
+                                        button(text : "Share files", actionPerformed : shareFiles)
+                                    }
                                 }
-                            }
-                            panel {
-                                borderLayout()
-                                panel (constraints : BorderLayout.NORTH) {
-                                    button(text : "Share files", actionPerformed : shareFiles)
-                                }
-                                scrollPane(constraints : BorderLayout.CENTER) {
-                                    table(id : "shared-files-table", autoCreateRowSorter: true) {
-                                        tableModel(list : model.shared) {
-                                            closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
-                                            closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
+                                panel (constraints : BorderLayout.EAST){
+                                    borderLayout()
+                                    scrollPane(constraints : BorderLayout.CENTER) {
+                                        table(id : "shared-files-table", autoCreateRowSorter: true) {
+                                            tableModel(list : model.shared) {
+                                                closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
+                                                closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
+                                            }
+                                        }
+                                    }
+                                    panel (constraints : BorderLayout.SOUTH) {
+                                        borderLayout()
+                                        panel (constraints : BorderLayout.EAST) {
+                                            label("Shared:")
+                                            label(text : bind {model.loadedFiles.toString()})
                                         }
                                     }
                                 }
                             }
                         }
-                        panel {
+                        panel (border : etchedBorder()) {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
                                 label("Uploads")
