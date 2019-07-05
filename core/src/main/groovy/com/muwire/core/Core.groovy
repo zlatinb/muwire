@@ -140,7 +140,7 @@ public class Core {
             routerProps.setProperty("i2np.udp.port", i2pOptions["i2np.udp.port"])
             routerProps.setProperty("i2np.udp.internalPort", i2pOptions["i2np.udp.port"])
             router = new Router(routerProps)
-            I2PAppContext.getGlobalContext().metaClass = new RouterContextMetaClass()
+            router.getContext().setLogManager(new MuWireLogManager())
             router.runRouter()
             while(!router.isRunning())
                 Thread.sleep(100)
@@ -328,19 +328,6 @@ public class Core {
         }
     }
 
-    static class RouterContextMetaClass extends DelegatingMetaClass {
-        private final Object logManager = new MuWireLogManager()
-        RouterContextMetaClass() {
-            super(RouterContext.class)
-        }
-        
-        Object invokeMethod(Object object, String name, Object[] args) {
-            if (name == "logManager")
-                return logManager
-            super.invokeMethod(object, name, args)
-        }
-    }
-    
     static main(args) {
         def home = System.getProperty("user.home") + File.separator + ".MuWire"
         home = new File(home)
