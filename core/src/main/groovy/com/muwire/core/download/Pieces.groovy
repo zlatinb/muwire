@@ -5,6 +5,7 @@ class Pieces {
     private final int nPieces
     private final float ratio
     private final Random random = new Random()
+    private final Map<Integer,Integer> partials = new HashMap<>()
 
     Pieces(int nPieces) {
         this(nPieces, 1.0f)
@@ -17,16 +18,16 @@ class Pieces {
         claimed = new BitSet(nPieces)
     }
 
-    synchronized int claim() {
+    synchronized int[] claim() {
         int claimedCardinality = claimed.cardinality()
         if (claimedCardinality == nPieces)
-            return -1
+            return null
 
         // if fuller than ratio just do sequential
         if ( (1.0f * claimedCardinality) / nPieces > ratio) {
             int rv = claimed.nextClearBit(0)
             claimed.set(rv)
-            return rv
+            return [rv, partials.getOrDefault(rv, 0)]
         }
 
         while(true) {
@@ -34,11 +35,11 @@ class Pieces {
             if (claimed.get(start))
                 continue
             claimed.set(start)
-            return start
+            return [start, partials.getOrDefault(start,0)]
         }
     }
 
-    synchronized int claim(Set<Integer> available) {
+    synchronized int[] claim(Set<Integer> available) {
         for (int i = claimed.nextSetBit(0); i >= 0; i = claimed.nextSetBit(i+1))
             available.remove(i)
         if (available.isEmpty())
@@ -47,7 +48,7 @@ class Pieces {
         Collections.shuffle(toList)
         int rv = toList[0]
         claimed.set(rv)
-        rv
+        [rv, partials.getOrDefault(rv, 0)]
     }
 
     synchronized def getDownloaded() {
@@ -61,6 +62,11 @@ class Pieces {
     synchronized void markDownloaded(int piece) {
         done.set(piece)
         claimed.set(piece)
+        partials.remove(piece)
+    }
+    
+    synchronized void markPartial(int piece, int position) {
+        partials.put(piece, position)
     }
 
     synchronized void unclaim(int piece) {
@@ -82,5 +88,15 @@ class Pieces {
     synchronized void clearAll() {
         done.clear()
         claimed.clear()
+        partials.clear()
+    }
+    
+    synchronized void write(PrintWriter writer) {
+        for (int i = done.nextSetBit(0); i >= 0; i = done.nextSetBit(i+1)) {
+            writer.println(i)
+        }
+        partials.each { piece, position ->
+            writer.println("$piece,$position")
+        }
     }
 }

@@ -111,8 +111,14 @@ public class Downloader {
         if (!piecesFile.exists())
             return
         piecesFile.eachLine {
-            int piece = Integer.parseInt(it)
-            pieces.markDownloaded(piece)
+            String [] split = it.split(",")
+            int piece = Integer.parseInt(split[0])
+            if (split.length == 1)
+                pieces.markDownloaded(piece)
+            else {
+                int position = Integer.parseInt(split[1])
+                pieces.markPartial(piece, position)
+            }
         }
     }
 
@@ -121,9 +127,7 @@ public class Downloader {
             if (piecesFileClosed)
                 return
             piecesFile.withPrintWriter { writer ->
-                pieces.getDownloaded().each { piece ->
-                    writer.println(piece)
-                }
+                pieces.write(writer)
             }
         }
     }

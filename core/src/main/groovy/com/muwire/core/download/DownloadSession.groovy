@@ -69,21 +69,22 @@ class DownloadSession {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
 
-        int piece
+        int[] pieceAndPosition
         if (available.isEmpty())
-            piece = pieces.claim()
+            pieceAndPosition = pieces.claim()
         else
-            piece = pieces.claim(new HashSet<>(available))
-        if (piece == -1)
+            pieceAndPosition = pieces.claim(new HashSet<>(available))
+        if (pieceAndPosition == null)
             return false
+        int piece = pieceAndPosition[0]
+        int position = pieceAndPosition[1]
         boolean unclaim = true
 
-        log.info("will download piece $piece")
+        log.info("will download piece $piece from position $position")
 
-        long start = piece * pieceSize
-        long end = Math.min(fileLength, start + pieceSize) - 1
-        long length = end - start + 1
-
+        long pieceStart = piece * pieceSize
+        long end = Math.min(fileLength, pieceStart + pieceSize) - 1
+        long start = pieceStart + position
         String root = Base64.encode(infoHash.getRoot())
 
         try {
@@ -172,8 +173,9 @@ class DownloadSession {
             FileChannel channel
             try {
                 channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ, StandardOpenOption.WRITE,
-                        StandardOpenOption.SPARSE, StandardOpenOption.CREATE)) // TODO: double-check, maybe CREATE_NEW
-                mapped = channel.map(FileChannel.MapMode.READ_WRITE, start, end - start + 1)
+                        StandardOpenOption.SPARSE, StandardOpenOption.CREATE)) 
+                mapped = channel.map(FileChannel.MapMode.READ_WRITE, pieceStart, end - start + 1)
+                mapped.position(position)
 
                 byte[] tmp = new byte[0x1 << 13]
                 while(mapped.hasRemaining()) {
@@ -185,6 +187,7 @@ class DownloadSession {
                     synchronized(this) {
                         mapped.put(tmp, 0, read)
                         dataSinceLastRead += read
+                        pieces.markPartial(piece, mapped.position())
                     }
                 }
 
@@ -194,8 +197,10 @@ class DownloadSession {
                 byte [] hash = digest.digest()
                 byte [] expected = new byte[32]
                 System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)
-                if (hash != expected)
+                if (hash != expected) {
+                    pieces.markPartial(piece, 0)
                     throw new BadHashException()
+                }
             } finally {
                 try { channel?.close() } catch (IOException ignore) {}
             }
