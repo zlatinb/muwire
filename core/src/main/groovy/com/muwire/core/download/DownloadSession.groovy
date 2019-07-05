@@ -14,6 +14,7 @@ import static com.muwire.core.util.DataUtil.readTillRN
 import groovy.util.logging.Log
 
 import java.nio.ByteBuffer
+import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -39,7 +40,7 @@ class DownloadSession {
     private long lastSpeedRead = System.currentTimeMillis()
     private long dataSinceLastRead
 
-    private ByteBuffer mapped
+    private MappedByteBuffer mapped
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available) {
@@ -174,7 +175,7 @@ class DownloadSession {
             try {
                 channel = Files.newByteChannel(file.toPath(), EnumSet.of(StandardOpenOption.READ, StandardOpenOption.WRITE,
                         StandardOpenOption.SPARSE, StandardOpenOption.CREATE)) 
-                mapped = channel.map(FileChannel.MapMode.READ_WRITE, pieceStart, end - start + 1)
+                mapped = channel.map(FileChannel.MapMode.READ_WRITE, pieceStart, end - pieceStart + 1)
                 mapped.position(position)
 
                 byte[] tmp = new byte[0x1 << 13]
@@ -193,21 +194,21 @@ class DownloadSession {
 
                 mapped.clear()
                 digest.update(mapped)
-                DataUtil.tryUnmap(mapped)
                 byte [] hash = digest.digest()
                 byte [] expected = new byte[32]
                 System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)
                 if (hash != expected) {
                     pieces.markPartial(piece, 0)
-                    throw new BadHashException()
+                    throw new BadHashException("bad hash on piece $piece")
                 }
             } finally {
                 try { channel?.close() } catch (IOException ignore) {}
+                DataUtil.tryUnmap(mapped)
             }
             pieces.markDownloaded(piece)
             unclaim = false
         } finally {
-            if (unclaim)
+            if (unclaim) 
                 pieces.unclaim(piece)
         }
         return true
