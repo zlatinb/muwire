@@ -314,6 +314,10 @@ public class Downloader {
                         piecesFileClosed = true
                         piecesFile.delete()
                     }
+                    activeWorkers.values().each { 
+                        if (it.destination != destination)
+                            it.cancel()
+                    }
                     try {
                         Files.move(incompleteFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
                     } catch (AtomicMoveNotSupportedException e) {
