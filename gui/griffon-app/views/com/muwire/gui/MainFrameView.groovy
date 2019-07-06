@@ -131,18 +131,7 @@ class MainFrameView {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
-                                            closureColumn(header: "Progress", preferredWidth: 70, type: String, read: { row ->
-                                                int pieces = row.downloader.nPieces
-                                                int done = row.downloader.donePieces()
-                                                int percent = -1
-                                                if ( row.downloader.nPieces != 0 ) {
-                                                    percent = (done * 100) / pieces
-                                                }
-                                                long size = row.downloader.pieceSize
-                                                size *= pieces
-                                                String totalSize = DataHelper.formatSize2Decimal(size, false) + "B"
-                                                String.format("%02d", percent) + "% of ${totalSize} ($done/$pieces pcs)".toString()
-                                            })
+                                            closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
                                             closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
@@ -418,9 +407,11 @@ class MainFrameView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        downloadsTable.setDefaultRenderer(Downloader.class, new DownloadProgressRenderer())
 
         downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
         downloadsTable.rowSorter.setSortsOnUpdates(true)
+        downloadsTable.rowSorter.setComparator(2, new DownloaderComparator())
 
         downloadsTable.addMouseListener(new MouseAdapter() {
             @Override
