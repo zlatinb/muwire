@@ -79,9 +79,10 @@ class DownloadSession {
             return false
         int piece = pieceAndPosition[0]
         int position = pieceAndPosition[1]
+        boolean steal = pieceAndPosition[2] == 1
         boolean unclaim = true
 
-        log.info("will download piece $piece from position $position")
+        log.info("will download piece $piece from position $position steal $steal")
 
         long pieceStart = piece * pieceSize
         long end = Math.min(fileLength, pieceStart + pieceSize) - 1
@@ -208,7 +209,7 @@ class DownloadSession {
             pieces.markDownloaded(piece)
             unclaim = false
         } finally {
-            if (unclaim) 
+            if (unclaim && !steal) 
                 pieces.unclaim(piece)
         }
         return true

@@ -20,14 +20,20 @@ class Pieces {
 
     synchronized int[] claim() {
         int claimedCardinality = claimed.cardinality()
-        if (claimedCardinality == nPieces)
-            return null
+        if (claimedCardinality == nPieces) {
+            // steal
+            int downloadedCardinality = done.cardinality()
+            if (downloadedCardinality == nPieces)
+                return null
+            int rv = done.nextClearBit(0)
+            return [rv, partials.getOrDefault(rv, 0), 1]
+        }
 
         // if fuller than ratio just do sequential
         if ( (1.0f * claimedCardinality) / nPieces > ratio) {
             int rv = claimed.nextClearBit(0)
             claimed.set(rv)
-            return [rv, partials.getOrDefault(rv, 0)]
+            return [rv, partials.getOrDefault(rv, 0), 0]
         }
 
         while(true) {
@@ -35,20 +41,28 @@ class Pieces {
             if (claimed.get(start))
                 continue
             claimed.set(start)
-            return [start, partials.getOrDefault(start,0)]
+            return [start, partials.getOrDefault(start,0), 0]
         }
     }
 
     synchronized int[] claim(Set<Integer> available) {
-        for (int i = claimed.nextSetBit(0); i >= 0; i = claimed.nextSetBit(i+1))
+        for (int i = done.nextSetBit(0); i >= 0; i = done.nextSetBit(i+1))
             available.remove(i)
         if (available.isEmpty())
             return null
+        Set<Integer> availableCopy = new HashSet<>(available)
+        for (int i = claimed.nextSetBit(0); i >= 0; i = claimed.nextSetBit(i+1))
+            availableCopy.remove(i)
+        if (availableCopy.isEmpty()) {
+            // steal
+            int rv = available.first()
+            return [rv, partials.getOrDefault(rv, 0), 1]
+        }
         List<Integer> toList = available.toList()
         Collections.shuffle(toList)
         int rv = toList[0]
         claimed.set(rv)
-        [rv, partials.getOrDefault(rv, 0)]
+        [rv, partials.getOrDefault(rv, 0), 0]
     }
 
     synchronized def getDownloaded() {
