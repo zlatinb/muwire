@@ -58,7 +58,7 @@ class Pieces {
             int rv = available.first()
             return [rv, partials.getOrDefault(rv, 0), 1]
         }
-        List<Integer> toList = available.toList()
+        List<Integer> toList = availableCopy.toList()
         Collections.shuffle(toList)
         int rv = toList[0]
         claimed.set(rv)
