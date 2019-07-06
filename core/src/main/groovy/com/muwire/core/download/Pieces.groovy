@@ -43,7 +43,7 @@ class Pieces {
         for (int i = claimed.nextSetBit(0); i >= 0; i = claimed.nextSetBit(i+1))
             available.remove(i)
         if (available.isEmpty())
-            return -1
+            return null
         List<Integer> toList = available.toList()
         Collections.shuffle(toList)
         int rv = toList[0]
