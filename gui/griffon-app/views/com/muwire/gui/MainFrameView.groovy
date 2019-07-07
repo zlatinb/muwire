@@ -26,7 +26,6 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
-
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.FlowLayout
@@ -456,9 +455,18 @@ class MainFrameView {
         // searches table
         def searchesTable = builder.getVariable("searches-table")
         JPopupMenu searchTableMenu = new JPopupMenu()
+
         JMenuItem copySearchToClipboard = new JMenuItem("Copy search to clipboard")
         copySearchToClipboard.addActionListener({mvcGroup.view.copySearchToClipboard(searchesTable)})
+        JMenuItem trustSearcher = new JMenuItem("Trust searcher")
+        trustSearcher.addActionListener({mvcGroup.controller.trustPersonaFromSearch()})
+        JMenuItem distrustSearcher = new JMenuItem("Distrust searcher")
+        distrustSearcher.addActionListener({mvcGroup.controller.distrustPersonaFromSearch()})
+
         searchTableMenu.add(copySearchToClipboard)
+        searchTableMenu.add(trustSearcher)
+        searchTableMenu.add(distrustSearcher)
+
         searchesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {

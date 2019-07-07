@@ -166,6 +166,24 @@ class MainFrameController {
     }
 
     @ControllerAction
+    void trustPersonaFromSearch() {
+        int selected = builder.getVariable("searches-table").getSelectedRow()
+        if (selected < 0)
+            return
+        Persona p = model.searches[selected].originator
+        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.TRUSTED) )
+    }
+
+    @ControllerAction
+    void distrustPersonaFromSearch() {
+        int selected = builder.getVariable("searches-table").getSelectedRow()
+        if (selected < 0)
+            return
+        Persona p = model.searches[selected].originator
+        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED) )
+    }
+
+    @ControllerAction
     void cancel() {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.cancel()
