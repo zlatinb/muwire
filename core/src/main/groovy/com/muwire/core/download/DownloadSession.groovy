@@ -84,7 +84,7 @@ class DownloadSession {
 
         log.info("will download piece $piece from position $position steal $steal")
 
-        long pieceStart = piece * pieceSize
+        long pieceStart = piece * ((long)pieceSize)
         long end = Math.min(fileLength, pieceStart + pieceSize) - 1
         long start = pieceStart + position
         String root = Base64.encode(infoHash.getRoot())
