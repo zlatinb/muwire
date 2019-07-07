@@ -29,3 +29,7 @@ If you have an I2P router running on the same machine that is all you need to do
 
 If you do not have an I2P router, pass the following switch to the Java process: `-DembeddedRouter=true`.  This will launch MuWire's embedded router.  Be aware that this causes startup to take a lot longer.
 
+### GPG Fingerprint
+471B 9FD4 5517 A5ED 101F  C57D A728 3207 2D52 5E41
+
+You can find the full key at https://keybase.io/zlatinb
