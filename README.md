@@ -25,7 +25,7 @@ Some of the UI tests will fail because they haven't been written yet :-/
 
 After you build the application, look inside `gui/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar MuWire-x.y.z.jar` in a terminal or command prompt.  
 
-If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `$HOME/.MuWire/i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.
+If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.  On Windows that file should go into `%HOME%\AppData\Roaming\MuWire`, on Mac into `$HOME/Library/Application Support/MuWire` and on Linux `$HOME/.MuWire`
 
 If you do not have an I2P router, pass the following switch to the Java process: `-DembeddedRouter=true`.  This will launch MuWire's embedded router.  Be aware that this causes startup to take a lot longer.
 
