@@ -11,21 +11,21 @@
 PRG="$0"
 # Need this for relative symlinks.
 while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
+    ls=$(ls -ld "$PRG")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
     if expr "$link" : '/.*' > /dev/null; then
         PRG="$link"
     else
-        PRG=`dirname "$PRG"`"/$link"
+        PRG=$(dirname "$PRG")"/$link"
     fi
 done
-SAVED="`pwd`"
-cd "`dirname \"$PRG\"`/" >/dev/null
-APP_HOME="`pwd -P`"
+SAVED="$(pwd)"
+cd "$(dirname "$PRG")/" >/dev/null
+APP_HOME="$(pwd -P)"
 cd "$SAVED" >/dev/null
 
 APP_NAME="Gradle"
-APP_BASE_NAME=`basename "$0"`
+APP_BASE_NAME=$(basename "$0")
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
@@ -49,7 +49,7 @@ cygwin=false
 msys=false
 darwin=false
 nonstop=false
-case "`uname`" in
+case "$(uname)" in
   CYGWIN* )
     cygwin=true
     ;;
@@ -90,7 +90,7 @@ fi
 
 # Increase the maximum file descriptors if we can.
 if [ "$cygwin" = "false" -a "$darwin" = "false" -a "$nonstop" = "false" ] ; then
-    MAX_FD_LIMIT=`ulimit -H -n`
+    MAX_FD_LIMIT=$(ulimit -H -n)
     if [ $? -eq 0 ] ; then
         if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
             MAX_FD="$MAX_FD_LIMIT"
@@ -111,12 +111,12 @@ fi
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin ; then
-    APP_HOME=`cygpath --path --mixed "$APP_HOME"`
-    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-    JAVACMD=`cygpath --unix "$JAVACMD"`
+    APP_HOME=$(cygpath --path --mixed "$APP_HOME")
+    CLASSPATH=$(cygpath --path --mixed "$CLASSPATH")
+    JAVACMD=$(cygpath --unix "$JAVACMD")
 
     # We build the pattern for arguments to be converted via cygpath
-    ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
+    ROOTDIRSRAW=$(find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null)
     SEP=""
     for dir in $ROOTDIRSRAW ; do
         ROOTDIRS="$ROOTDIRS$SEP$dir"
@@ -130,13 +130,13 @@ if $cygwin ; then
     # Now convert the arguments - kludge to limit ourselves to /bin/sh
     i=0
     for arg in "$@" ; do
-        CHECK=`echo "$arg"|egrep -c "$OURCYGPATTERN" -`
-        CHECK2=`echo "$arg"|egrep -c "^-"`                                 ### Determine if an option
+        CHECK=$(echo "$arg"|egrep -c "$OURCYGPATTERN" -)
+        CHECK2=$(echo "$arg"|egrep -c "^-")                                ### Determine if an option
 
         if [ $CHECK -ne 0 ] && [ $CHECK2 -eq 0 ] ; then                    ### Added a condition
-            eval `echo args$i`=`cygpath --path --ignore --mixed "$arg"`
+            eval $(echo args$i)=$(cygpath --path --ignore --mixed "$arg")
         else
-            eval `echo args$i`="\"$arg\""
+            eval $(echo args$i)="\"$arg\""
         fi
         i=$((i+1))
     done
