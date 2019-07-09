@@ -44,6 +44,7 @@ class ContentPanelModel {
         rules.addAll(contentManager.matchers)
         hits.clear()
         view.rulesTable.model.fireTableDataChanged()
+        view.hitsTable.model.fireTableDataChanged()
     }
     
     void onContentControlEvent(ContentControlEvent e) {
