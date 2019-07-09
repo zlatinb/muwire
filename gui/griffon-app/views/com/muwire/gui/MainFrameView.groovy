@@ -72,7 +72,11 @@ class MainFrameView {
                 menuBar {
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
-                        menuItem("Content Control", actionPerformed : {mvcGroup.createMVCGroup("content-panel")})
+                        menuItem("Content Control", actionPerformed : {
+                            def env = [:]
+                            env["eventBus"] = model.core.eventBus
+                            mvcGroup.createMVCGroup("content-panel", env)
+                        })
                     }
                     menu (text : "Status") {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})

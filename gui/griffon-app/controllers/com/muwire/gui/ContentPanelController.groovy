@@ -6,13 +6,22 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.EventBus
+import com.muwire.core.content.ContentControlEvent
+
 @ArtifactProviderFor(GriffonController)
 class ContentPanelController {
     @MVCMember @Nonnull
     ContentPanelModel model
+    @MVCMember @Nonnull
+    ContentPanelView view
+    
+    EventBus eventBus
 
     @ControllerAction
     void addRule() {
+        def term = view.ruleTextField.text
+        eventBus.publish(new ContentControlEvent(term : term, regex : model.regex, add:true))
     }
     
     @ControllerAction

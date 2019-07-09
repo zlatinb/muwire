@@ -47,12 +47,15 @@ class ContentPanelView {
                     }
                 }
                 panel (constraints : BorderLayout.SOUTH) {
-                    ruleTextField = textField(action: addRuleAction)
-                    buttonGroup(id : "ruleType")
-                    radioButton(text: "Keyword", selected : true, buttonGroup: ruleType, keywordAction)
-                    radioButton(text: "Regex", selected : false, buttonGroup: ruleType, regexAction)
-                    button(text : "Add Rule", addRuleAction)
-                    button(text : "Delete Rule", deleteRuleAction) // TODO: enable/disable
+                    borderLayout()
+                    ruleTextField = textField(constraints: BorderLayout.CENTER, action: addRuleAction)
+                    panel (constraints: BorderLayout.EAST) {
+                        buttonGroup(id : "ruleType")
+                        radioButton(text: "Keyword", selected : true, buttonGroup: ruleType, keywordAction)
+                        radioButton(text: "Regex", selected : false, buttonGroup: ruleType, regexAction)
+                        button(text : "Add Rule", addRuleAction)
+                        button(text : "Delete Rule", deleteRuleAction) // TODO: enable/disable
+                    }
                 }
             }
             panel {
