@@ -16,6 +16,11 @@ class RegexMatcher extends Matcher {
     }
     
     @Override
+    public String getTerm() {
+        pattern.pattern()
+    }
+    
+    @Override
     public int hashCode() {
         pattern.hashCode()
     }

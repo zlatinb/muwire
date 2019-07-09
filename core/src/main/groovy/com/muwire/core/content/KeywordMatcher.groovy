@@ -16,6 +16,11 @@ class KeywordMatcher extends Matcher {
     }
     
     @Override
+    public String getTerm() {
+        keyword
+    }
+    
+    @Override
     public int hashCode() {
         keyword.hashCode()
     }

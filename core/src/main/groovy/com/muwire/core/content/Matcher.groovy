@@ -7,6 +7,8 @@ abstract class Matcher {
     
     protected abstract boolean match(String []searchTerms);
     
+    public abstract String getTerm();
+    
     public void process(QueryEvent qe) {
         def terms = qe.searchEvent.searchTerms
         if (match(terms)) {

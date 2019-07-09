@@ -12,7 +12,21 @@ class ContentPanelController {
     ContentPanelModel model
 
     @ControllerAction
-    void click() {
-        model.clickCount++
+    void addRule() {
+    }
+    
+    @ControllerAction
+    void deleteRule() {
+        
+    }
+    
+    @ControllerAction
+    void keyword() {
+        model.regex = false
+    }
+    
+    @ControllerAction
+    void regex() {
+        model.regex = true
     }
 }
