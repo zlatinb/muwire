@@ -48,4 +48,9 @@ class EventBus {
         }
         currentHandlers.add handler
     }
+    
+    synchronized void unregister(Class<? extends Event> eventType, def handler) {
+        log.info("Unregistering $handler for type $eventType")
+        handlers[eventType]?.remove(handler)
+    }
 }
