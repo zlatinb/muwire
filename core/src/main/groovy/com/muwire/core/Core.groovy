@@ -48,6 +48,8 @@ import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.update.UpdateClient
 import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
+import com.muwire.core.content.ContentControlEvent
+import com.muwire.core.content.ContentManager
 
 import groovy.util.logging.Log
 import net.i2p.I2PAppContext
@@ -90,6 +92,7 @@ public class Core {
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
     final UploadManager uploadManager
+    final ContentManager contentManager
 
     private final Router router
 
@@ -289,6 +292,11 @@ public class Core {
         trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
         eventBus.register(UILoadedEvent.class, trustSubscriber)
         eventBus.register(TrustSubscriptionEvent.class, trustSubscriber)
+        
+        log.info("initializing content manager")
+        contentManager = new ContentManager()
+        eventBus.register(ContentControlEvent.class, contentManager)
+        eventBus.register(QueryEvent.class, contentManager)
     }
 
     public void startServices() {

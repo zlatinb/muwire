@@ -72,6 +72,7 @@ class MainFrameView {
                 menuBar {
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
+                        menuItem("Content Control", actionPerformed : {mvcGroup.createMVCGroup("content-panel")})
                     }
                     menu (text : "Status") {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})

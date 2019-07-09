@@ -41,4 +41,9 @@ mvcGroups {
         view = 'com.muwire.gui.TrustListView'
         controller = 'com.muwire.gui.TrustListController'
     }
+    'content-panel' {
+        model = 'com.muwire.gui.ContentPanelModel'
+        view = 'com.muwire.gui.ContentPanelView'
+        controller = 'com.muwire.gui.ContentPanelController'
+    }
 }
