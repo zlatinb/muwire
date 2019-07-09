@@ -28,6 +28,8 @@ class MuWireSettings {
     int meshExpiration
     boolean embeddedRouter
     int inBw, outBw
+    Set<String> watchedKeywords
+    Set<String> watchedRegexes
 
     MuWireSettings() {
         this(new Properties())
@@ -54,11 +56,9 @@ class MuWireSettings {
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
 
-        watchedDirectories = new HashSet<>()
-        if (props.containsKey("watchedDirectories")) {
-            String[] encoded = props.getProperty("watchedDirectories").split(",")
-            encoded.each { watchedDirectories << DataUtil.readi18nString(Base64.decode(it)) }
-        }
+        watchedDirectories = readEncodedSet(props, "watchedDirectories")
+        watchedKeywords = readEncodedSet(props, "watchedKeywords")
+        watchedRegexes = readEncodedSet(props, "watchedRegexes")
 
         trustSubscriptions = new HashSet<>()
         if (props.containsKey("trustSubscriptions")) {
@@ -66,6 +66,8 @@ class MuWireSettings {
                 trustSubscriptions.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
             }
         }
+        
+        
     }
 
     void write(OutputStream out) throws IOException {
@@ -89,12 +91,9 @@ class MuWireSettings {
         props.setProperty("inBw", String.valueOf(inBw))
         props.setProperty("outBw", String.valueOf(outBw))
 
-        if (!watchedDirectories.isEmpty()) {
-            String encoded = watchedDirectories.stream().
-                map({Base64.encode(DataUtil.encodei18nString(it))}).
-                collect(Collectors.joining(","))
-            props.setProperty("watchedDirectories", encoded)
-        }
+        writeEncodedSet(watchedDirectories, "watchedDirectories", props)
+        writeEncodedSet(watchedKeywords, "watchedKeywords", props)
+        writeEncodedSet(watchedRegexes, "watchedRegexes", props)
 
         if (!trustSubscriptions.isEmpty()) {
             String encoded = trustSubscriptions.stream().
@@ -104,6 +103,24 @@ class MuWireSettings {
         }
 
         props.store(out, "")
+    }
+    
+    private static Set<String> readEncodedSet(Properties props, String property) {
+        Set<String> rv = new HashSet<>()
+        if (props.containsKey(property)) {
+            String[] encoded = props.getProperty(property).split(",")
+            encoded.each { rv << DataUtil.readi18nString(Base64.decode(it)) }
+        }
+        rv
+    }
+    
+    private static void writeEncodedSet(Set<String> set, String property, Properties props) {
+        if (set.isEmpty())
+            return
+        String encoded = set.stream().
+            map({Base64.encode(DataUtil.encodei18nString(it))}).
+            collect(Collectors.joining(","))
+        props.setProperty(property, encoded)
     }
 
     boolean isLeaf() {
