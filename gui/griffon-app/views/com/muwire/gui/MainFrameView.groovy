@@ -74,7 +74,7 @@ class MainFrameView {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
                         menuItem("Content Control", actionPerformed : {
                             def env = [:]
-                            env["eventBus"] = model.core.eventBus
+                            env["core"] = model.core
                             mvcGroup.createMVCGroup("content-panel", env)
                         })
                     }

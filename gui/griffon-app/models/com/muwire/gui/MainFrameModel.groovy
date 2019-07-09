@@ -17,6 +17,7 @@ import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
+import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.AllFilesLoadedEvent
@@ -164,6 +165,13 @@ class MainFrameModel {
             core.eventBus.register(UpdateDownloadedEvent.class, this)
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
 
+            core.muOptions.watchedKeywords.each {
+                core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
+            }
+            core.muOptions.watchedRegexes.each {
+                core.eventBus.publish(new ContentControlEvent(term : it, regex: true, add: true))
+            }
+            
             timer.schedule({
                 if (core.shutdown.get())
                     return

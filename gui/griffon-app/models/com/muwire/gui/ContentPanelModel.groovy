@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import javax.annotation.Nonnull
 
+import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.content.ContentManager
@@ -17,7 +18,7 @@ class ContentPanelModel {
     @MVCMember @Nonnull
     ContentPanelView view
     
-    EventBus eventBus
+    Core core
     
     private ContentManager contentManager
     
@@ -29,11 +30,11 @@ class ContentPanelModel {
     void mvcGroupInit(Map<String,String> args) {
         contentManager = application.context.get("core").contentManager
         rules.addAll(contentManager.matchers)
-        eventBus.register(ContentControlEvent.class, this)
+        core.eventBus.register(ContentControlEvent.class, this)
     }
     
     void mvcGroupDestroy() {
-        eventBus.unregister(ContentControlEvent.class, this)
+        core.eventBus.unregister(ContentControlEvent.class, this)
     }
     
     void refresh() {

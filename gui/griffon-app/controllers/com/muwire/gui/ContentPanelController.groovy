@@ -6,6 +6,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.content.ContentControlEvent
 
@@ -16,12 +17,19 @@ class ContentPanelController {
     @MVCMember @Nonnull
     ContentPanelView view
     
-    EventBus eventBus
+    Core core
 
     @ControllerAction
     void addRule() {
         def term = view.ruleTextField.text
-        eventBus.publish(new ContentControlEvent(term : term, regex : model.regex, add:true))
+        
+        if (model.regex)
+            core.muOptions.watchedRegexes.add(term)
+        else
+            core.muOptions.watchedKeywords.add(term)
+        saveMuWireSettings()
+           
+        core.eventBus.publish(new ContentControlEvent(term : term, regex : model.regex, add:true))
     }
     
     @ControllerAction
@@ -37,5 +45,12 @@ class ContentPanelController {
     @ControllerAction
     void regex() {
         model.regex = true
+    }
+    
+    void saveMuWireSettings() {
+        File f = new File(core.home, "MuWire.properties")
+        f.withOutputStream {
+            core.muOptions.write(it)
+        }
     }
 }
