@@ -5,6 +5,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 
 import com.muwire.core.content.RegexMatcher
@@ -28,6 +29,7 @@ class ContentPanelView {
     
     def rulesTable
     def ruleTextField
+    def lastRulesSortEvent
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -54,7 +56,7 @@ class ContentPanelView {
                         radioButton(text: "Keyword", selected : true, buttonGroup: ruleType, keywordAction)
                         radioButton(text: "Regex", selected : false, buttonGroup: ruleType, regexAction)
                         button(text : "Add Rule", addRuleAction)
-                        button(text : "Delete Rule", deleteRuleAction) // TODO: enable/disable
+                        button(text : "Delete Rule", enabled : bind {model.deleteButtonEnabled}, deleteRuleAction)
                     }
                 }
             }
@@ -64,7 +66,33 @@ class ContentPanelView {
         }
     }
     
+    int getSelectedRule() {
+        int selectedRow = rulesTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastRulesSortEvent != null) 
+            selectedRow = rulesTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
     void mvcGroupInit(Map<String,String> args) {
+        
+        rulesTable.rowSorter.addRowSorterListener({evt -> lastRulesSortEvent = evt})
+        rulesTable.rowSorter.setSortsOnUpdates(true)
+        def selectionModel = rulesTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedRule()
+            if (selectedRow < 0) {
+                model.deleteButtonEnabled = false
+                return
+            } else {
+                model.deleteButtonEnabled = true
+                // TODO: populate hits table
+            }
+        })
+        
+        
         dialog.getContentPane().add(mainPanel)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)

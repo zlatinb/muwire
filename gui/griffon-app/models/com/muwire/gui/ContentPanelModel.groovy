@@ -26,6 +26,7 @@ class ContentPanelModel {
     def hits = []
     
     @Observable boolean regex
+    @Observable boolean deleteButtonEnabled
     
     void mvcGroupInit(Map<String,String> args) {
         contentManager = application.context.get("core").contentManager

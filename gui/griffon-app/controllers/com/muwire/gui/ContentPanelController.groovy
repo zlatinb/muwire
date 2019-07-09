@@ -9,6 +9,8 @@ import javax.annotation.Nonnull
 import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.content.ContentControlEvent
+import com.muwire.core.content.Matcher
+import com.muwire.core.content.RegexMatcher
 
 @ArtifactProviderFor(GriffonController)
 class ContentPanelController {
@@ -34,7 +36,18 @@ class ContentPanelController {
     
     @ControllerAction
     void deleteRule() {
+        int rule = view.getSelectedRule()
+        if (rule < 0)
+            return
+        Matcher matcher = model.rules[rule]
+        String term = matcher.getTerm()
+        if (matcher instanceof RegexMatcher) 
+            core.muOptions.watchedRegexes.remove(term)
+        else
+            core.muOptions.watchedKeywords.remove(term)
+        saveMuWireSettings()
         
+        core.eventBus.publish(new ContentControlEvent(term : term, regex : (matcher instanceof RegexMatcher), add: false))
     }
     
     @ControllerAction

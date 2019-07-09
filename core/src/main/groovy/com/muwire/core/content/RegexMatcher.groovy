@@ -22,7 +22,7 @@ class RegexMatcher extends Matcher {
     
     @Override
     public int hashCode() {
-        pattern.hashCode()
+        pattern.pattern().hashCode()
     }
     
     @Override
@@ -30,6 +30,6 @@ class RegexMatcher extends Matcher {
         if (!(o instanceof RegexMatcher))
             return false
         RegexMatcher other = (RegexMatcher) o
-        pattern.equals(other.pattern)
+        pattern.pattern() == other.pattern.pattern()
     }
 }
