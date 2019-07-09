@@ -8,6 +8,7 @@ import javax.swing.JDialog
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 
+import com.muwire.core.content.Matcher
 import com.muwire.core.content.RegexMatcher
 
 import java.awt.BorderLayout
@@ -30,6 +31,7 @@ class ContentPanelView {
     def rulesTable
     def ruleTextField
     def lastRulesSortEvent
+    def hitsTable
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -61,7 +63,21 @@ class ContentPanelView {
                 }
             }
             panel {
-                // TODO: hits table
+                borderLayout()
+                scrollPane(constraints : BorderLayout.CENTER) {
+                     hitsTable = table(id : "hits-table", autoCreateRowSorter : true) {
+                         tableModel(list : model.hits) {
+                             closureColumn(header : "Searcher", type : String, read : {row -> row.persona.getHumanReadableName()})
+                             closureColumn(header : "Keywords", type : String, read : {row -> row.keywords.join(" ")})
+                             closureColumn(header : "Date", type : String, read : {row -> String.valueOf(new Date(row.timestamp))})
+                         }
+                     }   
+                }
+                panel (constraints : BorderLayout.SOUTH) {
+                    button(text : "Refresh", refreshAction)
+                    button(text : "Trust", enabled : bind {model.trustButtonsEnabled}, trustAction)
+                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                }
             }
         }
     }
@@ -88,7 +104,10 @@ class ContentPanelView {
                 return
             } else {
                 model.deleteButtonEnabled = true
-                // TODO: populate hits table
+                model.hits.clear()
+                Matcher matcher = model.rules[selectedRow]
+                model.hits.addAll(matcher.matches)
+                hitsTable.model.fireTableDataChanged()
             }
         })
         

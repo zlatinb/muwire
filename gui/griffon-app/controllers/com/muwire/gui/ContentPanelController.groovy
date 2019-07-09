@@ -60,6 +60,21 @@ class ContentPanelController {
         model.regex = true
     }
     
+    @ControllerAction
+    void refresh() {
+        model.refresh()
+    }
+    
+    @ControllerAction
+    void trust() {
+        
+    }
+    
+    @ControllerAction
+    void distrust() {
+        
+    }
+    
     void saveMuWireSettings() {
         File f = new File(core.home, "MuWire.properties")
         f.withOutputStream {

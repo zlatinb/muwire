@@ -27,6 +27,7 @@ class ContentPanelModel {
     
     @Observable boolean regex
     @Observable boolean deleteButtonEnabled
+    @Observable boolean trustButtonsEnabled
     
     void mvcGroupInit(Map<String,String> args) {
         contentManager = application.context.get("core").contentManager
