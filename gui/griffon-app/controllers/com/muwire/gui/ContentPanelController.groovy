@@ -9,8 +9,11 @@ import javax.annotation.Nonnull
 import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.content.ContentControlEvent
+import com.muwire.core.content.Match
 import com.muwire.core.content.Matcher
 import com.muwire.core.content.RegexMatcher
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustLevel
 
 @ArtifactProviderFor(GriffonController)
 class ContentPanelController {
@@ -67,12 +70,20 @@ class ContentPanelController {
     
     @ControllerAction
     void trust() {
-        
+        int selectedHit = view.getSelectedHit()
+        if (selectedHit < 0)
+            return
+        Match m = model.hits[selectedHit]
+        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.TRUSTED))
     }
     
     @ControllerAction
     void distrust() {
-        
+        int selectedHit = view.getSelectedHit()
+        if (selectedHit < 0)
+            return
+        Match m = model.hits[selectedHit]
+        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.DISTRUSTED))
     }
     
     void saveMuWireSettings() {

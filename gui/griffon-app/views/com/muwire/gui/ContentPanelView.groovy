@@ -32,6 +32,7 @@ class ContentPanelView {
     def ruleTextField
     def lastRulesSortEvent
     def hitsTable
+    def lastHitsSortEvent
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -91,6 +92,15 @@ class ContentPanelView {
         selectedRow
     }
     
+    int getSelectedHit() {
+        int selectedRow = hitsTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastHitsSortEvent != null) 
+            selectedRow = hitsTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
     void mvcGroupInit(Map<String,String> args) {
         
         rulesTable.rowSorter.addRowSorterListener({evt -> lastRulesSortEvent = evt})
@@ -111,6 +121,14 @@ class ContentPanelView {
             }
         })
         
+        hitsTable.rowSorter.addRowSorterListener({evt -> lastHitsSortEvent = evt})
+        hitsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = hitsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedHit()
+            model.trustButtonsEnabled = selectedRow >= 0
+        })
         
         dialog.getContentPane().add(mainPanel)
         dialog.pack()
