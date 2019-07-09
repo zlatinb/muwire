@@ -9,8 +9,6 @@ abstract class Matcher {
     
     public void process(QueryEvent qe) {
         def terms = qe.searchEvent.searchTerms
-        if (terms == null)
-            return
         if (match(terms)) {
             long now = System.currentTimeMillis()
             matches << new Match(persona : qe.originator, keywords : terms, timestamp : now)

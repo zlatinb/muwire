@@ -14,4 +14,17 @@ class KeywordMatcher extends Matcher {
         }
         false
     }
+    
+    @Override
+    public int hashCode() {
+        keyword.hashCode()
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof KeywordMatcher))
+            return false
+        KeywordMatcher other = (KeywordMatcher) o
+        keyword.equals(other.keyword)
+    }
 }
