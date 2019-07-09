@@ -10,7 +10,7 @@ class RegexMatcher extends Matcher {
     }
     
     @Override
-    protected boolean match(String[] keywords) {
+    protected boolean match(List<String> keywords) {
         String combined = keywords.join(" ")
         return pattern.matcher(combined).find()
     }

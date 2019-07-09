@@ -7,12 +7,13 @@ class KeywordMatcher extends Matcher {
     }
     
     @Override
-    protected boolean match(String[] searchTerms) {
+    protected boolean match(List<String> searchTerms) {
+        boolean found = false
         searchTerms.each { 
             if (keyword == it)
-                return true
+                found = true
         }
-        false
+        found
     }
     
     @Override

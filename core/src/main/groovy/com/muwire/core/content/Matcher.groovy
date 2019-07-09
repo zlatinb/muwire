@@ -3,9 +3,9 @@ package com.muwire.core.content
 import com.muwire.core.search.QueryEvent
 
 abstract class Matcher {
-    final Match [] matches = Collections.synchronizedList(new ArrayList<>())
+    final List<Match> matches = Collections.synchronizedList(new ArrayList<>())
     
-    protected abstract boolean match(String []searchTerms);
+    protected abstract boolean match(List<String> searchTerms);
     
     public abstract String getTerm();
     
