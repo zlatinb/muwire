@@ -92,6 +92,7 @@ class MainFrameModel {
     @Observable boolean unsubscribeButtonEnabled
     
     @Observable boolean searchesPaneButtonEnabled
+    @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
@@ -207,6 +208,7 @@ class MainFrameModel {
                 resumeButtonText = "Retry"
                 
                 searchesPaneButtonEnabled = false
+                downloadsPaneButtonEnabled = true
                 uploadsPaneButtonEnabled = true
                 monitorPaneButtonEnabled = true
                 trustPaneButtonEnabled = true

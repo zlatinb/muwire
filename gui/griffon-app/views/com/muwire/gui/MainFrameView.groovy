@@ -90,6 +90,7 @@ class MainFrameView {
                     panel (constraints: BorderLayout.WEST) {
                         gridLayout(rows:1, cols: 2)
                         button(text: "Searches", enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
+                        button(text: "Downloads", enabled : bind{model.downloadsPaneButtonEnabled}, actionPerformed : showDownloadsWindow)
                         button(text: "Uploads", enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         if (settings.showMonitor)
                             button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
@@ -117,37 +118,43 @@ class MainFrameView {
                     cardLayout()
                     panel (constraints : "search window") {
                         borderLayout()
-                        splitPane( orientation : JSplitPane.VERTICAL_SPLIT, dividerLocation : 500,
-                        continuousLayout : true, constraints : BorderLayout.CENTER) {
-                            panel (constraints : JSplitPane.TOP) {
-                                borderLayout()
-                                tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
-                                panel(constraints : BorderLayout.SOUTH) {
-                                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
-                                    button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
-                                }
-                            }
-                            panel (constraints : JSplitPane.BOTTOM) {
-                                borderLayout()
-                                scrollPane (constraints : BorderLayout.CENTER) {
-                                    downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
-                                        tableModel(list: model.downloads) {
-                                            closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
-                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
-                                            closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
-                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
-                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
-                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
-                                            })
-                                        }
+                        tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
+                        panel(constraints : BorderLayout.SOUTH) {
+                            button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                            button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                            button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                        }
+                    }
+                    panel (constraints: "downloads window") {
+                        gridLayout(rows : 2, cols: 1)
+                        panel {
+                            borderLayout()
+                            scrollPane (constraints : BorderLayout.CENTER) {
+                                downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
+                                    tableModel(list: model.downloads) {
+                                        closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
+                                        closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
+                                        closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
+                                        closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
+                                        closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
+                                        DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
+                                        })
                                     }
                                 }
-                                panel (constraints : BorderLayout.SOUTH) {
-                                    button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
-                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
-                                    button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
-                                }
+                            }
+                            panel (constraints : BorderLayout.SOUTH) {
+                                button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
+                                button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
+                                button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
+                            }
+                        }
+                        panel {
+                            borderLayout()
+                            panel(constraints : BorderLayout.NORTH) {
+                                label(text : "Download Details")
+                            }
+                            panel(constraints : BorderLayout.CENTER) {
+                                label(text : "Details go here...")
                             }
                         }
                     }
@@ -691,6 +698,17 @@ class MainFrameView {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
         model.searchesPaneButtonEnabled = false
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+    }
+    
+    def showDownloadsWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "downloads window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = false
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -700,6 +718,7 @@ class MainFrameView {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "uploads window")
         model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = false
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -709,6 +728,7 @@ class MainFrameView {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"monitor window")
         model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
@@ -718,6 +738,7 @@ class MainFrameView {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"trust window")
         model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
