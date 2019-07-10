@@ -24,7 +24,7 @@ class SearchTabController {
     private def selectedResult() {
         int row = view.resultsTable.getSelectedRow()
         if (row == -1)
-            return
+            return null
         def sortEvt = view.lastSortEvent
         if (sortEvt != null) {
             row = view.resultsTable.rowSorter.convertRowIndexToModel(row)

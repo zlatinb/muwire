@@ -16,6 +16,7 @@ import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
+import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
@@ -37,32 +38,50 @@ class SearchTabView {
     def pane
     def parent
     def searchTerms
+    def sendersTable
+    def lastSendersSortEvent
     def resultsTable
     def lastSortEvent
 
     void initUI() {
         builder.with {
             def resultsTable
+            def sendersTable
             def pane = panel {
-                borderLayout()
-                scrollPane (constraints : BorderLayout.CENTER) {
-                    resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
-                        tableModel(list: model.results) {
-                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                            closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                            closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                            closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                            closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
-                            closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
-                                model.core.trustService.getLevel(row.sender.destination).toString()
-                            })
+                gridLayout(rows : 2, cols: 1)
+                panel {
+                    borderLayout()
+                    scrollPane (constraints : BorderLayout.CENTER) {
+                        sendersTable = table(id : "senders-table", autoCreateRowSorter : true) {
+                            tableModel(list : model.senders) {
+                                closureColumn(header : "Sender", type: String, read : {row -> row.getHumanReadableName()})
+                                closureColumn(header : "Results", type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                closureColumn(header : "Trust", type: String, read : { row ->
+                                    model.core.trustService.getLevel(row.destination).toString()
+                                })
+                            }
                         }
                     }
+                    panel(constraints : BorderLayout.SOUTH) {
+                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                    }
                 }
-                panel(constraints : BorderLayout.SOUTH) {
-                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
-                    button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                panel {
+                    borderLayout()
+                    scrollPane (constraints : BorderLayout.CENTER) {
+                        resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
+                            tableModel(list: model.results) {
+                                closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                                closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
+                                closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                                closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                            }
+                        }
+                    }
+                    panel(constraints : BorderLayout.SOUTH) {
+                        button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                    }
                 }
             }
 
@@ -71,6 +90,7 @@ class SearchTabView {
             this.pane.putClientProperty("results-table",resultsTable)
 
             this.resultsTable = resultsTable
+            this.sendersTable = sendersTable
 
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -109,9 +129,7 @@ class SearchTabView {
 
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
-        resultsTable.columnModel.getColumn(1).setCellRenderer(centerRenderer)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
-        resultsTable.columnModel.getColumn(4).setCellRenderer(centerRenderer)
 
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
 
@@ -134,6 +152,27 @@ class SearchTabView {
                     showPopupMenu(e)
             }
         })
+        
+        // senders table
+        sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
+        sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
+        sendersTable.rowSorter.setSortsOnUpdates(true)
+        def selectionModel = sendersTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int row = selectedSenderRow()
+            if (row < 0) {
+                model.trustButtonsEnabled = false
+                return
+            } else {
+                model.trustButtonsEnabled = true
+                model.results.clear()
+                Persona p = model.senders[row]
+                model.results.addAll(model.sendersBucket[p])
+                resultsTable.model.fireTableDataChanged()
+            }
+        })
+                
     }
 
     def closeTab = {
@@ -167,5 +206,14 @@ class SearchTabView {
         StringSelection selection = new StringSelection(hash)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
+    }
+    
+    int selectedSenderRow() {
+        int row = sendersTable.getSelectedRow()
+        if (row < 0)
+            return -1
+        if (lastSendersSortEvent != null)
+            row = sendersTable.rowSorter.convertRowIndexToModel(row)
+        row
     }
 }

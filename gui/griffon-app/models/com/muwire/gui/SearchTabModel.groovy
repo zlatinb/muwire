@@ -5,6 +5,7 @@ import javax.inject.Inject
 import javax.swing.JTable
 
 import com.muwire.core.Core
+import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
 
 import griffon.core.artifact.GriffonModel
@@ -24,10 +25,12 @@ class SearchTabModel {
     Core core
     UISettings uiSettings
     String uuid
+    def senders = []
     def results = []
     def hashBucket = [:]
     def sourcesBucket = [:]
-
+    def sendersBucket = new LinkedHashMap<>()
+    
 
     void mvcGroupInit(Map<String, String> args) {
         core = mvcGroup.parentGroup.model.core
@@ -51,6 +54,15 @@ class SearchTabModel {
             }
             bucket << e
 
+            def senderBucket = sendersBucket.get(e.sender)
+            if (senderBucket == null) {
+                senderBucket = []
+                sendersBucket[e.sender] = senderBucket
+                senders.clear()
+                senders.addAll(sendersBucket.keySet())
+            }
+            senderBucket << e
+            
             Set sourceBucket = sourcesBucket.get(e.infohash)
             if (sourceBucket == null) {
                 sourceBucket = new HashSet()
@@ -58,8 +70,7 @@ class SearchTabModel {
             }
             sourceBucket.addAll(e.sources)
 
-            results << e
-            JTable table = builder.getVariable("results-table")
+            JTable table = builder.getVariable("senders-table")
             table.model.fireTableDataChanged()
         }
     }
@@ -75,6 +86,14 @@ class SearchTabModel {
                     bucket = []
                     hashBucket[it.infohash] = bucket
                 }
+                
+                def senderBucket = sendersBucket.get(it.sender)
+                if (senderBucket == null) {
+                    senderBucket = []
+                    sendersBucket[it.sender] = senderBucket
+                    senders.clear()
+                    senders.addAll(sendersBucket.keySet())
+                }
 
                 Set sourceBucket = sourcesBucket.get(it.infohash)
                 if (sourceBucket == null) {
@@ -84,9 +103,9 @@ class SearchTabModel {
                 sourceBucket.addAll(it.sources)
 
                 bucket << it
-                results << it
+                senderBucket << it
             }
-            JTable table = builder.getVariable("results-table")
+            JTable table = builder.getVariable("senders-table")
             table.model.fireTableDataChanged()
         }
     }
