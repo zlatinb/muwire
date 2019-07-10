@@ -5,8 +5,10 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
+import javax.swing.JLabel
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.content.Matcher
 import com.muwire.core.content.RegexMatcher
@@ -39,9 +41,12 @@ class ContentPanelView {
         dialog = new JDialog(mainFrame, "Content Control Panel", true)
         
         mainPanel = builder.panel {
-            gridLayout(rows:2, cols:1)
+            gridLayout(rows:1, cols:2)
             panel {
                 borderLayout()
+                panel (constraints : BorderLayout.NORTH) {
+                    label(text : "Rules")
+                }
                 scrollPane (constraints : BorderLayout.CENTER) {
                     rulesTable = table(id : "rules-table", autoCreateRowSorter : true) {
                         tableModel(list : model.rules) {
@@ -63,8 +68,11 @@ class ContentPanelView {
                     }
                 }
             }
-            panel {
+            panel (border : etchedBorder()){
                 borderLayout()
+                panel (constraints : BorderLayout.NORTH) {
+                    label(text : "Hits")
+                }
                 scrollPane(constraints : BorderLayout.CENTER) {
                      hitsTable = table(id : "hits-table", autoCreateRowSorter : true) {
                          tableModel(list : model.hits) {
@@ -102,7 +110,9 @@ class ContentPanelView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        
+        def centerRenderer = new DefaultTableCellRenderer()
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+        rulesTable.setDefaultRenderer(Integer.class, centerRenderer)
         rulesTable.rowSorter.addRowSorterListener({evt -> lastRulesSortEvent = evt})
         rulesTable.rowSorter.setSortsOnUpdates(true)
         def selectionModel = rulesTable.getSelectionModel()
