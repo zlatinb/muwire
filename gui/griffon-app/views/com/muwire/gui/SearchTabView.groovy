@@ -126,7 +126,7 @@ class SearchTabView {
                 if (e.button == MouseEvent.BUTTON3)
                     showPopupMenu(e)
                 else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
-                    mvcGroup.parentGroup.controller.download()
+                    mvcGroup.controller.download()
             }
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -148,7 +148,7 @@ class SearchTabView {
         JPopupMenu menu = new JPopupMenu()
         if (model.downloadActionEnabled) {
             JMenuItem download = new JMenuItem("Download")
-            download.addActionListener({mvcGroup.parentGroup.controller.download()})
+            download.addActionListener({mvcGroup.controller.download()})
             menu.add(download)
         }
         JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
