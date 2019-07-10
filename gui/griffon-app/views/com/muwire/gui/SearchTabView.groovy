@@ -127,6 +127,7 @@ class SearchTabView {
         }
 
         parent.setTabComponentAt(index, tabPanel)
+        mvcGroup.parentGroup.view.showSearchWindow.call()
 
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
