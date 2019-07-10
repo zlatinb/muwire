@@ -54,9 +54,9 @@ class SearchTabView {
                     scrollPane (constraints : BorderLayout.CENTER) {
                         sendersTable = table(id : "senders-table", autoCreateRowSorter : true) {
                             tableModel(list : model.senders) {
-                                closureColumn(header : "Sender", type: String, read : {row -> row.getHumanReadableName()})
-                                closureColumn(header : "Results", type: Integer, read : {row -> model.sendersBucket[row].size()})
-                                closureColumn(header : "Trust", type: String, read : { row ->
+                                closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
+                                closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
                                     model.core.trustService.getLevel(row.destination).toString()
                                 })
                             }
