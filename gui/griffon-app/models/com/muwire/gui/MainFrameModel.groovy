@@ -90,6 +90,11 @@ class MainFrameModel {
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
     @Observable boolean unsubscribeButtonEnabled
+    
+    @Observable boolean searchesPaneButtonEnabled
+    @Observable boolean uploadsPaneButtonEnabled
+    @Observable boolean monitorPaneButtonEnabled
+    @Observable boolean trustPaneButtonEnabled
 
     private final Set<InfoHash> infoHashes = new HashSet<>()
 
@@ -200,6 +205,11 @@ class MainFrameModel {
                 distrusted.addAll(core.trustService.bad.values())
 
                 resumeButtonText = "Retry"
+                
+                searchesPaneButtonEnabled = false
+                uploadsPaneButtonEnabled = true
+                monitorPaneButtonEnabled = true
+                trustPaneButtonEnabled = true
             }
         })
 

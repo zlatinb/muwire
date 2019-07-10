@@ -89,11 +89,11 @@ class MainFrameView {
                     borderLayout()
                     panel (constraints: BorderLayout.WEST) {
                         gridLayout(rows:1, cols: 2)
-                        button(text: "Searches", actionPerformed : showSearchWindow)
-                        button(text: "Uploads", actionPerformed : showUploadsWindow)
+                        button(text: "Searches", enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
+                        button(text: "Uploads", enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         if (settings.showMonitor)
-                            button(text: "Monitor", actionPerformed : showMonitorWindow)
-                        button(text: "Trust", actionPerformed : showTrustWindow)
+                            button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
+                        button(text: "Trust", enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
@@ -690,21 +690,37 @@ class MainFrameView {
     def showSearchWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
+        model.searchesPaneButtonEnabled = false
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
     }
 
     def showUploadsWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "uploads window")
+        model.searchesPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = false
+        model.monitorPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
     }
 
     def showMonitorWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"monitor window")
+        model.searchesPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = false
+        model.trustPaneButtonEnabled = true
     }
 
     def showTrustWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel,"trust window")
+        model.searchesPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = false
     }
 
     def shareFiles = {
