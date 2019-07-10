@@ -59,6 +59,7 @@ class MainFrameController {
         Map<String, Object> params = new HashMap<>()
         params["search-terms"] = search
         params["uuid"] = uuid.toString()
+        params["core"] = core
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
@@ -96,6 +97,7 @@ class MainFrameController {
         Map<String, Object> params = new HashMap<>()
         params["search-terms"] = tabTitle
         params["uuid"] = uuid.toString()
+        params["core"] = core
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
@@ -106,20 +108,6 @@ class MainFrameController {
             originator : core.me))
     }
 
-    private def selectedResult() {
-        def selected = builder.getVariable("result-tabs").getSelectedComponent()
-        def group = selected.getClientProperty("mvc-group")
-        def table = selected.getClientProperty("results-table")
-        int row = table.getSelectedRow()
-        if (row == -1)
-            return
-        def sortEvt = group.view.lastSortEvent
-        if (sortEvt != null) {
-            row = group.view.resultsTable.rowSorter.convertRowIndexToModel(row)
-        }
-        group.model.results[row]
-    }
-
     private int selectedDownload() {
         def downloadsTable = builder.getVariable("downloads-table")
         def selected = downloadsTable.getSelectedRow()
@@ -127,42 +115,6 @@ class MainFrameController {
         if (sortEvt != null)
             selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
         selected
-    }
-
-    @ControllerAction
-    void download() {
-        def result = selectedResult()
-        if (result == null)
-            return
-
-        if (!model.canDownload(result.infohash))
-            return
-
-        def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
-
-        def selected = builder.getVariable("result-tabs").getSelectedComponent()
-        def group = selected.getClientProperty("mvc-group")
-
-        def resultsBucket = group.model.hashBucket[result.infohash]
-        def sources = group.model.sourcesBucket[result.infohash]
-
-        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, target : file))
-    }
-
-    @ControllerAction
-    void trust() {
-        def result = selectedResult()
-        if (result == null)
-            return // TODO disable button
-        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.TRUSTED))
-    }
-
-    @ControllerAction
-    void distrust() {
-        def result = selectedResult()
-        if (result == null)
-            return // TODO disable button
-        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.DISTRUSTED))
     }
 
     @ControllerAction

@@ -119,11 +119,6 @@ class MainFrameView {
                     panel (constraints : "search window") {
                         borderLayout()
                         tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
-                        panel(constraints : BorderLayout.SOUTH) {
-                            button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
-                            button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                            button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
-                        }
                     }
                     panel (constraints: "downloads window") {
                         gridLayout(rows : 2, cols: 1)

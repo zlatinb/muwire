@@ -17,6 +17,9 @@ import griffon.metadata.ArtifactProviderFor
 class SearchTabModel {
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
+    
+    @Observable boolean downloadActionEnabled
+    @Observable boolean trustButtonsEnabled
 
     Core core
     UISettings uiSettings

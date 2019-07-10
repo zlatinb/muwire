@@ -76,8 +76,6 @@ class MainFrameModel {
     @Observable String me
     @Observable int loadedFiles
     @Observable File hashingFile
-    @Observable boolean downloadActionEnabled
-    @Observable boolean trustButtonsEnabled
     @Observable boolean cancelButtonEnabled
     @Observable boolean retryButtonEnabled
     @Observable boolean pauseButtonEnabled

@@ -43,18 +43,26 @@ class SearchTabView {
     void initUI() {
         builder.with {
             def resultsTable
-            def pane = scrollPane {
-                resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
-                    tableModel(list: model.results) {
-                        closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                        closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                        closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                        closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                        closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
-                        closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
-                          model.core.trustService.getLevel(row.sender.destination).toString()
-                        })
+            def pane = panel {
+                borderLayout()
+                scrollPane (constraints : BorderLayout.CENTER) {
+                    resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
+                        tableModel(list: model.results) {
+                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                            closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
+                            closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                            closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                            closureColumn(header: "Sender", preferredWidth: 170, type: String, read : {row -> row.sender.getHumanReadableName()})
+                            closureColumn(header: "Trust", preferredWidth: 50, type: String, read : {row ->
+                                model.core.trustService.getLevel(row.sender.destination).toString()
+                            })
+                        }
                     }
+                }
+                panel(constraints : BorderLayout.SOUTH) {
+                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                    button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
                 }
             }
 
@@ -72,8 +80,8 @@ class SearchTabView {
                     return
                 if (lastSortEvent != null)
                     row = resultsTable.rowSorter.convertRowIndexToModel(row)
-                mvcGroup.parentGroup.model.trustButtonsEnabled = true
-                mvcGroup.parentGroup.model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
+                model.trustButtonsEnabled = true
+                model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
             })
         }
     }
@@ -131,14 +139,14 @@ class SearchTabView {
     def closeTab = {
         int index = parent.indexOfTab(searchTerms)
         parent.removeTabAt(index)
-        mvcGroup.parentGroup.model.trustButtonsEnabled = false
-        mvcGroup.parentGroup.model.downloadActionEnabled = false
+        model.trustButtonsEnabled = false
+        model.downloadActionEnabled = false
         mvcGroup.destroy()
     }
 
     def showPopupMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
-        if (mvcGroup.parentGroup.model.downloadActionEnabled) {
+        if (model.downloadActionEnabled) {
             JMenuItem download = new JMenuItem("Download")
             download.addActionListener({mvcGroup.parentGroup.controller.download()})
             menu.add(download)
