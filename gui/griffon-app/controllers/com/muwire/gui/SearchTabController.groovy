@@ -52,17 +52,19 @@ class SearchTabController {
 
     @ControllerAction
     void trust() {
-        def result = selectedResult()
-        if (result == null)
+        int row = view.selectedSenderRow()
+        if (row < 0)
             return 
-        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.TRUSTED))
+        def sender = model.senders[row]
+        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED))
     }
 
     @ControllerAction
     void distrust() {
-        def result = selectedResult()
-        if (result == null)
+        int row = view.selectedSenderRow()
+        if (row < 0)
             return 
-        core.eventBus.publish( new TrustEvent(persona : result.sender, level : TrustLevel.DISTRUSTED))
+        def sender = model.senders[row] 
+        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED))
     }
 }
