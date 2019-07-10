@@ -96,11 +96,12 @@ class SearchTabView {
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
             selectionModel.addListSelectionListener( {
                 int row = resultsTable.getSelectedRow()
-                if (row < 0)
+                if (row < 0) {
+                    model.downloadActionEnabled = false
                     return
+                }
                 if (lastSortEvent != null)
                     row = resultsTable.rowSorter.convertRowIndexToModel(row)
-                model.trustButtonsEnabled = true
                 model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
             })
         }
