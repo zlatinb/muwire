@@ -11,6 +11,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
+import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -48,39 +49,41 @@ class SearchTabView {
             def resultsTable
             def sendersTable
             def pane = panel {
-                gridLayout(rows : 2, cols: 1)
-                panel {
-                    borderLayout()
-                    scrollPane (constraints : BorderLayout.CENTER) {
-                        sendersTable = table(id : "senders-table", autoCreateRowSorter : true) {
-                            tableModel(list : model.senders) {
-                                closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
-                                closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
-                                closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
-                                    model.core.trustService.getLevel(row.destination).toString()
-                                })
+                gridLayout(rows :1, cols : 1)
+                splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                    panel {
+                        borderLayout()
+                        scrollPane (constraints : BorderLayout.CENTER) {
+                            sendersTable = table(id : "senders-table", autoCreateRowSorter : true) {
+                                tableModel(list : model.senders) {
+                                    closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
+                                    closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                    closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
+                                        model.core.trustService.getLevel(row.destination).toString()
+                                    })
+                                }
                             }
                         }
-                    }
-                    panel(constraints : BorderLayout.SOUTH) {
-                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
-                    }
-                }
-                panel {
-                    borderLayout()
-                    scrollPane (constraints : BorderLayout.CENTER) {
-                        resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
-                            tableModel(list: model.results) {
-                                closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                                closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                                closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                                closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                            }
+                        panel(constraints : BorderLayout.SOUTH) {
+                            button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                            button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
                         }
                     }
-                    panel(constraints : BorderLayout.SOUTH) {
-                        button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                    panel {
+                        borderLayout()
+                        scrollPane (constraints : BorderLayout.CENTER) {
+                            resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
+                                tableModel(list: model.results) {
+                                    closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                                    closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
+                                    closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                                    closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                                }
+                            }
+                        }
+                        panel(constraints : BorderLayout.SOUTH) {
+                            button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                        }
                     }
                 }
             }
