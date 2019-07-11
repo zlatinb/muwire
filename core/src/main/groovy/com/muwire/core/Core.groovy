@@ -220,7 +220,7 @@ public class Core {
         eventBus.register(SourceDiscoveredEvent.class, meshManager)
 
         log.info "initializing persistence service"
-        persisterService = new PersisterService(new File(home, "files.json"), eventBus, 15000, fileManager)
+        persisterService = new PersisterService(new File(home, "files.json"), eventBus, 60000, fileManager)
         eventBus.register(UILoadedEvent.class, persisterService)
 
         log.info("initializing host cache")
