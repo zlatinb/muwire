@@ -94,6 +94,8 @@ class MainFrameModel {
     @Observable boolean uploadsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
+    
+    @Observable Downloader downloader
 
     private final Set<InfoHash> infoHashes = new HashSet<>()
 

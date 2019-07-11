@@ -122,7 +122,7 @@ class MainFrameView {
                     }
                     panel (constraints: "downloads window") {
                         gridLayout(rows : 1, cols : 1)
-                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 500 ) {
                             panel {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
@@ -131,7 +131,6 @@ class MainFrameView {
                                             closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
                                             closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
-                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
                                             })
@@ -150,7 +149,28 @@ class MainFrameView {
                                     label(text : "Download Details")
                                 }
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    label(text : "Details go here...")
+                                    panel (id : "download-details-panel") {
+                                        cardLayout()
+                                        panel (constraints : "select-download") {
+                                            label(text : "Select a download to view details")
+                                        }
+                                        panel(constraints : "download-selected") {
+                                            gridBagLayout()
+                                            label(text : "Download Location:", constraints : gbc(gridx:0, gridy:0))
+                                            label(text : bind {model.downloader?.file?.getAbsolutePath()}, 
+                                                constraints: gbc(gridx:1, gridy:0, gridwidth: 2, insets : [0,0,0,20]))
+                                            label(text : "Piece Size", constraints : gbc(gridx: 0, gridy:1))
+                                            label(text : bind {model.downloader?.pieceSize}, constraints : gbc(gridx:1, gridy:1))
+                                            label(text : "Known Sources:", constraints : gbc(gridx:3, gridy: 0))
+                                            label(text : bind {model.downloader?.activeWorkers?.size()}, constraints : gbc(gridx:4, gridy:0, insets : [0,0,0,20]))
+                                            label(text : "Active Sources:", constraints : gbc(gridx:3, gridy:1))
+                                            label(text : bind {model.downloader?.activeWorkers()}, constraints : gbc(gridx:4, gridy:1, insets : [0,0,0,20]))
+                                            label(text : "Total Pieces:", constraints : gbc(gridx:5, gridy: 0))
+                                            label(text : bind {model.downloader?.nPieces}, constraints : gbc(gridx:6, gridy:0, insets : [0,0,0,20]))
+                                            label(text : "Done Pieces:", constraints: gbc(gridx:5, gridy: 1))
+                                            label(text : bind {model.downloader?.donePieces()}, constraints : gbc(gridx:6, gridy:1, insets : [0,0,0,20]))
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -375,16 +395,21 @@ class MainFrameView {
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
+            def downloadDetailsPanel = builder.getVariable("download-details-panel")
             int selectedRow = selectedDownloaderRow()
             if (selectedRow < 0) {
                 model.cancelButtonEnabled = false
                 model.retryButtonEnabled = false
                 model.pauseButtonEnabled = false
+                model.downloader = null
+                downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"select-download")
                 return
             }
             def downloader = model.downloads[selectedRow]?.downloader
-            if (downloader == null)
+            if (downloader == null) 
                 return
+            model.downloader = downloader
+            downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"download-selected")
             switch(downloader.getCurrentState()) {
                 case Downloader.DownloadState.CONNECTING :
                 case Downloader.DownloadState.DOWNLOADING :
