@@ -1,0 +1,14 @@
+name=MuWire
+description=Easy Anonymous File-Sharing
+license=GPLv3
+version=${version}
+author=${author}
+signer=${signer}
+websiteURL=${websiteURL}
+updateURL.su3=${updateURLsu3}
+min-i2p-version=${i2pVersion}
+min-java-version=1.8
+consoleLinkName=MuWire
+consoleLinkTooltip=Anonymous File Sharing
+consoleLinkURL=/MuWire
+<% println "date="+System.currentTimeMillis() %>

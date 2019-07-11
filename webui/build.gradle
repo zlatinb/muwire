@@ -30,6 +30,7 @@ configurations {
     runtimeClasspath {
         extendsFrom developmentOnly
     }
+    warArtifact
 }
 
 dependencies {
@@ -101,4 +102,8 @@ tasks.withType(Test) {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+artifacts {
+    warArtifact war
 }
