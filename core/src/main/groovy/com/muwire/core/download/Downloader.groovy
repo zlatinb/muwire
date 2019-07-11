@@ -326,7 +326,7 @@ public class Downloader {
                     }
                     eventBus.publish(
                         new FileDownloadedEvent(
-                            downloadedFile : new DownloadedFile(file, getInfoHash(), pieceSizePow2, successfulDestinations),
+                            downloadedFile : new DownloadedFile(file.getCanonicalFile(), getInfoHash(), pieceSizePow2, successfulDestinations),
                         downloader : Downloader.this))
 
                 }
