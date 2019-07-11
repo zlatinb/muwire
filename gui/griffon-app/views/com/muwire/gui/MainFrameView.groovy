@@ -121,35 +121,37 @@ class MainFrameView {
                         tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
                     }
                     panel (constraints: "downloads window") {
-                        gridLayout(rows : 2, cols: 1)
-                        panel {
-                            borderLayout()
-                            scrollPane (constraints : BorderLayout.CENTER) {
-                                downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
-                                    tableModel(list: model.downloads) {
-                                        closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
-                                        closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
-                                        closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
-                                        closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
-                                        closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
-                                        DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
-                                        })
+                        gridLayout(rows : 1, cols : 1)
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                            panel {
+                                borderLayout()
+                                scrollPane (constraints : BorderLayout.CENTER) {
+                                    downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
+                                        tableModel(list: model.downloads) {
+                                            closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
+                                            closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
+                                            closureColumn(header: "Sources", preferredWidth : 10, type: Integer, read : {row -> row.downloader.activeWorkers()})
+                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
+                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
+                                            })
+                                        }
                                     }
                                 }
+                                panel (constraints : BorderLayout.SOUTH) {
+                                    button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
+                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
+                                    button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
+                                }
                             }
-                            panel (constraints : BorderLayout.SOUTH) {
-                                button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
-                                button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
-                                button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
-                            }
-                        }
-                        panel {
-                            borderLayout()
-                            panel(constraints : BorderLayout.NORTH) {
-                                label(text : "Download Details")
-                            }
-                            panel(constraints : BorderLayout.CENTER) {
-                                label(text : "Details go here...")
+                            panel {
+                                borderLayout()
+                                panel(constraints : BorderLayout.NORTH) {
+                                    label(text : "Download Details")
+                                }
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    label(text : "Details go here...")
+                                }
                             }
                         }
                     }
