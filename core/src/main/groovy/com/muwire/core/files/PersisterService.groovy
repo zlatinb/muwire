@@ -137,7 +137,7 @@ class PersisterService extends Service {
     private def toJson(File f, SharedFile sf) {
         def json = [:]
         json.file = Base64.encode DataUtil.encodei18nString(f.toString())
-        json.length = f.length()
+        json.length = sf.getCachedLength()
         InfoHash ih = sf.getInfoHash()
         json.infoHash = Base64.encode ih.getRoot()
         json.pieceSize = sf.getPieceSize()
