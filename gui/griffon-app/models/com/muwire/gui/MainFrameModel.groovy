@@ -97,8 +97,6 @@ class MainFrameModel {
     
     @Observable Downloader downloader
 
-    private final Set<InfoHash> infoHashes = new HashSet<>()
-
     private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
 
     @Observable volatile Core core
@@ -300,9 +298,6 @@ class MainFrameModel {
         }
         if (e.error != null)
             return // TODO do something
-        if (infoHashes.contains(e.sharedFile.infoHash))
-            return
-        infoHashes.add(e.sharedFile.infoHash)
         runInsideUIAsync {
             shared << e.sharedFile
             loadedFiles = shared.size()
@@ -312,9 +307,6 @@ class MainFrameModel {
     }
 
     void onFileLoadedEvent(FileLoadedEvent e) {
-        if (infoHashes.contains(e.loadedFile.infoHash))
-            return
-        infoHashes.add(e.loadedFile.infoHash)
         runInsideUIAsync {
             shared << e.loadedFile
             loadedFiles = shared.size()
@@ -324,9 +316,6 @@ class MainFrameModel {
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
-        InfoHash infohash = e.unsharedFile.infoHash
-        if (!infoHashes.remove(infohash))
-            return
         runInsideUIAsync {
             shared.remove(e.unsharedFile)
             loadedFiles = shared.size()
@@ -470,7 +459,6 @@ class MainFrameModel {
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         if (!core.muOptions.shareDownloadedFiles)
             return
-        infoHashes.add(e.downloadedFile.infoHash)
         runInsideUIAsync {
             shared << e.downloadedFile
             JTable table = builder.getVariable("shared-files-table")
