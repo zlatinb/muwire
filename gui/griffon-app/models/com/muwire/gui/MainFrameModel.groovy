@@ -79,6 +79,7 @@ class MainFrameModel {
     @Observable boolean cancelButtonEnabled
     @Observable boolean retryButtonEnabled
     @Observable boolean pauseButtonEnabled
+    @Observable boolean clearButtonEnabled
     @Observable String resumeButtonText
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
@@ -123,17 +124,26 @@ class MainFrameModel {
                     return
 
                 // remove cancelled or finished downloads
-                def toRemove = []
-                downloads.each {
-                    if (uiSettings.clearCancelledDownloads &&
-                        it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED)
-                        toRemove << it
-                    if (uiSettings.clearFinishedDownloads &&
-                        it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED)
-                        toRemove << it
-                }
-                toRemove.each {
-                    downloads.remove(it)
+                if (!clearButtonEnabled || uiSettings.clearCancelledDownloads || uiSettings.clearFinishedDownloads) {
+                    def toRemove = []
+                    downloads.each {
+                        if (it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED) {
+                            if (uiSettings.clearCancelledDownloads) {
+                                toRemove << it
+                            } else {
+                                clearButtonEnabled = true
+                            }
+                        } else if (it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED) {
+                            if (uiSettings.clearFinishedDownloads) {
+                                toRemove << it
+                            } else {
+                                clearButtonEnabled = true
+                            }
+                        }
+                    }
+                    toRemove.each {
+                        downloads.remove(it)
+                    }
                 }
 
                 builder.getVariable("uploads-table")?.model.fireTableDataChanged()

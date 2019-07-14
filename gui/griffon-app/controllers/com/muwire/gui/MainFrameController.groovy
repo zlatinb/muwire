@@ -17,6 +17,7 @@ import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
+import com.muwire.core.download.Downloader
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
@@ -155,6 +156,23 @@ class MainFrameController {
         def downloader = model.downloads[selectedDownload()].downloader
         downloader.pause()
         core.eventBus.publish(new UIDownloadPausedEvent())
+    }
+
+    @ControllerAction
+    void clear() {
+        def toRemove = []
+        model.downloads.each {
+             if (it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED) {
+                 toRemove << it
+             } else if (it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED) {
+                 toRemove << it
+             }
+         }
+         toRemove.each {
+             model.downloads.remove(it)
+         }
+         model.clearButtonEnabled = false
+
     }
 
     private void markTrust(String tableName, TrustLevel level, def list) {

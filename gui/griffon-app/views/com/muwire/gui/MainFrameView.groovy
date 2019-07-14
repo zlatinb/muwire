@@ -139,8 +139,9 @@ class MainFrameView {
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
                                     button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
-                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction )
                                     button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
+                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction)
+                                    button(text: "Clear Done", enabled : bind {model.clearButtonEnabled}, clearAction)
                                 }
                             }
                             panel {
