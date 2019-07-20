@@ -12,10 +12,6 @@ This reduces query traffic by not sending last hop queries to peers that definit
 
 This helps with scalability
 
-##### Content Control Panel
-
-To allow every user to not route queries for content they do not like.  This is mostly GUI work, the backend part is simple
-
 ##### Web UI, REST Interface, etc.
 
 Basically any non-gui non-cli user interface
@@ -29,3 +25,4 @@ To enable parsing of metadata from known file types and the user editing it or a
 * Wrapper of some kind for in-place upgrades
 * Download file sequentially
 * Multiple-selection download, Ctrl-A
+* Automatic adjustment of number of I2P tunnels
