@@ -43,7 +43,7 @@ class Initialize extends AbstractLifecycleHandler {
 
         application.context.put("muwire-home", home.getAbsolutePath())
 
-        System.getProperties().setProperty("awt.useSystemAAFontSettings", "true")
+        System.getProperties().setProperty("awt.useSystemAAFontSettings", "gasp")
 
         def guiPropsFile = new File(home, "gui.properties")
         UISettings uiSettings
@@ -86,6 +86,8 @@ class Initialize extends AbstractLifecycleHandler {
                 }
             } else {
                 LookAndFeel chosen = lookAndFeel('system', 'gtk')
+                if (chosen == null)
+                    chosen = lookAndFeel('metal')
                 uiSettings.lnf = chosen.getID()
                 log.info("ended up applying $chosen.name")
             }
