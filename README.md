@@ -29,8 +29,6 @@ If you have an I2P router running on the same machine that is all you need to do
 
 [Default I2CP port]\: `7654`
 
-If you do not have an I2P router, pass the following switch to the Java process: `-DembeddedRouter=true`.  This will launch MuWire's embedded router.  Be aware that this causes startup to take a lot longer.
-
 ### GPG Fingerprint
 
 ```
