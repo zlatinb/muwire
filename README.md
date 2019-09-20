@@ -21,6 +21,8 @@ If you want to run the unit tests, type
 
 Some of the UI tests will fail because they haven't been written yet :-/
 
+If you want to build binary bundles for Windows and Mac that do not depend on Java or I2P, see the https://github.com/zlatinb/muwire-pkg project
+
 ### Running
 
 After you build the application, look inside `gui/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar MuWire-x.y.z.jar` in a terminal or command prompt.
