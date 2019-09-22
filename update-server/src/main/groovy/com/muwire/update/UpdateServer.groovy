@@ -9,6 +9,7 @@ import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
 import net.i2p.client.datagram.I2PDatagramDissector
 import net.i2p.client.datagram.I2PDatagramMaker
+import net.i2p.crypto.SigType
 
 
 @Log
@@ -28,7 +29,7 @@ class UpdateServer {
         def session
         if (!keyFile.exists()) {
             def os = new FileOutputStream(keyFile);
-            myDest = i2pClient.createDestination(os)
+            myDest = i2pClient.createDestination(os, SigType.EdDSA_SHA512_Ed25519)
             os.close()
             log.info "No key.dat file was found, so creating a new destination."
             log.info "This is the destination you want to give out for your new UpdateServer"
