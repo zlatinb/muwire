@@ -7,14 +7,15 @@ class Host {
     private static final int MAX_FAILURES = 3
 
     final Destination destination
-    private final int clearInterval
+    private final int clearInterval, hopelessInterval
     int failures,successes
     long lastAttempt
     long lastSuccessfulAttempt
 
-    public Host(Destination destination, int clearInterval) {
+    public Host(Destination destination, int clearInterval, int hopelessInterval) {
         this.destination = destination
         this.clearInterval = clearInterval
+        this.hopelessInterval = hopelessInterval
     }
 
     synchronized void onConnect() {
@@ -49,6 +50,6 @@ class Host {
     
     synchronized void isHopeless() {
         isFailed() && 
-            System.currentTimeMillis() - lastSuccessfulAttempt > (clearInterval * 24 * 60 * 1000)
+            System.currentTimeMillis() - lastSuccessfulAttempt > (hopelessInterval * 60 * 1000)
     }
 }
