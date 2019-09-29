@@ -50,7 +50,7 @@ class MuWireSettings {
         updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
-        hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","60"))
+        hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","15"))
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "1440"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
