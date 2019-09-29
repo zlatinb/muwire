@@ -10,6 +10,7 @@ class Host {
     private final int clearInterval
     int failures,successes
     long lastAttempt
+    long lastSuccessfulAttempt
 
     public Host(Destination destination, int clearInterval) {
         this.destination = destination
@@ -20,6 +21,7 @@ class Host {
         failures = 0
         successes++
         lastAttempt = System.currentTimeMillis()
+        lastSuccessfulAttempt = lastAttempt
     }
 
     synchronized void onFailure() {
@@ -41,6 +43,12 @@ class Host {
     }
 
     synchronized void canTryAgain() {
-        System.currentTimeMillis() - lastAttempt > (clearInterval * 60 * 1000)
+        lastSuccessfulAttempt > 0 && 
+            System.currentTimeMillis() - lastAttempt > (clearInterval * 60 * 1000)
+    }
+    
+    synchronized void isHopeless() {
+        isFailed() && 
+            System.currentTimeMillis() - lastSuccessfulAttempt > (clearInterval * 24 * 60 * 1000)
     }
 }

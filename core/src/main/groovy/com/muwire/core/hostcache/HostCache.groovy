@@ -111,7 +111,9 @@ class HostCache extends Service {
                 host.successes = Integer.valueOf(String.valueOf(entry.successes))
                 if (entry.lastAttempt != null)
                     host.lastAttempt = entry.lastAttempt
-                if (allowHost(host))
+                if (entry.lastSuccessfulAttempt != null)
+                    host.lastSuccessfulAttempt = entry.lastSuccessfulAttempt
+                if (allowHost(host)) 
                     hosts.put(dest, host)
             }
         }
@@ -140,12 +142,13 @@ class HostCache extends Service {
         storage.delete()
         storage.withPrintWriter { writer ->
             hosts.each { dest, host ->
-                if (allowHost(host)) {
+                if (allowHost(host) && !host.isHopeless()) {
                     def map = [:]
                     map.destination = dest.toBase64()
                     map.failures = host.failures
                     map.successes = host.successes
                     map.lastAttempt = host.lastAttempt
+                    map.lastSuccessfulAttempt = host.lastSuccessfulAttempt
                     def json = JsonOutput.toJson(map)
                     writer.println json
                 }
