@@ -82,6 +82,10 @@ class HostCache extends Service {
     List<Destination> getHosts(int n) {
         List<Destination> rv = new ArrayList<>(hosts.keySet())
         rv.retainAll {allowHost(hosts[it])}
+        rv.removeAll {
+            def h = hosts[it]; 
+            h.isFailed() && !h.canTryAgain()
+        }
         if (rv.size() <= n)
             return rv
         Collections.shuffle(rv)
@@ -122,8 +126,6 @@ class HostCache extends Service {
     }
 
     private boolean allowHost(Host host) {
-        if (host.isFailed() && !host.canTryAgain())
-            return false
         if (host.destination == myself)
             return false
         TrustLevel trust = trustService.getLevel(host.destination)
