@@ -53,7 +53,7 @@ class CliDownloader {
 
         Core core
         try {
-            core = new Core(props, home, "0.4.12")
+            core = new Core(props, home, "0.4.13")
         } catch (Exception bad) {
             bad.printStackTrace(System.out)
             println "Failed to initialize core, exiting"
