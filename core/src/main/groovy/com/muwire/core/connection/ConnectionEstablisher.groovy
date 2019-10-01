@@ -31,7 +31,7 @@ class ConnectionEstablisher {
     final HostCache hostCache
 
     final Timer timer
-    final ExecutorService executor
+    final ExecutorService executor, closer
 
     final Set inProgress = new ConcurrentHashSet()
 
@@ -51,6 +51,8 @@ class ConnectionEstablisher {
             rv.setName("connector-${System.currentTimeMillis()}")
             rv
         } as ThreadFactory)
+        
+        closer = Executors.newSingleThreadExecutor()
     }
 
     void start() {
@@ -60,6 +62,7 @@ class ConnectionEstablisher {
     void stop() {
         timer.cancel()
         executor.shutdownNow()
+        closer.shutdown()
     }
 
     private void connectIfNeeded() {
@@ -120,8 +123,10 @@ class ConnectionEstablisher {
     }
 
     private void fail(Endpoint endpoint) {
-        endpoint.close()
-        eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
+        closer.execute {
+            endpoint.close()
+            eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
+        } as Runnable
     }
 
     private void readK(Endpoint e) {
@@ -175,7 +180,7 @@ class ConnectionEstablisher {
             log.log(Level.WARNING,"Problem parsing post-rejection payload",ignore)
         } finally {
             // the end
-            e.close()
+            closer.execute({e.close()} as Runnable)
         }
     }
 
