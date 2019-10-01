@@ -24,7 +24,7 @@ class MuWireSettings {
     boolean shareDownloadedFiles
     Set<String> watchedDirectories
     float downloadSequentialRatio
-    int hostClearInterval, hostHopelessInterval
+    int hostClearInterval, hostHopelessInterval, hostRejectInterval
     int meshExpiration
     boolean embeddedRouter
     int inBw, outBw
@@ -52,6 +52,7 @@ class MuWireSettings {
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","15"))
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "1440"))
+        hostRejectInterval = Integer.valueOf(props.getProperty("hostRejectInterval", "1"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
@@ -88,6 +89,7 @@ class MuWireSettings {
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("hostHopelessInterval", String.valueOf(hostHopelessInterval))
+        props.setProperty("hostRejectInterval", String.valueOf(hostRejectInterval))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
         props.setProperty("embeddedRouter", String.valueOf(embeddedRouter))
         props.setProperty("inBw", String.valueOf(inBw))

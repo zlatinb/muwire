@@ -52,7 +52,7 @@ class HostCache extends Service {
             hosts.get(e.destination).clearFailures()
             return
         }
-        Host host = new Host(e.destination, settings.hostClearInterval, settings.hostHopelessInterval)
+        Host host = new Host(e.destination, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
         if (allowHost(host)) {
             hosts.put(e.destination, host)
         }
@@ -64,14 +64,16 @@ class HostCache extends Service {
         Destination dest = e.endpoint.destination
         Host host = hosts.get(dest)
         if (host == null) {
-            host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval)
+            host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
             hosts.put(dest, host)
         }
 
         switch(e.status) {
             case ConnectionAttemptStatus.SUCCESSFUL:
-            case ConnectionAttemptStatus.REJECTED:
                 host.onConnect()
+                break
+            case ConnectionAttemptStatus.REJECTED:
+                host.onReject()
                 break
             case ConnectionAttemptStatus.FAILED:
                 host.onFailure()
@@ -84,7 +86,7 @@ class HostCache extends Service {
         rv.retainAll {allowHost(hosts[it])}
         rv.removeAll {
             def h = hosts[it]; 
-            h.isFailed() && !h.canTryAgain()
+            (h.isFailed() && !h.canTryAgain()) || h.isRecentlyRejected()
         }
         if (rv.size() <= n)
             return rv
@@ -110,13 +112,15 @@ class HostCache extends Service {
             storage.eachLine {
                 def entry = slurper.parseText(it)
                 Destination dest = new Destination(entry.destination)
-                Host host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval)
+                Host host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
                 host.failures = Integer.valueOf(String.valueOf(entry.failures))
                 host.successes = Integer.valueOf(String.valueOf(entry.successes))
                 if (entry.lastAttempt != null)
                     host.lastAttempt = entry.lastAttempt
                 if (entry.lastSuccessfulAttempt != null)
                     host.lastSuccessfulAttempt = entry.lastSuccessfulAttempt
+                if (entry.lastRejection != null)
+                    host.lastRejection = entry.lastRejection
                 if (allowHost(host)) 
                     hosts.put(dest, host)
             }
@@ -151,6 +155,7 @@ class HostCache extends Service {
                     map.successes = host.successes
                     map.lastAttempt = host.lastAttempt
                     map.lastSuccessfulAttempt = host.lastSuccessfulAttempt
+                    map.lastRejection = host.lastRejection
                     def json = JsonOutput.toJson(map)
                     writer.println json
                 }

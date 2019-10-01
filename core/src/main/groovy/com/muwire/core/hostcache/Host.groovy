@@ -7,22 +7,33 @@ class Host {
     private static final int MAX_FAILURES = 3
 
     final Destination destination
-    private final int clearInterval, hopelessInterval
+    private final int clearInterval, hopelessInterval, rejectionInterval
     int failures,successes
     long lastAttempt
     long lastSuccessfulAttempt
+    long lastRejection
 
-    public Host(Destination destination, int clearInterval, int hopelessInterval) {
+    public Host(Destination destination, int clearInterval, int hopelessInterval, int rejectionInterval) {
         this.destination = destination
         this.clearInterval = clearInterval
         this.hopelessInterval = hopelessInterval
+        this.rejectionInterval = rejectionInterval
     }
-
-    synchronized void onConnect() {
+    
+    private void connectSuccessful() {
         failures = 0
         successes++
         lastAttempt = System.currentTimeMillis()
+    }
+
+    synchronized void onConnect() {
+        connectSuccessful()
         lastSuccessfulAttempt = lastAttempt
+    }
+    
+    synchronized void onReject() {
+        connectSuccessful()
+        lastRejection = lastAttempt;
     }
 
     synchronized void onFailure() {
@@ -43,13 +54,17 @@ class Host {
         failures = 0
     }
 
-    synchronized void canTryAgain() {
+    synchronized boolean canTryAgain() {
         lastSuccessfulAttempt > 0 && 
             System.currentTimeMillis() - lastAttempt > (clearInterval * 60 * 1000)
     }
     
-    synchronized void isHopeless() {
+    synchronized boolean isHopeless() {
         isFailed() && 
             System.currentTimeMillis() - lastSuccessfulAttempt > (hopelessInterval * 60 * 1000)
+    }
+    
+    synchronized boolean isRecentlyRejected() {
+        System.currentTimeMillis() - lastRejection < (rejectionInterval * 60 * 1000)
     }
 }
