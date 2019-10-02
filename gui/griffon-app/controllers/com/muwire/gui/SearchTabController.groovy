@@ -67,4 +67,13 @@ class SearchTabController {
         def sender = model.senders[row] 
         core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED))
     }
+    
+    @ControllerAction
+    void neutral() {
+        int row = view.selectedSenderRow()
+        if (row < 0)
+            return
+        def sender = model.senders[row]
+        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.NEUTRAL))
+    }
 }

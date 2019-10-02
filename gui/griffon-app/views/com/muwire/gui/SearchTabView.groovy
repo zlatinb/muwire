@@ -66,6 +66,7 @@ class SearchTabView {
                         }
                         panel(constraints : BorderLayout.SOUTH) {
                             button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                            button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
                             button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
                         }
                     }
