@@ -96,6 +96,10 @@ class OptionsController {
         model.onlyTrusted = onlyTrusted
         settings.setAllowUntrusted(!onlyTrusted)
 
+        boolean searchExtraHop = view.searchExtraHopCheckbox.model.isSelected()
+        model.searchExtraHop = searchExtraHop
+        settings.searchExtraHop = searchExtraHop
+        
         boolean trustLists = view.allowTrustListsCheckbox.model.isSelected()
         model.trustLists = trustLists
         settings.allowTrustLists = trustLists

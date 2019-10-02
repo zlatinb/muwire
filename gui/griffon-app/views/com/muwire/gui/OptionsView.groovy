@@ -55,6 +55,7 @@ class OptionsView {
     def outBwField
 
     def allowUntrustedCheckbox
+    def searchExtraHopCheckbox
     def allowTrustListsCheckbox
     def trustListIntervalField
 
@@ -138,11 +139,13 @@ class OptionsView {
             gridBagLayout()
             label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 0))
             allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0))
-            label(text : "Allow others to view my trust list", constraints : gbc(gridx: 0, gridy : 1))
-            allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 1))
-            label(text : "Update trust lists every ", constraints : gbc(gridx:0, gridy:2))
-            trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:2))
-            label(text : "hours", constraints : gbc(gridx: 2, gridy:2))
+            label(text : "Search extra hop", constraints : gbc(gridx:0, gridy:1))
+            searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, constraints : gbc(gridx: 1, gridy : 1))
+            label(text : "Allow others to view my trust list", constraints : gbc(gridx: 0, gridy : 2))
+            allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2))
+            label(text : "Update trust lists every ", constraints : gbc(gridx:0, gridy:3))
+            trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3))
+            label(text : "hours", constraints : gbc(gridx: 2, gridy:3))
         }
 
 

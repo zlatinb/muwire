@@ -86,7 +86,8 @@ class MainFrameController {
             terms.each { if (it.length() > 0) nonEmpty << it }
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true)
         }
-        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
+        boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me))
     }

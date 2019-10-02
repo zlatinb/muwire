@@ -11,6 +11,7 @@ class MuWireSettings {
 
     final boolean isLeaf
     boolean allowUntrusted
+    boolean searchExtraHop
     boolean allowTrustLists
     int trustListInterval
     Set<Persona> trustSubscriptions
@@ -38,6 +39,7 @@ class MuWireSettings {
     MuWireSettings(Properties props) {
         isLeaf = Boolean.valueOf(props.get("leaf","false"))
         allowUntrusted = Boolean.valueOf(props.getProperty("allowUntrusted","true"))
+        searchExtraHop = Boolean.valueOf(props.getProperty("searchExtraHop","false"))
         allowTrustLists = Boolean.valueOf(props.getProperty("allowTrustLists","true"))
         trustListInterval = Integer.valueOf(props.getProperty("trustListInterval","1"))
         crawlerResponse = CrawlerResponse.valueOf(props.get("crawlerResponse","REGISTERED"))
@@ -76,6 +78,7 @@ class MuWireSettings {
         Properties props = new Properties()
         props.setProperty("leaf", isLeaf.toString())
         props.setProperty("allowUntrusted", allowUntrusted.toString())
+        props.setProperty("searchExtraHop", String.valueOf(searchExtraHop))
         props.setProperty("allowTrustLists", String.valueOf(allowTrustLists))
         props.setProperty("trustListInterval", String.valueOf(trustListInterval))
         props.setProperty("crawlerResponse", crawlerResponse.toString())
