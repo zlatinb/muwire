@@ -43,11 +43,13 @@ class SearchTabView {
     def lastSendersSortEvent
     def resultsTable
     def lastSortEvent
+    def sequentialDownloadCheckbox
 
     void initUI() {
         builder.with {
             def resultsTable
             def sendersTable
+            def sequentialDownloadCheckbox
             def pane = panel {
                 gridLayout(rows :1, cols : 1)
                 splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
@@ -83,7 +85,14 @@ class SearchTabView {
                             }
                         }
                         panel(constraints : BorderLayout.SOUTH) {
-                            button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                            borderLayout()
+                            panel(constraints: BorderLayout.CENTER) {
+                                button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                            }
+                            panel(constraints: BorderLayout.EAST) {
+                                sequentialDownloadCheckbox = checkBox(selected : false)
+                                label(text : "Download sequentially")
+                            }
                         }
                     }
                 }
@@ -95,6 +104,7 @@ class SearchTabView {
 
             this.resultsTable = resultsTable
             this.sendersTable = sendersTable
+            this.sequentialDownloadCheckbox = sequentialDownloadCheckbox
 
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

@@ -33,11 +33,12 @@ class MeshManager {
         meshes.get(infoHash)
     }
 
-    Mesh getOrCreate(InfoHash infoHash, int nPieces) {
+    Mesh getOrCreate(InfoHash infoHash, int nPieces, boolean sequential) {
         synchronized(meshes) {
             if (meshes.containsKey(infoHash))
                 return meshes.get(infoHash)
-            Pieces pieces = new Pieces(nPieces, settings.downloadSequentialRatio)
+            float ratio = sequential ? 0f : settings.downloadSequentialRatio
+            Pieces pieces = new Pieces(nPieces, ratio)
             if (fileManager.rootToFiles.containsKey(infoHash)) {
                 for (int i = 0; i < nPieces; i++)
                     pieces.markDownloaded(i)

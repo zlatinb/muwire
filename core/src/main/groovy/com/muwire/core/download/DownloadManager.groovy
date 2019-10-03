@@ -74,7 +74,7 @@ public class DownloadManager {
         destinations.addAll(e.sources)
         destinations.remove(me.destination)
 
-        Pieces pieces = getPieces(infohash, size, pieceSize)
+        Pieces pieces = getPieces(infohash, size, pieceSize, e.sequential)
 
         def downloader = new Downloader(eventBus, this, me, e.target, size,
             infohash, pieceSize, connector, destinations,
@@ -122,8 +122,12 @@ public class DownloadManager {
                 byte [] root = Base64.decode(json.hashRoot)
                 infoHash = new InfoHash(root)
             }
+            
+            boolean sequential = false
+            if (json.sequential != null)
+                sequential = json.sequential
 
-            Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2)
+            Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
@@ -137,12 +141,12 @@ public class DownloadManager {
         }
     }
 
-    private Pieces getPieces(InfoHash infoHash, long length, int pieceSizePow2) {
+    private Pieces getPieces(InfoHash infoHash, long length, int pieceSizePow2, boolean sequential) {
         int pieceSize = 0x1 << pieceSizePow2
         int nPieces = (int)(length / pieceSize)
         if (length % pieceSize != 0)
             nPieces++
-        Mesh mesh = meshManager.getOrCreate(infoHash, nPieces)
+        Mesh mesh = meshManager.getOrCreate(infoHash, nPieces, sequential)
         mesh.pieces
     }
 
@@ -188,6 +192,9 @@ public class DownloadManager {
                         json.hashRoot = Base64.encode(infoHash.getRoot())
 
                     json.paused = downloader.paused
+                    
+                    json.sequential = downloader.pieces.ratio == 0f
+                    
                     writer.println(JsonOutput.toJson(json))
                 }
             }

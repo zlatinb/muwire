@@ -17,7 +17,7 @@ class Pieces {
         done = new BitSet(nPieces)
         claimed = new BitSet(nPieces)
     }
-
+    
     synchronized int[] claim() {
         int claimedCardinality = claimed.cardinality()
         if (claimedCardinality == nPieces) {
@@ -30,7 +30,7 @@ class Pieces {
         }
 
         // if fuller than ratio just do sequential
-        if ( (1.0f * claimedCardinality) / nPieces > ratio) {
+        if ( (1.0f * claimedCardinality) / nPieces >= ratio) {
             int rv = claimed.nextClearBit(0)
             claimed.set(rv)
             return [rv, partials.getOrDefault(rv, 0), 0]
@@ -59,7 +59,8 @@ class Pieces {
             return [rv, partials.getOrDefault(rv, 0), 1]
         }
         List<Integer> toList = availableCopy.toList()
-        Collections.shuffle(toList)
+        if (ratio > 0f)
+            Collections.shuffle(toList)
         int rv = toList[0]
         claimed.set(rv)
         [rv, partials.getOrDefault(rv, 0), 0]

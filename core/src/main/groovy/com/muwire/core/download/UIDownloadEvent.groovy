@@ -10,4 +10,5 @@ class UIDownloadEvent extends Event {
     UIResultEvent[] result
     Set<Destination> sources
     File target
+    boolean sequential
 }

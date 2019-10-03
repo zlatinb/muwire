@@ -46,7 +46,8 @@ class SearchTabController {
         def resultsBucket = model.hashBucket[result.infohash]
         def sources = model.sourcesBucket[result.infohash]
 
-        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, target : file))
+        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, 
+            target : file, sequential : view.sequentialDownloadCheckbox.model.isSelected()))
         mvcGroup.parentGroup.view.showDownloadsWindow.call()
     }
 
