@@ -46,7 +46,7 @@ class MuWireSettings {
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation",
             System.getProperty("user.home")))
-        downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","1"))
+        downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","60"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
         updateType = props.getProperty("updateType","jar")

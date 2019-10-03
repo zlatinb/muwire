@@ -71,7 +71,7 @@ class OptionsView {
             gridBagLayout()
             label(text : "Retry failed downloads every", constraints : gbc(gridx: 0, gridy: 0))
             retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, constraints : gbc(gridx: 1, gridy: 0))
-            label(text : "minutes", constraints : gbc(gridx : 2, gridy: 0))
+            label(text : "seconds", constraints : gbc(gridx : 2, gridy: 0))
 
             label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 1))
             updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))

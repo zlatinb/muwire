@@ -191,7 +191,7 @@ class MainFrameModel {
                     return
                 int retryInterval = core.muOptions.downloadRetryInterval
                 if (retryInterval > 0) {
-                    retryInterval *= 60000
+                    retryInterval *= 1000
                     long now = System.currentTimeMillis()
                     if (now - lastRetryTime > retryInterval) {
                         lastRetryTime = now
@@ -207,7 +207,7 @@ class MainFrameModel {
 
                     }
                 }
-            }, 60000, 60000)
+            }, 1000, 1000)
 
             runInsideUIAsync {
                 trusted.addAll(core.trustService.good.values())
