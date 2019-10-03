@@ -22,6 +22,8 @@ import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.FlowLayout
+import java.awt.GridBagConstraints
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
@@ -85,13 +87,16 @@ class SearchTabView {
                             }
                         }
                         panel(constraints : BorderLayout.SOUTH) {
-                            borderLayout()
-                            panel(constraints: BorderLayout.CENTER) {
+                            gridLayout(rows: 1, cols: 3)
+                            panel()
+                            panel {
                                 button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
                             }
-                            panel(constraints: BorderLayout.EAST) {
-                                sequentialDownloadCheckbox = checkBox(selected : false)
-                                label(text : "Download sequentially")
+                            panel {
+                                gridBagLayout()
+                                panel (constraints : gbc(gridx : 0, gridy : 0, weightx : 100))
+                                sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 1, gridy: 0, weightx : 0),selected : false, enabled : bind {model.downloadActionEnabled})
+                                label(constraints: gbc(gridx: 2, gridy: 0, weightx : 0),text : "Download sequentially")
                             }
                         }
                     }
