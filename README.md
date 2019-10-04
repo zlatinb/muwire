@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.4.13 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.4.14 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
 
 ### Building
 
@@ -14,18 +14,16 @@ You need JRE 8 or newer.  After installing that and setting up the appropriate p
 ./gradlew clean assemble
 ```
 
-If you want to run the unit tests, type
+If you want to run the unit tests, some of which will fail, type
 ```
 ./gradlew clean build
 ```
-
-Some of the UI tests will fail because they haven't been written yet :-/
 
 If you want to build binary bundles for Windows and Mac that do not depend on Java or I2P, see the https://github.com/zlatinb/muwire-pkg project
 
 ### Running
 
-After you build the application, look inside `gui/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar MuWire-x.y.z.jar` in a terminal or command prompt.
+After you build the application, look inside `gui/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar gui-x.y.z.jar` in a terminal or command prompt.
 
 If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.  On Windows that file should go into `%HOME%\AppData\Roaming\MuWire`, on Mac into `$HOME/Library/Application Support/MuWire` and on Linux `$HOME/.MuWire`
 
