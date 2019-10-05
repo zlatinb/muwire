@@ -40,11 +40,15 @@ class ContentPanelModel {
     }
     
     void refresh() {
+        int selectedRule = view.getSelectedRule()
         rules.clear()
         rules.addAll(contentManager.matchers)
         hits.clear()
         view.rulesTable.model.fireTableDataChanged()
         view.hitsTable.model.fireTableDataChanged()
+        if (selectedRule >= 0) {
+            view.rulesTable.selectionModel.setSelectionInterval(selectedRule,selectedRule)
+        }
     }
     
     void onContentControlEvent(ContentControlEvent e) {
