@@ -1,3 +1,8 @@
 apply plugin : 'application'
 mainClassName = 'com.muwire.hostcache.HostCache'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+
+dependencies {
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testCompile 'junit:junit:4.12'
+}

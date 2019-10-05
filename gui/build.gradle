@@ -44,9 +44,9 @@ mainClassName = 'com.muwire.gui.Launcher'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 
 apply from: 'gradle/publishing.gradle'
-apply from: 'gradle/code-coverage.gradle'
-apply from: 'gradle/code-quality.gradle'
-apply from: 'gradle/integration-test.gradle'
+// apply from: 'gradle/code-coverage.gradle'
+// apply from: 'gradle/code-quality.gradle'
+// apply from: 'gradle/integration-test.gradle'
 // apply from: 'gradle/package.gradle'
 apply from: 'gradle/docs.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -119,6 +119,7 @@ if (hasProperty('debugRun') && ((project.debugRun as boolean))) {
     }
 }
 
+/*
 task jacocoRootMerge(type: org.gradle.testing.jacoco.tasks.JacocoMerge, dependsOn: [test, jacocoTestReport, jacocoIntegrationTestReport]) {
     executionData = files(jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData)
     destinationFile = file("${buildDir}/jacoco/root.exec")
@@ -138,4 +139,5 @@ task jacocoRootReport(dependsOn: jacocoRootMerge, type: JacocoReport) {
         xml.destination = file("${buildDir}/reports/jacoco/root/root.xml")
     }
 }
+*/
 

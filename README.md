@@ -14,7 +14,7 @@ You need JRE 8 or newer.  After installing that and setting up the appropriate p
 ./gradlew clean assemble
 ```
 
-If you want to run the unit tests, some of which will fail, type
+If you want to run the unit tests, type
 ```
 ./gradlew clean build
 ```
