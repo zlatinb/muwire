@@ -135,6 +135,7 @@ public class Core {
         } else {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
+            routerProps.setProperty("i2p.dir.base", home.getAbsolutePath())
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
             routerProps.setProperty("router.excludePeerCaps", "KLM")
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
