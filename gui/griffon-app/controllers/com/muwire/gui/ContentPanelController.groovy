@@ -69,6 +69,16 @@ class ContentPanelController {
     }
     
     @ControllerAction
+    void clearHits() {
+        int selectedRule = view.getSelectedRule()
+        if (selectedRule < 0)
+            return
+        Matcher matcher = model.rules[selectedRule]
+        matcher.matches.clear()
+        model.refresh()
+    }
+    
+    @ControllerAction
     void trust() {
         int selectedHit = view.getSelectedHit()
         if (selectedHit < 0)

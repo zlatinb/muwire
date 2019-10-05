@@ -84,6 +84,7 @@ class ContentPanelView {
                 }
                 panel (constraints : BorderLayout.SOUTH) {
                     button(text : "Refresh", refreshAction)
+                    button(text : "Clear Hits", clearHitsAction)
                     button(text : "Trust", enabled : bind {model.trustButtonsEnabled}, trustAction)
                     button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
                 }
