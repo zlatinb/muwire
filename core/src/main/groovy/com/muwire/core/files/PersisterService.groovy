@@ -136,17 +136,12 @@ class PersisterService extends Service {
 
     private def toJson(File f, SharedFile sf) {
         def json = [:]
-        json.file = Base64.encode DataUtil.encodei18nString(f.toString())
+        json.file = sf.getB64EncodedFileName()
         json.length = sf.getCachedLength()
         InfoHash ih = sf.getInfoHash()
-        json.infoHash = Base64.encode ih.getRoot()
+        json.infoHash = sf.getB64EncodedHashRoot()
         json.pieceSize = sf.getPieceSize()
-        byte [] tmp = new byte [32]
-        json.hashList = []
-        for (int i = 0;i < ih.getHashList().length / 32; i++) {
-            System.arraycopy(ih.getHashList(), i * 32, tmp, 0, 32)
-            json.hashList.add Base64.encode(tmp)
-        }
+        json.hashList = sf.getB64EncodedHashList()
 
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())

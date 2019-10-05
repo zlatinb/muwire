@@ -13,10 +13,10 @@ import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.JTable
 
-import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
+import com.muwire.core.SplitPattern
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
@@ -80,7 +80,7 @@ class MainFrameController {
             searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true)
         } else {
             // this can be improved a lot
-            def replaced = search.toLowerCase().trim().replaceAll(Constants.SPLIT_PATTERN, " ")
+            def replaced = search.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
             def terms = replaced.split(" ")
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }

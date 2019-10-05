@@ -1,6 +1,6 @@
 package com.muwire.core.search
 
-import com.muwire.core.Constants
+import com.muwire.core.SplitPattern
 
 class SearchIndex {
 
@@ -32,7 +32,7 @@ class SearchIndex {
     }
 
     private static String[] split(String source) {
-        source = source.replaceAll(Constants.SPLIT_PATTERN, " ").toLowerCase()
+        source = source.replaceAll(SplitPattern.SPLIT_PATTERN, " ").toLowerCase()
         String [] split = source.split(" ")
         def rv = []
         split.each { if (it.length() > 0) rv << it }
