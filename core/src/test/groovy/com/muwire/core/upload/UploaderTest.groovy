@@ -9,6 +9,9 @@ import org.junit.Test
 
 import com.muwire.core.InfoHash
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.download.Pieces
+import com.muwire.core.files.FileHasher
+import com.muwire.core.mesh.Mesh
 
 class UploaderTest {
 
@@ -52,7 +55,13 @@ class UploaderTest {
     }
 
     private void startUpload() {
-        uploader = new ContentUploader(file, request, endpoint)
+        def hasher = new FileHasher()
+        InfoHash infoHash = hasher.hashFile(file)
+        Pieces pieces = new Pieces(FileHasher.getPieceSize(file.length()))
+        for (int i = 0; i < pieces.nPieces; i++)
+            pieces.markDownloaded(i)
+        Mesh mesh = new Mesh(infoHash, pieces)
+        uploader = new ContentUploader(file, request, endpoint, mesh, FileHasher.getPieceSize(file.length()))
         uploadThread = new Thread(uploader.respond() as Runnable)
         uploadThread.setDaemon(true)
         uploadThread.start()
@@ -81,6 +90,7 @@ class UploaderTest {
         startUpload()
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 0-19" == readUntilRN()
+        assert readUntilRN().startsWith("X-Have")
         assert "" == readUntilRN()
 
         byte [] data = new byte[20]
@@ -96,6 +106,7 @@ class UploaderTest {
         startUpload()
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 5-15" == readUntilRN()
+        assert readUntilRN().startsWith("X-Have")
         assert "" == readUntilRN()
 
         byte [] data = new byte[11]
@@ -111,6 +122,7 @@ class UploaderTest {
         request = new ContentRequest(range : new Range(0,20))
         startUpload()
         assert "416 Range Not Satisfiable" == readUntilRN()
+        assert readUntilRN().startsWith("X-Have")
         assert "" == readUntilRN()
     }
 
@@ -120,6 +132,7 @@ class UploaderTest {
         fillFile(length)
         request = new ContentRequest(range : new Range(0, length - 1))
         startUpload()
+        readUntilRN()
         readUntilRN()
         readUntilRN()
         readUntilRN()

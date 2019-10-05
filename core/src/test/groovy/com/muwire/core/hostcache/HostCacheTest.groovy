@@ -72,6 +72,9 @@ class HostCacheTest {
             TrustLevel.NEUTRAL
         }
         settingsMock.ignore.allowUntrusted { true }
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
 
         initMocks()
 
@@ -91,6 +94,10 @@ class HostCacheTest {
             TrustLevel.DISTRUSTED
         }
 
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
 
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -104,6 +111,9 @@ class HostCacheTest {
             TrustLevel.NEUTRAL
         }
         settingsMock.ignore.allowUntrusted { false }
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
 
         initMocks()
 
@@ -123,6 +133,9 @@ class HostCacheTest {
         }
         trustMock.demand.getLevel{ d -> TrustLevel.TRUSTED }
         trustMock.demand.getLevel{ d -> TrustLevel.TRUSTED }
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
 
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -139,7 +152,15 @@ class HostCacheTest {
             assert d == destinations.dest1
             TrustLevel.TRUSTED
         }
+        trustMock.demand.getLevel { d ->
+            assert d == destinations.dest1
+            TrustLevel.TRUSTED
+        }
 
+        settingsMock.ignore.getHostClearInterval { 100 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 
@@ -158,6 +179,10 @@ class HostCacheTest {
             TrustLevel.TRUSTED
         }
 
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 
@@ -183,6 +208,10 @@ class HostCacheTest {
             TrustLevel.TRUSTED
         }
 
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
 
@@ -214,6 +243,10 @@ class HostCacheTest {
             TrustLevel.TRUSTED
         }
 
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -229,6 +262,11 @@ class HostCacheTest {
             assert d == destinations.dest1
             TrustLevel.TRUSTED
         }
+        
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
         Thread.sleep(150)
@@ -260,6 +298,10 @@ class HostCacheTest {
             TrustLevel.TRUSTED
         }
 
+        settingsMock.ignore.getHostClearInterval { 0 }
+        settingsMock.ignore.getHostHopelessInterval { 0 }
+        settingsMock.ignore.getHostRejectInterval { 0 }
+        
         initMocks()
         def rv = cache.getHosts(5)
         assert rv.size() == 1
