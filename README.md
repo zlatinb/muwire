@@ -8,7 +8,7 @@ The current stable release - 0.4.14 is avaiable for download at https://muwire.c
 
 ### Building
 
-You need JRE 8 or newer.  After installing that and setting up the appropriate paths, just type
+You need JDK 8 or newer.  After installing that and setting up the appropriate paths, just type
 
 ```
 ./gradlew clean assemble
