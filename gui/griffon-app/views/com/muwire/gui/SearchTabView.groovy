@@ -112,16 +112,23 @@ class SearchTabView {
             this.sequentialDownloadCheckbox = sequentialDownloadCheckbox
 
             def selectionModel = resultsTable.getSelectionModel()
-            selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+            selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
             selectionModel.addListSelectionListener( {
-                int row = resultsTable.getSelectedRow()
-                if (row < 0) {
+                int[] rows = resultsTable.getSelectedRows()
+                if (rows.length == 0) {
                     model.downloadActionEnabled = false
                     return
                 }
-                if (lastSortEvent != null)
-                    row = resultsTable.rowSorter.convertRowIndexToModel(row)
-                model.downloadActionEnabled = mvcGroup.parentGroup.model.canDownload(model.results[row].infohash)
+                if (lastSortEvent != null) {
+                    for (int i = 0; i < rows.length; i ++) {
+                        rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+                    }
+                }
+                boolean downloadActionEnabled = true
+                rows.each { 
+                    downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
+                }
+                model.downloadActionEnabled = downloadActionEnabled
             })
         }
     }
@@ -206,21 +213,28 @@ class SearchTabView {
 
     def showPopupMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
+        boolean showMenu = false
         if (model.downloadActionEnabled) {
             JMenuItem download = new JMenuItem("Download")
             download.addActionListener({mvcGroup.controller.download()})
             menu.add(download)
+            showMenu = true
         }
-        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
-        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
-        menu.add(copyHashToClipboard)
-        menu.show(e.getComponent(), e.getX(), e.getY())
+        if (resultsTable.getSelectedRows().length == 1) {
+            JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+            copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
+            menu.add(copyHashToClipboard)
+            showMenu = true
+        }
+        if (showMenu)
+            menu.show(e.getComponent(), e.getX(), e.getY())
     }
 
     def copyHashToClipboard() {
-        int selected = resultsTable.getSelectedRow()
-        if (selected < 0)
+        int[] selectedRows = resultsTable.getSelectedRows()
+        if (selectedRows.length != 1)
             return
+        int selected = selectedRows[0]
         if (lastSortEvent != null)
             selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
         String hash = Base64.encode(model.results[selected].infohash.getRoot())

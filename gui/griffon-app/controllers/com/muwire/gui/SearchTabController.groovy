@@ -8,73 +8,81 @@ import javax.annotation.Nonnull
 
 import com.muwire.core.Core
 import com.muwire.core.download.UIDownloadEvent
+import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
 @ArtifactProviderFor(GriffonController)
 class SearchTabController {
-    
+
     @MVCMember @Nonnull
     SearchTabModel model
     @MVCMember @Nonnull
     SearchTabView view
-    
+
     Core core
-    
-    private def selectedResult() {
-        int row = view.resultsTable.getSelectedRow()
-        if (row == -1)
+
+    private def selectedResults() {
+        int[] rows = view.resultsTable.getSelectedRows()
+        if (rows.length == 0)
             return null
         def sortEvt = view.lastSortEvent
         if (sortEvt != null) {
-            row = view.resultsTable.rowSorter.convertRowIndexToModel(row)
+            for (int i = 0; i < rows.length; i++) {
+                rows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+            }
         }
-        model.results[row]
+        List<UIResultEvent> results = new ArrayList<>()
+        rows.each { results.add(model.results[it]) }
+            results
+        }
+
+        @ControllerAction
+        void download() {
+            def results = selectedResults()
+            if (results == null)
+                return
+
+            results.removeAll {
+                !mvcGroup.parentGroup.model.canDownload(it.infohash)
+            }
+
+            results.each { result ->
+                def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
+
+                def resultsBucket = model.hashBucket[result.infohash]
+                def sources = model.sourcesBucket[result.infohash]
+
+                core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources,
+                target : file, sequential : view.sequentialDownloadCheckbox.model.isSelected()))
+            }
+            mvcGroup.parentGroup.view.showDownloadsWindow.call()
+        }
+
+        @ControllerAction
+        void trust() {
+            int row = view.selectedSenderRow()
+            if (row < 0)
+                return
+            def sender = model.senders[row]
+            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED))
+        }
+
+        @ControllerAction
+        void distrust() {
+            int row = view.selectedSenderRow()
+            if (row < 0)
+                return
+            def sender = model.senders[row]
+            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED))
+        }
+
+        @ControllerAction
+        void neutral() {
+            int row = view.selectedSenderRow()
+            if (row < 0)
+                return
+            def sender = model.senders[row]
+            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.NEUTRAL))
+        }
     }
-    
-    @ControllerAction
-    void download() {
-        def result = selectedResult()
-        if (result == null)
-            return
-
-        if (!mvcGroup.parentGroup.model.canDownload(result.infohash))
-            return
-
-        def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
-
-        def resultsBucket = model.hashBucket[result.infohash]
-        def sources = model.sourcesBucket[result.infohash]
-
-        core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources, 
-            target : file, sequential : view.sequentialDownloadCheckbox.model.isSelected()))
-        mvcGroup.parentGroup.view.showDownloadsWindow.call()
-    }
-
-    @ControllerAction
-    void trust() {
-        int row = view.selectedSenderRow()
-        if (row < 0)
-            return 
-        def sender = model.senders[row]
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED))
-    }
-
-    @ControllerAction
-    void distrust() {
-        int row = view.selectedSenderRow()
-        if (row < 0)
-            return 
-        def sender = model.senders[row] 
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED))
-    }
-    
-    @ControllerAction
-    void neutral() {
-        int row = view.selectedSenderRow()
-        if (row < 0)
-            return
-        def sender = model.senders[row]
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.NEUTRAL))
-    }
-}
