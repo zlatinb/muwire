@@ -23,6 +23,4 @@ To enable parsing of metadata from known file types and the user editing it or a
 ### Small Items
 
 * Wrapper of some kind for in-place upgrades
-* Download file sequentially
-* Multiple-selection download, Ctrl-A
 * Automatic adjustment of number of I2P tunnels
