@@ -46,6 +46,8 @@ class PersisterService extends Service {
     }
 
     void load() {
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
+
         if (location.exists() && location.isFile()) {
             def slurper = new JsonSlurper()
             try {
