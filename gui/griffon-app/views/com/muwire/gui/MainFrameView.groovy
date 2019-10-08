@@ -772,9 +772,12 @@ class MainFrameView {
         chooser.setFileHidingEnabled(false)
         chooser.setDialogTitle("Select file to share")
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        chooser.setMultiSelectionEnabled(true)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
-            model.core.eventBus.publish(new FileSharedEvent(file : chooser.getSelectedFile()))
+            chooser.getSelectedFiles().each { 
+                model.core.eventBus.publish(new FileSharedEvent(file : it))
+            }
         }
     }
 
@@ -783,14 +786,16 @@ class MainFrameView {
         chooser.setFileHidingEnabled(false)
         chooser.setDialogTitle("Select directory to watch")
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        chooser.setMultiSelectionEnabled(true)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
-            File f = chooser.getSelectedFile()
-            model.watched << f.getAbsolutePath()
-            application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
-            mvcGroup.controller.saveMuWireSettings()
-            builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-            model.core.eventBus.publish(new FileSharedEvent(file : f))
+            chooser.getSelectedFiles().each { f ->
+                model.watched << f.getAbsolutePath()
+                application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
+                mvcGroup.controller.saveMuWireSettings()
+                builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+                model.core.eventBus.publish(new FileSharedEvent(file : f))
+            }
         }
     }
 
