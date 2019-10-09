@@ -60,7 +60,7 @@ class PersisterService extends Service {
                             log.fine("loaded file $event.loadedFile.file")
                             listener.publish event
                             loaded++
-                            if (loaded % 50 == 0)
+                            if (loaded % 10 == 0)
                                 Thread.sleep(10)
                         }
                     }
