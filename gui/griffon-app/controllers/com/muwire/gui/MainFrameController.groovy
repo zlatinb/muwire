@@ -270,10 +270,12 @@ class MainFrameController {
     }
 
     void unshareSelectedFile() {
-        SharedFile sf = view.selectedSharedFile()
+        def sf = view.selectedSharedFiles()
         if (sf == null)
             return
-        core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+        sf.each {  
+            core.eventBus.publish(new FileUnsharedEvent(unsharedFile : it))
+        }
     }
 
     void stopWatchingDirectory() {

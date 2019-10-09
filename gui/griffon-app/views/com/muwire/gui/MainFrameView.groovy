@@ -23,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.Constants
 import com.muwire.core.MuWireSettings
+import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
@@ -615,22 +616,36 @@ class MainFrameView {
         menu.show(event.getComponent(), event.getX(), event.getY())
     }
 
-    def selectedSharedFile() {
+    def selectedSharedFiles() {
         def sharedFilesTable = builder.getVariable("shared-files-table")
-        int selected = sharedFilesTable.getSelectedRow()
-        if (selected < 0)
+        int[] selected = sharedFilesTable.getSelectedRows()
+        if (selected.length == 0)
             return null
-        if (lastSharedSortEvent != null)
-            selected = sharedFilesTable.rowSorter.convertRowIndexToModel(selected)
-        model.shared[selected]
+        List<SharedFile> rv = new ArrayList<>()
+        if (lastSharedSortEvent != null) {
+            for (int i = 0; i < selected.length; i ++) {  
+                selected[i] = sharedFilesTable.rowSorter.convertRowIndexToModel(selected[i])
+            }
+        }
+        selected.each {
+            rv.add(model.shared[it])
+        }
+        rv
     }
 
     def copyHashToClipboard() {
-        def selected = selectedSharedFile()
-        if (selected == null)
+        def selectedFiles = selectedSharedFiles()
+        if (selectedFiles == null)
             return
-        String root = Base64.encode(selected.infoHash.getRoot())
-        StringSelection selection = new StringSelection(root)
+        String roots = ""
+        for (Iterator<SharedFile> iterator = selectedFiles.iterator(); iterator.hasNext(); ) {
+            SharedFile selected = iterator.next()
+            String root = Base64.encode(selected.infoHash.getRoot())
+            roots += root
+            if (iterator.hasNext())
+                roots += "\n"
+        }
+        StringSelection selection = new StringSelection(roots)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
     }
