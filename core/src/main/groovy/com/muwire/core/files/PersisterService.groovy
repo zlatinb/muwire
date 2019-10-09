@@ -61,7 +61,7 @@ class PersisterService extends Service {
                             listener.publish event
                             loaded++
                             if (loaded % 10 == 0)
-                                Thread.sleep(10)
+                                Thread.sleep(20)
                         }
                     }
                 }
