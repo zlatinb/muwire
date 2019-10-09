@@ -49,6 +49,7 @@ class PersisterService extends Service {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
 
         if (location.exists() && location.isFile()) {
+            int loaded = 0
             def slurper = new JsonSlurper()
             try {
                 location.eachLine {
@@ -58,6 +59,9 @@ class PersisterService extends Service {
                         if (event != null) {
                             log.fine("loaded file $event.loadedFile.file")
                             listener.publish event
+                            loaded++
+                            if (loaded % 50 == 0)
+                                Thread.sleep(10)
                         }
                     }
                 }
