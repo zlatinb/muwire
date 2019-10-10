@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.4.14 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.4.15 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
 
 ### Building
 
