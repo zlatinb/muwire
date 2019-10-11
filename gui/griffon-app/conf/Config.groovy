@@ -47,7 +47,7 @@ mvcGroups {
         controller = 'com.muwire.gui.ContentPanelController'
     }
     'show-comment' {
-        model = 'com.muwire.gui.ShowConmmentModel'
+        model = 'com.muwire.gui.ShowCommentModel'
         view = 'com.muwire.gui.ShowCommentView'
         controller = 'com.muwire.gui.ShowCommentController'
     }
