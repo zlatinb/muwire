@@ -121,6 +121,9 @@ class ResultsSender {
 
                         if (it instanceof DownloadedFile)
                             obj.sources = it.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
+                            
+                        if (it.getComment() != null)
+                            obj.comment = it.getComment()
 
                         def json = jsonOutput.toJson(obj)
                         os.writeShort((short)json.length())

@@ -90,6 +90,10 @@ class ResultsParser {
             Set<Destination> sources = Collections.emptySet()
             if (json.sources != null)
                 sources = json.sources.stream().map({new Destination(it)}).collect(Collectors.toSet())
+                
+            String comment = null
+            if (json.comment != null)
+                comment = DataUtil.readi18nString(Base64.decode(json.comment))
 
             return new UIResultEvent( sender : p,
                 name : name,
@@ -97,6 +101,7 @@ class ResultsParser {
                 infohash : new InfoHash(infoHash),
                 pieceSize : pieceSize,
                 sources : sources,
+                comment : comment,
                 uuid: uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)

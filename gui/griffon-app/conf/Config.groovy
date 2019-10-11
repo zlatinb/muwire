@@ -46,4 +46,14 @@ mvcGroups {
         view = 'com.muwire.gui.ContentPanelView'
         controller = 'com.muwire.gui.ContentPanelController'
     }
+    'show-comment' {
+        model = 'com.muwire.gui.ShowConmmentModel'
+        view = 'com.muwire.gui.ShowCommentView'
+        controller = 'com.muwire.gui.ShowCommentController'
+    }
+    'add-comment' {
+        model = 'com.muwire.gui.AddCommentModel'
+        view = 'com.muwire.gui.AddCommentView'
+        controller = 'com.muwire.gui.AddCommentController'
+    }
 }

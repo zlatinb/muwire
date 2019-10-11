@@ -18,6 +18,7 @@ import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.Persona
+import com.muwire.core.search.UIResultEvent
 import com.muwire.core.util.DataUtil
 
 import java.awt.BorderLayout
@@ -83,6 +84,7 @@ class SearchTabView {
                                     closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
                                     closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                                     closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                                    closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
                                 }
                             }
                         }
@@ -225,6 +227,16 @@ class SearchTabView {
             copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
             menu.add(copyHashToClipboard)
             showMenu = true
+            
+            // show comment if any
+            int selectedRow = resultsTable.getSelectedRow()
+            if (lastSortEvent != null) 
+                selectedRow = resultsTable.rowSorter.convertRowIndexToModel(selectedRow)
+            if (model.results[selectedRow].comment != null) {
+                JMenuItem showComment = new JMenuItem("Show Comment")
+                showComment.addActionListener({mvcGroup.view.showComment()})
+                menu.add(showComment)
+            }
         }
         if (showMenu)
             menu.show(e.getComponent(), e.getX(), e.getY())
@@ -241,6 +253,23 @@ class SearchTabView {
         StringSelection selection = new StringSelection(hash)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
+    }
+    
+    def showComment() {
+        int selectedRow = resultsTable.getSelectedRow()
+        if (selectedRow < 0)
+            return
+        if (lastSortEvent != null)
+            selectedRow = resultsTable.rowSorter.convertRowIndexToModel(selectedRow)
+        UIResultEvent event = model.results[selectedRow]
+        if (event.comment == null)
+            return
+            
+        String groupId = Base64.encode(event.infohash.getRoot())
+        Map<String,Object> params = new HashMap<>()
+        params['result'] = event
+        
+        mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
     
     int selectedSenderRow() {

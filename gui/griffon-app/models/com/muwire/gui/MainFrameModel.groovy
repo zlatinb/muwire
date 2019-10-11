@@ -81,6 +81,7 @@ class MainFrameModel {
     @Observable boolean pauseButtonEnabled
     @Observable boolean clearButtonEnabled
     @Observable String resumeButtonText
+    @Observable boolean addCommentButtonEnabled
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled

@@ -277,6 +277,17 @@ class MainFrameController {
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : it))
         }
     }
+    
+    @ControllerAction
+    void addComment() {
+        def selectedFiles = view.selectedSharedFiles()
+        if (selectedFiles == null || selectedFiles.isEmpty())
+            return
+        
+        Map<String, Object> params = new HashMap<>()
+        params['selectedFiles'] = selectedFiles
+        mvcGroup.createMVCGroup("add-comment", "Add Comment", params)
+    }
 
     void stopWatchingDirectory() {
         String directory = mvcGroup.view.getSelectedWatchedDirectory()

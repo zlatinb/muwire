@@ -115,11 +115,13 @@ class PersisterService extends Service {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({d -> new Destination(d.toString())}).collect Collectors.toSet()
             DownloadedFile df = new DownloadedFile(file, ih, pieceSize, sourceSet)
+            df.setComment(json.comment)
             return new FileLoadedEvent(loadedFile : df)
         }
 
 
         SharedFile sf = new SharedFile(file, ih, pieceSize)
+        sf.setComment(json.comment)
         return new FileLoadedEvent(loadedFile: sf)
 
     }
@@ -148,6 +150,7 @@ class PersisterService extends Service {
         json.infoHash = sf.getB64EncodedHashRoot()
         json.pieceSize = sf.getPieceSize()
         json.hashList = sf.getB64EncodedHashList()
+        json.comment = sf.getComment()
 
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())

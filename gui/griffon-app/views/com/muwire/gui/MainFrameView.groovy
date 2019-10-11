@@ -209,6 +209,7 @@ class MainFrameView {
                                             tableModel(list : model.shared) {
                                                 closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                 closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
+                                                closureColumn(header : "Comments", preferredWidth : 100, type : Boolean, read : {it.getComment() != null})
                                             }
                                         }
                                     }
@@ -221,8 +222,14 @@ class MainFrameView {
                                     button(text : "Share files", actionPerformed : shareFiles)
                                 }
                                 panel {
-                                    label("Shared:")
-                                    label(text : bind {model.loadedFiles.toString()})
+                                    gridLayout(rows : 1, cols : 2)
+                                    panel {
+                                        label("Shared:")
+                                        label(text : bind {model.loadedFiles.toString()})
+                                    }
+                                    panel {
+                                        button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
+                                    }
                                 }
                             }
                         }
@@ -475,6 +482,9 @@ class MainFrameView {
         JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
         unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
         sharedFilesMenu.add(unshareSelectedFiles)
+        JMenuItem commentSelectedFiles = new JMenuItem("Comment selected files")
+        commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
+        sharedFilesMenu.add(commentSelectedFiles)
         sharedFilesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -487,6 +497,14 @@ class MainFrameView {
                     showPopupMenu(sharedFilesMenu, e)
             }
         })
+        
+        selectionModel = sharedFilesTable.getSelectionModel()
+        selectionModel.addListSelectionListener({
+            def selectedFiles = selectedSharedFiles()
+            if (selectedFiles == null || selectedFiles.isEmpty())
+                return
+            model.addCommentButtonEnabled = true
+        }) 
 
         // searches table
         def searchesTable = builder.getVariable("searches-table")

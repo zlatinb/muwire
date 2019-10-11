@@ -21,6 +21,8 @@ public class SharedFile {
     private final String b64EncodedFileName;
     private final String b64EncodedHashRoot;
     private final List<String> b64EncodedHashList;
+    
+    private volatile String comment;
 
     public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
         this.file = file;
@@ -79,6 +81,14 @@ public class SharedFile {
 
     public long getCachedLength() {
         return cachedLength;
+    }
+    
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+    
+    public String getComment() {
+        return comment;
     }
 
     @Override

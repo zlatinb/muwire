@@ -14,6 +14,7 @@ class UIResultEvent extends Event {
     long size
     InfoHash infohash
     int pieceSize
+    String comment
 
     @Override
     public String toString() {
