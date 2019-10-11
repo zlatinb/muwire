@@ -109,7 +109,12 @@ class MainFrameModel {
     void updateTablePreservingSelection(String tableName) {
         def downloadTable = builder.getVariable(tableName)
         int selectedRow = downloadTable.getSelectedRow()
-        downloadTable.model.fireTableDataChanged()
+        while(true) {
+            try {
+                downloadTable.model.fireTableDataChanged()
+                break
+            } catch (IllegalArgumentException iae) {} // caused by underlying model changing while table is sorted
+        }
         downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
     }
 
