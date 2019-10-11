@@ -33,13 +33,11 @@ class ShowCommentView {
         dialog.setResizable(true)
         
         
-        String comment = DataUtil.readi18nString(Base64.decode(model.result.comment))
-        
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.CENTER) {
                 scrollPane {
-                    textArea(text : comment, rows : 20, columns : 100, editable : false)
+                    textArea(text : model.result.comment, rows : 20, columns : 100, editable : false)
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
