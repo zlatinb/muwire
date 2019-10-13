@@ -18,6 +18,7 @@ import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.TransferHandler
 import javax.swing.border.Border
 import javax.swing.table.DefaultTableCellRenderer
 
@@ -34,6 +35,7 @@ import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -400,6 +402,22 @@ class MainFrameView {
     }
 
     void mvcGroupInit(Map<String, String> args) {
+        
+        def mainFrame = builder.getVariable("main-frame")
+        mainFrame.setTransferHandler(new TransferHandler() {
+            public boolean canImport(TransferHandler.TransferSupport support) {
+                return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+            }
+            public boolean importData(TransferHandler.TransferSupport support) {
+                def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
+                files.each { 
+                    model.core.eventBus.publish(new FileSharedEvent(file : it))
+                }
+                showUploadsWindow.call()
+                true
+            }
+        })
+        
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
