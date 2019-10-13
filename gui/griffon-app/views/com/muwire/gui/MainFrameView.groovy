@@ -65,7 +65,7 @@ class MainFrameView {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
             title: application.configuration['application.title'] + " " +
-                metadata["application.version"] + " revision " + metadata["build.revision"],
+            metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
@@ -102,7 +102,7 @@ class MainFrameView {
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
                         label(constraints : "top-connect-panel",
-                            text : "        MuWire is connecting, please wait.  You will be able to search soon.") // TODO: real padding
+                        text : "        MuWire is connecting, please wait.  You will be able to search soon.") // TODO: real padding
                         panel(constraints : "top-search-panel") {
                             borderLayout()
                             panel(constraints: BorderLayout.CENTER) {
@@ -161,8 +161,8 @@ class MainFrameView {
                                         panel(constraints : "download-selected") {
                                             gridBagLayout()
                                             label(text : "Download Location:", constraints : gbc(gridx:0, gridy:0))
-                                            label(text : bind {model.downloader?.file?.getAbsolutePath()}, 
-                                                constraints: gbc(gridx:1, gridy:0, gridwidth: 2, insets : [0,0,0,20]))
+                                            label(text : bind {model.downloader?.file?.getAbsolutePath()},
+                                            constraints: gbc(gridx:1, gridy:0, gridwidth: 2, insets : [0,0,0,20]))
                                             label(text : "Piece Size", constraints : gbc(gridx: 0, gridy:1))
                                             label(text : bind {model.downloader?.pieceSize}, constraints : gbc(gridx:1, gridy:1))
                                             label(text : "Known Sources:", constraints : gbc(gridx:3, gridy: 0))
@@ -185,12 +185,12 @@ class MainFrameView {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
                                 label(text : bind {
-                                        if (model.hashingFile == null) {
-                                            ""
-                                        } else {
-                                            "hashing: " + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + "B)"
-                                        }
-                                    })
+                                    if (model.hashingFile == null) {
+                                        "You can drag-and-drop files and directories here"
+                                    } else {
+                                        "hashing: " + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + "B)"
+                                    }
+                                })
                             }
                             panel (border : etchedBorder(), constraints : BorderLayout.CENTER) {
                                 gridLayout(cols : 2, rows : 1)
@@ -315,8 +315,8 @@ class MainFrameView {
                                         })
                                         closureColumn(header : "Timestamp", type : String, read : {
                                             String.format("%02d", it.timestamp.get(Calendar.HOUR_OF_DAY)) + ":" +
-                                            String.format("%02d", it.timestamp.get(Calendar.MINUTE)) + ":" +
-                                            String.format("%02d", it.timestamp.get(Calendar.SECOND))
+                                                    String.format("%02d", it.timestamp.get(Calendar.MINUTE)) + ":" +
+                                                    String.format("%02d", it.timestamp.get(Calendar.SECOND))
                                         })
                                     }
                                 }
@@ -402,22 +402,25 @@ class MainFrameView {
     }
 
     void mvcGroupInit(Map<String, String> args) {
-        
+
         def mainFrame = builder.getVariable("main-frame")
         mainFrame.setTransferHandler(new TransferHandler() {
-            public boolean canImport(TransferHandler.TransferSupport support) {
-                return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-            }
-            public boolean importData(TransferHandler.TransferSupport support) {
-                def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
-                files.each { 
-                    model.core.eventBus.publish(new FileSharedEvent(file : it))
-                }
-                showUploadsWindow.call()
-                true
-            }
-        })
-        
+                    public boolean canImport(TransferHandler.TransferSupport support) {
+                        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+                    }
+                    public boolean importData(TransferHandler.TransferSupport support) {
+                        def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
+                        files.each {
+                            if (it.isDirectory())
+                                watchDirectory(it)
+                            else
+                                model.core.eventBus.publish(new FileSharedEvent(file : it))
+                        }
+                        showUploadsWindow.call()
+                        true
+                    }
+                })
+
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -433,7 +436,7 @@ class MainFrameView {
                 return
             }
             def downloader = model.downloads[selectedRow]?.downloader
-            if (downloader == null) 
+            if (downloader == null)
                 return
             model.downloader = downloader
             downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"download-selected")
@@ -441,26 +444,26 @@ class MainFrameView {
                 case Downloader.DownloadState.CONNECTING :
                 case Downloader.DownloadState.DOWNLOADING :
                 case Downloader.DownloadState.HASHLIST:
-                model.cancelButtonEnabled = true
-                model.pauseButtonEnabled = true
-                model.retryButtonEnabled = false
-                break
+                    model.cancelButtonEnabled = true
+                    model.pauseButtonEnabled = true
+                    model.retryButtonEnabled = false
+                    break
                 case Downloader.DownloadState.FAILED:
-                model.cancelButtonEnabled = true
-                model.retryButtonEnabled = true
-                model.resumeButtonText = "Retry"
-                model.pauseButtonEnabled = false
-                break
+                    model.cancelButtonEnabled = true
+                    model.retryButtonEnabled = true
+                    model.resumeButtonText = "Retry"
+                    model.pauseButtonEnabled = false
+                    break
                 case Downloader.DownloadState.PAUSED:
-                model.cancelButtonEnabled = true
-                model.retryButtonEnabled = true
-                model.resumeButtonText = "Resume"
-                model.pauseButtonEnabled = false
-                break
+                    model.cancelButtonEnabled = true
+                    model.retryButtonEnabled = true
+                    model.resumeButtonText = "Resume"
+                    model.pauseButtonEnabled = false
+                    break
                 default:
-                model.cancelButtonEnabled = false
-                model.retryButtonEnabled = false
-                model.pauseButtonEnabled = false
+                    model.cancelButtonEnabled = false
+                    model.retryButtonEnabled = false
+                    model.pauseButtonEnabled = false
             }
         })
 
@@ -474,17 +477,17 @@ class MainFrameView {
         downloadsTable.rowSorter.setComparator(2, new DownloaderComparator())
 
         downloadsTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showDownloadsMenu(e)
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showDownloadsMenu(e)
-            }
-        })
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showDownloadsMenu(e)
+                    }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showDownloadsMenu(e)
+                    }
+                })
 
         // shared files table
         def sharedFilesTable = builder.getVariable("shared-files-table")
@@ -504,25 +507,25 @@ class MainFrameView {
         commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
         sharedFilesMenu.add(commentSelectedFiles)
         sharedFilesTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(sharedFilesMenu, e)
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(sharedFilesMenu, e)
-            }
-        })
-        
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(sharedFilesMenu, e)
+                    }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(sharedFilesMenu, e)
+                    }
+                })
+
         selectionModel = sharedFilesTable.getSelectionModel()
         selectionModel.addListSelectionListener({
             def selectedFiles = selectedSharedFiles()
             if (selectedFiles == null || selectedFiles.isEmpty())
                 return
             model.addCommentButtonEnabled = true
-        }) 
+        })
 
         // searches table
         def searchesTable = builder.getVariable("searches-table")
@@ -540,17 +543,17 @@ class MainFrameView {
         searchTableMenu.add(distrustSearcher)
 
         searchesTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(searchTableMenu, e)
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(searchTableMenu, e)
-            }
-        })
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(searchTableMenu, e)
+                    }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(searchTableMenu, e)
+                    }
+                })
 
         // watched directories table
         def watchedTable = builder.getVariable("watched-directories-table")
@@ -561,17 +564,17 @@ class MainFrameView {
         stopWatching.addActionListener({mvcGroup.controller.stopWatchingDirectory()})
         watchedMenu.add(stopWatching)
         watchedTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(watchedMenu, e)
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(watchedMenu, e)
-            }
-        })
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(watchedMenu, e)
+                    }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger())
+                            showPopupMenu(watchedMenu, e)
+                    }
+                })
 
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
@@ -594,20 +597,20 @@ class MainFrameView {
             switch(trustList.status) {
                 case RemoteTrustList.Status.NEW:
                 case RemoteTrustList.Status.UPDATING:
-                model.reviewButtonEnabled = false
-                model.updateButtonEnabled = false
-                model.unsubscribeButtonEnabled = false
-                break
+                    model.reviewButtonEnabled = false
+                    model.updateButtonEnabled = false
+                    model.unsubscribeButtonEnabled = false
+                    break
                 case RemoteTrustList.Status.UPDATED:
-                model.reviewButtonEnabled = true
-                model.updateButtonEnabled = true
-                model.unsubscribeButtonEnabled = true
-                break
+                    model.reviewButtonEnabled = true
+                    model.updateButtonEnabled = true
+                    model.unsubscribeButtonEnabled = true
+                    break
                 case RemoteTrustList.Status.UPDATE_FAILED:
-                model.reviewButtonEnabled = false
-                model.updateButtonEnabled = true
-                model.unsubscribeButtonEnabled = true
-                break
+                    model.reviewButtonEnabled = false
+                    model.updateButtonEnabled = true
+                    model.unsubscribeButtonEnabled = true
+                    break
             }
         })
 
@@ -659,7 +662,7 @@ class MainFrameView {
             return null
         List<SharedFile> rv = new ArrayList<>()
         if (lastSharedSortEvent != null) {
-            for (int i = 0; i < selected.length; i ++) {  
+            for (int i = 0; i < selected.length; i ++) {
                 selected[i] = sharedFilesTable.rowSorter.convertRowIndexToModel(selected[i])
             }
         }
@@ -777,7 +780,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
     }
-    
+
     def showDownloadsWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "downloads window")
@@ -826,7 +829,7 @@ class MainFrameView {
         chooser.setMultiSelectionEnabled(true)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
-            chooser.getSelectedFiles().each { 
+            chooser.getSelectedFiles().each {
                 model.core.eventBus.publish(new FileSharedEvent(file : it))
             }
         }
@@ -841,13 +844,17 @@ class MainFrameView {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
             chooser.getSelectedFiles().each { f ->
-                model.watched << f.getAbsolutePath()
-                application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
-                mvcGroup.controller.saveMuWireSettings()
-                builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-                model.core.eventBus.publish(new FileSharedEvent(file : f))
+                watchDirectory(f)
             }
         }
+    }
+
+    private void watchDirectory(File f) {
+        model.watched << f.getAbsolutePath()
+        application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
+        mvcGroup.controller.saveMuWireSettings()
+        builder.getVariable("watched-directories-table").model.fireTableDataChanged()
+        model.core.eventBus.publish(new FileSharedEvent(file : f))
     }
 
     String getSelectedWatchedDirectory() {
