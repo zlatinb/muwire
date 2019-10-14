@@ -290,14 +290,16 @@ class MainFrameController {
     }
 
     void stopWatchingDirectory() {
-        String directory = mvcGroup.view.getSelectedWatchedDirectory()
-        if (directory == null)
+        List<String> directories = mvcGroup.view.getSelectedWatchedDirectories()
+        if (directories == null)
             return
-        core.muOptions.watchedDirectories.remove(directory)
+        directories.each { directory ->
+            core.muOptions.watchedDirectories.remove(directory)
+            core.eventBus.publish(new DirectoryUnsharedEvent(directory : new File(directory)))
+            model.watched.remove(directory)
+        }
         saveMuWireSettings()
-        core.eventBus.publish(new DirectoryUnsharedEvent(directory : new File(directory)))
 
-        model.watched.remove(directory)
         builder.getVariable("watched-directories-table").model.fireTableDataChanged()
     }
 

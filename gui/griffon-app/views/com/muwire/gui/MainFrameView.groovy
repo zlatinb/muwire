@@ -925,14 +925,21 @@ class MainFrameView {
         model.core.eventBus.publish(new FileSharedEvent(file : f))
     }
 
-    String getSelectedWatchedDirectory() {
+    List<String> getSelectedWatchedDirectories() {
         def watchedTable = builder.getVariable("watched-directories-table")
-        int selectedRow = watchedTable.getSelectedRow()
-        if (selectedRow < 0)
+        int[] selectedRows = watchedTable.getSelectedRows()
+        if (selectedRows.length == 0)
             return null
-        if (lastWatchedSortEvent != null)
-            selectedRow = watchedTable.rowSorter.convertRowIndexToModel(selectedRow)
-        model.watched[selectedRow]
+        if (lastWatchedSortEvent != null) {
+            for(int i = 0;i < selectedRows.length; i++)
+                selectedRows[i] = watchedTable.rowSorter.convertRowIndexToModel(selectedRows[i]) 
+        }
+
+        List<String> rv = new ArrayList<>()
+        selectedRows.each { 
+            rv.add(model.watched[it])
+        }            
+        rv
     }
 
     int getSelectedTrustTablesRow(String tableName) {
