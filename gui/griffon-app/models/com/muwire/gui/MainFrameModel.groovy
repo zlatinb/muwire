@@ -338,6 +338,7 @@ class MainFrameModel {
                 table.model.fireTableDataChanged()
             } else {
                 insertIntoTree(e.sharedFile)
+                loadedFiles = fileToNode.size()
             }
         }
     }
@@ -351,6 +352,7 @@ class MainFrameModel {
                 table.model.fireTableDataChanged()
             } else {
                 insertIntoTree(e.loadedFile)
+                loadedFiles = fileToNode.size()
             }
         }
     }
@@ -523,6 +525,7 @@ class MainFrameModel {
                 table.model.fireTableDataChanged()
             } else {
                 insertIntoTree(e.downloadedFile)
+                loadedFiles = fileToNode.size()
             }
         }
     }
@@ -550,9 +553,8 @@ class MainFrameModel {
         }
         
         def dmtn = new DefaultMutableTreeNode(file)
-        fileToNode[file] = dmtn
+        fileToNode.put(file, dmtn)
         node.add(dmtn)
-        loadedFiles = fileToNode.size()
         view.refreshSharedFiles()
     }
 
