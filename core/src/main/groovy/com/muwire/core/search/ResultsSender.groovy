@@ -4,6 +4,7 @@ import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.files.FileHasher
+import com.muwire.core.util.DataUtil
 import com.muwire.core.Persona
 
 import java.nio.charset.StandardCharsets
@@ -60,13 +61,18 @@ class ResultsSender {
                 Set<Destination> suggested = Collections.emptySet()
                 if (it instanceof DownloadedFile)
                     suggested = it.sources
+                def comment = null
+                if (it.getComment() != null) {
+                    comment = DataUtil.readi18nString(Base64.decode(it.getComment()))
+                }
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
                     infohash : it.getInfoHash(),
                     pieceSize : pieceSize,
                     uuid : uuid,
-                    sources : suggested
+                    sources : suggested,
+                    comment : comment
                     )
                     eventBus.publish(uiResultEvent)
             }
