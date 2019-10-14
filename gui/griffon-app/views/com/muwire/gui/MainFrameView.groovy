@@ -209,10 +209,11 @@ class MainFrameView {
                                         }
                                     }
                                 }
-                                panel {
-                                    borderLayout()
-                                    scrollPane(constraints : BorderLayout.CENTER) {
-                                        if (!settings.sharedFilesAsTree) {
+                                panel (id : "shared-files-panel"){
+                                    cardLayout()
+                                    panel (constraints : "shared files table") {
+                                        borderLayout()
+                                        scrollPane(constraints : BorderLayout.CENTER) {
                                             table(id : "shared-files-table", autoCreateRowSorter: true) {
                                                 tableModel(list : model.shared) {
                                                     closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
@@ -220,7 +221,11 @@ class MainFrameView {
                                                     closureColumn(header : "Comments", preferredWidth : 100, type : Boolean, read : {it.getComment() != null})
                                                 }
                                             }
-                                        } else {
+                                        }
+                                    }
+                                    panel (constraints : "shared files tree") {
+                                        borderLayout()
+                                        scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
                                             tree(id : "shared-files-tree", rootVisible : false, jtree)
@@ -242,6 +247,11 @@ class MainFrameView {
                                     }
                                     panel {
                                         button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
+                                    }
+                                    panel {
+                                        buttonGroup(id : "sharedViewType")
+                                        radioButton(text : "Tree", selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
+                                        radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                     }
                                 }
                             }
@@ -525,34 +535,30 @@ class MainFrameView {
                     }
                 }
 
-        // shared files table or tree
-        if (!settings.sharedFilesAsTree) {
-            def sharedFilesTable = builder.getVariable("shared-files-table")
-            sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+        // shared files table and tree
+        def sharedFilesTable = builder.getVariable("shared-files-table")
+        sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
 
-            sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
-            sharedFilesTable.rowSorter.setSortsOnUpdates(true)
+        sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
+        sharedFilesTable.rowSorter.setSortsOnUpdates(true)
 
-            sharedFilesTable.addMouseListener(sharedFilesMouseListener)
+        sharedFilesTable.addMouseListener(sharedFilesMouseListener)
 
-            selectionModel = sharedFilesTable.getSelectionModel()
-            selectionModel.addListSelectionListener({
-                def selectedFiles = selectedSharedFiles()
-                if (selectedFiles == null || selectedFiles.isEmpty())
-                    return
-                model.addCommentButtonEnabled = true
-            })
-        } else {
-            def sharedFilesTree = builder.getVariable("shared-files-tree")
-            sharedFilesTree.addMouseListener(sharedFilesMouseListener)
-            
-            sharedFilesTree.addTreeSelectionListener({
-                def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
-                model.addCommentButtonEnabled = selectedNode != null
-                    
-            })
-            // TODO: other stuff
-        }
+        selectionModel = sharedFilesTable.getSelectionModel()
+        selectionModel.addListSelectionListener({
+            def selectedFiles = selectedSharedFiles()
+            if (selectedFiles == null || selectedFiles.isEmpty())
+                return
+            model.addCommentButtonEnabled = true
+        })
+        def sharedFilesTree = builder.getVariable("shared-files-tree")
+        sharedFilesTree.addMouseListener(sharedFilesMouseListener)
+
+        sharedFilesTree.addTreeSelectionListener({
+            def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
+            model.addCommentButtonEnabled = selectedNode != null
+
+        })
 
         // searches table
         def searchesTable = builder.getVariable("searches-table")
@@ -676,6 +682,9 @@ class MainFrameView {
                 model.markNeutralFromDistrustedButtonEnabled = true
             }
         })
+        
+        // show tree by default
+        showSharedFilesTree.call()
     }
 
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -683,7 +692,7 @@ class MainFrameView {
     }
 
     def selectedSharedFiles() {
-        if (!settings.sharedFilesAsTree) {
+        if (!model.treeVisible) {
             def sharedFilesTable = builder.getVariable("shared-files-table")
             int[] selected = sharedFilesTable.getSelectedRows()
             if (selected.length == 0)
@@ -867,6 +876,18 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
     }
+    
+    def showSharedFilesTable = {
+        model.treeVisible = false
+        def cardsPanel = builder.getVariable("shared-files-panel")
+        cardsPanel.getLayout().show(cardsPanel, "shared files table")
+    }
+    
+    def showSharedFilesTree = {
+        model.treeVisible = true
+        def cardsPanel = builder.getVariable("shared-files-panel")
+        cardsPanel.getLayout().show(cardsPanel, "shared files tree")
+    }
 
     def shareFiles = {
         def chooser = new JFileChooser()
@@ -924,11 +945,8 @@ class MainFrameView {
         selectedRow
     }
     
-    public void refreshSharedFiles() { 
-        if (settings.sharedFilesAsTree) {
-            model.sharedTree.nodeStructureChanged(model.treeRoot)
-        } else {
-            builder.getVariable("shared-files-table").model.fireTableDataChanged()
-        }
+    public void refreshSharedFiles() {
+        model.sharedTree.nodeStructureChanged(model.treeRoot)
+        builder.getVariable("shared-files-table").model.fireTableDataChanged()
     }
 }

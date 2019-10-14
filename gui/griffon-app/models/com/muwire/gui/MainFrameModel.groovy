@@ -71,7 +71,8 @@ class MainFrameModel {
     def results = new ConcurrentHashMap<>()
     def downloads = []
     def uploads = []
-    def shared
+    boolean treeVisible = true
+    def shared 
     def sharedTree 
     def treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
@@ -133,12 +134,9 @@ class MainFrameModel {
 
         uiSettings = application.context.get("ui-settings")
         
-        if (!uiSettings.sharedFilesAsTree)
-            shared = []
-        else {
-            treeRoot = new DefaultMutableTreeNode()
-            sharedTree = new DefaultTreeModel(treeRoot)
-        }
+        shared = []
+        treeRoot = new DefaultMutableTreeNode()
+        sharedTree = new DefaultTreeModel(treeRoot)
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -331,52 +329,43 @@ class MainFrameModel {
         if (e.error != null)
             return // TODO do something
         runInsideUIAsync {
-            if (!uiSettings.sharedFilesAsTree) {
-                shared << e.sharedFile
-                loadedFiles = shared.size()
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
-            } else {
-                insertIntoTree(e.sharedFile)
-                loadedFiles = fileToNode.size()
-            }
+            shared << e.sharedFile
+            loadedFiles = shared.size()
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+            insertIntoTree(e.sharedFile)
+            loadedFiles = fileToNode.size()
         }
     }
 
     void onFileLoadedEvent(FileLoadedEvent e) {
         runInsideUIAsync {
-            if (!uiSettings.sharedFilesAsTree) {
-                shared << e.loadedFile
-                loadedFiles = shared.size()
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
-            } else {
-                insertIntoTree(e.loadedFile)
-                loadedFiles = fileToNode.size()
-            }
+            shared << e.loadedFile
+            loadedFiles = shared.size()
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+            insertIntoTree(e.loadedFile)
+            loadedFiles = fileToNode.size()
         }
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         runInsideUIAsync {
-            if (!uiSettings.sharedFilesAsTree) {
-                shared.remove(e.unsharedFile)
-                loadedFiles = shared.size()
-            } else {
-                def dmtn = fileToNode.remove(e.unsharedFile)
-                if (dmtn != null) {
-                    loadedFiles = fileToNode.size()
-                    while (true) {
-                        def parent = dmtn.getParent()
-                        parent.remove(dmtn)
-                        if (parent == treeRoot)
-                            break
-                        if (parent.getChildCount() == 0) {
-                            dmtn = parent
-                            continue
-                        }
+            shared.remove(e.unsharedFile)
+            loadedFiles = shared.size()
+            def dmtn = fileToNode.remove(e.unsharedFile)
+            if (dmtn != null) {
+                loadedFiles = fileToNode.size()
+                while (true) {
+                    def parent = dmtn.getParent()
+                    parent.remove(dmtn)
+                    if (parent == treeRoot)
                         break
+                    if (parent.getChildCount() == 0) {
+                        dmtn = parent
+                        continue
                     }
+                    break
                 }
             }
             view.refreshSharedFiles()
@@ -519,14 +508,11 @@ class MainFrameModel {
         if (!core.muOptions.shareDownloadedFiles)
             return
         runInsideUIAsync {
-            if (!uiSettings.sharedFilesAsTree) {
-                shared << e.downloadedFile
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
-            } else {
-                insertIntoTree(e.downloadedFile)
-                loadedFiles = fileToNode.size()
-            }
+            shared << e.downloadedFile
+            JTable table = builder.getVariable("shared-files-table")
+            table.model.fireTableDataChanged()
+            insertIntoTree(e.downloadedFile)
+            loadedFiles = fileToNode.size()
         }
     }
     
