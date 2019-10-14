@@ -9,6 +9,7 @@ class UISettings {
     boolean clearFinishedDownloads
     boolean excludeLocalResult
     boolean showSearchHashes
+    boolean sharedFilesAsTree
 
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -18,6 +19,7 @@ class UISettings {
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
         excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","true"))
         showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","true"))
+        sharedFilesAsTree = Boolean.parseBoolean(props.getProperty("sharedFilesAsTree","true"))
     }
 
     void write(OutputStream out) throws IOException {
@@ -28,6 +30,7 @@ class UISettings {
         props.setProperty("clearFinishedDownloads", String.valueOf(clearFinishedDownloads))
         props.setProperty("excludeLocalResult", String.valueOf(excludeLocalResult))
         props.setProperty("showSearchHashes", String.valueOf(showSearchHashes))
+        props.setProperty("sharedFilesAsTree", String.valueOf(sharedFilesAsTree))
         if (font != null)
             props.setProperty("font", font)
 

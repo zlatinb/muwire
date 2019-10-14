@@ -143,6 +143,8 @@ class OptionsController {
 //        boolean showSearchHashes = view.showSearchHashesCheckbox.model.isSelected()
 //        model.showSearchHashes = showSearchHashes
 //        uiSettings.showSearchHashes = showSearchHashes
+        
+        uiSettings.sharedFilesAsTree = model.sharedFilesAsTree
 
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream {
@@ -167,5 +169,15 @@ class OptionsController {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
             model.downloadLocation = chooser.getSelectedFile().getAbsolutePath()
+    }
+    
+    @ControllerAction
+    void sharedTree() {
+        model.sharedFilesAsTree = true
+    }
+    
+    @ControllerAction
+    void sharedTable() {
+        model.sharedFilesAsTree = false
     }
 }

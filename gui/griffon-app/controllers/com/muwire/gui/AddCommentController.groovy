@@ -27,7 +27,7 @@ class AddCommentController {
         model.selectedFiles.each {
             it.setComment(comment)
         }
-        mvcGroup.parentGroup.view.builder.getVariable("shared-files-table").model.fireTableDataChanged()
+        mvcGroup.parentGroup.view.refreshSharedFiles()
         cancel()
     }
     

@@ -16,11 +16,14 @@ import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTable
+import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.TransferHandler
 import javax.swing.border.Border
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.TreeNode
+import javax.swing.tree.TreePath
 
 import com.muwire.core.Constants
 import com.muwire.core.MuWireSettings
@@ -59,8 +62,10 @@ class MainFrameView {
     def lastWatchedSortEvent
     def trustTablesSortEvents = [:]
 
+    UISettings settings
+    
     void initUI() {
-        UISettings settings = application.context.get("ui-settings")
+        settings = application.context.get("ui-settings")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
@@ -207,12 +212,18 @@ class MainFrameView {
                                 panel {
                                     borderLayout()
                                     scrollPane(constraints : BorderLayout.CENTER) {
-                                        table(id : "shared-files-table", autoCreateRowSorter: true) {
-                                            tableModel(list : model.shared) {
-                                                closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
-                                                closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
-                                                closureColumn(header : "Comments", preferredWidth : 100, type : Boolean, read : {it.getComment() != null})
+                                        if (!settings.sharedFilesAsTree) {
+                                            table(id : "shared-files-table", autoCreateRowSorter: true) {
+                                                tableModel(list : model.shared) {
+                                                    closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
+                                                    closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
+                                                    closureColumn(header : "Comments", preferredWidth : 100, type : Boolean, read : {it.getComment() != null})
+                                                }
                                             }
+                                        } else {
+                                            def jtree = new JTree(model.sharedTree)
+                                            jtree.setCellRenderer(new SharedTreeRenderer())
+                                            tree(id : "shared-files-tree", rootVisible : false, jtree)
                                         }
                                     }
                                 }
@@ -227,7 +238,7 @@ class MainFrameView {
                                     gridLayout(rows : 1, cols : 2)
                                     panel {
                                         label("Shared:")
-                                        label(text : bind {model.loadedFiles.toString()})
+                                        label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
                                     panel {
                                         button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
@@ -489,13 +500,7 @@ class MainFrameView {
                     }
                 })
 
-        // shared files table
-        def sharedFilesTable = builder.getVariable("shared-files-table")
-        sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
-
-        sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
-        sharedFilesTable.rowSorter.setSortsOnUpdates(true)
-
+        // shared files menu
         JPopupMenu sharedFilesMenu = new JPopupMenu()
         JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
         copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
@@ -506,7 +511,8 @@ class MainFrameView {
         JMenuItem commentSelectedFiles = new JMenuItem("Comment selected files")
         commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
         sharedFilesMenu.add(commentSelectedFiles)
-        sharedFilesTable.addMouseListener(new MouseAdapter() {
+        
+        def sharedFilesMouseListener = new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if (e.isPopupTrigger())
@@ -517,15 +523,36 @@ class MainFrameView {
                         if (e.isPopupTrigger())
                             showPopupMenu(sharedFilesMenu, e)
                     }
-                })
+                }
 
-        selectionModel = sharedFilesTable.getSelectionModel()
-        selectionModel.addListSelectionListener({
-            def selectedFiles = selectedSharedFiles()
-            if (selectedFiles == null || selectedFiles.isEmpty())
-                return
-            model.addCommentButtonEnabled = true
-        })
+        // shared files table or tree
+        if (!settings.sharedFilesAsTree) {
+            def sharedFilesTable = builder.getVariable("shared-files-table")
+            sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+
+            sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
+            sharedFilesTable.rowSorter.setSortsOnUpdates(true)
+
+            sharedFilesTable.addMouseListener(sharedFilesMouseListener)
+
+            selectionModel = sharedFilesTable.getSelectionModel()
+            selectionModel.addListSelectionListener({
+                def selectedFiles = selectedSharedFiles()
+                if (selectedFiles == null || selectedFiles.isEmpty())
+                    return
+                model.addCommentButtonEnabled = true
+            })
+        } else {
+            def sharedFilesTree = builder.getVariable("shared-files-tree")
+            sharedFilesTree.addMouseListener(sharedFilesMouseListener)
+            
+            sharedFilesTree.addTreeSelectionListener({
+                def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
+                model.addCommentButtonEnabled = selectedNode != null
+                    
+            })
+            // TODO: other stuff
+        }
 
         // searches table
         def searchesTable = builder.getVariable("searches-table")
@@ -656,20 +683,40 @@ class MainFrameView {
     }
 
     def selectedSharedFiles() {
-        def sharedFilesTable = builder.getVariable("shared-files-table")
-        int[] selected = sharedFilesTable.getSelectedRows()
-        if (selected.length == 0)
-            return null
-        List<SharedFile> rv = new ArrayList<>()
-        if (lastSharedSortEvent != null) {
-            for (int i = 0; i < selected.length; i ++) {
-                selected[i] = sharedFilesTable.rowSorter.convertRowIndexToModel(selected[i])
+        if (!settings.sharedFilesAsTree) {
+            def sharedFilesTable = builder.getVariable("shared-files-table")
+            int[] selected = sharedFilesTable.getSelectedRows()
+            if (selected.length == 0)
+                return null
+            List<SharedFile> rv = new ArrayList<>()
+            if (lastSharedSortEvent != null) {
+                for (int i = 0; i < selected.length; i ++) {
+                    selected[i] = sharedFilesTable.rowSorter.convertRowIndexToModel(selected[i])
+                }
             }
+            selected.each {
+                rv.add(model.shared[it])
+            }
+            return rv
+        } else {
+            def sharedFilesTree = builder.getVariable("shared-files-tree")
+            List<SharedFile> rv = new ArrayList<>()
+            for (TreePath path : sharedFilesTree.getSelectionPaths()) {
+                getLeafs(path.getLastPathComponent(), rv)
+            }
+            return rv
         }
-        selected.each {
-            rv.add(model.shared[it])
+    }
+    
+    private static void getLeafs(TreeNode node, List<SharedFile> dest) {
+        if (node.isLeaf()) {
+            dest.add(node.getUserObject())
+            return
         }
-        rv
+        def children = node.children()
+        while(children.hasMoreElements()) {
+            getLeafs(children.nextElement(), dest)
+        }
     }
 
     def copyHashToClipboard() {
@@ -875,5 +922,13 @@ class MainFrameView {
         if (trustTablesSortEvents.get(tableName) != null)
             selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
+    }
+    
+    public void refreshSharedFiles() { 
+        if (settings.sharedFilesAsTree) {
+            model.sharedTree.nodeStructureChanged(model.treeRoot)
+        } else {
+            builder.getVariable("shared-files-table").model.fireTableDataChanged()
+        }
     }
 }

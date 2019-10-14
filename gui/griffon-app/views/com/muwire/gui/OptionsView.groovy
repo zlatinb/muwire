@@ -126,6 +126,12 @@ class OptionsView {
             excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, constraints : gbc(gridx: 1, gridy : 6))
 //            label(text : "Show Hash Searches In Monitor", constraints: gbc(gridx:0, gridy:7))
 //            showSearchHashesCheckbox = checkBox(selected : bind {model.showSearchHashes}, constraints : gbc(gridx: 1, gridy: 7))
+            label(text : "Show Shared Files as", constraints: gbc(gridx: 0, gridy:8))
+            panel( constraints : gbc(gridx: 1, gridy: 8)) {
+                buttonGroup(id : "viewShared")
+                radioButton(text: "Tree", selected : bind {model.sharedFilesAsTree}, buttonGroup: viewShared, sharedTreeAction)
+                radioButton(text: "Table", selected : bind {!model.sharedFilesAsTree}, buttonGroup: viewShared, sharedTableAction)
+            }
         }
         bandwidth = builder.panel {
             gridBagLayout()
