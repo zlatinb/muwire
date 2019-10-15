@@ -3,6 +3,9 @@ package com.muwire.core.files
 import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 import java.util.logging.Level
 import java.util.stream.Collectors
 
@@ -28,13 +31,16 @@ class PersisterService extends Service {
     final int interval
     final Timer timer
     final FileManager fileManager
+    final ExecutorService persisterExecutor = Executors.newSingleThreadExecutor({ r -> 
+        new Thread(r, "file persister")
+    } as ThreadFactory)
 
     PersisterService(File location, EventBus listener, int interval, FileManager fileManager) {
         this.location = location
         this.listener = listener
         this.interval = interval
         this.fileManager = fileManager
-        timer = new Timer("file persister", true)
+        timer = new Timer("file persister timer", true)
     }
 
     void stop() {
@@ -43,6 +49,10 @@ class PersisterService extends Service {
 
     void onUILoadedEvent(UILoadedEvent e) {
         timer.schedule({load()} as TimerTask, 1)
+    }
+    
+    void onUIPersistFilesEvent(UIPersistFilesEvent e) {
+        persistFiles()
     }
 
     void load() {
@@ -127,19 +137,21 @@ class PersisterService extends Service {
     }
 
     private void persistFiles() {
-        def sharedFiles = fileManager.getSharedFiles()
+        persisterExecutor.submit( {
+            def sharedFiles = fileManager.getSharedFiles()
 
-        File tmp = File.createTempFile("muwire-files", "tmp")
-        tmp.deleteOnExit()
-        tmp.withPrintWriter { writer ->
-            sharedFiles.each { k, v ->
-                def json = toJson(k,v)
-                json = JsonOutput.toJson(json)
-                writer.println json
+            File tmp = File.createTempFile("muwire-files", "tmp")
+            tmp.deleteOnExit()
+            tmp.withPrintWriter { writer ->
+                sharedFiles.each { k, v ->
+                    def json = toJson(k,v)
+                    json = JsonOutput.toJson(json)
+                    writer.println json
+                }
             }
-        }
-        Files.copy(tmp.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
-        tmp.delete()
+            Files.copy(tmp.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            tmp.delete()
+        } as Runnable)
     }
 
     private def toJson(File f, SharedFile sf) {

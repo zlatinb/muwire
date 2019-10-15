@@ -28,6 +28,7 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
+import com.muwire.core.files.UIPersistFilesEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatcher
@@ -223,6 +224,7 @@ public class Core {
         log.info "initializing persistence service"
         persisterService = new PersisterService(new File(home, "files.json"), eventBus, 60000, fileManager)
         eventBus.register(UILoadedEvent.class, persisterService)
+        eventBus.register(UIPersistFilesEvent.class, persisterService)
 
         log.info("initializing host cache")
         File hostStorage = new File(home, "hosts.json")

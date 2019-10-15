@@ -25,6 +25,7 @@ import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.files.UIPersistFilesEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
@@ -276,6 +277,7 @@ class MainFrameController {
         sf.each {  
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : it))
         }
+        core.eventBus.publish(new UIPersistFilesEvent())
     }
     
     @ControllerAction
