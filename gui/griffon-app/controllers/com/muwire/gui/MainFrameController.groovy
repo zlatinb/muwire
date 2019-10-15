@@ -291,20 +291,6 @@ class MainFrameController {
         mvcGroup.createMVCGroup("add-comment", "Add Comment", params)
     }
 
-    void stopWatchingDirectory() {
-        List<String> directories = mvcGroup.view.getSelectedWatchedDirectories()
-        if (directories == null)
-            return
-        directories.each { directory ->
-            core.muOptions.watchedDirectories.remove(directory)
-            core.eventBus.publish(new DirectoryUnsharedEvent(directory : new File(directory)))
-            model.watched.remove(directory)
-        }
-        saveMuWireSettings()
-
-        builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-    }
-
     void saveMuWireSettings() {
         File f = new File(core.home, "MuWire.properties")
         f.withOutputStream {

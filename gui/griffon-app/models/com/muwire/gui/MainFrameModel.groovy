@@ -76,7 +76,6 @@ class MainFrameModel {
     def sharedTree 
     def treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
-    def watched = []
     def connectionList = []
     def searches = new LinkedList()
     def trusted = []
@@ -248,9 +247,7 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
-            watched.addAll(core.muOptions.watchedDirectories)
-            builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-            watched.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
+            core.muOptions.watchedDirectories.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
 
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))

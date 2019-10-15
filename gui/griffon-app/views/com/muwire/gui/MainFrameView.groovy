@@ -59,7 +59,6 @@ class MainFrameView {
     def downloadsTable
     def lastDownloadSortEvent
     def lastSharedSortEvent
-    def lastWatchedSortEvent
     def trustTablesSortEvents = [:]
 
     UISettings settings
@@ -198,18 +197,8 @@ class MainFrameView {
                                 })
                             }
                             panel (border : etchedBorder(), constraints : BorderLayout.CENTER) {
-                                gridLayout(cols : 2, rows : 1)
-                                panel {
-                                    borderLayout()
-                                    scrollPane (constraints : BorderLayout.CENTER) {
-                                        table(id : "watched-directories-table", autoCreateRowSorter: true) {
-                                            tableModel(list : model.watched) {
-                                                closureColumn(header: "Watched Directories", type : String, read : { it })
-                                            }
-                                        }
-                                    }
-                                }
-                                panel (id : "shared-files-panel"){
+                                borderLayout()
+                                panel (id : "shared-files-panel", constraints : BorderLayout.CENTER){
                                     cardLayout()
                                     panel (constraints : "shared files table") {
                                         borderLayout()
@@ -236,17 +225,14 @@ class MainFrameView {
                             panel (constraints : BorderLayout.SOUTH) {
                                 gridLayout(rows:1, cols:2)
                                 panel {
-                                    button(text : "Add directories to watch", actionPerformed : watchDirectories)
                                     button(text : "Share files", actionPerformed : shareFiles)
+                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
                                 }
                                 panel {
                                     gridLayout(rows : 1, cols : 2)
                                     panel {
                                         label("Shared:")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
-                                    }
-                                    panel {
-                                        button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
                                     }
                                     panel {
                                         buttonGroup(id : "sharedViewType")
@@ -588,27 +574,6 @@ class MainFrameView {
                     }
                 })
 
-        // watched directories table
-        def watchedTable = builder.getVariable("watched-directories-table")
-        watchedTable.rowSorter.addRowSorterListener({evt -> lastWatchedSortEvent = evt})
-        watchedTable.rowSorter.setSortsOnUpdates(true)
-        JPopupMenu watchedMenu = new JPopupMenu()
-        JMenuItem stopWatching = new JMenuItem("Stop sharing")
-        stopWatching.addActionListener({mvcGroup.controller.stopWatchingDirectory()})
-        watchedMenu.add(stopWatching)
-        watchedTable.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showPopupMenu(watchedMenu, e)
-                    }
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showPopupMenu(watchedMenu, e)
-                    }
-                })
-
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -901,45 +866,6 @@ class MainFrameView {
                 model.core.eventBus.publish(new FileSharedEvent(file : it))
             }
         }
-    }
-
-    def watchDirectories = {
-        def chooser = new JFileChooser()
-        chooser.setFileHidingEnabled(false)
-        chooser.setDialogTitle("Select directory to watch")
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-        chooser.setMultiSelectionEnabled(true)
-        int rv = chooser.showOpenDialog(null)
-        if (rv == JFileChooser.APPROVE_OPTION) {
-            chooser.getSelectedFiles().each { f ->
-                watchDirectory(f)
-            }
-        }
-    }
-
-    private void watchDirectory(File f) {
-        model.watched << f.getAbsolutePath()
-        application.context.get("muwire-settings").watchedDirectories << f.getAbsolutePath()
-        mvcGroup.controller.saveMuWireSettings()
-        builder.getVariable("watched-directories-table").model.fireTableDataChanged()
-        model.core.eventBus.publish(new FileSharedEvent(file : f))
-    }
-
-    List<String> getSelectedWatchedDirectories() {
-        def watchedTable = builder.getVariable("watched-directories-table")
-        int[] selectedRows = watchedTable.getSelectedRows()
-        if (selectedRows.length == 0)
-            return null
-        if (lastWatchedSortEvent != null) {
-            for(int i = 0;i < selectedRows.length; i++)
-                selectedRows[i] = watchedTable.rowSorter.convertRowIndexToModel(selectedRows[i]) 
-        }
-
-        List<String> rv = new ArrayList<>()
-        selectedRows.each { 
-            rv.add(model.watched[it])
-        }            
-        rv
     }
 
     int getSelectedTrustTablesRow(String tableName) {
