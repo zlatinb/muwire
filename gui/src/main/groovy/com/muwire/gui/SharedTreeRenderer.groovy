@@ -23,7 +23,7 @@ class SharedTreeRenderer extends DefaultTreeCellRenderer {
         
         def userObject = value.getUserObject()
         def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) 
-        if (userObject instanceof String || userObject == null)
+        if (userObject instanceof InterimTreeNode || userObject == null)
             return defaultRenderer
             
         

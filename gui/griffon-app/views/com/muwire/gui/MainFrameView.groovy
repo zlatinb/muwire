@@ -418,10 +418,7 @@ class MainFrameView {
                     public boolean importData(TransferHandler.TransferSupport support) {
                         def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
                         files.each {
-                            if (it.isDirectory())
-                                watchDirectory(it)
-                            else
-                                model.core.eventBus.publish(new FileSharedEvent(file : it))
+                            model.core.eventBus.publish(new FileSharedEvent(file : it))
                         }
                         showUploadsWindow.call()
                         true
@@ -692,7 +689,7 @@ class MainFrameView {
             getLeafs(children.nextElement(), dest)
         }
     }
-
+    
     def copyHashToClipboard() {
         def selectedFiles = selectedSharedFiles()
         if (selectedFiles == null)
@@ -863,7 +860,8 @@ class MainFrameView {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
             chooser.getSelectedFiles().each {
-                model.core.eventBus.publish(new FileSharedEvent(file : it))
+                File canonical = it.getCanonicalFile()
+                model.core.eventBus.publish(new FileSharedEvent(file : canonical))
             }
         }
     }

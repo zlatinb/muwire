@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import java.util.concurrent.ConcurrentHashMap
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Calendar
 import java.util.UUID
 
@@ -26,6 +27,7 @@ import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.AllFilesLoadedEvent
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -350,6 +352,7 @@ class MainFrameModel {
         runInsideUIAsync {
             shared.remove(e.unsharedFile)
             loadedFiles = shared.size()
+            
             def dmtn = fileToNode.remove(e.unsharedFile)
             if (dmtn != null) {
                 loadedFiles = fileToNode.size()
@@ -359,12 +362,15 @@ class MainFrameModel {
                     if (parent == treeRoot)
                         break
                     if (parent.getChildCount() == 0) {
+                        File file = parent.getUserObject().file
+                        if (core.muOptions.watchedDirectories.contains(file.toString()))
+                            core.eventBus.publish(new DirectoryUnsharedEvent(directory : parent.getUserObject().file))
                         dmtn = parent
                         continue
                     }
                     break
                 }
-            }
+            } 
             view.refreshSharedFiles()
         }
     }
@@ -514,22 +520,28 @@ class MainFrameModel {
     }
     
     private void insertIntoTree(SharedFile file) {
-        Path folder = file.getFile().toPath()
-        folder = folder.subpath(0, folder.getNameCount() - 1)
+        List<File> parents = new ArrayList<>()
+        File tmp = file.file.getParentFile()
+        while(tmp.getParent() != null) {
+            parents << tmp
+            tmp = tmp.getParentFile()
+        }
+        Collections.reverse(parents)
         TreeNode node = treeRoot
-        for(Path path : folder) {
+        for(File path : parents) {
             boolean exists = false
             def children = node.children()
             def child = null
             while(children.hasMoreElements()) {
                 child = children.nextElement()
-                if (child.getUserObject() == path.toString()) {
+                def userObject = child.getUserObject()
+                if (userObject != null && userObject.file == path) {
                     exists = true
                     break
                 }
             }
             if (!exists) {
-                child = new DefaultMutableTreeNode(path.toString())
+                child = new DefaultMutableTreeNode(new InterimTreeNode(path))
                 node.add(child)
             }
             node = child

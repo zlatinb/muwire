@@ -13,6 +13,7 @@ import java.nio.file.WatchService
 import java.util.concurrent.ConcurrentHashMap
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 
 import groovy.util.logging.Log
@@ -31,6 +32,8 @@ class DirectoryWatcher {
             kinds = [ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE]
     }
 
+    private final File home
+    private final MuWireSettings muOptions
     private final EventBus eventBus
     private final FileManager fileManager
     private final Thread watcherThread, publisherThread
@@ -39,7 +42,9 @@ class DirectoryWatcher {
     private WatchService watchService
     private volatile boolean shutdown
 
-    DirectoryWatcher(EventBus eventBus, FileManager fileManager) {
+    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, MuWireSettings muOptions) {
+        this.home = home
+        this.muOptions = muOptions
         this.eventBus = eventBus
         this.fileManager = fileManager
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
@@ -64,15 +69,28 @@ class DirectoryWatcher {
     void onFileSharedEvent(FileSharedEvent e) {
         if (!e.file.isDirectory())
             return
-        Path path = e.file.getCanonicalFile().toPath()
+        File canonical = e.file.getCanonicalFile()
+        Path path = canonical.toPath()
         WatchKey wk = path.register(watchService, kinds)
-        watchedDirectories.put(e.file, wk)
-
+        watchedDirectories.put(canonical, wk)
+        
+        if (muOptions.watchedDirectories.add(canonical.toString()))
+            saveMuSettings()
     }
 
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         WatchKey wk = watchedDirectories.remove(e.directory)
         wk?.cancel()
+        
+        if (muOptions.watchedDirectories.remove(e.directory.toString()))
+            saveMuSettings()
+    }
+    
+    private void saveMuSettings() {
+        File muSettingsFile = new File(home, "MuWire.properties")
+        muSettingsFile.withOutputStream {
+            muOptions.write(it)
+        }
     }
 
     private void watch() {

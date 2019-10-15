@@ -11,6 +11,7 @@ class HasherService {
     final FileHasher hasher
     final EventBus eventBus
     final FileManager fileManager
+    final Set<File> hashed = new HashSet<>()
     Executor executor
 
     HasherService(FileHasher hasher, EventBus eventBus, FileManager fileManager) {
@@ -24,13 +25,22 @@ class HasherService {
     }
 
     void onFileSharedEvent(FileSharedEvent evt) {
-        if (fileManager.fileToSharedFile.containsKey(evt.file.getCanonicalFile()))
+        File canonical = evt.file.getCanonicalFile()
+        if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
-        executor.execute( { -> process(evt.file) } as Runnable)
+        if (hashed.add(canonical))
+            executor.execute( { -> process(canonical) } as Runnable)
+    }
+    
+    void onFileUnsharedEvent(FileUnsharedEvent evt) {
+        hashed.remove(evt.unsharedFile.file)
+    }
+    
+    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent evt) {
+        hashed.remove(evt.directory)
     }
 
     private void process(File f) {
-        f = f.getCanonicalFile()
         if (f.isDirectory()) {
             f.listFiles().each {eventBus.publish new FileSharedEvent(file: it) }
         } else {

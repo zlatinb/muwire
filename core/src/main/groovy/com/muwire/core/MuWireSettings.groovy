@@ -6,6 +6,7 @@ import com.muwire.core.hostcache.CrawlerResponse
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
+import net.i2p.util.ConcurrentHashSet
 
 class MuWireSettings {
 
@@ -113,7 +114,7 @@ class MuWireSettings {
     }
     
     private static Set<String> readEncodedSet(Properties props, String property) {
-        Set<String> rv = new HashSet<>()
+        Set<String> rv = new ConcurrentHashSet<>()
         if (props.containsKey(property)) {
             String[] encoded = props.getProperty(property).split(",")
             encoded.each { rv << DataUtil.readi18nString(Base64.decode(it)) }
