@@ -223,21 +223,20 @@ class MainFrameView {
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                gridLayout(rows:1, cols:2)
+                                gridLayout(rows:1, cols:3)
+                                panel {
+                                    buttonGroup(id : "sharedViewType")
+                                    radioButton(text : "Tree", selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
+                                    radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
+                                }
                                 panel {
                                     button(text : "Share files", actionPerformed : shareFiles)
                                     button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
                                 }
                                 panel {
-                                    gridLayout(rows : 1, cols : 2)
                                     panel {
                                         label("Shared:")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
-                                    }
-                                    panel {
-                                        buttonGroup(id : "sharedViewType")
-                                        radioButton(text : "Tree", selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
-                                        radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                     }
                                 }
                             }
