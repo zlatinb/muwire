@@ -217,7 +217,7 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
-                                            tree(id : "shared-files-tree", rootVisible : false, jtree)
+                                            tree(id : "shared-files-tree", rootVisible : false, expandsSelectedPaths: true, jtree)
                                         }
                                     }
                                 }
@@ -876,7 +876,10 @@ class MainFrameView {
     }
     
     public void refreshSharedFiles() {
+        def tree = builder.getVariable("shared-files-tree")
+        TreePath[] selectedPaths = tree.getSelectionPaths()
         model.sharedTree.nodeStructureChanged(model.treeRoot)
+        tree.setSelectionPaths(selectedPaths)
         builder.getVariable("shared-files-table").model.fireTableDataChanged()
     }
 }
