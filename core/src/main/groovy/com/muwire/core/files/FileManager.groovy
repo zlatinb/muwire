@@ -104,12 +104,13 @@ class FileManager {
         
         String comment = sf.getComment()
         if (comment != null) {
-            index.remove(comment)
             Set<File> existingComment = commentToFile.get(comment)
             if (existingComment != null) {
                 existingComment.remove(sf.getFile())
-                if (existingComment.isEmpty())
+                if (existingComment.isEmpty()) {
                     commentToFile.remove(comment)
+                    index.remove(comment)
+                }
             }
         }
 
