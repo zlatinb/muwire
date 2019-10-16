@@ -119,11 +119,12 @@ class FileManager {
     void onUICommentEvent(UICommentEvent e) {
         if (e.oldComment != null) {
             def comment = DataUtil.readi18nString(Base64.decode(e.oldComment))
-            index.remove(comment)
             Set<File> existingFiles = commentToFile.get(comment) 
             existingFiles.remove(e.sharedFile.getFile())
-            if (existingFiles.isEmpty())
+            if (existingFiles.isEmpty()) {
                 commentToFile.remove(comment)
+                index.remove(comment)
+            }
         }
         
         String comment = e.sharedFile.getComment()
