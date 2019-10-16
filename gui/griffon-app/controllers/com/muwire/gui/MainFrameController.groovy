@@ -288,6 +288,7 @@ class MainFrameController {
         
         Map<String, Object> params = new HashMap<>()
         params['selectedFiles'] = selectedFiles
+        params['core'] = core
         mvcGroup.createMVCGroup("add-comment", "Add Comment", params)
     }
 

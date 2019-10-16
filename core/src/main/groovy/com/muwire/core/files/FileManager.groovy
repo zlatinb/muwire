@@ -8,8 +8,10 @@ import com.muwire.core.UILoadedEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchIndex
+import com.muwire.core.util.DataUtil
 
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 
 @Log
 class FileManager {
@@ -20,6 +22,7 @@ class FileManager {
     final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
+    final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index = new SearchIndex()
 
     FileManager(EventBus eventBus, MuWireSettings settings) {
@@ -62,6 +65,18 @@ class FileManager {
         }
         existingFiles.add(sf.getFile())
 
+        String comment = sf.getComment()
+        if (comment != null) {
+            comment = DataUtil.readi18nString(Base64.decode(comment))
+            index.add(comment)
+            Set<File> existingComment = commentToFile.get(comment)
+            if(existingComment == null) {
+                existingComment = new HashSet<>()
+                commentToFile.put(comment, existingComment)
+            }
+            existingComment.add(sf.getFile())
+        }
+        
         index.add(name)
     }
 
@@ -86,8 +101,42 @@ class FileManager {
                 nameToFiles.remove(name)
             }
         }
+        
+        String comment = sf.getComment()
+        if (comment != null) {
+            index.remove(comment)
+            Set<File> existingComment = commentToFile.get(comment)
+            if (existingComment != null) {
+                existingComment.remove(sf.getFile())
+                if (existingComment.isEmpty())
+                    commentToFile.remove(comment)
+            }
+        }
 
         index.remove(name)
+    }
+    
+    void onUICommentEvent(UICommentEvent e) {
+        if (e.oldComment != null) {
+            def comment = DataUtil.readi18nString(Base64.decode(e.oldComment))
+            index.remove(comment)
+            Set<File> existingFiles = commentToFile.get(comment) 
+            existingFiles.remove(e.sharedFile.getFile())
+            if (existingFiles.isEmpty())
+                commentToFile.remove(comment)
+        }
+        
+        String comment = e.sharedFile.getComment()
+        comment = DataUtil.readi18nString(Base64.decode(comment))
+        if (comment != null) {
+            index.add(comment)
+            Set<File> existingComment = commentToFile.get(comment)
+            if(existingComment == null) {
+                existingComment = new HashSet<>()
+                commentToFile.put(comment, existingComment)
+            }
+            existingComment.add(e.sharedFile.getFile())
+        }        
     }
 
     Map<File, SharedFile> getSharedFiles() {
@@ -112,10 +161,14 @@ class FileManager {
         } else {
             def names = index.search e.searchTerms
             Set<File> files = new HashSet<>()
-            names.each { files.addAll nameToFiles.getOrDefault(it, []) }
+            names.each { 
+                files.addAll nameToFiles.getOrDefault(it, [])
+                files.addAll commentToFile.getOrDefault(it, []) 
+            }
             Set<SharedFile> sharedFiles = new HashSet<>()
             files.each { sharedFiles.add fileToSharedFile[it] }
             files = filter(sharedFiles, e.oobInfohash)
+            
             if (!sharedFiles.isEmpty())
                 re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
 

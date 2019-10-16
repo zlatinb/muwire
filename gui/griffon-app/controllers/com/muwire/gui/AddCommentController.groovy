@@ -8,6 +8,8 @@ import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 
+import com.muwire.core.Core
+import com.muwire.core.files.UICommentEvent
 import com.muwire.core.util.DataUtil
 
 @ArtifactProviderFor(GriffonController)
@@ -17,6 +19,8 @@ class AddCommentController {
     @MVCMember @Nonnull
     AddCommentView view
 
+    Core core
+    
     @ControllerAction
     void save() {
         String comment = view.textarea.getText()
@@ -25,7 +29,9 @@ class AddCommentController {
         else
             comment = Base64.encode(DataUtil.encodei18nString(comment))
         model.selectedFiles.each {
+            def event = new UICommentEvent(sharedFile : it, oldComment : it.getComment())
             it.setComment(comment)
+            core.eventBus.publish(event)    
         }
         mvcGroup.parentGroup.view.refreshSharedFiles()
         cancel()
