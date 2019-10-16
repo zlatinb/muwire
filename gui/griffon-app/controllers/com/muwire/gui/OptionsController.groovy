@@ -70,6 +70,10 @@ class OptionsController {
         model.updateCheckInterval = text
         settings.updateCheckInterval = Integer.valueOf(text)
 
+        boolean searchComments = view.searchCommentsCheckbox.model.isSelected()
+        model.searchComments = searchComments
+        settings.searchComments = searchComments
+        
         boolean autoDownloadUpdate = view.autoDownloadUpdateCheckbox.model.isSelected()
         model.autoDownloadUpdate = autoDownloadUpdate
         settings.autoDownloadUpdate = autoDownloadUpdate

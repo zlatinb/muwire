@@ -85,7 +85,8 @@ class MainFrameController {
             def terms = replaced.split(" ")
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }
-            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true)
+            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true, 
+                searchComments : core.muOptions.searchComments)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,

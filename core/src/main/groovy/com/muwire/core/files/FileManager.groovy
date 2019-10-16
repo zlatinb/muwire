@@ -165,7 +165,8 @@ class FileManager {
             Set<File> files = new HashSet<>()
             names.each { 
                 files.addAll nameToFiles.getOrDefault(it, [])
-                files.addAll commentToFile.getOrDefault(it, []) 
+                if (e.searchComments)
+                    files.addAll commentToFile.getOrDefault(it, [])
             }
             Set<SharedFile> sharedFiles = new HashSet<>()
             files.each { sharedFiles.add fileToSharedFile[it] }

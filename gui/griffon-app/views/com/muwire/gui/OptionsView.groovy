@@ -35,6 +35,7 @@ class OptionsView {
     def updateField
     def autoDownloadUpdateCheckbox
     def shareDownloadedCheckbox
+    def searchCommentsCheckbox
 
     def inboundLengthField
     def inboundQuantityField
@@ -69,23 +70,26 @@ class OptionsView {
         d.setResizable(false)
         p = builder.panel {
             gridBagLayout()
-            label(text : "Retry failed downloads every", constraints : gbc(gridx: 0, gridy: 0))
-            retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, constraints : gbc(gridx: 1, gridy: 0))
-            label(text : "seconds", constraints : gbc(gridx : 2, gridy: 0))
+            label(text : "Search in comments", constraints:gbc(gridx: 0, gridy:0))
+            searchCommentsCheckbox = checkBox(selected : bind {model.searchComments}, constraints : gbc(gridx:1, gridy:0))
+            
+            label(text : "Retry failed downloads every", constraints : gbc(gridx: 0, gridy: 1))
+            retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, constraints : gbc(gridx: 1, gridy: 1))
+            label(text : "seconds", constraints : gbc(gridx : 2, gridy: 1))
 
-            label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 1))
-            updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 1))
-            label(text : "hours", constraints : gbc(gridx: 2, gridy : 1))
+            label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 2))
+            updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 2))
+            label(text : "hours", constraints : gbc(gridx: 2, gridy : 2))
 
-            label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 2))
-            autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, constraints : gbc(gridx:1, gridy : 2))
+            label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 3))
+            autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, constraints : gbc(gridx:1, gridy : 3))
 
-            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:3))
-            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:3))
+            label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:4))
+            shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:4))
 
-            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:4))
-            button(text : "Choose", constraints : gbc(gridx : 1, gridy:4), downloadLocationAction)
-            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:5, gridwidth:2))
+            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:5))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:5), downloadLocationAction)
+            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:6, gridwidth:2))
 
         }
         i = builder.panel {

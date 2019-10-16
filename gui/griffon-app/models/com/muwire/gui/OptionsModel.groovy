@@ -14,6 +14,7 @@ class OptionsModel {
     @Observable boolean autoDownloadUpdate
     @Observable boolean shareDownloadedFiles
     @Observable String downloadLocation
+    @Observable boolean searchComments
 
     // i2p options
     @Observable String inboundLength
@@ -50,6 +51,7 @@ class OptionsModel {
         autoDownloadUpdate = settings.autoDownloadUpdate
         shareDownloadedFiles = settings.shareDownloadedFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
+        searchComments = settings.searchComments
 
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]
