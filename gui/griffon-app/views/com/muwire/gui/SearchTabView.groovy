@@ -226,6 +226,9 @@ class SearchTabView {
             JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
             copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
             menu.add(copyHashToClipboard)
+            JMenuItem copyNameToClipboard = new JMenuItem("Copy name to clipboard")
+            copyNameToClipboard.addActionListener({mvcGroup.view.copyNameToClipboard()})
+            menu.add(copyNameToClipboard)
             showMenu = true
             
             // show comment if any
@@ -241,16 +244,32 @@ class SearchTabView {
         if (showMenu)
             menu.show(e.getComponent(), e.getX(), e.getY())
     }
-
-    def copyHashToClipboard() {
+    
+    private UIResultEvent getSelectedResult() {
         int[] selectedRows = resultsTable.getSelectedRows()
         if (selectedRows.length != 1)
-            return
+            return null
         int selected = selectedRows[0]
         if (lastSortEvent != null)
             selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
-        String hash = Base64.encode(model.results[selected].infohash.getRoot())
+        model.results[selected]
+    }
+
+    def copyHashToClipboard() {
+        def result = getSelectedResult()
+        if (result == null)
+            return
+        String hash = Base64.encode(result.infohash.getRoot())
         StringSelection selection = new StringSelection(hash)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
+    }
+    
+    def copyNameToClipboard() {
+        def result = getSelectedResult()
+        if (result == null)
+            return
+        StringSelection selection = new StringSelection(result.getName())
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
     }
