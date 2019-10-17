@@ -10,14 +10,17 @@ import com.muwire.gui.UISettings
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.LookAndFeel
 import javax.swing.UIManager
+import javax.swing.plaf.FontUIResource
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
 import java.awt.Font
+import java.awt.Toolkit
 import java.util.logging.Level
 
 @Log
@@ -52,25 +55,43 @@ class Initialize extends AbstractLifecycleHandler {
             guiPropsFile.withInputStream { props.load(it) }
             uiSettings = new UISettings(props)
 
+            def lnf
             log.info("settting user-specified lnf $uiSettings.lnf")
             try {
-                lookAndFeel(uiSettings.lnf)
+                lnf = lookAndFeel(uiSettings.lnf)
             } catch (Throwable bad) {
-                log.log(Level.WARNING,"couldn't set desired look and feeel, switching to defaults", bad)
-                uiSettings.lnf = lookAndFeel("system","gtk","metal").getID()
+                log.log(Level.WARNING,"couldn't set desired look and feel, switching to defaults", bad)
+                lnf = lookAndFeel("system","gtk","metal")
+                uiSettings.lnf = lnf.getID()
             }
 
-            if (uiSettings.font != null) {
-                log.info("setting user-specified font $uiSettings.font")
-                Font font = new Font(uiSettings.font, Font.PLAIN, 12)
-                def defaults = UIManager.getDefaults()
-                defaults.put("Button.font", font)
-                defaults.put("RadioButton.font", font)
-                defaults.put("Label.font", font)
-                defaults.put("CheckBox.font", font)
-                defaults.put("Table.font", font)
-                defaults.put("TableHeader.font", font)
-                // TODO: add others
+            if (uiSettings.font != null || uiSettings.autoFontSize || uiSettings.fontSize > 0) {
+
+                FontUIResource defaultFont = lnf.getDefaults().getFont("Label.font")
+                
+                String fontName
+                if (uiSettings.font != null)
+                    fontName = uiSettings.font
+                else
+                    fontName = defaultFont.getName()
+                
+                int fontSize = defaultFont.getSize()
+                if (uiSettings.autoFontSize) {
+                    int resolution = Toolkit.getDefaultToolkit().getScreenResolution()
+                    fontSize = resolution / 9;
+                } else {
+                    fontSize = uiSettings.fontSize
+                }
+                
+                FontUIResource font = new FontUIResource(fontName, Font.PLAIN, fontSize)
+                
+                def keys = lnf.getDefaults().keys()
+                while(keys.hasMoreElements()) {
+                    def key = keys.nextElement()
+                    def value = lnf.getDefaults().get(key)
+                    if (value instanceof FontUIResource)
+                        lnf.getDefaults().put(key, font)
+                }
             }
         } else {
             Properties props = new Properties()

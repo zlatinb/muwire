@@ -29,6 +29,8 @@ class OptionsModel {
     @Observable boolean showMonitor
     @Observable String lnf
     @Observable String font
+    @Observable boolean automaticFontSize
+    @Observable int customFontSize
     @Observable boolean clearCancelledDownloads
     @Observable boolean clearFinishedDownloads
     @Observable boolean excludeLocalResult
@@ -67,6 +69,8 @@ class OptionsModel {
         showMonitor = uiSettings.showMonitor
         lnf = uiSettings.lnf
         font = uiSettings.font
+        automaticFontSize = uiSettings.autoFontSize
+        customFontSize = uiSettings.fontSize
         clearCancelledDownloads = uiSettings.clearCancelledDownloads
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult

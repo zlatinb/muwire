@@ -131,10 +131,9 @@ class OptionsController {
         text = view.fontField.text
         model.font = text
         uiSettings.font = text
-
-//        boolean showMonitor = view.monitorCheckbox.model.isSelected()
-//        model.showMonitor = showMonitor
-//        uiSettings.showMonitor = showMonitor
+        
+        uiSettings.autoFontSize = model.automaticFontSize
+        uiSettings.fontSize = Integer.parseInt(view.fontSizeField.text)
 
         boolean clearCancelledDownloads = view.clearCancelledDownloadsCheckbox.model.isSelected()
         model.clearCancelledDownloads = clearCancelledDownloads
@@ -148,10 +147,6 @@ class OptionsController {
         model.excludeLocalResult = excludeLocalResult
         uiSettings.excludeLocalResult = excludeLocalResult
 
-//        boolean showSearchHashes = view.showSearchHashesCheckbox.model.isSelected()
-//        model.showSearchHashes = showSearchHashes
-//        uiSettings.showSearchHashes = showSearchHashes
-        
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream {
             uiSettings.write(it)
@@ -176,4 +171,15 @@ class OptionsController {
         if (rv == JFileChooser.APPROVE_OPTION)
             model.downloadLocation = chooser.getSelectedFile().getAbsolutePath()
     }    
+    
+    @ControllerAction
+    void automaticFontAction() {
+        model.automaticFontSize = true
+        model.customFontSize = 12
+    }
+    
+    @ControllerAction
+    void customFontAction() {
+        model.automaticFontSize = false
+    }
 }

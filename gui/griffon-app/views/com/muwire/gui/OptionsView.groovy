@@ -12,6 +12,7 @@ import javax.swing.SwingConstants
 import com.muwire.core.Core
 
 import java.awt.BorderLayout
+import java.awt.GridBagConstraints
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -48,6 +49,7 @@ class OptionsView {
     def lnfField
     def monitorCheckbox
     def fontField
+    def fontSizeField
     def clearCancelledDownloadsCheckbox
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
@@ -121,19 +123,28 @@ class OptionsView {
             gridBagLayout()
             label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
             label(text : "Look And Feel", constraints : gbc(gridx: 0, gridy:1))
-            lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 1, gridy : 1))
+            lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_START))
             label(text : "Font", constraints : gbc(gridx: 0, gridy : 2))
-            fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 1, gridy:2))
-//            label(text : "Show Monitor", constraints : gbc(gridx :0, gridy: 3))
-//            monitorCheckbox = checkBox(selected : bind {model.showMonitor}, constraints : gbc(gridx : 1, gridy: 3))
-            label(text : "Automatically Clear Cancelled Downloads", constraints: gbc(gridx: 0, gridy:4))
-            clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads}, constraints : gbc(gridx : 1, gridy:4))
-            label(text : "Automatically Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:5))
-            clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, constraints : gbc(gridx : 1, gridy:5))
-            label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:6))
-            excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, constraints : gbc(gridx: 1, gridy : 6))
-//            label(text : "Show Hash Searches In Monitor", constraints: gbc(gridx:0, gridy:7))
-//            showSearchHashesCheckbox = checkBox(selected : bind {model.showSearchHashes}, constraints : gbc(gridx: 1, gridy: 7))
+            fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 1, gridy:2, anchor : GridBagConstraints.LINE_START))
+            
+            label(text : "Font Size", constraints : gbc(gridx: 0, gridy : 3))
+            buttonGroup(id: "fontSizeGroup")
+            radioButton(text: "Automatic", selected : bind {model.automaticFontSize}, buttonGroup : fontSizeGroup, 
+                constraints : gbc(gridx : 1, gridy: 3, anchor : GridBagConstraints.LINE_START), automaticFontAction)
+            radioButton(text: "Custom", selected : bind {!model.automaticFontSize}, buttonGroup : fontSizeGroup, 
+                constraints : gbc(gridx : 1, gridy: 4, anchor : GridBagConstraints.LINE_START), customFontAction)
+            fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, constraints : gbc(gridx : 2, gridy : 4))
+            
+            label(text : "Automatically Clear Cancelled Downloads", constraints: gbc(gridx: 0, gridy:5))
+            clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads}, 
+                constraints : gbc(gridx : 1, gridy:5, anchor : GridBagConstraints.LINE_START))
+            label(text : "Automatically Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:6))
+            clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, 
+                constraints : gbc(gridx : 1, gridy:6, anchor : GridBagConstraints.LINE_START))
+            label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:7))
+            excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, 
+                constraints : gbc(gridx: 1, gridy : 7, anchor : GridBagConstraints.LINE_START))
+            
         }
         bandwidth = builder.panel {
             gridBagLayout()
