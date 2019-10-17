@@ -13,6 +13,7 @@ class OptionsModel {
     @Observable String updateCheckInterval
     @Observable boolean autoDownloadUpdate
     @Observable boolean shareDownloadedFiles
+    @Observable boolean shareHiddenFiles
     @Observable String downloadLocation
     @Observable boolean searchComments
 
@@ -50,6 +51,7 @@ class OptionsModel {
         updateCheckInterval = settings.updateCheckInterval
         autoDownloadUpdate = settings.autoDownloadUpdate
         shareDownloadedFiles = settings.shareDownloadedFiles
+        shareHiddenFiles = settings.shareHiddenFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         searchComments = settings.searchComments
 

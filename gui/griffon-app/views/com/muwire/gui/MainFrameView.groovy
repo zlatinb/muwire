@@ -852,7 +852,7 @@ class MainFrameView {
 
     def shareFiles = {
         def chooser = new JFileChooser()
-        chooser.setFileHidingEnabled(false)
+        chooser.setFileHidingEnabled(!model.core.muOptions.shareHiddenFiles)
         chooser.setDialogTitle("Select file to share")
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
         chooser.setMultiSelectionEnabled(true)

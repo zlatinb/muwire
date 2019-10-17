@@ -290,7 +290,7 @@ public class Core {
         eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
 
         log.info("initializing hasher service")
-        hasherService = new HasherService(new FileHasher(), eventBus, fileManager)
+        hasherService = new HasherService(new FileHasher(), eventBus, fileManager, props)
         eventBus.register(FileSharedEvent.class, hasherService)
         eventBus.register(FileUnsharedEvent.class, hasherService)
         eventBus.register(DirectoryUnsharedEvent.class, hasherService)

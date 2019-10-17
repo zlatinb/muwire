@@ -24,6 +24,7 @@ class MuWireSettings {
     File downloadLocation
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
+    boolean shareHiddenFiles
     boolean searchComments
     Set<String> watchedDirectories
     float downloadSequentialRatio
@@ -53,6 +54,7 @@ class MuWireSettings {
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
         updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
+        shareHiddenFiles = Boolean.parseBoolean(props.getProperty("shareHiddenFiles","false"))
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","15"))
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "1440"))
@@ -92,6 +94,7 @@ class MuWireSettings {
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))
         props.setProperty("updateType",String.valueOf(updateType))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
+        props.setProperty("shareHiddenFiles", String.valueOf(shareHiddenFiles))
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("hostHopelessInterval", String.valueOf(hostHopelessInterval))

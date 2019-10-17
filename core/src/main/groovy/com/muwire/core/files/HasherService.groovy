@@ -4,6 +4,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 import com.muwire.core.EventBus
+import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 
 class HasherService {
@@ -12,12 +13,14 @@ class HasherService {
     final EventBus eventBus
     final FileManager fileManager
     final Set<File> hashed = new HashSet<>()
+    final MuWireSettings settings
     Executor executor
 
-    HasherService(FileHasher hasher, EventBus eventBus, FileManager fileManager) {
+    HasherService(FileHasher hasher, EventBus eventBus, FileManager fileManager, MuWireSettings settings) {
         this.hasher = hasher
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.settings = settings
     }
 
     void start() {
@@ -26,6 +29,8 @@ class HasherService {
 
     void onFileSharedEvent(FileSharedEvent evt) {
         File canonical = evt.file.getCanonicalFile()
+        if (!settings.shareHiddenFiles && canonical.isHidden())
+            return
         if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
         if (hashed.add(canonical))

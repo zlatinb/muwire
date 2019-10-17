@@ -35,6 +35,7 @@ class OptionsView {
     def updateField
     def autoDownloadUpdateCheckbox
     def shareDownloadedCheckbox
+    def shareHiddenCheckbox
     def searchCommentsCheckbox
 
     def inboundLengthField
@@ -86,10 +87,13 @@ class OptionsView {
 
             label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:4))
             shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:4))
+            
+            label(text : "Share hidden files", constraints : gbc(gridx : 0, gridy:5))
+            shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:5))
 
-            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:5))
-            button(text : "Choose", constraints : gbc(gridx : 1, gridy:5), downloadLocationAction)
-            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:6, gridwidth:2))
+            label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:6))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:6), downloadLocationAction)
+            label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:7, gridwidth:2))
 
         }
         i = builder.panel {

@@ -82,6 +82,10 @@ class OptionsController {
         boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
         model.shareDownloadedFiles = shareDownloaded
         settings.shareDownloadedFiles = shareDownloaded
+        
+        boolean shareHidden = view.shareHiddenCheckbox.model.isSelected()
+        model.shareHiddenFiles = shareHidden
+        settings.shareHiddenFiles = shareHidden
 
         String downloadLocation = model.downloadLocation
         settings.downloadLocation = new File(downloadLocation)
