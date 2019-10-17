@@ -22,6 +22,7 @@ import static groovy.swing.SwingBuilder.lookAndFeel
 import java.awt.Font
 import java.awt.Toolkit
 import java.util.logging.Level
+import java.util.logging.LogManager
 
 @Log
 class Initialize extends AbstractLifecycleHandler {
@@ -32,6 +33,16 @@ class Initialize extends AbstractLifecycleHandler {
 
     @Override
     void execute() {
+        
+        if (System.getProperty("java.util.logging.config.file") == null) {
+            log.info("No config file specified, so turning off logging")
+            def names = LogManager.getLogManager().getLoggerNames()
+            while(names.hasMoreElements()) {
+                def name = names.nextElement()
+                LogManager.getLogManager().getLogger(name).setLevel(Level.OFF)
+            }
+        }
+        
         log.info "Loading home dir"
         def portableHome = System.getProperty("portable.home")
         def home = portableHome == null ?
