@@ -37,11 +37,13 @@ import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.mesh.MeshManager
+import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchManager
+import com.muwire.core.search.UIBrowseEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustService
@@ -255,7 +257,7 @@ public class Core {
         I2PConnector i2pConnector = new I2PConnector(socketManager)
 
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me)
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props)
 
         log.info "initializing search manager"
         SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
@@ -281,7 +283,7 @@ public class Core {
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
-            i2pAcceptor, hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
+            i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher)
 
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
@@ -304,6 +306,11 @@ public class Core {
         contentManager = new ContentManager()
         eventBus.register(ContentControlEvent.class, contentManager)
         eventBus.register(QueryEvent.class, contentManager)
+        
+        log.info("initializing browse manager")
+        BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus)
+        eventBus.register(UIBrowseEvent.class, browseManager)
+        
     }
 
     public void startServices() {

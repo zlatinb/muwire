@@ -264,7 +264,7 @@ class ConnectionAcceptor {
             String header
             while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
 
-                OutputStream os = e.getOutputStream()
+            OutputStream os = e.getOutputStream()
             if (!settings.browseFiles) {
                 os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.flush()
