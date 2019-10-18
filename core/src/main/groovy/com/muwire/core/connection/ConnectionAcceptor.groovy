@@ -10,6 +10,7 @@ import java.util.zip.InflaterInputStream
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.files.FileManager
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
@@ -17,6 +18,7 @@ import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.DataUtil
 import com.muwire.core.search.InvalidSearchResultException
 import com.muwire.core.search.ResultsParser
+import com.muwire.core.search.ResultsSender
 import com.muwire.core.search.SearchManager
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
@@ -37,6 +39,7 @@ class ConnectionAcceptor {
     final TrustService trustService
     final SearchManager searchManager
     final UploadManager uploadManager
+    final FileManager fileManager
     final ConnectionEstablisher establisher
 
     final ExecutorService acceptorThread
@@ -47,7 +50,7 @@ class ConnectionAcceptor {
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
-        ConnectionEstablisher establisher) {
+        FileManager fileManager, ConnectionEstablisher establisher) {
         this.eventBus = eventBus
         this.manager = manager
         this.settings = settings
@@ -55,6 +58,7 @@ class ConnectionAcceptor {
         this.hostCache = hostCache
         this.trustService = trustService
         this.searchManager = searchManager
+        this.fileManager = fileManager
         this.uploadManager = uploadManager
         this.establisher = establisher
 
@@ -128,6 +132,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'T':
                     processTRUST(e)
+                    break
+                case (byte)'B':
+                    processBROWSE(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -246,44 +253,86 @@ class ConnectionAcceptor {
             e.close()
         }
     }
+    
+    private void processBROWSE(Endpoint e) {
+        try {
+            byte [] rowse = new byte[5]
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(rowse)
+            if (rowse != "OWSE\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new IOException("Invalid BROWSE connection")
+            String header
+            while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
+
+                OutputStream os = e.getOutputStream()
+            if (!settings.browseFiles) {
+                os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.flush()
+                e.close()
+                return
+            }
+
+
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            def sharedFiles = fileManager.getSharedFiles().values()
+
+            os.write("Count: ${sharedFiles.size()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            DataOutputStream dos = new DataOutputStream(os)
+            JsonOutput jsonOutput = new JsonOutput()
+            sharedFiles.each {
+                def obj = ResultsSender.sharedFileToObj(it, false)
+                def json = jsonOutput.toJson(obj)
+                dos.writeShort((short)json.length())
+                dos.write(json.getBytes(StandardCharsets.US_ASCII))
+            }
+            dos.flush()
+        } finally {
+            e.close()
+        }
+    }
 
     private void processTRUST(Endpoint e) {
-        byte[] RUST = new byte[6]
-        DataInputStream dis = new DataInputStream(e.getInputStream())
-        dis.readFully(RUST)
-        if (RUST != "RUST\r\n".getBytes(StandardCharsets.US_ASCII))
-            throw new IOException("Invalid TRUST connection")
-        String header
-        while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
+        try {
+            byte[] RUST = new byte[6]
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(RUST)
+            if (RUST != "RUST\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new IOException("Invalid TRUST connection")
+            String header
+            while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
 
-        OutputStream os = e.getOutputStream()
-        if (!settings.allowTrustLists) {
-            os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-            os.flush()
+                OutputStream os = e.getOutputStream()
+            if (!settings.allowTrustLists) {
+                os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.flush()
+                e.close()
+                return
+            }
+
+            os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            List<Persona> good = new ArrayList<>(trustService.good.values())
+            int size = Math.min(Short.MAX_VALUE * 2, good.size())
+            good = good.subList(0, size)
+            DataOutputStream dos = new DataOutputStream(os)
+            dos.writeShort(size)
+            good.each {
+                it.write(dos)
+            }
+
+            List<Persona> bad = new ArrayList<>(trustService.bad.values())
+            size = Math.min(Short.MAX_VALUE * 2, bad.size())
+            bad = bad.subList(0, size)
+            dos.writeShort(size)
+            bad.each {
+                it.write(dos)
+            }
+
+            dos.flush()
+        } finally {
             e.close()
-            return
         }
-
-        os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-        List<Persona> good = new ArrayList<>(trustService.good.values())
-        int size = Math.min(Short.MAX_VALUE * 2, good.size())
-        good = good.subList(0, size)
-        DataOutputStream dos = new DataOutputStream(os)
-        dos.writeShort(size)
-        good.each {
-            it.write(dos)
-        }
-
-        List<Persona> bad = new ArrayList<>(trustService.bad.values())
-        size = Math.min(Short.MAX_VALUE * 2, bad.size())
-        bad = bad.subList(0, size)
-        dos.writeShort(size)
-        bad.each {
-            it.write(dos)
-        }
-
-        dos.flush()
-        e.close()
     }
 
 }

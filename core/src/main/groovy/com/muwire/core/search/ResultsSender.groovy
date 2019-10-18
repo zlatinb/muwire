@@ -18,6 +18,7 @@ import java.util.stream.Collectors
 import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
 
 import groovy.json.JsonOutput
 import groovy.util.logging.Log
@@ -43,11 +44,13 @@ class ResultsSender {
     private final I2PConnector connector
     private final Persona me
     private final EventBus eventBus
+    private final MuWireSettings settings
 
-    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me) {
+    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings) {
         this.connector = connector;
         this.eventBus = eventBus
         this.me = me
+        this.settings = settings
     }
 
     void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash) {
@@ -91,7 +94,6 @@ class ResultsSender {
         @Override
         public void run() {
             try {
-                byte [] tmp = new byte[InfoHash.SIZE]
                 JsonOutput jsonOutput = new JsonOutput()
                 Endpoint endpoint = null;
                 try {
@@ -101,36 +103,7 @@ class ResultsSender {
                     me.write(os)
                     os.writeShort((short)results.length)
                     results.each {
-                        byte [] name = it.getFile().getName().getBytes(StandardCharsets.UTF_8)
-                        def baos = new ByteArrayOutputStream()
-                        def daos = new DataOutputStream(baos)
-                        daos.writeShort((short) name.length)
-                        daos.write(name)
-                        daos.flush()
-                        String encodedName = Base64.encode(baos.toByteArray())
-                        def obj = [:]
-                        obj.type = "Result"
-                        obj.version = oobInfohash ? 2 : 1
-                        obj.name = encodedName
-                        obj.infohash = Base64.encode(it.getInfoHash().getRoot())
-                        obj.size = it.getFile().length()
-                        obj.pieceSize = it.getPieceSize()
-                        if (!oobInfohash) {
-                            byte [] hashList = it.getInfoHash().getHashList()
-                            def hashListB64 = []
-                            for (int i = 0; i < hashList.length / InfoHash.SIZE; i++) {
-                                System.arraycopy(hashList, InfoHash.SIZE * i, tmp, 0, InfoHash.SIZE)
-                                hashListB64 << Base64.encode(tmp)
-                            }
-                            obj.hashList = hashListB64
-                        }
-
-                        if (it instanceof DownloadedFile)
-                            obj.sources = it.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
-                            
-                        if (it.getComment() != null)
-                            obj.comment = it.getComment()
-
+                        def obj = sharedFileToObj(it, settings.browseFiles)
                         def json = jsonOutput.toJson(obj)
                         os.writeShort((short)json.length())
                         os.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -143,5 +116,31 @@ class ResultsSender {
                 log.log(Level.WARNING, "problem sending results",e)
             }
         }
+    }
+    
+    public static def sharedFileToObj(SharedFile sf, boolean browseFiles) {
+        byte [] name = sf.getFile().getName().getBytes(StandardCharsets.UTF_8)
+        def baos = new ByteArrayOutputStream()
+        def daos = new DataOutputStream(baos)
+        daos.writeShort((short) name.length)
+        daos.write(name)
+        daos.flush()
+        String encodedName = Base64.encode(baos.toByteArray())
+        def obj = [:]
+        obj.type = "Result"
+        obj.version = 2
+        obj.name = encodedName
+        obj.infohash = Base64.encode(sf.getInfoHash().getRoot())
+        obj.size = sf.getCachedLength()
+        obj.pieceSize = sf.getPieceSize()
+
+        if (sf instanceof DownloadedFile)
+            obj.sources = sf.sources.stream().map({dest -> dest.toBase64()}).collect(Collectors.toSet())
+
+        if (sf.getComment() != null)
+            obj.comment = sf.getComment()
+
+        obj.browse = browseFiles 
+        obj
     }
 }

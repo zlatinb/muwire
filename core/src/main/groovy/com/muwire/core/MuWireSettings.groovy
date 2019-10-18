@@ -26,6 +26,7 @@ class MuWireSettings {
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
     boolean searchComments
+    boolean browseFiles
     Set<String> watchedDirectories
     float downloadSequentialRatio
     int hostClearInterval, hostHopelessInterval, hostRejectInterval
@@ -64,6 +65,7 @@ class MuWireSettings {
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
+        browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
 
         watchedDirectories = readEncodedSet(props, "watchedDirectories")
         watchedKeywords = readEncodedSet(props, "watchedKeywords")
@@ -104,6 +106,7 @@ class MuWireSettings {
         props.setProperty("inBw", String.valueOf(inBw))
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
+        props.setProperty("browseFiles", String.valueOf(browseFiles))
 
         writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         writeEncodedSet(watchedKeywords, "watchedKeywords", props)

@@ -15,6 +15,7 @@ class UIResultEvent extends Event {
     InfoHash infohash
     int pieceSize
     String comment
+    boolean browse
 
     @Override
     public String toString() {

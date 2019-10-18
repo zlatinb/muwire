@@ -94,6 +94,10 @@ class ResultsParser {
             String comment = null
             if (json.comment != null)
                 comment = DataUtil.readi18nString(Base64.decode(json.comment))
+                
+            boolean browse = false
+            if (json.browse != null)
+                browse = true
 
             return new UIResultEvent( sender : p,
                 name : name,
@@ -102,6 +106,7 @@ class ResultsParser {
                 pieceSize : pieceSize,
                 sources : sources,
                 comment : comment,
+                browse : browse,
                 uuid: uuid)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
