@@ -16,6 +16,7 @@ class OptionsModel {
     @Observable boolean shareHiddenFiles
     @Observable String downloadLocation
     @Observable boolean searchComments
+    @Observable boolean browseFiles
 
     // i2p options
     @Observable String inboundLength
@@ -56,6 +57,7 @@ class OptionsModel {
         shareHiddenFiles = settings.shareHiddenFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         searchComments = settings.searchComments
+        browseFiles = settings.browseFiles
 
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]

@@ -102,7 +102,7 @@ class BrowseView {
         controller.register()
         
         dialog.getContentPane().add(p)
-        dialog.pack()
+        dialog.setSize(700, 400)
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
         dialog.addWindowListener( new WindowAdapter() {
