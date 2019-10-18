@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
 import com.muwire.core.Core
+import com.muwire.core.Persona
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
@@ -84,5 +85,20 @@ class SearchTabController {
                 return
             def sender = model.senders[row]
             core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.NEUTRAL))
+        }
+        
+        @ControllerAction
+        void browse() {
+            int selectedSender = view.selectedSenderRow()
+            if (selectedSender < 0)
+                return
+            Persona sender = model.senders[selectedSender]
+            
+            String groupId = sender.getHumanReadableName()
+            Map<String,Object> params = new HashMap<>()
+            params['host'] = sender
+            params['eventBus'] = core.eventBus
+            
+            mvcGroup.createMVCGroup("browse", groupId, params)
         }
     }

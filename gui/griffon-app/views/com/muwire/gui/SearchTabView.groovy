@@ -63,6 +63,7 @@ class SearchTabView {
                                 tableModel(list : model.senders) {
                                     closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
                                     closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                    closureColumn(header : "Browse", preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
                                     closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
                                         model.core.trustService.getLevel(row.destination).toString()
                                     })
@@ -70,9 +71,15 @@ class SearchTabView {
                             }
                         }
                         panel(constraints : BorderLayout.SOUTH) {
-                            button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                            button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
-                            button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                            gridLayout(rows: 1, cols : 2)
+                            panel {
+                                button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
+                            }
+                            panel {
+                                button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                            }
                         }
                     }
                     panel {
@@ -193,12 +200,14 @@ class SearchTabView {
             int row = selectedSenderRow()
             if (row < 0) {
                 model.trustButtonsEnabled = false
+                model.browseActionEnabled = false
                 return
             } else {
+                Persona sender = model.senders[row]
+                model.browseActionEnabled = model.sendersBucket[sender].first().browse
                 model.trustButtonsEnabled = true
                 model.results.clear()
-                Persona p = model.senders[row]
-                model.results.addAll(model.sendersBucket[p])
+                model.results.addAll(model.sendersBucket[sender])
                 resultsTable.model.fireTableDataChanged()
             }
         })

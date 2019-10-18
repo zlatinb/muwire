@@ -56,4 +56,9 @@ mvcGroups {
         view = 'com.muwire.gui.AddCommentView'
         controller = 'com.muwire.gui.AddCommentController'
     }
+    'browse' {
+        model = 'com.muwire.gui.BrowseModel'
+        view = 'com.muwire.gui.BrowseView'
+        controller = 'com.muwire.gui.BrowseController'
+    }
 }

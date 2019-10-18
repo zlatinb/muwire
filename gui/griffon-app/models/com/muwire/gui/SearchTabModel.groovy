@@ -21,6 +21,7 @@ class SearchTabModel {
     
     @Observable boolean downloadActionEnabled
     @Observable boolean trustButtonsEnabled
+    @Observable boolean browseActionEnabled
 
     Core core
     UISettings uiSettings
