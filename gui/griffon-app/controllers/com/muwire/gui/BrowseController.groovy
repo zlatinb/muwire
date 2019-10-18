@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
 import com.muwire.core.EventBus
+import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.BrowseStatusEvent
 import com.muwire.core.search.UIBrowseEvent
 import com.muwire.core.search.UIResultEvent
@@ -53,7 +54,25 @@ class BrowseController {
     
     @ControllerAction
     void download() {
+        def selectedResults = view.selectedResults()
+        if (selectedResults == null || selectedResults.isEmpty())
+            return
+        selectedResults.removeAll {
+            !mvcGroup.parentGroup.parentGroup.model.canDownload(it.infohash)
+        }
         
+        selectedResults.each { result ->
+            def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
+            eventBus.publish(new UIDownloadEvent(
+                result : [result],
+                sources : [model.host.destination],
+                target : file,
+                sequential : mvcGroup.parentGroup.view.sequentialDownloadCheckbox.model.isSelected()
+                ))
+        }
+        
+        mvcGroup.parentGroup.parentGroup.view.showDownloadsWindow.call()
+        dismiss()
     }
     
     @ControllerAction

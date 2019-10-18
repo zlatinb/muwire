@@ -10,6 +10,8 @@ import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
+import com.muwire.core.search.UIResultEvent
+
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -111,4 +113,20 @@ class BrowseView {
         dialog.show()
     }
     
+    
+    def selectedResults() {
+        int [] rows = resultsTable.getSelectedRows()
+        if (rows.length == 0)
+            return null
+        if (lastSortEvent != null) {
+            for (int i = 0; i < rows.length; i ++) {
+                rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+            }
+        }
+        
+        List<UIResultEvent> rv = new ArrayList<>()
+        for (Integer i : rows)
+            rv << model.results[i]
+        rv
+    }
 }
