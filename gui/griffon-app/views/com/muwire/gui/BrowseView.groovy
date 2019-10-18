@@ -5,6 +5,8 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
@@ -20,6 +22,8 @@ class BrowseView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     BrowseModel model
+    @MVCMember @Nonnull
+    BrowseController controller
 
     def mainFrame
     def dialog
@@ -93,6 +97,8 @@ class BrowseView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        controller.register()
+        
         dialog.getContentPane().add(p)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)

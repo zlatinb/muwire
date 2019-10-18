@@ -8,6 +8,7 @@ import javax.annotation.Nonnull
 
 import com.muwire.core.EventBus
 import com.muwire.core.search.BrowseStatusEvent
+import com.muwire.core.search.UIBrowseEvent
 import com.muwire.core.search.UIResultEvent
 
 @ArtifactProviderFor(GriffonController)
@@ -20,9 +21,10 @@ class BrowseController {
     EventBus eventBus
     
     
-    void mvcGroupInit(Map<String,String> args) {
+    void register() {
         eventBus.register(BrowseStatusEvent.class, this)
         eventBus.register(UIResultEvent.class, this)
+        eventBus.publish(new UIBrowseEvent(host : model.host))
     }
     
     void mvcGroupDestroy() {
