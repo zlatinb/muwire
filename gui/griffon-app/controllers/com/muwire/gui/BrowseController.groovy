@@ -4,6 +4,8 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
+
 import javax.annotation.Nonnull
 
 import com.muwire.core.EventBus
@@ -77,6 +79,17 @@ class BrowseController {
     
     @ControllerAction
     void viewComment() {
+        def selectedResults = view.selectedResults()
+        if (selectedResults == null || selectedResults.size() != 1)
+            return
+        def result = selectedResults[0]
+        if (result.comment == null)
+            return
         
+        String groupId = Base64.encode(result.infohash.getRoot())
+        Map<String,Object> params = new HashMap<>()
+        params['result'] = result
+        
+        mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
 }
