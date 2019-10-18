@@ -256,10 +256,10 @@ class ConnectionAcceptor {
     
     private void processBROWSE(Endpoint e) {
         try {
-            byte [] rowse = new byte[5]
+            byte [] rowse = new byte[7]
             DataInputStream dis = new DataInputStream(e.getInputStream())
             dis.readFully(rowse)
-            if (rowse != "OWSE\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (rowse != "ROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new IOException("Invalid BROWSE connection")
             String header
             while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now

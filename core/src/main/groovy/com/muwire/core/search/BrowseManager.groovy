@@ -7,11 +7,14 @@ import com.muwire.core.connection.I2PConnector
 import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonSlurper
+import groovy.util.logging.Log
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.logging.Level
 
+@Log
 class BrowseManager {
     
     private final I2PConnector connector
@@ -73,6 +76,7 @@ class BrowseManager {
                 eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FINISHED))
                 
             } catch (Exception bad) {
+                log.log(Level.WARNING, "browse failed", bad)
                 eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FAILED))
             } finally {
                 endpoint?.close()
