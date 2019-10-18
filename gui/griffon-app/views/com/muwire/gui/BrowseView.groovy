@@ -90,7 +90,7 @@ class BrowseView {
                 model.viewCommentActionEnabled = false
              
             rows.each {
-                downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
+                downloadActionEnabled &= mvcGroup.parentGroup.parentGroup.model.canDownload(model.results[it].infohash)
             }
             model.downloadActionEnabled = downloadActionEnabled
         })
