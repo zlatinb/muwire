@@ -181,7 +181,6 @@ class MainFrameModel {
             core = e.getNewValue()
             routerPresent = core.router != null
             me = core.me.getHumanReadableName()
-            core.eventBus.register(UIResultEvent.class, this)
             core.eventBus.register(UIResultBatchEvent.class, this)
             core.eventBus.register(DownloadStartedEvent.class, this)
             core.eventBus.register(ConnectionEvent.class, this)
