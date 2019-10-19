@@ -97,7 +97,7 @@ class ResultsParser {
                 
             boolean browse = false
             if (json.browse != null)
-                browse = true
+                browse = json.browse
 
             return new UIResultEvent( sender : p,
                 name : name,

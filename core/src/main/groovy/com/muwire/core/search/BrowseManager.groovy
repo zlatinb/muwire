@@ -40,7 +40,7 @@ class BrowseManager {
                 InputStream is = endpoint.getInputStream()
                 String code = DataUtil.readTillRN(is)
                 if (!code.startsWith("200"))
-                    throw new IOException("Invalid code")
+                    throw new IOException("Invalid code $code")
                     
                 // parse all headers
                 Map<String,String> headers = new HashMap<>()
