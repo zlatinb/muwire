@@ -100,6 +100,7 @@ class SearchTabView {
                             panel()
                             panel {
                                 button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
                             }
                             panel {
                                 gridBagLayout()
@@ -190,6 +191,16 @@ class SearchTabView {
             }
         })
         
+        resultsTable.getSelectionModel().addListSelectionListener({
+            def result = getSelectedResult()
+            if (result == null) {
+                model.viewCommentActionEnabled = false
+                return
+            } else {
+                model.viewCommentActionEnabled = result.comment != null
+            }
+        })
+        
         // senders table
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
@@ -241,12 +252,9 @@ class SearchTabView {
             showMenu = true
             
             // show comment if any
-            int selectedRow = resultsTable.getSelectedRow()
-            if (lastSortEvent != null) 
-                selectedRow = resultsTable.rowSorter.convertRowIndexToModel(selectedRow)
-            if (model.results[selectedRow].comment != null) {
-                JMenuItem showComment = new JMenuItem("Show Comment")
-                showComment.addActionListener({mvcGroup.view.showComment()})
+            if (model.viewCommentActionEnabled) {
+                JMenuItem showComment = new JMenuItem("View Comment")
+                showComment.addActionListener({mvcGroup.controller.showComment()})
                 menu.add(showComment)
             }
         }
@@ -281,23 +289,6 @@ class SearchTabView {
         StringSelection selection = new StringSelection(result.getName())
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
-    }
-    
-    def showComment() {
-        int selectedRow = resultsTable.getSelectedRow()
-        if (selectedRow < 0)
-            return
-        if (lastSortEvent != null)
-            selectedRow = resultsTable.rowSorter.convertRowIndexToModel(selectedRow)
-        UIResultEvent event = model.results[selectedRow]
-        if (event.comment == null)
-            return
-            
-        String groupId = Base64.encode(event.infohash.getRoot())
-        Map<String,Object> params = new HashMap<>()
-        params['result'] = event
-        
-        mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
     
     int selectedSenderRow() {

@@ -4,6 +4,8 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
+
 import javax.annotation.Nonnull
 
 import com.muwire.core.Core
@@ -100,5 +102,23 @@ class SearchTabController {
             params['eventBus'] = core.eventBus
             
             mvcGroup.createMVCGroup("browse", groupId, params)
+        }
+        
+        @ControllerAction
+        void showComment() {
+            int[] selectedRows = view.resultsTable.getSelectedRows()
+            if (selectedRows.length != 1)
+                return
+            if (view.lastSortEvent != null)
+                selectedRows[0] = view.resultsTable.rowSorter.convertRowIndexToModel(selectedRows[0])
+            UIResultEvent event = model.results[selectedRows[0]]
+            if (event.comment == null)
+                return
+                
+            String groupId = Base64.encode(event.infohash.getRoot())
+            Map<String,Object> params = new HashMap<>()
+            params['result'] = event
+            
+            mvcGroup.createMVCGroup("show-comment", groupId, params)
         }
     }
