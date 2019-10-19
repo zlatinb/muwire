@@ -3,9 +3,12 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
 
 import javax.swing.JDialog
 import javax.swing.JLabel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
@@ -13,6 +16,10 @@ import javax.swing.table.DefaultTableCellRenderer
 import com.muwire.core.search.UIResultEvent
 
 import java.awt.BorderLayout
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -95,9 +102,70 @@ class BrowseView {
                 downloadActionEnabled &= mvcGroup.parentGroup.parentGroup.model.canDownload(model.results[it].infohash)
             }
             model.downloadActionEnabled = downloadActionEnabled
+            
+            resultsTable.addMouseListener(new MouseAdapter() {
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger())
+                        showMenu(e)
+                }
+                public void mousePressed(MouseEvent e) {
+                    if (e.isPopupTrigger())
+                        showMenu(e)
+                }
+            })
         })
     }
     
+    private void showMenu(MouseEvent e) {
+        JPopupMenu menu = new JPopupMenu()
+        if (model.downloadActionEnabled) {
+            JMenuItem download = new JMenuItem("Download")
+            download.addActionListener({controller.download()})
+            menu.add(download)
+        }
+        if (model.viewCommentActionEnabled) {
+            JMenuItem viewComment = new JMenuItem("View Comment")
+            viewComment.addActionListener({controller.viewComment()})
+            menu.add(viewComment)
+        }
+        
+        JMenuItem copyHash = new JMenuItem("Copy Hash To Clipboard")
+        copyHash.addActionListener({
+            List<UIResultEvent> results = selectedResults()
+            def hash = ""
+            for(Iterator<UIResultEvent> iter = results.iterator(); iter.hasNext();) {
+                UIResultEvent result = iter.next()
+                hash += Base64.encode(result.infohash.getRoot())
+                if (iter.hasNext())
+                    hash += "\n"
+            }
+            copyString(hash)
+        })
+        menu.add(copyHash)
+        
+        JMenuItem copyName = new JMenuItem("Copy Name To Clipboard")
+        copyName.addActionListener({
+            List<UIResultEvent> results = selectedResults()
+            def name = ""
+            for(Iterator<UIResultEvent> iter = results.iterator(); iter.hasNext();) {
+                UIResultEvent result = iter.next()
+                name += result.getName()
+                if (iter.hasNext())
+                    name += "\n"
+            }
+            copyString(name)
+            
+        })
+        menu.add(copyName)
+        
+        menu.show(e.getComponent(), e.getX(), e.getY())
+    }
+    
+    private static copyString(String s) {
+        StringSelection selection = new StringSelection(s)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
+    }
     void mvcGroupInit(Map<String,String> args) {
         controller.register()
         

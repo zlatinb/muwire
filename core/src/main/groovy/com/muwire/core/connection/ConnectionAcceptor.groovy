@@ -289,6 +289,7 @@ class ConnectionAcceptor {
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
             }
             dos.flush()
+            dos.close()
         } finally {
             e.close()
         }
