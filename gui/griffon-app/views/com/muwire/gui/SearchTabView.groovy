@@ -72,10 +72,10 @@ class SearchTabView {
                         }
                         panel(constraints : BorderLayout.SOUTH) {
                             gridLayout(rows: 1, cols : 2)
-                            panel {
+                            panel (border : etchedBorder()){
                                 button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
                             }
-                            panel {
+                            panel (border : etchedBorder()){
                                 button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
                                 button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
                                 button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
