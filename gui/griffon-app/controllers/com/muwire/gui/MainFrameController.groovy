@@ -78,7 +78,7 @@ class MainFrameController {
 
         def searchEvent
         if (hashSearch) {
-            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true)
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true, compressedResults : true)
         } else {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
@@ -86,7 +86,7 @@ class MainFrameController {
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true, 
-                searchComments : core.muOptions.searchComments)
+                searchComments : core.muOptions.searchComments, compressedResults : true)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,

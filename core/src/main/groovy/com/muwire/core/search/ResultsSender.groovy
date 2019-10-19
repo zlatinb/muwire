@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
 import java.util.stream.Collectors
+import java.util.zip.GZIPOutputStream
 
 import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
@@ -53,7 +54,7 @@ class ResultsSender {
         this.settings = settings
     }
 
-    void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash) {
+    void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults) {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()} oobInfohash : $oobInfohash")
         if (target.equals(me.destination)) {
             results.each {
@@ -81,7 +82,7 @@ class ResultsSender {
             }
         } else {
             executor.execute(new ResultSendJob(uuid : uuid, results : results,
-                target: target, oobInfohash : oobInfohash))
+                target: target, oobInfohash : oobInfohash, compressedResults : compressedResults))
         }
     }
 
@@ -90,27 +91,49 @@ class ResultsSender {
         SharedFile [] results
         Destination target
         boolean oobInfohash
+        boolean compressedResults
 
         @Override
         public void run() {
             try {
                 JsonOutput jsonOutput = new JsonOutput()
                 Endpoint endpoint = null;
-                try {
-                    endpoint = connector.connect(target)
-                    DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
-                    os.write("POST $uuid\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                    me.write(os)
-                    os.writeShort((short)results.length)
-                    results.each {
-                        def obj = sharedFileToObj(it, settings.browseFiles)
-                        def json = jsonOutput.toJson(obj)
-                        os.writeShort((short)json.length())
-                        os.write(json.getBytes(StandardCharsets.US_ASCII))
+                if (!compressedResults) {
+                    try {
+                        endpoint = connector.connect(target)
+                        DataOutputStream os = new DataOutputStream(endpoint.getOutputStream())
+                        os.write("POST $uuid\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                        me.write(os)
+                        os.writeShort((short)results.length)
+                        results.each {
+                            def obj = sharedFileToObj(it, settings.browseFiles)
+                            def json = jsonOutput.toJson(obj)
+                            os.writeShort((short)json.length())
+                            os.write(json.getBytes(StandardCharsets.US_ASCII))
+                        }
+                        os.flush()
+                    } finally {
+                        endpoint?.close()
                     }
-                    os.flush()
-                } finally {
-                    endpoint?.close()
+                } else {
+                    try {
+                        endpoint = connector.connect(target)
+                        OutputStream os = endpoint.getOutputStream()
+                        os.write("RESULTS $uuid\r\n".getBytes(StandardCharsets.US_ASCII))
+                        os.write("Sender: ${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                        os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
+                        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+                        DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+                        results.each { 
+                            def obj = sharedFileToObj(it, settings.browseFiles)
+                            def json = jsonOutput.toJson(obj)
+                            dos.writeShort((short)json.length())
+                            dos.write(json.getBytes(StandardCharsets.US_ASCII))
+                        }
+                        dos.close()
+                    } finally {
+                        endpoint?.close()
+                    }
                 }
             } catch (Exception e) {
                 log.log(Level.WARNING, "problem sending results",e)

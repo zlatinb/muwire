@@ -5,9 +5,11 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Level
 import java.util.zip.DeflaterOutputStream
+import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import java.util.zip.InflaterInputStream
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
@@ -28,6 +30,7 @@ import com.muwire.core.search.UnexpectedResultsException
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 
 @Log
 class ConnectionAcceptor {
@@ -130,6 +133,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'P':
                     processPOST(e)
+                    break
+                case (byte)'R':
+                    processRESULTS(e)
                     break
                 case (byte)'T':
                     processTRUST(e)
@@ -237,7 +243,7 @@ class ConnectionAcceptor {
 
             Persona sender = new Persona(dis)
             if (sender.destination != e.getDestination())
-                throw new IOException("Sender destination mismatch expected $e.getDestination(), got $sender.destination")
+                throw new IOException("Sender destination mismatch expected ${e.getDestination()}, got $sender.destination")
             int nResults = dis.readUnsignedShort()
             UIResultEvent[] results = new UIResultEvent[nResults]
             for (int i = 0; i < nResults; i++) {
@@ -253,6 +259,66 @@ class ConnectionAcceptor {
         } finally {
             e.close()
         }
+    }
+    
+    private void processRESULTS(Endpoint e) {
+        InputStream is = e.getInputStream()
+        DataInputStream dis = new DataInputStream(is)
+        byte[] esults = new byte[7]
+        dis.readFully(esults)
+        if (esults != "ESULTS ".getBytes(StandardCharsets.US_ASCII))
+            throw new IOException("Invalid RESULTS connection")
+            
+        JsonSlurper slurper = new JsonSlurper()
+        try {
+            String uuid = DataUtil.readTillRN(dis)
+            UUID resultsUUID = UUID.fromString(uuid)
+            if (!searchManager.hasLocalSearch(resultsUUID))
+                throw new UnexpectedResultsException(resultsUUID.toString())
+            
+                
+            // parse all headers
+            Map<String,String> headers = new HashMap<>()
+            String header
+            while((header = DataUtil.readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) {
+                int colon = header.indexOf(':')
+                if (colon == -1 || colon == header.length() - 1)
+                    throw new IOException("invalid header $header")
+                String key = header.substring(0, colon)
+                String value = header.substring(colon + 1)
+                headers[key] = value.trim()
+            }
+            
+            if (!headers.containsKey("Sender"))
+                throw new IOException("No Sender header")
+            if (!headers.containsKey("Count"))
+                throw new IOException("No Count header")
+                
+            byte [] personaBytes = Base64.decode(headers['Sender'])
+            Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
+            if (sender.destination != e.getDestination())
+                throw new IOException("Sender destination mismatch expected ${e.getDestination()}, got $sender.destination")
+                
+            int nResults = Integer.parseInt(headers['Count'])
+            if (nResults > Constants.MAX_RESULTS)
+                throw new IOException("too many results $nResults")
+                
+            dis = new DataInputStream(new GZIPInputStream(dis))
+            UIResultEvent[] results = new UIResultEvent[nResults]
+            for (int i = 0; i < nResults; i++) {
+                int jsonSize = dis.readUnsignedShort()
+                byte [] payload = new byte[jsonSize]
+                dis.readFully(payload)
+                def json = slurper.parse(payload)
+                results[i] = ResultsParser.parse(sender, resultsUUID, json)
+            }
+            eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
+        } catch (IOException bad) {
+            log.log(Level.WARNING, "failed to process RESULTS", bad)
+        } finally {
+            e.close()
+        }
+            
     }
     
     private void processBROWSE(Endpoint e) {

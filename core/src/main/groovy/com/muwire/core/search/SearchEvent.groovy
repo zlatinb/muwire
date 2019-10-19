@@ -10,11 +10,12 @@ class SearchEvent extends Event {
     UUID uuid
     boolean oobInfohash
     boolean searchComments
+    boolean compressedResults
 
     String toString() {
         def infoHash = null
         if (searchHash != null)
             infoHash = new InfoHash(searchHash)
-        "searchTerms: $searchTerms searchHash:$infoHash, uuid:$uuid oobInfohash:$oobInfohash searchComments:$searchComments"
+        "searchTerms: $searchTerms searchHash:$infoHash, uuid:$uuid oobInfohash:$oobInfohash searchComments:$searchComments compressedResults:$compressedResults"
     }
 }
