@@ -35,11 +35,11 @@ class Initialize extends AbstractLifecycleHandler {
     void execute() {
         
         if (System.getProperty("java.util.logging.config.file") == null) {
-            log.info("No config file specified, so turning off logging")
+            log.info("No config file specified, so turning off most logging")
             def names = LogManager.getLogManager().getLoggerNames()
             while(names.hasMoreElements()) {
                 def name = names.nextElement()
-                LogManager.getLogManager().getLogger(name).setLevel(Level.OFF)
+                LogManager.getLogManager().getLogger(name).setLevel(Level.SEVERE)
             }
         }
         
