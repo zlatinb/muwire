@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Level
 import java.util.zip.DeflaterOutputStream
+import java.util.zip.GZIPOutputStream
 import java.util.zip.InflaterInputStream
 
 import com.muwire.core.EventBus
@@ -279,7 +280,7 @@ class ConnectionAcceptor {
 
             os.write("Count: ${sharedFiles.size()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
 
-            DataOutputStream dos = new DataOutputStream(os)
+            DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
                 def obj = ResultsSender.sharedFileToObj(it, false)

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.logging.Level
+import java.util.zip.GZIPInputStream
 
 @Log
 class BrowseManager {
@@ -62,7 +63,7 @@ class BrowseManager {
                 eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FETCHING))
                 
                 JsonSlurper slurper = new JsonSlurper()
-                DataInputStream dis = new DataInputStream(is)
+                DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
                 UUID uuid = UUID.randomUUID()
                 for (int i = 0; i < results; i++) {
                     int size = dis.readUnsignedShort()
