@@ -44,7 +44,7 @@ public class SearchManager {
             log.info("No results for search uuid $event.uuid")
             return
         }
-        resultsSender.sendResults(event.uuid, event.results, target, event.searchEvent.oobInfohash)
+        resultsSender.sendResults(event.uuid, event.results, target, event.searchEvent.oobInfohash, event.searchEvent.compressedResults)
     }
 
     boolean hasLocalSearch(UUID uuid) {
