@@ -130,7 +130,7 @@ class OptionsView {
         }
         u = builder.panel {
             gridBagLayout()
-            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
+            label(text : "Changing font or look-and-feel requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
             label(text : "Look And Feel", constraints : gbc(gridx: 0, gridy:1))
             lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_START))
             label(text : "Font", constraints : gbc(gridx: 0, gridy : 2))
