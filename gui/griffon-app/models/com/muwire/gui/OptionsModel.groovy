@@ -15,6 +15,7 @@ class OptionsModel {
     @Observable boolean shareDownloadedFiles
     @Observable boolean shareHiddenFiles
     @Observable String downloadLocation
+    @Observable String incompleteLocation
     @Observable boolean searchComments
     @Observable boolean browseFiles
 
@@ -56,6 +57,7 @@ class OptionsModel {
         shareDownloadedFiles = settings.shareDownloadedFiles
         shareHiddenFiles = settings.shareHiddenFiles
         downloadLocation = settings.downloadLocation.getAbsolutePath()
+        incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
         browseFiles = settings.browseFiles
 

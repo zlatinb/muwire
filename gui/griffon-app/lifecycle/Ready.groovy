@@ -45,9 +45,12 @@ class Ready extends AbstractLifecycleHandler {
                 props.load(it)
             }
             props = new MuWireSettings(props)
+            if (props.incompleteLocation == null)
+                props.incompleteLocation = new File(home, "incompletes")
         } else {
             log.info("creating new properties")
             props = new MuWireSettings()
+            props.incompleteLocation = new File(home, "incompletes")
             props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
             props.updateType = System.getProperty("updateType","jar")
             def nickname

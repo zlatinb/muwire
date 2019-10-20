@@ -93,6 +93,9 @@ class OptionsController {
         
         String downloadLocation = model.downloadLocation
         settings.downloadLocation = new File(downloadLocation)
+        
+        String incompleteLocation = model.incompleteLocation
+        settings.incompleteLocation = new File(incompleteLocation)
 
         if (settings.embeddedRouter) {
             text = view.inBwField.text
@@ -174,7 +177,18 @@ class OptionsController {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
             model.downloadLocation = chooser.getSelectedFile().getAbsolutePath()
-    }    
+    }
+    
+    @ControllerAction
+    void incompleteLocation() {
+        def chooser = new JFileChooser()
+        chooser.setFileHidingEnabled(false)
+        chooser.setDialogTitle("Select location for downloaded files")
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        int rv = chooser.showOpenDialog(null)
+        if (rv == JFileChooser.APPROVE_OPTION)
+            model.incompleteLocation = chooser.getSelectedFile().getAbsolutePath()
+    }
     
     @ControllerAction
     void automaticFontAction() {

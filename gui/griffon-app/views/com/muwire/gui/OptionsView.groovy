@@ -100,6 +100,10 @@ class OptionsView {
             label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:7))
             button(text : "Choose", constraints : gbc(gridx : 1, gridy:7), downloadLocationAction)
             label(text : bind {model.downloadLocation}, constraints: gbc(gridx:0, gridy:8, gridwidth:2))
+            
+            label(text : "Store incomplete files in:", constraints: gbc(gridx:0, gridy:9))
+            button(text : "Choose", constraints : gbc(gridx : 1, gridy:9), incompleteLocationAction)
+            label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:0, gridy:10, gridwidth:2))
 
         }
         i = builder.panel {

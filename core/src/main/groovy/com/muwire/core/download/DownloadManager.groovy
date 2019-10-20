@@ -34,7 +34,7 @@ public class DownloadManager {
     private final MuWireSettings muSettings
     private final I2PConnector connector
     private final Executor executor
-    private final File incompletes, home
+    private final File home
     private final Persona me
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
@@ -46,11 +46,8 @@ public class DownloadManager {
         this.meshManager = meshManager
         this.muSettings = muSettings
         this.connector = connector
-        this.incompletes = new File(home,"incompletes")
         this.home = home
         this.me = me
-
-        incompletes.mkdir()
 
         this.executor = Executors.newCachedThreadPool({ r ->
             Thread rv = new Thread(r)
@@ -63,6 +60,11 @@ public class DownloadManager {
 
     public void onUIDownloadEvent(UIDownloadEvent e) {
 
+        File incompletes = muSettings.incompleteLocation
+        if (incompletes == null)
+            incompletes = new File(home, "incompletes")
+        incompletes.mkdirs()
+        
         def size = e.result[0].size
         def infohash = e.result[0].infohash
         def pieceSize = e.result[0].pieceSize
@@ -126,6 +128,10 @@ public class DownloadManager {
             boolean sequential = false
             if (json.sequential != null)
                 sequential = json.sequential
+                
+            File incompletes = this.incompletes
+            if (json.incompletes != null) 
+                incompletes = new File(DataUtil.readi18nString(Base64.decode(json.incompletes)))
 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
@@ -194,6 +200,8 @@ public class DownloadManager {
                     json.paused = downloader.paused
                     
                     json.sequential = downloader.pieces.ratio == 0f
+                    
+                    json.incompletes = Base64.encode(DataUtil.encodei18nString(downloader.incompletes.getAbsolutePath()))
                     
                     writer.println(JsonOutput.toJson(json))
                 }

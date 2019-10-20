@@ -48,6 +48,7 @@ public class Downloader {
     private final I2PConnector connector
     private final Set<Destination> destinations
     private final int nPieces
+    private final File incompletes
     private final File piecesFile
     private final File incompleteFile
     final int pieceSizePow2
@@ -76,6 +77,7 @@ public class Downloader {
         this.length = length
         this.connector = connector
         this.destinations = destinations
+        this.incompletes = incompletes
         this.piecesFile = new File(incompletes, file.getName()+".pieces")
         this.incompleteFile = new File(incompletes, file.getName()+".part")
         this.pieceSizePow2 = pieceSizePow2

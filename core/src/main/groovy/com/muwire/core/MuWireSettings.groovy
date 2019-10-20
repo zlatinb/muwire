@@ -22,6 +22,7 @@ class MuWireSettings {
     String updateType
     String nickname
     File downloadLocation
+    File incompleteLocation
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
@@ -50,6 +51,9 @@ class MuWireSettings {
         nickname = props.getProperty("nickname","MuWireUser")
         downloadLocation = new File((String)props.getProperty("downloadLocation",
             System.getProperty("user.home")))
+        String incompleteLocationProp = props.getProperty("incompleteLocation")
+        if (incompleteLocationProp != null)
+            incompleteLocation = new File(incompleteLocationProp)
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","60"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
@@ -91,6 +95,8 @@ class MuWireSettings {
         props.setProperty("crawlerResponse", crawlerResponse.toString())
         props.setProperty("nickname", nickname)
         props.setProperty("downloadLocation", downloadLocation.getAbsolutePath())
+        if (incompleteLocation != null)
+            props.setProperty("incompleteLocation", incompleteLocation.getAbsolutePath())
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))
