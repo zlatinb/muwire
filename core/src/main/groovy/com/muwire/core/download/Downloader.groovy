@@ -27,6 +27,7 @@ import net.i2p.util.ConcurrentHashSet
 
 @Log
 public class Downloader {
+    
     public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, PAUSED, FINISHED }
     private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
 
@@ -84,10 +85,6 @@ public class Downloader {
         this.pieceSize = 1 << pieceSizePow2
         this.pieces = pieces
         this.nPieces = pieces.nPieces
-
-        // default size suitable for an average of 5 seconds / 5 elements / 5 interval units
-        // it's easily adjustable by resizing the size of speedArr
-        this.speedArr = [ 0, 0, 0, 0, 0 ]
     }
 
     public synchronized InfoHash getInfoHash() {
@@ -146,6 +143,12 @@ public class Downloader {
                 if (it.currentState == WorkerState.DOWNLOADING)
                     currSpeed += it.speed()
             }
+        }
+        
+        if (speedArr.size() != downloadManager.muSettings.speedSmoothSeconds) {
+            speedArr.clear()
+            downloadManager.muSettings.speedSmoothSeconds.times { speedArr.add(0) }
+            speedPos = 0
         }
 
         // normalize to speedArr.size

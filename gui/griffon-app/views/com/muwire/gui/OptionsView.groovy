@@ -39,6 +39,7 @@ class OptionsView {
     def shareHiddenCheckbox
     def searchCommentsCheckbox
     def browseFilesCheckbox
+    def speedSmoothSecondsField
 
     def inboundLengthField
     def inboundQuantityField
@@ -149,9 +150,12 @@ class OptionsView {
             label(text : "Automatically Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:6))
             clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads}, 
                 constraints : gbc(gridx : 1, gridy:6, anchor : GridBagConstraints.LINE_START))
-            label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:7))
+            label(text : "Smooth Download Speed Over (seconds)", constraints : gbc(gridx: 0, gridy : 7))
+            speedSmoothSecondsField = textField(text : bind {model.speedSmoothSeconds}, 
+                constraints : gbc(gridx:1, gridy: 7, anchor : GridBagConstraints.LINE_START))
+            label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:8))
             excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult}, 
-                constraints : gbc(gridx: 1, gridy : 7, anchor : GridBagConstraints.LINE_START))
+                constraints : gbc(gridx: 1, gridy : 8, anchor : GridBagConstraints.LINE_START))
             
         }
         bandwidth = builder.panel {

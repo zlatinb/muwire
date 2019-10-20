@@ -18,6 +18,7 @@ class OptionsModel {
     @Observable String incompleteLocation
     @Observable boolean searchComments
     @Observable boolean browseFiles
+    @Observable int speedSmoothSeconds
 
     // i2p options
     @Observable String inboundLength
@@ -60,6 +61,7 @@ class OptionsModel {
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
         browseFiles = settings.browseFiles
+        speedSmoothSeconds = settings.speedSmoothSeconds
 
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]

@@ -32,6 +32,7 @@ class MuWireSettings {
     float downloadSequentialRatio
     int hostClearInterval, hostHopelessInterval, hostRejectInterval
     int meshExpiration
+    int speedSmoothSeconds
     boolean embeddedRouter
     int inBw, outBw
     Set<String> watchedKeywords
@@ -70,6 +71,7 @@ class MuWireSettings {
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
+        speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
 
         watchedDirectories = readEncodedSet(props, "watchedDirectories")
         watchedKeywords = readEncodedSet(props, "watchedKeywords")
@@ -113,6 +115,7 @@ class MuWireSettings {
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
+        props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
 
         writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         writeEncodedSet(watchedKeywords, "watchedKeywords", props)

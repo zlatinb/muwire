@@ -91,6 +91,10 @@ class OptionsController {
         model.browseFiles = browseFiles
         settings.browseFiles = browseFiles
         
+        text = view.speedSmoothSecondsField.text
+        model.speedSmoothSeconds = Integer.valueOf(text)
+        settings.speedSmoothSeconds = Integer.valueOf(text)
+        
         String downloadLocation = model.downloadLocation
         settings.downloadLocation = new File(downloadLocation)
         
