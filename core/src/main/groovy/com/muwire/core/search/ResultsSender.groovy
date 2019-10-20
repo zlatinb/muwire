@@ -57,6 +57,7 @@ class ResultsSender {
     void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults) {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()} oobInfohash : $oobInfohash")
         if (target.equals(me.destination)) {
+            def uiResultEvents = []
             results.each {
                 long length = it.getFile().length()
                 int pieceSize = it.getPieceSize()
@@ -78,8 +79,9 @@ class ResultsSender {
                     sources : suggested,
                     comment : comment
                     )
-                    eventBus.publish(uiResultEvent)
+                uiResultEvents << uiResultEvent
             }
+            eventBus.publish(new UIResultBatchEvent(uuid : uuid, results : uiResultEvents))
         } else {
             executor.execute(new ResultSendJob(uuid : uuid, results : results,
                 target: target, oobInfohash : oobInfohash, compressedResults : compressedResults))
