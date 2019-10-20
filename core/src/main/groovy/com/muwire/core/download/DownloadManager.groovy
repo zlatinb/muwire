@@ -129,9 +129,11 @@ public class DownloadManager {
             if (json.sequential != null)
                 sequential = json.sequential
                 
-            File incompletes = this.incompletes
+            File incompletes
             if (json.incompletes != null) 
                 incompletes = new File(DataUtil.readi18nString(Base64.decode(json.incompletes)))
+            else
+                incompletes = new File(home, "incompletes")
 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
