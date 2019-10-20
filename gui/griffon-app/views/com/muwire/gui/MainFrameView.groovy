@@ -141,6 +141,15 @@ class MainFrameView {
                                             closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
                                             })
+                                            closureColumn(header : "ETA", preferredWidth : 50, type:String, read :{ row ->
+                                                def speed = row.downloader.speed()
+                                                if (speed == 0)
+                                                    return "Unknown"
+                                                else {
+                                                    def remaining = (row.downloader.nPieces - row.downloader.donePieces()) * row.downloader.pieceSize / speed
+                                                    return DataHelper.formatDuration(remaining.toLong() * 1000)
+                                                }
+                                            })
                                         }
                                     }
                                 }
