@@ -717,9 +717,12 @@ class MainFrameView {
     }
 
     int selectedDownloaderRow() {
-        int selected = builder.getVariable("downloads-table").getSelectedRow()
+        def downloadsTable = builder.getVariable("downloads-table")
+        int selected = downloadsTable.getSelectedRow()
+        if (selected < 0)
+            return selected
         if (lastDownloadSortEvent != null)
-            selected = lastDownloadSortEvent.convertPreviousRowIndexToModel(selected)
+            selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
         selected
     }
 
