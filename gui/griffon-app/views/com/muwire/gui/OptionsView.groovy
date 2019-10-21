@@ -93,10 +93,9 @@ class OptionsView {
             panel (border : titledBorder(title : "Download Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL))) {
                 gridBagLayout()
-                label(text : "Retry failed downloads every", constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Retry failed downloads every (seconds)", constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, 
-                    constraints : gbc(gridx: 1, gridy: 0, anchor : GridBagConstraints.LINE_END, weightx: 0))
-                label(text : "seconds", constraints : gbc(gridx : 2, gridy: 0, weightx : 0, anchor : GridBagConstraints.LINE_START))
+                    constraints : gbc(gridx: 2, gridy: 0, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
                 label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START))
                 label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_START))
@@ -120,59 +119,71 @@ class OptionsView {
             panel (border : titledBorder(title : "Update Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL))) {
                 gridBagLayout()
-                label(text : "Check for updates every", constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Check for updates every (hours)", constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
-                label(text : "hours", constraints : gbc(gridx: 2, gridy : 0, weightx: 0, anchor : GridBagConstraints.LINE_START))
 
                 label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, 
-                    constraints : gbc(gridx:2, gridy : 1, anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL))
+                    constraints : gbc(gridx:1, gridy : 1, anchor : GridBagConstraints.LINE_END))
 
             }
         }
         i = builder.panel {
             gridBagLayout()
-            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2, anchor:GridBagConstraints.PAGE_START))
-            label(text : "Inbound Length", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START))
-            inboundLengthField = textField(text : bind {model.inboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:1))
-            label(text : "Inbound Quantity", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
-            inboundQuantityField = textField(text : bind {model.inboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:2))
-            label(text : "Outbound Length", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
-            outboundLengthField = textField(text : bind {model.outboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:3))
-            label(text : "Outbound Quantity", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_START))
-            outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:4))
+            label(text : "Changing any I2P settings requires a restart", constraints : gbc(gridx:0, gridy : 0))
+            panel (border : titledBorder(title : "Tunnel Settings", border : etchedBorder(), titlePosition: TitledBorder.TOP,
+            constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
+                gridBagLayout()
+                label(text : "Inbound Length", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                inboundLengthField = textField(text : bind {model.inboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:0, 
+                    anchor : GridBagConstraints.LINE_END))
+                label(text : "Inbound Quantity", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                inboundQuantityField = textField(text : bind {model.inboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:1,
+                    anchor : GridBagConstraints.LINE_END))
+                label(text : "Outbound Length", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                outboundLengthField = textField(text : bind {model.outboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:2,
+                    anchor : GridBagConstraints.LINE_END))
+                label(text : "Outbound Quantity", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:3,
+                    anchor : GridBagConstraints.LINE_END))
+            }
 
             Core core = application.context.get("core")
             if (core.router != null) {
-                label(text : "TCP Port", constraints : gbc(gridx :0, gridy: 5, anchor : GridBagConstraints.LINE_START))
-                i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:5))
-                label(text : "UDP Port", constraints : gbc(gridx :0, gridy: 6, anchor : GridBagConstraints.LINE_START))
-                i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:6))
+                panel(border : titledBorder(title : "Port Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
+                constraints : gbc(gridx: 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100))) {
+                    gridBagLayout()
+                    label(text : "TCP Port", constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                    label(text : "UDP Port", constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                }
             }
-            panel(constraints : gbc(gridx: 0, gridy: 7, weighty: 100))
+            panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
 
         }
         u = builder.panel {
             gridBagLayout()
             panel (border : titledBorder(title : "Theme Settings (changes require restart)", border : etchedBorder(), titlePosition: TitledBorder.TOP,
-            constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL))) {
+            constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : "Look And Feel", constraints : gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_START))
+                lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 3, gridy : 0, anchor : GridBagConstraints.LINE_START))
                 label(text : "Font", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_START))
+                fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
 
                 label(text : "Font Size", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 buttonGroup(id: "fontSizeGroup")
                 radioButton(text: "Automatic", selected : bind {model.automaticFontSize}, buttonGroup : fontSizeGroup,
                 constraints : gbc(gridx : 1, gridy: 2, anchor : GridBagConstraints.LINE_START), automaticFontAction)
                 radioButton(text: "Custom", selected : bind {!model.automaticFontSize}, buttonGroup : fontSizeGroup,
-                constraints : gbc(gridx : 1, gridy: 3, anchor : GridBagConstraints.LINE_START), customFontAction)
-                fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, constraints : gbc(gridx : 2, gridy : 3))
+                constraints : gbc(gridx : 2, gridy: 2, anchor : GridBagConstraints.LINE_START), customFontAction)
+                fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, 
+                    constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END))
 
             }
-            panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
-            constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL))) {
+            panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
                 label(text : "Automatically Clear Cancelled Downloads", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads},
@@ -191,26 +202,31 @@ class OptionsView {
         }
         bandwidth = builder.panel {
             gridBagLayout()
-            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
-            label(text : "Inbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START))
-            inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1))
-            label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START))
-            outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 2))
-            panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
+            panel( border : titledBorder(title : "Changing bandwidth settings requires a restart", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
+                gridBagLayout()
+                label(text : "Inbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(constraints : gbc(gridx: 0, gridy: 1, weighty: 100))
         }
         trust = builder.panel {
             gridBagLayout()
-            label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START))
-            allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0))
-            label(text : "Search extra hop", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START))
-            searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, constraints : gbc(gridx: 1, gridy : 1))
-            label(text : "Allow others to view my trust list", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START))
-            allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2))
-            label(text : "Update trust lists every ", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
-            trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3))
-            label(text : "hours", constraints : gbc(gridx: 2, gridy:3))
-            
-            panel(constraints : gbc(gridx: 0, gridy : 4, weighty: 100))
+            panel (border : titledBorder(title : "Trust Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Allow only trusted connections", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Search extra hop", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Allow others to view my trust list", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                label(text : "Update trust lists every (hours)", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }
 
 
