@@ -7,10 +7,12 @@ import griffon.metadata.ArtifactProviderFor
 import javax.swing.JDialog
 import javax.swing.JPanel
 import javax.swing.SwingConstants
+import javax.swing.border.TitledBorder
 
 import com.muwire.core.Core
 
 import java.awt.BorderLayout
+import java.awt.GridBagConstraints
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -35,16 +37,32 @@ class MuWireStatusView {
 
         panel = builder.panel {
             gridBagLayout()
-            label(text : "Incoming connections", constraints : gbc(gridx:0, gridy:0))
-            label(text : bind {model.incomingConnections}, constraints : gbc(gridx:1, gridy:0))
-            label(text : "Outgoing connections", constraints : gbc(gridx:0, gridy:1))
-            label(text : bind {model.outgoingConnections}, constraints : gbc(gridx:1, gridy:1))
-            label(text : "Known hosts", constraints : gbc(gridx:0, gridy:2))
-            label(text : bind {model.knownHosts}, constraints : gbc(gridx:1, gridy:2))
-            label(text : "Shared files", constraints : gbc(gridx:0, gridy:3))
-            label(text : bind {model.sharedFiles}, constraints : gbc(gridx:1, gridy:3))
-            label(text : "Downloads", constraints : gbc(gridx:0, gridy:4))
-            label(text : bind {model.downloads}, constraints : gbc(gridx:1, gridy:4))
+            panel(border : titledBorder(title : "Connections", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy: 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Incoming", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.incomingConnections}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Outgoing", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.outgoingConnections}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(border : titledBorder(title : "Hosts", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Known", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.knownHosts}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Failing", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.failingHosts}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Hopeless", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.hopelessHosts}, constraints : gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(border : titledBorder(title : "Files", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Shared", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.sharedFiles}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Downloading", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.downloads}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+            }
         }
         buttonsPanel = builder.panel {
             gridBagLayout()
@@ -60,7 +78,8 @@ class MuWireStatusView {
         statusPanel.add(buttonsPanel, BorderLayout.SOUTH)
 
         dialog.getContentPane().add(statusPanel)
-        dialog.pack()
+        dialog.setSize(200,300)
+        dialog.setResizable(false)
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
         dialog.addWindowListener(new WindowAdapter() {

@@ -105,6 +105,22 @@ class HostCache extends Service {
         Collections.shuffle(rv)
         rv[0..n-1]
     }
+    
+    int countFailingHosts() {
+        List<Destination> rv = new ArrayList<>(hosts.keySet())
+        rv.retainAll { 
+            hosts[it].isFailed()
+        }
+        rv.size()
+    }
+    
+    int countHopelessHosts() {
+        List<Destination> rv = new ArrayList<>(hosts.keySet())
+        rv.retainAll {
+            hosts[it].isHopeless()
+        }
+        rv.size()
+    }
 
     void load() {
         if (storage.exists()) {

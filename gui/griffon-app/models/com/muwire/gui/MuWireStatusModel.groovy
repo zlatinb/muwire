@@ -16,6 +16,8 @@ class MuWireStatusModel {
     @Observable int incomingConnections
     @Observable int outgoingConnections
     @Observable int knownHosts
+    @Observable int failingHosts
+    @Observable int hopelessHosts
     @Observable int sharedFiles
     @Observable int downloads
 
