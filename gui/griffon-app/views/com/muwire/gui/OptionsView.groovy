@@ -192,10 +192,11 @@ class OptionsView {
         bandwidth = builder.panel {
             gridBagLayout()
             label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
-            label(text : "Inbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 1))
+            label(text : "Inbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START))
             inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1))
-            label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 2))
+            label(text : "Outbound bandwidth (KB)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START))
             outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 2))
+            panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
         }
         trust = builder.panel {
             gridBagLayout()
