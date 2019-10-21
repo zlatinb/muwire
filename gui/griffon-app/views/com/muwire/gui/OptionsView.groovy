@@ -134,16 +134,16 @@ class OptionsView {
             panel (border : titledBorder(title : "Tunnel Settings", border : etchedBorder(), titlePosition: TitledBorder.TOP,
             constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
-                label(text : "Inbound Length", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Inbound length", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 inboundLengthField = textField(text : bind {model.inboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:0, 
                     anchor : GridBagConstraints.LINE_END))
-                label(text : "Inbound Quantity", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Inbound quantity", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 inboundQuantityField = textField(text : bind {model.inboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:1,
                     anchor : GridBagConstraints.LINE_END))
-                label(text : "Outbound Length", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Outbound length", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 outboundLengthField = textField(text : bind {model.outboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:2,
                     anchor : GridBagConstraints.LINE_END))
-                label(text : "Outbound Quantity", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Outbound quantity", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:3,
                     anchor : GridBagConstraints.LINE_END))
             }
@@ -153,9 +153,9 @@ class OptionsView {
                 panel(border : titledBorder(title : "Port Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx: 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100))) {
                     gridBagLayout()
-                    label(text : "TCP Port", constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    label(text : "TCP port", constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                    label(text : "UDP Port", constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    label(text : "UDP port", constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 }
             }
@@ -172,7 +172,7 @@ class OptionsView {
                 label(text : "Font", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
 
-                label(text : "Font Size", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Font size", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 buttonGroup(id: "fontSizeGroup")
                 radioButton(text: "Automatic", selected : bind {model.automaticFontSize}, buttonGroup : fontSizeGroup,
                 constraints : gbc(gridx : 1, gridy: 2, anchor : GridBagConstraints.LINE_START), automaticFontAction)
@@ -185,16 +185,16 @@ class OptionsView {
             panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
-                label(text : "Automatically Clear Cancelled Downloads", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Automatically clear cancelled downloads", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads},
                 constraints : gbc(gridx : 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Automatically Clear Finished Downloads", constraints: gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Automatically flear finished downloads", constraints: gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads},
                 constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Smooth Download Speed Over (seconds)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Smooth download speed over (seconds)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 speedSmoothSecondsField = textField(text : bind {model.speedSmoothSeconds},
                 constraints : gbc(gridx:1, gridy: 2, anchor : GridBagConstraints.LINE_START))
-                label(text : "Exclude Local Files From Results", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Exclude local files from results", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
             }
