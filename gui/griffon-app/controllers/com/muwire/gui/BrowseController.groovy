@@ -10,6 +10,7 @@ import javax.annotation.Nonnull
 
 import com.muwire.core.EventBus
 import com.muwire.core.download.UIDownloadEvent
+import com.muwire.core.search.BrowseStatus
 import com.muwire.core.search.BrowseStatusEvent
 import com.muwire.core.search.UIBrowseEvent
 import com.muwire.core.search.UIResultEvent
@@ -38,12 +39,15 @@ class BrowseController {
     void onBrowseStatusEvent(BrowseStatusEvent e) {
         runInsideUIAsync {
             model.status = e.status
+            if (e.status == BrowseStatus.FETCHING)
+                model.totalResults = e.totalResults
         }
     }
     
     void onUIResultEvent(UIResultEvent e) {
         runInsideUIAsync {
             model.results << e
+            model.resultCount = model.results.size()
             view.resultsTable.model.fireTableDataChanged()
         }
     }

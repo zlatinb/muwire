@@ -4,4 +4,5 @@ import com.muwire.core.Event
 
 class BrowseStatusEvent extends Event {
     BrowseStatus status
+    int totalResults
 }

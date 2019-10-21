@@ -14,6 +14,8 @@ class BrowseModel {
     @Observable BrowseStatus status
     @Observable boolean downloadActionEnabled
     @Observable boolean viewCommentActionEnabled
+    @Observable int totalResults
+    @Observable int resultCount
     
     def results = []
 }

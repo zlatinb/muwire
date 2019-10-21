@@ -60,7 +60,7 @@ class BrowseManager {
                 int results = Integer.parseInt(headers['Count'])
                 
                 // at this stage, start pulling the results
-                eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FETCHING))
+                eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FETCHING, totalResults : results))
                 
                 JsonSlurper slurper = new JsonSlurper()
                 DataInputStream dis = new DataInputStream(new GZIPInputStream(is))

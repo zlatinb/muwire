@@ -49,6 +49,7 @@ class BrowseView {
             panel (constraints : BorderLayout.NORTH) {
                 label(text: "Status:")
                 label(text: bind {model.status.toString()})
+                label(text : bind {model.totalResults == 0 ? "" : (model.resultCount * 100 / model.totalResults)+ "%"})
             }
             scrollPane (constraints : BorderLayout.CENTER){
                 resultsTable = table(autoCreateRowSorter : true) {
