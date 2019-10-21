@@ -132,7 +132,7 @@ class OptionsView {
         }
         i = builder.panel {
             gridBagLayout()
-            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2))
+            label(text : "Changing these settings requires a restart", constraints : gbc(gridx : 0, gridy : 0, gridwidth: 2, anchor:GridBagConstraints.PAGE_START))
             label(text : "Inbound Length", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START))
             inboundLengthField = textField(text : bind {model.inboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:1))
             label(text : "Inbound Quantity", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
@@ -149,6 +149,7 @@ class OptionsView {
                 label(text : "UDP Port", constraints : gbc(gridx :0, gridy: 6, anchor : GridBagConstraints.LINE_START))
                 i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:6))
             }
+            panel(constraints : gbc(gridx: 0, gridy: 7, weighty: 100))
 
         }
         u = builder.panel {
@@ -186,6 +187,7 @@ class OptionsView {
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
             }
+            panel (constraints : gbc(gridx: 0, gridy: 2, weighty: 100))
         }
         bandwidth = builder.panel {
             gridBagLayout()
@@ -206,6 +208,8 @@ class OptionsView {
             label(text : "Update trust lists every ", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
             trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3))
             label(text : "hours", constraints : gbc(gridx: 2, gridy:3))
+            
+            panel(constraints : gbc(gridx: 0, gridy : 4, weighty: 100))
         }
 
 
