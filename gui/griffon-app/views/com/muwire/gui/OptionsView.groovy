@@ -188,7 +188,7 @@ class OptionsView {
                 label(text : "Automatically clear cancelled downloads", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads},
                 constraints : gbc(gridx : 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Automatically flear finished downloads", constraints: gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "Automatically clear finished downloads", constraints: gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearFinishedDownloadsCheckbox = checkBox(selected : bind {model.clearFinishedDownloads},
                 constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 label(text : "Smooth download speed over (seconds)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
