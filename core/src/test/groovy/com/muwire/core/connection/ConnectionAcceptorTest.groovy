@@ -95,7 +95,7 @@ class ConnectionAcceptorTest {
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
         acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor,
-            hostCache, trustService, searchManager, uploadManager, connectionEstablisher)
+            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher)
         acceptor.start()
         Thread.sleep(100)
     }
