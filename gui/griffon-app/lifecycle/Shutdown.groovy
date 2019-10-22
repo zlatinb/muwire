@@ -20,6 +20,7 @@ class Shutdown extends AbstractLifecycleHandler {
     void execute() {
         log.info("shutting down")
         Core core = application.context.get("core")
-        core.shutdown()
+        if (core != null) 
+            core.shutdown()
     }
 }

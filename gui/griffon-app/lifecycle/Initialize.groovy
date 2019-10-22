@@ -49,7 +49,7 @@ class Initialize extends AbstractLifecycleHandler {
             }
         }
         
-        if (SystemTray.isSupported()) {
+        if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
             try {
                 def tray = SystemTray.getSystemTray()
                 def url = Initialize.class.getResource("/MuWire-32x32.png")
@@ -60,11 +60,17 @@ class Initialize extends AbstractLifecycleHandler {
 
                 def exit = new MenuItem("Exit")
                 exit.addActionListener({
+                    application.getWindowManager().findWindow("main-frame").setVisible(false)
+                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
                     Core core = application.getContext().get("core")
-                    if (core != null)
-                        core.shutdown()
+                    if (core != null) {
+                        Thread t = new Thread({
+                            core.shutdown()
+                            application.shutdown()
+                        }as Runnable)
+                        t.start()
+                    }
                     tray.remove(trayIcon)
-                    System.exit(0)
                 })
                 
                 def showMW = {e ->

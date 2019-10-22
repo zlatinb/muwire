@@ -1,7 +1,7 @@
 
 application {
     title = 'MuWire'
-    startupGroups = ['EventList', 'MainFrame']
+    startupGroups = ['EventList', 'MainFrame', 'ShutdownWindow']
     autoShutdown = false
 }
 
@@ -15,6 +15,11 @@ mvcGroups {
         model = 'com.muwire.gui.MainFrameModel'
         view = 'com.muwire.gui.MainFrameView'
         controller = 'com.muwire.gui.MainFrameController'
+    }
+    'ShutdownWindow' {
+        model = 'com.muwire.gui.ShutdownWindowModel'
+        view = 'com.muwire.gui.ShutdownWindowView'
+        controller = 'com.muwire.gui.ShutdownWindowController'
     }
     'SearchTab' {
         model = 'com.muwire.gui.SearchTabModel'
