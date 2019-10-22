@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.core.env.Metadata
 import griffon.inject.MVCMember
@@ -11,6 +12,7 @@ import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JFileChooser
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
@@ -54,6 +56,7 @@ class MainFrameView {
     @MVCMember @Nonnull
     MainFrameModel model
 
+    @Inject @Nonnull GriffonApplication application
     @Inject Metadata metadata
 
     def downloadsTable
@@ -64,10 +67,13 @@ class MainFrameView {
     UISettings settings
     
     void initUI() {
+        int closeOperation = application.getContext().get("tray-icon") ? JFrame.HIDE_ON_CLOSE : JFrame.EXIT_ON_CLOSE
+        
         settings = application.context.get("ui-settings")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
+            defaultCloseOperation : closeOperation,
             title: application.configuration['application.title'] + " " +
             metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
@@ -432,7 +438,7 @@ class MainFrameView {
                         true
                     }
                 })
-
+            
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

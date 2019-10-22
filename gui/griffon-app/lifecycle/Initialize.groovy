@@ -10,7 +10,9 @@ import com.muwire.gui.UISettings
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.ImageIcon
 import javax.swing.JLabel
+import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.LookAndFeel
 import javax.swing.UIManager
@@ -20,7 +22,11 @@ import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
 import java.awt.Font
+import java.awt.MenuItem
+import java.awt.PopupMenu
+import java.awt.SystemTray
 import java.awt.Toolkit
+import java.awt.TrayIcon
 import java.util.logging.Level
 import java.util.logging.LogManager
 
@@ -40,6 +46,39 @@ class Initialize extends AbstractLifecycleHandler {
             while(names.hasMoreElements()) {
                 def name = names.nextElement()
                 LogManager.getLogManager().getLogger(name).setLevel(Level.SEVERE)
+            }
+        }
+        
+        if (SystemTray.isSupported()) {
+            try {
+                def tray = SystemTray.getSystemTray()
+                def url = Initialize.class.getResource("/MuWire-32x32.png")
+                def image = new ImageIcon(url, "tray icon").getImage()
+                def popupMenu = new PopupMenu()
+                def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
+
+
+                def exit = new MenuItem("Exit")
+                exit.addActionListener({
+                    Core core = application.getContext().get("core")
+                    if (core != null)
+                        core.shutdown()
+                    tray.remove(trayIcon)
+                    System.exit(0)
+                })
+
+                popupMenu.add(exit)
+                tray.add(trayIcon)
+                
+                
+                trayIcon.addActionListener({ e ->
+                    def mainFrame = application.getWindowManager().findWindow("main-frame")
+                    if (mainFrame != null)
+                        mainFrame.setVisible(true)
+                })
+                application.getContext().put("tray-icon", true)
+            } catch (Exception bad) {
+                log.log(Level.WARNING,"couldn't set tray icon",bad)
             }
         }
         
