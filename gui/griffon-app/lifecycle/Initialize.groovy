@@ -66,16 +66,21 @@ class Initialize extends AbstractLifecycleHandler {
                     tray.remove(trayIcon)
                     System.exit(0)
                 })
+                
+                def showMW = {e ->
+                def mainFrame = application.getWindowManager().findWindow("main-frame")
+                if (mainFrame != null)
+                    mainFrame.setVisible(true)
+                }
 
+                def show = new MenuItem("Open MuWire")
+                show.addActionListener(showMW)
+                popupMenu.add(show)
                 popupMenu.add(exit)
                 tray.add(trayIcon)
                 
                 
-                trayIcon.addActionListener({ e ->
-                    def mainFrame = application.getWindowManager().findWindow("main-frame")
-                    if (mainFrame != null)
-                        mainFrame.setVisible(true)
-                })
+                trayIcon.addActionListener(showMW)
                 application.getContext().put("tray-icon", true)
             } catch (Exception bad) {
                 log.log(Level.WARNING,"couldn't set tray icon",bad)
