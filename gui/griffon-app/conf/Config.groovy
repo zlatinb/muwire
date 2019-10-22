@@ -2,7 +2,7 @@
 application {
     title = 'MuWire'
     startupGroups = ['EventList', 'MainFrame']
-    autoShutdown = true
+    autoShutdown = false
 }
 
 mvcGroups {
