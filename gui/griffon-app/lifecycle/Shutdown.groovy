@@ -20,7 +20,9 @@ class Shutdown extends AbstractLifecycleHandler {
     void execute() {
         log.info("shutting down")
         Core core = application.context.get("core")
-        if (core != null) 
-            core.shutdown()
+        if (core != null) {
+            Thread t = new Thread({ core.shutdown() } as Runnable)
+            t.start()
+        }
     }
 }
