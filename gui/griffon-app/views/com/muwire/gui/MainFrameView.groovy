@@ -440,8 +440,8 @@ class MainFrameView {
                 })
         
         if (!application.getContext().get("tray-icon")) {
-            mainFrame.addWindowListener(new WindowAdapter(WindowEvent e){
-                public void windowClosing() {
+            mainFrame.addWindowListener(new WindowAdapter(){
+                public void windowClosing(WindowEvent e) {
                     application.shutdown()
                 }
             })
