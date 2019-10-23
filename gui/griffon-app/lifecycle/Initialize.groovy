@@ -49,6 +49,8 @@ class Initialize extends AbstractLifecycleHandler {
             }
         }
         
+        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+        
         if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
             try {
                 def tray = SystemTray.getSystemTray()
