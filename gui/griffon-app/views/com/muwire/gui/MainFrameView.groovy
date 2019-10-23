@@ -85,6 +85,9 @@ class MainFrameView {
             pack : false,
             visible : bind { model.coreInitialized }) {
                 menuBar {
+                    menu (text : "File") {
+                        menuItem("Exit", actionPerformed : {application.shutdown()})
+                    }
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
                         menuItem("Content Control", actionPerformed : {
