@@ -69,7 +69,8 @@ class Initialize extends AbstractLifecycleHandler {
                             application.shutdown()
                         }as Runnable)
                         t.start()
-                    }
+                    } else
+                        application.shutdown()
                     tray.remove(trayIcon)
                 })
                 
