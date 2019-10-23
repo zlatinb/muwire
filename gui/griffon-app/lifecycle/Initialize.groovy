@@ -52,7 +52,7 @@ class Initialize extends AbstractLifecycleHandler {
         if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
             try {
                 def tray = SystemTray.getSystemTray()
-                def url = Initialize.class.getResource("/MuWire-32x32.png")
+                def url = Initialize.class.getResource("/MuWire-16x16.png")
                 def image = new ImageIcon(url, "tray icon").getImage()
                 def popupMenu = new PopupMenu()
                 def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
