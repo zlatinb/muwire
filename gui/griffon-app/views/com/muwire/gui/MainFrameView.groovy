@@ -86,7 +86,7 @@ class MainFrameView {
             visible : bind { model.coreInitialized }) {
                 menuBar {
                     menu (text : "File") {
-                        menuItem("Exit", actionPerformed : {application.shutdown()})
+                        menuItem("Exit", actionPerformed : {closeApplication()})
                     }
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
@@ -456,16 +456,7 @@ class MainFrameView {
                                 }
                             }
                         } else {
-                            mainFrame.setVisible(false)
-                            application.getWindowManager().findWindow("shutdown-window").setVisible(true)
-                            Core core = application.getContext().get("core")
-                            if (core != null) {
-                                Thread t = new Thread({
-                                    core.shutdown()
-                                    application.shutdown()
-                                }as Runnable)
-                                t.start()
-                            }
+                            closeApplication()
                         }
                     }})
 
@@ -929,5 +920,19 @@ class MainFrameView {
         model.sharedTree.nodeStructureChanged(model.treeRoot)
         tree.setSelectionPaths(selectedPaths)
         builder.getVariable("shared-files-table").model.fireTableDataChanged()
+    }
+    
+    private void closeApplication() {
+        def mainFrame = builder.getVariable("main-frame")
+        mainFrame.setVisible(false)
+        application.getWindowManager().findWindow("shutdown-window").setVisible(true)
+        Core core = application.getContext().get("core")
+        if (core != null) {
+            Thread t = new Thread({
+                core.shutdown()
+                application.shutdown()
+            }as Runnable)
+            t.start()
+        }
     }
 }
