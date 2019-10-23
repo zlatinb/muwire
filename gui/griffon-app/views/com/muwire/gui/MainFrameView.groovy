@@ -28,6 +28,7 @@ import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
 import com.muwire.core.Constants
+import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
@@ -442,7 +443,15 @@ class MainFrameView {
         if (!application.getContext().get("tray-icon")) {
             mainFrame.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e) {
-                    application.shutdown()
+                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
+                    Core core = application.getContext().get("core")
+                    if (core != null) {
+                        Thread t = new Thread({
+                            core.shutdown()
+                            application.shutdown()
+                        }as Runnable)
+                        t.start()
+                    }
                 }
             })
         }
