@@ -77,7 +77,9 @@ class Initialize extends AbstractLifecycleHandler {
                 def showMW = {e ->
                 def mainFrame = application.getWindowManager().findWindow("main-frame")
                 if (mainFrame != null)
-                    mainFrame.setVisible(true)
+                    Core core = application.getContext().findWindow("main-frame")
+                    if (core != null)
+                        mainFrame.setVisible(true)
                 }
 
                 def show = new MenuItem("Open MuWire")
