@@ -44,6 +44,8 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
@@ -67,13 +69,11 @@ class MainFrameView {
     UISettings settings
     
     void initUI() {
-        int closeOperation = application.getContext().get("tray-icon") ? JFrame.HIDE_ON_CLOSE : JFrame.EXIT_ON_CLOSE
-        
         settings = application.context.get("ui-settings")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
-            defaultCloseOperation : closeOperation,
+            defaultCloseOperation : JFrame.HIDE_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
             metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
@@ -438,6 +438,14 @@ class MainFrameView {
                         true
                     }
                 })
+        
+        if (!application.getContext().get("tray-icon")) {
+            mainFrame.addWindowListener(new WindowAdapter(WindowEvent e){
+                public void windowClosing() {
+                    application.shutdown()
+                }
+            })
+        }
             
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
