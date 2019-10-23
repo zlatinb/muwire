@@ -66,4 +66,9 @@ mvcGroups {
         view = 'com.muwire.gui.BrowseView'
         controller = 'com.muwire.gui.BrowseController'
     }
+    'close-warning' {
+        model = 'com.muwire.gui.CloseWarningModel'
+        view = 'com.muwire.gui.CloseWarningView'
+        controller = 'com.muwire.gui.CloseWarningController'
+    }
 }

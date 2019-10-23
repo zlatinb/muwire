@@ -21,6 +21,7 @@ import javax.swing.JTable
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
 import javax.swing.border.Border
 import javax.swing.table.DefaultTableCellRenderer
@@ -74,7 +75,7 @@ class MainFrameView {
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
-            defaultCloseOperation : JFrame.HIDE_ON_CLOSE,
+            defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
             metadata["application.version"] + " revision " + metadata["build.revision"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
@@ -440,22 +441,31 @@ class MainFrameView {
                     }
                 })
         
-        if (!application.getContext().get("tray-icon")) {
-            mainFrame.addWindowListener(new WindowAdapter(){
-                public void windowClosing(WindowEvent e) {
-                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
-                    Core core = application.getContext().get("core")
-                    if (core != null) {
-                        Thread t = new Thread({
-                            core.shutdown()
-                            application.shutdown()
-                        }as Runnable)
-                        t.start()
-                    }
-                }
-            })
-        }
-            
+        mainFrame.addWindowListener(new WindowAdapter(){
+                    public void windowClosing(WindowEvent e) {
+                        if (application.getContext().get("tray-icon")) {
+                            if (settings.closeWarning) {
+                                runInsideUIAsync {
+                                    Map<String, Object> args2 = new HashMap<>()
+                                    args2.put("settings", settings)
+                                    args2.put("home", model.core.home)
+                                    mvcGroup.createMVCGroup("close-warning", "Close Warning", args2)
+                                }
+                            }
+                        } else {
+                            mainFrame.setVisible(false)
+                            application.getWindowManager().findWindow("shutdown-window").setVisible(true)
+                            Core core = application.getContext().get("core")
+                            if (core != null) {
+                                Thread t = new Thread({
+                                    core.shutdown()
+                                    application.shutdown()
+                                }as Runnable)
+                                t.start()
+                            }
+                        }
+                    }})
+
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
