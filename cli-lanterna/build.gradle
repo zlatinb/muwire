@@ -1,0 +1,23 @@
+buildscript {
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+apply plugin : 'application'
+mainClassName = 'com.muwire.clilanterna.CliLanterna'
+apply plugin : 'com.github.johnrengelman.shadow'
+
+applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+
+dependencies {
+    compile project(":core")
+    compile 'com.googlecode.lanterna:lanterna:3.0.1'
+}
+
