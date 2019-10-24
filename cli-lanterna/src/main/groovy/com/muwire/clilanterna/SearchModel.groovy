@@ -14,7 +14,9 @@ class SearchModel {
     private final String query
     private final Core core
     final TableModel model
-    
+
+    final Map<String, UIResultBatchEvent> resultsPerSender = new HashMap<>()
+        
     SearchModel(String query, Core core) {
         this.query = query
         this.core = core
@@ -40,6 +42,9 @@ class SearchModel {
     
     void onUIResultBatchEvent(UIResultBatchEvent e) {
         Persona sender = e.results[0].sender
+        
+        resultsPerSender.put(sender.getHumanReadableName(), e)
+        
         String browse = String.valueOf(e.results[0].browse)
         String results = String.valueOf(e.results.length)
         String trust = core.trustService.getLevel(sender.destination).toString()

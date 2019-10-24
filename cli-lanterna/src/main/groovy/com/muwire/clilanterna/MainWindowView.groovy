@@ -87,6 +87,6 @@ class MainWindowView extends BasicWindow {
     private void search() {
         String query = searchTextBox.getText()
         SearchModel model = new SearchModel(query, core)
-        textGUI.addWindowAndWait(new SearchView(model,core))
+        textGUI.addWindowAndWait(new SearchView(model,core, textGUI))
     }
 }
