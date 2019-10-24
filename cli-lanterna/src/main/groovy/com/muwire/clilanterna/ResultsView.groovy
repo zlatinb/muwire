@@ -3,13 +3,18 @@ package com.muwire.clilanterna
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
+import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
 import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
 import com.googlecode.lanterna.gui2.table.Table
 
 import com.muwire.core.Core
+import com.muwire.core.download.UIDownloadEvent
+import com.muwire.core.search.UIResultEvent
 
 class ResultsView extends BasicWindow {
     
@@ -43,6 +48,41 @@ class ResultsView extends BasicWindow {
     }
     
     private void rowSelected() {
+        int selectedRow = table.getSelectedRow()
+        def rows = model.model.getRow(selectedRow)
+        boolean comment = Boolean.parseBoolean(rows[4])
+        if (comment) {
+            Window prompt = new BasicWindow("Download Or View Comment")
+            prompt.setHints([Window.Hint.CENTERED])
+            Panel contentPanel = new Panel()
+            contentPanel.setLayoutManager(new GridLayout(3))
+            Button downloadButton = new Button("Download", {download(rows[2])})
+            Button viewButton = new Button("View Comment", {viewComment(rows[2])})
+            Button closeButton = new Button("Cancel", {prompt.close()})
+            
+            LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+            contentPanel.addComponent(downloadButton, layoutData)
+            contentPanel.addComponent(viewButton, layoutData)
+            contentPanel.addComponent(closeButton, layoutData)
+            prompt.setComponent(contentPanel)
+            downloadButton.takeFocus()
+            textGUI.addWindowAndWait(prompt)    
+        } else {
+            download(rows[2])
+        }
+
+    }
+    
+    private void download(String infohash) {
+        UIResultEvent result = model.rootToResult[infohash]
+        def file = new File(core.muOptions.downloadLocation, result.name)
+        
+        core.eventBus.publish(new UIDownloadEvent(result : [result], sources : result.sources,
+            target : file, sequential : false))
+        MessageDialog.showMessageDialog(textGUI, "Download Started", "Started download of "+result.name, MessageDialogButton.OK)
+    }
+    
+    private void viewComment(String infohash) {
         
     }
 }
