@@ -30,7 +30,7 @@ class DownloadsView extends BasicWindow {
         
         Panel contentPanel = new Panel()
         contentPanel.setLayoutManager(new GridLayout(1))
-        table = new Table("Name","Status","Progress","Speed")
+        table = new Table("Name","Status","Progress","Speed","ETA")
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)

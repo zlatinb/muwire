@@ -14,7 +14,7 @@ class DownloadsModel {
     private final TextGUIThread guiThread
     private final Core core
     private final List<Downloader> downloaders = new ArrayList<>()
-    private final TableModel model = new TableModel("Name", "Status", "Progress", "Speed")
+    private final TableModel model = new TableModel("Name", "Status", "Progress", "Speed", "ETA")
     
     DownloadsModel(TextGUIThread guiThread, Core core) {
         this.guiThread = guiThread
@@ -40,7 +40,8 @@ class DownloadsModel {
         rowCount.times { model.removeRow(0) }
         downloaders.each { 
             String status = it.getCurrentState().toString()
-            String speed = DataHelper.formatSize2Decimal(it.speed(), false) + "B/sec"
+            int speedInt = it.speed()
+            String speed = DataHelper.formatSize2Decimal(speedInt, false) + "B/sec"
             
             int pieces = it.nPieces
             int done = it.donePieces()
@@ -50,7 +51,15 @@ class DownloadsModel {
             String totalSize = DataHelper.formatSize2Decimal(it.length, false) + "B"
             String progress = (String.format("%2d", percent) + "% of ${totalSize}".toString())
             
-            model.addRow([new DownloaderWrapper(it), status, progress, speed])
+            String ETA
+            if (speedInt == 0)
+                ETA = "Unknown"
+            else {
+                long remaining = (pieces - done) * it.pieceSize / speedInt
+                ETA = DataHelper.formatDuration(remaining * 1000)
+            }
+
+            model.addRow([new DownloaderWrapper(it), status, progress, speed, ETA])
         }
         
     }
