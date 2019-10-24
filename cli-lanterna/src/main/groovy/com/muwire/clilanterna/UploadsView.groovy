@@ -27,7 +27,7 @@ class UploadsView extends BasicWindow {
         table = new Table("Name","Progress","Downloader","Remote Pieces")
         table.setCellSelection(false)
         table.setTableModel(model.model)
-        table.setSize(terminalSize)
+        table.setVisibleRows(terminalSize.getRows())
         contentPanel.addComponent(table, layoutData)
         
         Button closeButton = new Button("Close",{close()})

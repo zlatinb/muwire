@@ -40,7 +40,7 @@ class FilesView extends BasicWindow {
         table.setCellSelection(false)
         table.setTableModel(model.model)
         table.setSelectAction({rowSelected()})
-        table.setSize(terminalSize)
+        table.setVisibleRows(terminalSize.getRows())
         contentPanel.addComponent(table, layoutData)
         
         Panel buttonsPanel = new Panel()

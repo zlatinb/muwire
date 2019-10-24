@@ -39,7 +39,7 @@ class ResultsView extends BasicWindow {
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)
-        table.setSize(terminalSize)
+        table.setVisibleRows(terminalSize.getRows())
         contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
         
         Button closeButton = new Button("Close", {close()})
