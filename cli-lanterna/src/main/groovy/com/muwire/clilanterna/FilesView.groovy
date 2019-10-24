@@ -1,6 +1,7 @@
 package com.muwire.clilanterna
 
 
+import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
@@ -23,7 +24,7 @@ class FilesView extends BasicWindow {
     private final Core core
     private final Table table
     
-    FilesView(FilesModel model, TextGUI textGUI, Core core) {
+    FilesView(FilesModel model, TextGUI textGUI, Core core, TerminalSize terminalSize) {
         super("Shared Files")
         this.model = model
         this.core = core
@@ -39,6 +40,7 @@ class FilesView extends BasicWindow {
         table.setCellSelection(false)
         table.setTableModel(model.model)
         table.setSelectAction({rowSelected()})
+        table.setSize(terminalSize)
         contentPanel.addComponent(table, layoutData)
         
         Panel buttonsPanel = new Panel()

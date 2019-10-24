@@ -1,5 +1,6 @@
 package com.muwire.clilanterna
 
+import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
@@ -14,7 +15,7 @@ class UploadsView extends BasicWindow {
     private final UploadsModel model
     private final Table table
     
-    UploadsView(UploadsModel model) {
+    UploadsView(UploadsModel model, TerminalSize terminalSize) {
         this.model = model
         
         setHints([Window.Hint.EXPANDED])
@@ -26,6 +27,7 @@ class UploadsView extends BasicWindow {
         table = new Table("Name","Progress","Downloader","Remote Pieces")
         table.setCellSelection(false)
         table.setTableModel(model.model)
+        table.setSize(terminalSize)
         contentPanel.addComponent(table, layoutData)
         
         Button closeButton = new Button("Close",{close()})

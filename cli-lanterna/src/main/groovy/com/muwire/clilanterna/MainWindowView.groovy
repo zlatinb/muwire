@@ -11,6 +11,7 @@ import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.Panels
 import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
+import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.gui2.TextBox
 import com.muwire.core.Core
 
@@ -18,6 +19,7 @@ class MainWindowView extends BasicWindow {
     
     private final Core core
     private final TextGUI textGUI
+    private final Screen screen
 
     private final Label connectionCount
     private final TextBox searchTextBox
@@ -26,11 +28,12 @@ class MainWindowView extends BasicWindow {
     private final UploadsModel uploadsModel
     private final FilesModel filesModel
     
-    public MainWindowView(String title, Core core, TextGUI textGUI) {
+    public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
         super(title);
         
         this.core = core
         this.textGUI = textGUI
+        this.screen = screen
         
         downloadsModel = new DownloadsModel(textGUI.getGUIThread(),core)
         uploadsModel = new UploadsModel(textGUI.getGUIThread(), core)
@@ -92,21 +95,27 @@ class MainWindowView extends BasicWindow {
         connectionCount.setText(String.valueOf(core.connectionManager.connections.size()))
     }
     
+    private TerminalSize sizeForTables() {
+        TerminalSize full = screen.getTerminalSize()
+        return new TerminalSize(full.getColumns(), full.getRows() - 10)
+    }
+    
     private void search() {
         String query = searchTextBox.getText()
         SearchModel model = new SearchModel(query, core)
-        textGUI.addWindowAndWait(new SearchView(model,core, textGUI))
+        textGUI.addWindowAndWait(new SearchView(model,core, textGUI, sizeForTables()))
     }
     
+    
     private void download() {
-        textGUI.addWindowAndWait(new DownloadsView(core, downloadsModel, textGUI))
+        textGUI.addWindowAndWait(new DownloadsView(core, downloadsModel, textGUI, sizeForTables()))
     }
     
     private void upload() {
-        textGUI.addWindowAndWait(new UploadsView(uploadsModel))
+        textGUI.addWindowAndWait(new UploadsView(uploadsModel, sizeForTables()))
     }
     
     private void files() {
-        textGUI.addWindowAndWait(new FilesView(filesModel, textGUI, core))
+        textGUI.addWindowAndWait(new FilesView(filesModel, textGUI, core, sizeForTables()))
     }
 }

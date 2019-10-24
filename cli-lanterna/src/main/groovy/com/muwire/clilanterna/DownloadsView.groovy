@@ -1,5 +1,6 @@
 package com.muwire.clilanterna
 
+import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
@@ -21,7 +22,7 @@ class DownloadsView extends BasicWindow {
     private final TextGUI textGUI
     private final Table table
     
-    DownloadsView(Core core, DownloadsModel model, TextGUI textGUI) {
+    DownloadsView(Core core, DownloadsModel model, TextGUI textGUI, TerminalSize terminalSize) {
         this.core = core
         this.model = model
         this.textGUI = textGUI
@@ -34,6 +35,7 @@ class DownloadsView extends BasicWindow {
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)
+        table.setSize(terminalSize)
         contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
         
         Button closeButton = new Button("Close",{close()})

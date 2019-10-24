@@ -154,7 +154,7 @@ class CliLanterna {
             System.exit(1)
         }        
         
-        window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI)
+        window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI, screen)
         core.eventBus.publish(new UILoadedEvent())
         textGUI.addWindowAndWait(window)
         core.shutdown()

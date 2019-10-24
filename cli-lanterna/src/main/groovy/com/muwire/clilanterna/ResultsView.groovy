@@ -1,5 +1,6 @@
 package com.muwire.clilanterna
 
+import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
@@ -23,7 +24,7 @@ class ResultsView extends BasicWindow {
     private final Core core
     private final Table table
     
-    ResultsView(ResultsModel model, Core core, TextGUI textGUI) {
+    ResultsView(ResultsModel model, Core core, TextGUI textGUI, TerminalSize terminalSize) {
         super(model.results.results[0].sender.getHumanReadableName() + " Results")
         this.model = model
         this.core = core
@@ -38,6 +39,7 @@ class ResultsView extends BasicWindow {
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)
+        table.setSize(terminalSize)
         contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
         
         Button closeButton = new Button("Close", {close()})

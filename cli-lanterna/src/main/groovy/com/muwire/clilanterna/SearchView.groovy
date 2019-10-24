@@ -1,5 +1,6 @@
 package com.muwire.clilanterna
 
+import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
@@ -16,8 +17,9 @@ class SearchView extends BasicWindow {
     private final SearchModel model
     private final Table table
     private final TextGUI textGUI
+    private final TerminalSize terminalSize
     
-    SearchView(SearchModel model, Core core, TextGUI textGUI) {
+    SearchView(SearchModel model, Core core, TextGUI textGUI, TerminalSize terminalSize) {
         super(model.query)
         this.core = core
         this.model = model
@@ -32,6 +34,7 @@ class SearchView extends BasicWindow {
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)   
+        table.setSize(terminalSize)
         contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
         
         Button closeButton = new Button("Close", {
@@ -72,7 +75,7 @@ class SearchView extends BasicWindow {
     private void showResults(String personaName) {
         def results = model.resultsPerSender.get(personaName)
         ResultsModel resultsModel = new ResultsModel(results)
-        ResultsView resultsView = new ResultsView(resultsModel, core, textGUI)
+        ResultsView resultsView = new ResultsView(resultsModel, core, textGUI, terminalSize)
         textGUI.addWindowAndWait(resultsView)
     }
 }
