@@ -13,9 +13,11 @@ import com.googlecode.lanterna.gui2.Window
 import com.googlecode.lanterna.gui2.dialogs.FileDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialog
 import com.googlecode.lanterna.gui2.table.Table
 import com.muwire.core.Core
 import com.muwire.core.SharedFile
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.UIPersistFilesEvent
@@ -96,7 +98,7 @@ class FilesView extends BasicWindow {
     
     
     private void shareFile() {
-        TerminalSize terminalSize = new TerminalSize(terminalSize.getColumns(), terminalSize.getRows() - 10)
+        TerminalSize terminalSize = new TerminalSize(terminalSize.getColumns() - 10, terminalSize.getRows() - 10)
         FileDialog fileDialog = new FileDialog("Share File", "Select a file to share", "Share", terminalSize, false, null)
         File f = fileDialog.showDialog(textGUI)
         f = f.getCanonicalFile()
@@ -105,10 +107,22 @@ class FilesView extends BasicWindow {
     }
     
     private void shareDirectory() {
-        
+        String directoryName = TextInputDialog.showDialog(textGUI, "Share a directory", "Enter the directory to share", "")
+        if (directoryName == null)
+            return
+        File directory = new File(directoryName)
+        directory = directory.getCanonicalFile()
+        core.eventBus.publish(new FileSharedEvent(file : directory))
+        MessageDialog.showMessageDialog(textGUI, "Directory Shared", directory.getName()+" has been shared", MessageDialogButton.OK)
     }
     
     private void unshareDirectory() {
-        
+        String directoryName = TextInputDialog.showDialog(textGUI, "Unshare a directory", "Enter the directory to unshare", "")
+        if (directoryName == null)
+            return
+        File directory = new File(directoryName)
+        directory = directory.getCanonicalFile()
+        core.eventBus.publish(new DirectoryUnsharedEvent(directory : directory))
+        MessageDialog.showMessageDialog(textGUI, "Directory Unshared", directory.getName()+" has been unshared", MessageDialogButton.OK)
     }
 }
