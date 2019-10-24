@@ -24,6 +24,7 @@ class MainWindowView extends BasicWindow {
     
     private final DownloadsModel downloadsModel
     private final UploadsModel uploadsModel
+    private final FilesModel filesModel
     
     public MainWindowView(String title, Core core, TextGUI textGUI) {
         super(title);
@@ -33,6 +34,7 @@ class MainWindowView extends BasicWindow {
         
         downloadsModel = new DownloadsModel(textGUI.getGUIThread(),core)
         uploadsModel = new UploadsModel(textGUI.getGUIThread(), core)
+        filesModel = new FilesModel(textGUI.getGUIThread(),core)
         
         setHints([Window.Hint.EXPANDED])
         Panel contentPanel = new Panel()
@@ -51,7 +53,7 @@ class MainWindowView extends BasicWindow {
         Button searchButton = new Button("Search", { search() })
         Button downloadsButton = new Button("Downloads", {download()})
         Button uploadsButton = new Button("Uploads", {upload()})
-        Button filesButton = new Button("Files", {println "files" })
+        Button filesButton = new Button("Files", { files() })
         Button trustButton = new Button("Trust", {println "trust"})
         Button quitButton = new Button("Quit", {close()})
         
@@ -102,5 +104,9 @@ class MainWindowView extends BasicWindow {
     
     private void upload() {
         textGUI.addWindowAndWait(new UploadsView(uploadsModel))
+    }
+    
+    private void files() {
+        textGUI.addWindowAndWait(new FilesView(filesModel, textGUI, core))
     }
 }
