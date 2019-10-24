@@ -57,6 +57,7 @@ class CliLanterna {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory()
         Screen screen = terminalFactory.createScreen()
         textGUI = new MultiWindowTextGUI( new SeparateTextGUIThread.Factory(), screen)
+        textGUI.getGUIThread().start()
         screen.startScreen()
 
         def props
@@ -91,6 +92,16 @@ class CliLanterna {
             props = new MuWireSettings(props)
         }
         
+        def i2pPropsFile = new File(home, "i2p.properties")
+        if (!i2pPropsFile.exists()) {
+            String i2pHost = TextInputDialog.showDialog(textGUI, "I2P router host", "Specifiy the host I2P router is on", "127.0.0.1")
+            int i2pPort = TextInputDialog.showNumberDialog(textGUI, "I2CP port", "Specify the I2CP port", "7654").toInteger()
+            
+            Properties i2pProps = new Properties()
+            i2pProps["i2cp.tcp.host"] = i2pHost
+            i2pProps["i2cp.tcp.port"] = String.valueOf(i2pPort)
+            i2pPropsFile.withOutputStream { i2pProps.store(it, "") }
+        }
         
 
         Window window = new BasicWindow("MuWire "+ MW_VERSION)
@@ -117,9 +128,12 @@ class CliLanterna {
             
             CountDownLatch latch = new CountDownLatch(1)
             Thread connector = new Thread({
-                core = new Core(props, home, MW_VERSION)
-                core.startServices()
-                latch.countDown()
+                try {
+                    core = new Core(props, home, MW_VERSION)
+                    core.startServices()
+                } finally {
+                    latch.countDown()
+                }
             })
             connector.start()
             while(latch.getCount() > 0) {
@@ -133,7 +147,6 @@ class CliLanterna {
         
         
         window.setComponent(contentPanel)
-        textGUI.getGUIThread().start()
         textGUI.addWindowAndWait(window)
 
         if (core == null) {
