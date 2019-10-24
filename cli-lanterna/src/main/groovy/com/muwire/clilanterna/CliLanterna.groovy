@@ -28,6 +28,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.googlecode.lanterna.terminal.Terminal
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.UILoadedEvent
 
 class CliLanterna {
     private static final String MW_VERSION = "0.5.3"
@@ -110,8 +111,22 @@ class CliLanterna {
         contentPanel.addComponent(connectButtonPanel, BorderLayout.Location.BOTTOM)
         connectButtonPanel.setLayoutManager(new GridLayout(1))
         Button connectButton = new Button("Connect", {
-            core = new Core(props, home, MW_VERSION)
-            core.startServices()
+            
+            WaitingDialog waiting = new WaitingDialog("Connecting", "Please wait")
+            waiting.showDialog(textGUI, false)
+            
+            CountDownLatch latch = new CountDownLatch(1)
+            Thread connector = new Thread({
+                core = new Core(props, home, MW_VERSION)
+                core.startServices()
+                latch.countDown()
+            })
+            connector.start()
+            while(latch.getCount() > 0) {
+                textGUI.updateScreen()
+                Thread.sleep(10)
+            }
+            waiting.close()
             window.close()
         } as Runnable)
         welcomeNamePanel.addComponent(connectButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
@@ -126,12 +141,11 @@ class CliLanterna {
             System.exit(1)
         }        
         
-        window = new BasicWindow("MuWire " + MW_VERSION)
-        contentPanel = new Panel()
-        Label addStuff = new Label("Add stuff here")
-        contentPanel.addComponent(addStuff)
-        window.setComponent(contentPanel)
+        window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI)
+        core.eventBus.publish(new UILoadedEvent())
         textGUI.addWindowAndWait(window)
+        core.shutdown()
         screen.stopScreen()
+        System.exit(0)
     }
 }
