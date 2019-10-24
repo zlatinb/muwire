@@ -11,6 +11,6 @@ class SharedFileWrapper {
     
     @Override
     public String toString() {
-        sharedFile.getFile().getName()
+        sharedFile.getCachedPath()
     }
 }

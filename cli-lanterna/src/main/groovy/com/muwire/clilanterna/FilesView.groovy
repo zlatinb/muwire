@@ -10,11 +10,13 @@ import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
+import com.googlecode.lanterna.gui2.dialogs.FileDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
 import com.googlecode.lanterna.gui2.table.Table
 import com.muwire.core.Core
 import com.muwire.core.SharedFile
+import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.UIPersistFilesEvent
 
@@ -23,12 +25,14 @@ class FilesView extends BasicWindow {
     private final TextGUI textGUI
     private final Core core
     private final Table table
+    private final TerminalSize terminalSize
     
     FilesView(FilesModel model, TextGUI textGUI, Core core, TerminalSize terminalSize) {
         super("Shared Files")
         this.model = model
         this.core = core
         this.textGUI = textGUI
+        this.terminalSize = terminalSize
         
         setHints([Window.Hint.EXPANDED])
         
@@ -71,7 +75,7 @@ class FilesView extends BasicWindow {
         Window prompt = new BasicWindow("Unshare or add comment to "+sf.getFile().getName()+" ?")
         prompt.setHints([Window.Hint.CENTERED])
         Panel contentPanel = new Panel()
-        contentPanel.setLayoutManager(new GridLayout(2))
+        contentPanel.setLayoutManager(new GridLayout(3))
         
         Button unshareButton = new Button("Unshare", {
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
@@ -92,7 +96,12 @@ class FilesView extends BasicWindow {
     
     
     private void shareFile() {
-        
+        TerminalSize terminalSize = new TerminalSize(terminalSize.getColumns(), terminalSize.getRows() - 10)
+        FileDialog fileDialog = new FileDialog("Share File", "Select a file to share", "Share", terminalSize, false, null)
+        File f = fileDialog.showDialog(textGUI)
+        f = f.getCanonicalFile()
+        core.eventBus.publish(new FileSharedEvent(file : f))
+        MessageDialog.showMessageDialog(textGUI, "File Shared", f.getName()+" has been shared", MessageDialogButton.OK)
     }
     
     private void shareDirectory() {

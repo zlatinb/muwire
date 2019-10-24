@@ -4,6 +4,7 @@ import com.googlecode.lanterna.gui2.TextGUIThread
 import com.googlecode.lanterna.gui2.table.TableModel
 import com.muwire.core.Core
 import com.muwire.core.SharedFile
+import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileUnsharedEvent
 
@@ -21,6 +22,7 @@ class FilesModel {
         
         core.eventBus.register(FileLoadedEvent.class, this)
         core.eventBus.register(FileUnsharedEvent.class, this)
+        core.eventBus.register(FileHashedEvent.class, this)
         
         Runnable refreshModel = {refreshModel()}
         Timer timer = new Timer(true)
@@ -33,6 +35,12 @@ class FilesModel {
     void onFileLoadedEvent(FileLoadedEvent e) {
         guiThread.invokeLater {
             sharedFiles.add(e.loadedFile)
+        }
+    }
+    
+    void onFileHashedEvent(FileHashedEvent e) {
+        guiThread.invokeLater {
+            sharedFiles.add(e.sharedFile)
         }
     }
     
