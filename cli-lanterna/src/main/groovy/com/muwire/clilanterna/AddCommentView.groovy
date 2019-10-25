@@ -50,8 +50,9 @@ class AddCommentView extends BasicWindow {
         Button saveButton = new Button("Save", {
             String newComment = textBox.getText()
             newComment = Base64.encode(DataUtil.encodei18nString(newComment))
+            String encodedOldComment = sharedFile.getComment()
             sharedFile.setComment(newComment)
-            core.eventBus.publish(new UICommentEvent(sharedFile : sharedFile, oldComment : oldComment))
+            core.eventBus.publish(new UICommentEvent(sharedFile : sharedFile, oldComment : encodedOldComment))
             close()
         })
         Button cancelButton = new Button("Cancel", {close()})

@@ -23,12 +23,14 @@ class ResultsView extends BasicWindow {
     private final TextGUI textGUI
     private final Core core
     private final Table table
+    private final TerminalSize terminalSize
     
     ResultsView(ResultsModel model, Core core, TextGUI textGUI, TerminalSize terminalSize) {
         super(model.results.results[0].sender.getHumanReadableName() + " Results")
         this.model = model
         this.core = core
         this.textGUI = textGUI
+        this.terminalSize = terminalSize
         
         setHints([Window.Hint.EXPANDED])
         
@@ -85,6 +87,8 @@ class ResultsView extends BasicWindow {
     }
     
     private void viewComment(String infohash) {
-        
+        UIResultEvent result = model.rootToResult[infohash]
+        ViewCommentView view = new ViewCommentView(result, terminalSize)
+        textGUI.addWindowAndWait(view)
     }
 }

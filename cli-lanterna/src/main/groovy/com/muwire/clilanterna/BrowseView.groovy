@@ -23,6 +23,7 @@ class BrowseView extends BasicWindow {
     private final TextGUI textGUI
     private final Core core
     private final Table table
+    private final TerminalSize terminalSize
     private final LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER) 
     
     BrowseView(BrowseModel model, TextGUI textGUI, Core core, TerminalSize terminalSize) {
@@ -30,6 +31,7 @@ class BrowseView extends BasicWindow {
         this.model = model
         this.textGUI = textGUI
         this.core = core
+        this.terminalSize = terminalSize
         
         setHints([Window.Hint.EXPANDED])
         
@@ -102,6 +104,8 @@ class BrowseView extends BasicWindow {
     }
     
     private void viewComment(String infoHash) {
-        
+        UIResultEvent result = model.rootToResult[infoHash]
+        ViewCommentView view = new ViewCommentView(result, terminalSize)
+        textGUI.addWindowAndWait(view)
     }
 }
