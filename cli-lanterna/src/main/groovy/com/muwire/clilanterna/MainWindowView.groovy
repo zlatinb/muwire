@@ -14,6 +14,7 @@ import com.googlecode.lanterna.gui2.Window
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.gui2.TextBox
 import com.muwire.core.Core
+import com.muwire.core.connection.ConnectionEvent
 
 class MainWindowView extends BasicWindow {
     
@@ -85,14 +86,16 @@ class MainWindowView extends BasicWindow {
         connectionsPanel.addComponent(connectionCount, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
         
         bottomPanel.addComponent(connectionsPanel, BorderLayout.Location.RIGHT)
-            
-        Button refreshButton = new Button("Refresh", {refresh()})
-        bottomPanel.addComponent(refreshButton, BorderLayout.Location.CENTER)
-        refreshButton.takeFocus()
+
+        searchButton.takeFocus()
+        
+        core.eventBus.register(ConnectionEvent.class, this)
     }
     
-    private void refresh() {
-        connectionCount.setText(String.valueOf(core.connectionManager.connections.size()))
+    void onConnectionEvent(ConnectionEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            connectionCount.setText(String.valueOf(core.connectionManager.connections.size()))
+        }
     }
     
     private TerminalSize sizeForTables() {
