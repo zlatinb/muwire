@@ -29,6 +29,7 @@ import com.googlecode.lanterna.terminal.Terminal
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
+import com.muwire.core.files.AllFilesLoadedEvent
 
 class CliLanterna {
     private static final String MW_VERSION = "0.5.3"
@@ -130,7 +131,6 @@ class CliLanterna {
             Thread connector = new Thread({
                 try {
                     core = new Core(props, home, MW_VERSION)
-                    core.startServices()
                 } finally {
                     latch.countDown()
                 }
@@ -155,9 +155,25 @@ class CliLanterna {
         }        
         
         window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI, screen)
+        core.startServices()
+        
         core.eventBus.publish(new UILoadedEvent())
         textGUI.addWindowAndWait(window)
-        core.shutdown()
+        
+        CountDownLatch latch = new CountDownLatch(1)
+        Thread stopper = new Thread({
+            core.shutdown()
+            latch.countDown()
+        } as Runnable)
+        WaitingDialog waitingForShutdown = new WaitingDialog("MuWire is shutting down","Please wait")
+        waitingForShutdown.showDialog(textGUI, false)
+        stopper.start()
+        while(latch.getCount() > 0) {
+            textGUI.updateScreen()
+            Thread.sleep(10)
+        }
+        waitingForShutdown.close()
+        
         screen.stopScreen()
         System.exit(0)
     }
