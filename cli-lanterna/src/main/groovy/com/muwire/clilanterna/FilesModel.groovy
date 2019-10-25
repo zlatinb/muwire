@@ -53,7 +53,8 @@ class FilesModel {
     
     void onFileHashedEvent(FileHashedEvent e) {
         guiThread.invokeLater {
-            sharedFiles.add(e.sharedFile)
+            if (e.sharedFile != null)
+                sharedFiles.add(e.sharedFile)
         }
     }
     
