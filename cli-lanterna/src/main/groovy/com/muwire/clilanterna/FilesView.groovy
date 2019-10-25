@@ -84,7 +84,10 @@ class FilesView extends BasicWindow {
             core.eventBus.publish(new UIPersistFilesEvent())
             MessageDialog.showMessageDialog(textGUI, "File Unshared", "Unshared "+sf.getFile().getName(), MessageDialogButton.OK)
         } )
-        Button addCommentButton = new Button("Add comment", {})
+        Button addCommentButton = new Button("Add Comment", {
+            AddCommentView view = new AddCommentView(textGUI, core, sf, terminalSize)
+            textGUI.addWindowAndWait(view)
+        })
         Button closeButton = new Button("Close", {prompt.close()})
         
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
