@@ -53,7 +53,7 @@ class DownloadsView extends BasicWindow {
         Window prompt = new BasicWindow("Kill Download?")
         prompt.setHints([Window.Hint.CENTERED])
         Panel contentPanel = new Panel()
-        contentPanel.setLayoutManager(new GridLayout(2))
+        contentPanel.setLayoutManager(new GridLayout(3))
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
         
         Button killDownload = new Button("Kill Download", {
@@ -61,11 +61,15 @@ class DownloadsView extends BasicWindow {
             core.eventBus.publish(new UIDownloadCancelledEvent(downloader : downloader))
             MessageDialog.showMessageDialog(textGUI, "Download Killed", downloader.file.getName()+ " has been killed", MessageDialogButton.OK)
         })
+        Button viewDetails = new Button("View Details", {
+            textGUI.addWindowAndWait(new DownloadDetailsView(downloader))
+        })
         Button close = new Button("Close", {
             prompt.close()  
         })
         
         contentPanel.addComponent(killDownload,layoutData)
+        contentPanel.addComponent(viewDetails, layoutData)
         contentPanel.addComponent(close, layoutData)
         prompt.setComponent(contentPanel)
         close.takeFocus()
