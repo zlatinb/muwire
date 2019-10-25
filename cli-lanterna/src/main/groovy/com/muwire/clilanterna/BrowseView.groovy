@@ -24,7 +24,7 @@ class BrowseView extends BasicWindow {
     private final Core core
     private final Table table
     private final TerminalSize terminalSize
-    private final LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER) 
+    private final LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false) 
     
     BrowseView(BrowseModel model, TextGUI textGUI, Core core, TerminalSize terminalSize) {
         super("Browse "+model.persona.getHumanReadableName())

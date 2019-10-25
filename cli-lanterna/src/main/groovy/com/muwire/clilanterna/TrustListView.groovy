@@ -37,7 +37,7 @@ class TrustListView extends BasicWindow {
         
         Panel contentPanel = new Panel()
         contentPanel.setLayoutManager(new GridLayout(1))
-        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
         Label nameLabel = new Label("Trust list for "+model.trustList.persona.getHumanReadableName())
         Label lastUpdatedLabel = new Label("Last updated "+new Date(model.trustList.timestamp))

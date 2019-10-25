@@ -42,13 +42,13 @@ class SearchView extends BasicWindow {
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)   
         table.setVisibleRows(terminalSize.getRows())
-        contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
+        contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false))
         
         Button closeButton = new Button("Close", {
             model.unregister()
             close()
         })
-        contentPanel.addComponent(closeButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
+        contentPanel.addComponent(closeButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false))
         
         setComponent(contentPanel)
         closeButton.takeFocus()

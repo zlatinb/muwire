@@ -39,7 +39,7 @@ class TrustView extends BasicWindow {
         
         Panel contentPanel = new Panel()
         contentPanel.setLayoutManager(new GridLayout(1))
-        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
         Panel topPanel = new Panel()
         topPanel.setLayoutManager(new GridLayout(2))
