@@ -17,7 +17,12 @@ import com.googlecode.lanterna.gui2.Window
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.gui2.TextBox
 import com.muwire.core.Core
+import com.muwire.core.DownloadedFile
 import com.muwire.core.connection.ConnectionEvent
+import com.muwire.core.files.FileDownloadedEvent
+import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileLoadedEvent
+import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.hostcache.HostDiscoveredEvent
 
 class MainWindowView extends BasicWindow {
@@ -35,6 +40,7 @@ class MainWindowView extends BasicWindow {
     
     private final Label connectionCount, incoming, outgoing
     private final Label known, failing, hopeless
+    private final Label sharedFiles
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
         super(title);
@@ -112,7 +118,9 @@ class MainWindowView extends BasicWindow {
         outgoing = new Label("0")
         known = new Label("0")
         failing = new Label("0")
-        hopeless = new Label("0")        
+        hopeless = new Label("0")
+        sharedFiles = new Label("0")
+                
         statusPanel.with { 
             addComponent(new Label("Incoming Connections: "), layoutData)
             addComponent(incoming, layoutData)
@@ -124,6 +132,8 @@ class MainWindowView extends BasicWindow {
             addComponent(failing, layoutData)
             addComponent(new Label("Hopeless Hosts: "), layoutData)
             addComponent(hopeless, layoutData)
+            addComponent(new Label("Shared Files: "), layoutData)
+            addComponent(sharedFiles, layoutData)
         }
         
         refreshStats()
@@ -131,6 +141,10 @@ class MainWindowView extends BasicWindow {
         searchButton.takeFocus()
         core.eventBus.register(ConnectionEvent.class, this)
         core.eventBus.register(HostDiscoveredEvent.class, this)
+        core.eventBus.register(FileLoadedEvent.class, this)
+        core.eventBus.register(FileHashedEvent.class, this)
+        core.eventBus.register(FileUnsharedEvent.class, this)
+        core.eventBus.register(FileDownloadedEvent.class, this)
     }
     
     void onConnectionEvent(ConnectionEvent e) {
@@ -141,6 +155,30 @@ class MainWindowView extends BasicWindow {
     }
     
     void onHostDiscoveredEvent(HostDiscoveredEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            refreshStats()
+        }
+    }
+    
+    void onFileLoadedEvent(FileLoadedEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            refreshStats()
+        }
+    }
+    
+    void onFileHashedEvent(FileHashedEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            refreshStats()
+        }
+    }
+    
+    void onFileUnsharedEvent(FileUnsharedEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            refreshStats()
+        }
+    }
+    
+    void onFileDownloadedEvent(FileDownloadedEvent e) {
         textGUI.getGUIThread().invokeLater {
             refreshStats()
         }
@@ -186,11 +224,13 @@ class MainWindowView extends BasicWindow {
         int knownHosts = core.hostCache.hosts.size()
         int failingHosts = core.hostCache.countFailingHosts()
         int hopelessHosts = core.hostCache.countHopelessHosts()
+        int shared = core.fileManager.fileToSharedFile.size()
         
         incoming.setText(String.valueOf(inCon))
         outgoing.setText(String.valueOf(outCon))
         known.setText(String.valueOf(knownHosts))
         failing.setText(String.valueOf(failingHosts))
         hopeless.setText(String.valueOf(hopelessHosts))
+        sharedFiles.setText(String.valueOf(shared))
     }
 }
