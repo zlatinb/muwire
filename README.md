@@ -31,7 +31,7 @@ If you have an I2P router running on the same machine that is all you need to do
 
 ### Running the CLI
 
-Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java- jar cli-lanterna-x.y.z.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.
+Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.
 
 The CLI is under active development and doesn't have all the features of the GUI.
 
