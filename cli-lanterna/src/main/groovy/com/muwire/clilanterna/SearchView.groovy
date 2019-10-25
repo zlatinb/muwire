@@ -67,7 +67,11 @@ class SearchView extends BasicWindow {
         Button showResults = new Button("Show Results", {
             showResults(persona)
         })
-        Button browseHost = new Button("Browse Host", {}) // TODO
+        Button browseHost = new Button("Browse Host", {
+            BrowseModel model = new BrowseModel(persona, core, textGUI.getGUIThread())
+            BrowseView view = new BrowseView(model, textGUI, core, terminalSize)
+            textGUI.addWindowAndWait(view)
+        }) 
         Button trustHost = new Button("Trust",{
             core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED))
             MessageDialog.showMessageDialog(textGUI, "Marked Trusted", persona.getHumanReadableName() + " has been marked trusted",
