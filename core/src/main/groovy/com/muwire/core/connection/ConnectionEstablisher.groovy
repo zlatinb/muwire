@@ -62,7 +62,7 @@ class ConnectionEstablisher {
     void stop() {
         timer.cancel()
         executor.shutdownNow()
-        closer.shutdown()
+        closer.shutdownNow()
     }
 
     private void connectIfNeeded() {
@@ -123,10 +123,12 @@ class ConnectionEstablisher {
     }
 
     private void fail(Endpoint endpoint) {
-        closer.execute {
-            endpoint.close()
-            eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
-        } as Runnable
+        if (!closer.isShutdown()) {
+            closer.execute {
+                endpoint.close()
+                eventBus.publish(new ConnectionEvent(endpoint: endpoint, incoming: false, leaf: false, status: ConnectionAttemptStatus.FAILED))
+            } as Runnable
+        }
     }
 
     private void readK(Endpoint e) {
