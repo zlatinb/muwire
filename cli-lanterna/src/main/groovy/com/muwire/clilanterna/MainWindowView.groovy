@@ -1,12 +1,15 @@
 package com.muwire.clilanterna
 
+import com.googlecode.lanterna.TerminalPosition
 import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.BorderLayout
+import com.googlecode.lanterna.gui2.Borders
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
 import com.googlecode.lanterna.gui2.Label
+import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.Panels
 import com.googlecode.lanterna.gui2.TextGUI
@@ -15,6 +18,7 @@ import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.gui2.TextBox
 import com.muwire.core.Core
 import com.muwire.core.connection.ConnectionEvent
+import com.muwire.core.hostcache.HostDiscoveredEvent
 
 class MainWindowView extends BasicWindow {
     
@@ -22,13 +26,15 @@ class MainWindowView extends BasicWindow {
     private final TextGUI textGUI
     private final Screen screen
 
-    private final Label connectionCount
     private final TextBox searchTextBox
     
     private final DownloadsModel downloadsModel
     private final UploadsModel uploadsModel
     private final FilesModel filesModel
     private final TrustModel trustModel
+    
+    private final Label connectionCount, incoming, outgoing
+    private final Label known, failing, hopeless
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
         super(title);
@@ -63,13 +69,17 @@ class MainWindowView extends BasicWindow {
         Button trustButton = new Button("Trust", {trust()})
         Button quitButton = new Button("Quit", {close()})
         
-        buttonsPanel.addComponent(searchTextBox, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(searchButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(downloadsButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(uploadsButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(filesButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(trustButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-        buttonsPanel.addComponent(quitButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
+        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+        
+        buttonsPanel.with { 
+            addComponent(searchTextBox, layoutData)
+            addComponent(searchButton, layoutData)
+            addComponent(downloadsButton, layoutData)
+            addComponent(uploadsButton, layoutData)
+            addComponent(filesButton, layoutData)
+            addComponent(trustButton, layoutData)
+            addComponent(quitButton, layoutData)
+        }
         
         Panel bottomPanel = new Panel()
         contentPanel.addComponent(bottomPanel, BorderLayout.Location.BOTTOM)
@@ -89,14 +99,50 @@ class MainWindowView extends BasicWindow {
         
         bottomPanel.addComponent(connectionsPanel, BorderLayout.Location.RIGHT)
 
-        searchButton.takeFocus()
         
+        Panel centralPanel = new Panel()
+        centralPanel.setLayoutManager(new GridLayout(1))
+        contentPanel.addComponent(centralPanel, BorderLayout.Location.CENTER)
+        Panel statusPanel = new Panel()
+        statusPanel.setLayoutManager(new GridLayout(2))
+        statusPanel.withBorder(Borders.doubleLine("Stats"))
+        centralPanel.addComponent(statusPanel, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, true))
+
+        incoming = new Label("0")
+        outgoing = new Label("0")
+        known = new Label("0")
+        failing = new Label("0")
+        hopeless = new Label("0")        
+        statusPanel.with { 
+            addComponent(new Label("Incoming Connections: "), layoutData)
+            addComponent(incoming, layoutData)
+            addComponent(new Label("Outgoing Connections: "), layoutData)
+            addComponent(outgoing, layoutData)
+            addComponent(new Label("Known Hosts: "), layoutData)
+            addComponent(known, layoutData)
+            addComponent(new Label("Failing Hosts: "), layoutData)
+            addComponent(failing, layoutData)
+            addComponent(new Label("Hopeless Hosts: "), layoutData)
+            addComponent(hopeless, layoutData)
+        }
+        
+        refreshStats()
+        
+        searchButton.takeFocus()
         core.eventBus.register(ConnectionEvent.class, this)
+        core.eventBus.register(HostDiscoveredEvent.class, this)
     }
     
     void onConnectionEvent(ConnectionEvent e) {
         textGUI.getGUIThread().invokeLater {
             connectionCount.setText(String.valueOf(core.connectionManager.connections.size()))
+            refreshStats()
+        }
+    }
+    
+    void onHostDiscoveredEvent(HostDiscoveredEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            refreshStats()
         }
     }
     
@@ -126,5 +172,25 @@ class MainWindowView extends BasicWindow {
     
     private void trust() {
         textGUI.addWindowAndWait(new TrustView(trustModel, textGUI, core, sizeForTables()))
+    }
+    
+    private void refreshStats() {
+        int inCon = 0
+        int outCon = 0
+        core.connectionManager.getConnections().each { 
+            if (it.isIncoming())
+                inCon++
+            else
+                outCon++
+        }
+        int knownHosts = core.hostCache.hosts.size()
+        int failingHosts = core.hostCache.countFailingHosts()
+        int hopelessHosts = core.hostCache.countHopelessHosts()
+        
+        incoming.setText(String.valueOf(inCon))
+        outgoing.setText(String.valueOf(outCon))
+        known.setText(String.valueOf(knownHosts))
+        failing.setText(String.valueOf(failingHosts))
+        hopeless.setText(String.valueOf(hopelessHosts))
     }
 }
