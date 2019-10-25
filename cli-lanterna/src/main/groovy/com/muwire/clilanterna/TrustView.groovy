@@ -51,7 +51,7 @@ class TrustView extends BasicWindow {
         trusted.setVisibleRows(tableSize)
         topPanel.addComponent(trusted, layoutData)
         
-        distrusted = new Table("distrusted users")
+        distrusted = new Table("Distrusted users")
         distrusted.setCellSelection(false)
         distrusted.setSelectAction({distrustedActions()})
         distrusted.setTableModel(model.modelDistrusted)
@@ -156,7 +156,8 @@ class TrustView extends BasicWindow {
         int selectedRow = subscriptions.getSelectedRow()
         def row = model.modelSubscriptions.getRow(selectedRow)
         
-        Persona persona = row[0].trustList.persona
+        def trustList = row[0].trustList
+        Persona persona = trustList.persona
         
         Window prompt = new BasicWindow("Trust List Actions")
         prompt.setHints([Window.Hint.CENTERED])
@@ -164,7 +165,7 @@ class TrustView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(4))
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
         
-        Button reviewButton = new Button("Review",{}) // TODO
+        Button reviewButton = new Button("Review",{review(trustList)})
         Button updateButton = new Button("Update",{
             core.eventBus.publish(new TrustSubscriptionEvent(persona : persona, subscribe : true))
             MessageDialog.showMessageDialog(textGUI, "Updating...", "Trust list will update soon", MessageDialogButton.OK)
@@ -187,6 +188,13 @@ class TrustView extends BasicWindow {
         }
         prompt.setComponent(contentPanel)
         textGUI.addWindowAndWait(prompt)
+    }
+    
+    private void review(def trustList) {
+        TrustListModel model = new TrustListModel(trustList, core)
+        TrustListView view = new TrustListView(model, textGUI, core, terminalSize)
+        textGUI.addWindowAndWait(view)
+        model.unregister()
     }
     
     private void saveMuSettings() {
