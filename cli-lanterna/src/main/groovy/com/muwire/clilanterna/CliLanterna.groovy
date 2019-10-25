@@ -166,6 +166,7 @@ class CliLanterna {
             latch.countDown()
         } as Runnable)
         WaitingDialog waitingForShutdown = new WaitingDialog("MuWire is shutting down","Please wait")
+        waitingForShutdown.setHints([Window.Hint.CENTERED])
         waitingForShutdown.showDialog(textGUI, false)
         stopper.start()
         while(latch.getCount() > 0) {
