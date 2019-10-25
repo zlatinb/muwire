@@ -5,12 +5,18 @@ import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
+import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
 import com.googlecode.lanterna.gui2.table.Table
 
 import com.muwire.core.Core
+import com.muwire.core.Persona
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustLevel
 
 class SearchView extends BasicWindow {
     private final Core core
@@ -24,6 +30,7 @@ class SearchView extends BasicWindow {
         this.core = core
         this.model = model
         this.textGUI = textGUI
+        this.terminalSize = terminalSize
         
         setHints([Window.Hint.EXPANDED])
         
@@ -50,30 +57,51 @@ class SearchView extends BasicWindow {
     private void rowSelected() {
         int selectedRow = table.getSelectedRow()
         def rows = model.model.getRow(selectedRow)
+        Persona persona = rows[0].persona
         boolean browse = Boolean.parseBoolean(rows[2])
-        if (browse) {
-            Window prompt = new BasicWindow("Show Or Browse "+rows[0]+"?")
-            prompt.setHints([Window.Hint.CENTERED])
-            Panel contentPanel = new Panel()
-            contentPanel.setLayoutManager(new GridLayout(3))
-            Button showResults = new Button("Show Results", {
-                showResults(rows[0])
-            })
-            Button browseHost = new Button("Browse Host", {})
-            Button closePrompt = new Button("Close", {prompt.close()})
-            contentPanel.addComponent(showResults, , GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-            contentPanel.addComponent(browseHost, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-            contentPanel.addComponent(closePrompt, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
-            prompt.setComponent(contentPanel)
-            showResults.takeFocus()
-            textGUI.addWindowAndWait(prompt)
-        } else {
-            showResults(rows[0])    
+        Window prompt = new BasicWindow("Show Or Browse "+rows[0]+"?")
+        prompt.setHints([Window.Hint.CENTERED])
+        Panel contentPanel = new Panel()
+        contentPanel.setLayoutManager(new GridLayout(6))
+        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+        Button showResults = new Button("Show Results", {
+            showResults(persona)
+        })
+        Button browseHost = new Button("Browse Host", {}) // TODO
+        Button trustHost = new Button("Trust",{
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED))
+            MessageDialog.showMessageDialog(textGUI, "Marked Trusted", persona.getHumanReadableName() + " has been marked trusted",
+                    MessageDialogButton.OK)
+        })
+        Button neutralHost = new Button("Neutral",{
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.NEUTRAL))
+            MessageDialog.showMessageDialog(textGUI, "Marked Neutral", persona.getHumanReadableName() + " has been marked neutral",
+                    MessageDialogButton.OK)
+        })
+        Button distrustHost = new Button("Distrust", {
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.DISTRUSTED))
+            MessageDialog.showMessageDialog(textGUI, "Marked Distrusted", persona.getHumanReadableName() + " has been marked distrusted",
+                    MessageDialogButton.OK)
+        })
+        Button closePrompt = new Button("Close", {prompt.close()})
+
+        contentPanel.with {
+            addComponent(showResults, layoutData)
+            if (browse)
+                addComponent(browseHost, layoutData)
+            addComponent(trustHost, layoutData)
+            addComponent(neutralHost, layoutData)
+            addComponent(distrustHost, layoutData)
+            addComponent(closePrompt, layoutData)
         }
+
+        prompt.setComponent(contentPanel)
+        showResults.takeFocus()
+        textGUI.addWindowAndWait(prompt)
     }
     
-    private void showResults(String personaName) {
-        def results = model.resultsPerSender.get(personaName)
+    private void showResults(Persona persona) {
+        def results = model.resultsPerSender.get(persona)
         ResultsModel resultsModel = new ResultsModel(results)
         ResultsView resultsView = new ResultsView(resultsModel, core, textGUI, terminalSize)
         textGUI.addWindowAndWait(resultsView)
