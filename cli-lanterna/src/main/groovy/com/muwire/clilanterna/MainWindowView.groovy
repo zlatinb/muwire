@@ -28,6 +28,7 @@ class MainWindowView extends BasicWindow {
     private final DownloadsModel downloadsModel
     private final UploadsModel uploadsModel
     private final FilesModel filesModel
+    private final TrustModel trustModel
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
         super(title);
@@ -39,6 +40,7 @@ class MainWindowView extends BasicWindow {
         downloadsModel = new DownloadsModel(textGUI.getGUIThread(),core)
         uploadsModel = new UploadsModel(textGUI.getGUIThread(), core)
         filesModel = new FilesModel(textGUI.getGUIThread(),core)
+        trustModel = new TrustModel(textGUI.getGUIThread(), core)
         
         setHints([Window.Hint.EXPANDED])
         Panel contentPanel = new Panel()
@@ -58,7 +60,7 @@ class MainWindowView extends BasicWindow {
         Button downloadsButton = new Button("Downloads", {download()})
         Button uploadsButton = new Button("Uploads", {upload()})
         Button filesButton = new Button("Files", { files() })
-        Button trustButton = new Button("Trust", {println "trust"})
+        Button trustButton = new Button("Trust", {trust()})
         Button quitButton = new Button("Quit", {close()})
         
         buttonsPanel.addComponent(searchTextBox, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER))
@@ -120,5 +122,9 @@ class MainWindowView extends BasicWindow {
     
     private void files() {
         textGUI.addWindowAndWait(new FilesView(filesModel, textGUI, core, sizeForTables()))
+    }
+    
+    private void trust() {
+        textGUI.addWindowAndWait(new TrustView(trustModel, textGUI, core, sizeForTables()))
     }
 }

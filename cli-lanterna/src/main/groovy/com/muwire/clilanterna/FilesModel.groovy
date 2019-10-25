@@ -42,10 +42,6 @@ class FilesModel {
             core.muOptions.watchedDirectories.each {
                 eventBus.publish(new FileSharedEvent(file : new File(it)))
             }
-            // TODO: move this to the trust model class
-            core.muOptions.trustSubscriptions.each { 
-                eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
-            }
         }
     }
     
