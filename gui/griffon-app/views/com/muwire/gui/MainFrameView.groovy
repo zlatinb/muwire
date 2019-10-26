@@ -293,7 +293,6 @@ class MainFrameView {
                                             }
                                             String.format("%02d", percent) + "% ${totalSize} ($done/$pieces pcs)".toString()
                                         })
-                                        closureColumn(header : "Requests", type : Integer, read : {row -> row.requests})
                                     }
                                 }
                             }
