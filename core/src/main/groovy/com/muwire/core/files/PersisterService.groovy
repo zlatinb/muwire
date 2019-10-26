@@ -129,9 +129,15 @@ class PersisterService extends Service {
             return new FileLoadedEvent(loadedFile : df)
         }
 
+        int hits = 0
+        if (json.hits != null)
+            hits = json.hits
 
         SharedFile sf = new SharedFile(file, ih, pieceSize)
         sf.setComment(json.comment)
+        sf.hits = hits
+        if (json.downloaders != null)
+            sf.getDownloaders().addAll(json.downloaders)
         return new FileLoadedEvent(loadedFile: sf)
 
     }
@@ -163,6 +169,8 @@ class PersisterService extends Service {
         json.pieceSize = sf.getPieceSize()
         json.hashList = sf.getB64EncodedHashList()
         json.comment = sf.getComment()
+        json.hits = sf.getHits()
+        json.downloaders = sf.getDownloaders()
 
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())

@@ -35,6 +35,7 @@ import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
@@ -199,6 +200,7 @@ class MainFrameModel {
             core.eventBus.register(AllFilesLoadedEvent.class, this)
             core.eventBus.register(UpdateDownloadedEvent.class, this)
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
+            core.eventBus.register(SearchEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -379,6 +381,7 @@ class MainFrameModel {
             uploads << e.uploader
             JTable table = builder.getVariable("uploads-table")
             table.model.fireTableDataChanged()
+            view.refreshSharedFiles()
         }
     }
 
@@ -414,6 +417,12 @@ class MainFrameModel {
             if (!subscriptions.contains(e.trustList))
                 subscriptions << e.trustList
             updateTablePreservingSelection("subscription-table")
+        }
+    }
+    
+    void onSearchEvent(SearchEvent e) {
+        runInsideUIAsync {
+            view.refreshSharedFiles()
         }
     }
 

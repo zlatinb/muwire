@@ -158,8 +158,10 @@ class FileManager {
             Set<SharedFile> found
             found = rootToFiles.get new InfoHash(e.searchHash)
             found = filter(found, e.oobInfohash)
-            if (found != null && !found.isEmpty())
+            if (found != null && !found.isEmpty()) {
+                found.each { it.hit() }
                 re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
+            }
         } else {
             def names = index.search e.searchTerms
             Set<File> files = new HashSet<>()
@@ -172,8 +174,10 @@ class FileManager {
             files.each { sharedFiles.add fileToSharedFile[it] }
             files = filter(sharedFiles, e.oobInfohash)
             
-            if (!sharedFiles.isEmpty())
+            if (!sharedFiles.isEmpty()) {
+                sharedFiles.each { it.hit() }
                 re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
+            }
 
         }
 

@@ -17,7 +17,7 @@ class FilesModel {
     private final TextGUIThread guiThread
     private final Core core
     private final List<SharedFile> sharedFiles = new ArrayList<>()
-    private final TableModel model = new TableModel("Name","Size","Comment")
+    private final TableModel model = new TableModel("Name","Size","Comment","Search Hits","Downloaders")
     
     FilesModel(TextGUIThread guiThread, Core core) {
         this.guiThread = guiThread
@@ -71,7 +71,9 @@ class FilesModel {
         sharedFiles.each { 
             long size = it.getCachedLength()
             boolean comment = it.comment != null
-            model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment)
+            String hits = String.valueOf(it.getHits())
+            String downloaders = String.valueOf(it.getDownloaders().size())
+            model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment, hits, downloaders)
         }
     }
 }

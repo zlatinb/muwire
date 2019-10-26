@@ -42,7 +42,7 @@ class FilesView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(1))
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
-        table = new Table("Name","Size","Comment")
+        table = new Table("Name","Size","Comment","Search Hits","Downloaders")
         table.setCellSelection(false)
         table.setTableModel(model.model)
         table.setSelectAction({rowSelected()})

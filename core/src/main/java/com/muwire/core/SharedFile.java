@@ -3,7 +3,10 @@ package com.muwire.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.muwire.core.util.DataUtil;
 
@@ -23,6 +26,8 @@ public class SharedFile {
     private final List<String> b64EncodedHashList;
     
     private volatile String comment;
+    private volatile int hits;
+    private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
 
     public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
         this.file = file;
@@ -89,6 +94,22 @@ public class SharedFile {
     
     public String getComment() {
         return comment;
+    }
+    
+    public int getHits() {
+        return hits;
+    }
+    
+    public void hit() {
+        hits++;
+    }
+    
+    public Set<String> getDownloaders() {
+        return downloaders;
+    }
+    
+    public void addDownloader(String name) {
+        downloaders.add(name);
     }
 
     @Override

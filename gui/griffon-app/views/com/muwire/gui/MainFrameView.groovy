@@ -226,8 +226,10 @@ class MainFrameView {
                                             table(id : "shared-files-table", autoCreateRowSorter: true) {
                                                 tableModel(list : model.shared) {
                                                     closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
-                                                    closureColumn(header : "Size", preferredWidth : 100, type : Long, read : {row -> row.getCachedLength() })
-                                                    closureColumn(header : "Comments", preferredWidth : 100, type : Boolean, read : {it.getComment() != null})
+                                                    closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
+                                                    closureColumn(header : "Comments", preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
+                                                    closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
+                                                    closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
                                                 }
                                             }
                                         }
