@@ -7,6 +7,9 @@ import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
+
+import net.i2p.data.Base64
+
 import com.googlecode.lanterna.gui2.TextGUIThread
 import com.googlecode.lanterna.gui2.table.TableModel
 class SearchModel {
@@ -25,12 +28,28 @@ class SearchModel {
         core.eventBus.register(UIResultBatchEvent.class, this)
         
         
-        def replaced = query.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
-        def terms = replaced.split(" ")
-        def nonEmpty = []
-        terms.each { if (it.length() > 0) nonEmpty << it }
-        def searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : UUID.randomUUID(), oobInfohash: true,
+        boolean hashSearch = false
+        byte [] root = null
+        if (query.length() == 44 && query.indexOf(" ") < 0) {
+            try {
+                root = Base64.decode(query)
+                hashSearch = true
+            } catch (Exception e) {
+                // not  hash search
+            }
+        }
+        
+        def searchEvent
+        if (hashSearch) {
+            searchEvent = new SearchEvent(searchHash : root, uuid : UUID.randomUUID(), oobInfohash : true, compressedResults : true)
+        } else {
+            def replaced = query.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
+            def terms = replaced.split(" ")
+            def nonEmpty = []
+            terms.each { if (it.length() > 0) nonEmpty << it }
+            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : UUID.randomUUID(), oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true)
+        }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
             replyTo: core.me.destination, receivedOn: core.me.destination,

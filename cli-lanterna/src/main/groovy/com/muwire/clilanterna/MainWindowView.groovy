@@ -25,6 +25,8 @@ import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.hostcache.HostDiscoveredEvent
 
+import net.i2p.data.Base64
+
 class MainWindowView extends BasicWindow {
     
     private final Core core
@@ -191,6 +193,12 @@ class MainWindowView extends BasicWindow {
     
     private void search() {
         String query = searchTextBox.getText()
+        query = query.trim()
+        if (query.length() == 0)
+            return
+        if (query.length() > 128)
+            query = query.substring(0, 128)
+        
         SearchModel model = new SearchModel(query, core, textGUI.getGUIThread())
         textGUI.addWindowAndWait(new SearchView(model,core, textGUI, sizeForTables()))
     }
