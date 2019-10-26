@@ -16,15 +16,23 @@ class DownloadsModel {
     private final List<Downloader> downloaders = new ArrayList<>()
     private final TableModel model = new TableModel("Name", "Status", "Progress", "Speed", "ETA")
     
+    
+    private long lastRetryTime
+    
     DownloadsModel(TextGUIThread guiThread, Core core) {
         this.guiThread = guiThread
         this.core = core
         
         core.eventBus.register(DownloadStartedEvent.class, this)
         Timer timer = new Timer(true)
-        Runnable refreshModel = {refreshModel()}
+        Runnable guiRunnable = {
+            refreshModel()
+            resumeDownloads()
+        }
         timer.schedule({
-            guiThread.invokeLater(refreshModel)
+            if (core.shutdown.get())
+                return
+            guiThread.invokeLater(guiRunnable)
         } as TimerTask, 1000,1000)
     }
     
@@ -62,5 +70,21 @@ class DownloadsModel {
             model.addRow([new DownloaderWrapper(it), status, progress, speed, ETA])
         }
         
+    }
+    
+    private void resumeDownloads() {
+        int retryInterval = core.muOptions.downloadRetryInterval
+        if (retryInterval == 0)
+            return
+        retryInterval *= 1000
+        long now = System.currentTimeMillis()
+        if (now - lastRetryTime > retryInterval) {
+            lastRetryTime = now
+            downloaders.each { 
+                def state = it.getCurrentState()
+                if (state == Downloader.DownloadState.FAILED || state == Downloader.DownloadState.DOWNLOADING)
+                    it.resume()
+            }
+        }
     }
 }
