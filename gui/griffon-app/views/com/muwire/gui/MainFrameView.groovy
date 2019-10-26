@@ -271,30 +271,34 @@ class MainFrameView {
                             scrollPane (constraints : BorderLayout.CENTER) {
                                 table(id : "uploads-table") {
                                     tableModel(list : model.uploads) {
-                                        closureColumn(header : "Name", type : String, read : {row -> row.getName() })
+                                        closureColumn(header : "Name", type : String, read : {row -> row.uploader.getName() })
                                         closureColumn(header : "Progress", type : String, read : { row ->
-                                            int percent = row.getProgress()
+                                            int percent = row.uploader.getProgress()
                                             "$percent% of piece".toString()
                                         })
                                         closureColumn(header : "Downloader", type : String, read : { row ->
-                                            row.getDownloader()
+                                            row.uploader.getDownloader()
                                         })
                                         closureColumn(header : "Remote Pieces", type : String, read : { row ->
-                                            int pieces = row.getTotalPieces()
-                                            int done = row.getDonePieces()
+                                            int pieces = row.uploader.getTotalPieces()
+                                            int done = row.uploader.getDonePieces()
                                             int percent = -1
                                             if ( pieces != 0 ) {
                                                 percent = (done * 100) / pieces
                                             }
-                                            long size = row.getTotalSize()
+                                            long size = row.uploader.getTotalSize()
                                             String totalSize = ""
                                             if (size >= 0 ) {
                                                 totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
                                             }
                                             String.format("%02d", percent) + "% ${totalSize} ($done/$pieces pcs)".toString()
                                         })
+                                        closureColumn(header : "Requests", type : Integer, read : {row -> row.requests})
                                     }
                                 }
+                            }
+                            panel (constraints : BorderLayout.SOUTH) {
+                                button(text : "Clear Finished Uploads", clearUploadsAction)
                             }
                         }
                     }

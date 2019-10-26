@@ -38,6 +38,7 @@ class OptionsModel {
     @Observable boolean clearFinishedDownloads
     @Observable boolean excludeLocalResult
     @Observable boolean showSearchHashes
+    @Observable boolean clearUploads
 
     // bw options
     @Observable String inBw
@@ -81,6 +82,7 @@ class OptionsModel {
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult
         showSearchHashes = uiSettings.showSearchHashes
+        clearUploads = uiSettings.clearUploads
 
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)

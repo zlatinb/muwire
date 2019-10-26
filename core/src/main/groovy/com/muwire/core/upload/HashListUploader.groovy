@@ -65,4 +65,12 @@ class HashListUploader extends Uploader {
     public long getTotalSize() {
         return -1;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof HashListUploader))
+            return false
+        HashListUploader other = (HashListUploader)o
+        infoHash == other.infoHash && request.downloader == other.request.downloader
+    }
 }

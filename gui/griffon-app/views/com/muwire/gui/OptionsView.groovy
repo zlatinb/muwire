@@ -58,6 +58,7 @@ class OptionsView {
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
     def showSearchHashesCheckbox
+    def clearUploadsCheckbox
 
     def inBwField
     def outBwField
@@ -197,6 +198,9 @@ class OptionsView {
                 label(text : "Exclude local files from results", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
+                label(text : "Clear finished uploads", constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
+                clearUploadsCheckbox = checkBox(selected : bind {model.clearUploads},
+                constraints : gbc(gridx:1, gridy: 4, anchor:GridBagConstraints.LINE_END))
             }
             panel (constraints : gbc(gridx: 0, gridy: 2, weighty: 100))
         }

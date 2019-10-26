@@ -123,4 +123,13 @@ class ContentUploader extends Uploader {
     public long getTotalSize() {
         return file.length();
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ContentUploader)) 
+            return false
+        ContentUploader other = (ContentUploader)o
+        request.infoHash == other.request.infoHash &&
+            request.getDownloader() == other.request.getDownloader()
+    }
 }

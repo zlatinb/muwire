@@ -46,6 +46,7 @@ import com.muwire.core.update.UpdateAvailableEvent
 import com.muwire.core.update.UpdateDownloadedEvent
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
+import com.muwire.core.upload.Uploader
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -378,7 +379,19 @@ class MainFrameModel {
 
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
-            uploads << e.uploader
+            UploaderWrapper wrapper = null
+            uploads.each {
+                if (it.uploader == e.uploader) {
+                    wrapper = it
+                    return
+                }
+            }
+            if (wrapper != null) {
+                wrapper.uploader = e.uploader
+                wrapper.requests++
+                wrapper.finished = false
+            } else
+                uploads << new UploaderWrapper(uploader : e.uploader)
             JTable table = builder.getVariable("uploads-table")
             table.model.fireTableDataChanged()
             view.refreshSharedFiles()
@@ -387,7 +400,18 @@ class MainFrameModel {
 
     void onUploadFinishedEvent(UploadFinishedEvent e) {
         runInsideUIAsync {
-            uploads.remove(e.uploader)
+            UploaderWrapper wrapper = null
+            uploads.each {
+                if (it.uploader == e.uploader) {
+                    wrapper = it
+                    return
+                }
+            }
+            if (uiSettings.clearUploads) {
+                uploads.remove(wrapper)
+            } else {
+                wrapper.finished = true
+            }
             JTable table = builder.getVariable("uploads-table")
             table.model.fireTableDataChanged()
         }
@@ -583,5 +607,11 @@ class MainFrameModel {
 
     boolean canDownload(InfoHash hash) {
         !downloadInfoHashes.contains(hash)
+    }
+    
+    class UploaderWrapper {
+        Uploader uploader
+        int requests
+        boolean finished
     }
 }

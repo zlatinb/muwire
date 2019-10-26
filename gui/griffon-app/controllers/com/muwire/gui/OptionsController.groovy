@@ -157,6 +157,10 @@ class OptionsController {
         boolean excludeLocalResult = view.excludeLocalResultCheckbox.model.isSelected()
         model.excludeLocalResult = excludeLocalResult
         uiSettings.excludeLocalResult = excludeLocalResult
+        
+        boolean clearUploads = view.clearUploadsCheckbox.model.isSelected()
+        model.clearUploads = clearUploads
+        uiSettings.clearUploads = clearUploads
 
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream {

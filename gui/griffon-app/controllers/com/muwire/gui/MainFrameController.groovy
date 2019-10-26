@@ -292,6 +292,11 @@ class MainFrameController {
         params['core'] = core
         mvcGroup.createMVCGroup("add-comment", "Add Comment", params)
     }
+    
+    @ControllerAction
+    void clearUploads() {
+        model.uploads.removeAll { it.finished }
+    }
 
     void saveMuWireSettings() {
         File f = new File(core.home, "MuWire.properties")
