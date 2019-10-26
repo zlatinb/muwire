@@ -92,7 +92,8 @@ class CliLanterna {
             }
             props = new MuWireSettings(props)
         }
-        
+        props.updateType = "cli-lanterna"
+                
         def i2pPropsFile = new File(home, "i2p.properties")
         if (!i2pPropsFile.exists()) {
             String i2pHost = TextInputDialog.showDialog(textGUI, "I2P router host", "Specifiy the host I2P router is on", "127.0.0.1")

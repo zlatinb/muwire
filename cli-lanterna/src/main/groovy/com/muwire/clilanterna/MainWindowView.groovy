@@ -8,6 +8,8 @@ import com.googlecode.lanterna.gui2.Borders
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
 import com.googlecode.lanterna.gui2.Label
 import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.Panel
@@ -24,6 +26,8 @@ import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.update.UpdateAvailableEvent
+import com.muwire.core.update.UpdateDownloadedEvent
 
 import net.i2p.data.Base64
 
@@ -43,6 +47,7 @@ class MainWindowView extends BasicWindow {
     private final Label connectionCount, incoming, outgoing
     private final Label known, failing, hopeless
     private final Label sharedFiles
+    private final Label updateStatus
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
         super(title);
@@ -122,6 +127,7 @@ class MainWindowView extends BasicWindow {
         failing = new Label("0")
         hopeless = new Label("0")
         sharedFiles = new Label("0")
+        updateStatus = new Label("Unknown")
                 
         statusPanel.with { 
             addComponent(new Label("Incoming Connections: "), layoutData)
@@ -136,6 +142,8 @@ class MainWindowView extends BasicWindow {
             addComponent(hopeless, layoutData)
             addComponent(new Label("Shared Files: "), layoutData)
             addComponent(sharedFiles, layoutData)
+            addComponent(new Label("Update Status: "), layoutData)
+            addComponent(updateStatus, layoutData)
         }
         
         refreshStats()
@@ -147,6 +155,8 @@ class MainWindowView extends BasicWindow {
         core.eventBus.register(FileHashedEvent.class, this)
         core.eventBus.register(FileUnsharedEvent.class, this)
         core.eventBus.register(FileDownloadedEvent.class, this)
+        core.eventBus.register(UpdateAvailableEvent.class, this)
+        core.eventBus.register(UpdateDownloadedEvent.class, this)
     }
     
     void onConnectionEvent(ConnectionEvent e) {
@@ -183,6 +193,24 @@ class MainWindowView extends BasicWindow {
     void onFileDownloadedEvent(FileDownloadedEvent e) {
         textGUI.getGUIThread().invokeLater {
             refreshStats()
+        }
+    }
+    
+    void onUpdateAvailableEvent(UpdateAvailableEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            String label = "$e.version is available with hash $e.infoHash"
+            updateStatus.setText(label)
+            String message = "Version $e.version is available from $e.signer, search for $e.infoHash"
+            MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.OK)
+        }
+    }
+    
+    void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
+        textGUI.getGUIThread().invokeLater {
+            String label = "$e.version downloaded"
+            updateStatus.setText(label)
+            String message = "Version $e.version from $e.signer has been downloaded.  You can update now."
+            MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.OK)
         }
     }
     
