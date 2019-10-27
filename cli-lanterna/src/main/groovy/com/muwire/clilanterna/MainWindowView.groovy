@@ -49,15 +49,15 @@ class MainWindowView extends BasicWindow {
     private final Label sharedFiles
     private final Label updateStatus
     
-    public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen) {
+    public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen, CliSettings props) {
         super(title);
         
         this.core = core
         this.textGUI = textGUI
         this.screen = screen
         
-        downloadsModel = new DownloadsModel(textGUI.getGUIThread(),core)
-        uploadsModel = new UploadsModel(textGUI.getGUIThread(), core)
+        downloadsModel = new DownloadsModel(textGUI.getGUIThread(),core, props)
+        uploadsModel = new UploadsModel(textGUI.getGUIThread(), core, props)
         filesModel = new FilesModel(textGUI.getGUIThread(),core)
         trustModel = new TrustModel(textGUI.getGUIThread(), core)
         

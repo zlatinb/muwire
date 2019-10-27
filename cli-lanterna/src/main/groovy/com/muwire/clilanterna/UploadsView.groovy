@@ -29,9 +29,19 @@ class UploadsView extends BasicWindow {
         table.setTableModel(model.model)
         table.setVisibleRows(terminalSize.getRows())
         contentPanel.addComponent(table, layoutData)
+
+        Panel buttonsPanel = new Panel()
+        buttonsPanel.setLayoutManager(new GridLayout(2))
         
+        Button clearDoneButton = new Button("Clear Finished",{
+            model.uploaders.removeAll { it.finished }
+        })        
         Button closeButton = new Button("Close",{close()})
-        contentPanel.addComponent(closeButton, layoutData)
+        
+        buttonsPanel.addComponent(clearDoneButton, layoutData)
+        buttonsPanel.addComponent(closeButton, layoutData)
+        
+        contentPanel.addComponent(buttonsPanel, layoutData)
         
         setComponent(contentPanel)
         closeButton.takeFocus()

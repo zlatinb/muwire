@@ -104,7 +104,18 @@ class CliLanterna {
             i2pProps["i2cp.tcp.port"] = String.valueOf(i2pPort)
             i2pPropsFile.withOutputStream { i2pProps.store(it, "") }
         }
-        
+ 
+        def cliProps 
+        def cliPropsFile = new File(home, "cli.properties")
+        if (cliPropsFile.exists()) {
+            Properties p = new Properties()
+            cliPropsFile.withInputStream { 
+                p.load(it)
+            }
+            cliProps = new CliSettings(p)
+        } else
+            cliProps = new CliSettings(new Properties())
+               
 
         Window window = new BasicWindow("MuWire "+ MW_VERSION)
         window.setHints([Window.Hint.CENTERED])
@@ -155,7 +166,7 @@ class CliLanterna {
             System.exit(1)
         }        
         
-        window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI, screen)
+        window = new MainWindowView("MuWire "+MW_VERSION, core, textGUI, screen, cliProps)
         core.startServices()
         
         core.eventBus.publish(new UILoadedEvent())

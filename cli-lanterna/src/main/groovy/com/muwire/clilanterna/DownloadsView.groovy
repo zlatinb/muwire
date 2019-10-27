@@ -28,6 +28,7 @@ class DownloadsView extends BasicWindow {
         this.textGUI = textGUI
         
         setHints([Window.Hint.EXPANDED])
+        LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
         Panel contentPanel = new Panel()
         contentPanel.setLayoutManager(new GridLayout(1))
@@ -36,10 +37,18 @@ class DownloadsView extends BasicWindow {
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)
         table.setVisibleRows(terminalSize.getRows())
-        contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER,true,false))
+        contentPanel.addComponent(table, layoutData)
+
+        Panel buttonsPanel = new Panel()
+        buttonsPanel.setLayoutManager(new GridLayout(2))
         
+        Button clearButton = new Button("Clear Done",{clearDone()})
+        buttonsPanel.addComponent(clearButton, layoutData)
+                
         Button closeButton = new Button("Close",{close()})
-        contentPanel.addComponent(closeButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER,true,false))
+        buttonsPanel.addComponent(closeButton, layoutData)
+        
+        contentPanel.addComponent(buttonsPanel, layoutData)
         
         setComponent(contentPanel)
         closeButton.takeFocus()
@@ -74,5 +83,12 @@ class DownloadsView extends BasicWindow {
         prompt.setComponent(contentPanel)
         close.takeFocus()
         textGUI.addWindowAndWait(prompt)
+    }
+    
+    private void clearDone() {
+        model.downloaders.removeAll {
+            def state = it.getCurrentState() 
+            state == Downloader.DownloadState.CANCELLED || state == Downloader.DownloadState.FINISHED
+        }
     }
 }

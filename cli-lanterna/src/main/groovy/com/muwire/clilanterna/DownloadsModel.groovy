@@ -13,15 +13,17 @@ import net.i2p.data.DataHelper
 class DownloadsModel {
     private final TextGUIThread guiThread
     private final Core core
+    private final CliSettings props
     private final List<Downloader> downloaders = new ArrayList<>()
     private final TableModel model = new TableModel("Name", "Status", "Progress", "Speed", "ETA")
     
     
     private long lastRetryTime
     
-    DownloadsModel(TextGUIThread guiThread, Core core) {
+    DownloadsModel(TextGUIThread guiThread, Core core, CliSettings props) {
         this.guiThread = guiThread
         this.core = core
+        this.props = props
         
         core.eventBus.register(DownloadStartedEvent.class, this)
         Timer timer = new Timer(true)
@@ -46,6 +48,14 @@ class DownloadsModel {
     private void refreshModel() {
         int rowCount = model.getRowCount()
         rowCount.times { model.removeRow(0) }
+        
+        if (props.clearCancelledDownloads) {
+            downloaders.removeAll { it.cancelled }
+        }
+        if (props.clearFinishedDownloads) {
+            downloaders.removeAll { it.getCurrentState() == Downloader.DownloadState.FINISHED }
+        }
+        
         downloaders.each { 
             String status = it.getCurrentState().toString()
             int speedInt = it.speed()

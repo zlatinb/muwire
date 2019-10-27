@@ -13,12 +13,14 @@ import net.i2p.data.DataHelper
 class UploadsModel {
     private final TextGUIThread guiThread
     private final Core core
-    private final List<Uploader> uploaders = new ArrayList<>()
+    private CliSettings props
+    private final List<UploaderWrapper> uploaders = new ArrayList<>()
     private final TableModel model = new TableModel("Name","Progress","Downloader","Remote Pieces")
     
-    UploadsModel(TextGUIThread guiThread, Core core) {
+    UploadsModel(TextGUIThread guiThread, Core core, CliSettings props) {
         this.guiThread = guiThread
         this.core = core
+        this.props = props
         
         core.eventBus.register(UploadEvent.class, this)
         core.eventBus.register(UploadFinishedEvent.class, this)
@@ -32,35 +34,69 @@ class UploadsModel {
     }
     
     void onUploadEvent(UploadEvent e) {
-        guiThread.invokeLater({uploaders.add(e.uploader)})
+        guiThread.invokeLater {
+            UploaderWrapper found = null
+            uploaders.each { 
+                if (it.uploader == e.uploader) {
+                    found = it
+                    return
+                }
+            }
+            if (found != null) {
+                found.uploader = e.uploader
+                found.finished = false
+            } else
+                uploaders << new UploaderWrapper(uploader : e.uploader)
+        }
     }
     
     void onUploadFinishedEvent(UploadFinishedEvent e) {
-        guiThread.invokeLater({uploaders.remove(e.uploader)})
+        guiThread.invokeLater {
+            uploaders.each { 
+                if (it.uploader == e.uploader) {
+                    it.finished = true
+                    return
+                }
+            }
+        }
     }
     
     private void refreshModel() {
         int uploadersSize = model.getRowCount()
         uploadersSize.times { model.removeRow(0) }
-        
+
+        if (props.clearUploads) {
+            uploaders.removeAll { it.finished }
+        }
+                
         uploaders.each { 
-            String name = it.getName()
-            int percent = it.getProgress()
+            String name = it.uploader.getName()
+            int percent = it.uploader.getProgress()
             String percentString = "$percent% of piece".toString()
-            String downloader = it.getDownloader()
+            String downloader = it.uploader.getDownloader()
             
-            int pieces = it.getTotalPieces()
-            int done = it.getDonePieces()
+            int pieces = it.uploader.getTotalPieces()
+            int done = it.uploader.getDonePieces()
             int percentTotal = -1
             if (pieces != 0)
                 percentTotal = (done * 100) / pieces
-            long size = it.getTotalSize()
+            long size = it.uploader.getTotalSize()
             String totalSize = ""
             if (size > 0)
                 totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
             String remotePieces = String.format("%02d", percentTotal) + "% ${totalSize} ($done/$pieces) pcs".toString()
             
             model.addRow([name, percentString, downloader, remotePieces])
+        }
+    }
+    
+    private static class UploaderWrapper {
+        Uploader uploader
+        boolean finished
+        
+        @Override
+        public String toString() {
+            uploader.getName()
         }
     }
 }
