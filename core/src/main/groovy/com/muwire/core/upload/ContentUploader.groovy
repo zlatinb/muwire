@@ -62,11 +62,13 @@ class ContentUploader extends Uploader {
             mapped = channel.map(FileChannel.MapMode.READ_ONLY, range.start, range.end - range.start + 1)
             byte [] tmp = new byte[0x1 << 13]
             while(mapped.hasRemaining()) {
-                int start = mapped.position()
+                int read
                 synchronized(this) {
+                    int start = mapped.position()
                     mapped.get(tmp, 0, Math.min(tmp.length, mapped.remaining()))
+                    read = mapped.position() - start
+                    dataSinceLastRead += read
                 }
-                int read = mapped.position() - start
                 endpoint.getOutputStream().write(tmp, 0, read)
             }
         } finally {

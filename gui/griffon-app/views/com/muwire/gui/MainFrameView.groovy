@@ -293,6 +293,10 @@ class MainFrameView {
                                             }
                                             String.format("%02d", percent) + "% ${totalSize} ($done/$pieces pcs)".toString()
                                         })
+                                        closureColumn(header : "Speed", type : String, read : { row ->
+                                            int speed = row.uploader.speed()
+                                            DataHelper.formatSize2Decimal(speed, false) + "B/sec"
+                                        })
                                     }
                                 }
                             }
