@@ -24,7 +24,7 @@ class UploadsView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(1))
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
-        table = new Table("Name","Progress","Downloader","Remote Pieces")
+        table = new Table("Name","Progress","Downloader","Remote Pieces","Speed")
         table.setCellSelection(false)
         table.setTableModel(model.model)
         table.setVisibleRows(terminalSize.getRows())

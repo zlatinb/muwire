@@ -15,7 +15,7 @@ class UploadsModel {
     private final Core core
     private CliSettings props
     private final List<UploaderWrapper> uploaders = new ArrayList<>()
-    private final TableModel model = new TableModel("Name","Progress","Downloader","Remote Pieces")
+    private final TableModel model = new TableModel("Name","Progress","Downloader","Remote Pieces", "Speed")
     
     UploadsModel(TextGUIThread guiThread, Core core, CliSettings props) {
         this.guiThread = guiThread
@@ -86,7 +86,10 @@ class UploadsModel {
                 totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
             String remotePieces = String.format("%02d", percentTotal) + "% ${totalSize} ($done/$pieces) pcs".toString()
             
-            model.addRow([name, percentString, downloader, remotePieces])
+            String speed = DataHelper.formatSize2Decimal(it.uploader.speed(), false) + "B/sec"
+            
+            
+            model.addRow([name, percentString, downloader, remotePieces, speed])
         }
     }
     
