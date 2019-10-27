@@ -82,7 +82,7 @@ class PersisterService extends Service {
         } else {
             listener.publish(new AllFilesLoadedEvent())
         }
-        timer.schedule({persistFiles()} as TimerTask, 0, interval)
+        timer.schedule({persistFiles()} as TimerTask, 1000, interval)
         loaded = true
     }
 
