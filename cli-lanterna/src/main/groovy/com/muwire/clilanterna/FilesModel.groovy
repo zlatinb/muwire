@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.table.TableModel
 import com.muwire.core.Core
 import com.muwire.core.SharedFile
 import com.muwire.core.files.AllFilesLoadedEvent
+import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
@@ -40,7 +41,7 @@ class FilesModel {
         def eventBus = core.eventBus
         guiThread.invokeLater {
             core.muOptions.watchedDirectories.each {
-                eventBus.publish(new FileSharedEvent(file : new File(it)))
+                eventBus.publish(new DirectoryWatchedEvent(directory : new File(it)))
             }
         }
     }
