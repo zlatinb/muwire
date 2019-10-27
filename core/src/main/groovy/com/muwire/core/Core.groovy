@@ -32,6 +32,7 @@ import com.muwire.core.files.UICommentEvent
 import com.muwire.core.files.UIPersistFilesEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
+import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.HostCache
@@ -287,7 +288,7 @@ public class Core {
 
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
-        eventBus.register(FileSharedEvent.class, directoryWatcher)
+        eventBus.register(DirectoryWatchedEvent.class, directoryWatcher)
         eventBus.register(AllFilesLoadedEvent.class, directoryWatcher)
         eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
 
@@ -331,6 +332,9 @@ public class Core {
             log.info("already shutting down")
             return
         }
+        log.info("saving settings")
+        File f = new File(home, "MuWire.properties")
+        f.withOutputStream { muOptions.write(it) }
         log.info("shutting down trust subscriber")
         trustSubscriber.stop()
         log.info("shutting down download manageer")

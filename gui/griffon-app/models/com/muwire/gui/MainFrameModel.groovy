@@ -28,6 +28,7 @@ import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
+import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -251,7 +252,7 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
-            core.muOptions.watchedDirectories.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
+            core.muOptions.watchedDirectories.each { core.eventBus.publish(new DirectoryWatchedEvent(directory : new File(it))) }
 
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))

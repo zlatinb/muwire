@@ -66,10 +66,8 @@ class DirectoryWatcher {
         watchService?.close()
     }
 
-    void onFileSharedEvent(FileSharedEvent e) {
-        if (!e.file.isDirectory())
-            return
-        File canonical = e.file.getCanonicalFile()
+    void onDirectoryWatchedEvent(DirectoryWatchedEvent e) {
+        File canonical = e.directory.getCanonicalFile()
         Path path = canonical.toPath()
         WatchKey wk = path.register(watchService, kinds)
         watchedDirectories.put(canonical, wk)
@@ -125,7 +123,8 @@ class DirectoryWatcher {
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
         log.fine("modified entry $f")
-        waitingFiles.put(f, System.currentTimeMillis())
+        if (!fileManager.getNegativeTree().fileToNode.containsKey(f))
+            waitingFiles.put(f, System.currentTimeMillis())
     }
 
     private void processDeleted(Path parent, Path path) {
@@ -133,7 +132,7 @@ class DirectoryWatcher {
         log.fine("deleted entry $f")
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
-            eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+            eventBus.publish(new FileUnsharedEvent(unsharedFile : sf, deleted : true))
     }
 
     private static File join(Path parent, Path path) {

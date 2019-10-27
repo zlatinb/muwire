@@ -5,4 +5,5 @@ import com.muwire.core.SharedFile
 
 class FileUnsharedEvent extends Event {
     SharedFile unsharedFile
+    boolean deleted
 }

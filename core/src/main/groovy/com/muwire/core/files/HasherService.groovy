@@ -47,7 +47,10 @@ class HasherService {
 
     private void process(File f) {
         if (f.isDirectory()) {
-            f.listFiles().each {eventBus.publish new FileSharedEvent(file: it) }
+            eventBus.publish(new DirectoryWatchedEvent(directory : f))
+            f.listFiles().each {
+                eventBus.publish new FileSharedEvent(file: it)
+            }
         } else {
             if (f.length() == 0) {
                 eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")

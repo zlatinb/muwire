@@ -37,6 +37,7 @@ class MuWireSettings {
     int inBw, outBw
     Set<String> watchedKeywords
     Set<String> watchedRegexes
+    Set<String> negativeFileTree
 
     MuWireSettings() {
         this(new Properties())
@@ -76,6 +77,7 @@ class MuWireSettings {
         watchedDirectories = readEncodedSet(props, "watchedDirectories")
         watchedKeywords = readEncodedSet(props, "watchedKeywords")
         watchedRegexes = readEncodedSet(props, "watchedRegexes")
+        negativeFileTree = readEncodedSet(props, "negativeFileTree")
 
         trustSubscriptions = new HashSet<>()
         if (props.containsKey("trustSubscriptions")) {
@@ -120,6 +122,7 @@ class MuWireSettings {
         writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         writeEncodedSet(watchedKeywords, "watchedKeywords", props)
         writeEncodedSet(watchedRegexes, "watchedRegexes", props)
+        writeEncodedSet(negativeFileTree, "negativeFileTree", props)
 
         if (!trustSubscriptions.isEmpty()) {
             String encoded = trustSubscriptions.stream().

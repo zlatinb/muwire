@@ -24,12 +24,17 @@ class FileManager {
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index = new SearchIndex()
+    final FileTree negativeTree = new FileTree()
 
     FileManager(EventBus eventBus, MuWireSettings settings) {
         this.settings = settings
         this.eventBus = eventBus
+        
+        for (String negative : settings.negativeFileTree) {
+            negativeTree.add(new File(negative))
+        }
     }
-
+    
     void onFileHashedEvent(FileHashedEvent e) {
         if (e.sharedFile != null)
             addToIndex(e.sharedFile)
@@ -56,6 +61,13 @@ class FileManager {
         }
         existing.add(sf)
         fileToSharedFile.put(sf.file, sf)
+        
+        negativeTree.remove(sf.file)
+        String parent = sf.getFile().getParent()
+        if (parent != null && settings.watchedDirectories.contains(parent)) {
+            negativeTree.add(sf.file.getParentFile())
+        }
+        saveNegativeTree()
 
         String name = sf.getFile().getName()
         Set<File> existingFiles = nameToFiles.get(name)
@@ -92,6 +104,10 @@ class FileManager {
         }
 
         fileToSharedFile.remove(sf.file)
+        if (!e.deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
+            negativeTree.add(sf.file)
+            saveNegativeTree()
+        }
 
         String name = sf.getFile().getName()
         Set<File> existingFiles = nameToFiles.get(name)
@@ -195,8 +211,10 @@ class FileManager {
         }
         rv
     }
-
+    
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        negativeTree.remove(e.directory)
+        saveNegativeTree()
         e.directory.listFiles().each {
             if (it.isDirectory())
                 eventBus.publish(new DirectoryUnsharedEvent(directory : it))
@@ -206,5 +224,10 @@ class FileManager {
                     eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
             }
         }
+    }
+    
+    private void saveNegativeTree() {
+        settings.negativeFileTree.clear()
+        settings.negativeFileTree.addAll(negativeTree.fileToNode.keySet().collect { it.getAbsolutePath() })
     }
 }
