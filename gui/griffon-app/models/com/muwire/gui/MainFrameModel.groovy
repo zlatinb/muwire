@@ -358,6 +358,7 @@ class MainFrameModel {
             def dmtn = fileToNode.remove(e.unsharedFile)
             if (dmtn != null) {
                 loadedFiles = fileToNode.size()
+                List<File> unshared = new ArrayList<>()
                 while (true) {
                     def parent = dmtn.getParent()
                     parent.remove(dmtn)
@@ -366,11 +367,15 @@ class MainFrameModel {
                     if (parent.getChildCount() == 0) {
                         File file = parent.getUserObject().file
                         if (core.muOptions.watchedDirectories.contains(file.toString()))
-                            core.eventBus.publish(new DirectoryUnsharedEvent(directory : parent.getUserObject().file))
+                            unshared.add(file)
                         dmtn = parent
                         continue
                     }
                     break
+                }
+                if (!unshared.isEmpty()) {
+                    File unsharedRoot = unshared.get( unshared.size() -1 )
+                    core.eventBus.publish(new DirectoryUnsharedEvent(directory : unsharedRoot))
                 }
             } 
             view.refreshSharedFiles()
