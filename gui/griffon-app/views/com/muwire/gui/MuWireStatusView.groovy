@@ -62,6 +62,8 @@ class MuWireStatusView {
                 label(text : bind {model.sharedFiles}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                 label(text : "Downloading", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.downloads}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Times Browsed", constraints : gbc(gridx:0, gridy:2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : bind {model.browsed}, constraints : gbc(gridx: 1, gridy: 2, anchor : GridBagConstraints.LINE_END))
             }
         }
         buttonsPanel = builder.panel {

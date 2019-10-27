@@ -36,8 +36,8 @@ class MuWireStatusController {
         
 
         model.sharedFiles = core.fileManager.fileToSharedFile.size()
-
         model.downloads = core.downloadManager.downloaders.size()
+        model.browsed = core.connectionAcceptor.browsed
     }
 
     @ControllerAction

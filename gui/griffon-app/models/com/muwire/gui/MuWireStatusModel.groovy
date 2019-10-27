@@ -20,6 +20,7 @@ class MuWireStatusModel {
     @Observable int hopelessHosts
     @Observable int sharedFiles
     @Observable int downloads
+    @Observable int browsed
 
     void mvcGroupInit(Map<String,String> args) {
         controller.refresh()

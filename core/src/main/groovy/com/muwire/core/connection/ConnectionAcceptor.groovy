@@ -50,6 +50,8 @@ class ConnectionAcceptor {
     final ExecutorService handshakerThreads
 
     private volatile shutdown
+    
+    private volatile int browsed
 
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
@@ -339,7 +341,8 @@ class ConnectionAcceptor {
                 return
             }
 
-
+            browsed++
+            
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
 
             def sharedFiles = fileManager.getSharedFiles().values()
@@ -349,6 +352,7 @@ class ConnectionAcceptor {
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
+                it.hit()
                 def obj = ResultsSender.sharedFileToObj(it, false)
                 def json = jsonOutput.toJson(obj)
                 dos.writeShort((short)json.length())

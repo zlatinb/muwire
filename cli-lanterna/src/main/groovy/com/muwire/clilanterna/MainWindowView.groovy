@@ -47,6 +47,7 @@ class MainWindowView extends BasicWindow {
     private final Label connectionCount, incoming, outgoing
     private final Label known, failing, hopeless
     private final Label sharedFiles
+    private final Label timesBrowsed
     private final Label updateStatus
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen, CliSettings props) {
@@ -127,6 +128,7 @@ class MainWindowView extends BasicWindow {
         failing = new Label("0")
         hopeless = new Label("0")
         sharedFiles = new Label("0")
+        timesBrowsed = new Label("0")
         updateStatus = new Label("Unknown")
                 
         statusPanel.with { 
@@ -142,6 +144,8 @@ class MainWindowView extends BasicWindow {
             addComponent(hopeless, layoutData)
             addComponent(new Label("Shared Files: "), layoutData)
             addComponent(sharedFiles, layoutData)
+            addComponent(new Label("Times Browsed: "), layoutData)
+            addComponent(timesBrowsed, layoutData)
             addComponent(new Label("Update Status: "), layoutData)
             addComponent(updateStatus, layoutData)
         }
@@ -261,6 +265,7 @@ class MainWindowView extends BasicWindow {
         int failingHosts = core.hostCache.countFailingHosts()
         int hopelessHosts = core.hostCache.countHopelessHosts()
         int shared = core.fileManager.fileToSharedFile.size()
+        int browsed = core.connectionAcceptor.browsed
         
         incoming.setText(String.valueOf(inCon))
         outgoing.setText(String.valueOf(outCon))
@@ -268,5 +273,6 @@ class MainWindowView extends BasicWindow {
         failing.setText(String.valueOf(failingHosts))
         hopeless.setText(String.valueOf(hopelessHosts))
         sharedFiles.setText(String.valueOf(shared))
+        timesBrowsed.setText(String.valueOf(browsed))
     }
 }
