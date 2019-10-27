@@ -1,9 +1,11 @@
 package com.muwire.core.files
 
+import java.util.concurrent.ConcurrentHashMap
+
 class FileTree {
     
     private final TreeNode root = new TreeNode()
-    private final Map<File, TreeNode> fileToNode = new HashMap<>()
+    private final Map<File, TreeNode> fileToNode = new ConcurrentHashMap<>()
     
     void add(File file) {
         List<File> path = new ArrayList<>()
