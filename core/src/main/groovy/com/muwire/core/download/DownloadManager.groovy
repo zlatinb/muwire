@@ -135,6 +135,9 @@ public class DownloadManager {
             else
                 incompletes = new File(home, "incompletes")
 
+            if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0)
+                return // skip this download as it's corrupt anyway
+                
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
