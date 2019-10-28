@@ -13,8 +13,9 @@ import java.security.NoSuchAlgorithmException
 
 class FileHasher {
 
+    public static final int MAX_PIECE_SIZE_POW2 = 37
     /** max size of shared file is 128 GB */
-    public static final long MAX_SIZE = 0x1L << 37
+    public static final long MAX_SIZE = 0x1L << MAX_PIECE_SIZE_POW2
 
     /**
      * @param size of the file to be shared
@@ -26,7 +27,7 @@ class FileHasher {
         if (size <= 0x1 << 30)
             return 17
 
-        for (int i = 31; i <= 37; i++) {
+        for (int i = 31; i <= MAX_PIECE_SIZE_POW2; i++) {
             if (size <= 0x1L << i) {
                 return i-13
             }

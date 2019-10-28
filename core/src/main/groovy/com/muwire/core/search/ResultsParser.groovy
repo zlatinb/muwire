@@ -6,6 +6,7 @@ import javax.naming.directory.InvalidSearchControlsException
 
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
+import com.muwire.core.files.FileHasher
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
@@ -30,12 +31,12 @@ class ResultsParser {
     private static parseV1(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
-        if (json.size == null || json.size <= 0)
-            throw new InvalidSearchResultException("length missing")
+        if (json.size == null || json.size <= 0 || json.size > FileHasher.MAX_SIZE)
+            throw new InvalidSearchResultException("length missing or invalid, $json.size")
         if (json.infohash == null)
             throw new InvalidSearchResultException("infohash missing")
-        if (json.pieceSize == null || json.pieceSize <= 0)
-            throw new InvalidSearchResultException("pieceSize missing")
+        if (json.pieceSize == null || json.pieceSize <= 0 || json.pieceSize > FileHasher.MAX_PIECE_SIZE_POW2)
+            throw new InvalidSearchResultException("pieceSize missing or invalid, $json.pieceSize")
         if (!(json.hashList instanceof List))
             throw new InvalidSearchResultException("hashlist not a list")
         try {
@@ -71,12 +72,12 @@ class ResultsParser {
     private static UIResultEvent parseV2(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
-        if (json.size == null || json.size <= 0)
-            throw new InvalidSearchResultException("length missing")
+        if (json.size == null || json.size <= 0 || json.size > FileHasher.MAX_SIZE)
+            throw new InvalidSearchResultException("length missing or invalid $json.size")
         if (json.infohash == null)
             throw new InvalidSearchResultException("infohash missing")
-        if (json.pieceSize == null || json.pieceSize <= 0)
-            throw new InvalidSearchResultException("pieceSize missing")
+        if (json.pieceSize == null || json.pieceSize <= 0 || json.pieceSize > FileHasher.MAX_PIECE_SIZE_POW2)
+            throw new InvalidSearchResultException("pieceSize missing or invalid, $json.pieceSize")
         if (json.hashList != null)
             throw new InvalidSearchResultException("V2 result with hashlist")
         try {
