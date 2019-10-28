@@ -17,6 +17,8 @@ class MuWireSettings {
     int trustListInterval
     Set<Persona> trustSubscriptions
     int downloadRetryInterval
+    int totalUploadSlots
+    int uploadSlotsPerUser
     int updateCheckInterval
     boolean autoDownloadUpdate
     String updateType
@@ -73,6 +75,8 @@ class MuWireSettings {
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
+        totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
+        uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
 
         watchedDirectories = readEncodedSet(props, "watchedDirectories")
         watchedKeywords = readEncodedSet(props, "watchedKeywords")
@@ -118,6 +122,8 @@ class MuWireSettings {
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
         props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
+        props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
+        props.setProperty("uploadSlotsPerUser", String.valueOf(uploadSlotsPerUser))
 
         writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         writeEncodedSet(watchedKeywords, "watchedKeywords", props)

@@ -19,6 +19,8 @@ class OptionsModel {
     @Observable boolean searchComments
     @Observable boolean browseFiles
     @Observable int speedSmoothSeconds
+    @Observable int totalUploadSlots
+    @Observable int uploadSlotsPerUser
 
     // i2p options
     @Observable String inboundLength
@@ -65,6 +67,8 @@ class OptionsModel {
         searchComments = settings.searchComments
         browseFiles = settings.browseFiles
         speedSmoothSeconds = settings.speedSmoothSeconds
+        totalUploadSlots = settings.totalUploadSlots
+        uploadSlotsPerUser = settings.uploadSlotsPerUser
 
         Core core = application.context.get("core")
         inboundLength = core.i2pOptions["inbound.length"]

@@ -69,6 +69,16 @@ class OptionsController {
         text = view.updateField.text
         model.updateCheckInterval = text
         settings.updateCheckInterval = Integer.valueOf(text)
+        
+        text = view.totalUploadSlotsField.text
+        int totalUploadSlots = Integer.valueOf(text)
+        model.totalUploadSlots = totalUploadSlots
+        settings.totalUploadSlots = totalUploadSlots
+        
+        text = view.uploadSlotsPerUserField.text
+        int uploadSlotsPerUser = Integer.valueOf(text)
+        model.uploadSlotsPerUser = uploadSlotsPerUser
+        settings.uploadSlotsPerUser = uploadSlotsPerUser
 
         boolean searchComments = view.searchCommentsCheckbox.model.isSelected()
         model.searchComments = searchComments

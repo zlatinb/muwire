@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.download.DownloadManager
@@ -22,15 +24,22 @@ public class UploadManager {
     private final FileManager fileManager
     private final MeshManager meshManager
     private final DownloadManager downloadManager
+    private final MuWireSettings props
 
+    /** LOCKING: this on both structures */
+    private int totalUploads
+    private final Map<Persona, Integer> uploadsPerUser = new HashMap<>()
+    
     public UploadManager() {}
 
     public UploadManager(EventBus eventBus, FileManager fileManager,
-        MeshManager meshManager, DownloadManager downloadManager) {
+        MeshManager meshManager, DownloadManager downloadManager,
+        MuWireSettings props) {
         this.eventBus = eventBus
         this.fileManager = fileManager
         this.meshManager = meshManager
         this.downloadManager = downloadManager
+        this.props = props
     }
 
     public void processGET(Endpoint e) throws IOException {
@@ -82,7 +91,15 @@ public class UploadManager {
 
             if (request.have > 0)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
-
+                
+            if (!incrementUploads(request.downloader)) {
+                log.info("rejecting due to slot limit")
+                e.getOutputStream().write("429 Too Many Requests\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                e.getOutputStream().flush()
+                e.close()
+                return
+            }
+            
             Mesh mesh
             File file
             int pieceSize
@@ -103,6 +120,7 @@ public class UploadManager {
             try {
                 uploader.respond()
             } finally {
+                decrementUploads(request.downloader)
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
             }
         }
@@ -157,12 +175,21 @@ public class UploadManager {
                 return
             }
         }
+        
+        if (!incrementUploads(request.downloader)) {
+            log.info("rejecting due to slot limit")
+            e.getOutputStream().write("429 Too Many Requests\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            e.getOutputStream().flush()
+            e.close()
+            return
+        }
 
         Uploader uploader = new HashListUploader(e, fullInfoHash, request)
         eventBus.publish(new UploadEvent(uploader : uploader))
         try {
             uploader.respond()
         } finally {
+            decrementUploads(request.downloader)
             eventBus.publish(new UploadFinishedEvent(uploader : uploader))
         }
 
@@ -232,6 +259,38 @@ public class UploadManager {
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
             }
         }
+    }
+    
+    /**
+     * @param p downloader
+     * @return true if this upload hasn't hit any slot limits
+     */
+    private synchronized boolean incrementUploads(Persona p) {
+        if (props.totalUploadSlots >= 0 && totalUploads >= props.totalUploadSlots)
+            return false
+        if (props.uploadSlotsPerUser == 0)
+            return false
+        
+        Integer currentUploads = uploadsPerUser.get(p)
+        if (currentUploads == null)
+            currentUploads = 0
+        if (props.uploadSlotsPerUser > 0 && currentUploads >= props.uploadSlotsPerUser)
+            return false
+        uploadsPerUser.put(p, ++currentUploads)
+        totalUploads++
+        true
+    }
+    
+    private synchronized void decrementUploads(Persona p) {
+        totalUploads--
+        Integer currentUploads = uploadsPerUser.get(p)
+        if (currentUploads == null || currentUploads == 0)
+            throw new IllegalStateException()
+        currentUploads--
+        if (currentUploads == 0)
+            uploadsPerUser.remove(p)
+        else
+            uploadsPerUser.put(p, currentUploads)
     }
 }
 

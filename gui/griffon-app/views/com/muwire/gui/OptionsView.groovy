@@ -42,6 +42,8 @@ class OptionsView {
     def searchCommentsCheckbox
     def browseFilesCheckbox
     def speedSmoothSecondsField
+    def totalUploadSlotsField
+    def uploadSlotsPerUserField
 
     def inboundLengthField
     def inboundQuantityField
@@ -107,8 +109,19 @@ class OptionsView {
                 button(text : "Choose", constraints : gbc(gridx : 2, gridy:2), incompleteLocationAction)
             }
             
+            panel (border : titledBorder(title : "Upload Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
+                constraints : gbc(gridx : 0, gridy:2, fill : GridBagConstraints.HORIZONTAL))) {
+                gridBagLayout()
+                label(text : "Total upload slots (-1 means unlimited)", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                totalUploadSlotsField = textField(text : bind {model.totalUploadSlots}, columns: 2,
+                    constraints : gbc(gridx : 1, gridy: 0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Upload slots per user (-1 means unlimited)", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                uploadSlotsPerUserField = textField(text : bind {model.uploadSlotsPerUser}, columns: 2,
+                    constraints : gbc(gridx : 1, gridy: 1, anchor : GridBagConstraints.LINE_END))
+            }
+            
             panel (border : titledBorder(title : "Sharing Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL))) {
                 gridBagLayout()
                 label(text : "Share downloaded files", constraints : gbc(gridx : 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:0, weightx : 0))
@@ -118,7 +131,7 @@ class OptionsView {
             }
             
             panel (border : titledBorder(title : "Update Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL))) {
                 gridBagLayout()
                 label(text : "Check for updates every (hours)", constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))

@@ -276,7 +276,7 @@ public class Core {
         eventBus.register(UIDownloadResumedEvent.class, downloadManager)
 
         log.info("initializing upload manager")
-        uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager)
+        uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, props)
 
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
