@@ -161,6 +161,10 @@ class OptionsController {
         boolean clearUploads = view.clearUploadsCheckbox.model.isSelected()
         model.clearUploads = clearUploads
         uiSettings.clearUploads = clearUploads
+        
+        uiSettings.exitOnClose = model.exitOnClose
+        if (model.closeDecisionMade)
+            uiSettings.closeWarning = false
 
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream {
@@ -199,13 +203,25 @@ class OptionsController {
     }
     
     @ControllerAction
-    void automaticFontAction() {
+    void automaticFont() {
         model.automaticFontSize = true
         model.customFontSize = 12
     }
     
     @ControllerAction
-    void customFontAction() {
+    void customFont() {
         model.automaticFontSize = false
+    }
+    
+    @ControllerAction
+    void exitOnClose() {
+        model.exitOnClose = true
+        model.closeDecisionMade = true
+    }
+    
+    @ControllerAction
+    void minimizeOnClose() {
+        model.exitOnClose = false
+        model.closeDecisionMade = true
     }
 }

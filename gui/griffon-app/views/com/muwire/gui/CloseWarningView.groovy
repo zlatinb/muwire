@@ -28,15 +28,16 @@ class CloseWarningView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        dialog = new JDialog(mainFrame, "MuWire will continue running", true)
+        dialog = new JDialog(mainFrame, "Close MuWire?", true)
         panel = builder.panel {
             gridBagLayout()
-            label(text : "MuWire will continue running.  You can close it from the system tray", constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2))
+            label(text : "Would you like to minimize to system tray or exit immediately?", constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2))
             label(text : "\n", constraints : gbc(gridx : 0, gridy : 1)) // TODO: real padding
-            label(text : "Do not show this warning again", constraints : gbc(gridx: 0, gridy : 2, weightx: 100, anchor : GridBagConstraints.LINE_END))
+            label(text : "Remember my decision", constraints : gbc(gridx: 0, gridy : 2, weightx: 100, anchor : GridBagConstraints.LINE_END))
             checkbox = checkBox(selected : bind {model.closeWarning}, constraints : gbc(gridx: 1, gridy :2))
             panel (constraints : gbc(gridx: 0, gridy : 3, gridwidth : 2)) {
-                button(text : "Ok", closeAction)
+                button(text : "Minimize To Tray", closeAction)
+                button(text : "Exit MuWire", exitAction)
             }
         }
         dialog.getContentPane().add(panel)

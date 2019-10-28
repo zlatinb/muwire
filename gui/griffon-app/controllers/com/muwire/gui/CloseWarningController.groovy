@@ -23,17 +23,38 @@ class CloseWarningController {
     
     @ControllerAction
     void close() {
-        boolean showWarning = !view.checkbox.model.isSelected()
-        model.closeWarning = showWarning
-        settings.closeWarning = showWarning
-        
-        File props = new File(home, "gui.properties")
-        props.withOutputStream { 
-            settings.write(it)
+        boolean rememberDecision = view.checkbox.model.isSelected()
+        if (rememberDecision) {
+            settings.exitOnClose = false
+            settings.closeWarning = false
+            saveMuSettings()
         }
         
         view.dialog.setVisible(false)
         view.mainFrame.setVisible(false)
         mvcGroup.destroy()
+    }
+    
+    @ControllerAction
+    void exit() {
+        boolean rememberDecision = view.checkbox.model.isSelected()
+        if (rememberDecision) {
+            settings.exitOnClose = true
+            settings.closeWarning = false
+            saveMuSettings()
+        }
+        view.dialog.setVisible(false)
+        view.mainFrame.setVisible(false)
+        def parentView = mvcGroup.parentGroup.view
+        mvcGroup.destroy()
+        parentView.closeApplication()
+    }
+    
+    private void saveMuSettings() {
+
+        File props = new File(home, "gui.properties")
+        props.withOutputStream {
+            settings.write(it)
+        }
     }
 }

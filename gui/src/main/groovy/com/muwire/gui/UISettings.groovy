@@ -12,6 +12,7 @@ class UISettings {
     boolean excludeLocalResult
     boolean showSearchHashes
     boolean closeWarning
+    boolean exitOnClose
     boolean clearUploads
     
     UISettings(Properties props) {
@@ -25,6 +26,7 @@ class UISettings {
         autoFontSize = Boolean.parseBoolean(props.getProperty("autoFontSize","false"))
         fontSize = Integer.parseInt(props.getProperty("fontSize","12"))
         closeWarning = Boolean.parseBoolean(props.getProperty("closeWarning","true"))
+        exitOnClose = Boolean.parseBoolean(props.getProperty("exitOnClose","false"))
         clearUploads = Boolean.parseBoolean(props.getProperty("clearUploads","false"))
     }
 
@@ -39,6 +41,7 @@ class UISettings {
         props.setProperty("autoFontSize", String.valueOf(autoFontSize))
         props.setProperty("fontSize", String.valueOf(fontSize))
         props.setProperty("closeWarning", String.valueOf(closeWarning))
+        props.setProperty("exitOnClose", String.valueOf(exitOnClose))
         props.setProperty("clearUploads", String.valueOf(clearUploads))
         if (font != null)
             props.setProperty("font", font)

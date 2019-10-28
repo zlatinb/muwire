@@ -194,13 +194,19 @@ class OptionsView {
                 constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 label(text : "Smooth download speed over (seconds)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 speedSmoothSecondsField = textField(text : bind {model.speedSmoothSeconds},
-                constraints : gbc(gridx:1, gridy: 2, anchor : GridBagConstraints.LINE_START))
+                constraints : gbc(gridx:1, gridy: 2, anchor : GridBagConstraints.LINE_END))
                 label(text : "Exclude local files from results", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
                 label(text : "Automatically Clear finished uploads", constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 clearUploadsCheckbox = checkBox(selected : bind {model.clearUploads},
                 constraints : gbc(gridx:1, gridy: 4, anchor:GridBagConstraints.LINE_END))
+                label(text : "When closing MuWire", constraints : gbc(gridx: 0, gridy : 5, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                panel (constraints : gbc(gridx:1, gridy: 5, anchor : GridBagConstraints.LINE_END)) {
+                    buttonGroup(id : "closeBehaviorGroup")
+                    radioButton(text : "Minimize to tray", selected : bind {!model.exitOnClose}, buttonGroup: closeBehaviorGroup, minimizeOnCloseAction)
+                    radioButton(text : "Exit", selected : bind {model.exitOnClose}, buttonGroup : closeBehaviorGroup, exitOnCloseAction)
+                }
             }
             panel (constraints : gbc(gridx: 0, gridy: 2, weighty: 100))
         }

@@ -463,7 +463,8 @@ class MainFrameView {
                                     args2.put("home", model.core.home)
                                     mvcGroup.createMVCGroup("close-warning", "Close Warning", args2)
                                 }
-                            }
+                            } else if (settings.exitOnClose)
+                                closeApplication()
                         } else {
                             closeApplication()
                         }
