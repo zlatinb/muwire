@@ -82,6 +82,9 @@ class MeshManager {
         JsonSlurper slurper = new JsonSlurper()
         meshFile.eachLine {
             def json = slurper.parseText(it)
+            if (json.nPieces == null || json.nPieces == 0)
+                return // skip it, invalid
+                
             if (now - json.timestamp > settings.meshExpiration * 60 * 1000)
                 return
             InfoHash infoHash = new InfoHash(Base64.decode(json.infoHash))
