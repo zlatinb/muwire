@@ -67,7 +67,10 @@ class MeshManager {
                     json.infoHash = Base64.encode(mesh.infoHash.getRoot())
                     json.sources = mesh.sources.stream().map({it.toBase64()}).collect(Collectors.toList())
                     json.nPieces = mesh.pieces.nPieces
-                    json.xHave = DataUtil.encodeXHave(mesh.pieces.downloaded, mesh.pieces.nPieces)
+                    List<Integer> downloaded = mesh.pieces.getDownloaded()
+                    if( downloaded.size() > mesh.pieces.nPieces)
+                        return
+                    json.xHave = DataUtil.encodeXHave(downloaded, mesh.pieces.nPieces)
                     writer.println(JsonOutput.toJson(json))
                 }
             }
