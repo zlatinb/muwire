@@ -30,7 +30,7 @@ class ResultsParser {
     private static parseV1(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
-        if (json.size == null || json.size == 0)
+        if (json.size == null || json.size <= 0)
             throw new InvalidSearchResultException("length missing")
         if (json.infohash == null)
             throw new InvalidSearchResultException("infohash missing")
@@ -71,7 +71,7 @@ class ResultsParser {
     private static UIResultEvent parseV2(Persona p, UUID uuid, def json) {
         if (json.name == null)
             throw new InvalidSearchResultException("name missing")
-        if (json.size == null || json.size == 0)
+        if (json.size == null || json.size <= 0)
             throw new InvalidSearchResultException("length missing")
         if (json.infohash == null)
             throw new InvalidSearchResultException("infohash missing")
