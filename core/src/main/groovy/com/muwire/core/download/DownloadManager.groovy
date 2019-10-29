@@ -160,7 +160,7 @@ public class DownloadManager {
     }
 
     private Pieces getPieces(InfoHash infoHash, long length, int pieceSizePow2, boolean sequential) {
-        int pieceSize = 0x1 << pieceSizePow2
+        long pieceSize = 0x1L << pieceSizePow2
         int nPieces = (int)(length / pieceSize)
         if (length % pieceSize != 0)
             nPieces++
