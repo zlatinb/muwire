@@ -140,10 +140,13 @@ public class DownloadManager {
             if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0) {
                 log.warning("Skipping $file because pieceSizePow2=$json.pieceSizePow2")
                 return // skip this download as it's corrupt anyway
-            }
+            } else
+                log.info("Loading $file because pieceSizePow2=$json.pieceSizePow2")
                 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
+            log.info("Got pieces for file above $pieces.nPieces")
+            
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
             if (json.paused != null)
