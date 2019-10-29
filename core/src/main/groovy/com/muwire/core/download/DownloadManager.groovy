@@ -26,6 +26,7 @@ import com.muwire.core.UILoadedEvent
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.logging.Level
 
 @Log
 public class DownloadManager {
@@ -140,22 +141,25 @@ public class DownloadManager {
             if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0) {
                 log.warning("Skipping $file because pieceSizePow2=$json.pieceSizePow2")
                 return // skip this download as it's corrupt anyway
-            } else
-                log.info("Loading $file because pieceSizePow2=$json.pieceSizePow2")
+            }
                 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
-            log.info("Got pieces for file above $pieces.nPieces")
-            
             def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
             if (json.paused != null)
                 downloader.paused = json.paused
-            downloaders.put(infoHash, downloader)
-            downloader.readPieces()
-            if (!downloader.paused)
-                downloader.download()
-            eventBus.publish(new DownloadStartedEvent(downloader : downloader))
+                
+            try {
+                downloader.readPieces()
+                if (!downloader.paused)
+                    downloader.download()
+                downloaders.put(infoHash, downloader)
+                eventBus.publish(new DownloadStartedEvent(downloader : downloader))
+            } catch (IllegalArgumentException bad) {
+                log.log(Level.WARNING,"cannot start downloader, skipping", bad)
+                return
+            }
         }
     }
 
