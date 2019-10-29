@@ -76,11 +76,11 @@ class ContentUploader extends Uploader {
             done = true
         } finally {
             try {channel?.close() } catch (IOException ignored) {}
-            endpoint.getOutputStream().flush()
             synchronized(this) {
                 DataUtil.tryUnmap(mapped)
                 mapped = null
             }
+            endpoint.getOutputStream().flush()
         }
     }
 
