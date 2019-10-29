@@ -27,17 +27,6 @@ import net.i2p.data.Destination
 @Log
 abstract class Connection implements Closeable {
     
-    /**
-     * This exists because the reset() method blocks for a long time
-     * even though the javadocs say it's non-blocking.  When that gets
-     * fixed on the I2P side, this can be removed.
-     */
-    private static final ExecutorService CLOSER = Executors.newCachedThreadPool( {r ->
-        def rv = new Thread(r,"connection closer")
-        rv.setDaemon(true) 
-        rv
-    } as ThreadFactory)
-
     private static final int SEARCHES = 10
     private static final long INTERVAL = 1000
 
@@ -98,14 +87,8 @@ abstract class Connection implements Closeable {
         log.info("closing $name")
         reader.interrupt()
         writer.interrupt()
-        
-        CountDownLatch latch = new CountDownLatch(1)
-        CLOSER.submit({
-            endpoint.close()
-            latch.countDown()
-            log.info("closed $name")
-        })
-        latch.await(1000, TimeUnit.MILLISECONDS)
+        endpoint.close()
+        log.info("closed $name")
         eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
     }
 
