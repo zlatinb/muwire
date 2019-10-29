@@ -105,7 +105,7 @@ abstract class Connection implements Closeable {
             latch.countDown()
             log.info("closed $name")
         })
-        latch.await(3000, TimeUnit.MILLISECONDS)
+        latch.await(1000, TimeUnit.MILLISECONDS)
         eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
     }
 
