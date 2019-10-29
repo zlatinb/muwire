@@ -50,27 +50,28 @@ class FileHasher {
 
     InfoHash hashFile(File file) {
         final long length = file.length()
-        final int size = 0x1 << getPieceSize(length)
-        int numPieces = (int) (length / size)
+        final long size = 0x1L << getPieceSize(length)
+        int numPieces = (length / size).toInteger()
         if (numPieces * size < length)
             numPieces++
 
         def output = new ByteArrayOutputStream()
         RandomAccessFile raf = new RandomAccessFile(file, "r")
+        MappedByteBuffer buf = null
         try {
-            MappedByteBuffer buf
             for (int i = 0; i < numPieces - 1; i++) {
-                buf = raf.getChannel().map(MapMode.READ_ONLY, ((long)size) * i, size)
+                buf = raf.getChannel().map(MapMode.READ_ONLY, size * i, size.toInteger())
                 digest.update buf
                 DataUtil.tryUnmap(buf)
                 output.write(digest.digest(), 0, 32)
             }
-            def lastPieceLength = length - (numPieces - 1) * ((long)size)
-            buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength)
+            long lastPieceLength = length - (numPieces - 1) * size
+            buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength.toInteger())
             digest.update buf
             output.write(digest.digest(), 0, 32)
         } finally {
             raf.close()
+            DataUtil.tryUnmap(buf)
         }
 
         byte [] hashList = output.toByteArray()
