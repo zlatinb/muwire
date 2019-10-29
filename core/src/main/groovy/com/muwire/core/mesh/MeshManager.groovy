@@ -1,5 +1,6 @@
 package com.muwire.core.mesh
 
+import java.util.logging.Level
 import java.util.stream.Collectors
 
 import com.muwire.core.Constants
@@ -13,8 +14,10 @@ import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Log
 import net.i2p.data.Base64
 
+@Log
 class MeshManager {
 
     private final Map<InfoHash, Mesh> meshes = Collections.synchronizedMap(new HashMap<>())
@@ -99,8 +102,13 @@ class MeshManager {
                 mesh.sources.add(persona)
             }
 
-            if (json.xHave != null)
-                DataUtil.decodeXHave(json.xHave).each { pieces.markDownloaded(it) }
+            if (json.xHave != null) {
+                try {
+                    DataUtil.decodeXHave(json.xHave).each { pieces.markDownloaded(it) }
+                } catch (IllegalArgumentException bad) {
+                    log.log(Level.WARNING, "couldn't parse XHave", bad)
+                }
+            }
 
             if (!mesh.sources.isEmpty())
                 meshes.put(infoHash, mesh)
