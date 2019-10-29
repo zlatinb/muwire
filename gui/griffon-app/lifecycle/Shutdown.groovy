@@ -18,11 +18,8 @@ class Shutdown extends AbstractLifecycleHandler {
 
     @Override
     void execute() {
-        log.info("shutting down")
+        log.info("shutting down from lifecycle")
         Core core = application.context.get("core")
-        if (core != null) {
-            Thread t = new Thread({ core.shutdown() } as Runnable)
-            t.start()
-        }
+        core?.shutdown() 
     }
 }

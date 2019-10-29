@@ -353,6 +353,7 @@ public class Core {
             log.info("shutting down embedded router")
             router.shutdown(0)
         }
+        log.info("shutdown complete")
     }
 
     static main(args) {

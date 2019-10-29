@@ -1,7 +1,12 @@
 package com.muwire.core.connection
 
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
@@ -21,6 +26,17 @@ import net.i2p.data.Destination
 
 @Log
 abstract class Connection implements Closeable {
+    
+    /**
+     * This exists because the reset() method blocks for a long time
+     * even though the javadocs say it's non-blocking.  When that gets
+     * fixed on the I2P side, this can be removed.
+     */
+    private static final ExecutorService CLOSER = Executors.newCachedThreadPool( {r ->
+        def rv = new Thread(r,"connection closer")
+        rv.setDaemon(true) 
+        rv
+    } as ThreadFactory)
 
     private static final int SEARCHES = 10
     private static final long INTERVAL = 1000
@@ -82,7 +98,14 @@ abstract class Connection implements Closeable {
         log.info("closing $name")
         reader.interrupt()
         writer.interrupt()
-        endpoint.close()
+        
+        CountDownLatch latch = new CountDownLatch(1)
+        CLOSER.submit({
+            endpoint.close()
+            latch.countDown()
+            log.info("closed $name")
+        })
+        latch.await(3000, TimeUnit.MILLISECONDS)
         eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
     }
 
@@ -91,6 +114,7 @@ abstract class Connection implements Closeable {
             while(running.get()) {
                 read()
             }
+        } catch (InterruptedException ok) {
         } catch (SocketTimeoutException e) {
         } catch (Exception e) {
             log.log(Level.WARNING,"unhandled exception in reader",e)
@@ -107,6 +131,7 @@ abstract class Connection implements Closeable {
                 def message = messages.take()
                 write(message)
             }
+        } catch (InterruptedException ok) {
         } catch (Exception e) {
             log.log(Level.WARNING, "unhandled exception in writer",e)
         } finally {

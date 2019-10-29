@@ -36,9 +36,8 @@ abstract class ConnectionManager {
         timer.schedule({sendPings()} as TimerTask, 1000,1000)
     }
 
-    void stop() {
+    void shutdown() {
         timer.cancel()
-        getConnections().each { it.close() }
     }
 
     void onTrustEvent(TrustEvent e) {
@@ -61,8 +60,6 @@ abstract class ConnectionManager {
     abstract void onConnectionEvent(ConnectionEvent e)
 
     abstract void onDisconnectionEvent(DisconnectionEvent e)
-
-    abstract void shutdown()
 
     protected void sendPings() {
         final long now = System.currentTimeMillis()
