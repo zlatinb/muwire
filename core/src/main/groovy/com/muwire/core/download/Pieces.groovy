@@ -75,6 +75,8 @@ class Pieces {
     }
 
     synchronized void markDownloaded(int piece) {
+        if (piece >= nPieces)
+            throw new IllegalArgumentException("invalid piece marked as downloaded? $piece/$nPieces")
         done.set(piece)
         claimed.set(piece)
         partials.remove(piece)

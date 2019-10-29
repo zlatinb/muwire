@@ -141,6 +141,8 @@ class DownloadSession {
             // parse X-Have if present
             if (headers.containsKey("X-Have")) {
                 DataUtil.decodeXHave(headers["X-Have"]).each {
+                    if (it >= pieces.nPieces)
+                        throw new IOException("Invalid X-Have header, available piece $it/$pieces.nPieces")
                     available.add(it)
                 }
                 if (!available.contains(piece))
