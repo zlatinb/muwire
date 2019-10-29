@@ -135,8 +135,10 @@ public class DownloadManager {
             else
                 incompletes = new File(home, "incompletes")
 
-            if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0)
+            if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0) {
+                log.warning("Skipping $file because pieceSizePow2=$json.pieceSizePow2")
                 return // skip this download as it's corrupt anyway
+            }
                 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
