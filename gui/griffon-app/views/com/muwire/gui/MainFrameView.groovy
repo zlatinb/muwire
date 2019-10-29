@@ -282,6 +282,8 @@ class MainFrameView {
                                         closureColumn(header : "Remote Pieces", type : String, read : { row ->
                                             int pieces = row.uploader.getTotalPieces()
                                             int done = row.uploader.getDonePieces()
+                                            if (row.uploader.getProgress() == 100)
+                                                done++
                                             int percent = -1
                                             if ( pieces != 0 ) {
                                                 percent = (done * 100) / pieces

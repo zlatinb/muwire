@@ -77,6 +77,8 @@ class UploadsModel {
             
             int pieces = it.uploader.getTotalPieces()
             int done = it.uploader.getDonePieces()
+            if (percent == 100)
+                done++
             int percentTotal = -1
             if (pieces != 0)
                 percentTotal = (done * 100) / pieces

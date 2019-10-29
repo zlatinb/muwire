@@ -20,6 +20,8 @@ class ContentUploader extends Uploader {
     private final ContentRequest request
     private final Mesh mesh
     private final int pieceSize
+    
+    private volatile boolean done
 
     ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize) {
         super(endpoint)
@@ -71,6 +73,7 @@ class ContentUploader extends Uploader {
                 }
                 endpoint.getOutputStream().write(tmp, 0, read)
             }
+            done = true
         } finally {
             try {channel?.close() } catch (IOException ignored) {}
             endpoint.getOutputStream().flush()
@@ -100,7 +103,7 @@ class ContentUploader extends Uploader {
     @Override
     public synchronized int getProgress() {
         if (mapped == null)
-            return 0
+            return done ? 100 : 0
         int position = mapped.position()
         int total = request.getRange().end - request.getRange().start
         (int)(position * 100.0 / total)
