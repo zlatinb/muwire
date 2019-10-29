@@ -12,6 +12,7 @@ import com.muwire.core.util.DataUtil
 import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Log
 import net.i2p.data.Base64
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+@Log
 public class DownloadManager {
 
     private final EventBus eventBus
