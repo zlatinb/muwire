@@ -37,7 +37,7 @@ class ShowCommentView {
             borderLayout()
             panel (constraints : BorderLayout.CENTER) {
                 scrollPane {
-                    textArea(text : model.result.comment, rows : 20, columns : 100, editable : false)
+                    textArea(text : model.result.comment, rows : 20, columns : 100, editable : false, lineWrap : true, wrapStyleWord : true)
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {

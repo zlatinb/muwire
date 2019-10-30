@@ -43,7 +43,7 @@ class AddCommentView {
             borderLayout()
             panel (constraints : BorderLayout.CENTER) {
                 scrollPane {
-                    textarea = textArea(text : comment, rows : 20, columns : 100, editable : true)
+                    textarea = textArea(text : comment, rows : 20, columns : 100, editable : true, lineWrap:true, wrapStyleWord:true)
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
