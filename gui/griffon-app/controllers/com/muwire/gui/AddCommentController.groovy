@@ -7,7 +7,9 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
+import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.files.UICommentEvent
 import com.muwire.core.util.DataUtil
@@ -24,6 +26,11 @@ class AddCommentController {
     @ControllerAction
     void save() {
         String comment = view.textarea.getText()
+        if (comment.length() > Constants.MAX_COMMENT_LENGTH ) {
+            JOptionPane.showMessageDialog(null, "Your comment is too long - ${comment.length()} bytes.  The maximum size is $Constants.MAX_COMMENT_LENGTH bytes", 
+                "Comment Too Long", JOptionPane.WARNING_MESSAGE)
+            return
+        }
         if (comment.trim().length() == 0)
             comment = null
         else
