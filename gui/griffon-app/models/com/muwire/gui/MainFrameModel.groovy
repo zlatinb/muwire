@@ -35,6 +35,7 @@ import com.muwire.core.files.FileHashingEvent
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -189,6 +190,7 @@ class MainFrameModel {
             core.eventBus.register(ConnectionEvent.class, this)
             core.eventBus.register(DisconnectionEvent.class, this)
             core.eventBus.register(FileHashedEvent.class, this)
+            core.eventBus.register(SideCarFileEvent.class, this)
             core.eventBus.register(FileHashingEvent.class, this)
             core.eventBus.register(FileLoadedEvent.class, this)
             core.eventBus.register(UploadEvent.class, this)
@@ -556,6 +558,12 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
             insertIntoTree(e.downloadedFile)
             loadedFiles = fileToNode.size()
+        }
+    }
+    
+    void onSideCarFileEvent(SideCarFileEvent e) {
+        runInsideUIAsync {
+            view.refreshSharedFiles()
         }
     }
     
