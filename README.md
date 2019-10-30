@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.5.3 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.5.5 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
 
 ### Building
 
@@ -31,7 +31,7 @@ If you have an I2P router running on the same machine that is all you need to do
 
 ### Running the CLI
 
-Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.
+Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.  However, the CLI does not have an options window yet, so if you need to change any options you will need to edit the configuration files.  The CLI options are documented here https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
 
 The CLI is under active development and doesn't have all the features of the GUI.
 
