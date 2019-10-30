@@ -28,6 +28,7 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
+import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
 import com.muwire.core.files.UIPersistFilesEvent
 import com.muwire.core.files.AllFilesLoadedEvent
@@ -221,6 +222,7 @@ public class Core {
         eventBus.register(SearchEvent.class, fileManager)
         eventBus.register(DirectoryUnsharedEvent.class, fileManager)
         eventBus.register(UICommentEvent.class, fileManager)
+        eventBus.register(SideCarFileEvent.class, fileManager)
 
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)

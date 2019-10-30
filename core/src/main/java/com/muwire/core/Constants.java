@@ -10,4 +10,6 @@ public class Constants {
     public static final int MAX_HEADERS = 16;
     
     public static final int MAX_RESULTS = 0x1 << 16;
+    
+    public static final int MAX_COMMENT_LENGTH = 0x1 << 15;
 }

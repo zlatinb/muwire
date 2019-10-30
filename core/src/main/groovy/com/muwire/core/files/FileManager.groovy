@@ -25,6 +25,7 @@ class FileManager {
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index = new SearchIndex()
     final FileTree negativeTree = new FileTree()
+    final Set<File> sideCarFiles = new HashSet<>()
 
     FileManager(EventBus eventBus, MuWireSettings settings) {
         this.settings = settings
@@ -36,8 +37,15 @@ class FileManager {
     }
     
     void onFileHashedEvent(FileHashedEvent e) {
-        if (e.sharedFile != null)
-            addToIndex(e.sharedFile)
+        if (e.sharedFile == null)
+            return
+        File f = e.sharedFile.getFile()
+        if (sideCarFiles.remove(f)) {
+            File sideCar = new File(f.getParentFile(), f.getName() + ".mwcomment")
+            if (sideCar.exists()) 
+                e.sharedFile.setComment(Base64.encode(DataUtil.encodei18nString(sideCar.text)))
+        }
+        addToIndex(e.sharedFile)
     }
 
     void onFileLoadedEvent(FileLoadedEvent e) {
@@ -48,6 +56,21 @@ class FileManager {
         if (settings.shareDownloadedFiles) {
             addToIndex(e.downloadedFile)
         }
+    }
+    
+    void onSideCarFileEvent(SideCarFileEvent e) {
+        String name = e.file.getName()
+        name = name.substring(0, name.length() - ".mwcomment".length())
+        File target = new File(e.file.getParentFile(), name)
+        SharedFile existing = fileToSharedFile.get(target)
+        if (existing == null) {
+            sideCarFiles.add(target)
+            return
+        }
+        String comment = Base64.encode(DataUtil.encodei18nString(e.file.text))
+        String oldComment = existing.getComment()
+        existing.setComment(comment)
+        eventBus.publish(new UICommentEvent(oldComment : oldComment, sharedFile : existing))
     }
 
     private void addToIndex(SharedFile sf) {

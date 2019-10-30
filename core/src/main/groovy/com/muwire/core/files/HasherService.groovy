@@ -3,6 +3,7 @@ package com.muwire.core.files
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
@@ -33,7 +34,9 @@ class HasherService {
             return
         if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
-        if (hashed.add(canonical))
+        if (canonical.getName().endsWith(".mwcomment") && canonical.length() < Constants.MAX_COMMENT_LENGTH)
+            eventBus.publish(new SideCarFileEvent(file : canonical))
+        else if (hashed.add(canonical))
             executor.execute( { -> process(canonical) } as Runnable)
     }
     
