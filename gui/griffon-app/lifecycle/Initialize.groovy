@@ -156,8 +156,10 @@ class Initialize extends AbstractLifecycleHandler {
                 while(keys.hasMoreElements()) {
                     def key = keys.nextElement()
                     def value = lnf.getDefaults().get(key)
-                    if (value instanceof FontUIResource)
+                    if (value instanceof FontUIResource) {
                         lnf.getDefaults().put(key, font)
+                        UIManager.put(key, font)
+                    }
                 }
             }
         } else {
