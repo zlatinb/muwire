@@ -14,7 +14,7 @@ apply plugin : 'application'
 mainClassName = 'com.muwire.clilanterna.CliLanterna'
 apply plugin : 'com.github.johnrengelman.shadow'
 
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties -Xmx256M']
+applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
 
 dependencies {
     compile project(":core")
