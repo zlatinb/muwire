@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.DataHelper
 
 import javax.swing.JDialog
 import javax.swing.JPanel
@@ -64,10 +65,10 @@ class I2PStatusView {
             panel(border : titledBorder(title : "Bandwidth", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy: 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Receive Bps (15 seconds)", constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                label(text : bind {model.receiveBps}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Send Bps (15 seconds)", constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                label(text : bind {model.sendBps}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Receive (15 seconds)", constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : bind {DataHelper.formatSize2Decimal(model.receiveBps,false)+"B"}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Send (15 seconds)", constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : bind {DataHelper.formatSize2Decimal(model.sendBps, false)+"B"}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
         }
 
