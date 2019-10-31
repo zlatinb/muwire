@@ -40,8 +40,11 @@ griffon {
     ]
 }
 
-mainClassName = 'com.muwire.gui.Launcher'
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
+application {
+    mainClassName = 'com.muwire.gui.Launcher'
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
+    applicationName = 'MuWire'
+}
 
 apply from: 'gradle/publishing.gradle'
 // apply from: 'gradle/code-coverage.gradle'
