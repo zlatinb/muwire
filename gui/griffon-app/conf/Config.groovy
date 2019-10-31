@@ -41,6 +41,11 @@ mvcGroups {
         view = 'com.muwire.gui.I2PStatusView'
         controller = 'com.muwire.gui.I2PStatusController'
     }
+    'system-status' {
+        model = 'com.muwire.gui.SystemStatusModel'
+        view = 'com.muwire.gui.SystemStatusView'
+        controller = 'com.muwire.gui.SystemStatusController'
+    }
     'trust-list' {
         model = 'com.muwire.gui.TrustListModel'
         view = 'com.muwire.gui.TrustListView'

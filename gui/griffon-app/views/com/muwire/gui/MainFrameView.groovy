@@ -100,6 +100,7 @@ class MainFrameView {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
                         MuWireSettings muSettings = application.context.get("muwire-settings")
                         menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status")})
+                        menuItem("System", actionPerformed : {mvcGroup.createMVCGroup("system-status")})
                     }
                 }
                 borderLayout()
