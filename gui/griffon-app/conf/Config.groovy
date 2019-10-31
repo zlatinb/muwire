@@ -76,4 +76,9 @@ mvcGroups {
         view = 'com.muwire.gui.CloseWarningView'
         controller = 'com.muwire.gui.CloseWarningController'
     }
+    'update' {
+        model = 'com.muwire.gui.UpdateModel'
+        view = 'com.muwire.gui.UpdateView'
+        controller = 'com.muwire.gui.UpdateController'
+    }
 }

@@ -7,4 +7,5 @@ class UpdateAvailableEvent extends Event {
     String version
     String signer
     String infoHash
+    String text
 }

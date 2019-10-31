@@ -1,3 +1,4 @@
+
 package com.muwire.gui
 
 import java.util.concurrent.ConcurrentHashMap
@@ -264,8 +265,10 @@ class MainFrameModel {
 
     void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
         runInsideUIAsync {
-            JOptionPane.showMessageDialog(null, "MuWire $e.version has been downloaded.  You can update now",
-                "Update Downloaded", JOptionPane.INFORMATION_MESSAGE)
+            Map<String, Object> args = new HashMap<>()
+            args['available'] = null
+            args['downloaded'] = e
+            mvcGroup.createMVCGroup("update", "update", args)
         }
     }
 
@@ -529,13 +532,10 @@ class MainFrameModel {
 
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
         runInsideUIAsync {
-
-            int option = JOptionPane.showConfirmDialog(null,
-                "MuWire $e.version is available from $e.signer.  You have "+ metadata["application.version"]+" Update?",
-                "New MuWire version availble", JOptionPane.OK_CANCEL_OPTION)
-            if (option == JOptionPane.CANCEL_OPTION)
-                return
-            controller.search(e.infoHash,"MuWire update")
+            Map<String, Object> args = new HashMap<>()
+            args['available'] = e
+            args['downloaded'] = null
+            mvcGroup.createMVCGroup("update", "update", args)
         }
     }
 

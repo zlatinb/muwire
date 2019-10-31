@@ -40,6 +40,8 @@ class UpdateClient {
     private volatile InfoHash updateInfoHash
     private volatile String version, signer
     private volatile boolean updateDownloading
+    
+    private volatile String text
 
     UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, FileManager fileManager, Persona me) {
         this.eventBus = eventBus
@@ -75,7 +77,7 @@ class UpdateClient {
         if (e.downloadedFile.infoHash != updateInfoHash)
             return
         updateDownloading = false
-        eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer))
+        eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, text : text))
     }
 
     private void checkUpdate() {
@@ -147,15 +149,16 @@ class UpdateClient {
                 } else
                     infoHash = payload[settings.updateType]
 
-
+                text = payload.text
+                    
                 if (!settings.autoDownloadUpdate) {
                     log.info("new version $payload.version available, publishing event")
-                    eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : infoHash))
+                    eventBus.publish(new UpdateAvailableEvent(version : payload.version, signer : payload.signer, infoHash : infoHash, text : text))
                 } else {
                     log.info("new version $payload.version available")
                     updateInfoHash = new InfoHash(Base64.decode(infoHash))
                     if (fileManager.rootToFiles.containsKey(updateInfoHash))
-                        eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer))
+                        eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer, text : text))
                     else {
                         updateDownloading = false
                         version = payload.version
