@@ -50,7 +50,7 @@ class MainWindowView extends BasicWindow {
     private final Label sharedFiles
     private final Label timesBrowsed
     private final Label updateStatus
-    private final Label freeRam, totalRam, maxRam
+    private final Label usedRam, totalRam, maxRam
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen, CliSettings props) {
         super(title);
@@ -132,7 +132,7 @@ class MainWindowView extends BasicWindow {
         sharedFiles = new Label("0")
         timesBrowsed = new Label("0")
         updateStatus = new Label("Unknown")
-        freeRam = new Label("0")
+        usedRam = new Label("0")
         maxRam = new Label("0")
         totalRam = new Label("0")
                 
@@ -155,8 +155,8 @@ class MainWindowView extends BasicWindow {
             addComponent(updateStatus, layoutData)
             addComponent(new Label("Java Version: "), layoutData)
             addComponent(new Label(System.getProperty("java.vendor")+ " " + System.getProperty("java.version")), layoutData)
-            addComponent(new Label("Free Memory: "), layoutData)
-            addComponent(freeRam, layoutData)
+            addComponent(new Label("Used Memory: "), layoutData)
+            addComponent(usedRam, layoutData)
             addComponent(new Label("Total Memory: "), layoutData)
             addComponent(totalRam, layoutData)
             addComponent(new Label("Maximum Memory: "), layoutData)
@@ -279,8 +279,10 @@ class MainWindowView extends BasicWindow {
         int hopelessHosts = core.hostCache.countHopelessHosts()
         int shared = core.fileManager.fileToSharedFile.size()
         int browsed = core.connectionAcceptor.browsed
-        String freeMem = DataHelper.formatSize2Decimal(Runtime.getRuntime().freeMemory(), false) + "B"
-        String totalMem = DataHelper.formatSize2Decimal(Runtime.getRuntime().totalMemory(), false)+"B"
+        long freeMemL = Runtime.getRuntime().freeMemory()
+        long totalMemL = Runtime.getRuntime().totalMemory()
+        String usedMem = DataHelper.formatSize2Decimal(freeMemL, false) + "B"
+        String totalMem = DataHelper.formatSize2Decimal(totalMemL, false)+"B"
         String maxMem
         long maxMemL = Runtime.getRuntime().maxMemory()
         if (maxMemL >= Long.MAX_VALUE / 2)
@@ -296,7 +298,7 @@ class MainWindowView extends BasicWindow {
         hopeless.setText(String.valueOf(hopelessHosts))
         sharedFiles.setText(String.valueOf(shared))
         timesBrowsed.setText(String.valueOf(browsed))
-        freeRam.setText(freeMem)
+        usedRam.setText(usedMem)
         totalRam.setText(totalMem)
         maxRam.setText(maxMem)
     }
