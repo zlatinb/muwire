@@ -217,8 +217,11 @@ class MainWindowView extends BasicWindow {
         textGUI.getGUIThread().invokeLater {
             String label = "$e.version is available with hash $e.infoHash"
             updateStatus.setText(label)
-            String message = "Version $e.version is available from $e.signer, search for $e.infoHash"
-            MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.OK)
+            String message = "Version $e.version is available, with hash $e.infoHash .  Show details?"
+            def button = MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.Yes, MessageDialogButton.No)
+            if (button == MessageDialogButton.No)
+                return
+            textGUI.addWindowAndWait(new UpdateTextView(e.text, sizeForTables()))
         }
     }
     
@@ -226,8 +229,11 @@ class MainWindowView extends BasicWindow {
         textGUI.getGUIThread().invokeLater {
             String label = "$e.version downloaded"
             updateStatus.setText(label)
-            String message = "Version $e.version from $e.signer has been downloaded.  You can update now."
-            MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.OK)
+            String message = "MuWire version $e.version has been downloaded.  Show details?."
+            def button = MessageDialog.showMessageDialog(textGUI, "Update Available", message, MessageDialogButton.Yes, MessageDialogButton.No)
+            if (button == MessageDialogButton.No)
+                return
+            textGUI.addWindowAndWait(new UpdateTextView(e.text, sizeForTables()))
         }
     }
     
