@@ -11,10 +11,14 @@ buildscript {
 }
 
 apply plugin : 'application'
-mainClassName = 'com.muwire.clilanterna.CliLanterna'
+application {
+    mainClassName = 'com.muwire.clilanterna.CliLanterna'
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
+    applicationName = 'MuWire-cli'
+}
+
 apply plugin : 'com.github.johnrengelman.shadow'
 
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
 
 dependencies {
     compile project(":core")
