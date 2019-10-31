@@ -30,6 +30,7 @@ import com.muwire.core.update.UpdateAvailableEvent
 import com.muwire.core.update.UpdateDownloadedEvent
 
 import net.i2p.data.Base64
+import net.i2p.data.DataHelper
 
 class MainWindowView extends BasicWindow {
     
@@ -49,6 +50,7 @@ class MainWindowView extends BasicWindow {
     private final Label sharedFiles
     private final Label timesBrowsed
     private final Label updateStatus
+    private final Label freeRam, totalRam, maxRam
     
     public MainWindowView(String title, Core core, TextGUI textGUI, Screen screen, CliSettings props) {
         super(title);
@@ -130,6 +132,9 @@ class MainWindowView extends BasicWindow {
         sharedFiles = new Label("0")
         timesBrowsed = new Label("0")
         updateStatus = new Label("Unknown")
+        freeRam = new Label("0")
+        maxRam = new Label("0")
+        totalRam = new Label("0")
                 
         statusPanel.with { 
             addComponent(new Label("Incoming Connections: "), layoutData)
@@ -148,6 +153,14 @@ class MainWindowView extends BasicWindow {
             addComponent(timesBrowsed, layoutData)
             addComponent(new Label("Update Status: "), layoutData)
             addComponent(updateStatus, layoutData)
+            addComponent(new Label("Java Version: "), layoutData)
+            addComponent(new Label(System.getProperty("java.vendor")+ " " + System.getProperty("java.version")), layoutData)
+            addComponent(new Label("Free Memory: "), layoutData)
+            addComponent(freeRam, layoutData)
+            addComponent(new Label("Total Memory: "), layoutData)
+            addComponent(totalRam, layoutData)
+            addComponent(new Label("Maximum Memory: "), layoutData)
+            addComponent(maxRam, layoutData)
         }
         
         refreshStats()
@@ -266,6 +279,15 @@ class MainWindowView extends BasicWindow {
         int hopelessHosts = core.hostCache.countHopelessHosts()
         int shared = core.fileManager.fileToSharedFile.size()
         int browsed = core.connectionAcceptor.browsed
+        String freeMem = DataHelper.formatSize2Decimal(Runtime.getRuntime().freeMemory(), false) + "B"
+        String totalMem = DataHelper.formatSize2Decimal(Runtime.getRuntime().totalMemory(), false)+"B"
+        String maxMem
+        long maxMemL = Runtime.getRuntime().maxMemory()
+        if (maxMemL >= Long.MAX_VALUE / 2)
+            maxMem = "Unlimited"
+        else
+            maxMem = DataHelper.formatSize2Decimal(maxMemL, false) + "B"
+            
         
         incoming.setText(String.valueOf(inCon))
         outgoing.setText(String.valueOf(outCon))
@@ -274,5 +296,8 @@ class MainWindowView extends BasicWindow {
         hopeless.setText(String.valueOf(hopelessHosts))
         sharedFiles.setText(String.valueOf(shared))
         timesBrowsed.setText(String.valueOf(browsed))
+        freeRam.setText(freeMem)
+        totalRam.setText(totalMem)
+        maxRam.setText(maxMem)
     }
 }
