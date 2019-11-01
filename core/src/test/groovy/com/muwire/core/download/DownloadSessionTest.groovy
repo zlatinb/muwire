@@ -2,6 +2,8 @@ package com.muwire.core.download
 
 import static org.junit.Assert.fail
 
+import java.util.concurrent.atomic.AtomicLong
+
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -76,7 +78,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
 
-        session = new DownloadSession(eventBus, "",pieces, infoHash, endpoint, target, pieceSize, size, available)
+        session = new DownloadSession(eventBus, "",pieces, infoHash, endpoint, target, pieceSize, size, available, new AtomicLong())
         downloadThread = new Thread( { perform() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Level
 
 import com.muwire.core.Constants
@@ -61,10 +62,11 @@ public class Downloader {
     private final AtomicBoolean eventFired = new AtomicBoolean()
     private boolean piecesFileClosed
 
+    private final AtomicLong dataSinceLastRead = new AtomicLong(0)
+    private volatile long lastSpeedRead = System.currentTimeMillis()
     private ArrayList speedArr = new ArrayList<Integer>()
     private int speedPos = 0
     private int speedAvg = 0
-    private long timestamp = Instant.now().toEpochMilli()
 
     public Downloader(EventBus eventBus, DownloadManager downloadManager,
         Persona me, File file, long length, InfoHash infoHash,
@@ -139,10 +141,11 @@ public class Downloader {
     public int speed() {
         int currSpeed = 0
         if (getCurrentState() == DownloadState.DOWNLOADING) {
-            activeWorkers.values().each {
-                if (it.currentState == WorkerState.DOWNLOADING)
-                    currSpeed += it.speed()
-            }
+            long dataRead = dataSinceLastRead.getAndSet(0)
+            long now = System.currentTimeMillis()
+            if (now > lastSpeedRead)
+                currSpeed = (int) (dataRead * 1000.0 / (now - lastSpeedRead))
+            lastSpeedRead = now
         }
         
         if (speedArr.size() != downloadManager.muSettings.speedSmoothSeconds) {
@@ -302,7 +305,7 @@ public class Downloader {
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
                     currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
-                        endpoint, incompleteFile, pieceSize, length, available)
+                        endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break
@@ -337,12 +340,6 @@ public class Downloader {
                 }
                 endpoint?.close()
             }
-        }
-
-        int speed() {
-            if (currentSession == null)
-                return 0
-            currentSession.speed()
         }
 
         void cancel() {

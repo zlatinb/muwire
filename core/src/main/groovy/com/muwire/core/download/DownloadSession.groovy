@@ -21,6 +21,7 @@ import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Level
 
 @Log
@@ -37,13 +38,12 @@ class DownloadSession {
     private final Set<Integer> available
     private final MessageDigest digest
 
-    private long lastSpeedRead = System.currentTimeMillis()
-    private long dataSinceLastRead
+    private final AtomicLong dataSinceLastRead
 
     private MappedByteBuffer mapped
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
-        int pieceSize, long fileLength, Set<Integer> available) {
+        int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead) {
         this.eventBus = eventBus
         this.meB64 = meB64
         this.pieces = pieces
@@ -53,6 +53,7 @@ class DownloadSession {
         this.pieceSize = pieceSize
         this.fileLength = fileLength
         this.available = available
+        this.dataSinceLastRead = dataSinceLastRead
         try {
             digest = MessageDigest.getInstance("SHA-256")
         } catch (NoSuchAlgorithmException impossible) {
@@ -190,7 +191,7 @@ class DownloadSession {
                         throw new IOException()
                     synchronized(this) {
                         mapped.put(tmp, 0, read)
-                        dataSinceLastRead += read
+                        dataSinceLastRead.addAndGet(read)
                         pieces.markPartial(piece, mapped.position())
                     }
                 }
@@ -221,14 +222,5 @@ class DownloadSession {
         if (mapped == null)
             return 0
         mapped.position()
-    }
-
-    synchronized int speed() {
-        final long now = System.currentTimeMillis()
-        long interval = Math.max(1000, now - lastSpeedRead)
-        lastSpeedRead = now;
-        int rv = (int) (dataSinceLastRead * 1000.0 / interval)
-        dataSinceLastRead = 0
-        rv
     }
 }
