@@ -38,6 +38,7 @@ class ContentPanelView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
+        int rowHeight = application.context.get("row-height")
         dialog = new JDialog(mainFrame, "Content Control Panel", true)
         
         mainPanel = builder.panel {
@@ -48,7 +49,7 @@ class ContentPanelView {
                     label(text : "Rules")
                 }
                 scrollPane (constraints : BorderLayout.CENTER) {
-                    rulesTable = table(id : "rules-table", autoCreateRowSorter : true) {
+                    rulesTable = table(id : "rules-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.rules) {
                             closureColumn(header: "Term", type:String, read: {row -> row.getTerm()})
                             closureColumn(header: "Regex?", type:Boolean, read: {row -> row instanceof RegexMatcher})
@@ -74,7 +75,7 @@ class ContentPanelView {
                     label(text : "Hits")
                 }
                 scrollPane(constraints : BorderLayout.CENTER) {
-                     hitsTable = table(id : "hits-table", autoCreateRowSorter : true) {
+                     hitsTable = table(id : "hits-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                          tableModel(list : model.hits) {
                              closureColumn(header : "Searcher", type : String, read : {row -> row.persona.getHumanReadableName()})
                              closureColumn(header : "Keywords", type : String, read : {row -> row.keywords.join(" ")})

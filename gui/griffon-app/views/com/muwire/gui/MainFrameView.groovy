@@ -72,6 +72,7 @@ class MainFrameView {
     
     void initUI() {
         settings = application.context.get("ui-settings")
+        int rowHeight = application.context.get("row-height")
         builder.with {
             application(size : [1024,768], id: 'main-frame',
             locationRelativeTo : null,
@@ -152,7 +153,7 @@ class MainFrameView {
                             panel {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
-                                    downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true) {
+                                    downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
                                             closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
@@ -231,7 +232,7 @@ class MainFrameView {
                                     panel (constraints : "shared files table") {
                                         borderLayout()
                                         scrollPane(constraints : BorderLayout.CENTER) {
-                                            table(id : "shared-files-table", autoCreateRowSorter: true) {
+                                            table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                                 tableModel(list : model.shared) {
                                                     closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                     closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
@@ -277,7 +278,7 @@ class MainFrameView {
                                 label("Uploads")
                             }
                             scrollPane (constraints : BorderLayout.CENTER) {
-                                table(id : "uploads-table") {
+                                table(id : "uploads-table", rowHeight : rowHeight) {
                                     tableModel(list : model.uploads) {
                                         closureColumn(header : "Name", type : String, read : {row -> row.uploader.getName() })
                                         closureColumn(header : "Progress", type : String, read : { row ->
@@ -323,7 +324,7 @@ class MainFrameView {
                                 label("Connections")
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "connections-table") {
+                                table(id : "connections-table", rowHeight : rowHeight) {
                                     tableModel(list : model.connectionList) {
                                         closureColumn(header : "Destination", preferredWidth: 250, type: String, read : { row -> row.destination.toBase32() })
                                         closureColumn(header : "Direction", preferredWidth: 20, type: String, read : { row ->
@@ -342,7 +343,7 @@ class MainFrameView {
                                 label("Incoming searches")
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "searches-table") {
+                                table(id : "searches-table", rowHeight : rowHeight) {
                                     tableModel(list : model.searches) {
                                         closureColumn(header : "Keywords", type : String, read : {
                                             sanitized = it.search.replace('<', ' ')
@@ -375,7 +376,7 @@ class MainFrameView {
                             panel (border : etchedBorder()){
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    table(id : "trusted-table", autoCreateRowSorter : true) {
+                                    table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.trusted) {
                                             closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
                                         }
@@ -391,7 +392,7 @@ class MainFrameView {
                             panel (border : etchedBorder()){
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    table(id : "distrusted-table", autoCreateRowSorter : true) {
+                                    table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.distrusted) {
                                             closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
                                         }
@@ -410,7 +411,7 @@ class MainFrameView {
                                 label(text : "Trust List Subscriptions")
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "subscription-table", autoCreateRowSorter : true) {
+                                table(id : "subscription-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.subscriptions) {
                                         closureColumn(header : "Name", preferredWidth: 200, type: String, read : {it.persona.getHumanReadableName()})
                                         closureColumn(header : "Trusted", preferredWidth : 20, type: Integer, read : {it.good.size()})

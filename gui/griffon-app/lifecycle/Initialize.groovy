@@ -117,6 +117,7 @@ class Initialize extends AbstractLifecycleHandler {
 
         def guiPropsFile = new File(home, "gui.properties")
         UISettings uiSettings
+        int rowHeight = 14
         if (guiPropsFile.exists()) {
             Properties props = new Properties()
             guiPropsFile.withInputStream { props.load(it) }
@@ -149,7 +150,7 @@ class Initialize extends AbstractLifecycleHandler {
                 } else {
                     fontSize = uiSettings.fontSize
                 }
-                
+                rowHeight = fontSize + 2
                 FontUIResource font = new FontUIResource(fontName, Font.PLAIN, fontSize)
                 
                 def keys = lnf.getDefaults().keys()
@@ -183,6 +184,7 @@ class Initialize extends AbstractLifecycleHandler {
             }
         }
 
+        application.context.put("row-height", rowHeight)
         application.context.put("ui-settings", uiSettings)
     }
 

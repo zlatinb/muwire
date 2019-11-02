@@ -49,6 +49,7 @@ class SearchTabView {
     def sequentialDownloadCheckbox
 
     void initUI() {
+        int rowHeight = application.context.get("row-height")
         builder.with {
             def resultsTable
             def sendersTable
@@ -59,7 +60,7 @@ class SearchTabView {
                     panel {
                         borderLayout()
                         scrollPane (constraints : BorderLayout.CENTER) {
-                            sendersTable = table(id : "senders-table", autoCreateRowSorter : true) {
+                            sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                 tableModel(list : model.senders) {
                                     closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
                                     closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
@@ -85,7 +86,7 @@ class SearchTabView {
                     panel {
                         borderLayout()
                         scrollPane (constraints : BorderLayout.CENTER) {
-                            resultsTable = table(id : "results-table", autoCreateRowSorter : true) {
+                            resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                 tableModel(list: model.results) {
                                     closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
                                     closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})

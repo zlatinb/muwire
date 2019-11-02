@@ -29,6 +29,7 @@ class TrustListView {
 
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
+        int rowHeight = application.context.get("row-height")
         dialog = new JDialog(mainFrame, model.trustList.persona.getHumanReadableName(), true)
         mainPanel = builder.panel {
             borderLayout()
@@ -46,7 +47,7 @@ class TrustListView {
                 panel {
                     borderLayout()
                     scrollPane (constraints : BorderLayout.CENTER){
-                        table(id : "trusted-table", autoCreateRowSorter : true) {
+                        table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
                                 closureColumn(header: "Trusted Users", type : String, read : {it.getHumanReadableName()})
                                 closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.destination).toString()})
@@ -62,7 +63,7 @@ class TrustListView {
                 panel {
                     borderLayout()
                     scrollPane (constraints : BorderLayout.CENTER ){
-                        table(id : "distrusted-table", autoCreateRowSorter : true) {
+                        table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
                                 closureColumn(header: "Distrusted Users", type : String, read : {it.getHumanReadableName()})
                                 closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.destination).toString()})

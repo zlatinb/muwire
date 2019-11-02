@@ -31,6 +31,7 @@ class AdvancedSharingView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
+        int rowHeight = application.context.get("row-height")
         dialog = new JDialog(mainFrame,"Advanced Sharing",true)
         dialog.setResizable(true)
         
@@ -40,7 +41,7 @@ class AdvancedSharingView {
                 label(text : "Directories watched for file changes")
             }
             scrollPane( constraints : BorderLayout.CENTER ) {
-                watchedDirsTable = table(autoCreateRowSorter : true) {
+                watchedDirsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.watchedDirectories) {
                         closureColumn(header : "Directory", type : String, read : {it})
                     }
