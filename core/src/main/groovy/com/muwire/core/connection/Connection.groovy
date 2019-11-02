@@ -1,5 +1,6 @@
 package com.muwire.core.connection
 
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
@@ -21,8 +23,10 @@ import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
 import groovy.util.logging.Log
+import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Destination
+import net.i2p.data.Signature
 
 @Log
 abstract class Connection implements Closeable {
@@ -147,6 +151,8 @@ abstract class Connection implements Closeable {
         query.replyTo = e.replyTo.toBase64()
         if (e.originator != null)
             query.originator = e.originator.toBase64()
+        if (e.sig != null)
+            query.sig = Base64.encode(e.sig)
         messages.put(query)
     }
 
@@ -225,6 +231,24 @@ abstract class Connection implements Closeable {
         boolean compressedResults = false
         if (search.compressedResults != null)
             compressedResults = search.compressedResults
+        byte[] sig = null
+        // TODO: make this mandatory at some point
+        if (search.sig != null) {
+            sig = Base64.decode(search.sig)
+            byte [] payload 
+            if (infohash != null)
+                payload = infohash
+            else 
+                payload =  String.join(" ",search.keywords).getBytes(StandardCharsets.UTF_8)
+            def spk = originator.destination.getSigningPublicKey()
+            def signature = new Signature(Constants.SIG_TYPE, sig)
+            if (!DSAEngine.getInstance().verifySig(signature, payload, spk)) {
+                log.info("signature didn't match keywords")
+                return
+            } else
+                log.info("query signature verified")
+        } else
+            log.info("no signature in query")
 
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : infohash,
@@ -236,7 +260,8 @@ abstract class Connection implements Closeable {
                                             replyTo : replyTo,
                                             originator : originator,
                                             receivedOn : endpoint.destination,
-                                            firstHop : search.firstHop )
+                                            firstHop : search.firstHop,
+                                            sig : sig )
         eventBus.publish(event)
 
     }

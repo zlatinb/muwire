@@ -8,7 +8,11 @@ import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 
+import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
+import net.i2p.data.Signature
+
+import java.nio.charset.StandardCharsets
 
 import com.googlecode.lanterna.gui2.TextGUIThread
 import com.googlecode.lanterna.gui2.table.TableModel
@@ -40,20 +44,27 @@ class SearchModel {
         }
         
         def searchEvent
+        byte [] payload
         if (hashSearch) {
             searchEvent = new SearchEvent(searchHash : root, uuid : UUID.randomUUID(), oobInfohash : true, compressedResults : true)
+            payload = root
         } else {
             def replaced = query.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
             def terms = replaced.split(" ")
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }
+            payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : UUID.randomUUID(), oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true)
         }
+        
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
+        
+        Signature sig = DSAEngine.getInstance().sign(payload, core.spk)
+        
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
             replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me))
+            originator : core.me, sig: sig.data))
     }
     
     void unregister() {

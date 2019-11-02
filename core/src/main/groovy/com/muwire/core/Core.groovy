@@ -103,6 +103,8 @@ public class Core {
     private final Router router
 
     final AtomicBoolean shutdown = new AtomicBoolean()
+    
+    final SigningPrivateKey spk
 
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home
@@ -180,7 +182,7 @@ public class Core {
         i2pSession = socketManager.getSession()
 
         def destination = new Destination()
-        def spk = new SigningPrivateKey(Constants.SIG_TYPE)
+        spk = new SigningPrivateKey(Constants.SIG_TYPE)
         keyDat.withInputStream {
             destination.readBytes(it)
             def privateKey = new PrivateKey()

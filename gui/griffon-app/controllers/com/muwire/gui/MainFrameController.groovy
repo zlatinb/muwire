@@ -7,7 +7,11 @@ import griffon.core.mvc.MVCGroup
 import griffon.core.mvc.MVCGroupConfiguration
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
+import net.i2p.data.Signature
+
+import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -77,21 +81,27 @@ class MainFrameController {
         }
 
         def searchEvent
+        byte [] payload
         if (hashSearch) {
             searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true, compressedResults : true)
+            payload = root
         } else {
             // this can be improved a lot
             def replaced = search.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
             def terms = replaced.split(" ")
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }
+            payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true, 
                 searchComments : core.muOptions.searchComments, compressedResults : true)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
+        
+        Signature sig = DSAEngine.getInstance().sign(payload, core.spk)
+        
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
             replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me))
+            originator : core.me, sig : sig.data))
     }
 
     void search(String infoHash, String tabTitle) {
