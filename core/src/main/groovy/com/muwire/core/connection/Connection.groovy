@@ -242,7 +242,7 @@ abstract class Connection implements Closeable {
                 payload =  String.join(" ",search.keywords).getBytes(StandardCharsets.UTF_8)
             def spk = originator.destination.getSigningPublicKey()
             def signature = new Signature(Constants.SIG_TYPE, sig)
-            if (!DSAEngine.getInstance().verifySig(signature, payload, spk)) {
+            if (!DSAEngine.getInstance().verifySignature(signature, payload, spk)) {
                 log.info("signature didn't match keywords")
                 return
             } else
