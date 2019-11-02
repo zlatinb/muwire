@@ -24,6 +24,8 @@ import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
 import javax.swing.border.Border
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
@@ -67,6 +69,7 @@ class MainFrameView {
     def lastDownloadSortEvent
     def lastSharedSortEvent
     def trustTablesSortEvents = [:]
+    def expansionListener = new TreeExpansions()
 
     UISettings settings
     
@@ -598,6 +601,8 @@ class MainFrameView {
             model.addCommentButtonEnabled = selectedNode != null
 
         })
+        
+        sharedFilesTree.addTreeExpansionListener(expansionListener)
 
         // searches table
         def searchesTable = builder.getVariable("searches-table")
@@ -938,8 +943,13 @@ class MainFrameView {
     public void refreshSharedFiles() {
         def tree = builder.getVariable("shared-files-tree")
         TreePath[] selectedPaths = tree.getSelectionPaths()
+        Set<TreePath> expanded = new HashSet<>(expansionListener.expandedPaths)
+        
         model.sharedTree.nodeStructureChanged(model.treeRoot)
+        
+        expanded.each { tree.expandPath(it) }
         tree.setSelectionPaths(selectedPaths)
+        
         builder.getVariable("shared-files-table").model.fireTableDataChanged()
     }
     
@@ -956,4 +966,19 @@ class MainFrameView {
             t.start()
         }
     }
+
+    private static class TreeExpansions implements TreeExpansionListener {
+        private final Set<TreePath> expandedPaths = new HashSet<>()
+
+
+        @Override
+        public void treeExpanded(TreeExpansionEvent event) {
+            expandedPaths.add(event.getPath())
+        }
+
+        @Override
+        public void treeCollapsed(TreeExpansionEvent event) {
+            expandedPaths.remove(event.getPath())
+        }        
+    }    
 }
