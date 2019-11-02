@@ -36,9 +36,10 @@ class HasherService {
             return
         if (canonical.isFile() && fileManager.negativeTree.fileToNode.containsKey(canonical))
             return
-        if (canonical.getName().endsWith(".mwcomment") && canonical.length() <= Constants.MAX_COMMENT_LENGTH)
-            eventBus.publish(new SideCarFileEvent(file : canonical))
-        else if (hashed.add(canonical))
+        if (canonical.getName().endsWith(".mwcomment")) { 
+            if (canonical.length() <= Constants.MAX_COMMENT_LENGTH)
+                eventBus.publish(new SideCarFileEvent(file : canonical))
+        } else if (hashed.add(canonical))
             executor.execute( { -> process(canonical) } as Runnable)
     }
     
