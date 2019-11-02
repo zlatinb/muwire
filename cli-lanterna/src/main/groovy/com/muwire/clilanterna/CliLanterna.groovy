@@ -82,14 +82,14 @@ class CliLanterna {
             props.setDownloadLocation(downloadLocationFile)
             props.incompleteLocation = incompletesLocationFile
             
-            propsFile.withOutputStream { 
+            propsFile.withPrintWriter("UTF-8", { 
                 props.write(it)
-            }
+            })
         } else {
             props = new Properties()
-            propsFile.withInputStream { 
+            propsFile.withReader("UTF-8", { 
                 props.load(it)
-            }
+            })
             props = new MuWireSettings(props)
         }
         props.updateType = "cli-lanterna"

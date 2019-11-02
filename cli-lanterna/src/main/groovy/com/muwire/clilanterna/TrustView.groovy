@@ -199,6 +199,6 @@ class TrustView extends BasicWindow {
     
     private void saveMuSettings() {
         File settingsFile = new File(core.home,"MuWire.properties")
-        settingsFile.withOutputStream { core.muOptions.write(it) }
+        settingsFile.withPrintWriter("UTF-8",{ core.muOptions.write(it) })
     }
 }
