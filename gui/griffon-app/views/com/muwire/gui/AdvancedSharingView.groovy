@@ -6,6 +6,7 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
 import javax.swing.JTabbedPane
+import javax.swing.JTree
 import javax.swing.SwingConstants
 
 import java.awt.BorderLayout
@@ -53,7 +54,8 @@ class AdvancedSharingView {
                 label(text : "Files which are explicitly not shared")
             }
             scrollPane( constraints : BorderLayout.CENTER ) {
-                // add tree here
+                def jtree = new JTree(model.negativeTree)
+                tree(rootVisible : false, jtree)
             }
         }
     }

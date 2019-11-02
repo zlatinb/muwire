@@ -45,7 +45,7 @@ class FileTree {
         true
     }    
     
-    private static class TreeNode {
+    public static class TreeNode {
         TreeNode parent
         File file
         final Set<TreeNode> children = new HashSet<>()
