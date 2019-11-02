@@ -56,7 +56,7 @@ class AdvancedSharingView {
             }
             scrollPane( constraints : BorderLayout.CENTER ) {
                 def jtree = new JTree(model.negativeTree)
-                tree(rootVisible : false, jtree)
+                tree(rootVisible : false, rowHeight : rowHeight,jtree)
             }
         }
     }

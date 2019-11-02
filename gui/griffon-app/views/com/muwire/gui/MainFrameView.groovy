@@ -251,7 +251,7 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
-                                            tree(id : "shared-files-tree", rootVisible : false, expandsSelectedPaths: true, jtree)
+                                            tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, jtree)
                                         }
                                     }
                                 }
