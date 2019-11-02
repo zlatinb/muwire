@@ -34,7 +34,7 @@ class HasherService {
             return
         if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
-        if (fileManager.negativeTree.fileToNode.containsKey(canonical))
+        if (canonical.isFile() && fileManager.negativeTree.fileToNode.containsKey(canonical))
             return
         if (canonical.getName().endsWith(".mwcomment") && canonical.length() <= Constants.MAX_COMMENT_LENGTH)
             eventBus.publish(new SideCarFileEvent(file : canonical))
