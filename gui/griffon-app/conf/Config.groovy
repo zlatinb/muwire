@@ -81,4 +81,9 @@ mvcGroups {
         view = 'com.muwire.gui.UpdateView'
         controller = 'com.muwire.gui.UpdateController'
     }
+    'advanced-sharing' {
+        model = 'com.muwire.gui.AdvancedSharingModel'
+        view = 'com.muwire.gui.AdvancedSharingView'
+        controller = 'com.muwire.gui.AdvancedSharingController'
+    }
 }

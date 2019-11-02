@@ -90,17 +90,24 @@ class MainFrameView {
                     }
                     menu (text : "Options") {
                         menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
-                        menuItem("Content Control", actionPerformed : {
-                            def env = [:]
-                            env["core"] = model.core
-                            mvcGroup.createMVCGroup("content-panel", env)
-                        })
                     }
                     menu (text : "Status") {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
                         MuWireSettings muSettings = application.context.get("muwire-settings")
                         menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status")})
                         menuItem("System", actionPerformed : {mvcGroup.createMVCGroup("system-status")})
+                    }
+                    menu (text : "Tools") {
+                        menuItem("Content Control", actionPerformed : {
+                            def env = [:]
+                            env["core"] = model.core
+                            mvcGroup.createMVCGroup("content-panel", env)
+                        })
+                        menuItem("Advanced Sharing", actionPerformed : {
+                            def env = [:]
+                            env["core"] = model.core
+                            mvcGroup.createMVCGroup("advanced-sharing",env)  
+                        })
                     }
                 }
                 borderLayout()
