@@ -137,10 +137,7 @@ class OptionsController {
         model.trustListInterval = trustListInterval
         settings.trustListInterval = Integer.parseInt(trustListInterval)
 
-        File settingsFile = new File(core.home, "MuWire.properties")
-        settingsFile.withOutputStream {
-            settings.write(it)
-        }
+        core.saveMuSettings()
 
         // UI Setttings
 

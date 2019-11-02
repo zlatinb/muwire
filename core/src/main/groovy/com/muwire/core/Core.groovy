@@ -191,8 +191,9 @@ public class Core {
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
         daos.write(Constants.PERSONA_VERSION)
-        daos.writeShort((short)props.getNickname().length())
-        daos.write(props.getNickname().getBytes(StandardCharsets.UTF_8))
+        byte [] name = props.getNickname().getBytes(StandardCharsets.UTF_8)
+        daos.writeShort((short)name.length)
+        daos.write(name)
         destination.writeBytes(daos)
         daos.flush()
         byte [] payload = baos.toByteArray()
@@ -335,8 +336,7 @@ public class Core {
             return
         }
         log.info("saving settings")
-        File f = new File(home, "MuWire.properties")
-        f.withOutputStream { muOptions.write(it) }
+        saveMuSettings()
         log.info("shutting down trust subscriber")
         trustSubscriber.stop()
         log.info("shutting down download manageer")
@@ -356,6 +356,11 @@ public class Core {
             router.shutdown(0)
         }
         log.info("shutdown complete")
+    }
+    
+    public void saveMuSettings() {
+        File f = new File(home, "MuWire.properties")
+        f.withPrintWriter("UTF-8", { muOptions.write(it) })
     }
 
     static main(args) {

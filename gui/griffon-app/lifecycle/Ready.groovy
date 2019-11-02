@@ -41,9 +41,9 @@ class Ready extends AbstractLifecycleHandler {
         def propsFile = new File(home, "MuWire.properties")
         if (propsFile.exists()) {
             log.info("loading existing props file")
-            propsFile.withInputStream {
+            propsFile.withReader("UTF-8", {
                 props.load(it)
-            }
+            })
             props = new MuWireSettings(props)
             if (props.incompleteLocation == null)
                 props.incompleteLocation = new File(home, "incompletes")
@@ -90,9 +90,9 @@ class Ready extends AbstractLifecycleHandler {
                 props.downloadLocation = chooser.getSelectedFile()
             }
 
-            propsFile.withOutputStream {
+            propsFile.withPrintWriter("UTF-8", {
                 props.write(it)
-            }
+            })
         }
 
         Core core

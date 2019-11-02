@@ -93,7 +93,7 @@ class MuWireSettings {
         
     }
 
-    void write(OutputStream out) throws IOException {
+    void write(Writer out) throws IOException {
         Properties props = new Properties()
         props.setProperty("leaf", isLeaf.toString())
         props.setProperty("allowUntrusted", allowUntrusted.toString())
@@ -137,7 +137,7 @@ class MuWireSettings {
             props.setProperty("trustSubscriptions", encoded)
         }
 
-        props.store(out, "")
+        props.store(out, "This file is UTF-8")
     }
     
     private static Set<String> readEncodedSet(Properties props, String property) {

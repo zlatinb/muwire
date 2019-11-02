@@ -22,8 +22,9 @@ public class Name {
 
     public void write(OutputStream out) throws IOException {
         DataOutputStream dos = new DataOutputStream(out)
-        dos.writeShort(name.length())
-        dos.write(name.getBytes(StandardCharsets.UTF_8))
+        byte [] bytes = name.getBytes(StandardCharsets.UTF_8)
+        dos.writeShort(bytes.length)
+        dos.write(bytes)
     }
 
     public getName() {

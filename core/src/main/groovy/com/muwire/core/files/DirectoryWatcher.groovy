@@ -86,9 +86,9 @@ class DirectoryWatcher {
     
     private void saveMuSettings() {
         File muSettingsFile = new File(home, "MuWire.properties")
-        muSettingsFile.withOutputStream {
+        muSettingsFile.withPrintWriter("UTF-8", {
             muOptions.write(it)
-        }
+        })
     }
 
     private void watch() {

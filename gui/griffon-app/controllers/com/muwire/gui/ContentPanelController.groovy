@@ -97,9 +97,6 @@ class ContentPanelController {
     }
     
     void saveMuWireSettings() {
-        File f = new File(core.home, "MuWire.properties")
-        f.withOutputStream {
-            core.muOptions.write(it)
-        }
+        core.saveMuSettings()
     }
 }
