@@ -154,6 +154,7 @@ class MainFrameView {
                             }
                             panel( constraints: BorderLayout.EAST) {
                                 button(text: "Search", searchAction)
+                                button(text : "", icon : imageIcon("/close_tab.png"), clearSearchAction)
                             }
                         }
                     }

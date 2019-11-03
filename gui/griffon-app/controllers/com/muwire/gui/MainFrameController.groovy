@@ -52,6 +52,13 @@ class MainFrameController {
     private volatile Core core
 
     @ControllerAction
+    void clearSearch() {
+        def searchField = builder.getVariable("search-field")
+        searchField.setSelectedItem(null)
+        searchField.requestFocus()
+    }
+    
+    @ControllerAction
     void search(ActionEvent evt) {
         if (evt?.getActionCommand() == null)
             return
