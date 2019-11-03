@@ -135,11 +135,14 @@ class MainFrameController {
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
+        byte [] infoHashBytes = Base64.decode(infoHash)
+        Signature sig = DSAEngine.getInstance().sign(infoHashBytes, core.spk)
+        
         def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
             oobInfohash: true)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me))
+            originator : core.me, sig : sig.data))
     }
 
     private int selectedDownload() {

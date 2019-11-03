@@ -255,7 +255,7 @@ public class Core {
         cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
 
         log.info("initializing update client")
-        updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me)
+        updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me, spk)
         eventBus.register(FileDownloadedEvent.class, updateClient)
         eventBus.register(UIResultBatchEvent.class, updateClient)
 

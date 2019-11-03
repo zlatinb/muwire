@@ -21,7 +21,10 @@ import net.i2p.client.I2PSessionMuxedListener
 import net.i2p.client.SendMessageOptions
 import net.i2p.client.datagram.I2PDatagramDissector
 import net.i2p.client.datagram.I2PDatagramMaker
+import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
+import net.i2p.data.Signature
+import net.i2p.data.SigningPrivateKey
 import net.i2p.util.VersionComparator
 
 @Log
@@ -32,6 +35,7 @@ class UpdateClient {
     final MuWireSettings settings
     final FileManager fileManager
     final Persona me
+    final SigningPrivateKey spk
 
     private final Timer timer
 
@@ -43,13 +47,15 @@ class UpdateClient {
     
     private volatile String text
 
-    UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, FileManager fileManager, Persona me) {
+    UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, 
+        FileManager fileManager, Persona me, SigningPrivateKey spk) {
         this.eventBus = eventBus
         this.session = session
         this.myVersion = myVersion
         this.settings = settings
         this.fileManager = fileManager
         this.me = me
+        this.spk = spk
         timer = new Timer("update-client",true)
     }
 
@@ -164,9 +170,10 @@ class UpdateClient {
                         version = payload.version
                         signer = payload.signer
                         log.info("starting search for new version hash $payload.infoHash")
+                        Signature sig = DSAEngine.getInstance().sign(updateInfoHash.getRoot(), spk)
                         def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : UUID.randomUUID(), oobInfohash : true)
                         def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, replyTo : me.destination,
-                            receivedOn : me.destination, originator : me)
+                            receivedOn : me.destination, originator : me, sig : sig.data)
                         eventBus.publish(queryEvent)
                     }
                 }
