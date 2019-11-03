@@ -11,10 +11,14 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.muwire.core.Constants;
 
 import net.i2p.data.Base64;
+import net.i2p.util.ConcurrentHashSet;
 
 public class DataUtil {
 
@@ -164,5 +168,23 @@ public class DataUtil {
             }
         } catch(Exception ex) { }
         cb = null;
+    }
+    
+    public static Set<String> readEncodedSet(Properties props, String property) {
+        Set<String> rv = new ConcurrentHashSet<>();
+        if (props.containsKey(property)) {
+            String [] encoded = props.getProperty(property).split(",");
+            for(String s : encoded)
+                rv.add(readi18nString(Base64.decode(s)));
+        }
+        return rv;
+    }
+    
+    public static void writeEncodedSet(Set<String> set, String property, Properties props) {
+        if (set.isEmpty())
+            return;
+        String encoded = set.stream().map(s -> Base64.encode(encodei18nString(s)))
+                .collect(Collectors.joining(","));
+        props.setProperty(property, encoded);
     }
 }

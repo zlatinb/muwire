@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.util.DataUtil
+
 class UISettings {
 
     String lnf
@@ -14,6 +16,7 @@ class UISettings {
     boolean closeWarning
     boolean exitOnClose
     boolean clearUploads
+    Set<String> searchHistory
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -28,6 +31,8 @@ class UISettings {
         closeWarning = Boolean.parseBoolean(props.getProperty("closeWarning","true"))
         exitOnClose = Boolean.parseBoolean(props.getProperty("exitOnClose","false"))
         clearUploads = Boolean.parseBoolean(props.getProperty("clearUploads","false"))
+        
+        searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
     }
 
     void write(OutputStream out) throws IOException {
@@ -46,6 +51,7 @@ class UISettings {
         if (font != null)
             props.setProperty("font", font)
 
+        DataUtil.writeEncodedSet(searchHistory, "searchHistory", props)
 
         props.store(out, "UI Properties")
     }

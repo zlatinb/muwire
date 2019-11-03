@@ -11,6 +11,7 @@ import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
 
+import java.awt.event.ActionEvent
 import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
@@ -51,11 +52,16 @@ class MainFrameController {
     private volatile Core core
 
     @ControllerAction
-    void search() {
+    void search(ActionEvent evt) {
+        if (evt.getActionCommand() == null)
+            return
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
 
-        def search = builder.getVariable("search-field").text
+        def searchField = builder.getVariable("search-field") 
+        def search = searchField.getSelectedItem()
+        searchField.model.addElement(search)
+        
         search = search.trim()
         if (search.length() == 0)
             return

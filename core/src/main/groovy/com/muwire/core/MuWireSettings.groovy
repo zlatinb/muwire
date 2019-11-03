@@ -78,10 +78,10 @@ class MuWireSettings {
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
 
-        watchedDirectories = readEncodedSet(props, "watchedDirectories")
-        watchedKeywords = readEncodedSet(props, "watchedKeywords")
-        watchedRegexes = readEncodedSet(props, "watchedRegexes")
-        negativeFileTree = readEncodedSet(props, "negativeFileTree")
+        watchedDirectories = DataUtil.readEncodedSet(props, "watchedDirectories")
+        watchedKeywords = DataUtil.readEncodedSet(props, "watchedKeywords")
+        watchedRegexes = DataUtil.readEncodedSet(props, "watchedRegexes")
+        negativeFileTree = DataUtil.readEncodedSet(props, "negativeFileTree")
 
         trustSubscriptions = new HashSet<>()
         if (props.containsKey("trustSubscriptions")) {
@@ -125,10 +125,10 @@ class MuWireSettings {
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
         props.setProperty("uploadSlotsPerUser", String.valueOf(uploadSlotsPerUser))
 
-        writeEncodedSet(watchedDirectories, "watchedDirectories", props)
-        writeEncodedSet(watchedKeywords, "watchedKeywords", props)
-        writeEncodedSet(watchedRegexes, "watchedRegexes", props)
-        writeEncodedSet(negativeFileTree, "negativeFileTree", props)
+        DataUtil.writeEncodedSet(watchedDirectories, "watchedDirectories", props)
+        DataUtil.writeEncodedSet(watchedKeywords, "watchedKeywords", props)
+        DataUtil.writeEncodedSet(watchedRegexes, "watchedRegexes", props)
+        DataUtil.writeEncodedSet(negativeFileTree, "negativeFileTree", props)
 
         if (!trustSubscriptions.isEmpty()) {
             String encoded = trustSubscriptions.stream().
@@ -138,24 +138,6 @@ class MuWireSettings {
         }
 
         props.store(out, "This file is UTF-8")
-    }
-    
-    private static Set<String> readEncodedSet(Properties props, String property) {
-        Set<String> rv = new ConcurrentHashSet<>()
-        if (props.containsKey(property)) {
-            String[] encoded = props.getProperty(property).split(",")
-            encoded.each { rv << DataUtil.readi18nString(Base64.decode(it)) }
-        }
-        rv
-    }
-    
-    private static void writeEncodedSet(Set<String> set, String property, Properties props) {
-        if (set.isEmpty())
-            return
-        String encoded = set.stream().
-            map({Base64.encode(DataUtil.encodei18nString(it))}).
-            collect(Collectors.joining(","))
-        props.setProperty(property, encoded)
     }
 
     boolean isLeaf() {

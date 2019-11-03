@@ -11,6 +11,7 @@ import net.i2p.data.DataHelper
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.JComboBox
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -24,6 +25,8 @@ import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
 import javax.swing.border.Border
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
@@ -135,7 +138,11 @@ class MainFrameView {
                             panel(constraints: BorderLayout.CENTER) {
                                 borderLayout()
                                 label("        Enter search here:", constraints: BorderLayout.WEST) // TODO: fix this
-                                textField(id: "search-field", constraints: BorderLayout.CENTER, action : searchAction)
+                                
+                                def searchFieldModel = new SearchFieldModel(settings, new File(application.context.get("muwire-home")))
+                                JComboBox myComboBox = new SearchField(searchFieldModel)
+                                myComboBox.setAction(searchAction)
+                                widget(id: "search-field", constraints: BorderLayout.CENTER, myComboBox)
 
                             }
                             panel( constraints: BorderLayout.EAST) {
@@ -484,6 +491,10 @@ class MainFrameView {
                         }
                     }})
 
+        // search field
+        def searchField = builder.getVariable("search-field")
+        
+        // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
