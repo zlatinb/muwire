@@ -88,6 +88,8 @@ class MainFrameModel {
     def trusted = []
     def distrusted = []
     def subscriptions = []
+    
+    boolean sessionRestored
 
     @Observable int connections
     @Observable String me
@@ -295,6 +297,8 @@ class MainFrameModel {
         runInsideUIAsync {
             connections = core.connectionManager.getConnections().size()
 
+            view.showRestoreOrEmpty()
+            
             if (connections > 0) {
                 def topPanel = builder.getVariable("top-panel")
                 topPanel.getLayout().show(topPanel, "top-search-panel")

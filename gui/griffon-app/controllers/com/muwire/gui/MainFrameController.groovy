@@ -53,7 +53,7 @@ class MainFrameController {
 
     @ControllerAction
     void search(ActionEvent evt) {
-        if (evt.getActionCommand() == null)
+        if (evt?.getActionCommand() == null)
             return
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
@@ -61,6 +61,12 @@ class MainFrameController {
         def searchField = builder.getVariable("search-field") 
         def search = searchField.getSelectedItem()
         searchField.model.addElement(search)
+        performSearch(search)
+    }
+    
+    private void performSearch(String search) {
+        
+        model.sessionRestored = true
         
         search = search.trim()
         if (search.length() == 0)
@@ -98,16 +104,17 @@ class MainFrameController {
             def nonEmpty = []
             terms.each { if (it.length() > 0) nonEmpty << it }
             payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
-            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true, 
-                searchComments : core.muOptions.searchComments, compressedResults : true)
+            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
+            searchComments : core.muOptions.searchComments, compressedResults : true)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
-        
+
         Signature sig = DSAEngine.getInstance().sign(payload, core.spk)
-        
+
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
-            replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me, sig : sig.data))
+        replyTo: core.me.destination, receivedOn: core.me.destination,
+        originator : core.me, sig : sig.data))
+
     }
 
     void search(String infoHash, String tabTitle) {
@@ -312,6 +319,14 @@ class MainFrameController {
     @ControllerAction
     void clearUploads() {
         model.uploads.removeAll { it.finished }
+    }
+    
+    @ControllerAction
+    void restoreSession() {
+        model.sessionRestored = true
+        view.settings.openTabs.each { 
+            performSearch(it)
+        }
     }
 
     void saveMuWireSettings() {

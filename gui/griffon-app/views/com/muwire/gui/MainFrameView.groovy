@@ -73,6 +73,7 @@ class MainFrameView {
     def lastSharedSortEvent
     def trustTablesSortEvents = [:]
     def expansionListener = new TreeExpansions()
+    
 
     UISettings settings
     
@@ -159,9 +160,23 @@ class MainFrameView {
                 }
                 panel (id: "cards-panel", constraints : BorderLayout.CENTER) {
                     cardLayout()
-                    panel (constraints : "search window") {
-                        borderLayout()
-                        tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
+                    panel (id : "search window", constraints : "search window") {
+                        cardLayout()
+                        panel (constraints : "tabs-panel") {
+                            borderLayout()
+                            tabbedPane(id : "result-tabs", constraints: BorderLayout.CENTER)
+                        }
+                        panel(constraints : "restore session") {
+                            borderLayout()
+                            panel (constraints : BorderLayout.CENTER) {
+                                gridBagLayout()
+                                label(text :  "Saved Tabs:", constraints : gbc(gridx : 0, gridy : 0))
+                                scrollPane (constraints : gbc(gridx : 0, gridy : 1)) {
+                                    list(items : new ArrayList(settings.openTabs))
+                                }
+                                button(text : "Restore Session", constraints : gbc(gridx :0, gridy : 2), restoreSessionAction)
+                            }
+                        } 
                     }
                     panel (constraints: "downloads window") {
                         gridLayout(rows : 1, cols : 1)
@@ -725,6 +740,9 @@ class MainFrameView {
         
         // show tree by default
         showSharedFilesTree.call()
+        
+        // show search panel by default
+        showSearchWindow.call()
     }
 
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
@@ -869,10 +887,23 @@ class MainFrameView {
 
         showPopupMenu(menu, e)
     }
+    
+    void showRestoreOrEmpty() {
+        def searchWindow = builder.getVariable("search window")
+        String id
+        if (!model.sessionRestored && !settings.openTabs.isEmpty())
+            id = model.connections > 0 ? "restore session" : "tabs-panel"
+        else
+            id = "tabs-panel"
+        searchWindow.getLayout().show(searchWindow, id)
+    }
 
     def showSearchWindow = {
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, "search window")
+
+        showRestoreOrEmpty()        
+        
         model.searchesPaneButtonEnabled = false
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
@@ -971,10 +1002,20 @@ class MainFrameView {
     }
     
     private void closeApplication() {
+        Core core = application.getContext().get("core")
+        
+        def tabbedPane = builder.getVariable("result-tabs")
+        settings.openTabs.clear()
+        int count = tabbedPane.getTabCount()
+        for (int i = 0; i < count; i++)
+            settings.openTabs.add(tabbedPane.getTitleAt(i))
+        
+        File uiPropsFile = new File(core.home, "gui.properties")
+        uiPropsFile.withOutputStream { settings.write(it) }    
+            
         def mainFrame = builder.getVariable("main-frame")
         mainFrame.setVisible(false)
         application.getWindowManager().findWindow("shutdown-window").setVisible(true)
-        Core core = application.getContext().get("core")
         if (core != null) {
             Thread t = new Thread({
                 core.shutdown()

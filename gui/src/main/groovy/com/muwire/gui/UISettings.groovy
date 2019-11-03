@@ -18,6 +18,7 @@ class UISettings {
     boolean clearUploads
     boolean storeSearchHistory
     Set<String> searchHistory
+    Set<String> openTabs
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -35,6 +36,7 @@ class UISettings {
         storeSearchHistory = Boolean.parseBoolean(props.getProperty("storeSearchHistory","true"))
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
+        openTabs = DataUtil.readEncodedSet(props, "openTabs")
     }
 
     void write(OutputStream out) throws IOException {
@@ -55,6 +57,7 @@ class UISettings {
             props.setProperty("font", font)
 
         DataUtil.writeEncodedSet(searchHistory, "searchHistory", props)
+        DataUtil.writeEncodedSet(openTabs, "openTabs", props)
 
         props.store(out, "UI Properties")
     }
