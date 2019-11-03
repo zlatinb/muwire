@@ -18,9 +18,11 @@ class SearchFieldModel extends AbstractListModel implements MutableComboBoxModel
     }
     
     public void addElement(Object string) {
-        if (!uiSettings.searchHistory.add(string)) 
-            return
-        settingsFile.withOutputStream { uiSettings.write(it) }
+        if (uiSettings.storeSearchHistory) {
+            if (!uiSettings.searchHistory.add(string))
+                return
+            settingsFile.withOutputStream { uiSettings.write(it) }
+        }
         objects.add(string);
         fireIntervalAdded(this,objects.size()-1, objects.size()-1);
         if ( objects.size() == 1 && selectedObject == null && string != null ) {

@@ -96,7 +96,13 @@ class MainFrameView {
                         menuItem("Exit", actionPerformed : {closeApplication()})
                     }
                     menu (text : "Options") {
-                        menuItem("Configuration", actionPerformed : {mvcGroup.createMVCGroup("Options")})
+                        menuItem("Configuration", actionPerformed : {
+                            def params = [:]
+                            params['core'] = application.context.get("core")
+                            params['settings'] = params['core'].muOptions
+                            params['uiSettings'] = settings 
+                            mvcGroup.createMVCGroup("Options", params)
+                        })
                     }
                     menu (text : "Status") {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})

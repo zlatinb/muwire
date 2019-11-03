@@ -21,6 +21,7 @@ class OptionsModel {
     @Observable int speedSmoothSeconds
     @Observable int totalUploadSlots
     @Observable int uploadSlotsPerUser
+    @Observable boolean storeSearchHistory
 
     // i2p options
     @Observable String inboundLength
@@ -90,6 +91,7 @@ class OptionsModel {
         showSearchHashes = uiSettings.showSearchHashes
         clearUploads = uiSettings.clearUploads
         exitOnClose = uiSettings.exitOnClose
+        storeSearchHistory = uiSettings.storeSearchHistory
 
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)

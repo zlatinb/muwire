@@ -10,6 +10,7 @@ import java.util.logging.Level
 
 import javax.annotation.Nonnull
 import javax.swing.JFileChooser
+import javax.swing.JOptionPane
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
@@ -20,12 +21,14 @@ class OptionsController {
     OptionsModel model
     @MVCMember @Nonnull
     OptionsView view
+    
+    Core core
+    MuWireSettings settings
+    UISettings uiSettings
 
     @ControllerAction
     void save() {
         String text
-        Core core = application.context.get("core")
-        MuWireSettings settings = application.context.get("muwire-settings")
 
         def i2pProps = core.i2pOptions
 
@@ -141,7 +144,6 @@ class OptionsController {
 
         // UI Setttings
 
-        UISettings uiSettings = application.context.get("ui-settings")
         text = view.lnfField.text
         model.lnf = text
         uiSettings.lnf = text
@@ -169,16 +171,24 @@ class OptionsController {
         model.clearUploads = clearUploads
         uiSettings.clearUploads = clearUploads
         
+        boolean storeSearchHistory = view.storeSearchHistoryCheckbox.model.isSelected()
+        model.storeSearchHistory = storeSearchHistory
+        uiSettings.storeSearchHistory = storeSearchHistory
+        
         uiSettings.exitOnClose = model.exitOnClose
         if (model.closeDecisionMade)
             uiSettings.closeWarning = false
+            
+        saveUISettings()
 
+        cancel()
+    }
+    
+    private void saveUISettings() {
         File uiSettingsFile = new File(core.home, "gui.properties")
         uiSettingsFile.withOutputStream {
             uiSettings.write(it)
         }
-
-        cancel()
     }
 
     @ControllerAction
@@ -230,5 +240,12 @@ class OptionsController {
     void minimizeOnClose() {
         model.exitOnClose = false
         model.closeDecisionMade = true
+    }
+    
+    @ControllerAction
+    void clearHistory() {
+        uiSettings.searchHistory.clear()
+        saveUISettings()
+        JOptionPane.showMessageDialog(null, "Search history has been cleared")
     }
 }

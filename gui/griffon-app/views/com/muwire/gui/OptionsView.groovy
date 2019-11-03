@@ -61,6 +61,7 @@ class OptionsView {
     def excludeLocalResultCheckbox
     def showSearchHashesCheckbox
     def clearUploadsCheckbox
+    def storeSearchHistoryCheckbox
 
     def inBwField
     def outBwField
@@ -196,8 +197,17 @@ class OptionsView {
                     constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END))
 
             }
-            panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel (border : titledBorder(title : "Search Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
+                gridBagLayout()
+                label(text : "Remember search history", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                storeSearchHistoryCheckbox = checkBox(selected : bind {model.storeSearchHistory},
+                constraints : gbc(gridx : 1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                button(text : "Clear history", constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END), clearHistoryAction)
+                
+            }
+            panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            constraints : gbc(gridx : 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
                 label(text : "Automatically clear cancelled downloads", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 clearCancelledDownloadsCheckbox = checkBox(selected : bind {model.clearCancelledDownloads},
@@ -221,7 +231,7 @@ class OptionsView {
                     radioButton(text : "Exit", selected : bind {model.exitOnClose}, buttonGroup : closeBehaviorGroup, exitOnCloseAction)
                 }
             }
-            panel (constraints : gbc(gridx: 0, gridy: 2, weighty: 100))
+            panel (constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
         }
         bandwidth = builder.panel {
             gridBagLayout()

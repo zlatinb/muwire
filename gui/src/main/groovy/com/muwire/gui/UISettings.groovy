@@ -16,6 +16,7 @@ class UISettings {
     boolean closeWarning
     boolean exitOnClose
     boolean clearUploads
+    boolean storeSearchHistory
     Set<String> searchHistory
     
     UISettings(Properties props) {
@@ -31,6 +32,7 @@ class UISettings {
         closeWarning = Boolean.parseBoolean(props.getProperty("closeWarning","true"))
         exitOnClose = Boolean.parseBoolean(props.getProperty("exitOnClose","false"))
         clearUploads = Boolean.parseBoolean(props.getProperty("clearUploads","false"))
+        storeSearchHistory = Boolean.parseBoolean(props.getProperty("storeSearchHistory","true"))
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
     }
@@ -48,6 +50,7 @@ class UISettings {
         props.setProperty("closeWarning", String.valueOf(closeWarning))
         props.setProperty("exitOnClose", String.valueOf(exitOnClose))
         props.setProperty("clearUploads", String.valueOf(clearUploads))
+        props.setProperty("storeSearchHistory", String.valueOf(storeSearchHistory))
         if (font != null)
             props.setProperty("font", font)
 
