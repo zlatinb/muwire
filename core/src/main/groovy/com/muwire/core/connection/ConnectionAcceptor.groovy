@@ -1,6 +1,7 @@
 package com.muwire.core.connection
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.attribute.DosFileAttributes
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Level
@@ -11,8 +12,11 @@ import java.util.zip.InflaterInputStream
 
 import com.muwire.core.Constants
 import com.muwire.core.EventBus
+import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.filecert.Certificate
+import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.files.FileManager
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
@@ -45,6 +49,7 @@ class ConnectionAcceptor {
     final UploadManager uploadManager
     final FileManager fileManager
     final ConnectionEstablisher establisher
+    final CertificateManager certificateManager
 
     final ExecutorService acceptorThread
     final ExecutorService handshakerThreads
@@ -56,7 +61,7 @@ class ConnectionAcceptor {
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
-        FileManager fileManager, ConnectionEstablisher establisher) {
+        FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager) {
         this.eventBus = eventBus
         this.manager = manager
         this.settings = settings
@@ -67,6 +72,7 @@ class ConnectionAcceptor {
         this.fileManager = fileManager
         this.uploadManager = uploadManager
         this.establisher = establisher
+        this.certificateManager = certificateManager
 
         acceptorThread = Executors.newSingleThreadExecutor { r ->
             def rv = new Thread(r)
@@ -144,6 +150,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'B':
                     processBROWSE(e)
+                    break
+                case (byte)'C':
+                    processCERTIFICATES(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -353,7 +362,8 @@ class ConnectionAcceptor {
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
                 it.hit()
-                def obj = ResultsSender.sharedFileToObj(it, false)
+                int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
+                def obj = ResultsSender.sharedFileToObj(it, false, certificates)
                 def json = jsonOutput.toJson(obj)
                 dos.writeShort((short)json.length())
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -402,6 +412,56 @@ class ConnectionAcceptor {
             }
 
             dos.flush()
+        } finally {
+            e.close()
+        }
+    }
+    
+    private void processCERTIFICATES(Endpoint e) {
+        try {
+            byte [] ERTIFICATES = new byte[12]
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(ERTIFICATES)
+            if (ERTIFICATES != "ERTIFICATES ".getBytes(StandardCharsets.US_ASCII))
+                throw new IOException("Invalid CERTIFICATES connection")
+            
+            byte [] infoHashStringBytes = new byte[44]
+            dis.readFully(infoHashStringBytes)
+            String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
+
+            byte[] rn = new byte[2]
+            dis.readFully(rn)
+            if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new IOException("Malformed CERTIFICATES request")            
+            
+            String header
+            while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
+            
+            log.info("responding to certificates request for $infoHashString")
+            byte [] root = Base64.decode(infoHashString)
+            
+            Set<Certificate> certs = certificateManager.getByInfoHash(new InfoHash(root))
+            if (certs.isEmpty()) {
+                log.info("certs not found")
+                e.getOutputStream().write("404 Certs Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                e.getOutputStream().flush()
+                return
+            }
+            
+            OutputStream os = e.getOutputStream()
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count: ${certs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            DataOutputStream dos = new DataOutputStream(os)
+            certs.each { 
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()
+                it.write(baos)
+                byte [] payload = baos.toByteArray()
+                dos.writeShort(payload.length)
+                dos.write(payload)
+            }
+            dos.close()
         } finally {
             e.close()
         }

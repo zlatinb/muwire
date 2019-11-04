@@ -12,6 +12,7 @@ import com.muwire.core.Persona
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 import net.i2p.data.SigningPrivateKey
+import net.i2p.util.ConcurrentHashSet
 
 @Log
 class CertificateManager {
@@ -51,14 +52,14 @@ class CertificateManager {
             
             Set<Certificate> existing = byInfoHash.get(cert.infoHash)
             if (existing == null) {
-                existing = new HashSet<>()
+                existing = new ConcurrentHashSet<>()
                 byInfoHash.put(cert.infoHash, existing)
             }
             existing.add(cert)
             
             existing = byIssuer.get(cert.issuer)
             if (existing == null) {
-                existing = new HashSet<>()
+                existing = new ConcurrentHashSet<>()
                 byIssuer.put(cert.issuer, existing)
             }
             existing.add(cert)
@@ -73,30 +74,45 @@ class CertificateManager {
         long timestamp = System.currentTimeMillis()
         Certificate cert = new Certificate(infoHash, name, timestamp, me, spk)
         
-        boolean added = true
         
-        Set<Certificate> existing = byInfoHash.get(cert.infoHash)
-        if (existing == null) {
-            existing = new HashSet<>()
-            byInfoHash.put(cert.infoHash, existing)
-        }
-        added &= existing.add(cert)
-        
-        existing = byIssuer.get(cert.issuer)
-        if (existing == null) {
-            existing = new HashSet<>()
-            byIssuer.put(cert.issuer, existing)
-        }
-        added &= existing.add(cert)
-        
-        if (added) {
-            String infoHashString = Base64.encode(infoHash.getRoot())
-            File certFile = new File(certDir, "${infoHashString}${name}.mwcert")
-            certFile.withOutputStream { cert.write(it) }
+        if (addToMaps(cert)) {
+            saveCert(cert)
             eventBus.publish(new CertificateCreatedEvent(certificate : cert))
         }
     }
+    
+    void onUIImportCertificateEvent(UIImportCertificateEvent e) {
+        Certificate cert = e.certificate
+        if (!addToMaps(cert))
+            return
+        saveCert(cert)
+    }
 
+    private void saveCert(Certificate cert) {
+        String infoHashString = Base64.encode(cert.infoHash.getRoot())
+        File certFile = new File(certDir, "${infoHashString}_${cert.issuer.getHumanReadableName()}.mwcert")
+        certFile.withOutputStream { cert.write(it) }
+    }
+    
+    private boolean addToMaps(Certificate cert) {
+        boolean added = true
+
+        Set<Certificate> existing = byInfoHash.get(cert.infoHash)
+        if (existing == null) {
+            existing = new ConcurrentHashSet<>()
+            byInfoHash.put(cert.infoHash, existing)
+        }
+        added &= existing.add(cert)
+
+        existing = byIssuer.get(cert.issuer)
+        if (existing == null) {
+            existing = new ConcurrentHashSet<>()
+            byIssuer.put(cert.issuer, existing)
+        }
+        added &= existing.add(cert)
+        added
+    }
+    
     boolean hasLocalCertificate(InfoHash infoHash) {
         if (!byInfoHash.containsKey(infoHash))
             return false
@@ -106,5 +122,12 @@ class CertificateManager {
                 return true
         }
         return false
+    }
+    
+    Set<Certificate> getByInfoHash(InfoHash infoHash) {
+        Set<Certificate> rv = new HashSet<>()
+        if (byInfoHash.containsKey(infoHash))
+            rv.addAll(byInfoHash.get(infoHash))
+        rv
     }    
 }

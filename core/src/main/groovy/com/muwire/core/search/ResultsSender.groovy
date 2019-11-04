@@ -3,6 +3,7 @@ package com.muwire.core.search
 import com.muwire.core.SharedFile
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.files.FileHasher
 import com.muwire.core.util.DataUtil
 import com.muwire.core.Persona
@@ -46,12 +47,14 @@ class ResultsSender {
     private final Persona me
     private final EventBus eventBus
     private final MuWireSettings settings
+    private final CertificateManager certificateManager
 
-    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings) {
+    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings, CertificateManager certificateManager) {
         this.connector = connector;
         this.eventBus = eventBus
         this.me = me
         this.settings = settings
+        this.certificateManager = certificateManager
     }
 
     void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults) {
@@ -70,6 +73,7 @@ class ResultsSender {
                 if (it.getComment() != null) {
                     comment = DataUtil.readi18nString(Base64.decode(it.getComment()))
                 }
+                int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
@@ -77,7 +81,8 @@ class ResultsSender {
                     pieceSize : pieceSize,
                     uuid : uuid,
                     sources : suggested,
-                    comment : comment
+                    comment : comment,
+                    certificates : certificates
                     )
                 uiResultEvents << uiResultEvent
             }
@@ -108,7 +113,8 @@ class ResultsSender {
                         me.write(os)
                         os.writeShort((short)results.length)
                         results.each {
-                            def obj = sharedFileToObj(it, settings.browseFiles)
+                            int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
                             os.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -125,9 +131,10 @@ class ResultsSender {
                         os.write("Sender: ${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+                        int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
                         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
-                            def obj = sharedFileToObj(it, settings.browseFiles)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -143,7 +150,7 @@ class ResultsSender {
         }
     }
     
-    public static def sharedFileToObj(SharedFile sf, boolean browseFiles) {
+    public static def sharedFileToObj(SharedFile sf, boolean browseFiles, int certificates) {
         byte [] name = sf.getFile().getName().getBytes(StandardCharsets.UTF_8)
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
@@ -166,6 +173,7 @@ class ResultsSender {
             obj.comment = sf.getComment()
 
         obj.browse = browseFiles 
+        obj.certificates = certificates
         obj
     }
 }

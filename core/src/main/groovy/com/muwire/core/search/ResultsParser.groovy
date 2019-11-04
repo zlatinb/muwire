@@ -99,6 +99,10 @@ class ResultsParser {
             boolean browse = false
             if (json.browse != null)
                 browse = json.browse
+            
+            int certificates = 0
+            if (json.certificates != null)
+                certificates = json.certificates
 
             return new UIResultEvent( sender : p,
                 name : name,
@@ -108,7 +112,8 @@ class ResultsParser {
                 sources : sources,
                 comment : comment,
                 browse : browse,
-                uuid: uuid)
+                uuid: uuid,
+                certificates : certificates)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }

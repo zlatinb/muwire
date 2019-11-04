@@ -270,7 +270,7 @@ public class Core {
         I2PConnector i2pConnector = new I2PConnector(socketManager)
 
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props)
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager)
 
         log.info "initializing search manager"
         SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
@@ -296,7 +296,8 @@ public class Core {
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
-            i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher)
+            i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
+            certificateManager)
 
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)

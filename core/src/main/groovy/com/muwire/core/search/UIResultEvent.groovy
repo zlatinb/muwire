@@ -16,6 +16,7 @@ class UIResultEvent extends Event {
     int pieceSize
     String comment
     boolean browse
+    int certificates
 
     @Override
     public String toString() {
