@@ -28,6 +28,7 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
+import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.UIPersistFilesEvent
@@ -336,6 +337,13 @@ class MainFrameController {
         model.sessionRestored = true
         view.settings.openTabs.each { 
             performSearch(it)
+        }
+    }
+    
+    @ControllerAction
+    void issueCertificate() {
+        view.selectedSharedFiles().each { 
+            core.eventBus.publish(new UICreateCertificateEvent(sharedFile : it))
         }
     }
 

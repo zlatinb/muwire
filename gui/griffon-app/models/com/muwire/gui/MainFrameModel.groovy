@@ -27,6 +27,7 @@ import com.muwire.core.connection.DisconnectionEvent
 import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
+import com.muwire.core.filecert.CertificateCreatedEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -208,6 +209,7 @@ class MainFrameModel {
             core.eventBus.register(UpdateDownloadedEvent.class, this)
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
             core.eventBus.register(SearchEvent.class, this)
+            core.eventBus.register(CertificateCreatedEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -566,6 +568,12 @@ class MainFrameModel {
     }
     
     void onSideCarFileEvent(SideCarFileEvent e) {
+        runInsideUIAsync {
+            view.refreshSharedFiles()
+        }
+    }
+    
+    void onCertificateCreatedEvent(CertificateCreatedEvent e) {
         runInsideUIAsync {
             view.refreshSharedFiles()
         }

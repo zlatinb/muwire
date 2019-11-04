@@ -18,6 +18,8 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
+import com.muwire.core.filecert.CertificateManager
+import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -99,6 +101,7 @@ public class Core {
     final FileManager fileManager
     final UploadManager uploadManager
     final ContentManager contentManager
+    final CertificateManager certificateManager
 
     private final Router router
 
@@ -209,6 +212,10 @@ public class Core {
 
         eventBus = new EventBus()
 
+        log.info("initializing certificate manager")
+        certificateManager = new CertificateManager(eventBus, home, me, spk)
+        eventBus.register(UICreateCertificateEvent.class, certificateManager)
+        
         log.info("initializing trust service")
         File goodTrust = new File(home, "trusted")
         File badTrust = new File(home, "distrusted")

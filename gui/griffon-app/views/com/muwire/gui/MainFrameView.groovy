@@ -269,6 +269,10 @@ class MainFrameView {
                                                     closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                     closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
                                                     closureColumn(header : "Comments", preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
+                                                    closureColumn(header : "Certificates", preferredWidth : 50, type : Boolean, read : {
+                                                        Core core = application.context.get("core")
+                                                        core.certificateManager.hasLocalCertificate(it.getInfoHash())
+                                                    })
                                                     closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
                                                     closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
                                                 }
@@ -295,6 +299,7 @@ class MainFrameView {
                                 panel {
                                     button(text : "Share files", actionPerformed : shareFiles)
                                     button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
+                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, issueCertificateAction)
                                 }
                                 panel {
                                     panel {
@@ -596,6 +601,9 @@ class MainFrameView {
         JMenuItem commentSelectedFiles = new JMenuItem("Comment selected files")
         commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
         sharedFilesMenu.add(commentSelectedFiles)
+        JMenuItem certifySelectedFiles = new JMenuItem("Certify selected files")
+        certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
+        sharedFilesMenu.add(certifySelectedFiles)
         
         def sharedFilesMouseListener = new MouseAdapter() {
                     @Override
