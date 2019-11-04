@@ -122,6 +122,11 @@ class MainFrameView {
                             env["core"] = model.core
                             mvcGroup.createMVCGroup("advanced-sharing",env)  
                         })
+                        menuItem("Certificates", actionPerformed : {
+                            def env = [:]
+                            env['core'] = model.core
+                            mvcGroup.createMVCGroup("certificate-control",env)
+                        })
                     }
                 }
                 borderLayout()
