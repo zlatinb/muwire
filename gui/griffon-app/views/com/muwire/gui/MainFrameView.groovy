@@ -269,7 +269,7 @@ class MainFrameView {
                                                     closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                     closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
                                                     closureColumn(header : "Comments", preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
-                                                    closureColumn(header : "Certificates", preferredWidth : 50, type : Boolean, read : {
+                                                    closureColumn(header : "Certified", preferredWidth : 50, type : Boolean, read : {
                                                         Core core = application.context.get("core")
                                                         core.certificateManager.hasLocalCertificate(it.getInfoHash())
                                                     })

@@ -93,6 +93,7 @@ class SearchTabView {
                                     closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                                     closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
                                     closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
+                                    closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
                                 }
                             }
                         }
