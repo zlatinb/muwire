@@ -91,4 +91,9 @@ mvcGroups {
         view = 'com.muwire.gui.FetchCertificatesView'
         controller = 'com.muwire.gui.FetchCertificatesController'
     }
+    'certificate-warning' {
+        model = 'com.muwire.gui.CertificateWarningModel'
+        view = 'com.muwire.gui.CertificateWarningView'
+        controller = 'com.muwire.gui.CertificateWarningController'
+    }
 }

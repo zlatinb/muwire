@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
+import javax.swing.JOptionPane
 import javax.swing.JTable
 
 import com.muwire.core.Core
@@ -342,8 +343,16 @@ class MainFrameController {
     
     @ControllerAction
     void issueCertificate() {
-        view.selectedSharedFiles().each { 
-            core.eventBus.publish(new UICreateCertificateEvent(sharedFile : it))
+        if (view.settings.certificateWarning) {
+            def params = [:]
+            params['settings'] = view.settings
+            params['home'] = core.home
+            mvcGroup.createMVCGroup("certificate-warning", params)
+        } else {
+            view.selectedSharedFiles().each {
+                core.eventBus.publish(new UICreateCertificateEvent(sharedFile : it))
+            }
+            JOptionPane.showMessageDialog(null, "Certificate(s) have been issued")
         }
     }
 
