@@ -40,6 +40,7 @@ class BrowseView {
     def resultsTable
     def lastSortEvent
     void initUI() {
+        int rowHeight = application.context.get("row-height")
         mainFrame = application.windowManager.findWindow("main-frame")
         dialog = new JDialog(mainFrame, model.host.getHumanReadableName(), true)
         dialog.setResizable(true)
@@ -52,7 +53,7 @@ class BrowseView {
                 label(text : bind {model.totalResults == 0 ? "" : Math.round(model.resultCount * 100 / model.totalResults)+ "%"})
             }
             scrollPane (constraints : BorderLayout.CENTER){
-                resultsTable = table(autoCreateRowSorter : true) {
+                resultsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.results) {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
                         closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})

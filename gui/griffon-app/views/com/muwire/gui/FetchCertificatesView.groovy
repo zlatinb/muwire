@@ -34,6 +34,7 @@ class FetchCertificatesView {
     def lastSortEvent
     
     void initUI() {
+        int rowHeight = application.context.get("row-height")
         mainFrame = application.windowManager.findWindow("main-frame")
         dialog = new JDialog(mainFrame, model.result.name, true)
         dialog.setResizable(true)
@@ -46,7 +47,7 @@ class FetchCertificatesView {
                 label(text : bind {model.certificateCount == 0 ? "" : Math.round(model.certificateCount * 100 / model.totalCertificates)+"%"})
             }
             scrollPane(constraints : BorderLayout.CENTER) {
-                certsTable = table(autoCreateRowSorter : true) {
+                certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
                         closureColumn(header : "Issuer", preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
                         closureColumn(header : "Name", preferredWidth : 200, type: String, read : {it.name.toString()})
