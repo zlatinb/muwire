@@ -15,6 +15,8 @@ import com.muwire.core.filecert.Certificate
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 import javax.annotation.Nonnull
 
@@ -50,7 +52,7 @@ class FetchCertificatesView {
                 certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
                         closureColumn(header : "Issuer", preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
-                        closureColumn(header : "Name", preferredWidth : 200, type: String, read : {it.name.toString()})
+                        closureColumn(header : "Name", preferredWidth : 200, type: String, read : {it.name.name.toString()})
                         closureColumn(header : "Issued", preferredWidth : 100, type : String, read : {
                             def date = new Date(it.timestamp)
                             date.toString()
@@ -109,6 +111,21 @@ class FetchCertificatesView {
         for (Integer i : rows)
             rv << model.certificates[i]
         rv
+    }
+    
+    void mvcGroupInit(Map<String,String> args) {
+        controller.register()
+        
+        dialog.getContentPane().add(p)
+        dialog.setSize(700, 400)
+        dialog.setLocationRelativeTo(mainFrame)
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
+        dialog.addWindowListener( new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                mvcGroup.destroy()
+            }
+        })
+        dialog.show()
     }
     
 }

@@ -22,6 +22,7 @@ import com.muwire.core.filecert.CertificateClient
 import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filecert.UIFetchCertificatesEvent
+import com.muwire.core.filecert.UIImportCertificateEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -217,6 +218,7 @@ public class Core {
         log.info("initializing certificate manager")
         certificateManager = new CertificateManager(eventBus, home, me, spk)
         eventBus.register(UICreateCertificateEvent.class, certificateManager)
+        eventBus.register(UIImportCertificateEvent.class, certificateManager)
         
         
         log.info("initializing trust service")
