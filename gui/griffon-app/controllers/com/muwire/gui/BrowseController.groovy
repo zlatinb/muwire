@@ -96,4 +96,19 @@ class BrowseController {
         
         mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
+    
+    @ControllerAction
+    void viewCertificates() {
+        def selectedResults = view.selectedResults()
+        if (selectedResults == null || selectedResults.size() != 1)
+            return
+        def result = selectedResults[0]
+        if (result.certificates <= 0)
+            return
+        
+        def params = [:]
+        params['result'] = result
+        params['eventBus'] = eventBus
+        mvcGroup.createMVCGroup("fetch-certificates", params)
+    }
 }

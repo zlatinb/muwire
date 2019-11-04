@@ -58,12 +58,14 @@ class BrowseView {
                         closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
                         closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
                         closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
+                        closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
                     }
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
                 button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
                 button(text : "View Comment", enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
+                button(text : "View Certificates", enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
                 button(text : "Dismiss", dismissAction)
             }
         }
@@ -85,6 +87,7 @@ class BrowseView {
             if (rows.length == 0) {
                 model.downloadActionEnabled = false
                 model.viewCommentActionEnabled = false
+                model.viewCertificatesActionEnabled = false
                 return
             }
             
@@ -95,6 +98,9 @@ class BrowseView {
             }
             
             boolean downloadActionEnabled = true
+            
+            model.viewCertificatesActionEnabled = (rows.length == 1 && model.results[rows[0]].certificates > 0)
+            
             if (rows.length == 1 && model.results[rows[0]].comment != null) 
                 model.viewCommentActionEnabled = true
             else
@@ -129,6 +135,11 @@ class BrowseView {
             JMenuItem viewComment = new JMenuItem("View Comment")
             viewComment.addActionListener({controller.viewComment()})
             menu.add(viewComment)
+        }
+        if (model.viewCertificatesActionEnabled) {
+            JMenuItem viewCertificates = new JMenuItem("View Certificates")
+            viewCertificates.addActionListener({controller.viewCertificates()})
+            menu.add(viewCertificates)
         }
         
         JMenuItem copyHash = new JMenuItem("Copy Hash To Clipboard")
