@@ -131,9 +131,9 @@ class ResultsSender {
                         os.write("Sender: ${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-                        int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
                         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
+                            int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
