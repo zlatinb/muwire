@@ -75,7 +75,8 @@ class CertificateClient {
                     } catch (IOException | InvalidSignatureException ignore) {
                         continue
                     }
-                    eventBus.publish(new CertificateFetchedEvent(certificate : cert))
+                    if (cert.infoHash == e.infoHash)
+                        eventBus.publish(new CertificateFetchedEvent(certificate : cert))
                 }
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Fetching certificates failed", bad)

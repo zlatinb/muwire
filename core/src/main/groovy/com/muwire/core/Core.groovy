@@ -18,8 +18,10 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
+import com.muwire.core.filecert.CertificateClient
 import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
+import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -216,6 +218,7 @@ public class Core {
         certificateManager = new CertificateManager(eventBus, home, me, spk)
         eventBus.register(UICreateCertificateEvent.class, certificateManager)
         
+        
         log.info("initializing trust service")
         File goodTrust = new File(home, "trusted")
         File badTrust = new File(home, "distrusted")
@@ -269,6 +272,10 @@ public class Core {
         log.info("initializing connector")
         I2PConnector i2pConnector = new I2PConnector(socketManager)
 
+        log.info("initializing certificate client")
+        CertificateClient certificateClient = new CertificateClient(eventBus, i2pConnector)
+        eventBus.register(UIFetchCertificatesEvent.class, certificateClient)
+        
         log.info "initializing results sender"
         ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager)
 
