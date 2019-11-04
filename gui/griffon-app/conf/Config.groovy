@@ -86,4 +86,9 @@ mvcGroups {
         view = 'com.muwire.gui.AdvancedSharingView'
         controller = 'com.muwire.gui.AdvancedSharingController'
     }
+    'fetch-certificates' {
+        model = 'com.muwire.gui.FetchCertificatesModel'
+        view = 'com.muwire.gui.FetchCertificatesView'
+        controller = 'com.muwire.gui.FetchCertificatesController'
+    }
 }

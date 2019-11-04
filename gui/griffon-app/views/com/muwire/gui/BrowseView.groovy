@@ -104,16 +104,16 @@ class BrowseView {
             }
             model.downloadActionEnabled = downloadActionEnabled
             
-            resultsTable.addMouseListener(new MouseAdapter() {
-                public void mouseReleased(MouseEvent e) {
-                    if (e.isPopupTrigger())
-                        showMenu(e)
-                }
-                public void mousePressed(MouseEvent e) {
-                    if (e.isPopupTrigger())
-                        showMenu(e)
-                }
-            })
+        })
+        resultsTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
         })
     }
     

@@ -23,6 +23,7 @@ class SearchTabModel {
     @Observable boolean trustButtonsEnabled
     @Observable boolean browseActionEnabled
     @Observable boolean viewCommentActionEnabled
+    @Observable boolean viewCertificatesActionEnabled
 
     Core core
     UISettings uiSettings

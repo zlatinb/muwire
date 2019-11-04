@@ -121,4 +121,21 @@ class SearchTabController {
             
             mvcGroup.createMVCGroup("show-comment", groupId, params)
         }
+        
+        @ControllerAction
+        void viewCertificates() {
+            int[] selectedRows = view.resultsTable.getSelectedRows()
+            if (selectedRows.length != 1)
+                return
+            if (view.lastSortEvent != null)
+                selectedRows[0] = view.resultsTable.rowSorter.convertRowIndexToModel(selectedRows[0])
+            UIResultEvent event = model.results[selectedRows[0]]
+            if (event.certificates <= 0)
+                return
+            
+            def params = [:]
+            params['result'] = event
+            params['eventBus'] = core.eventBus
+            mvcGroup.createMVCGroup("fetch-certificates", params)
+        }
     }

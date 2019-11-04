@@ -103,6 +103,7 @@ class SearchTabView {
                             panel {
                                 button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
                                 button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
+                                button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
                             }
                             panel {
                                 gridBagLayout()
@@ -197,9 +198,11 @@ class SearchTabView {
             def result = getSelectedResult()
             if (result == null) {
                 model.viewCommentActionEnabled = false
+                model.viewCertificatesActionEnabled = false
                 return
             } else {
                 model.viewCommentActionEnabled = result.comment != null
+                model.viewCertificatesActionEnabled = result.certificates > 0
             }
         })
         
@@ -258,6 +261,13 @@ class SearchTabView {
                 JMenuItem showComment = new JMenuItem("View Comment")
                 showComment.addActionListener({mvcGroup.controller.showComment()})
                 menu.add(showComment)
+            }
+            
+            // view certificates if any
+            if (model.viewCertificatesActionEnabled) {
+                JMenuItem viewCerts = new JMenuItem("View Certificates")
+                viewCerts.addActionListener({mvcGroup.controller.viewCertificates()})
+                menu.add(viewCerts)
             }
         }
         if (showMenu)
