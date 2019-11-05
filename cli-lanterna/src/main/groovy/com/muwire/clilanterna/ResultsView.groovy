@@ -37,7 +37,7 @@ class ResultsView extends BasicWindow {
         Panel contentPanel = new Panel()
         contentPanel.setLayoutManager(new GridLayout(1))
         
-        table = new Table("Name","Size","Hash","Sources","Comment")
+        table = new Table("Name","Size","Hash","Sources","Comment","Certificates")
         table.setCellSelection(false)
         table.setSelectAction({rowSelected()})
         table.setTableModel(model.model)
@@ -55,18 +55,29 @@ class ResultsView extends BasicWindow {
         int selectedRow = table.getSelectedRow()
         def rows = model.model.getRow(selectedRow)
         boolean comment = Boolean.parseBoolean(rows[4])
-        if (comment) {
-            Window prompt = new BasicWindow("Download Or View Comment")
+        boolean certificates = rows[5] > 0
+        if (comment || certificates) {
+            LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
+            
+            Window prompt = new BasicWindow("Download Or View Comment/Certificates")
             prompt.setHints([Window.Hint.CENTERED])
             Panel contentPanel = new Panel()
-            contentPanel.setLayoutManager(new GridLayout(3))
+            contentPanel.setLayoutManager(new GridLayout(4))
             Button downloadButton = new Button("Download", {download(rows[2])})
-            Button viewButton = new Button("View Comment", {viewComment(rows[2])})
+            contentPanel.addComponent(downloadButton, layoutData)
+            
+            
+            if (comment) { 
+                Button viewButton = new Button("View Comment", {viewComment(rows[2])})
+                contentPanel.addComponent(viewButton, layoutData)
+            }
+            if (certificates) {
+                Button certsButton = new Button("View Certificates", {viewCertificates(rows[2])})
+                contentPanel.addComponent(certsButton, layoutData)
+            }
+                
             Button closeButton = new Button("Cancel", {prompt.close()})
             
-            LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
-            contentPanel.addComponent(downloadButton, layoutData)
-            contentPanel.addComponent(viewButton, layoutData)
             contentPanel.addComponent(closeButton, layoutData)
             prompt.setComponent(contentPanel)
             downloadButton.takeFocus()
@@ -89,6 +100,13 @@ class ResultsView extends BasicWindow {
     private void viewComment(String infohash) {
         UIResultEvent result = model.rootToResult[infohash]
         ViewCommentView view = new ViewCommentView(result, terminalSize)
+        textGUI.addWindowAndWait(view)
+    }
+    
+    private void viewCertificates(String infohash) {
+        UIResultEvent result = model.rootToResult[infohash]
+        ViewCertificatesModel model = new ViewCertificatesModel(result, core, textGUI.getGUIThread())
+        ViewCertificatesView view = new ViewCertificatesView(model, textGUI, core, terminalSize)
         textGUI.addWindowAndWait(view)
     }
 }

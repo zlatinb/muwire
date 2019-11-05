@@ -15,13 +15,13 @@ class ResultsModel {
     
     ResultsModel(UIResultBatchEvent results) {
         this.results = results
-        model = new TableModel("Name","Size","Hash","Sources","Comment")
+        model = new TableModel("Name","Size","Hash","Sources","Comment","Certificates")
         results.results.each { 
             String size = DataHelper.formatSize2Decimal(it.size, false) + "B"
             String infoHash = Base64.encode(it.infohash.getRoot())
             String sources = String.valueOf(it.sources.size())
             String comment = String.valueOf(it.comment != null)
-            model.addRow(it.name, size, infoHash, sources, comment)
+            model.addRow(it.name, size, infoHash, sources, comment, it.certificates)
             rootToResult.put(infoHash, it)
         }
     }
