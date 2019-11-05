@@ -108,4 +108,16 @@ class SearchIndexTest {
         assert index.search(['c-d e-f']).size() == 1
         assert index.search(['a-b e-f']).size() == 0
     }
+    
+    @Test
+    void testMixedPhraseAndKeyword() {
+        initIndex(["My siamese cat video", 
+            "My cat video of a siamese", 
+            "Video of a siamese cat"])
+        
+        assert index.search(['cat video']).size() == 2
+        assert index.search(['cat video','siamese']).size() == 2
+        assert index.search(['cat', 'video siamese']).size() == 0
+        assert index.search(['cat','video','siamese']).size() == 3
+    }
 }
