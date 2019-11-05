@@ -49,10 +49,7 @@ class SearchModel {
             searchEvent = new SearchEvent(searchHash : root, uuid : UUID.randomUUID(), oobInfohash : true, compressedResults : true)
             payload = root
         } else {
-            def replaced = query.toLowerCase().trim().replaceAll(SplitPattern.SPLIT_PATTERN, " ")
-            def terms = replaced.split(" ")
-            def nonEmpty = []
-            terms.each { if (it.length() > 0) nonEmpty << it }
+            def nonEmpty = SplitPattern.termify(query)
             payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : UUID.randomUUID(), oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true)
