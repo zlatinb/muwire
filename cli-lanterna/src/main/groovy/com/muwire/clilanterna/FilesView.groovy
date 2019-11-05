@@ -17,6 +17,7 @@ import com.googlecode.lanterna.gui2.dialogs.TextInputDialog
 import com.googlecode.lanterna.gui2.table.Table
 import com.muwire.core.Core
 import com.muwire.core.SharedFile
+import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
@@ -42,7 +43,7 @@ class FilesView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(1))
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
         
-        table = new Table("Name","Size","Comment","Search Hits","Downloaders")
+        table = new Table("Name","Size","Comment","Certified","Search Hits","Downloaders")
         table.setCellSelection(false)
         table.setTableModel(model.model)
         table.setSelectAction({rowSelected()})
@@ -77,7 +78,7 @@ class FilesView extends BasicWindow {
         Window prompt = new BasicWindow("Unshare or add comment to "+sf.getFile().getName()+" ?")
         prompt.setHints([Window.Hint.CENTERED])
         Panel contentPanel = new Panel()
-        contentPanel.setLayoutManager(new GridLayout(3))
+        contentPanel.setLayoutManager(new GridLayout(4))
         
         Button unshareButton = new Button("Unshare", {
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
@@ -88,11 +89,16 @@ class FilesView extends BasicWindow {
             AddCommentView view = new AddCommentView(textGUI, core, sf, terminalSize)
             textGUI.addWindowAndWait(view)
         })
+        Button certifyButton = new Button("Certify", {
+            core.eventBus.publish(new UICreateCertificateEvent(sharedFile : sf))
+            MessageDialog.showMessageDialog(textGUI, "Certificate Created", "Certificate has been issued", MessageDialogButton.OK)  
+        })
         Button closeButton = new Button("Close", {prompt.close()})
         
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
         contentPanel.addComponent(unshareButton, layoutData)
         contentPanel.addComponent(addCommentButton, layoutData)
+        contentPanel.addComponent(certifyButton, layoutData)
         contentPanel.addComponent(closeButton, layoutData)
         
         prompt.setComponent(contentPanel)

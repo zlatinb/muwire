@@ -18,7 +18,7 @@ class FilesModel {
     private final TextGUIThread guiThread
     private final Core core
     private final List<SharedFile> sharedFiles = new ArrayList<>()
-    private final TableModel model = new TableModel("Name","Size","Comment","Search Hits","Downloaders")
+    private final TableModel model = new TableModel("Name","Size","Comment","Certified","Search Hits","Downloaders")
     
     FilesModel(TextGUIThread guiThread, Core core) {
         this.guiThread = guiThread
@@ -41,7 +41,7 @@ class FilesModel {
         def eventBus = core.eventBus
         guiThread.invokeLater {
             core.muOptions.watchedDirectories.each {
-                eventBus.publish(new DirectoryWatchedEvent(directory : new File(it)))
+                eventBus.publish(new FileSharedEvent(file: new File(it)))
             }
         }
     }
@@ -72,9 +72,10 @@ class FilesModel {
         sharedFiles.each { 
             long size = it.getCachedLength()
             boolean comment = it.comment != null
+            boolean certified = core.certificateManager.hasLocalCertificate(it.getInfoHash())
             String hits = String.valueOf(it.getHits())
             String downloaders = String.valueOf(it.getDownloaders().size())
-            model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment, hits, downloaders)
+            model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment, certified, hits, downloaders)
         }
     }
 }
