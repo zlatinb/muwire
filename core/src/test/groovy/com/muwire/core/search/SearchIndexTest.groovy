@@ -90,4 +90,22 @@ class SearchIndexTest {
         def found = index.search(["muwire", "0", "3", "jar"])
         assert found.size() == 1
     }
+    
+    @Test
+    void testOriginalText() {
+        initIndex(["a-b c-d"])
+        def found = index.search(['a-b'])
+        assert found.size() == 1
+        found = index.search(['c-d'])
+        assert found.size() == 1
+    }
+    
+    @Test
+    void testPhrase() {
+        initIndex(["a-b c-d e-f"])
+        def found = index.search(['a-b c-d'])
+        assert found.size() == 1
+        assert index.search(['c-d e-f']).size() == 1
+        assert index.search(['a-b e-f']).size() == 0
+    }
 }
