@@ -49,7 +49,7 @@ class ViewCertificatesView extends BasicWindow {
         topPanel.addComponent(percentageLabel, layoutData)
         contentPanel.addComponent(topPanel, layoutData)
         
-        table = new Table("Issuer","File Name","Comment","Timestamp")
+        table = new Table("Issuer","Trust Status","File Name","Comment","Timestamp")
         table.with { 
             setCellSelection(false)
             setTableModel(model.model)

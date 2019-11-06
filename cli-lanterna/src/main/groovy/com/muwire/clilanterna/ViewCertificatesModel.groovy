@@ -17,7 +17,7 @@ class ViewCertificatesModel {
     private final Core core
     private final TextGUIThread guiThread
     
-    private final TableModel model = new TableModel("Issuer","File Name","Comment","Timestamp")
+    private final TableModel model = new TableModel("Issuer","Trust Status","File Name","Comment","Timestamp")
     
     private int totalCerts
     
@@ -52,7 +52,8 @@ class ViewCertificatesModel {
     void onCertificateFetchedEvent(CertificateFetchedEvent e) {
         guiThread.invokeLater {
             Date date = new Date(e.certificate.timestamp)
-            model.addRow(new CertificateWrapper(e.certificate), e.certificate.name.name, e.certificate.comment != null, date)
+            model.addRow(new CertificateWrapper(e.certificate), core.trustService.getLevel(e.certificate.issuer.destination),
+                e.certificate.name.name, e.certificate.comment != null, date)
             
             String percentageString = ""
             if (totalCerts > 0) {
