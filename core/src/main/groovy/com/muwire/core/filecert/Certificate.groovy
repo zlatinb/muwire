@@ -115,11 +115,13 @@ class Certificate {
             daos.write(infoHash.getRoot())
             name.write(daos)
             issuer.write(daos)
-            if (comment == null)
-                daos.write((byte) 0)
-            else {
-                daos.write((byte) 1)
-                comment.write(daos)
+            if (version == 2) {
+                if (comment == null)
+                    daos.write((byte) 0)
+                else {
+                    daos.write((byte) 1)
+                    comment.write(daos)
+                }
             }
             daos.write(sig)
             daos.close()
@@ -131,7 +133,7 @@ class Certificate {
     
     @Override
     public int hashCode() {
-        version.hashCode() ^ infoHash.hashCode() ^ timestamp.hashCode() ^ name.hashCode() ^ issuer.hashCode()
+        version.hashCode() ^ infoHash.hashCode() ^ timestamp.hashCode() ^ name.hashCode() ^ issuer.hashCode() ^ Objects.hashCode(comment)
     }
     
     @Override

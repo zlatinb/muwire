@@ -73,6 +73,7 @@ class CertificateClient {
                     try {
                         cert = new Certificate(new ByteArrayInputStream(tmp))
                     } catch (IOException | InvalidSignatureException ignore) {
+                        log.log(Level.WARNING, "certificate creation failed",ignore)
                         continue
                     }
                     if (cert.infoHash == e.infoHash)
