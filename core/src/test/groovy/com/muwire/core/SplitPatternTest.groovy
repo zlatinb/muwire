@@ -24,4 +24,12 @@ class SplitPatternTest {
         assert SplitPattern.termify('"siamese cat" any cat "persian cat"') ==
             ['siamese cat','any','cat','persian cat']
     }
+    
+    @Test
+    void testNewLine() {
+        def s = "first\nsecond"
+        s = s.replaceAll(SplitPattern.SPLIT_PATTERN, " ")
+        s = s.split(" ")
+        assert s.length == 2
+    }
 }

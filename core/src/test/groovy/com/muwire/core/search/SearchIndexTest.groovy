@@ -120,4 +120,26 @@ class SearchIndexTest {
         assert index.search(['cat', 'video siamese']).size() == 0
         assert index.search(['cat','video','siamese']).size() == 3
     }
+    
+    @Test
+    void testNewLine() {
+        initIndex(['first\nsecond'])
+        assert index.search(['first']).size() == 1
+        assert index.search(['second']).size() == 1
+        assert index.search(['first','second']).size() == 1
+        assert index.search(['second','first']).size() == 1
+        assert index.search(['second first']).size() == 0
+        assert index.search(['first second']).size() == 0
+    }
+    
+    @Test
+    void testDosNewLine() {
+        initIndex(['first\r\nsecond'])
+        assert index.search(['first']).size() == 1
+        assert index.search(['second']).size() == 1
+        assert index.search(['first','second']).size() == 1
+        assert index.search(['second','first']).size() == 1
+        assert index.search(['second first']).size() == 0
+        assert index.search(['first second']).size() == 0
+    }
 }
