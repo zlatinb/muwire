@@ -8,6 +8,7 @@ import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 
+import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.BrowseStatus
@@ -22,18 +23,18 @@ class BrowseController {
     @MVCMember @Nonnull
     BrowseView view
 
-    EventBus eventBus
+    Core core
     
     
     void register() {
-        eventBus.register(BrowseStatusEvent.class, this)
-        eventBus.register(UIResultEvent.class, this)
-        eventBus.publish(new UIBrowseEvent(host : model.host))
+        core.eventBus.register(BrowseStatusEvent.class, this)
+        core.eventBus.register(UIResultEvent.class, this)
+        core.eventBus.publish(new UIBrowseEvent(host : model.host))
     }
     
     void mvcGroupDestroy() {
-        eventBus.unregister(BrowseStatusEvent.class, this)
-        eventBus.unregister(UIResultEvent.class, this)
+        core.eventBus.unregister(BrowseStatusEvent.class, this)
+        core.eventBus.unregister(UIResultEvent.class, this)
     }
     
     void onBrowseStatusEvent(BrowseStatusEvent e) {
@@ -69,7 +70,7 @@ class BrowseController {
         
         selectedResults.each { result ->
             def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
-            eventBus.publish(new UIDownloadEvent(
+            core.eventBus.publish(new UIDownloadEvent(
                 result : [result],
                 sources : [model.host.destination],
                 target : file,
@@ -109,7 +110,7 @@ class BrowseController {
         
         def params = [:]
         params['result'] = result
-        params['eventBus'] = eventBus
+        params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }
 }

@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 import javax.swing.JOptionPane
 
+import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.filecert.CertificateFetchEvent
 import com.muwire.core.filecert.CertificateFetchStatus
@@ -21,10 +22,10 @@ class FetchCertificatesController {
     @MVCMember @Nonnull
     FetchCertificatesView view
 
-    EventBus eventBus
+    Core core
     
     void register() {
-        eventBus.with { 
+        core.eventBus.with { 
             register(CertificateFetchEvent.class, this)
             register(CertificateFetchedEvent.class, this)
             publish(new UIFetchCertificatesEvent(host : model.result.sender, infoHash : model.result.infohash))
@@ -32,8 +33,8 @@ class FetchCertificatesController {
     }
     
     void mvcGroupDestroy() {
-        eventBus.unregister(CertificateFetchEvent.class, this)
-        eventBus.unregister(CertificateFetchedEvent.class, this)
+        core.eventBus.unregister(CertificateFetchEvent.class, this)
+        core.eventBus.unregister(CertificateFetchedEvent.class, this)
     }
     
     void onCertificateFetchEvent(CertificateFetchEvent e) {
@@ -58,7 +59,7 @@ class FetchCertificatesController {
         if (selectedCerts == null)
             return
         selectedCerts.each { 
-            eventBus.publish(new UIImportCertificateEvent(certificate : it))
+            core.eventBus.publish(new UIImportCertificateEvent(certificate : it))
         }
         JOptionPane.showMessageDialog(null, "Certificates imported.")
     }

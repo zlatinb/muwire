@@ -99,7 +99,7 @@ class SearchTabController {
             String groupId = sender.getHumanReadableName()
             Map<String,Object> params = new HashMap<>()
             params['host'] = sender
-            params['eventBus'] = core.eventBus
+            params['core'] = core
             
             mvcGroup.createMVCGroup("browse", groupId, params)
         }
@@ -136,7 +136,7 @@ class SearchTabController {
             
             def params = [:]
             params['result'] = event
-            params['eventBus'] = core.eventBus
+            params['core'] = core
             mvcGroup.createMVCGroup("fetch-certificates", params)
         }
     }

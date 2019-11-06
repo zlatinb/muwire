@@ -52,6 +52,7 @@ class FetchCertificatesView {
                 certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
                         closureColumn(header : "Issuer", preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
+                        closureColumn(header : "Trust Status", preferredWidth: 50, type : String, read : {controller.core.trustService.getLevel(it.issuer.destination)})
                         closureColumn(header : "Name", preferredWidth : 200, type: String, read : {it.name.name.toString()})
                         closureColumn(header : "Issued", preferredWidth : 100, type : String, read : {
                             def date = new Date(it.timestamp)
