@@ -92,7 +92,8 @@ class BrowseController {
         
         String groupId = Base64.encode(result.infohash.getRoot())
         Map<String,Object> params = new HashMap<>()
-        params['result'] = result
+        params['text'] = result.comment
+        params['name'] = result.name
         
         mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
