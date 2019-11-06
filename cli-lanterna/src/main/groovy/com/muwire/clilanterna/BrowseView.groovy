@@ -49,7 +49,7 @@ class BrowseView extends BasicWindow {
         topPanel.addComponent(percentageLabel, layoutData)
         contentPanel.addComponent(topPanel, layoutData)
         
-        table = new Table("Name","Size","Hash","Comment")
+        table = new Table("Name","Size","Hash","Comment","Certificates")
         table.with { 
             setCellSelection(false)
             setTableModel(model.model)
@@ -71,14 +71,16 @@ class BrowseView extends BasicWindow {
         int selectedRow = table.getSelectedRow()
         def row = model.model.getRow(selectedRow)
         String infoHash = row[2]
-        boolean comment = Boolean.parseBoolean(row[3])
-        if (comment) {
+        boolean comment = Boolean.parseBoolean(row[3]) 
+        boolean certificates = Integer.parseInt(row[4]) > 0
+        if (comment || certificates) {
             Window prompt = new BasicWindow("Download Or View Comment")
             prompt.setHints([Window.Hint.CENTERED])
             Panel contentPanel = new Panel()
-            contentPanel.setLayoutManager(new GridLayout(3))
+            contentPanel.setLayoutManager(new GridLayout(4))
             Button downloadButton = new Button("Download", {download(infoHash)})
             Button viewButton = new Button("View Comment", {viewComment(infoHash)})
+            Button viewCertificate = new Button("View Certificates",{viewCertificates(infoHash)})
             Button closeButton = new Button("Cancel", {prompt.close()})
             
             contentPanel.with { 
@@ -105,7 +107,14 @@ class BrowseView extends BasicWindow {
     
     private void viewComment(String infoHash) {
         UIResultEvent result = model.rootToResult[infoHash]
-        ViewCommentView view = new ViewCommentView(result, terminalSize)
+        ViewCommentView view = new ViewCommentView(result.comment, result.name, terminalSize)
+        textGUI.addWindowAndWait(view)
+    }
+    
+    private void viewCertificates(String infoHash) {
+        UIResultEvent result = model.rootToResult[infoHash]
+        ViewCertificatesModel model = new ViewCertificatesModel(result, core, textGUI.getGUIThread())
+        ViewCertificatesView view = new ViewCertificatesView(model, textGUI, core, terminalSize)
         textGUI.addWindowAndWait(view)
     }
 }

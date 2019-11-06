@@ -19,8 +19,8 @@ class ViewCommentView extends BasicWindow {
     private final TextBox textBox
     private final LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
     
-    ViewCommentView(UIResultEvent result, TerminalSize terminalSize) {
-        super("View Comments For "+result.getName())
+    ViewCommentView(String text, String title, TerminalSize terminalSize) {
+        super("View Comments For "+title)
         
         setHints([Window.Hint.CENTERED])
         
@@ -28,7 +28,7 @@ class ViewCommentView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(1))
         
         TerminalSize boxSize = new TerminalSize((terminalSize.getColumns() / 2).toInteger(), (terminalSize.getRows() / 2).toInteger())
-        textBox = new TextBox(boxSize, result.comment, TextBox.Style.MULTI_LINE)
+        textBox = new TextBox(boxSize, text, TextBox.Style.MULTI_LINE)
         contentPanel.addComponent(textBox, layoutData)
         
         Button closeButton = new Button("Close", {close()})

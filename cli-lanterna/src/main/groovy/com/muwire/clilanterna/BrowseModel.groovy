@@ -17,7 +17,7 @@ class BrowseModel {
     private final Persona persona
     private final Core core
     private final TextGUIThread guiThread
-    private final TableModel model = new TableModel("Name","Size","Hash","Comment")
+    private final TableModel model = new TableModel("Name","Size","Hash","Comment","Certificates")
     private Map<String, UIResultEvent> rootToResult = new HashMap<>()
     
     private int totalResults
@@ -53,7 +53,7 @@ class BrowseModel {
             String size = DataHelper.formatSize2Decimal(e.size, false) + "B"
             String infoHash = Base64.encode(e.infohash.getRoot())
             String comment = String.valueOf(e.comment != null)
-            model.addRow(e.name, size, infoHash, comment)
+            model.addRow(e.name, size, infoHash, comment, e.certificates)
             rootToResult.put(infoHash, e)
             
             String percentageString = ""

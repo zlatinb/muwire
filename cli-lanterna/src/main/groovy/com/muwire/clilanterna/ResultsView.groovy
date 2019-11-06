@@ -99,7 +99,7 @@ class ResultsView extends BasicWindow {
     
     private void viewComment(String infohash) {
         UIResultEvent result = model.rootToResult[infohash]
-        ViewCommentView view = new ViewCommentView(result, terminalSize)
+        ViewCommentView view = new ViewCommentView(result.comment, result.name, terminalSize)
         textGUI.addWindowAndWait(view)
     }
     

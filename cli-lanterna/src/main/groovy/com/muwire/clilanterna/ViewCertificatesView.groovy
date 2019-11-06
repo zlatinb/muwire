@@ -49,7 +49,7 @@ class ViewCertificatesView extends BasicWindow {
         topPanel.addComponent(percentageLabel, layoutData)
         contentPanel.addComponent(topPanel, layoutData)
         
-        table = new Table("Issuer","File Name","Timestamp")
+        table = new Table("Issuer","File Name","Comment","Timestamp")
         table.with { 
             setCellSelection(false)
             setTableModel(model.model)
@@ -69,16 +69,21 @@ class ViewCertificatesView extends BasicWindow {
     private void rowSelected() {
         int selectedRow = table.getSelectedRow()
         def row = model.model.getRow(selectedRow)
-        Persona persona = row[0].persona
+        Certificate certificate = row[0].certificate
         
         Window prompt = new BasicWindow("Import Certificate?")
         prompt.setHints([Window.Hint.CENTERED])
         
         Panel contentPanel = new Panel()
-        contentPanel.setLayoutManager(new GridLayout(2))
-        Button importButton = new Button("Import", {importCert(persona)})
+        contentPanel.setLayoutManager(new GridLayout(3))
+        Button importButton = new Button("Import", {importCert(certificate)})
+        
+        Button viewCommentButton = new Button("View Comment", {viewComment(certificate)})
+        
         Button closeButton = new Button("Close", {prompt.close()})
         contentPanel.addComponent(importButton, layoutData)
+        if (certificate.comment != null)
+            contentPanel.addComponent(viewCommentButton, layoutData)
         contentPanel.addComponent(closeButton, layoutData)
         
         prompt.setComponent(contentPanel)
@@ -86,11 +91,13 @@ class ViewCertificatesView extends BasicWindow {
         textGUI.addWindowAndWait(prompt)
     }
     
-    private void importCert(Persona persona) {
-        Set<Certificate> certs = model.byIssuer.get(persona)
-        certs.each { 
-            core.eventBus.publish(new UIImportCertificateEvent(certificate : it))
-        }
+    private void importCert(Certificate certificate) {
+        core.eventBus.publish(new UIImportCertificateEvent(certificate : certificate))
         MessageDialog.showMessageDialog(textGUI, "Certificate(s) Imported", "", MessageDialogButton.OK)
+    }
+    
+    private void viewComment(Certificate certificate) {
+        ViewCommentView view = new ViewCommentView(certificate.comment.name, "Certificate Comment", terminalSize)
+        textGUI.addWindowAndWait(view)
     }
 }

@@ -17,8 +17,7 @@ class ViewCertificatesModel {
     private final Core core
     private final TextGUIThread guiThread
     
-    private final TableModel model = new TableModel("Issuer","File Name","Timestamp")
-    private final Map<Persona, Set<Certificate>> byIssuer = new HashMap<>()
+    private final TableModel model = new TableModel("Issuer","File Name","Comment","Timestamp")
     
     private int totalCerts
     
@@ -53,14 +52,7 @@ class ViewCertificatesModel {
     void onCertificateFetchedEvent(CertificateFetchedEvent e) {
         guiThread.invokeLater {
             Date date = new Date(e.certificate.timestamp)
-            model.addRow(new PersonaWrapper(e.certificate.issuer), e.certificate.name.name, date)
-            
-            Set<Certificate> set = byIssuer.get(e.certificate.issuer)
-            if (set == null) {
-                set = new HashSet<>()
-                byIssuer.put(e.certificate.issuer, set)
-            }
-            set.add(e.certificate)
+            model.addRow(new CertificateWrapper(e.certificate), e.certificate.name.name, e.certificate.comment != null, date)
             
             String percentageString = ""
             if (totalCerts > 0) {
