@@ -90,7 +90,7 @@ class CertificateManager {
 
     private void saveCert(Certificate cert) {
         String infoHashString = Base64.encode(cert.infoHash.getRoot())
-        File certFile = new File(certDir, "${infoHashString}_${cert.issuer.getHumanReadableName()}.mwcert")
+        File certFile = new File(certDir, "${infoHashString}_${cert.issuer.getHumanReadableName()}_${cert.timestamp}.mwcert")
         certFile.withOutputStream { cert.write(it) }
     }
     
