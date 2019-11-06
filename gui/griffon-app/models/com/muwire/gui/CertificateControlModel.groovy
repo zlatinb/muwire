@@ -13,6 +13,8 @@ class CertificateControlModel {
     
     Core core
     
+    @Observable boolean showCommentActionEnabled
+    
     void mvcGroupInit(Map<String,String> args) {
         users.addAll(core.certificateManager.byIssuer.keySet())
     }

@@ -14,7 +14,7 @@ import net.i2p.data.SigningPublicKey
 class Certificate {
     private final byte version
     private final InfoHash infoHash
-    private final Name name
+    private final Name name, comment
     private final long timestamp
     private final Persona issuer
     private final byte[] sig
@@ -23,7 +23,7 @@ class Certificate {
     
     Certificate(InputStream is) {
         version = (byte) (is.read() & 0xFF)
-        if (version != Constants.FILE_CERT_VERSION)
+        if (version > Constants.FILE_CERT_VERSION)
             throw new IOException("Unknown version $version")
         
         DataInputStream dis = new DataInputStream(is)
@@ -35,19 +35,29 @@ class Certificate {
         
         name = new Name(dis)
         
-        issuer = new Persona(is)
+        issuer = new Persona(dis)
+        if (version == 2) {
+            byte present = (byte)(dis.read() & 0xFF)
+            if (present != 0) {
+                comment = new Name(dis)
+            }
+        }
         
         sig = new byte[Constants.SIG_TYPE.getSigLen()]
         dis.readFully(sig)
         
-        if (!verify(version, infoHash, name, timestamp, issuer, sig))
+        if (!verify(version, infoHash, name, timestamp, issuer, comment, sig))
             throw new InvalidSignatureException("certificate for $name.name from ${issuer.getHumanReadableName()} didn't verify")
     }
     
-    Certificate(InfoHash infoHash, String name, long timestamp, Persona issuer, SigningPrivateKey spk) {
+    Certificate(InfoHash infoHash, String name, long timestamp, Persona issuer, String comment, SigningPrivateKey spk) {
         this.version = Constants.FILE_CERT_VERSION
         this.infoHash = infoHash
         this.name = new Name(name)
+        if (comment != null)
+            this.comment = new Name(comment)
+        else
+            this.comment = null
         this.timestamp = timestamp
         this.issuer = issuer
         
@@ -59,6 +69,12 @@ class Certificate {
         daos.write(infoHash.getRoot())
         this.name.write(daos)
         issuer.write(daos)
+        if (this.comment == null) {
+            daos.write((byte) 0)
+        } else {
+            daos.write((byte) 1)
+            this.comment.write(daos)
+        }
         daos.close()
         
         byte[] payload = baos.toByteArray()
@@ -66,7 +82,7 @@ class Certificate {
         this.sig = signature.getData()
     }
     
-    private static boolean verify(byte version, InfoHash infoHash, Name name, long timestamp, Persona issuer, byte[] sig) {
+    private static boolean verify(byte version, InfoHash infoHash, Name name, long timestamp, Persona issuer, Name comment, byte[] sig) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         DataOutputStream daos = new DataOutputStream(baos)
         daos.write(version)
@@ -74,6 +90,14 @@ class Certificate {
         daos.write(infoHash.getRoot())
         name.write(daos)
         issuer.write(daos)
+        if (version == 2) {
+            if (comment == null) {
+                daos.write((byte)0)
+            } else {
+                daos.write((byte)1)
+                comment.write(daos)
+            }
+        }
         daos.close()
         
         byte [] payload = baos.toByteArray()
@@ -91,6 +115,12 @@ class Certificate {
             daos.write(infoHash.getRoot())
             name.write(daos)
             issuer.write(daos)
+            if (comment == null)
+                daos.write((byte) 0)
+            else {
+                daos.write((byte) 1)
+                comment.write(daos)
+            }
             daos.write(sig)
             daos.close()
             
@@ -114,6 +144,7 @@ class Certificate {
             infoHash == other.infoHash &&
             timestamp == other.timestamp &&
             name == other.name &&
-            issuer == other.issuer
+            issuer == other.issuer &&
+            comment == other.comment
     }
 }

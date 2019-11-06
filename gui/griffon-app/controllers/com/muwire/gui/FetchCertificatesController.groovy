@@ -64,6 +64,19 @@ class FetchCertificatesController {
     }
     
     @ControllerAction
+    void showComment() {
+        def selectedCerts = view.selectedCertificates()
+        if (selectedCerts == null || selectedCerts.size() != 1)
+            return
+            
+        String comment = selectedCerts[0].comment.name
+        def params = [:]
+        params['text'] = comment
+        params['name'] = "Certificate Comment"
+        mvcGroup.createMVCGroup("show-comment", params)
+    }
+    
+    @ControllerAction
     void dismiss() {
         view.dialog.setVisible(false)
         mvcGroup.destroy()

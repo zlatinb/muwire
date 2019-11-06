@@ -16,6 +16,7 @@ class FetchCertificatesModel {
     @Observable int certificateCount
     
     @Observable boolean importActionEnabled
+    @Observable boolean showCommentActionEnabled
     
     def certificates = []
 }

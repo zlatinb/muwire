@@ -117,7 +117,8 @@ class SearchTabController {
                 
             String groupId = Base64.encode(event.infohash.getRoot())
             Map<String,Object> params = new HashMap<>()
-            params['result'] = event
+            params['text'] = event.comment
+            params['name'] = event.name
             
             mvcGroup.createMVCGroup("show-comment", groupId, params)
         }

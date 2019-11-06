@@ -8,5 +8,6 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class ShowCommentModel {
-    UIResultEvent result
+    String name
+    String text
 }

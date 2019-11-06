@@ -29,7 +29,7 @@ class ShowCommentView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, model.result.name, true)
+        dialog = new JDialog(mainFrame, model.name, true)
         dialog.setResizable(true)
         
         
@@ -37,7 +37,7 @@ class ShowCommentView {
             borderLayout()
             panel (constraints : BorderLayout.CENTER) {
                 scrollPane {
-                    textArea(text : model.result.comment, rows : 20, columns : 100, editable : false, lineWrap : true, wrapStyleWord : true)
+                    textArea(text : model.text, rows : 20, columns : 100, editable : false, lineWrap : true, wrapStyleWord : true)
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {

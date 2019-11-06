@@ -8,6 +8,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.InvalidSignatureException
 import com.muwire.core.Name
 import com.muwire.core.Persona
+import com.muwire.core.util.DataUtil
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -72,7 +73,12 @@ class CertificateManager {
         InfoHash infoHash = e.sharedFile.getInfoHash()
         String name = e.sharedFile.getFile().getName()
         long timestamp = System.currentTimeMillis()
-        Certificate cert = new Certificate(infoHash, name, timestamp, me, spk)
+        
+        String comment = null
+        if (e.sharedFile.getComment() != null)
+            comment = DataUtil.readi18nString(Base64.decode(e.sharedFile.getComment()))
+        
+        Certificate cert = new Certificate(infoHash, name, timestamp, me, comment, spk)
         
         
         if (addToMaps(cert)) {

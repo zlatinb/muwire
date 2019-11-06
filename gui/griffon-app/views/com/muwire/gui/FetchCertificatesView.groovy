@@ -57,11 +57,13 @@ class FetchCertificatesView {
                             def date = new Date(it.timestamp)
                             date.toString()
                         })
+                        closureColumn(header : "Comments", preferredWidth: 20, type : Boolean, read :{it.comment != null})
                     }
                 }
             }
             panel(constraints : BorderLayout.SOUTH) {
                 button(text : "Import", enabled : bind {model.importActionEnabled}, importCertificatesAction)
+                button(text : "Show Comment", enabled : bind {model.showCommentActionEnabled}, showCommentAction)
                 button(text : "Dismiss", dismissAction)
             }
         }
@@ -74,6 +76,14 @@ class FetchCertificatesView {
         selectionModel.addListSelectionListener({
             int[] rows = certsTable.getSelectedRows()
             model.importActionEnabled = rows.length > 0
+            
+            if (rows.length == 1) {
+                if (lastSortEvent != null)
+                    rows[0] = certsTable.rowSorter.convertRowIndexToModel(rows[0])
+                model.showCommentActionEnabled = model.certificates[rows[0]].comment != null
+            } else
+                model.showCommentActionEnabled = false
+            
         })
         
         certsTable.addMouseListener(new MouseAdapter() {
@@ -94,7 +104,12 @@ class FetchCertificatesView {
         JMenuItem importItem = new JMenuItem("Import")
         importItem.addActionListener({controller.importCertificates()})
         menu.add(importItem)
-        menu.showing(e.getComponent(), e.getX(), e.getY())
+        if (model.showCommentActionEnabled) {
+            JMenuItem showComment = new JMenuItem("Show Comment")
+            showComment.addActionListener({controller.showComment()})
+            menu.add(showComment)
+        }
+        menu.show(e.getComponent(), e.getX(), e.getY())
     }
 
     def selectedCertificates() {
