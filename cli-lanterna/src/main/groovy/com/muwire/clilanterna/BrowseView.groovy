@@ -72,7 +72,7 @@ class BrowseView extends BasicWindow {
         def row = model.model.getRow(selectedRow)
         String infoHash = row[2]
         boolean comment = Boolean.parseBoolean(row[3]) 
-        boolean certificates = Integer.parseInt(row[4]) > 0
+        boolean certificates = row[4] > 0
         if (comment || certificates) {
             Window prompt = new BasicWindow("Download Or View Comment")
             prompt.setHints([Window.Hint.CENTERED])
@@ -85,7 +85,10 @@ class BrowseView extends BasicWindow {
             
             contentPanel.with { 
                 addComponent(downloadButton, layoutData)
-                addComponent(viewButton, layoutData)
+                if (comment)
+                    addComponent(viewButton, layoutData)
+                if (certificates)
+                    addComponent(viewCertificate, layoutData)
                 addComponent(closeButton, layoutData)
             }
             
