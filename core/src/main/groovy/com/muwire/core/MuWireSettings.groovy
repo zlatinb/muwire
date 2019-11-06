@@ -20,6 +20,7 @@ class MuWireSettings {
     int totalUploadSlots
     int uploadSlotsPerUser
     int updateCheckInterval
+    long lastUpdateCheck
     boolean autoDownloadUpdate
     String updateType
     String nickname
@@ -60,6 +61,7 @@ class MuWireSettings {
             incompleteLocation = new File(incompleteLocationProp)
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","60"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
+        lastUpdateCheck = Long.parseLong(props.getProperty("lastUpdateChec","0"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
         updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
@@ -107,6 +109,7 @@ class MuWireSettings {
             props.setProperty("incompleteLocation", incompleteLocation.getAbsolutePath())
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
+        props.setProperty("lastUpdateCheck", String.valueOf(lastUpdateCheck))
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))
         props.setProperty("updateType",String.valueOf(updateType))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))

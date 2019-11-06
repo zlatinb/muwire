@@ -9,6 +9,7 @@ import com.muwire.core.Persona
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -56,6 +57,7 @@ class UpdateClient {
         this.fileManager = fileManager
         this.me = me
         this.spk = spk
+        this.lastUpdateCheckTime = settings.lastUpdateCheck
         timer = new Timer("update-client",true)
     }
 
@@ -84,6 +86,8 @@ class UpdateClient {
             return
         updateDownloading = false
         eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, text : text))
+        if (!settings.shareDownloadedFiles)
+            eventBus.publish(new FileSharedEvent(file : e.downloadedFile))
     }
 
     private void checkUpdate() {
@@ -93,6 +97,7 @@ class UpdateClient {
                 return
         }
         lastUpdateCheckTime = now
+        settings.lastUpdateCheck = now
 
         log.info("checking for update")
 
