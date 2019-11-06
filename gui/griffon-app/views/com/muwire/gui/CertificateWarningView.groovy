@@ -33,7 +33,7 @@ class CertificateWarningView {
             label(text : "Even if you delete the certificate from your disk, others may already have it.", constraints : gbc(gridx:0, gridy : 1, gridwidth: 2))
             label(text : "If you are sure you want to do this, check the checkbox below, then click \"Certify\" again.", constraints : gbc(gridx:0, gridy: 2, gridwidth:2))
             label(text : "\n", constraints : gbc(gridx:0, gridy:3)) // TODO: real padding
-            label(text : "I understand, do not show this warning again", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_END))
+            label(text : "   I understand, do not show this warning again", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_END))
             checkbox = checkBox(constraints : gbc(gridx:1, gridy:4, anchor : GridBagConstraints.LINE_START))
             panel (constraints : gbc(gridx :0, gridy : 5, gridwidth : 2)) {
                 button(text : "Ok", dismissAction)

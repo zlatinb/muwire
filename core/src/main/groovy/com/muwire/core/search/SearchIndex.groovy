@@ -31,25 +31,48 @@ class SearchIndex {
         }
     }
 
-    private static String[] split(String source) {
-        source = source.replaceAll(SplitPattern.SPLIT_PATTERN, " ").toLowerCase()
-        String [] split = source.split(" ")
+    private static String[] split(final String source) {
+        // first split by split pattern
+        String sourceSplit = source.replaceAll(SplitPattern.SPLIT_PATTERN, " ").toLowerCase()
+        String [] split = sourceSplit.split(" ")
         def rv = []
         split.each { if (it.length() > 0) rv << it }
+        
+        // then just by ' '
+        source.split(' ').each { if (it.length() > 0) rv << it }
+        
+        // and add original string
+        rv << source
         rv.toArray(new String[0])
     }
 
     String[] search(List<String> terms) {
         Set<String> rv = null;
 
+        Set<String> powerSet = new HashSet<>()
         terms.each {
+            powerSet.addAll(it.toLowerCase().split(' '))
+        }
+        
+        powerSet.each {
             Set<String> forWord = keywords.getOrDefault(it,[])
             if (rv == null) {
                 rv = new HashSet<>(forWord)
             } else {
                 rv.retainAll(forWord)
             }
-
+        }
+        
+        // now, filter by terms
+        for (Iterator<String> iter = rv.iterator(); iter.hasNext();) {
+            String candidate = iter.next()
+            candidate = candidate.toLowerCase()
+            boolean keep = true
+            terms.each { 
+                keep &= candidate.contains(it)
+            }
+            if (!keep)
+                iter.remove()
         }
 
         if (rv != null)

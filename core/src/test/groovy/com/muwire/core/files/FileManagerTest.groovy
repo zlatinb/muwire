@@ -149,7 +149,7 @@ class FileManagerTest {
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf1)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf2)
 
-        manager.onFileUnsharedEvent new FileUnsharedEvent(unsharedFile: sf2)
+        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFile: sf2)
 
         manager.onSearchEvent new SearchEvent(searchHash : ih.getRoot())
         Thread.sleep(20)
@@ -170,7 +170,7 @@ class FileManagerTest {
         SharedFile sf2 = new SharedFile(f2, ih2, 0)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
 
-        manager.onFileUnsharedEvent new FileUnsharedEvent(unsharedFile: sf2)
+        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFile: sf2)
 
         // 1 match left
         manager.onSearchEvent new SearchEvent(searchTerms: ["c"])
