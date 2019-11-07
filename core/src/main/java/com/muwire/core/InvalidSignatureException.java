@@ -1,4 +1,4 @@
-package com.muwire.core
+package com.muwire.core;
 
 class InvalidSignatureException extends Exception {
 
