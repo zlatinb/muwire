@@ -2,6 +2,7 @@ package com.muwire.core.search
 
 import com.muwire.core.Constants
 import com.muwire.core.EventBus
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.util.DataUtil
@@ -20,12 +21,14 @@ class BrowseManager {
     
     private final I2PConnector connector
     private final EventBus eventBus
+    private final Persona me
     
     private final Executor browserThread = Executors.newSingleThreadExecutor()
     
-    BrowseManager(I2PConnector connector, EventBus eventBus) {
+    BrowseManager(I2PConnector connector, EventBus eventBus, Persona me) {
         this.connector = connector
         this.eventBus = eventBus
+        this.me = me
     }
     
     void onUIBrowseEvent(UIBrowseEvent e) {
@@ -35,7 +38,9 @@ class BrowseManager {
                 eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.CONNECTING))
                 endpoint = connector.connect(e.host.destination)
                 OutputStream os = endpoint.getOutputStream()
-                os.write("BROWSE\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("BROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
              
                 InputStream is = endpoint.getInputStream()
                 String code = DataUtil.readTillRN(is)
@@ -43,16 +48,7 @@ class BrowseManager {
                     throw new IOException("Invalid code $code")
                     
                 // parse all headers
-                Map<String,String> headers = new HashMap<>()
-                String header
-                while((header = DataUtil.readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) {
-                    int colon = header.indexOf(':')
-                    if (colon == -1 || colon == header.length() - 1)
-                        throw new IOException("invalid header $header")
-                    String key = header.substring(0, colon)
-                    String value = header.substring(colon + 1)
-                    headers[key] = value.trim()
-                }
+                Map<String,String> headers = DataUtil.readAllHeaders(is)
                 
                 if (!headers.containsKey("Count"))
                     throw new IOException("No count header")

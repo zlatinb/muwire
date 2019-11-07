@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import com.muwire.core.util.DataUtil;
@@ -26,8 +27,8 @@ public class SharedFile {
     private final List<String> b64EncodedHashList;
     
     private volatile String comment;
-    private volatile int hits;
     private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
+    private final Set<SearchEntry> searches = Collections.synchronizedSet(new HashSet<>());
 
     public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
         this.file = file;
@@ -97,11 +98,11 @@ public class SharedFile {
     }
     
     public int getHits() {
-        return hits;
+        return searches.size();
     }
     
-    public void hit() {
-        hits++;
+    public void hit(Persona searcher, long timestamp, String query) {
+        searches.add(new SearchEntry(searcher, timestamp, query));
     }
     
     public Set<String> getDownloaders() {
@@ -123,5 +124,30 @@ public class SharedFile {
             return false;
         SharedFile other = (SharedFile)o;
         return file.equals(other.file) && infoHash.equals(other.infoHash);
+    }
+    
+    public static class SearchEntry {
+        private final Persona searcher;
+        private final long timestamp;
+        private final String query;
+        
+        public SearchEntry(Persona searcher, long timestamp, String query) {
+            this.searcher = searcher;
+            this.timestamp = timestamp;
+            this.query = query;
+        }
+        
+        public int hashCode() {
+            return Objects.hash(searcher) ^ Objects.hash(timestamp) ^ query.hashCode();
+        }
+        
+        public boolean equals(Object o) {
+            if (!(o instanceof SearchEntry))
+                return false;
+            SearchEntry other = (SearchEntry)o;
+            return Objects.equals(searcher, other.searcher) &&
+                    timestamp == other.timestamp &&
+                    query.equals(other.query);
+        }
     }
 }

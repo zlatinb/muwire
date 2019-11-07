@@ -12,6 +12,7 @@ import java.util.stream.Collectors
 import com.muwire.core.DownloadedFile
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.Service
 import com.muwire.core.SharedFile
 import com.muwire.core.UILoadedEvent
@@ -129,15 +130,19 @@ class PersisterService extends Service {
             return new FileLoadedEvent(loadedFile : df)
         }
 
-        int hits = 0
-        if (json.hits != null)
-            hits = json.hits
 
         SharedFile sf = new SharedFile(file, ih, pieceSize)
         sf.setComment(json.comment)
-        sf.hits = hits
         if (json.downloaders != null)
             sf.getDownloaders().addAll(json.downloaders)
+        if (json.searchers != null) {
+            json.searchers.each {
+                Persona searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
+                long timestamp = it.timestamp
+                String query = it.query
+                sf.hit(searcher, timestamp, query)
+            }
+        }
         return new FileLoadedEvent(loadedFile: sf)
 
     }
@@ -172,6 +177,18 @@ class PersisterService extends Service {
         json.hits = sf.getHits()
         json.downloaders = sf.getDownloaders()
 
+        if (!sf.searches.isEmpty()) {
+            Set searchers = new HashSet<>()
+            sf.searches.each {
+                def search = [:]
+                search.searcher = it.searcher.toBase64()
+                search.timestamp = it.timestamp
+                search.query = it.query
+                searchers.add(search)
+            }
+            json.searchers = searchers
+        }
+        
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())
         }

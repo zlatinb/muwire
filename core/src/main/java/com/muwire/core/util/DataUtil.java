@@ -10,7 +10,9 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,6 +100,20 @@ public class DataUtil {
             baos.write(read);
         }
         return new String(baos.toByteArray(), StandardCharsets.US_ASCII);
+    }
+    
+    public static Map<String, String> readAllHeaders(InputStream is) throws IOException {
+        Map<String, String> headers = new HashMap<>();
+        String header;
+        while(!(header = readTillRN(is)).equals("") && headers.size() < Constants.MAX_HEADERS) {
+            int colon = header.indexOf(':');
+            if (colon == -1 || colon == header.length() - 1)
+                throw new IOException("Invalid header "+ header);
+            String key = header.substring(0, colon);
+            String value = header.substring(colon + 1);
+            headers.put(key, value.trim());
+        }
+        return headers;
     }
 
     public static String encodeXHave(List<Integer> pieces, int totalPieces) {

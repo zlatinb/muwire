@@ -288,18 +288,8 @@ class ConnectionAcceptor {
             if (!searchManager.hasLocalSearch(resultsUUID))
                 throw new UnexpectedResultsException(resultsUUID.toString())
             
-                
             // parse all headers
-            Map<String,String> headers = new HashMap<>()
-            String header
-            while((header = DataUtil.readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) {
-                int colon = header.indexOf(':')
-                if (colon == -1 || colon == header.length() - 1)
-                    throw new IOException("invalid header $header")
-                String key = header.substring(0, colon)
-                String value = header.substring(colon + 1)
-                headers[key] = value.trim()
-            }
+            Map<String,String> headers = DataUtil.readAllHeaders(is);
             
             if (!headers.containsKey("Sender"))
                 throw new IOException("No Sender header")
@@ -340,8 +330,11 @@ class ConnectionAcceptor {
             dis.readFully(rowse)
             if (rowse != "ROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new IOException("Invalid BROWSE connection")
-            String header
-            while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
+                
+            Persona browser = null
+            Map<String,String> headers = DataUtil.readAllHeaders(dis);
+            if (headers.containsKey('Persona')) 
+                browser = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
 
             OutputStream os = e.getOutputStream()
             if (!settings.browseFiles) {
@@ -362,7 +355,7 @@ class ConnectionAcceptor {
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
-                it.hit()
+                it.hit(browser, System.currentTimeMillis(), "Browse Host");
                 int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
                 def obj = ResultsSender.sharedFileToObj(it, false, certificates)
                 def json = jsonOutput.toJson(obj)

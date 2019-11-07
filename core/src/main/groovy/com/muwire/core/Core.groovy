@@ -331,7 +331,7 @@ public class Core {
         eventBus.register(QueryEvent.class, contentManager)
         
         log.info("initializing browse manager")
-        BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus)
+        BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
         eventBus.register(UIBrowseEvent.class, browseManager)
         
     }

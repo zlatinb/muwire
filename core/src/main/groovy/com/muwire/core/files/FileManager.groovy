@@ -198,7 +198,7 @@ class FileManager {
             found = rootToFiles.get new InfoHash(e.searchHash)
             found = filter(found, e.oobInfohash)
             if (found != null && !found.isEmpty()) {
-                found.each { it.hit() }
+                found.each { it.hit(e.persona, e.timestamp, "Hash Search") }
                 re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
             }
         } else {
@@ -214,7 +214,7 @@ class FileManager {
             files = filter(sharedFiles, e.oobInfohash)
             
             if (!sharedFiles.isEmpty()) {
-                sharedFiles.each { it.hit() }
+                sharedFiles.each { it.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms)) }
                 re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)
             }
 
