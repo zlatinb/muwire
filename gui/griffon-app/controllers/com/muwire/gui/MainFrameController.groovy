@@ -376,6 +376,19 @@ class MainFrameController {
             JOptionPane.showMessageDialog(null, "Certificate(s) have been issued")
         }
     }
+    
+    @ControllerAction
+    void showFileDetails() {
+        def selected = view.selectedSharedFiles()
+        if (selected.size() != 1) {
+            JOptionPane.showMessageDialog(null, "Please select only one file to view it's details")
+            return
+        }
+        def params = [:]
+        params['sf'] = selected[0]
+        params['core'] = core
+        mvcGroup.createMVCGroup("shared-file", params)
+    }
 
     void saveMuWireSettings() {
         core.saveMuSettings()

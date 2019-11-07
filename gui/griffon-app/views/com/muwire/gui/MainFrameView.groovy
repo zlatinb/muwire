@@ -611,6 +611,9 @@ class MainFrameView {
         JMenuItem certifySelectedFiles = new JMenuItem("Certify selected files")
         certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
         sharedFilesMenu.add(certifySelectedFiles)
+        JMenuItem showFileDetails = new JMenuItem("Show file details")
+        showFileDetails.addActionListener({mvcGroup.controller.showFileDetails()})
+        sharedFilesMenu.add(showFileDetails)
         
         def sharedFilesMouseListener = new MouseAdapter() {
                     @Override

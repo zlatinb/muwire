@@ -8,11 +8,4 @@ import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonController)
 class SharedFileController {
-    @MVCMember @Nonnull
-    SharedFileModel model
-
-    @ControllerAction
-    void click() {
-        model.clickCount++
-    }
 }
