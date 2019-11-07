@@ -137,7 +137,9 @@ class PersisterService extends Service {
             sf.getDownloaders().addAll(json.downloaders)
         if (json.searchers != null) {
             json.searchers.each {
-                Persona searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
+                Persona searcher = null
+                if (it.searcher != null)
+                    searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
                 long timestamp = it.timestamp
                 String query = it.query
                 sf.hit(searcher, timestamp, query)
@@ -181,7 +183,8 @@ class PersisterService extends Service {
             Set searchers = new HashSet<>()
             sf.searches.each {
                 def search = [:]
-                search.searcher = it.searcher.toBase64()
+                if (it.searcher != null)
+                    search.searcher = it.searcher.toBase64()
                 search.timestamp = it.timestamp
                 search.query = it.query
                 searchers.add(search)
