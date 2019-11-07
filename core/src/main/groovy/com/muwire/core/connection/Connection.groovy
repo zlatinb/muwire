@@ -255,7 +255,8 @@ abstract class Connection implements Closeable {
                                             uuid : uuid,
                                             oobInfohash : oob,
                                             searchComments : searchComments,
-                                            compressedResults : compressedResults)
+                                            compressedResults : compressedResults,
+                                            persona : originator)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,
                                             originator : originator,

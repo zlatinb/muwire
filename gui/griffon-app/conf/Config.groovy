@@ -101,4 +101,9 @@ mvcGroups {
         view = 'com.muwire.gui.CertificateControlView'
         controller = 'com.muwire.gui.CertificateControlController'
     }
+    'shared-file' {
+        model = 'com.muwire.gui.SharedFileModel'
+        view = 'com.muwire.gui.SharedFileView'
+        controller = 'com.muwire.gui.SharedFileController'
+    }
 }

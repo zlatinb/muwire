@@ -176,7 +176,7 @@ class UpdateClient {
                         signer = payload.signer
                         log.info("starting search for new version hash $payload.infoHash")
                         Signature sig = DSAEngine.getInstance().sign(updateInfoHash.getRoot(), spk)
-                        def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : UUID.randomUUID(), oobInfohash : true)
+                        def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : UUID.randomUUID(), oobInfohash : true, persona : me)
                         def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, replyTo : me.destination,
                             receivedOn : me.destination, originator : me, sig : sig.data)
                         eventBus.publish(queryEvent)

@@ -2,6 +2,7 @@ package com.muwire.core.search
 
 import com.muwire.core.Event
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 
 class SearchEvent extends Event {
 
@@ -11,6 +12,7 @@ class SearchEvent extends Event {
     boolean oobInfohash
     boolean searchComments
     boolean compressedResults
+    Persona persona
 
     String toString() {
         def infoHash = null

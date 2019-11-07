@@ -107,13 +107,13 @@ class MainFrameController {
         def searchEvent
         byte [] payload
         if (hashSearch) {
-            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true, compressedResults : true)
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true, compressedResults : true, persona : core.me)
             payload = root
         } else {
             def nonEmpty = SplitPattern.termify(search)
             payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
-            searchComments : core.muOptions.searchComments, compressedResults : true)
+            searchComments : core.muOptions.searchComments, compressedResults : true, persona : core.me)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
 
@@ -140,7 +140,7 @@ class MainFrameController {
         Signature sig = DSAEngine.getInstance().sign(infoHashBytes, core.spk)
         
         def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
-            oobInfohash: true)
+            oobInfohash: true, persona : core.me)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me, sig : sig.data))
