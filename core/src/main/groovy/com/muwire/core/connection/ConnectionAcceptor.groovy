@@ -333,8 +333,11 @@ class ConnectionAcceptor {
                 
             Persona browser = null
             Map<String,String> headers = DataUtil.readAllHeaders(dis);
-            if (headers.containsKey('Persona')) 
+            if (headers.containsKey('Persona')) { 
                 browser = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
+                if (browser.destination != e.destination)
+                    throw new IOException("browser persona mismatch")
+            }
 
             OutputStream os = e.getOutputStream()
             if (!settings.browseFiles) {
