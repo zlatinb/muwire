@@ -176,8 +176,7 @@ class MainFrameModel {
                     }
                 }
 
-                builder.getVariable("uploads-table")?.model.fireTableDataChanged()
-
+                updateTablePreservingSelection("uploads-table")
                 updateTablePreservingSelection("downloads-table")
                 updateTablePreservingSelection("trusted-table")
                 updateTablePreservingSelection("distrusted-table")
@@ -409,8 +408,7 @@ class MainFrameModel {
                 wrapper.finished = false
             } else
                 uploads << new UploaderWrapper(uploader : e.uploader)
-            JTable table = builder.getVariable("uploads-table")
-            table.model.fireTableDataChanged()
+            updateTablePreservingSelection("uploads-table")
             view.refreshSharedFiles()
         }
     }
@@ -429,8 +427,7 @@ class MainFrameModel {
             } else {
                 wrapper.finished = true
             }
-            JTable table = builder.getVariable("uploads-table")
-            table.model.fireTableDataChanged()
+            updateTablePreservingSelection("uploads-table")
         }
     }
 

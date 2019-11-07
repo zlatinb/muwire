@@ -20,6 +20,7 @@ import javax.swing.JOptionPane
 import javax.swing.JTable
 
 import com.muwire.core.Core
+import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.SplitPattern
@@ -39,6 +40,8 @@ import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustSubscriptionEvent
+import com.muwire.core.upload.HashListUploader
+import com.muwire.core.upload.Uploader
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -327,6 +330,28 @@ class MainFrameController {
     @ControllerAction
     void clearUploads() {
         model.uploads.removeAll { it.finished }
+    }
+    
+    @ControllerAction
+    void showInLibrary() {
+        Uploader uploader = view.selectedUploader()
+        if (uploader == null)
+            return
+        SharedFile sf = null
+        if (uploader instanceof HashListUploader) {
+            InfoHash infoHash = uploader.infoHash
+            Set<SharedFile> sfs = core.fileManager.rootToFiles.get(infoHash)
+            if (sfs != null  && !sfs.isEmpty())
+                sf = sfs.first()
+        } else {
+            File f = uploader.file
+            sf = core.fileManager.fileToSharedFile.get(f)
+        }
+        
+        if (sf == null)
+            return // can happen if user un-shared
+
+        view.focusOnSharedFile(sf)
     }
     
     @ControllerAction

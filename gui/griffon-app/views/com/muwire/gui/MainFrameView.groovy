@@ -46,6 +46,7 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
+import java.awt.Rectangle
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
@@ -70,6 +71,7 @@ class MainFrameView {
 
     def downloadsTable
     def lastDownloadSortEvent
+    def lastUploadsSortEvent
     def lastSharedSortEvent
     def trustTablesSortEvents = [:]
     def expansionListener = new TreeExpansions()
@@ -320,7 +322,7 @@ class MainFrameView {
                                 label("Uploads")
                             }
                             scrollPane (constraints : BorderLayout.CENTER) {
-                                table(id : "uploads-table", rowHeight : rowHeight) {
+                                table(id : "uploads-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                     tableModel(list : model.uploads) {
                                         closureColumn(header : "Name", type : String, read : {row -> row.uploader.getName() })
                                         closureColumn(header : "Progress", type : String, read : { row ->
@@ -650,6 +652,29 @@ class MainFrameView {
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
 
+        // uploadsTable
+        def uploadsTable = builder.getVariable("uploads-table")
+        
+        uploadsTable.rowSorter.addRowSorterListener({evt -> lastUploadsSortEvent = evt})
+        uploadsTable.rowSorter.setSortsOnUpdates(true)
+        
+        selectionModel = uploadsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        JPopupMenu uploadsTableMenu = new JPopupMenu()
+        JMenuItem showInLibrary = new JMenuItem("Show in library")
+        showInLibrary.addActionListener({mvcGroup.controller.showInLibrary()})
+        uploadsTableMenu.add(showInLibrary)
+        uploadsTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(uploadsTableMenu, e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(uploadsTableMenu, e)
+            }
+        })
+        
         // searches table
         def searchesTable = builder.getVariable("searches-table")
         JPopupMenu searchTableMenu = new JPopupMenu()
@@ -900,6 +925,36 @@ class MainFrameView {
         }
 
         showPopupMenu(menu, e)
+    }
+    
+    def selectedUploader() {
+        def uploadsTable = builder.getVariable("uploads-table")
+        int selectedRow = uploadsTable.getSelectedRow()
+        if (selectedRow < 0)
+            return null
+        if (lastUploadsSortEvent != null) 
+            selectedRow = uploadsTable.rowSorter.convertRowIndexToModel(selectedRow)
+        model.uploads[selectedRow].uploader
+    }
+    
+    void focusOnSharedFile(SharedFile sf) {
+        if(model.treeVisible) {
+            def tree = builder.getVariable("shared-files-tree")
+            def node = model.fileToNode.get(sf)
+            if (node == null)
+                return
+            def path = new TreePath(node.getPath())
+            tree.setSelectionPath(path)
+            tree.scrollPathToVisible(path)
+        } else {
+            def table = builder.getVariable("shared-files-table")
+            int row = model.shared.indexOf(sf)
+            if (row < 0)
+                return
+            table.setRowSelectionInterval(row, row)
+            
+            table.scrollRectToVisible(new Rectangle(table.getCellRect(row, 0, true)))
+        }
     }
     
     void showRestoreOrEmpty() {
