@@ -14,6 +14,10 @@ class SizeRenderer extends DefaultTableCellRenderer {
     @Override
     JComponent getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
+        if (value == null) {
+            // this is very strange, but it happens.  Probably a swing bug?
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+        }
         Long l = (Long) value
         String formatted = DataHelper.formatSize2Decimal(l, false)+"B"
         setText(formatted)
