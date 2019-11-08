@@ -161,13 +161,13 @@ class TrustSubscriber {
                 int nGood = dis.readUnsignedShort()
                 for (int i = 0; i < nGood; i++) {
                     Persona p = new Persona(dis)
-                    good.add(p)
+                    good.add(new TrustEntry(p,null))
                 }
 
                 int nBad = dis.readUnsignedShort()
                 for (int i = 0; i < nBad; i++) {
                     Persona p = new Persona(dis)
-                    bad.add(p)
+                    bad.add(new TrustEntry(p, null))
                 }
             }
 
