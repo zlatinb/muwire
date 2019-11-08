@@ -42,6 +42,7 @@ class OptionsModel {
     @Observable boolean excludeLocalResult
     @Observable boolean showSearchHashes
     @Observable boolean clearUploads
+    @Observable boolean groupByFile
     @Observable boolean exitOnClose
     @Observable boolean closeDecisionMade 
 
@@ -92,6 +93,7 @@ class OptionsModel {
         clearUploads = uiSettings.clearUploads
         exitOnClose = uiSettings.exitOnClose
         storeSearchHistory = uiSettings.storeSearchHistory
+        groupByFile = uiSettings.groupByFile
 
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)

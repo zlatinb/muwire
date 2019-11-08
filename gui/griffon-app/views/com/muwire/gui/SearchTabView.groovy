@@ -39,6 +39,8 @@ class SearchTabView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     SearchTabModel model
+    
+    UISettings settings
 
     def pane
     def parent
@@ -175,6 +177,7 @@ class SearchTabView {
                                         tableModel(list : model.senders2) {
                                             closureColumn(header : "Sender", preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
                                             closureColumn(header : "Browse", preferredWidth : 20, type : Boolean, read : {it.browse})
+                                            closureColumn(header : "Comment", preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : "Certificates", preferredWidth : 20, type: Integer, read : {it.certificates})
                                             closureColumn(header : "Trust", preferredWidth : 50, type : String, read : {
                                                 model.core.trustService.getLevel(it.sender.destination).toString()
@@ -202,8 +205,8 @@ class SearchTabView {
                 panel (constraints : BorderLayout.SOUTH) {
                     label(text : "Group by")
                     buttonGroup(id : "groupBy")
-                    radioButton(text : "Sender", selected : true, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
-                    radioButton(text : "File", selected : false, buttonGroup : groupBy, actionPerformed: showFileGrouping)
+                    radioButton(text : "Sender", selected : bind  {!model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
+                    radioButton(text : "File", selected : bind {model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showFileGrouping)
                 }
             }
 
@@ -344,6 +347,14 @@ class SearchTabView {
             sendersTable2.model.fireTableDataChanged()
         })
         
+        resultsTable2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && e.button == MouseEvent.BUTTON1)
+                    mvcGroup.controller.download()
+            }
+        })
+        
         // TODO: add download right-click action
         
         // senders table 2
@@ -358,15 +369,19 @@ class SearchTabView {
                 model.browseActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.trustButtonsEnabled = false
+                model.viewCommentActionEnabled = false
                 return
             }
             model.browseActionEnabled = model.senders2[row].browse
             model.trustButtonsEnabled = true
+            model.viewCommentActionEnabled = model.senders2[row].comment != null
             model.viewCertificatesActionEnabled = model.senders2[row].certificates > 0
         })
        
-           
-        showSenderGrouping.call()     
+        if (settings.groupByFile)
+            showFileGrouping.call()
+        else
+            showSenderGrouping.call()
     }
 
     def closeTab = {

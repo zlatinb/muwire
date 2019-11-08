@@ -200,10 +200,16 @@ class OptionsView {
             panel (border : titledBorder(title : "Search Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
-                label(text : "Remember search history", constraints: gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : "By default, group search results by", constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                panel(constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END)) {
+                    buttonGroup(id : "groupBy")
+                    radioButton(text : "Sender", selected : bind {!model.groupByFile}, buttonGroup : groupBy, groupBySenderAction)
+                    radioButton(text : "File", selected : bind {model.groupByFile}, buttonGroup : groupBy, groupByFileAction)
+                }
+                label(text : "Remember search history", constraints: gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 storeSearchHistoryCheckbox = checkBox(selected : bind {model.storeSearchHistory},
-                constraints : gbc(gridx : 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                button(text : "Clear history", constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END), clearHistoryAction)
+                constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                button(text : "Clear history", constraints : gbc(gridx : 1, gridy : 2, anchor : GridBagConstraints.LINE_END), clearHistoryAction)
                 
             }
             panel (border : titledBorder(title : "Other Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),

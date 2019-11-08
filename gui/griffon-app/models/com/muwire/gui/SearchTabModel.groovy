@@ -76,8 +76,13 @@ class SearchTabModel {
                 sourcesBucket.put(e.infohash, sourceBucket)
             }
             sourceBucket.addAll(e.sources)
+            
+            results2.clear()
+            results2.addAll(hashBucket.keySet())
 
             JTable table = builder.getVariable("senders-table")
+            table.model.fireTableDataChanged()
+            table = builder.getVariable("results-table2")
             table.model.fireTableDataChanged()
         }
     }

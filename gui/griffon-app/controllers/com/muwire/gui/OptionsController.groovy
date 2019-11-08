@@ -155,6 +155,8 @@ class OptionsController {
         uiSettings.autoFontSize = model.automaticFontSize
         uiSettings.fontSize = Integer.parseInt(view.fontSizeField.text)
 
+        uiSettings.groupByFile = model.groupByFile
+        
         boolean clearCancelledDownloads = view.clearCancelledDownloadsCheckbox.model.isSelected()
         model.clearCancelledDownloads = clearCancelledDownloads
         uiSettings.clearCancelledDownloads = clearCancelledDownloads
@@ -240,6 +242,16 @@ class OptionsController {
     void minimizeOnClose() {
         model.exitOnClose = false
         model.closeDecisionMade = true
+    }
+    
+    @ControllerAction
+    void groupByFile() {
+        model.groupByFile = true
+    }
+    
+    @ControllerAction
+    void groupBySender() {
+        model.groupByFile = false
     }
     
     @ControllerAction

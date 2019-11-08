@@ -90,6 +90,7 @@ class MainFrameController {
         params["search-terms"] = search
         params["uuid"] = uuid.toString()
         params["core"] = core
+        params["settings"] = view.settings
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
