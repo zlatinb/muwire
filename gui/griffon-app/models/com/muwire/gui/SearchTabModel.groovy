@@ -35,6 +35,9 @@ class SearchTabModel {
     def sourcesBucket = [:]
     def sendersBucket = new LinkedHashMap<>()
     
+    def results2 = []
+    def senders2 = []
+    
 
     void mvcGroupInit(Map<String, String> args) {
         core = mvcGroup.parentGroup.model.core
@@ -108,8 +111,13 @@ class SearchTabModel {
 
                 bucket << it
                 senderBucket << it
+                
+                results2.clear()
+                results2.addAll(hashBucket.keySet())
             }
             JTable table = builder.getVariable("senders-table")
+            table.model.fireTableDataChanged()
+            table = builder.getVariable("results-table2")
             table.model.fireTableDataChanged()
         }
     }

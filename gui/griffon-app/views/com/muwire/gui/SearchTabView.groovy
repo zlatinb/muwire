@@ -17,6 +17,7 @@ import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
+import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.util.DataUtil
@@ -42,19 +43,20 @@ class SearchTabView {
     def pane
     def parent
     def searchTerms
-    def sendersTable
+    def sendersTable, sendersTable2
     def lastSendersSortEvent
-    def resultsTable
+    def resultsTable, resultsTable2
     def lastSortEvent
+    def lastResults2SortEvent, lastSenders2SortEvent
     def sequentialDownloadCheckbox
     def sequentialDownloadCheckbox2
 
     void initUI() {
         int rowHeight = application.context.get("row-height")
         builder.with {
-            def resultsTable
-            def sendersTable
-            def sequentialDownloadCheckbox
+            def resultsTable, resultsTable2
+            def sendersTable, sendersTable2
+            def sequentialDownloadCheckbox, sequentialDownloadCheckbox2
             def pane = panel {
                 borderLayout()
                 panel (id : "results-panel", constraints : BorderLayout.CENTER) {
@@ -121,7 +123,37 @@ class SearchTabView {
                             panel {
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    
+                                    resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                        tableModel(list : model.results2) {
+                                            closureColumn(header : "Name", preferredWidth : 350, type : String, read : {
+                                                model.hashBucket[it].first().name.replace('<', '_')
+                                            })
+                                            closureColumn(header : "Size", preferredWidth : 20, type : Long, read : {
+                                                model.hashBucket[it].first().size
+                                            })
+                                            closureColumn(header : "Direct Sources", preferredWidth : 20, type : Integer, read : {
+                                                model.hashBucket[it].size()
+                                            })
+                                            closureColumn(header : "Possible Sources", preferredWidth : 20, type : Integer , read : {
+                                                model.sourcesBucket[it].size()
+                                            })
+                                            closureColumn(header : "Comments", preferredWidth : 20, type : Integer, read : {
+                                                int count = 0
+                                                model.hashBucket[it].each { 
+                                                    if (it.comment != null)
+                                                        count++
+                                                }
+                                                count
+                                            })
+                                            closureColumn(header : "Certificates", preferredWidth : 20, type : Integer, read : {
+                                                int count = 0
+                                                model.hashBucket[it].each { 
+                                                    count += it.certificates
+                                                }
+                                                count
+                                            })
+                                        }
+                                    }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows :1, cols : 3)
@@ -139,7 +171,16 @@ class SearchTabView {
                             panel {
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    
+                                    sendersTable2 = table(id : "senders-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                        tableModel(list : model.senders2) {
+                                            closureColumn(header : "Sender", preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
+                                            closureColumn(header : "Browse", preferredWidth : 20, type : Boolean, read : {it.browse})
+                                            closureColumn(header : "Certificates", preferredWidth : 20, type: Integer, read : {it.certificates})
+                                            closureColumn(header : "Trust", preferredWidth : 50, type : String, read : {
+                                                model.core.trustService.getLevel(it.sender.destination).toString()
+                                            })
+                                        }
+                                    }
                                 } 
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows : 1, cols : 2)
@@ -172,7 +213,10 @@ class SearchTabView {
 
             this.resultsTable = resultsTable
             this.sendersTable = sendersTable
+            this.resultsTable2 = resultsTable2
+            this.sendersTable2 = sendersTable2
             this.sequentialDownloadCheckbox = sequentialDownloadCheckbox
+            this.sequentialDownloadCheckbox2 = sequentialDownloadCheckbox2
 
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -277,6 +321,50 @@ class SearchTabView {
                 resultsTable.model.fireTableDataChanged()
             }
         })
+        
+        // results table 2
+        resultsTable2.setDefaultRenderer(Integer.class,centerRenderer)
+        resultsTable2.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+        resultsTable2.rowSorter.addRowSorterListener({evt -> lastResults2SortEvent = evt})
+        resultsTable2.rowSorter.setSortsOnUpdates(true)
+        selectionModel = resultsTable2.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            UIResultEvent e = getSelectedResult()
+            if (e == null) {
+                model.trustButtonsEnabled = false
+                model.browseActionEnabled = false
+                model.viewCertificatesActionEnabled = false
+                return
+            }
+            model.downloadActionEnabled = true
+            def results = model.hashBucket[e.infohash]
+            model.senders2.clear()
+            model.senders2.addAll(results)
+            sendersTable2.model.fireTableDataChanged()
+        })
+        
+        // TODO: add download right-click action
+        
+        // senders table 2
+        sendersTable2.setDefaultRenderer(Integer.class, centerRenderer)
+        sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
+        sendersTable2.rowSorter.setSortsOnUpdates(true)
+        selectionModel = sendersTable2.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int row = selectedSenderRow()
+            if (row < 0) {
+                model.browseActionEnabled = false
+                model.viewCertificatesActionEnabled = false
+                model.trustButtonsEnabled = false
+                return
+            }
+            model.browseActionEnabled = model.senders2[row].browse
+            model.trustButtonsEnabled = true
+            model.viewCertificatesActionEnabled = model.senders2[row].certificates > 0
+        })
+       
            
         showSenderGrouping.call()     
     }
@@ -325,14 +413,24 @@ class SearchTabView {
             menu.show(e.getComponent(), e.getX(), e.getY())
     }
     
-    private UIResultEvent getSelectedResult() {
-        int[] selectedRows = resultsTable.getSelectedRows()
-        if (selectedRows.length != 1)
-            return null
-        int selected = selectedRows[0]
-        if (lastSortEvent != null)
-            selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
-        model.results[selected]
+    UIResultEvent getSelectedResult() {
+        if (model.groupedByFile) {
+            int selectedRow = resultsTable2.getSelectedRow()
+            if (selectedRow < 0)
+                return null
+            if (lastResults2SortEvent != null)
+                selectedRow = resultsTable2.rowSorter.convertRowIndexToModel(selectedRow)
+            InfoHash infohash = model.results2[selectedRow]
+            return model.hashBucket[infohash].first()
+        } else {
+            int[] selectedRows = resultsTable.getSelectedRows()
+            if (selectedRows.length != 1)
+                return null
+            int selected = selectedRows[0]
+            if (lastSortEvent != null)
+                selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
+            return model.results[selected]
+        }
     }
 
     def copyHashToClipboard() {
@@ -355,12 +453,31 @@ class SearchTabView {
     }
     
     int selectedSenderRow() {
-        int row = sendersTable.getSelectedRow()
+        if (model.groupedByFile) {
+            int row = sendersTable2.getSelectedRow()
+            if (row < 0)
+                return row
+            if (lastSenders2SortEvent != null) 
+                row = sendersTable2.rowSorter.convertRowIndexToModel(row)
+            return row
+        } else {
+            int row = sendersTable.getSelectedRow()
+            if (row < 0)
+                return -1
+            if (lastSendersSortEvent != null)
+                row = sendersTable.rowSorter.convertRowIndexToModel(row)
+            return row
+        }
+    }
+    
+    Persona selectedSender() {
+        int row = selectedSenderRow()
         if (row < 0)
-            return -1
-        if (lastSendersSortEvent != null)
-            row = sendersTable.rowSorter.convertRowIndexToModel(row)
-        row
+            return null
+        if (model.groupedByFile)
+            return model.senders2[row].sender
+        else
+            return model.senders[row]
     }
     
     def showSenderGrouping = {
@@ -373,5 +490,12 @@ class SearchTabView {
         model.groupedByFile = true
         def cardsPanel = builder.getVariable("results-panel")
         cardsPanel.getLayout().show(cardsPanel, "grouped-by-file")
+    }
+    
+    boolean sequentialDownload() {
+        if (model.groupedByFile)
+            return sequentialDownloadCheckbox2.model.isSelected()
+        else
+            return sequentialDownloadCheckbox.model.isSelected()
     }
 }
