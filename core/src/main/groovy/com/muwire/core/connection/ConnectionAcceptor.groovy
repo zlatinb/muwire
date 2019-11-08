@@ -391,21 +391,21 @@ class ConnectionAcceptor {
             }
 
             os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-            List<Persona> good = new ArrayList<>(trustService.good.values())
+            List<TrustService.TrustEntry> good = new ArrayList<>(trustService.good.values())
             int size = Math.min(Short.MAX_VALUE * 2, good.size())
             good = good.subList(0, size)
             DataOutputStream dos = new DataOutputStream(os)
             dos.writeShort(size)
             good.each {
-                it.write(dos)
+                it.persona.write(dos)
             }
 
-            List<Persona> bad = new ArrayList<>(trustService.bad.values())
+            List<TrustService.TrustEntry> bad = new ArrayList<>(trustService.bad.values())
             size = Math.min(Short.MAX_VALUE * 2, bad.size())
             bad = bad.subList(0, size)
             dos.writeShort(size)
             bad.each {
-                it.write(dos)
+                it.persona.write(dos)
             }
 
             dos.flush()
