@@ -47,6 +47,7 @@ class SearchTabView {
     def resultsTable
     def lastSortEvent
     def sequentialDownloadCheckbox
+    def sequentialDownloadCheckbox2
 
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -55,59 +56,113 @@ class SearchTabView {
             def sendersTable
             def sequentialDownloadCheckbox
             def pane = panel {
-                gridLayout(rows :1, cols : 1)
-                splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
-                    panel {
-                        borderLayout()
-                        scrollPane (constraints : BorderLayout.CENTER) {
-                            sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                tableModel(list : model.senders) {
-                                    closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
-                                    closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
-                                    closureColumn(header : "Browse", preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
-                                    closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
-                                        model.core.trustService.getLevel(row.destination).toString()
-                                    })
+                borderLayout()
+                panel (id : "results-panel", constraints : BorderLayout.CENTER) {
+                    cardLayout()
+                    panel (constraints : "grouped-by-sender"){
+                        gridLayout(rows :1, cols : 1)
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                            panel {
+                                borderLayout()
+                                scrollPane (constraints : BorderLayout.CENTER) {
+                                    sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                        tableModel(list : model.senders) {
+                                            closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
+                                            closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                            closureColumn(header : "Browse", preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
+                                            closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
+                                                model.core.trustService.getLevel(row.destination).toString()
+                                            })
+                                        }
+                                    }
+                                }
+                                panel(constraints : BorderLayout.SOUTH) {
+                                    gridLayout(rows: 1, cols : 2)
+                                    panel (border : etchedBorder()){
+                                        button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
+                                    }
+                                    panel (border : etchedBorder()){
+                                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                    }
+                                }
+                            }
+                            panel {
+                                borderLayout()
+                                scrollPane (constraints : BorderLayout.CENTER) {
+                                    resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                        tableModel(list: model.results) {
+                                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                                            closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
+                                            closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                                            closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                                            closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
+                                            closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                                        }
+                                    }
+                                }
+                                panel(constraints : BorderLayout.SOUTH) {
+                                    gridBagLayout()
+                                    label(text : "", constraints : gbc(gridx : 0, gridy: 0, weightx : 100))
+                                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
+                                    button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
+                                    button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
+                                    label(text : "Download sequentially", constraints : gbc(gridx: 4, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
+                                    sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 5, gridy: 0, anchor : GridBagConstraints.LINE_END),
+                                    selected : false, enabled : bind {model.downloadActionEnabled})
                                 }
                             }
                         }
-                        panel(constraints : BorderLayout.SOUTH) {
-                            gridLayout(rows: 1, cols : 2)
-                            panel (border : etchedBorder()){
-                                button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
-                            }
-                            panel (border : etchedBorder()){
-                                button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
-                                button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
-                            }
-                        }
                     }
-                    panel {
-                        borderLayout()
-                        scrollPane (constraints : BorderLayout.CENTER) {
-                            resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                tableModel(list: model.results) {
-                                    closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                                    closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                                    closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                                    closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                                    closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
-                                    closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                    panel (constraints : "grouped-by-file") {
+                        gridLayout(rows : 1, cols : 1)
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                            panel {
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    
+                                }
+                                panel (constraints : BorderLayout.SOUTH) {
+                                    gridLayout(rows :1, cols : 3)
+                                    panel {}
+                                    panel {
+                                        button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                    }
+                                    panel {
+                                        gridBagLayout()
+                                        label(text : "Download sequentially", constraints : gbc(gridx : 0, gridy : 0, weightx : 100, anchor : GridBagConstraints.LINE_END))
+                                        sequentialDownloadCheckbox2 = checkBox( constraints : gbc(gridx: 1, gridy:0, weightx: 0, anchor : GridBagConstraints.LINE_END))
+                                    }
+                                }
+                            }
+                            panel {
+                                borderLayout()
+                                scrollPane(constraints : BorderLayout.CENTER) {
+                                    
+                                } 
+                                panel (constraints : BorderLayout.SOUTH) {
+                                    gridLayout(rows : 1, cols : 2)
+                                    panel (border : etchedBorder()) {
+                                        button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
+                                        button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                                    }
+                                    panel (border : etchedBorder()) {
+                                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                    }
                                 }
                             }
                         }
-                        panel(constraints : BorderLayout.SOUTH) {
-                            gridBagLayout()
-                            label(text : "", constraints : gbc(gridx : 0, gridy: 0, weightx : 100))
-                            button(text : "Download", enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
-                            button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
-                            button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
-                            label(text : "Download sequentially", constraints : gbc(gridx: 4, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
-                            sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 5, gridy: 0, anchor : GridBagConstraints.LINE_END),
-                                selected : false, enabled : bind {model.downloadActionEnabled})
-                        }
                     }
+                }
+                panel (constraints : BorderLayout.SOUTH) {
+                    label(text : "Group by")
+                    buttonGroup(id : "groupBy")
+                    radioButton(text : "Sender", selected : true, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
+                    radioButton(text : "File", selected : false, buttonGroup : groupBy, actionPerformed: showFileGrouping)
                 }
             }
 
@@ -222,7 +277,8 @@ class SearchTabView {
                 resultsTable.model.fireTableDataChanged()
             }
         })
-                
+           
+        showSenderGrouping.call()     
     }
 
     def closeTab = {
@@ -305,5 +361,17 @@ class SearchTabView {
         if (lastSendersSortEvent != null)
             row = sendersTable.rowSorter.convertRowIndexToModel(row)
         row
+    }
+    
+    def showSenderGrouping = {
+        model.groupedByFile = false  
+        def cardsPanel = builder.getVariable("results-panel")
+        cardsPanel.getLayout().show(cardsPanel, "grouped-by-sender")  
+    }
+    
+    def showFileGrouping = {
+        model.groupedByFile = true
+        def cardsPanel = builder.getVariable("results-panel")
+        cardsPanel.getLayout().show(cardsPanel, "grouped-by-file")
     }
 }

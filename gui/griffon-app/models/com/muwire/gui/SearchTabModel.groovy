@@ -24,6 +24,7 @@ class SearchTabModel {
     @Observable boolean browseActionEnabled
     @Observable boolean viewCommentActionEnabled
     @Observable boolean viewCertificatesActionEnabled
+    @Observable boolean groupedByFile
 
     Core core
     UISettings uiSettings
