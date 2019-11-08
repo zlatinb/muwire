@@ -109,6 +109,10 @@ public class SharedFile {
         return downloaders;
     }
     
+    public Set<SearchEntry> getSearches() {
+        return searches;
+    }
+    
     public void addDownloader(String name) {
         downloaders.add(name);
     }

@@ -19,8 +19,8 @@ class SharedFileModel {
     @Observable boolean showCommentActionEnabled
     
     public void mvcGroupInit(Map<String,String> args) {
-        searchers.addAll(sf.searches)
-        downloaders.addAll(sf.downloaders)
-        certificates.addAll(core.certificateManager.byInfoHash.get(sf.infoHash))
+        searchers.addAll(sf.getSearches())
+        downloaders.addAll(sf.getDownloaders())
+        certificates.addAll(core.certificateManager.byInfoHash.getOrDefault(sf.infoHash,[]))
     }
 }
