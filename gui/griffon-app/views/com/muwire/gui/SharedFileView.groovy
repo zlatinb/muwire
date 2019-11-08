@@ -34,6 +34,7 @@ class SharedFileView {
     def dialog
     def panel
     def searchersPanel
+    def searchersTable
     def downloadersPanel
     def certificatesTable
     def certificatesPanel
@@ -48,14 +49,11 @@ class SharedFileView {
         searchersPanel = builder.panel {
             borderLayout()
             scrollPane(constraints : BorderLayout.CENTER) {
-                table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                searchersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.searchers) {
                         closureColumn(header : "Searcher", type : String, read : {it.searcher?.getHumanReadableName()})
                         closureColumn(header : "Query", type : String, read : {it.query})
-                        closureColumn(header : "Timestamp", type : String, read : {
-                            Date d = new Date(it.timestamp)
-                            d.toString()
-                        })
+                        closureColumn(header : "Timestamp", type : Long, read : {it.timestamp})
                     }
                 }
             }
@@ -80,10 +78,7 @@ class SharedFileView {
                         closureColumn(header : "Issuer", type:String, read : {it.issuer.getHumanReadableName()})
                         closureColumn(header : "File Name", type : String, read : {it.name.name})
                         closureColumn(header : "Comment", type : Boolean, read : {it.comment != null})
-                        closureColumn(header :  "Timestamp", type : String, read : {
-                            Date d = new Date(it.timestamp)
-                            d.toString()
-                        })
+                        closureColumn(header :  "Timestamp", type : Long, read : {it.timestamp})
                     }
                 }
             }
@@ -113,6 +108,11 @@ class SharedFileView {
                     showMenu(e)
             }
         })
+        
+        certificatesTable.setDefaultRenderer(Long.class, new DateRenderer())
+        
+        
+        searchersTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         def tabbedPane = new JTabbedPane()
         tabbedPane.addTab("Search Hits", searchersPanel)

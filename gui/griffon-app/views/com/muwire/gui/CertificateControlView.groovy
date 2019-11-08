@@ -65,10 +65,7 @@ class CertificateControlView {
                             closureColumn(header : "File Name", type : String, read : {it.name.name})
                             closureColumn(header : "Hash", type : String, read : {Base64.encode(it.infoHash.getRoot())})
                             closureColumn(header : "Comment", preferredWidth : 20, type : Boolean, read : {it.comment != null})
-                            closureColumn(header : "Timestamp", type : String, read : {
-                                def date = new Date(it.timestamp)
-                                date.toString()
-                            })
+                            closureColumn(header : "Timestamp", type : Long, read : { it.timestamp })
                         }
                     }
                 }
@@ -112,6 +109,8 @@ class CertificateControlView {
                     showMenu(e)
             }
         })
+        
+        certsTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         dialog.getContentPane().add(panel)
         dialog.pack()
