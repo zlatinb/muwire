@@ -221,7 +221,7 @@ class OptionsView {
                 label(text : "Exclude local files from results", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
-                label(text : "Automatically Clear finished uploads", constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
+                label(text : "Automatically clear finished uploads", constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 clearUploadsCheckbox = checkBox(selected : bind {model.clearUploads},
                 constraints : gbc(gridx:1, gridy: 4, anchor:GridBagConstraints.LINE_END))
                 label(text : "When closing MuWire", constraints : gbc(gridx: 0, gridy : 5, anchor : GridBagConstraints.LINE_START, weightx: 100))
