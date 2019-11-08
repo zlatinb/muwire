@@ -160,8 +160,9 @@ class MainFrameController {
         int selected = builder.getVariable("searches-table").getSelectedRow()
         if (selected < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.searches[selected].originator
-        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.TRUSTED) )
+        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason) )
     }
 
     @ControllerAction
@@ -169,8 +170,9 @@ class MainFrameController {
         int selected = builder.getVariable("searches-table").getSelectedRow()
         if (selected < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.searches[selected].originator
-        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED) )
+        core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason) )
     }
 
     @ControllerAction
@@ -217,7 +219,7 @@ class MainFrameController {
         if (row < 0)
             return
         builder.getVariable(tableName).model.fireTableDataChanged()
-        core.eventBus.publish(new TrustEvent(persona : list[row], level : level))
+        core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level))
     }
 
     @ControllerAction

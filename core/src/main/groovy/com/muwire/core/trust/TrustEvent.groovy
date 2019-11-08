@@ -7,4 +7,5 @@ class TrustEvent extends Event {
 
     Persona persona
     TrustLevel level
+    String reason
 }

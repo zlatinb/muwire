@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
 import com.muwire.core.Core
 import com.muwire.core.Persona
@@ -67,8 +68,9 @@ class SearchTabController {
             int row = view.selectedSenderRow()
             if (row < 0)
                 return
+            String reason = JOptionPane.showInputDialog("Enter reason (optional)")
             def sender = model.senders[row]
-            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED))
+            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED, reason : reason))
         }
 
         @ControllerAction
@@ -76,8 +78,9 @@ class SearchTabController {
             int row = view.selectedSenderRow()
             if (row < 0)
                 return
+            String reason = JOptionPane.showInputDialog("Enter reason (optional)")
             def sender = model.senders[row]
-            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED))
+            core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED, reason : reason))
         }
 
         @ControllerAction

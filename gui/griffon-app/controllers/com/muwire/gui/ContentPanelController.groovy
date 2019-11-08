@@ -5,6 +5,7 @@ import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
 import com.muwire.core.Core
 import com.muwire.core.EventBus
@@ -83,8 +84,9 @@ class ContentPanelController {
         int selectedHit = view.getSelectedHit()
         if (selectedHit < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Match m = model.hits[selectedHit]
-        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.TRUSTED))
+        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.TRUSTED, reason : reason))
     }
     
     @ControllerAction
@@ -92,8 +94,9 @@ class ContentPanelController {
         int selectedHit = view.getSelectedHit()
         if (selectedHit < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Match m = model.hits[selectedHit]
-        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.DISTRUSTED))
+        core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.DISTRUSTED, reason : reason))
     }
     
     void saveMuWireSettings() {

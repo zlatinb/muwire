@@ -422,7 +422,8 @@ class MainFrameView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.trusted) {
-                                            closureColumn(header : "Trusted Users", type : String, read : { it.getHumanReadableName() } )
+                                            closureColumn(header : "Trusted Users", type : String, read : { it.persona.getHumanReadableName() } )
+                                            closureColumn(header : "Reason", type : String, read : {it.reason})
                                         }
                                     }
                                 }
@@ -438,7 +439,8 @@ class MainFrameView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.distrusted) {
-                                            closureColumn(header: "Distrusted Users", type : String, read : { it.getHumanReadableName() } )
+                                            closureColumn(header: "Distrusted Users", type : String, read : { it.persona.getHumanReadableName() } )
+                                            closureColumn(header: "Reason", type : String, read : {it.reason})
                                         }
                                     }
                                 }
