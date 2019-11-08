@@ -123,7 +123,9 @@ class SearchTabModel {
             JTable table = builder.getVariable("senders-table")
             table.model.fireTableDataChanged()
             table = builder.getVariable("results-table2")
+            int selectedRow = table.getSelectedRow() 
             table.model.fireTableDataChanged()
+            table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
         }
     }
 }
