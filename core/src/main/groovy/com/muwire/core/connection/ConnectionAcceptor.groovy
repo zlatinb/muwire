@@ -159,7 +159,9 @@ class ConnectionAcceptor {
             }
         } catch (Exception ex) {
             log.log(Level.WARNING, "incoming connection failed",ex)
-            e.getOutputStream().close()
+            try {
+                e.getOutputStream().close()
+            } catch (Exception ignore) {}
             e.close()
             eventBus.publish new ConnectionEvent(endpoint: e, incoming: true, leaf: null, status: ConnectionAttemptStatus.FAILED)
         }
@@ -208,7 +210,9 @@ class ConnectionAcceptor {
                 os.writeShort(json.bytes.length)
                 os.write(json.bytes)
             }
-            e.outputStream.close()
+            try {
+                e.outputStream.close()
+            } catch (Exception ignored) {}
             e.close()
             eventBus.publish(new ConnectionEvent(endpoint: e, incoming: true, leaf: leaf, status: ConnectionAttemptStatus.REJECTED))
         }
