@@ -5,10 +5,17 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JTabbedPane
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 
+import com.muwire.core.filecert.Certificate
+
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -20,6 +27,8 @@ class SharedFileView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     SharedFileModel model
+    @MVCMember @Nonnull
+    SharedFileController controller
 
     def mainFrame
     def dialog
@@ -28,6 +37,7 @@ class SharedFileView {
     def downloadersPanel
     def certificatesTable
     def certificatesPanel
+    def lastCertificateSortEvent
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -77,10 +87,33 @@ class SharedFileView {
                     }
                 }
             }
+            panel(constraints : BorderLayout.SOUTH) {
+                button(text : "Show Comment", enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+            }
         }
     }
     
     void mvcGroupInit(Map<String,String> args) {
+
+        certificatesTable.rowSorter.addRowSorterListener({evt -> lastCertificateSortEvent = evt})
+        def selectionModel = certificatesTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            Certificate c = getSelectedCertificate()
+            model.showCommentActionEnabled = c != null && c.comment != null
+        })
+        
+        certificatesTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
+        })
+        
         def tabbedPane = new JTabbedPane()
         tabbedPane.addTab("Search Hits", searchersPanel)
         tabbedPane.addTab("Downloaders", downloadersPanel)
@@ -98,5 +131,24 @@ class SharedFileView {
             })
             show()
         }
+    }
+    
+    Certificate getSelectedCertificate() {
+        int selectedRow = certificatesTable.getSelectedRow()
+        if (selectedRow < 0)
+            return null
+        if (lastCertificateSortEvent != null) 
+            selectedRow = certificatesTable.rowSorter.convertRowIndexToModel(selectedRow)
+        model.certificates[selectedRow]
+    }
+    
+    private void showMenu(MouseEvent e) {
+        if (!model.showCommentActionEnabled)
+            return
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem showComment = new JMenuItem("Show Comment")
+        showComment.addActionListener({controller.showComment()})
+        menu.add(showComment)
+        menu.show(e.getComponent(), e.getX(), e.getY())
     }
 }

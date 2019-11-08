@@ -16,6 +16,8 @@ class SharedFileModel {
     def downloaders = []
     def certificates = []
     
+    @Observable boolean showCommentActionEnabled
+    
     public void mvcGroupInit(Map<String,String> args) {
         searchers.addAll(sf.searches)
         downloaders.addAll(sf.downloaders)
