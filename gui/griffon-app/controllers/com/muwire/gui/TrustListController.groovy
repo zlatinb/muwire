@@ -5,6 +5,7 @@ import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
@@ -25,8 +26,9 @@ class TrustListController {
         int selectedRow = view.getSelectedRow("trusted-table")
         if (selectedRow < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.trusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
+        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
         view.fireUpdate("trusted-table")
     }
 
@@ -35,8 +37,9 @@ class TrustListController {
         int selectedRow = view.getSelectedRow("distrusted-table")
         if (selectedRow < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.distrusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED))
+        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
         view.fireUpdate("distrusted-table")
     }
 
@@ -45,8 +48,9 @@ class TrustListController {
         int selectedRow = view.getSelectedRow("trusted-table")
         if (selectedRow < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.trusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED))
+        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
         view.fireUpdate("trusted-table")
     }
 
@@ -55,8 +59,9 @@ class TrustListController {
         int selectedRow = view.getSelectedRow("distrusted-table")
         if (selectedRow < 0)
             return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         Persona p = model.distrusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED))
+        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
         view.fireUpdate("distrusted-table")
     }
 }
