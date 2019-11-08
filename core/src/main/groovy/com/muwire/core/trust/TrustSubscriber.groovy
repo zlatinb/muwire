@@ -12,9 +12,12 @@ import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.trust.TrustService.TrustEntry
 import com.muwire.core.util.DataUtil
 
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 
 @Log
@@ -109,7 +112,9 @@ class TrustSubscriber {
             endpoint = i2pConnector.connect(trustList.persona.destination)
             OutputStream os = endpoint.getOutputStream()
             InputStream is = endpoint.getInputStream()
-            os.write("TRUST\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("TRUST\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Json:true\r\n")
+            os.write("\r\n")
             os.flush()
 
             String codeString = DataUtil.readTillRN(is)
@@ -123,24 +128,47 @@ class TrustSubscriber {
                 return false
             }
 
-            // swallow any headers
-            String header
-            while (( header = DataUtil.readTillRN(is)) != "");
-
+            Map<String,String> headers = DataUtil.readAllHeaders(is)
             DataInputStream dis = new DataInputStream(is)
+            Set<TrustService.TrustEntry> good = new HashSet<>()
+            Set<TrustService.TrustEntry> bad = new HashSet<>()
+            
+            if (headers.containsKey('Json') && Boolean.parseBoolean(headers['Json'])) {
+                int countGood = Integer.parseInt(headers['Good'])
+                int countBad = Integer.parseInt(headers['Bad'])
+                
+                JsonSlurper slurper = new JsonSlurper()
+                
+                for (int i = 0; i < countGood; i++) {
+                    int length = dis.readUnsignedShort()
+                    byte []payload = new byte[length]
+                    dis.readFully(payload)
+                    def json = slurper.parse(payload)
+                    Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(json.persona)))
+                    good.add(new TrustEntry(persona, json.reason))
+                }
+                
+                for (int i = 0; i < countBad; i++) {
+                    int length = dis.readUnsignedShort()
+                    byte []payload = new byte[length]
+                    dis.readFully(payload)
+                    def json = slurper.parse(payload)
+                    Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(json.persona)))
+                    bad.add(new TrustEntry(persona, json.reason))
+                }
+                
+            } else {
+                int nGood = dis.readUnsignedShort()
+                for (int i = 0; i < nGood; i++) {
+                    Persona p = new Persona(dis)
+                    good.add(p)
+                }
 
-            Set<Persona> good = new HashSet<>()
-            int nGood = dis.readUnsignedShort()
-            for (int i = 0; i < nGood; i++) {
-                Persona p = new Persona(dis)
-                good.add(p)
-            }
-
-            Set<Persona> bad = new HashSet<>()
-            int nBad = dis.readUnsignedShort()
-            for (int i = 0; i < nBad; i++) {
-                Persona p = new Persona(dis)
-                bad.add(p)
+                int nBad = dis.readUnsignedShort()
+                for (int i = 0; i < nBad; i++) {
+                    Persona p = new Persona(dis)
+                    bad.add(p)
+                }
             }
 
             trustList.timestamp = now

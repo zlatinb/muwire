@@ -49,8 +49,9 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER){
                         table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
-                                closureColumn(header: "Trusted Users", type : String, read : {it.getHumanReadableName()})
-                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.destination).toString()})
+                                closureColumn(header: "Trusted Users", type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: "Reason", type : String, read : {it.reason})
+                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
                             }
                         }
                     }
@@ -65,8 +66,9 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER ){
                         table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
-                                closureColumn(header: "Distrusted Users", type : String, read : {it.getHumanReadableName()})
-                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.destination).toString()})
+                                closureColumn(header: "Distrusted Users", type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: "Reason", type:String, read : {it.reason})
+                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
                             }
                         }
                     }

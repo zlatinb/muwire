@@ -136,5 +136,16 @@ class TrustService extends Service {
             this.persona = persona
             this.reason = reason
         }
+        
+        public int hashCode() {
+            persona.hashCode()
+        }
+        
+        public boolean equals(Object o) {
+            if (!(o instanceof TrustEntry))
+                return false
+            persona == o.persona
+        }
     }
+    
 }

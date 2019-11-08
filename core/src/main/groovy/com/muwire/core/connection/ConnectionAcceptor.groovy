@@ -379,10 +379,10 @@ class ConnectionAcceptor {
             dis.readFully(RUST)
             if (RUST != "RUST\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new IOException("Invalid TRUST connection")
-            String header
-            while ((header = DataUtil.readTillRN(dis)) != ""); // ignore headers for now
-
-                OutputStream os = e.getOutputStream()
+            
+            Map<String,String> headers = DataUtil.readAllHeaders(dis)
+            
+            OutputStream os = e.getOutputStream()
             if (!settings.allowTrustLists) {
                 os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.flush()
@@ -390,22 +390,53 @@ class ConnectionAcceptor {
                 return
             }
 
-            os.write("200 OK\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            boolean json = headers.containsKey('Json') && Boolean.parseBoolean(headers['Json'])
+            
             List<TrustService.TrustEntry> good = new ArrayList<>(trustService.good.values())
-            int size = Math.min(Short.MAX_VALUE * 2, good.size())
-            good = good.subList(0, size)
-            DataOutputStream dos = new DataOutputStream(os)
-            dos.writeShort(size)
-            good.each {
-                it.persona.write(dos)
-            }
-
             List<TrustService.TrustEntry> bad = new ArrayList<>(trustService.bad.values())
-            size = Math.min(Short.MAX_VALUE * 2, bad.size())
-            bad = bad.subList(0, size)
-            dos.writeShort(size)
-            bad.each {
-                it.persona.write(dos)
+            DataOutputStream dos = new DataOutputStream(os)
+
+            if (!json) {
+                os.write("\r\n")
+                int size = Math.min(Short.MAX_VALUE * 2, good.size())
+                good = good.subList(0, size)
+                dos.writeShort(size)
+                good.each {
+                    it.persona.write(dos)
+                }
+
+                size = Math.min(Short.MAX_VALUE * 2, bad.size())
+                bad = bad.subList(0, size)
+                dos.writeShort(size)
+                bad.each {
+                    it.persona.write(dos)
+                }
+            } else {
+                dos.write("Json: true\r\n")
+                dos.write("Good:${good.size()}\r\n")
+                dos.write("Bad:${bad.size()}\r\n")
+                dos.write("\r\n")
+                
+                good.each { 
+                    def obj = [:]
+                    obj.persona = it.persona.toBase64()
+                    obj.reason = it.reason
+                    String toJson = JsonOutput.toJson(obj)
+                    byte [] payload = toJson.getBytes(StandardCharsets.US_ASCII)
+                    dos.writeShort(payload.length)
+                    dos.write(payload)   
+                }
+                bad.each {
+                    def obj = [:]
+                    obj.persona = it.persona.toBase64()
+                    obj.reason = it.reason
+                    String toJson = JsonOutput.toJson(obj)
+                    byte [] payload = toJson.getBytes(StandardCharsets.US_ASCII)
+                    dos.writeShort(payload.length)
+                    dos.write(payload)
+                }
             }
 
             dos.flush()

@@ -27,7 +27,7 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.trusted[selectedRow]
+        Persona p = model.trusted[selectedRow].persona
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
         view.fireUpdate("trusted-table")
     }
@@ -38,7 +38,7 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.distrusted[selectedRow]
+        Persona p = model.distrusted[selectedRow].persona
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
         view.fireUpdate("distrusted-table")
     }
@@ -49,7 +49,7 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.trusted[selectedRow]
+        Persona p = model.trusted[selectedRow].persona
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
         view.fireUpdate("trusted-table")
     }
@@ -60,7 +60,7 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.distrusted[selectedRow]
+        Persona p = model.distrusted[selectedRow].persona
         eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
         view.fireUpdate("distrusted-table")
     }
