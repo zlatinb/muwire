@@ -40,7 +40,7 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.searchers) {
-                        closureColumn(header : "Searcher", type : String, read : {it.searcher.getHumanReadableName()})
+                        closureColumn(header : "Searcher", type : String, read : {it.searcher?.getHumanReadableName()})
                         closureColumn(header : "Query", type : String, read : {it.query})
                         closureColumn(header : "Timestamp", type : String, read : {
                             Date d = new Date(it.timestamp)
