@@ -15,7 +15,11 @@ class DateRenderer extends DefaultTableCellRenderer {
     JComponent getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
         Long l = (Long) value
-        String formatted = DataHelper.formatTime(l)
+        String formatted
+        if (l == 0)
+            formatted = "Never"
+        else
+            formatted = DataHelper.formatTime(l)
         setText(formatted)
         if (isSelected) {
             setForeground(table.getSelectionForeground())
