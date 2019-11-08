@@ -399,7 +399,7 @@ class ConnectionAcceptor {
             DataOutputStream dos = new DataOutputStream(os)
 
             if (!json) {
-                os.write("\r\n")
+                os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                 int size = Math.min(Short.MAX_VALUE * 2, good.size())
                 good = good.subList(0, size)
                 dos.writeShort(size)
@@ -414,10 +414,10 @@ class ConnectionAcceptor {
                     it.persona.write(dos)
                 }
             } else {
-                dos.write("Json: true\r\n")
-                dos.write("Good:${good.size()}\r\n")
-                dos.write("Bad:${bad.size()}\r\n")
-                dos.write("\r\n")
+                dos.write("Json: true\r\n".getBytes(StandardCharsets.US_ASCII))
+                dos.write("Good:${good.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                dos.write("Bad:${bad.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                dos.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                 
                 good.each { 
                     def obj = [:]

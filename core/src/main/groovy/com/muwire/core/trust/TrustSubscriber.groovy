@@ -113,8 +113,8 @@ class TrustSubscriber {
             OutputStream os = endpoint.getOutputStream()
             InputStream is = endpoint.getInputStream()
             os.write("TRUST\r\n".getBytes(StandardCharsets.US_ASCII))
-            os.write("Json:true\r\n")
-            os.write("\r\n")
+            os.write("Json:true\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
 
             String codeString = DataUtil.readTillRN(is)
