@@ -117,9 +117,9 @@ class SearchTabModel {
                 bucket << it
                 senderBucket << it
                 
-                results2.clear()
-                results2.addAll(hashBucket.keySet())
             }
+            results2.clear()
+            results2.addAll(hashBucket.keySet())
             JTable table = builder.getVariable("senders-table")
             table.model.fireTableDataChanged()
             table = builder.getVariable("results-table2")
