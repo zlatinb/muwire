@@ -12,6 +12,7 @@ import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialog
 import com.googlecode.lanterna.gui2.table.Table
 import com.muwire.core.Core
 import com.muwire.core.Persona
@@ -48,7 +49,7 @@ class TrustListView extends BasicWindow {
         Panel topPanel = new Panel()
         topPanel.setLayoutManager(new GridLayout(2))
         
-        trusted = new Table("Trusted User","Your Trust")
+        trusted = new Table("Trusted User","Reason","Your Trust")
         trusted.with {
             setCellSelection(false)
             setTableModel(model.trustedTableModel)
@@ -57,7 +58,7 @@ class TrustListView extends BasicWindow {
         trusted.setSelectAction({ actionsForUser(true) })
         topPanel.addComponent(trusted, layoutData)
         
-        distrusted = new Table("Distrusted User", "Your Trust")
+        distrusted = new Table("Distrusted User","Reason", "Your Trust")
         distrusted.with { 
             setCellSelection(false)
             setTableModel(model.distrustedTableModel)
@@ -90,7 +91,8 @@ class TrustListView extends BasicWindow {
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
         
         Button trustButton = new Button("Trust",{
-            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED))
+            String reason = TextInputDialog.showDialog(textGUI, "Reason", "Enter reason (optional)", "")
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED, reason : reason))
             MessageDialog.showMessageDialog(textGUI, "Marked Trusted", persona.getHumanReadableName() + "has been marked trusted",
                 MessageDialogButton.OK)
         })
@@ -100,7 +102,8 @@ class TrustListView extends BasicWindow {
                 MessageDialogButton.OK)
         })
         Button distrustButton = new Button("Distrust",{
-            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.DISTRUSTED))
+            String reason = TextInputDialog.showDialog(textGUI, "Reason", "Enter reason (optional)", "")
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.DISTRUSTED, reason : reason))
             MessageDialog.showMessageDialog(textGUI, "Marked Distrusted", persona.getHumanReadableName() + "has been marked distrusted",
                 MessageDialogButton.OK)
         })

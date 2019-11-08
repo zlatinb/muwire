@@ -11,6 +11,7 @@ import com.googlecode.lanterna.gui2.Window
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialog
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
 import com.googlecode.lanterna.gui2.Label
 import com.googlecode.lanterna.gui2.table.Table
@@ -44,14 +45,14 @@ class TrustView extends BasicWindow {
         Panel topPanel = new Panel()
         topPanel.setLayoutManager(new GridLayout(2))
         
-        trusted = new Table("Trusted Users")
+        trusted = new Table("Trusted Users","Reason")
         trusted.setCellSelection(false)
         trusted.setSelectAction({trustedActions()})
         trusted.setTableModel(model.modelTrusted)
         trusted.setVisibleRows(tableSize)
         topPanel.addComponent(trusted, layoutData)
         
-        distrusted = new Table("Distrusted users")
+        distrusted = new Table("Distrusted users","Reason")
         distrusted.setCellSelection(false)
         distrusted.setSelectAction({distrustedActions()})
         distrusted.setTableModel(model.modelDistrusted)
@@ -106,7 +107,8 @@ class TrustView extends BasicWindow {
                  MessageDialogButton.OK)  
         })
         Button markDistrusted = new Button("Mark Distrusted", {
-            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.DISTRUSTED))
+            String reason = TextInputDialog.showDialog(textGUI, "Reason", "Enter reason (optional)", "")
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.DISTRUSTED, reason : reason))
             MessageDialog.showMessageDialog(textGUI, "Marked Distrusted", persona.getHumanReadableName() + "has been marked distrusted",
                  MessageDialogButton.OK)
         })
@@ -122,7 +124,7 @@ class TrustView extends BasicWindow {
     }
     
     private void distrustedActions() {
-        int selectedRow = trusted.getSelectedRow()
+        int selectedRow = distrusted.getSelectedRow()
         def row = model.modelDistrusted.getRow(selectedRow)
         Persona persona = row[0].persona
         
@@ -138,7 +140,8 @@ class TrustView extends BasicWindow {
                  MessageDialogButton.OK)
         })
         Button markDistrusted = new Button("Mark Trusted", {
-            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED))
+            String reason = TextInputDialog.showDialog(textGUI, "Reason", "Enter reason (optional)", "")
+            core.eventBus.publish(new TrustEvent(persona : persona, level : TrustLevel.TRUSTED, reason : reason))
             MessageDialog.showMessageDialog(textGUI, "Marked Trusted", persona.getHumanReadableName() + "has been marked trusted",
                  MessageDialogButton.OK)
         })

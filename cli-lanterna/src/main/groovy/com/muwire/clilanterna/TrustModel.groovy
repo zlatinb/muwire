@@ -17,8 +17,8 @@ class TrustModel {
         this.guiThread = guiThread
         this.core = core
         
-        modelTrusted = new TableModel("Trusted Users")
-        modelDistrusted = new TableModel("Distrusted Users")
+        modelTrusted = new TableModel("Trusted Users","Reason")
+        modelDistrusted = new TableModel("Distrusted Users","Reason")
         modelSubscriptions = new TableModel("Name","Trusted","Distrusted","Status","Last Updated")
         
         core.eventBus.register(TrustEvent.class, this)
@@ -57,11 +57,11 @@ class TrustModel {
         subsRows.times { modelSubscriptions.removeRow(0) }
         
         core.trustService.good.values().each { 
-            modelTrusted.addRow(new PersonaWrapper(it))
+            modelTrusted.addRow(new PersonaWrapper(it.persona),it.reason)
         }
         
         core.trustService.bad.values().each { 
-            modelDistrusted.addRow(new PersonaWrapper(it))
+            modelDistrusted.addRow(new PersonaWrapper(it.persona),it.reason)
         }
         
         core.trustSubscriber.remoteTrustLists.values().each { 

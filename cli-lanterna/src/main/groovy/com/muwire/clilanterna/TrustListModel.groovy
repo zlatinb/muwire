@@ -16,8 +16,8 @@ class TrustListModel {
         this.trustList = trustList
         this.core = core
         
-        trustedTableModel = new TableModel("Trusted User","Your Trust")
-        distrustedTableModel = new TableModel("Distrusted User", "Your Trust")
+        trustedTableModel = new TableModel("Trusted User","Reason","Your Trust")
+        distrustedTableModel = new TableModel("Distrusted User", "Reason", "Your Trust")
         refreshModels()
         
         core.eventBus.register(TrustEvent.class, this)
@@ -36,10 +36,10 @@ class TrustListModel {
         distrustRows.times { distrustedTableModel.removeRow(0) }
         
         trustList.good.each { 
-            trustedTableModel.addRow(new PersonaWrapper(it), core.trustService.getLevel(it.destination))
+            trustedTableModel.addRow(new PersonaWrapper(it.persona),it.reason, core.trustService.getLevel(it.persona.destination))
         }
         trustList.bad.each { 
-            distrustedTableModel.addRow(new PersonaWrapper(it), core.trustService.getLevel(it.destination))
+            distrustedTableModel.addRow(new PersonaWrapper(it.persona),it.reason, core.trustService.getLevel(it.persona.destination))
         }
     }
     
