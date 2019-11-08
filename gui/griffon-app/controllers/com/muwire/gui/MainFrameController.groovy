@@ -257,7 +257,7 @@ class MainFrameController {
         int row = view.getSelectedTrustTablesRow("trusted-table")
         if (row < 0)
             return
-        Persona p = model.trusted[row]
+        Persona p = model.trusted[row].persona
         core.muOptions.trustSubscriptions.add(p)
         saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
