@@ -463,12 +463,7 @@ class MainFrameView {
                                         closureColumn(header : "Trusted", preferredWidth : 20, type: Integer, read : {it.good.size()})
                                         closureColumn(header : "Distrusted", preferredWidth: 20, type: Integer, read : {it.bad.size()})
                                         closureColumn(header : "Status", preferredWidth: 30, type: String, read : {it.status.toString()})
-                                        closureColumn(header : "Last Updated", preferredWidth: 200, type : String, read : {
-                                            if (it.timestamp == 0)
-                                                return "Never"
-                                            else
-                                                return String.valueOf(new Date(it.timestamp))
-                                        })
+                                        closureColumn(header : "Last Updated", preferredWidth: 200, type : Long, read : { it.timestamp })
                                     }
                                 }
                             }
@@ -745,6 +740,8 @@ class MainFrameView {
                     break
             }
         })
+        
+        subscriptionTable.setDefaultRenderer(Long.class, new DateRenderer())
 
         // trusted table
         def trustedTable = builder.getVariable("trusted-table")
