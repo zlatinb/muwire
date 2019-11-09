@@ -438,6 +438,17 @@ class SearchTabView {
             if (lastResults2SortEvent != null)
                 selectedRow = resultsTable2.rowSorter.convertRowIndexToModel(selectedRow)
             InfoHash infohash = model.results2[selectedRow]
+            
+            Persona sender = selectedSender()
+            if (sender == null) // really shouldn't happen
+                return model.hashBucket[infohash].first()
+            
+            for (UIResultEvent candidate : model.hashBucket[infohash]) {
+                if (candidate.sender == sender)
+                    return candidate
+            }
+            
+            // also shouldn't happen
             return model.hashBucket[infohash].first()
         } else {
             int[] selectedRows = resultsTable.getSelectedRows()
