@@ -367,7 +367,7 @@ class SearchTabView {
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
             int row = selectedSenderRow()
-            if (row < 0) {
+            if (row < 0 || model.senders2[row] == null) {
                 model.browseActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.trustButtonsEnabled = false
