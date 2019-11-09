@@ -503,7 +503,7 @@ class SearchTabView {
         if (row < 0)
             return null
         if (model.groupedByFile)
-            return model.senders2[row].sender
+            return model.senders2[row]?.sender
         else
             return model.senders[row]
     }
