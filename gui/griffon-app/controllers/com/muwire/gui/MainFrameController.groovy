@@ -11,6 +11,7 @@ import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
 
+import java.awt.Desktop
 import java.awt.event.ActionEvent
 import java.nio.charset.StandardCharsets
 
@@ -383,7 +384,7 @@ class MainFrameController {
     @ControllerAction
     void showFileDetails() {
         def selected = view.selectedSharedFiles()
-        if (selected.size() != 1) {
+        if (selected == null || selected.size() != 1) {
             JOptionPane.showMessageDialog(null, "Please select only one file to view it's details")
             return
         }
@@ -391,6 +392,19 @@ class MainFrameController {
         params['sf'] = selected[0]
         params['core'] = core
         mvcGroup.createMVCGroup("shared-file", params)
+    }
+    
+    @ControllerAction
+    void openContainingFolder() {
+        def selected = view.selectedSharedFiles()
+        if (selected == null || selected.size() != 1) {
+            JOptionPane.showMessageDialog(null, "Please select only one file to open it's containing folder")
+            return
+        }
+        
+        try {
+            Desktop.getDesktop().open(selected[0].file.getParentFile())
+        } catch (Exception ignored) {}
     }
 
     void saveMuWireSettings() {
