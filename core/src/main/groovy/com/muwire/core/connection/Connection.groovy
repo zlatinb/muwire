@@ -236,7 +236,6 @@ abstract class Connection implements Closeable {
         if (search.compressedResults != null)
             compressedResults = search.compressedResults
         byte[] sig = null
-        // TODO: make this mandatory at some point
         if (search.sig != null) {
             sig = Base64.decode(search.sig)
             byte [] payload 
@@ -251,8 +250,10 @@ abstract class Connection implements Closeable {
                 return
             } else
                 log.info("query signature verified")
-        } else
+        } else {
             log.info("no signature in query")
+            return
+        }
         
         // TODO: make this mandatory at some point
         byte[] sig2 = null        
