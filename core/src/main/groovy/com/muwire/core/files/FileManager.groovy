@@ -229,7 +229,7 @@ class FileManager {
             return files
         Set<SharedFile> rv = new HashSet<>()
         files.each {
-            if (it.getPieceSize() != 0)
+            if (it != null && it.getPieceSize() != 0)
                 rv.add(it)
         }
         rv
