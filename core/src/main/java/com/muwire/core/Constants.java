@@ -13,4 +13,6 @@ public class Constants {
     public static final int MAX_RESULTS = 0x1 << 16;
     
     public static final int MAX_COMMENT_LENGTH = 0x1 << 15;
+    
+    public static final long MAX_QUERY_AGE = 5 * 60 * 1000L; 
 }

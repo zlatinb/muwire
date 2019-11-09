@@ -7,9 +7,11 @@ import griffon.core.mvc.MVCGroup
 import griffon.core.mvc.MVCGroupConfiguration
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import groovy.json.StringEscapeUtils
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
+import net.i2p.data.SigningPrivateKey
 
 import java.awt.Desktop
 import java.awt.event.ActionEvent
@@ -43,6 +45,7 @@ import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.upload.HashListUploader
 import com.muwire.core.upload.Uploader
+import com.muwire.core.util.DataUtil
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -121,9 +124,10 @@ class MainFrameController {
 
         Signature sig = DSAEngine.getInstance().sign(payload, core.spk)
 
+        long timestamp = System.currentTimeMillis()
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
         replyTo: core.me.destination, receivedOn: core.me.destination,
-        originator : core.me, sig : sig.data))
+        originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : DataUtil.signUUID(uuid, timestamp, core.spk)))
 
     }
 
@@ -140,14 +144,16 @@ class MainFrameController {
 
         byte [] infoHashBytes = Base64.decode(infoHash)
         Signature sig = DSAEngine.getInstance().sign(infoHashBytes, core.spk)
+        long timestamp = System.currentTimeMillis()
+        byte [] sig2 = DataUtil.signUUID(uuid, timestamp, core.spk)
         
         def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
             oobInfohash: true, persona : core.me)
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me, sig : sig.data))
+            originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : sig2))
     }
-
+    
     private int selectedDownload() {
         def downloadsTable = builder.getVariable("downloads-table")
         def selected = downloadsTable.getSelectedRow()

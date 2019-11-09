@@ -13,6 +13,8 @@ class QueryEvent extends Event {
     Persona originator
     Destination receivedOn
     byte[] sig
+    long queryTime
+    byte[] sig2
 
     String toString() {
         "searchEvent: $searchEvent firstHop:$firstHop, replyTo:${replyTo.toBase32()}" +

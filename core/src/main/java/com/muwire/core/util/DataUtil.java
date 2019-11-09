@@ -15,11 +15,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.muwire.core.Constants;
 
+import net.i2p.crypto.DSAEngine;
 import net.i2p.data.Base64;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.ConcurrentHashSet;
 
 public class DataUtil {
@@ -202,5 +206,11 @@ public class DataUtil {
         String encoded = set.stream().map(s -> Base64.encode(encodei18nString(s)))
                 .collect(Collectors.joining(","));
         props.setProperty(property, encoded);
+    }
+    
+    public static byte[] signUUID(UUID uuid, long timestamp, SigningPrivateKey spk) {
+        byte [] payload = (uuid.toString() + String.valueOf(timestamp)).getBytes(StandardCharsets.US_ASCII);
+        Signature sig = DSAEngine.getInstance().sign(payload, spk);
+        return sig.getData();
     }
 }

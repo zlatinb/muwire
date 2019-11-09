@@ -153,6 +153,10 @@ abstract class Connection implements Closeable {
             query.originator = e.originator.toBase64()
         if (e.sig != null)
             query.sig = Base64.encode(e.sig)
+        if (e.queryTime > 0)
+            query.queryTime = e.queryTime
+        if (e.sig2 != null)
+            query.sig2 = Base64.encode(e.sig2)
         messages.put(query)
     }
 
@@ -249,6 +253,32 @@ abstract class Connection implements Closeable {
                 log.info("query signature verified")
         } else
             log.info("no signature in query")
+        
+        // TODO: make this mandatory at some point
+        byte[] sig2 = null        
+        long queryTime = 0
+        if (search.sig2 != null) {
+            if (search.queryTime == null) {
+                log.info("extended signature but no timestamp")
+                return
+            }
+            sig2 = Base64.decode(search.sig2)
+            queryTime = search.queryTime
+            byte [] payload = (search.uuid + String.valueOf(queryTime)).getBytes(StandardCharsets.US_ASCII)
+            def spk = originator.destination.getSigningPublicKey()
+            def signature = new Signature(Constants.SIG_TYPE, sig2)
+            if (!DSAEngine.getInstance().verifySignature(signature, payload, spk)) {
+                log.info("extended signature didn't match uuid and timestamp")
+                return
+            } else {
+                log.info("extended query signature verified")
+                if (queryTime < System.currentTimeMillis() - Constants.MAX_QUERY_AGE) {
+                    log.info("query too old")
+                    return
+                }
+            }
+        } else
+            log.info("no extended signature in query")
 
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : infohash,
@@ -262,7 +292,9 @@ abstract class Connection implements Closeable {
                                             originator : originator,
                                             receivedOn : endpoint.destination,
                                             firstHop : search.firstHop,
-                                            sig : sig )
+                                            sig : sig,
+                                            queryTime : queryTime,
+                                            sig2 : sig2 )
         eventBus.publish(event)
 
     }

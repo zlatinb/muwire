@@ -13,6 +13,7 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
+import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -176,9 +177,12 @@ class UpdateClient {
                         signer = payload.signer
                         log.info("starting search for new version hash $payload.infoHash")
                         Signature sig = DSAEngine.getInstance().sign(updateInfoHash.getRoot(), spk)
-                        def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : UUID.randomUUID(), oobInfohash : true, persona : me)
+                        UUID uuid = UUID.randomUUID()
+                        long timestamp = System.currentTimeMillis()
+                        byte [] sig2 = DataUtil.signUUID(uuid, timestamp, spk)
+                        def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : uuid, oobInfohash : true, persona : me)
                         def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, replyTo : me.destination,
-                            receivedOn : me.destination, originator : me, sig : sig.data)
+                            receivedOn : me.destination, originator : me, sig : sig.data, queryTime : timestamp, sig2 : sig2)
                         eventBus.publish(queryEvent)
                     }
                 }
