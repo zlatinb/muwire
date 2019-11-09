@@ -346,7 +346,8 @@ class SearchTabView {
             model.senders2.addAll(results)
             int selectedRow = sendersTable2.getSelectedRow()
             sendersTable2.model.fireTableDataChanged()
-            sendersTable2.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+            if (selectedRow < results.size())
+                sendersTable2.selectionModel.setSelectionInterval(selectedRow,selectedRow)
         })
         
         resultsTable2.addMouseListener(new MouseAdapter() {
