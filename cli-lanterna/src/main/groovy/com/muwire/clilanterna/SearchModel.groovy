@@ -7,6 +7,7 @@ import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
+import com.muwire.core.util.DataUtil
 
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
@@ -45,13 +46,16 @@ class SearchModel {
         
         def searchEvent
         byte [] payload
+        UUID uuid = UUID.randomUUID()
+        long timestamp = System.currentTimeMillis()
+        byte [] sig2 = DataUtil.signUUID(uuid, timestamp, core.spk)
         if (hashSearch) {
-            searchEvent = new SearchEvent(searchHash : root, uuid : UUID.randomUUID(), oobInfohash : true, compressedResults : true)
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash : true, compressedResults : true)
             payload = root
         } else {
             def nonEmpty = SplitPattern.termify(query)
             payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8)
-            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : UUID.randomUUID(), oobInfohash: true,
+            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true)
         }
         
@@ -61,7 +65,7 @@ class SearchModel {
         
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
             replyTo: core.me.destination, receivedOn: core.me.destination,
-            originator : core.me, sig: sig.data))
+            originator : core.me, sig: sig.data, queryTime : timestamp, sig2 : sig2))
     }
     
     void unregister() {
