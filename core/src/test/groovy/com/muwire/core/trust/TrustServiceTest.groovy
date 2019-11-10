@@ -8,6 +8,7 @@ import com.muwire.core.Destinations
 import com.muwire.core.Persona
 import com.muwire.core.Personas
 
+import groovy.json.JsonSlurper
 import net.i2p.data.Base64
 import net.i2p.data.Destination
 
@@ -55,13 +56,16 @@ class TrustServiceTest {
         service.onTrustEvent new TrustEvent(level: TrustLevel.DISTRUSTED, persona: personas.persona2)
 
         Thread.sleep(250)
+        JsonSlurper slurper = new JsonSlurper()
         def trusted = new HashSet<>()
         persistGood.eachLine {
-            trusted.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
+            def json = slurper.parseText(it)
+            trusted.add(new Persona(new ByteArrayInputStream(Base64.decode(json.persona))))
         }
         def distrusted = new HashSet<>()
         persistBad.eachLine {
-            distrusted.add(new Persona(new ByteArrayInputStream(Base64.decode(it))))
+            def json = slurper.parseText(it)
+            distrusted.add(new Persona(new ByteArrayInputStream(Base64.decode(json.persona))))
         }
 
         assert trusted.size() == 1
