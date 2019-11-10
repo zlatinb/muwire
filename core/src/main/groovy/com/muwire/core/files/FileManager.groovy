@@ -143,6 +143,7 @@ class FileManager {
         
         String comment = sf.getComment()
         if (comment != null) {
+            comment = DataUtil.readi18nString(Base64.decode(comment))
             Set<File> existingComment = commentToFile.get(comment)
             if (existingComment != null) {
                 existingComment.remove(sf.getFile())

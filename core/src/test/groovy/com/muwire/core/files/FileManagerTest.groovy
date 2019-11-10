@@ -1,5 +1,7 @@
 package com.muwire.core.files
 
+import static org.junit.jupiter.api.Assertions.assertAll
+
 import org.junit.Before
 import org.junit.Test
 
@@ -9,6 +11,9 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
+import com.muwire.core.util.DataUtil
+
+import net.i2p.data.Base64
 
 class FileManagerTest {
 
@@ -184,5 +189,40 @@ class FileManagerTest {
         manager.onSearchEvent new SearchEvent(searchTerms: ["d"])
         assert results == null
 
+    }
+    
+    @Test
+    void testComplicatedScenario() {
+        // this tries to reproduce an NPE when un-sharing then sharing again and searching
+        String comment = "same comment"
+        comment = Base64.encode(DataUtil.encodei18nString(comment))
+        File f1 = new File("MuWire-0.5.10.AppImage")
+        InfoHash ih1 = InfoHash.fromHashList(new byte[32])
+        SharedFile sf1 = new SharedFile(f1, ih1, 0)
+        sf1.setComment(comment)
+        
+        manager.onFileLoadedEvent(new FileLoadedEvent(loadedFile : sf1))
+        manager.onFileUnsharedEvent(new FileUnsharedEvent(unsharedFile : sf1, deleted : true))
+        
+        File f2 = new File("MuWire-0.6.0.AppImage")
+        InfoHash ih2 = InfoHash.fromHashList(new byte[64])
+        SharedFile sf2 = new SharedFile(f2, ih2, 0)
+        sf2.setComment(comment)
+        
+        manager.onFileLoadedEvent(new FileLoadedEvent(loadedFile : sf2))
+        
+        manager.onSearchEvent(new SearchEvent(searchTerms : ["muwire"]))
+        Thread.sleep(20)
+        
+        assert results != null
+        assert results.results.size() == 1
+        assert results.results.contains(sf2)
+        
+        results = null
+        manager.onSearchEvent(new SearchEvent(searchTerms : ['comment'], searchComments : true, oobInfohash : true))
+        Thread.sleep(20)
+        assert results != null
+        assert results.results.size() == 1
+        assert results.results.contains(sf2)
     }
 }
