@@ -276,6 +276,57 @@ public class Downloader {
         activeWorkers.put(d, newWorker)
         executorService.submit(newWorker)
     }
+    
+    boolean isSequential() {
+        pieces.ratio == 0f
+    }
+    
+    File generatePreview() {
+        int lastCompletePiece = pieces.firstIncomplete() - 1
+        if (lastCompletePiece == -1)
+            return null
+        if (lastCompletePiece < -1)
+            return file
+        long previewableLength = (lastCompletePiece + 1) * ((long)pieceSize)
+        
+        // generate name
+        long now = System.currentTimeMillis()
+        File previewFile
+        File parentFile = file.getParentFile()
+        int lastDot = file.getName().lastIndexOf('.')
+        if (lastDot < 0) 
+            previewFile = new File(parentFile, file.getName() + "." + String.valueOf(now) + ".mwpreview")
+        else {
+            String name = file.getName().substring(0, lastDot)
+            String extension = file.getName().substring(lastDot + 1)
+            String previewName = name + "." + String.valueOf(now) + ".mwpreview."+extension
+            previewFile = new File(parentFile, previewName)
+        }
+        
+        // copy
+        InputStream is = null
+        OutputStream os = null
+        try {
+            is = new BufferedInputStream(new FileInputStream(incompleteFile))
+            os = new BufferedOutputStream(new FileOutputStream(previewFile))
+            byte [] tmp = new byte[0x1 << 13]
+            long totalCopied = 0
+            while(totalCopied < previewableLength) {
+                int read = is.read(tmp, 0, (int)Math.min(tmp.length, previewableLength - totalCopied))
+                if (read < 0)
+                    throw new IOException("EOF?")
+                os.write(tmp, 0, read)
+                totalCopied += read
+            }
+            return previewFile
+        } catch (IOException bad) {
+            log.log(Level.WARNING,"Preview failed",bad)
+            return null
+        } finally {
+            try {is?.close() } catch (IOException ignore) {}
+            try {os?.close() } catch (IOException ignore) {}
+        }
+    }
 
     class DownloadWorker implements Runnable {
         private final Destination destination

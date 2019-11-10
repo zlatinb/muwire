@@ -216,6 +216,7 @@ class MainFrameView {
                                     button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
                                     button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
                                     button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction)
+                                    button(text: "Preview", previewAction)
                                     button(text: "Clear Done", enabled : bind {model.clearButtonEnabled}, clearAction)
                                 }
                             }

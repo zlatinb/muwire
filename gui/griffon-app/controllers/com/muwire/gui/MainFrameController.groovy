@@ -204,6 +204,16 @@ class MainFrameController {
         downloader.pause()
         core.eventBus.publish(new UIDownloadPausedEvent())
     }
+    
+    @ControllerAction
+    void preview() {
+        def downloader = model.downloads[selectedDownload()].downloader
+        File previewFile = downloader.generatePreview()
+        if (previewFile != null)
+            Desktop.getDesktop().open(previewFile)
+        else
+            JOptionPane.showMessageDialog(null, "Failed to generate preview", "Failed to generate preveiw", JOptionPane.ERROR_MESSAGE)
+    }
 
     @ControllerAction
     void clear() {

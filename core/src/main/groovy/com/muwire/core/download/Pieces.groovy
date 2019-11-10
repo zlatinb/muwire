@@ -108,6 +108,10 @@ class Pieces {
         partials.clear()
     }
     
+    synchronized int firstIncomplete() {
+        done.nextClearBit(0)
+    }
+    
     synchronized void write(PrintWriter writer) {
         for (int i = done.nextSetBit(0); i >= 0; i = done.nextSetBit(i+1)) {
             writer.println(i)
