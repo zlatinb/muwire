@@ -216,7 +216,7 @@ class MainFrameView {
                                     button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
                                     button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
                                     button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction)
-                                    button(text: "Preview", previewAction)
+                                    button(text: "Preview", enabled : bind {model.previewButtonEnabled}, previewAction)
                                     button(text: "Clear Done", enabled : bind {model.clearButtonEnabled}, clearAction)
                                 }
                             }
@@ -537,6 +537,7 @@ class MainFrameView {
                 model.cancelButtonEnabled = false
                 model.retryButtonEnabled = false
                 model.pauseButtonEnabled = false
+                model.previewButtonEnabled = false
                 model.downloader = null
                 downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"select-download")
                 return
@@ -545,6 +546,7 @@ class MainFrameView {
             if (downloader == null)
                 return
             model.downloader = downloader
+            model.previewButtonEnabled = true
             downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"download-selected")
             switch(downloader.getCurrentState()) {
                 case Downloader.DownloadState.CONNECTING :

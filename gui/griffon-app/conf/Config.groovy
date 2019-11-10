@@ -106,4 +106,9 @@ mvcGroups {
         view = 'com.muwire.gui.SharedFileView'
         controller = 'com.muwire.gui.SharedFileController'
     }
+    'download-preview' {
+        model = "com.muwire.gui.DownloadPreviewModel"
+        view = "com.muwire.gui.DownloadPreviewView"
+        controller = "com.muwire.gui.DownloadPreviewController"
+    }
 }
