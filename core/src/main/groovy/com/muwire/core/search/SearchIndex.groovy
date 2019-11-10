@@ -39,10 +39,11 @@ class SearchIndex {
         split.each { if (it.length() > 0) rv << it }
         
         // then just by ' '
-        source.split(' ').each { if (it.length() > 0) rv << it }
+        source.toLowerCase().split(' ').each { if (it.length() > 0) rv << it }
         
         // and add original string
         rv << source
+        rv << source.toLowerCase()
         rv.toArray(new String[0])
     }
 
