@@ -32,6 +32,7 @@ class MuWireSettings {
     boolean searchComments
     boolean browseFiles
     boolean enableChat
+    int maxChatConnections
     Set<String> watchedDirectories
     float downloadSequentialRatio
     int hostClearInterval, hostHopelessInterval, hostRejectInterval
@@ -81,6 +82,7 @@ class MuWireSettings {
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
         enableChat = Boolean.valueOf(props.getProperty("enableChat","false"))
+        maxChatConnections = Integer.valueOf(props.get("maxChatConnections", "-1"))
 
         watchedDirectories = DataUtil.readEncodedSet(props, "watchedDirectories")
         watchedKeywords = DataUtil.readEncodedSet(props, "watchedKeywords")
@@ -130,6 +132,7 @@ class MuWireSettings {
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
         props.setProperty("uploadSlotsPerUser", String.valueOf(uploadSlotsPerUser))
         props.setProperty("enableChat", String.valueOf(enableChat))
+        props.setProperty("maxChatConnectios", String.valueOf(maxChatConnections))
 
         DataUtil.writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         DataUtil.writeEncodedSet(watchedKeywords, "watchedKeywords", props)
