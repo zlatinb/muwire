@@ -15,6 +15,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.chat.ChatServer
 import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.files.FileManager
@@ -50,6 +51,7 @@ class ConnectionAcceptor {
     final FileManager fileManager
     final ConnectionEstablisher establisher
     final CertificateManager certificateManager
+    final ChatServer chatServer
 
     final ExecutorService acceptorThread
     final ExecutorService handshakerThreads
@@ -61,7 +63,8 @@ class ConnectionAcceptor {
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
-        FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager) {
+        FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
+        ChatServer chatServer) {
         this.eventBus = eventBus
         this.manager = manager
         this.settings = settings
@@ -73,6 +76,7 @@ class ConnectionAcceptor {
         this.uploadManager = uploadManager
         this.establisher = establisher
         this.certificateManager = certificateManager
+        this.chatServer = chatServer
 
         acceptorThread = Executors.newSingleThreadExecutor { r ->
             def rv = new Thread(r)
@@ -153,6 +157,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'C':
                     processCERTIFICATES(e)
+                    break
+                case (byte)'I':
+                    processIRC(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -497,6 +504,15 @@ class ConnectionAcceptor {
         } finally {
             e.close()
         }
+    }
+    
+    private void processIRC(Endpoint e) {
+        byte[] IRC = new byte[4]
+        DataInputStream dis = new DataInputStream(e.getInputStream())
+        dis.readFully(IRC)
+        if (IRC != "RC\r\n".getBytes(StandardCharsets.US_ASCII))
+            throw new Exception("Invalid IRC connection")
+        chatServer.handle(e)
     }
 
 }

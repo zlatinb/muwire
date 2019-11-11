@@ -3,6 +3,11 @@ package com.muwire.core
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
+import com.muwire.core.chat.ChatManager
+import com.muwire.core.chat.ChatMessageEvent
+import com.muwire.core.chat.ChatServer
+import com.muwire.core.chat.UIConnectChatEvent
+import com.muwire.core.chat.UIDisconnectChatEvent
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -302,11 +307,23 @@ public class Core {
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
+        log.info("initializing chat server")
+        ChatServer chatServer = new ChatServer(eventBus, props, trustService, me) 
+        eventBus.register(ChatMessageEvent.class, chatServer)
+        
+        log.info("initializing chat manager")
+        ChatManager chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
+        eventBus.with { 
+            register(UIConnectChatEvent.class, chatManager)
+            register(UIDisconnectChatEvent.class, chatManager)
+            register(ChatMessageEvent.class, chatManager)
+        }
+        
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
-            certificateManager)
+            certificateManager, chatServer)
 
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
