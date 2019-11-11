@@ -11,4 +11,7 @@ class ChatRoomModel {
     Core core
     String tabName
     String room
+    boolean console
+    
+    def members = []
 }

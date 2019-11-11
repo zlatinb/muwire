@@ -54,6 +54,7 @@ class ChatServerView {
         params['core'] = model.core
         params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
         params['room'] = 'Console'
+        params['console'] = true
         mvcGroup.createMVCGroup("chat-room","Console", params) 
     }
 

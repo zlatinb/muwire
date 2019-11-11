@@ -3,6 +3,8 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+
+import javax.swing.JSplitPane
 import javax.swing.SwingConstants
 
 import java.awt.BorderLayout
@@ -20,17 +22,48 @@ class ChatRoomView {
 
     def pane
     def parent
+    def sayField
+    def roomTextArea
     
     void initUI() {
-        pane = builder.panel {
-            borderLayout()
-            panel(constraints : BorderLayout.CENTER) {
-                textArea(editable : false)
-            }
-            panel(constraints : BorderLayout.SOUTH) {
+        int rowHeight = application.context.get("row-height")
+        if (model.console) {
+            pane = builder.panel {
                 borderLayout()
-                textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                button(text : "Say", constraints : BorderLayout.EAST, sayAction)
+                panel(constraints : BorderLayout.CENTER) {
+                    gridLayout(rows : 1, cols : 1)
+                    roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                }
+                panel(constraints : BorderLayout.SOUTH) {
+                    borderLayout()
+                    sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    button(text : "Say", constraints : BorderLayout.EAST, sayAction)
+                }
+            }
+        } else {
+            pane = builder.panel {
+                borderLayout()
+                panel(constraints : BorderLayout.CENTER) {
+                    splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 200)
+                    panel {
+                        table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            tableModel(list : model.members) {
+                                closureColumn(header : "Name", type: String, read : {it.getHumanReadableName()})
+                                closureColumn(header : "Trust Status", type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
+                            }
+                        }
+                    }
+                    panel {
+                        gridLayout(rows : 1, cols : 1)
+                        roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                    }
+                }
+                panel(constraints : BorderLayout.SOUTH) {
+                    borderLayout()
+                    sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    button(text : "Say", constraints : BorderLayout.EAST, sayAction)
+                }
+
             }
         }
     }
@@ -50,7 +83,8 @@ class ChatRoomView {
             button(icon : imageIcon("/close_tab.png"), preferredSize: [20, 20], constraints : BorderLayout.EAST,
                 actionPerformed : closeTab )
         }
-        parent.setTabComponentAt(index, tabPanel)
+        if (!model.console)
+            parent.setTabComponentAt(index, tabPanel)
     }
     
     def closeTab = {

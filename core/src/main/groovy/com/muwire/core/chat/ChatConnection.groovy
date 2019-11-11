@@ -20,6 +20,7 @@ import groovy.util.logging.Log
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
+import net.i2p.data.SigningPrivateKey
 
 @Log
 class ChatConnection implements Closeable {
@@ -218,6 +219,23 @@ class ChatConnection implements Closeable {
         def spk = sender.destination.getSigningPublicKey()
         def signature = new Signature(Constants.SIG_TYPE, sig)
         DSAEngine.getInstance().verifySignature(signature, signed, spk)
+    }
+    
+    public static byte[] sign(UUID uuid, long chatTime, String room, String words, Persona sender, Persona host, SigningPrivateKey spk) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream()
+        DataOutputStream daos = new DataOutputStream(baos)
+        daos.with {
+            write(uuid.toString().bytes)
+            host.write(daos)
+            sender.write(daos)
+            writeLong(chatTime)
+            write(room.getBytes(StandardCharsets.UTF_8))
+            write(words.getBytes(StandardCharsets.UTF_8))
+            close()
+        }
+        byte [] payload = baos.toByteArray()
+        Signature sig = DSAEngine.getInstance().sign(payload, spk)
+        sig.getData()
     }
     
     void sendChat(ChatMessageEvent e) {
