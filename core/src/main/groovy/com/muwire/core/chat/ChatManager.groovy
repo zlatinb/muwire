@@ -56,7 +56,10 @@ class ChatManager {
     }
     
     private void connect() {
-        clients.each { k, v -> v.connectIfNeeded() }
+        clients.each { k, v -> 
+            v.connectIfNeeded()
+            v.ping() 
+        }
     }
     
     void shutdown() {

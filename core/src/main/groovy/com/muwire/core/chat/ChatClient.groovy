@@ -110,4 +110,8 @@ class ChatClient implements Closeable {
         connectThread?.interrupt()
         connection?.close()
     }
+    
+    void ping() {
+        connection?.sendPing()
+    }
 }

@@ -39,10 +39,19 @@ class ChatServer {
         this.settings = settings
         this.trustService = trustService
         this.me = me
+        
+        Timer timer = new Timer("chat-server-pinger", true)
+        timer.schedule({sendPings()} as TimerTask, 1000, 1000)
     }
     
     public void start() {
         running.set(true)
+    }
+    
+    private void sendPings() {
+        connections.each { k,v -> 
+            v.sendPing()
+        }
     }
     
     public void handle(Endpoint endpoint) {
