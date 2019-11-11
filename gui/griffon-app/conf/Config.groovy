@@ -111,4 +111,14 @@ mvcGroups {
         view = "com.muwire.gui.DownloadPreviewView"
         controller = "com.muwire.gui.DownloadPreviewController"
     }
+    'chat-server' {
+        model = 'com.muwire.gui.ChatServerModel'
+        view = 'com.muwire.gui.ChatServerView'
+        controller = 'com.muwire.gui.ChatServerController'
+    }
+    'chat-room' {
+        model = 'com.muwire.gui.ChatRoomModel'
+        view = 'com.muwire.gui.ChatRoomView'
+        controller = 'com.muwire.gui.ChatRoomController'
+    }
 }

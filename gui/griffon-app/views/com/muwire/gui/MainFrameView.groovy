@@ -142,6 +142,7 @@ class MainFrameView {
                         if (settings.showMonitor)
                             button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
                         button(text: "Trust", enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
+                        button(text: "Chat", enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
@@ -473,6 +474,15 @@ class MainFrameView {
                                 button(text : "Update", enabled : bind {model.updateButtonEnabled}, updateAction)
                                 button(text : "Unsubscribe", enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
                             }
+                        }
+                    }
+                    panel(constraints : "chat window") {
+                        borderLayout()
+                        tabbedPane(id : "chat-tabs", constraints : BorderLayout.CENTER)
+                        panel(constraints : BorderLayout.SOUTH) {
+                            button(text : "Start Chat Server", enabled : bind {!model.chatServerRunning}, startChatServerAction)
+                            button(text : "Stop Chat Server", enabled : bind {model.chatServerRunning}, stopChatServerAction)
+                            button(text : "Connect To Remote Server", connectChatServerAction)
                         }
                     }
                 }
@@ -986,6 +996,7 @@ class MainFrameView {
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
     }
 
     def showDownloadsWindow = {
@@ -996,6 +1007,7 @@ class MainFrameView {
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
     }
 
     def showUploadsWindow = {
@@ -1006,6 +1018,7 @@ class MainFrameView {
         model.uploadsPaneButtonEnabled = false
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
     }
 
     def showMonitorWindow = {
@@ -1016,6 +1029,7 @@ class MainFrameView {
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
     }
 
     def showTrustWindow = {
@@ -1026,6 +1040,18 @@ class MainFrameView {
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
+        model.chatPaneButtonEnabled = true
+    }
+    
+    def showChatWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "chat window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = false
     }
     
     def showSharedFilesTable = {

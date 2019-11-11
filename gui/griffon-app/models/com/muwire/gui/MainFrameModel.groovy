@@ -117,6 +117,9 @@ class MainFrameModel {
     @Observable boolean uploadsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
+    @Observable boolean chatPaneButtonEnabled
+    
+    @Observable boolean chatServerRunning
     
     @Observable Downloader downloader
 
@@ -217,6 +220,8 @@ class MainFrameModel {
             core.muOptions.watchedRegexes.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: true, add: true))
             }
+            
+            chatServerRunning = core.chatServer.running.get()
             
             timer.schedule({
                 if (core.shutdown.get())

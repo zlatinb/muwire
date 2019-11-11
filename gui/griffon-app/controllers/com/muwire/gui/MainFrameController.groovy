@@ -420,7 +420,31 @@ class MainFrameController {
             Desktop.getDesktop().open(selected[0].file.getParentFile())
         } catch (Exception ignored) {}
     }
+    
+    @ControllerAction
+    void startChatServer() {
+        model.core.chatServer.start()
+        model.chatServerRunning = true
+        
+        if (!mvcGroup.getChildrenGroups().containsKey("local-chat-server")) {
+            def params = [:]
+            params['core'] = model.core
+            params['host'] = model.core.me
+            mvcGroup.createMVCGroup("chat-server","local-chat-server", params)
+        }
+    }
+    
+    @ControllerAction
+    void stopChatServer() {
+        model.core.chatServer.stop()
+        model.chatServerRunning = false
+    }
 
+    @ControllerAction
+    void connectChatServer() {
+        
+    }
+    
     void saveMuWireSettings() {
         core.saveMuSettings()
     }
