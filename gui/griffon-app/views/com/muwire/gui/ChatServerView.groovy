@@ -5,6 +5,8 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.swing.SwingConstants
 
+import com.muwire.core.chat.ChatServer
+
 import java.awt.BorderLayout
 
 import javax.annotation.Nonnull
@@ -24,7 +26,10 @@ class ChatServerView {
             borderLayout()
             tabbedPane(id : model.host.getHumanReadableName()+"-chat-rooms", constraints : BorderLayout.CENTER)
             panel(constraints : BorderLayout.SOUTH) {
+                gridLayout(rows : 1, cols : 3)
+                panel {}
                 button(text : "Disconnect", enabled : bind {model.disconnectActionEnabled}, disconnectAction)
+                label(text : bind {model.status.toString()})
             }
         }
     }
@@ -55,7 +60,7 @@ class ChatServerView {
         params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
         params['room'] = 'Console'
         params['console'] = true
-        mvcGroup.createMVCGroup("chat-room","Console", params) 
+        mvcGroup.createMVCGroup("chat-room",ChatServer.CONSOLE, params) 
     }
 
     def closeTab = {

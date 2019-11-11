@@ -18,6 +18,7 @@ import com.muwire.core.util.DataUtil
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 import net.i2p.data.Destination
+import net.i2p.data.SigningPrivateKey
 import net.i2p.util.ConcurrentHashSet
 
 @Log
@@ -27,18 +28,20 @@ class ChatServer {
     private final MuWireSettings settings
     private final TrustService trustService
     private final Persona me
+    private final SigningPrivateKey spk
     
-    private final Map<Destination, ChatConnection> connections = new ConcurrentHashMap()
+    private final Map<Destination, ChatLink> connections = new ConcurrentHashMap()
     private final Map<String, Set<Persona>> rooms = new ConcurrentHashMap<>()
     private final Map<Persona, Set<String>> memberships = new ConcurrentHashMap<>()
     
     private final AtomicBoolean running = new AtomicBoolean()
     
-    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, Persona me) {
+    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, Persona me, SigningPrivateKey spk) {
         this.eventBus = eventBus
         this.settings = settings
         this.trustService = trustService
         this.me = me
+        this.spk = spk
         
         Timer timer = new Timer("chat-server-pinger", true)
         timer.schedule({sendPings()} as TimerTask, 1000, 1000)
@@ -46,6 +49,7 @@ class ChatServer {
     
     public void start() {
         running.set(true)
+        connections.put(me.destination, LocalChatLink.INSTANCE)
     }
     
     private void sendPings() {
@@ -175,11 +179,18 @@ class ChatServer {
             log.log(Level.WARNING, "bad chat command",badCommand)
             return
         }
-        
+
+        if ((command.action.console && e.room != CONSOLE) ||
+            (!command.action.console && e.room == CONSOLE))
+            return
+            
         switch(command.action) {
             case ChatAction.JOIN : processJoin(command.payload, e); break
             case ChatAction.LEAVE : processLeave(e); break
             case ChatAction.SAY : processSay(e); break
+            case ChatAction.LIST : processList(e); break
+            case ChatAction.INFO : processInfo(e); break
+            case ChatAction.HELP : processHelp(e); break
         }
     }
     
@@ -213,6 +224,38 @@ class ChatServer {
             Persona target = new Persona(new ByteArrayInputStream(Base64.decode(e.room)))
             connections[target.destination]?.sendChat(e)
         }
+    }
+    
+    private void processList(ChatMessageEvent e) {
+        String roomList = "/SAY " + String.join("\n", rooms.keySet())
+        echo(roomList, e)
+    }
+    
+    private void processInfo(ChatMessageEvent e) {
+        String info = "/SAY The address of this server is \n${me.toBase64()}\nCopy/paste this and share it"
+        echo(info, e)
+    }
+    
+    private void processHelp(ChatMessageEvent e) {
+        String help = "/SAY Available commands: /JOIN /LEAVE /SAY /LIST /INFO /HELP"
+        echo(help, e)
+    }
+    
+    private void echo(String payload, ChatMessageEvent e) {
+        log.info "echoing $payload"
+        UUID uuid = UUID.randomUUID()
+        long now = System.currentTimeMillis()
+        byte [] sig = ChatConnection.sign(uuid, now, CONSOLE, payload, me, me, spk)
+        ChatMessageEvent echo = new ChatMessageEvent(
+            uuid : uuid,
+            payload : payload,
+            sender : me,
+            host : me,
+            room : CONSOLE,
+            chatTime : now,
+            sig : sig
+            )
+        connections[e.sender.destination]?.sendChat(echo)
     }
     
     void stop() {

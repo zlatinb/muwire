@@ -3,16 +3,26 @@ package com.muwire.core.chat
 class ChatCommand {
     private final ChatAction action
     private final String payload
-    
+    final String source
     ChatCommand(String source) {
-        int space = source.indexOf(' ')
-        if (space < 0)
-            throw new Exception("Invalid command $source")
-        String command = source.substring(0, space)
-        if (command.charAt(0) != '/')
+        if (source.charAt(0) != '/')
             throw new Exception("command doesn't start with / $source")
-        command = command.substring(1)
+        
+        int position = 1
+        StringBuilder sb = new StringBuilder()
+        while(position < source.length()) {
+            char c = source.charAt(position)
+            if (c == ' ')
+                break
+            sb.append(c)
+            position++    
+        }
+        String command = sb.toString().toUpperCase()
         action = ChatAction.valueOf(command)
-        payload = source.substring(space + 1)
+        if (position < source.length())
+            payload = source.substring(position + 1)
+        else
+            payload = ""
+        this.source = source
     }
 }

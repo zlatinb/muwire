@@ -6,5 +6,5 @@ import com.muwire.core.Persona
 class ChatConnectionEvent extends Event {
     ChatConnectionAttemptStatus status
     Persona persona
-    ChatConnection connection
+    ChatLink connection
 }

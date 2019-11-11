@@ -23,7 +23,7 @@ import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 
 @Log
-class ChatConnection implements Closeable {
+class ChatConnection implements ChatLink {
     
     private static final long PING_INTERVAL = 20000
     private static final long MAX_CHAT_AGE = 5 * 60 * 1000
@@ -39,6 +39,7 @@ class ChatConnection implements Closeable {
     private final BlockingQueue messages = new LinkedBlockingQueue()
     private final Thread reader, writer
     private final LinkedList<Long> timestamps = new LinkedList<>()
+    private final BlockingQueue incomingEvents = new LinkedBlockingQueue()
     
     private final DataInputStream dis
     private final DataOutputStream dos
@@ -75,6 +76,11 @@ class ChatConnection implements Closeable {
         }
         reader.start()
         writer.start()
+    }
+    
+    @Override
+    public boolean isUp() {
+        running.get()
     }
     
     @Override
@@ -193,11 +199,13 @@ class ChatConnection implements Closeable {
         def event = new ChatMessageEvent( uuid : uuid, payload : payload, sender : sender,
             host : host, room : room, chatTime : chatTime, sig : sig)
         eventBus.publish(event)
+        incomingEvents.put(event)
     }
     
     private void handleLeave(def json) {
         Persona leaver = fromString(json.persona)
         eventBus.publish(new UserDisconnectedEvent(user : leaver, host : persona))
+        incomingEvents.put(leaver)
     }
     
     private static Persona fromString(String base64) {
@@ -256,5 +264,9 @@ class ChatConnection implements Closeable {
         leave.type = "Leave"
         leave.persona = p.toBase64()
         messages.put(leave)
+    }
+    
+    public Object nextEvent() {
+        incomingEvents.take()
     }
 }

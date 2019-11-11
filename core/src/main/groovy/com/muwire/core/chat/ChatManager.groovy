@@ -30,10 +30,13 @@ class ChatManager {
     }
     
     void onUIConnectChatEvent(UIConnectChatEvent e) {
-        if (e.host == me)
-            return
-        ChatClient client = new ChatClient(connector, eventBus, e.host, me, trustService, settings)
-        clients.put(e.host, client)
+        if (e.host == me) { 
+            eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, 
+                persona : me, connection : LocalChatLink.INSTANCE))
+        } else {
+            ChatClient client = new ChatClient(connector, eventBus, e.host, me, trustService, settings)
+            clients.put(e.host, client)
+        }
     }
     
     void onUIDisconnectChatEvent(UIDisconnectChatEvent e) {
@@ -44,7 +47,7 @@ class ChatManager {
     }
     
     void onChatMessageEvent(ChatMessageEvent e) {
-        if (e.host == me)
+        if (e.host == me) 
             return
         if (e.sender != me)
             return
