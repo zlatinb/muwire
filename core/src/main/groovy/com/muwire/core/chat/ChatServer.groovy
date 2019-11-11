@@ -9,6 +9,8 @@ import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
 
@@ -82,6 +84,32 @@ class ChatServer {
         joinRoom(client, CONSOLE)
         connection.start()
         eventBus.publish(new ChatConnectionEvent(connection : connection, status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : client))
+    }
+    
+    void onChatDisconnectionEvent(ChatDisconnectionEvent e) {
+        ChatConnection con = connections.remove(e.persona.destination)
+        if (con == null)
+            return
+            
+        Set<String> rooms = memberships.get(e.persona)
+        if (rooms != null) {
+            rooms.each { 
+                leaveRoom(e.persona, it)
+            }
+        }
+        connections.each { k, v ->
+            v.sendLeave(e.persona)
+        }
+    }
+    
+    void onTrustEvent(TrustEvent e) {
+        if (e.level == TrustLevel.TRUSTED)
+            return
+        if (settings.allowUntrusted && e.level == TrustLevel.NEUTRAL)
+            return
+        
+        ChatConnection connection = connections.remove(e.persona.destination)
+        connection?.close()
     }
     
     private void joinRoom(Persona p, String room) {

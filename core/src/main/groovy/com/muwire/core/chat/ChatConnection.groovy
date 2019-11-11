@@ -125,6 +125,7 @@ class ChatConnection implements Closeable {
         switch(json.type) {
             case "Ping" : break // just ignore
             case "Chat" : handleChat(json); break
+            case "Leave": handleLeave(json); break
             default :
                 throw new Exception("unknown json type ${json.type}")
         }
@@ -193,6 +194,11 @@ class ChatConnection implements Closeable {
         eventBus.publish(event)
     }
     
+    private void handleLeave(def json) {
+        Persona leaver = fromString(json.persona)
+        eventBus.publish(new UserDisconnectedEvent(user : leaver, host : persona))
+    }
+    
     private static Persona fromString(String base64) {
         new Persona(new ByteArrayInputStream(Base64.decode(base64)))
     }
@@ -216,6 +222,7 @@ class ChatConnection implements Closeable {
     
     void sendChat(ChatMessageEvent e) {
         def chat = [:]
+        chat.type = "Chat"
         chat.uuid = e.uuid.toString()
         chat.host = e.host.toBase64()
         chat.sender = e.sender.toBase64()
@@ -224,5 +231,12 @@ class ChatConnection implements Closeable {
         chat.payload = e.payload
         chat.sig = Base64.encode(e.sig)
         messages.put(chat)
+    }
+    
+    void sendLeave(Persona p) {
+        def leave = [:]
+        leave.type = "Leave"
+        leave.persona = p.toBase64()
+        messages.put(leave)
     }
 }

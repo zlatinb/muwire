@@ -311,8 +311,12 @@ public class Core {
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
         log.info("initializing chat server")
-        chatServer = new ChatServer(eventBus, props, trustService, me) 
-        eventBus.register(ChatMessageEvent.class, chatServer)
+        chatServer = new ChatServer(eventBus, props, trustService, me)
+        eventBus.with { 
+            register(ChatMessageEvent.class, chatServer)
+            register(ChatDisconnectionEvent.class, chatServer)
+            register(TrustEvent.class, chatServer)
+        } 
         
         log.info("initializing chat manager")
         chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
