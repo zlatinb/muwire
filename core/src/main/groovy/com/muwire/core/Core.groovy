@@ -110,6 +110,8 @@ public class Core {
     final UploadManager uploadManager
     final ContentManager contentManager
     final CertificateManager certificateManager
+    final ChatServer chatServer
+    final ChatManager chatManager
 
     private final Router router
 
@@ -308,11 +310,11 @@ public class Core {
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
         log.info("initializing chat server")
-        ChatServer chatServer = new ChatServer(eventBus, props, trustService, me) 
+        chatServer = new ChatServer(eventBus, props, trustService, me) 
         eventBus.register(ChatMessageEvent.class, chatServer)
         
         log.info("initializing chat manager")
-        ChatManager chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
+        chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
         eventBus.with { 
             register(UIConnectChatEvent.class, chatManager)
             register(UIDisconnectChatEvent.class, chatManager)
@@ -385,6 +387,10 @@ public class Core {
         directoryWatcher.stop()
         log.info("shutting down cache client")
         cacheClient.stop()
+        log.info("shutting down chat server")
+        chatServer.shutdown()
+        log.info("shutting down chat manager")
+        chatManager.shutdown()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         if (router != null) {

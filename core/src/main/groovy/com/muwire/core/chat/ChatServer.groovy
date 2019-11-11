@@ -170,4 +170,10 @@ class ChatServer {
             connections[target.destination]?.sendChat(e)
         }
     }
+    
+    void shutdown() {
+        connections.each { k, v -> 
+            v.close()
+        }
+    }
 }
