@@ -29,6 +29,8 @@ class ChatRoomController {
     @MVCMember @Nonnull
     ChatRoomView view
 
+    boolean leftRoom
+    
     @ControllerAction
     void say() {
         String words = view.sayField.text
@@ -45,23 +47,58 @@ class ChatRoomController {
         UUID uuid = UUID.randomUUID()
         String room = model.console ? ChatServer.CONSOLE : model.room
 
-        byte [] sig = ChatConnection.sign(uuid, now, room, command.source, model.core.me, mvcGroup.parentGroup.model.host, model.core.spk)
+        byte [] sig = ChatConnection.sign(uuid, now, room, command.source, model.core.me, model.host, model.core.spk)
 
         def event = new ChatMessageEvent(uuid : uuid,
         payload : command.source,
         sender : model.core.me,
-        host : mvcGroup.parentGroup.model.host,
+        host : model.host,
         room : room,
         chatTime : now,
         sig : sig)
 
         model.core.eventBus.publish(event)
-        if (command.payload.length() > 0) {
+        if (command.action == ChatAction.SAY && command.payload.length() > 0) {
             String toShow = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + "> "+command.payload
 
             view.roomTextArea.append(toShow)
             view.roomTextArea.append('\n')
         }
+        
+        if (command.action == ChatAction.JOIN) {
+            String newRoom = command.payload
+            if (mvcGroup.parentGroup.childrenGroups.containsKey(newRoom))
+                return
+            def params = [:]
+            params['core'] = model.core
+            params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
+            params['room'] = newRoom
+            params['console'] = false
+            params['host'] = model.host
+
+            mvcGroup.parentGroup.createMVCGroup("chat-room", newRoom, params)            
+        }
+        if (command.action == ChatAction.LEAVE && !model.console) {
+            leftRoom = true
+            view.closeTab.call()
+        }
+    }
+    
+    void leaveRoom() {
+        if (leftRoom)
+            return
+        leftRoom = true
+        long now = System.currentTimeMillis()
+        UUID uuid = UUID.randomUUID()
+        byte [] sig = ChatConnection.sign(uuid, now, model.room, "/LEAVE", model.core.me, model.host, model.core.spk)
+        def event = new ChatMessageEvent(uuid : uuid,
+            payload : "/LEAVE",
+            sender : model.core.me,
+            host : model.host,
+            room : model.room,
+            chatTime : now,
+            sig : sig)
+        model.core.eventBus.publish(event)
     }
     
     void handleChatMessage(ChatMessageEvent e) {

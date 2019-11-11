@@ -195,7 +195,7 @@ class ChatServer {
     }
     
     private void processJoin(String room, ChatMessageEvent e) {
-        joinRoom(room, e.sender)
+        joinRoom(e.sender, room)
         rooms[room].each { 
             if (it == e.sender)
                 return

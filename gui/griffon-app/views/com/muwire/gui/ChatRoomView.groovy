@@ -44,7 +44,8 @@ class ChatRoomView {
             pane = builder.panel {
                 borderLayout()
                 panel(constraints : BorderLayout.CENTER) {
-                    splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 200)
+                    gridLayout(rows : 1, cols : 1)
+                    splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100)
                     panel {
                         table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.members) {
@@ -90,6 +91,7 @@ class ChatRoomView {
     def closeTab = {
         int index = parent.indexOfComponent(pane)
         parent.removeTabAt(index)
+        controller.leaveRoom()
         mvcGroup.destroy()
     }
 }
