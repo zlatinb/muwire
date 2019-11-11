@@ -32,7 +32,9 @@ class ChatRoomView {
                 borderLayout()
                 panel(constraints : BorderLayout.CENTER) {
                     gridLayout(rows : 1, cols : 1)
-                    roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                    scrollPane {
+                        roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                    }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
@@ -45,18 +47,24 @@ class ChatRoomView {
                 borderLayout()
                 panel(constraints : BorderLayout.CENTER) {
                     gridLayout(rows : 1, cols : 1)
-                    splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100)
-                    panel {
-                        table(autoCreateRowSorter : true, rowHeight : rowHeight) {
-                            tableModel(list : model.members) {
-                                closureColumn(header : "Name", type: String, read : {it.getHumanReadableName()})
-                                closureColumn(header : "Trust Status", type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
+                    splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 300) {
+                        panel {
+                            gridLayout(rows : 1, cols : 1)
+                            scrollPane {
+                                table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.members) {
+                                        closureColumn(header : "Name", preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
+                                        closureColumn(header : "Trust Status", preferredWidth: 30, type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
+                                    }
+                                }
                             }
                         }
-                    }
-                    panel {
-                        gridLayout(rows : 1, cols : 1)
-                        roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                        panel {
+                            gridLayout(rows : 1, cols : 1)
+                            scrollPane {
+                                roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                            }
+                        }
                     }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
