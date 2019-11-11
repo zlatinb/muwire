@@ -442,7 +442,23 @@ class MainFrameController {
 
     @ControllerAction
     void connectChatServer() {
+        String address = JOptionPane.showInputDialog("Copy/paste the address of the server here")
+        if (address == null)
+            return
+        Persona p
+        try {
+            p = new Persona(new ByteArrayInputStream(Base64.decode(address)))
+        } catch (Exception bad) {
+            JOptionPane.showMessageDialog(null, "Invalid server address", "Invalid server address", JOptionPane.ERROR_MESSAGE)
+            return
+        }
         
+        if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
+            def params = [:]
+            params['core'] = model.core
+            params['host'] = p
+            mvcGroup.createMVCGroup("chat-server", p.getHumanReadableName(), params)
+        }
     }
     
     void saveMuWireSettings() {
