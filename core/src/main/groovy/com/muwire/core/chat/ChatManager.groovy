@@ -51,6 +51,10 @@ class ChatManager {
         clients[e.host]?.connection?.sendChat(e)
     }
     
+    void onChatDisconnectionEvent(ChatDisconnectionEvent e) {
+        clients[e.persona]?.disconnected()
+    }
+    
     private void connect() {
         clients.each { k, v -> v.connectIfNeeded() }
     }

@@ -100,6 +100,11 @@ class ChatClient implements Closeable {
         }
     }
     
+    void disconnected() {
+        connectInProgress = false
+        connection = null
+    }
+    
     @Override
     public void close() {
         connectThread?.interrupt()

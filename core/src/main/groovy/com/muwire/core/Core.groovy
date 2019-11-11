@@ -3,6 +3,7 @@ package com.muwire.core
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
+import com.muwire.core.chat.ChatDisconnectionEvent
 import com.muwire.core.chat.ChatManager
 import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.ChatServer
@@ -319,6 +320,7 @@ public class Core {
             register(UIConnectChatEvent.class, chatManager)
             register(UIDisconnectChatEvent.class, chatManager)
             register(ChatMessageEvent.class, chatManager)
+            register(ChatDisconnectionEvent.class, chatManager)
         }
         
         log.info("initializing acceptor")
