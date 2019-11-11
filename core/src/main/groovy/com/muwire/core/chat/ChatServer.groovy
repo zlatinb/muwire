@@ -2,6 +2,7 @@ package com.muwire.core.chat
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 
 import com.muwire.core.Constants
@@ -31,11 +32,17 @@ class ChatServer {
     private final Map<String, Set<Persona>> rooms = new ConcurrentHashMap<>()
     private final Map<Persona, Set<String>> memberships = new ConcurrentHashMap<>()
     
+    private final AtomicBoolean running = new AtomicBoolean()
+    
     ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, Persona me) {
         this.eventBus = eventBus
         this.settings = settings
         this.trustService = trustService
         this.me = me
+    }
+    
+    public void start() {
+        running.set(true)
     }
     
     public void handle(Endpoint endpoint) {
@@ -58,7 +65,7 @@ class ChatServer {
         if (client.destination != endpoint.destination)
             throw new Exception("Client destination mismatch")
         
-        if (!settings.enableChat) {
+        if (!running.get()) {
             os.write("400 Chat Not Enabled\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.close()
             endpoint.close()
@@ -199,9 +206,11 @@ class ChatServer {
         }
     }
     
-    void shutdown() {
-        connections.each { k, v -> 
-            v.close()
+    void stop() {
+        if (running.compareAndSet(true, false)) {
+            connections.each { k, v ->
+                v.close()
+            }
         }
     }
 }

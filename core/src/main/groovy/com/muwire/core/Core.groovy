@@ -372,6 +372,8 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
         updateClient.start()
+        if (muOptions.startChatServer)
+            chatServer.start()
     }
 
     public void shutdown() {
@@ -383,9 +385,9 @@ public class Core {
         saveMuSettings()
         log.info("shutting down trust subscriber")
         trustSubscriber.stop()
-        log.info("shutting down download manageer")
+        log.info("shutting down download manager")
         downloadManager.shutdown()
-        log.info("shutting down connection acceeptor")
+        log.info("shutting down connection acceptor")
         connectionAcceptor.stop()
         log.info("shutting down connection establisher")
         connectionEstablisher.stop()
@@ -394,7 +396,7 @@ public class Core {
         log.info("shutting down cache client")
         cacheClient.stop()
         log.info("shutting down chat server")
-        chatServer.shutdown()
+        chatServer.stop()
         log.info("shutting down chat manager")
         chatManager.shutdown()
         log.info("shutting down connection manager")
