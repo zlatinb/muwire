@@ -2,6 +2,7 @@ package com.muwire.core.chat
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
+import java.util.logging.Level
 
 import com.muwire.core.Constants
 import com.muwire.core.EventBus
@@ -11,21 +12,28 @@ import com.muwire.core.connection.Endpoint
 import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
 
+import groovy.util.logging.Log
 import net.i2p.data.Base64
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
 
+@Log
 class ChatServer {
+    public static final String CONSOLE = "__CONSOLE__"
     private final EventBus eventBus
     private final MuWireSettings settings
     private final TrustService trustService
+    private final Persona me
     
     private final Map<Destination, ChatConnection> connections = new ConcurrentHashMap()
+    private final Map<String, Set<Persona>> rooms = new ConcurrentHashMap<>()
+    private final Map<Persona, Set<String>> memberships = new ConcurrentHashMap<>()
     
-    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService) {
+    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, Persona me) {
         this.eventBus = eventBus
         this.settings = settings
         this.trustService = trustService
+        this.me = me
     }
     
     public void handle(Endpoint endpoint) {
@@ -71,7 +79,95 @@ class ChatServer {
         
         ChatConnection connection = new ChatConnection(eventBus, endpoint, client, true, trustService, settings)
         connections.put(endpoint.destination, connection)
+        joinRoom(client, CONSOLE)
         connection.start()
         eventBus.publish(new ChatConnectionEvent(connection : connection, status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : client))
+    }
+    
+    private void joinRoom(Persona p, String room) {
+        Set<Persona> existing = rooms.get(room)
+        if (existing == null) {
+            existing = new ConcurrentHashSet<>()
+            rooms.put(room, existing)
+        }
+        existing.add(p)
+        
+        Set<String> membership = memberships.get(p)
+        if (membership == null) {
+            membership = new ConcurrentHashSet<>()
+            memberships.put(p, membership)
+        }
+        membership.add(room)
+    }
+    
+    private void leaveRoom(Persona p, String room) {
+        Set<Persona> existing = rooms.get(room)
+        if (existing == null) {
+            log.warning(p.getHumanReadableName() + " leaving room they hadn't joined")
+            return
+        }
+        existing.remove(p)
+        if (existing.isEmpty())
+            rooms.remove(room)
+            
+        Set<String> membership = memberships.get(p)
+        if (membership == null) {
+            log.warning(p.getHumanReadableName() + " didn't have any memberships")
+            return
+        }
+        membership.remove(room)
+        if (membership.isEmpty())
+            memberships.remove(p)
+    }
+    
+    void onChatMessageEvent(ChatMessageEvent e) {
+        if (e.host != me)
+            return
+        
+        ChatCommand command
+        try {
+            command = new ChatCommand(e.payload)
+        } catch (Exception badCommand) {
+            log.log(Level.WARNING, "bad chat command",badCommand)
+            return
+        }
+        
+        switch(command.action) {
+            case ChatAction.JOIN : processJoin(command.payload, e); break
+            case ChatAction.LEAVE : processLeave(e); break
+            case ChatAction.SAY : processSay(e); break
+        }
+    }
+    
+    private void processJoin(String room, ChatMessageEvent e) {
+        joinRoom(room, e.sender)
+        rooms[room].each { 
+            if (it == e.sender)
+                return
+            connections[it.destination].sendChat(e)
+        }
+    }
+    
+    private void processLeave(ChatMessageEvent e) {
+        leaveRoom(e.room)
+        rooms.getOrDefault(e.room, []).each { 
+            if (it == e.sender)
+                return
+            connections[it.destination].sendChat(e)
+        }
+    }
+    
+    private void processSay(ChatMessageEvent e) {
+        if (rooms.containsKey(e.room)) {
+            // not a private message
+            rooms[e.room].each { 
+                if (it == e.sender)
+                    return
+                connections[it.destination].sendChat(e)
+            }
+        } else {
+            Persona target = new Persona(new ByteArrayInputStream(Base64.decode(e.room)))
+            connections[target.destination]?.sendChat(e)
+        }
     }
 }
