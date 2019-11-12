@@ -49,6 +49,7 @@ class ChatRoomController {
             JOptionPane.showMessageDialog(null, "$words is not a user command","Invalid Command", JOptionPane.ERROR_MESSAGE)
             return
         }
+        long now = System.currentTimeMillis()
         
         if (command.action == ChatAction.SAY && command.payload.length() > 0) {
             String toShow = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + "> "+command.payload
@@ -75,7 +76,6 @@ class ChatRoomController {
             view.closeTab.call()
         }
         
-        long now = System.currentTimeMillis()
         UUID uuid = UUID.randomUUID()
         String room = model.console ? ChatServer.CONSOLE : model.room
 

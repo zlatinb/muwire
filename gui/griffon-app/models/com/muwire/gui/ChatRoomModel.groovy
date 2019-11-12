@@ -17,4 +17,7 @@ class ChatRoomModel {
     
     def members = []
     
+    void mvcGroupInit(Map<String,String> args) {
+        members.add(core.me)
+    }
 }
