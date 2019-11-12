@@ -60,6 +60,7 @@ class OptionsModel {
     @Observable boolean startChatServer
     @Observable int maxChatConnections
     @Observable boolean advertiseChat
+    @Observable int maxChatLines
 
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
@@ -112,5 +113,6 @@ class OptionsModel {
         startChatServer = settings.startChatServer
         maxChatConnections = settings.maxChatConnections
         advertiseChat = settings.advertiseChat
+        maxChatLines = uiSettings.maxChatLines
     }
 }

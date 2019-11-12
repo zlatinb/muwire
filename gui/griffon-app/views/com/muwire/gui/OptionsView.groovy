@@ -75,6 +75,7 @@ class OptionsView {
     def startChatServerCheckbox
     def maxChatConnectionsField
     def advertiseChatCheckbox
+    def maxChatLinesField
     
     def buttonsPanel
 
@@ -284,6 +285,8 @@ class OptionsView {
                 maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 1, gridy : 1, anchor:GridBagConstraints.LINE_END))
                 label(text : "Advertise chat ability in search results", constraints : gbc(gridx: 0, gridy:2, anchor:GridBagConstraints.LINE_START, weightx:100))
                 advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:1, gridy:2, anchor:GridBagConstraints.LINE_END))
+                label(text : "Maximum lines of scrollback (-1 means unlimited)", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:1, gridy: 3, anchor: GridBagConstraints.LINE_END))
             }
             panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }

@@ -56,6 +56,7 @@ class ChatRoomController {
 
             view.roomTextArea.append(toShow)
             view.roomTextArea.append('\n')
+            trimLines()
         }
         
         if (command.action == ChatAction.JOIN) {
@@ -131,6 +132,7 @@ class ChatRoomController {
         String toDisplay = DataHelper.formatTime(e.timestamp) + " <"+e.sender.getHumanReadableName()+"> " + text + "\n"
         runInsideUIAsync {
             view.roomTextArea.append(toDisplay)
+            trimLines()
         }
     }
     
@@ -139,6 +141,7 @@ class ChatRoomController {
         runInsideUIAsync {
             model.members.add(p)
             view.roomTextArea.append(toDisplay)
+            trimLines()
             view.membersTable?.model?.fireTableDataChanged()
         }
     }
@@ -158,6 +161,7 @@ class ChatRoomController {
         runInsideUIAsync {
             model.members.remove(p)
             view.roomTextArea.append(toDisplay)
+            trimLines()
             view.membersTable?.model?.fireTableDataChanged()
         }
     }
@@ -167,8 +171,19 @@ class ChatRoomController {
         runInsideUIAsync {
             if (model.members.remove(p)) {
                 view.roomTextArea.append(toDisplay)
+                trimLines()
                 view.membersTable?.model?.fireTableDataChanged()
             }
+        }
+    }
+    
+    private void trimLines() {
+        if (model.settings.maxChatLines < 0)
+            return
+        while(view.roomTextArea.getLineCount() > model.settings.maxChatLines) {
+            int line0Start = view.roomTextArea.getLineStartOffset(0)
+            int line0End = view.roomTextArea.getLineEndOffset(0)
+            view.roomTextArea.replaceRange(null, line0Start, line0End)
         }
     }
 }

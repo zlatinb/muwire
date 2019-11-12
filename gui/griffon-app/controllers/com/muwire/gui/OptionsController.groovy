@@ -151,6 +151,10 @@ class OptionsController {
         boolean advertiseChat = view.advertiseChatCheckbox.model.isSelected()
         model.advertiseChat = advertiseChat
         settings.advertiseChat = advertiseChat
+        
+        int maxChatLines = Integer.parseInt(view.maxChatLinesField.text)
+        model.maxChatLines = maxChatLines
+        uiSettings.maxChatLines = maxChatLines
 
         core.saveMuSettings()
 

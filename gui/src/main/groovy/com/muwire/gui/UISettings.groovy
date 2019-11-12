@@ -19,6 +19,7 @@ class UISettings {
     boolean clearUploads
     boolean storeSearchHistory
     boolean groupByFile
+    int maxChatLines
     Set<String> searchHistory
     Set<String> openTabs
     
@@ -38,6 +39,7 @@ class UISettings {
         clearUploads = Boolean.parseBoolean(props.getProperty("clearUploads","false"))
         storeSearchHistory = Boolean.parseBoolean(props.getProperty("storeSearchHistory","true"))
         groupByFile = Boolean.parseBoolean(props.getProperty("groupByFile","false"))
+        maxChatLines = Integer.parseInt(props.getProperty("maxChatLines","-1"))
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
         openTabs = DataUtil.readEncodedSet(props, "openTabs")
@@ -59,6 +61,7 @@ class UISettings {
         props.setProperty("clearUploads", String.valueOf(clearUploads))
         props.setProperty("storeSearchHistory", String.valueOf(storeSearchHistory))
         props.setProperty("groupByFile", String.valueOf(groupByFile))
+        props.setProperty("maxChatLines", String.valueOf(maxChatLines))
         if (font != null)
             props.setProperty("font", font)
 

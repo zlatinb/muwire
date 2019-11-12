@@ -19,7 +19,10 @@ class ChatRoomModel {
     
     def members = []
     
+    UISettings settings
+    
     void mvcGroupInit(Map<String,String> args) {
         members.add(core.me)
+        settings = application.context.get("ui-settings")
     }
 }
