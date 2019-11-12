@@ -4,6 +4,8 @@ import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -113,25 +115,49 @@ class ChatRoomView {
             membersTable.addMouseListener(new MouseAdapter() {
                         public void mouseClicked(MouseEvent e) {
                             if (e.button == MouseEvent.BUTTON1 && e.clickCount > 1) {
-                                int selectedRow = membersTable.getSelectedRow()
-                                if (lastMembersTableSortEvent != null)
-                                    selectedRow = membersTable.rowSorter.convertRowIndexToModel(selectedRow)
-                                Persona p = model.members[selectedRow]
-                                if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName()+"-private-chat")) {
-                                    def params = [:]
-                                    params['core'] = model.core
-                                    params['tabName'] = model.tabName
-                                    params['room'] = p.toBase64()
-                                    params['privateChat'] = true
-                                    params['host'] = model.host
-                                    params['roomTabName'] = p.getHumanReadableName()
-                                    
-                                    mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
-                                }
-                            }
+                                controller.privateMessage()
+                            } else if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                                showPopupMenu(e)
+                        }
+                        
+                        public void mouseReleased(MouseEvent e) {
+                            if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                                showPopupMenu(e)
                         }
                     })
         }
+    }
+    
+    private void showPopupMenu(MouseEvent e) {
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem privateChat = new JMenuItem("Start Private Chat")
+        privateChat.addActionListener({controller.privateMessage()})
+        menu.add(privateChat)
+        JMenuItem markTrusted = new JMenuItem("Mark Trusted")
+        markTrusted.addActionListener({controller.markTrusted()})
+        menu.add(markTrusted)
+        JMenuItem markNeutral = new JMenuItem("Mark Neutral")
+        markNeutral.addActionListener({controller.markNeutral()})
+        menu.add(markNeutral)
+        JMenuItem markDistrusted = new JMenuItem("Mark Distrusted")
+        markDistrusted.addActionListener({controller.markDistrusted()})
+        menu.add(markDistrusted)
+        menu.show(e.getComponent(), e.getX(), e.getY())
+    }
+    
+    Persona getSelectedPersona() {
+        int selectedRow = membersTable.getSelectedRow()
+        if (selectedRow < 0)
+            return null
+        if (lastMembersTableSortEvent != null)
+            selectedRow = membersTable.rowSorter.convertRowIndexToModel(selectedRow)
+        model.members[selectedRow]
+    }
+    
+    void refreshMembersTable() {
+        int selectedRow = membersTable.getSelectedRow()
+        membersTable.model.fireTableDataChanged()
+        membersTable.selectionModel.setSelectionInterval(selectedRow, selectedRow)
     }
     
     def closeTab = {

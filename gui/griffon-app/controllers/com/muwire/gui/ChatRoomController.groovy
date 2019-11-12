@@ -22,6 +22,8 @@ import com.muwire.core.chat.ChatAction
 import com.muwire.core.chat.ChatConnection
 import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.ChatServer
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustLevel
 
 @Log
 @ArtifactProviderFor(GriffonController)
@@ -92,6 +94,50 @@ class ChatRoomController {
         sig : sig)
 
         model.core.eventBus.publish(event)
+    }
+    
+    @ControllerAction
+    void privateMessage() { 
+        Persona p = view.getSelectedPersona()
+        if (p == null)
+            return
+        if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName()+"-private-chat")) {
+            def params = [:]
+            params['core'] = model.core
+            params['tabName'] = model.tabName
+            params['room'] = p.toBase64()
+            params['privateChat'] = true
+            params['host'] = model.host
+            params['roomTabName'] = p.getHumanReadableName()
+            
+            mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
+        }
+    }
+    
+    void markTrusted() {
+        Persona p = view.getSelectedPersona()
+        if (p == null)
+            return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        model.core.eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
+        view.refreshMembersTable()    
+    }
+    
+    void markDistrusted() {
+        Persona p = view.getSelectedPersona()
+        if (p == null)
+            return
+        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        model.core.eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
+        view.refreshMembersTable()
+    }
+    
+    void markNeutral() {
+        Persona p = view.getSelectedPersona()
+        if (p == null)
+            return
+        model.core.eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.NEUTRAL))
+        view.refreshMembersTable()
     }
     
     void leaveRoom() {
