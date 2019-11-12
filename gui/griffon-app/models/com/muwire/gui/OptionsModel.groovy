@@ -56,6 +56,10 @@ class OptionsModel {
     @Observable boolean trustLists
     @Observable String trustListInterval
 
+    // chat options
+    @Observable boolean startChatServer
+    @Observable int maxChatConnections
+    @Observable boolean advertiseChat
 
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
@@ -104,5 +108,9 @@ class OptionsModel {
         searchExtraHop = settings.searchExtraHop
         trustLists = settings.allowTrustLists
         trustListInterval = String.valueOf(settings.trustListInterval)
+        
+        startChatServer = settings.startChatServer
+        maxChatConnections = settings.maxChatConnections
+        advertiseChat = settings.advertiseChat
     }
 }

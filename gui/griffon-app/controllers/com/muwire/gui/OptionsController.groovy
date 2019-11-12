@@ -139,6 +139,18 @@ class OptionsController {
         String trustListInterval = view.trustListIntervalField.text
         model.trustListInterval = trustListInterval
         settings.trustListInterval = Integer.parseInt(trustListInterval)
+        
+        boolean startChatServer = view.startChatServerCheckbox.model.isSelected()
+        model.startChatServer = startChatServer
+        settings.startChatServer = startChatServer
+        
+        String maxChatConnections = view.maxChatConnectionsField.text
+        model.maxChatConnections = Integer.parseInt(maxChatConnections)
+        settings.maxChatConnections = Integer.parseInt(maxChatConnections)
+        
+        boolean advertiseChat = view.advertiseChatCheckbox.model.isSelected()
+        model.advertiseChat = advertiseChat
+        settings.advertiseChat = advertiseChat
 
         core.saveMuSettings()
 

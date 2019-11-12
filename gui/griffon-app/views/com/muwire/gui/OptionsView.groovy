@@ -33,6 +33,7 @@ class OptionsView {
     def u
     def bandwidth
     def trust
+    def chat
 
     def retryField
     def updateField
@@ -71,6 +72,10 @@ class OptionsView {
     def allowTrustListsCheckbox
     def trustListIntervalField
 
+    def startChatServerCheckbox
+    def maxChatConnectionsField
+    def advertiseChatCheckbox
+    
     def buttonsPanel
 
     def mainFrame
@@ -267,6 +272,21 @@ class OptionsView {
             }
             panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }
+        
+        chat = builder.panel {
+            gridBagLayout()
+            panel (border : titledBorder(title : "Chat Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+                constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Start chat server on startup", constraints : gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:1, gridy:0, anchor:GridBagConstraints.LINE_END))
+                label(text : "Maximum chat connections (-1 means unlimited)", constraints : gbc(gridx: 0, gridy:1, anchor:GridBagConstraints.LINE_START, weightx:100))
+                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 1, gridy : 1, anchor:GridBagConstraints.LINE_END))
+                label(text : "Advertise chat ability in search results", constraints : gbc(gridx: 0, gridy:2, anchor:GridBagConstraints.LINE_START, weightx:100))
+                advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:1, gridy:2, anchor:GridBagConstraints.LINE_END))
+            }
+            panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
+        }
 
 
         buttonsPanel = builder.panel {
@@ -286,6 +306,7 @@ class OptionsView {
             tabbedPane.addTab("Bandwidth", bandwidth)
         }
         tabbedPane.addTab("Trust", trust)
+        tabbedPane.addTab("Chat", chat)
 
         JPanel panel = new JPanel()
         panel.setLayout(new BorderLayout())

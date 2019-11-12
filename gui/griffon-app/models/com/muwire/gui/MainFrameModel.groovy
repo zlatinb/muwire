@@ -257,6 +257,10 @@ class MainFrameModel {
                 uploadsPaneButtonEnabled = true
                 monitorPaneButtonEnabled = true
                 trustPaneButtonEnabled = true
+                chatPaneButtonEnabled = true
+                
+                if (core.muOptions.startChatServer)
+                    controller.startChatServer()
             }
         })
 

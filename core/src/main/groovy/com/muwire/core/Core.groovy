@@ -372,8 +372,6 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
         updateClient.start()
-        if (muOptions.startChatServer)
-            chatServer.start()
     }
 
     public void shutdown() {
