@@ -115,7 +115,7 @@ class ChatRoomView {
                                 if (lastMembersTableSortEvent != null)
                                     selectedRow = membersTable.rowSorter.convertRowIndexToModel(selectedRow)
                                 Persona p = model.members[selectedRow]
-                                if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName())) {
+                                if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName()+"-private-chat")) {
                                     def params = [:]
                                     params['core'] = model.core
                                     params['tabName'] = model.tabName
@@ -123,7 +123,7 @@ class ChatRoomView {
                                     params['privateChat'] = true
                                     params['host'] = model.host
                                     
-                                    mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName(), params)
+                                    mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
                                 }
                             }
                         }
