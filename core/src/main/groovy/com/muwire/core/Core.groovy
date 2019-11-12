@@ -286,8 +286,16 @@ public class Core {
         CertificateClient certificateClient = new CertificateClient(eventBus, i2pConnector)
         eventBus.register(UIFetchCertificatesEvent.class, certificateClient)
         
+        log.info("initializing chat server")
+        chatServer = new ChatServer(eventBus, props, trustService, me, spk)
+        eventBus.with {
+            register(ChatMessageEvent.class, chatServer)
+            register(ChatDisconnectionEvent.class, chatServer)
+            register(TrustEvent.class, chatServer)
+        }
+        
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager)
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer)
 
         log.info "initializing search manager"
         SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
@@ -310,13 +318,6 @@ public class Core {
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
-        log.info("initializing chat server")
-        chatServer = new ChatServer(eventBus, props, trustService, me, spk)
-        eventBus.with { 
-            register(ChatMessageEvent.class, chatServer)
-            register(ChatDisconnectionEvent.class, chatServer)
-            register(TrustEvent.class, chatServer)
-        } 
         
         log.info("initializing chat manager")
         chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
