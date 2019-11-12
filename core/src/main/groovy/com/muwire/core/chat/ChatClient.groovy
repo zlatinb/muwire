@@ -89,6 +89,7 @@ class ChatClient implements Closeable {
                 throw new Exception("Unknown chat version $version")
             
             connection = new ChatConnection(eventBus, endpoint, host, false, trustService, settings)
+            connection.start()
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 
                 connection : connection))
         } catch (Exception e) {
