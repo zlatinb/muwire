@@ -6,6 +6,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import groovy.util.logging.Log
 import net.i2p.crypto.DSAEngine
+import net.i2p.data.Base64
 import net.i2p.data.DataHelper
 import net.i2p.data.Signature
 
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets
 import java.util.logging.Level
 
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
 import com.muwire.core.Persona
 import com.muwire.core.chat.ChatCommand
@@ -43,6 +45,36 @@ class ChatRoomController {
             command = new ChatCommand("/SAY $words")
         }
         
+        if (!command.action.user) {
+            JOptionPane.showMessageDialog(null, "$words is not a user command","Invalid Command", JOptionPane.ERROR_MESSAGE)
+            return
+        }
+        
+        if (command.action == ChatAction.SAY && command.payload.length() > 0) {
+            String toShow = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + "> "+command.payload
+
+            view.roomTextArea.append(toShow)
+            view.roomTextArea.append('\n')
+        }
+        
+        if (command.action == ChatAction.JOIN) {
+            String newRoom = command.payload
+            if (!mvcGroup.parentGroup.childrenGroups.containsKey(newRoom)) {
+                def params = [:]
+                params['core'] = model.core
+                params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
+                params['room'] = newRoom
+                params['console'] = false
+                params['host'] = model.host
+
+                mvcGroup.parentGroup.createMVCGroup("chat-room", newRoom, params)
+            }
+        }
+        if (command.action == ChatAction.LEAVE && !model.console) {
+            leftRoom = true
+            view.closeTab.call()
+        }
+        
         long now = System.currentTimeMillis()
         UUID uuid = UUID.randomUUID()
         String room = model.console ? ChatServer.CONSOLE : model.room
@@ -58,30 +90,6 @@ class ChatRoomController {
         sig : sig)
 
         model.core.eventBus.publish(event)
-        if (command.action == ChatAction.SAY && command.payload.length() > 0) {
-            String toShow = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + "> "+command.payload
-
-            view.roomTextArea.append(toShow)
-            view.roomTextArea.append('\n')
-        }
-        
-        if (command.action == ChatAction.JOIN) {
-            String newRoom = command.payload
-            if (mvcGroup.parentGroup.childrenGroups.containsKey(newRoom))
-                return
-            def params = [:]
-            params['core'] = model.core
-            params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
-            params['room'] = newRoom
-            params['console'] = false
-            params['host'] = model.host
-
-            mvcGroup.parentGroup.createMVCGroup("chat-room", newRoom, params)            
-        }
-        if (command.action == ChatAction.LEAVE && !model.console) {
-            leftRoom = true
-            view.closeTab.call()
-        }
     }
     
     void leaveRoom() {
@@ -109,16 +117,16 @@ class ChatRoomController {
             log.log(Level.WARNING,"bad chat command",bad)
             return
         }
-        
+        log.info("$model.room processing $command.action")
         switch(command.action) {
             case ChatAction.SAY : processSay(e, command.payload);break
             case ChatAction.JOIN : processJoin(e.timestamp, e.sender); break
+            case ChatAction.JOINED : processJoined(command.payload); break
             case ChatAction.LEAVE : processLeave(e.timestamp, e.sender); break
         }
     }
     
     private void processSay(ChatMessageEvent e, String text) {
-        log.info "processing say $text"
         String toDisplay = DataHelper.formatTime(e.timestamp) + " <"+e.sender.getHumanReadableName()+"> " + text + "\n"
         runInsideUIAsync {
             view.roomTextArea.append(toDisplay)
@@ -128,14 +136,28 @@ class ChatRoomController {
     private void processJoin(long timestamp, Persona p) {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " joined the room\n"
         runInsideUIAsync {
+            model.members.add(p)
             view.roomTextArea.append(toDisplay)
+            view.membersTable?.model?.fireTableDataChanged()
+        }
+    }
+    
+    private void processJoined(String list) {
+        runInsideUIAsync {
+            list.split(",").each { 
+                Persona p = new Persona(new ByteArrayInputStream(Base64.decode(it)))
+                model.members.add(p)
+            }
+            view.membersTable?.model?.fireTableDataChanged()
         }
     }
     
     private void processLeave(long timestamp, Persona p) {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " left the room\n"
         runInsideUIAsync {
+            model.members.remove(p)
             view.roomTextArea.append(toDisplay)
+            view.membersTable?.model?.fireTableDataChanged()
         }
     }
     

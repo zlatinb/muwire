@@ -50,11 +50,17 @@ class ChatServerModel {
     }
     
     void onChatConnectionEvent(ChatConnectionEvent e) {
-        if (e.connection != null)
-            link = e.connection
         runInsideUIAsync {
             status = e.status
         }
+        
+        ChatLink link = e.connection
+        if (link == null)
+            return
+        if (link.getPersona() == host)
+            this.link = link
+        else if (link.getPersona() == null && host == core.me)
+            this.link = link
     }
     
     private void eventLoop() {
@@ -87,7 +93,6 @@ class ChatServerModel {
         if (chatCommand.action == ChatAction.JOIN) {
             room = chatCommand.payload
         }
-        log.info("dispatching to room ${room}")
         mvcGroup.childrenGroups[room]?.controller?.handleChatMessage(e)
     }
     

@@ -16,4 +16,5 @@ class ChatRoomModel {
     boolean console
     
     def members = []
+    
 }

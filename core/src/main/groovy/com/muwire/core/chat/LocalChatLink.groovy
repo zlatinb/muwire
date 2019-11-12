@@ -42,4 +42,8 @@ class LocalChatLink implements ChatLink {
     public boolean isUp() {
         true
     }
+    
+    public Persona getPersona() {
+        null
+    }
 }

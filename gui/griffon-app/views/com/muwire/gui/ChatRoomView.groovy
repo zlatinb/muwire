@@ -24,6 +24,7 @@ class ChatRoomView {
     def parent
     def sayField
     def roomTextArea
+    def membersTable
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -51,7 +52,7 @@ class ChatRoomView {
                         panel {
                             gridLayout(rows : 1, cols : 1)
                             scrollPane {
-                                table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
                                         closureColumn(header : "Name", preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
                                         closureColumn(header : "Trust Status", preferredWidth: 30, type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})

@@ -107,7 +107,6 @@ class ChatServer {
         joinRoom(client, CONSOLE)
         connection.start()
         processHelp(connection.endpoint.destination)
-        eventBus.publish(new ChatConnectionEvent(connection : connection, status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : client))
     }
     
     void onChatDisconnectionEvent(ChatDisconnectionEvent e) {
@@ -185,7 +184,8 @@ class ChatServer {
         }
 
         if ((command.action.console && e.room != CONSOLE) ||
-            (!command.action.console && e.room == CONSOLE))
+            (!command.action.console && e.room == CONSOLE) ||
+            !command.action.user)
             return
             
         switch(command.action) {
@@ -205,10 +205,29 @@ class ChatServer {
                 return
             connections[it.destination].sendChat(e)
         }
+        String payload = rooms[room].stream().filter({it != e.sender}).map({it.toBase64()})
+            .collect(Collectors.joining(","))
+        if (payload.length() == 0) {
+            return
+        }
+        payload = "/JOINED $payload"
+        long now = System.currentTimeMillis()
+        UUID uuid = UUID.randomUUID()
+        byte [] sig = ChatConnection.sign(uuid, now, room, payload, me, me, spk)
+        ChatMessageEvent echo = new ChatMessageEvent(
+            uuid : uuid,
+            payload : payload,
+            sender : me,
+            host : me,
+            room : room,
+            chatTime : now,
+            sig : sig
+            )
+        connections[e.sender.destination].sendChat(echo)
     }
     
     private void processLeave(ChatMessageEvent e) {
-        leaveRoom(e.room)
+        leaveRoom(e.sender, e.room)
         rooms.getOrDefault(e.room, []).each { 
             if (it == e.sender)
                 return

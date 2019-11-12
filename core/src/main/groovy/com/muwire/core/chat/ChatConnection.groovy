@@ -84,6 +84,11 @@ class ChatConnection implements ChatLink {
     }
     
     @Override
+    public Persona getPersona() {
+        persona
+    }
+    
+    @Override
     public void close() {
         if (!running.compareAndSet(true, false)) {
             log.log(Level.WARNING,"${persona.getHumanReadableName()} already closed", new Exception())
@@ -199,7 +204,8 @@ class ChatConnection implements ChatLink {
         def event = new ChatMessageEvent( uuid : uuid, payload : payload, sender : sender,
             host : host, room : room, chatTime : chatTime, sig : sig)
         eventBus.publish(event)
-        incomingEvents.put(event)
+        if (!incoming)
+            incomingEvents.put(event)
     }
     
     private void handleLeave(def json) {
