@@ -67,6 +67,7 @@ class ChatRoomController {
                 params['room'] = newRoom
                 params['console'] = false
                 params['host'] = model.host
+                params['roomTabName'] = newRoom
 
                 mvcGroup.parentGroup.createMVCGroup("chat-room", newRoom, params)
             }
@@ -76,9 +77,9 @@ class ChatRoomController {
             view.closeTab.call()
         }
         
-        UUID uuid = UUID.randomUUID()
         String room = model.console ? ChatServer.CONSOLE : model.room
-
+        
+        UUID uuid = UUID.randomUUID()
         byte [] sig = ChatConnection.sign(uuid, now, room, command.source, model.core.me, model.host, model.core.spk)
 
         def event = new ChatMessageEvent(uuid : uuid,

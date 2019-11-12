@@ -15,6 +15,7 @@ class ChatRoomModel {
     String room
     boolean console
     boolean privateChat
+    String roomTabName
     
     def members = []
     

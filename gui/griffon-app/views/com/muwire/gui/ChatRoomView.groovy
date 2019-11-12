@@ -86,7 +86,7 @@ class ChatRoomView {
     
     void mvcGroupInit(Map<String,String> args) {
         parent = mvcGroup.parentGroup.view.builder.getVariable(model.tabName)
-        parent.addTab(model.room, pane)
+        parent.addTab(model.roomTabName, pane)
         
         int index = parent.indexOfComponent(pane)
         parent.setSelectedIndex(index)
@@ -94,7 +94,7 @@ class ChatRoomView {
         def tabPanel = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.CENTER) {
-                label(text : model.room)
+                label(text : model.roomTabName)
             }
             button(icon : imageIcon("/close_tab.png"), preferredSize: [20, 20], constraints : BorderLayout.EAST,
                 actionPerformed : closeTab )
@@ -122,6 +122,7 @@ class ChatRoomView {
                                     params['room'] = p.getHumanReadableName()
                                     params['privateChat'] = true
                                     params['host'] = model.host
+                                    params['privateTarget'] = p
                                     
                                     mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
                                 }
