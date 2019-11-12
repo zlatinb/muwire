@@ -17,6 +17,8 @@ class ChatServerView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     ChatServerModel model
+    @MVCMember @Nonnull
+    ChatServerController controller
 
     def pane
     def parent
@@ -66,6 +68,7 @@ class ChatServerView {
     }
 
     def closeTab = {
+        controller.disconnect()
         int index = parent.indexOfComponent(pane)
         parent.removeTabAt(index)
         mvcGroup.destroy()
