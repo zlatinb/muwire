@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
+import java.util.stream.Collectors
 
 import com.muwire.core.Constants
 import com.muwire.core.EventBus
@@ -50,6 +51,8 @@ class ChatServer {
     public void start() {
         running.set(true)
         connections.put(me.destination, LocalChatLink.INSTANCE)
+        joinRoom(me, CONSOLE)
+        processHelp(me.destination)
     }
     
     private void sendPings() {
@@ -103,6 +106,7 @@ class ChatServer {
         connections.put(endpoint.destination, connection)
         joinRoom(client, CONSOLE)
         connection.start()
+        processHelp(connection.endpoint.destination)
         eventBus.publish(new ChatConnectionEvent(connection : connection, status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : client))
     }
     
@@ -188,9 +192,9 @@ class ChatServer {
             case ChatAction.JOIN : processJoin(command.payload, e); break
             case ChatAction.LEAVE : processLeave(e); break
             case ChatAction.SAY : processSay(e); break
-            case ChatAction.LIST : processList(e); break
-            case ChatAction.INFO : processInfo(e); break
-            case ChatAction.HELP : processHelp(e); break
+            case ChatAction.LIST : processList(e.sender.destination); break
+            case ChatAction.INFO : processInfo(e.sender.destination); break
+            case ChatAction.HELP : processHelp(e.sender.destination); break
         }
     }
     
@@ -226,22 +230,25 @@ class ChatServer {
         }
     }
     
-    private void processList(ChatMessageEvent e) {
-        String roomList = "/SAY " + String.join("\n", rooms.keySet())
-        echo(roomList, e)
+    private void processList(Destination d) {
+        String roomList = rooms.keySet().stream().filter({it != CONSOLE}).collect(Collectors.joining("\n"))
+        roomList = "/SAY \nRoom List:\n"+roomList
+        echo(roomList, d)
     }
     
-    private void processInfo(ChatMessageEvent e) {
-        String info = "/SAY The address of this server is \n${me.toBase64()}\nCopy/paste this and share it"
-        echo(info, e)
+    private void processInfo(Destination d) {
+        String info = "/SAY \nThe address of this server is\n========\n${me.toBase64()}\n========\nCopy/paste the above and share it\n"
+        String connectedUsers = memberships.keySet().stream().map({it.getHumanReadableName()}).collect(Collectors.joining("\n"))
+        info = "${info}\nConnected Users:\n$connectedUsers\n======="
+        echo(info, d)
     }
     
-    private void processHelp(ChatMessageEvent e) {
+    private void processHelp(Destination d) {
         String help = "/SAY Available commands: /JOIN /LEAVE /SAY /LIST /INFO /HELP"
-        echo(help, e)
+        echo(help, d)
     }
     
-    private void echo(String payload, ChatMessageEvent e) {
+    private void echo(String payload, Destination d) {
         log.info "echoing $payload"
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
@@ -255,7 +262,7 @@ class ChatServer {
             chatTime : now,
             sig : sig
             )
-        connections[e.sender.destination]?.sendChat(echo)
+        connections[d]?.sendChat(echo)
     }
     
     void stop() {
