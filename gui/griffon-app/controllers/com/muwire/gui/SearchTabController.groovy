@@ -106,6 +106,17 @@ class SearchTabController {
 
         mvcGroup.createMVCGroup("browse", groupId, params)
     }
+    
+    @ControllerAction
+    void chat() {
+        def sender = view.selectedSender()
+        if (sender == null)
+            return
+        
+        def parent = mvcGroup.parentGroup
+        parent.controller.startChat(sender)
+        parent.view.showChatWindow.call()
+    }
 
     @ControllerAction
     void showComment() {

@@ -74,6 +74,7 @@ class SearchTabView {
                                             closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
                                             closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
                                             closureColumn(header : "Browse", preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
+                                            closureColumn(header : "Chat", preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
                                             closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
                                                 model.core.trustService.getLevel(row.destination).toString()
                                             })
@@ -84,6 +85,7 @@ class SearchTabView {
                                     gridLayout(rows: 1, cols : 2)
                                     panel (border : etchedBorder()){
                                         button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : "Chat", enabled : bind{model.chatActionEnabled}, chatAction)
                                     }
                                     panel (border : etchedBorder()){
                                         button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
@@ -154,6 +156,14 @@ class SearchTabView {
                                                 }
                                                 count
                                             })
+                                            closureColumn(header : "Chat Hosts", preferredWidth : 20, type : Integer, read : {
+                                                int count = 0
+                                                model.hashBucket[it].each { 
+                                                    if (it.chat)
+                                                        count++
+                                                }
+                                                count
+                                            })
                                         }
                                     }
                                 }
@@ -177,6 +187,7 @@ class SearchTabView {
                                         tableModel(list : model.senders2) {
                                             closureColumn(header : "Sender", preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
                                             closureColumn(header : "Browse", preferredWidth : 20, type : Boolean, read : {it.browse})
+                                            closureColumn(header : "Chat", preferredWidth : 20, type : Boolean, read : {it.chat})
                                             closureColumn(header : "Comment", preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : "Certificates", preferredWidth : 20, type: Integer, read : {it.certificates})
                                             closureColumn(header : "Trust", preferredWidth : 50, type : String, read : {
@@ -189,6 +200,7 @@ class SearchTabView {
                                     gridLayout(rows : 1, cols : 2)
                                     panel (border : etchedBorder()) {
                                         button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : "Chat", enabled : bind{model.chatActionEnabled}, chatAction)
                                         button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
                                         button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
                                     }
@@ -314,10 +326,12 @@ class SearchTabView {
             if (row < 0) {
                 model.trustButtonsEnabled = false
                 model.browseActionEnabled = false
+                model.chatActionEnabled = false
                 return
             } else {
                 Persona sender = model.senders[row]
                 model.browseActionEnabled = model.sendersBucket[sender].first().browse
+                model.chatActionEnabled = model.sendersBucket[sender].first().chat
                 model.trustButtonsEnabled = true
                 model.results.clear()
                 model.results.addAll(model.sendersBucket[sender])
@@ -337,6 +351,7 @@ class SearchTabView {
             if (e == null) {
                 model.trustButtonsEnabled = false
                 model.browseActionEnabled = false
+                model.chatActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 return
             }
@@ -370,12 +385,14 @@ class SearchTabView {
             int row = selectedSenderRow()
             if (row < 0 || model.senders2[row] == null) {
                 model.browseActionEnabled = false
+                model.chatActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.trustButtonsEnabled = false
                 model.viewCommentActionEnabled = false
                 return
             }
             model.browseActionEnabled = model.senders2[row].browse
+            model.chatActionEnabled = model.senders2[row].chat
             model.trustButtonsEnabled = true
             model.viewCommentActionEnabled = model.senders2[row].comment != null
             model.viewCertificatesActionEnabled = model.senders2[row].certificates > 0

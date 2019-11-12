@@ -452,7 +452,11 @@ class MainFrameController {
             JOptionPane.showMessageDialog(null, "Invalid server address", "Invalid server address", JOptionPane.ERROR_MESSAGE)
             return
         }
-        
+     
+        startChat(p)   
+    }
+    
+    void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]
             params['core'] = model.core
@@ -460,7 +464,7 @@ class MainFrameController {
             mvcGroup.createMVCGroup("chat-server", p.getHumanReadableName(), params)
         }
     }
-    
+
     void saveMuWireSettings() {
         core.saveMuSettings()
     }

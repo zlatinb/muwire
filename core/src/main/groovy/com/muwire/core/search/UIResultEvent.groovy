@@ -17,6 +17,7 @@ class UIResultEvent extends Event {
     String comment
     boolean browse
     int certificates
+    boolean chat
 
     @Override
     public String toString() {

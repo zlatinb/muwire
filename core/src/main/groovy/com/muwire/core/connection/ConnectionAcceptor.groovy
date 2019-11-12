@@ -306,6 +306,10 @@ class ConnectionAcceptor {
                 throw new IOException("No Sender header")
             if (!headers.containsKey("Count"))
                 throw new IOException("No Count header")
+            
+            boolean chat = false
+            if (headers.containsKey('Chat'))
+                chat = Boolean.parseBoolean(headers['Chat'])
                 
             byte [] personaBytes = Base64.decode(headers['Sender'])
             Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
@@ -324,6 +328,7 @@ class ConnectionAcceptor {
                 dis.readFully(payload)
                 def json = slurper.parse(payload)
                 results[i] = ResultsParser.parse(sender, resultsUUID, json)
+                results[i].chat = chat
             }
             eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
         } catch (IOException bad) {

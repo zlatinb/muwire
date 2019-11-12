@@ -1,6 +1,7 @@
 package com.muwire.core.search
 
 import com.muwire.core.SharedFile
+import com.muwire.core.chat.ChatServer
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.filecert.CertificateManager
@@ -48,13 +49,16 @@ class ResultsSender {
     private final EventBus eventBus
     private final MuWireSettings settings
     private final CertificateManager certificateManager
+    private final ChatServer chatServer
 
-    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings, CertificateManager certificateManager) {
+    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings, 
+        CertificateManager certificateManager, ChatServer chatServer) {
         this.connector = connector;
         this.eventBus = eventBus
         this.me = me
         this.settings = settings
         this.certificateManager = certificateManager
+        this.chatServer = chatServer
     }
 
     void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults) {
@@ -82,7 +86,8 @@ class ResultsSender {
                     uuid : uuid,
                     sources : suggested,
                     comment : comment,
-                    certificates : certificates
+                    certificates : certificates,
+                    chat : chatServer.running.get() && settings.advertiseChat
                     )
                 uiResultEvents << uiResultEvent
             }
@@ -130,6 +135,8 @@ class ResultsSender {
                         os.write("RESULTS $uuid\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Sender: ${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
+                        boolean chat = chatServer.running.get() && settings.advertiseChat
+                        os.write("Chat: $chat\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
