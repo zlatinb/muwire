@@ -97,7 +97,8 @@ class ChatServerModel {
         }
         if (chatCommand.action == ChatAction.SAY &&
             room == core.me.toBase64()) {
-            if (!mvcGroup.childrenGroups.containsKey(e.sender.getHumanReadableName()+"-private-chat")) {
+            String groupId = e.sender.getHumanReadableName() + "-private-chat"
+            if (!mvcGroup.childrenGroups.containsKey(groupId)) {
                 def params = [:]
                 params['core'] = core
                 params['tabName'] = host.getHumanReadableName() + "-chat-rooms"
@@ -106,9 +107,9 @@ class ChatServerModel {
                 params['host'] = host
                 params['roomTabName'] = e.sender.getHumanReadableName() 
 
-                mvcGroup.createMVCGroup("chat-room",e.sender.getHumanReadableName()+"-private-chat", params)
+                mvcGroup.createMVCGroup("chat-room",groupId, params)
             }
-            room = e.sender.toBase64()
+            room = groupId
         }
         mvcGroup.childrenGroups[room]?.controller?.handleChatMessage(e)
     }
