@@ -6,6 +6,8 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.chat.UIDisconnectChatEvent
+
 @ArtifactProviderFor(GriffonController)
 class ChatServerController {
     @MVCMember @Nonnull
@@ -13,5 +15,6 @@ class ChatServerController {
 
     @ControllerAction
     void disconnect() {
+        model.core.eventBus.publish(new UIDisconnectChatEvent(host : model.host))
     }
 }

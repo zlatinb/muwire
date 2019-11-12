@@ -110,6 +110,7 @@ class ChatClient implements Closeable {
     public void close() {
         connectThread?.interrupt()
         connection?.close()
+        eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.DISCONNECTED, persona : host))
     }
     
     void ping() {
