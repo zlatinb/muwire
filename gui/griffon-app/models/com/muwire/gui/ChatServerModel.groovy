@@ -1,7 +1,11 @@
 package com.muwire.gui
 
+import java.util.logging.Level
+
 import com.muwire.core.Core
 import com.muwire.core.Persona
+import com.muwire.core.chat.ChatCommand
+import com.muwire.core.chat.ChatAction
 import com.muwire.core.chat.ChatConnectionAttemptStatus
 import com.muwire.core.chat.ChatConnectionEvent
 import com.muwire.core.chat.ChatLink
@@ -72,8 +76,19 @@ class ChatServerModel {
     }
     
     private void handleChatMessage(ChatMessageEvent e) {
-        log.info("dispatching to room ${e.room}")
-        mvcGroup.childrenGroups[e.room]?.controller?.handleChatMessage(e)
+        ChatCommand chatCommand
+        try {
+            chatCommand = new ChatCommand(e.payload)
+        } catch (Exception badCommand) {
+            log.log(Level.WARNING,"bad chat command",badCommand)
+            return
+        }
+        String room = e.room
+        if (chatCommand.action == ChatAction.JOIN) {
+            room = chatCommand.payload
+        }
+        log.info("dispatching to room ${room}")
+        mvcGroup.childrenGroups[room]?.controller?.handleChatMessage(e)
     }
     
     private void handleLeave(Persona p) {
