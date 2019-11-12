@@ -99,8 +99,8 @@ class ChatServerModel {
     }
     
     private void handleLeave(Persona p) {
-        mvcGroup.childrenGroups.each { 
-            it.controller.handleLeave(p)
+        mvcGroup.childrenGroups.each { k, v ->
+            v.controller.handleLeave(p)
         }
     }
 }

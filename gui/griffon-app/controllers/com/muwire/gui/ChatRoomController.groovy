@@ -164,7 +164,10 @@ class ChatRoomController {
     void handleLeave(Persona p) {
         String toDisplay = DataHelper.formatTime(System.currentTimeMillis()) + " " + p.getHumanReadableName() + " disconnected\n"
         runInsideUIAsync {
-            view.roomTextArea.append(toDisplay)
+            if (model.members.remove(p)) {
+                view.roomTextArea.append(toDisplay)
+                view.membersTable?.model?.fireTableDataChanged()
+            }
         }
     }
 }
