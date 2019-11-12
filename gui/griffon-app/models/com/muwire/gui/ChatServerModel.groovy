@@ -50,8 +50,10 @@ class ChatServerModel {
     }
     
     void onChatConnectionEvent(ChatConnectionEvent e) {
-        runInsideUIAsync {
-            status = e.status
+        if (e.persona == host) {
+            runInsideUIAsync {
+                status = e.status
+            }
         }
         
         ChatLink link = e.connection
