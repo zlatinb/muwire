@@ -5,9 +5,14 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JSplitPane
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 
+import com.muwire.core.Persona
+
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 
 import javax.annotation.Nonnull
 
@@ -25,10 +30,11 @@ class ChatRoomView {
     def sayField
     def roomTextArea
     def membersTable
+    def lastMembersTableSortEvent
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
-        if (model.console) {
+        if (model.console || model.privateChat) {
             pane = builder.panel {
                 borderLayout()
                 panel(constraints : BorderLayout.CENTER) {
@@ -95,6 +101,34 @@ class ChatRoomView {
         }
         if (!model.console)
             parent.setTabComponentAt(index, tabPanel)
+            
+        if (membersTable != null) {
+            
+            membersTable.rowSorter.addRowSorterListener({evt -> lastMembersTableSortEvent = evt})
+            membersTable.rowSorter.setSortsOnUpdates(true)
+            membersTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+            
+            membersTable.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            if (e.button == MouseEvent.BUTTON1 && e.clickCount > 1) {
+                                int selectedRow = membersTable.getSelectedRow()
+                                if (lastMembersTableSortEvent != null)
+                                    selectedRow = membersTable.rowSorter.convertRowIndexToModel(selectedRow)
+                                Persona p = model.members[selectedRow]
+                                if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName())) {
+                                    def params = [:]
+                                    params['core'] = model.core
+                                    params['tabName'] = model.tabName
+                                    params['room'] = p.getHumanReadableName()
+                                    params['privateChat'] = true
+                                    params['host'] = model.host
+                                    
+                                    mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName(), params)
+                                }
+                            }
+                        }
+                    })
+        }
     }
     
     def closeTab = {

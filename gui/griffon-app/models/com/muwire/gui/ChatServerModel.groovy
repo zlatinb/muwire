@@ -95,6 +95,20 @@ class ChatServerModel {
         if (chatCommand.action == ChatAction.JOIN) {
             room = chatCommand.payload
         }
+        if (chatCommand.action == ChatAction.SAY &&
+            room == core.me.getHumanReadableName()) {
+            if (!mvcGroup.childrenGroups.containsKey(e.sender.getHumanReadableName())) {
+                def params = [:]
+                params['core'] = core
+                params['tabName'] = host.getHumanReadableName() + "-chat-rooms"
+                params['room'] = e.sender.getHumanReadableName()
+                params['privateChat'] = true
+                params['host'] = host
+
+                mvcGroup.createMVCGroup("chat-room",e.sender.getHumanReadableName(), params)
+            }
+            room = e.sender.getHumanReadableName()
+        }
         mvcGroup.childrenGroups[room]?.controller?.handleChatMessage(e)
     }
     
