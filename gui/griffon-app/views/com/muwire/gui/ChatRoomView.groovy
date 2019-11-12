@@ -119,10 +119,10 @@ class ChatRoomView {
                                     def params = [:]
                                     params['core'] = model.core
                                     params['tabName'] = model.tabName
-                                    params['room'] = p.getHumanReadableName()
+                                    params['room'] = p.toBase64()
                                     params['privateChat'] = true
                                     params['host'] = model.host
-                                    params['privateTarget'] = p
+                                    params['roomTabName'] = p.getHumanReadableName()
                                     
                                     mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
                                 }
