@@ -30,8 +30,13 @@ class ChatServerView {
             panel(constraints : BorderLayout.SOUTH) {
                 gridLayout(rows : 1, cols : 3)
                 panel {}
-                button(text : "Disconnect", enabled : bind {model.disconnectActionEnabled}, disconnectAction)
-                label(text : bind {model.status.toString()})
+                panel {
+                    button(text : "Disconnect", enabled : bind {model.disconnectActionEnabled}, disconnectAction)
+                }
+                panel {
+                    label(text : "Connection Status ")
+                    label(text : bind {model.status.toString()})
+                }
             }
         }
     }

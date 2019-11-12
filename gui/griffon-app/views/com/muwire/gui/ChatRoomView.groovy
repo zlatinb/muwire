@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.SpringLayout.Constraints
 
 import com.muwire.core.Persona
 
@@ -45,6 +46,7 @@ class ChatRoomView {
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
+                    label(text : "Say something here: ", constraints : BorderLayout.WEST)
                     sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
                     button(text : "Say", constraints : BorderLayout.EAST, sayAction)
                 }
