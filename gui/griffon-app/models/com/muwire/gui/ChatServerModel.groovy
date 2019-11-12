@@ -108,7 +108,7 @@ class ChatServerModel {
 
                 mvcGroup.createMVCGroup("chat-room",e.sender.getHumanReadableName()+"-private-chat", params)
             }
-            room = e.sender.getHumanReadableName()
+            room = e.sender.toBase64()
         }
         mvcGroup.childrenGroups[room]?.controller?.handleChatMessage(e)
     }
