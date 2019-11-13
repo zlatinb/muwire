@@ -102,7 +102,7 @@ class ChatRoomController {
         if (p == null)
             return
         String groupId = model.host.getHumanReadableName() + "-" + p.getHumanReadableName() +"-private-chat"
-        if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(groupId) {
+        if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(groupId)) {
             def params = [:]
             params['core'] = model.core
             params['tabName'] = model.tabName
