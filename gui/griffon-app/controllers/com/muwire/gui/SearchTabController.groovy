@@ -99,7 +99,7 @@ class SearchTabController {
         if (sender == null)
             return
 
-        String groupId = sender.getHumanReadableName()
+        String groupId = sender.getHumanReadableName() + "-browse"
         Map<String,Object> params = new HashMap<>()
         params['host'] = sender
         params['core'] = core

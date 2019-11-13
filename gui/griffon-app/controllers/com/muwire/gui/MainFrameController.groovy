@@ -234,8 +234,11 @@ class MainFrameController {
         int row = view.getSelectedTrustTablesRow(tableName)
         if (row < 0)
             return
+        String reason = null
+        if (level != TrustLevel.NEUTRAL)
+            reason = JOptionPane.showInputDialog("Enter reason (optional)")
         builder.getVariable(tableName).model.fireTableDataChanged()
-        core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level))
+        core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level, reason : reason))
     }
 
     @ControllerAction
@@ -321,6 +324,29 @@ class MainFrameController {
         if (row < 0)
             return null
         model.subscriptions[row]
+    }
+    
+    void browseFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        Persona p = model.trusted[row].persona
+        
+        String groupId = p.getHumanReadableName() + "-browse"
+        def params = [:]
+        params['host'] = p
+        params['core'] = model.core
+        mvcGroup.createMVCGroup("browse",groupId,params)
+    }
+    
+    void chatFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        Persona p = model.trusted[row].persona
+        
+        startChat(p)
+        view.showChatWindow.call()
     }
 
     void unshareSelectedFile() {

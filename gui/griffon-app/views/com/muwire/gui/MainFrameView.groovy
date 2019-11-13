@@ -777,6 +777,34 @@ class MainFrameView {
                 model.markNeutralFromTrustedButtonEnabled = true
             }
         })
+        
+        JPopupMenu trustMenu = new JPopupMenu()
+        JMenuItem subscribeItem = new JMenuItem("Subscribe")
+        subscribeItem.addActionListener({mvcGroup.controller.subscribe()})
+        trustMenu.add(subscribeItem)
+        JMenuItem markNeutralItem = new JMenuItem("Mark Neutral")
+        markNeutralItem.addActionListener({mvcGroup.controller.markNeutralFromTrusted()})
+        trustMenu.add(markNeutralItem)
+        JMenuItem markDistrustedItem = new JMenuItem("Mark Distrusted")
+        markDistrustedItem.addActionListener({mvcGroup.controller.markDistrusted()})
+        trustMenu.add(markDistrustedItem)
+        JMenuItem browseItem = new JMenuItem("Browse")
+        browseItem.addActionListener({mvcGroup.controller.browseFromTrusted()})
+        trustMenu.add(browseItem)
+        JMenuItem chatItem = new JMenuItem("Chat")
+        chatItem.addActionListener({mvcGroup.controller.chatFromTrusted()})
+        trustMenu.add(chatItem)
+        
+        trustedTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(trustMenu, e)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(trustMenu, e)
+            }
+        })
 
         // distrusted table
         def distrustedTable = builder.getVariable("distrusted-table")
