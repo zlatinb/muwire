@@ -326,6 +326,7 @@ class MainFrameController {
         model.subscriptions[row]
     }
     
+    @ControllerAction
     void browseFromTrusted() {
         int row = view.getSelectedTrustTablesRow("trusted-table")
         if (row < 0)
@@ -339,6 +340,7 @@ class MainFrameController {
         mvcGroup.createMVCGroup("browse",groupId,params)
     }
     
+    @ControllerAction
     void chatFromTrusted() {
         int row = view.getSelectedTrustTablesRow("trusted-table")
         if (row < 0)
