@@ -52,7 +52,7 @@ class ChatServer {
         running.set(true)
         connections.put(me.destination, LocalChatLink.INSTANCE)
         joinRoom(me, CONSOLE)
-        processHelp(me.destination)
+        echo("/SAY Welcome to my chat server!  Type /HELP for list of available commands.",me.destination)
     }
     
     private void sendPings() {
@@ -106,7 +106,7 @@ class ChatServer {
         connections.put(endpoint.destination, connection)
         joinRoom(client, CONSOLE)
         connection.start()
-        processHelp(connection.endpoint.destination)
+        echo("/SAY Welcome to my chat server!  Type /HELP for help on available commands",connection.endpoint.destination)
     }
     
     void onChatDisconnectionEvent(ChatDisconnectionEvent e) {
@@ -263,7 +263,15 @@ class ChatServer {
     }
     
     private void processHelp(Destination d) {
-        String help = "/SAY Available commands: /JOIN /LEAVE /SAY /LIST /INFO /HELP"
+        String help = """/SAY 
+            Available commands: /JOIN /LEAVE /SAY /LIST /INFO /HELP
+            /JOIN <room name>  - joins a room, or creates one if it does not exist.  You must type this in the console
+            /LEAVE             - leaves a room.  You must type this in the room you want to leave
+            /SAY               - optional, says something in the room you're in
+            /LIST              - lists the existing rooms on this server.  You must type this in the console
+            /INFO              - shows information about this server.  You must type this in the console
+            /HELP              - prints this help message
+            """
         echo(help, d)
     }
     
