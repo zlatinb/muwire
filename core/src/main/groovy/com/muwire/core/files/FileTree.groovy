@@ -7,7 +7,7 @@ class FileTree {
     private final TreeNode root = new TreeNode()
     private final Map<File, TreeNode> fileToNode = new ConcurrentHashMap<>()
     
-    void add(File file) {
+    synchronized void add(File file) {
         List<File> path = new ArrayList<>()
         path.add(file)
         while (file.getParentFile() != null) {
@@ -31,7 +31,7 @@ class FileTree {
         }
     }
 
-    boolean remove(File file) {
+    synchronized boolean remove(File file) {
         TreeNode node = fileToNode.remove(file)
         if (node == null) {
             return false

@@ -511,7 +511,9 @@ class MainFrameView {
                     public boolean importData(TransferHandler.TransferSupport support) {
                         def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
                         files.each {
-                            model.core.eventBus.publish(new FileSharedEvent(file : it))
+                            File canonical = it.getCanonicalFile()
+                            model.core.fileManager.negativeTree.remove(canonical)
+                            model.core.eventBus.publish(new FileSharedEvent(file : canonical))
                         }
                         showUploadsWindow.call()
                         true
@@ -1106,6 +1108,7 @@ class MainFrameView {
         if (rv == JFileChooser.APPROVE_OPTION) {
             chooser.getSelectedFiles().each {
                 File canonical = it.getCanonicalFile()
+                model.core.fileManager.negativeTree.remove(canonical)
                 model.core.eventBus.publish(new FileSharedEvent(file : canonical))
             }
         }
