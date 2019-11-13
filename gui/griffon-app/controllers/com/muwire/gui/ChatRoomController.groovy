@@ -101,7 +101,8 @@ class ChatRoomController {
         Persona p = view.getSelectedPersona()
         if (p == null)
             return
-        if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(p.getHumanReadableName()+"-private-chat")) {
+        String groupId = model.host.getHumanReadableName() + "-" + p.getHumanReadableName() +"-private-chat"
+        if (p != model.core.me && !mvcGroup.parentGroup.childrenGroups.containsKey(groupId) {
             def params = [:]
             params['core'] = model.core
             params['tabName'] = model.tabName
@@ -110,7 +111,7 @@ class ChatRoomController {
             params['host'] = model.host
             params['roomTabName'] = p.getHumanReadableName()
             
-            mvcGroup.parentGroup.createMVCGroup("chat-room", p.getHumanReadableName()+"-private-chat", params)
+            mvcGroup.parentGroup.createMVCGroup("chat-room", groupId, params)
         }
     }
     
