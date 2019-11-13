@@ -306,7 +306,7 @@ class MainFrameView {
                                     radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                 }
                                 panel {
-                                    button(text : "Share files", actionPerformed : shareFiles)
+                                    button(text : "Share", actionPerformed : shareFiles)
                                     button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
                                     button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, issueCertificateAction)
                                 }
@@ -1069,8 +1069,8 @@ class MainFrameView {
     def shareFiles = {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(!model.core.muOptions.shareHiddenFiles)
-        chooser.setDialogTitle("Select file to share")
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        chooser.setDialogTitle("Select files or directories to share")
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
         chooser.setMultiSelectionEnabled(true)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
