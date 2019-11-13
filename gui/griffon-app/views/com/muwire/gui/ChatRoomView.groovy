@@ -80,6 +80,7 @@ class ChatRoomView {
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
+                    label(text : "Say something here: ", constraints : BorderLayout.WEST)
                     sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
                     button(text : "Say", constraints : BorderLayout.EAST, sayAction)
                 }
