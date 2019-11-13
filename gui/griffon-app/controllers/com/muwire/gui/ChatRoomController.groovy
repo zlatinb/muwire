@@ -72,7 +72,7 @@ class ChatRoomController {
                 params['host'] = model.host
                 params['roomTabName'] = newRoom
 
-                mvcGroup.parentGroup.createMVCGroup("chat-room", newRoom, params)
+                mvcGroup.parentGroup.createMVCGroup("chat-room", model.host.getHumanReadableName()+"-"+newRoom, params)
             }
         }
         if (command.action == ChatAction.LEAVE && !model.console) {

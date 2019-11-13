@@ -69,7 +69,7 @@ class ChatServerView {
         params['roomTabName'] = 'Console'
         params['console'] = true
         params['host'] = model.host
-        mvcGroup.createMVCGroup("chat-room",ChatServer.CONSOLE, params) 
+        mvcGroup.createMVCGroup("chat-room",model.host.getHumanReadableName()+"-"+ChatServer.CONSOLE, params) 
     }
 
     def closeTab = {
