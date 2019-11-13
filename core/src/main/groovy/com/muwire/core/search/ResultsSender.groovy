@@ -84,6 +84,7 @@ class ResultsSender {
                     infohash : it.getInfoHash(),
                     pieceSize : pieceSize,
                     uuid : uuid,
+                    browse : settings.browseFiles,
                     sources : suggested,
                     comment : comment,
                     certificates : certificates,
