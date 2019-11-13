@@ -35,6 +35,10 @@ Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow`
 
 The CLI is under active development and doesn't have all the features of the GUI.
 
+### Web UI
+
+If you are a Grails/Scala/JRuby/Kotlin developer and are interested in building a Web UI for MuWire, please get in touch.  The MuWire core is written in Groovy and should be easy to integrate with any JVM-based language.
+
 ### GPG Fingerprint
 
 ```
