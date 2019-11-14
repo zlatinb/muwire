@@ -490,7 +490,8 @@ class MainFrameController {
             params['core'] = model.core
             params['host'] = p
             mvcGroup.createMVCGroup("chat-server", p.getHumanReadableName(), params)
-        }
+        } else 
+            mvcGroup.getChildrenGroups().get(p.getHumanReadableName()).model.connect()
     }
 
     void saveMuWireSettings() {

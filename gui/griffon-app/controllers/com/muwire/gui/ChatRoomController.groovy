@@ -238,6 +238,9 @@ class ChatRoomController {
         if (model.room == ChatServer.CONSOLE)
             return
         
+        model.members.clear()
+        model.members.add(model.core.me)
+        
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
         String join = "/JOIN $model.room"

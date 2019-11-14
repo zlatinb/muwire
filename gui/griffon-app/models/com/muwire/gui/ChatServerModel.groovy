@@ -32,19 +32,27 @@ class ChatServerModel {
     
     void mvcGroupInit(Map<String, String> params) {
         disconnectActionEnabled = host != core.me // can't disconnect from myself
+
+        connect()        
+    }
+    
+    void connect() {
+        if (running)
+            return
+        running = true
         
-        core.eventBus.with { 
+        core.eventBus.with {
             register(ChatConnectionEvent.class, this)
             publish(new UIConnectChatEvent(host : host))
         }
-        
-        running = true
+
         poller = new Thread({eventLoop()} as Runnable)
         poller.setDaemon(true)
         poller.start()
     }
     
     void mvcGroupDestroy() {
+        core.eventBus.unregister(ChatConnectionEvent.class, this)
         running = false
         poller?.interrupt()
     }
