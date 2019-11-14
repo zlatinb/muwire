@@ -244,7 +244,7 @@ class ChatRoomController {
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
         String join = "/JOIN $model.room"
-        byte [] sig = ChatConnection.sign(uuid, now, model.room, join, model.core.me, model.host, model.core.spk)
+        byte [] sig = ChatConnection.sign(uuid, now, ChatServer.CONSOLE, join, model.core.me, model.host, model.core.spk)
         def event = new ChatMessageEvent(
             uuid : uuid,
             payload : join,
