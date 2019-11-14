@@ -64,8 +64,11 @@ class BrowseController {
         def selectedResults = view.selectedResults()
         if (selectedResults == null || selectedResults.isEmpty())
             return
+            
+        def group = application.mvcGroupManager.getGroups()['MainFrame']
+
         selectedResults.removeAll {
-            !mvcGroup.parentGroup.parentGroup.model.canDownload(it.infohash)
+            !group.model.canDownload(it.infohash)
         }
         
         selectedResults.each { result ->
@@ -74,11 +77,11 @@ class BrowseController {
                 result : [result],
                 sources : [model.host.destination],
                 target : file,
-                sequential : mvcGroup.parentGroup.view.sequentialDownloadCheckbox.model.isSelected()
+                sequential : view.sequentialDownloadCheckbox.model.isSelected()
                 ))
         }
         
-        mvcGroup.parentGroup.parentGroup.view.showDownloadsWindow.call()
+        group.view.showDownloadsWindow.call()
         dismiss()
     }
     

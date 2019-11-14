@@ -39,6 +39,8 @@ class BrowseView {
     def p
     def resultsTable
     def lastSortEvent
+    def sequentialDownloadCheckbox
+    
     void initUI() {
         int rowHeight = application.context.get("row-height")
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -67,6 +69,8 @@ class BrowseView {
                 button(text : "View Comment", enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
                 button(text : "View Certificates", enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
                 button(text : "Dismiss", dismissAction)
+                label(text : "Download sequentially")
+                sequentialDownloadCheckbox = checkBox()
             }
         }
         
