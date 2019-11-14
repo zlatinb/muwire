@@ -246,7 +246,7 @@ class ChatRoomController {
     }
     
     void rejoinRoom() {
-        if (model.room == ChatServer.CONSOLE)
+        if (model.room == "Console")
             return
         
         model.members.clear()
