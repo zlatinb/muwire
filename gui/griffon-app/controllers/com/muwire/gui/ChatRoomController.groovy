@@ -141,6 +141,17 @@ class ChatRoomController {
         view.refreshMembersTable()
     }
     
+    void browse() {
+        Persona p = view.getSelectedPersona()
+        if (p == null)
+            return
+        String groupId = p.getHumanReadableName() + "-browse"
+        def params = [:]
+        params['host'] = p
+        params['core'] = model.core
+        mvcGroup.createMVCGroup("browse",groupId,params)
+    }
+    
     void leaveRoom() {
         if (leftRoom)
             return
