@@ -250,7 +250,7 @@ class ChatRoomController {
             payload : join,
             sender : model.core.me,
             host : model.host,
-            room : model.room,
+            room : ChatServer.CONSOLE,
             chatTime : now,
             sig : sig
         )
