@@ -50,19 +50,21 @@ class ChatServerModel {
     }
     
     void onChatConnectionEvent(ChatConnectionEvent e) {
-        if (e.persona == host) {
-            runInsideUIAsync {
-                status = e.status
-            }
+        if (e.persona != host)
+            return
+            
+        runInsideUIAsync {
+            status = e.status
         }
-        
+
         ChatLink link = e.connection
         if (link == null)
             return
-        if (link.getPersona() == host)
-            this.link = link
-        else if (link.getPersona() == null && host == core.me)
-            this.link = link
+        this.link = e.connection
+        
+        mvcGroup.childrenGroups.each {k,v -> 
+            v.controller.rejoinRoom()
+        }
     }
     
     private void eventLoop() {

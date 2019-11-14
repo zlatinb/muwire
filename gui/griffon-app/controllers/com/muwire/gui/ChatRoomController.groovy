@@ -233,4 +233,24 @@ class ChatRoomController {
             view.roomTextArea.replaceRange(null, line0Start, line0End)
         }
     }
+    
+    void rejoinRoom() {
+        if (model.room == ChatServer.CONSOLE)
+            return
+        
+        UUID uuid = UUID.randomUUID()
+        long now = System.currentTimeMillis()
+        String join = "/JOIN $model.room"
+        byte [] sig = ChatConnection.sign(uuid, now, model.room, join, model.core.me, model.host, model.core.spk)
+        def event = new ChatMessageEvent(
+            uuid : uuid,
+            payload : join,
+            sender : model.core.me,
+            host : model.host,
+            room : model.room,
+            chatTime : now,
+            sig : sig
+        )
+        model.core.eventBus.publish(event)
+    }
 }
