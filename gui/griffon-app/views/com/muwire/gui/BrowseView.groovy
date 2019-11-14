@@ -106,8 +106,9 @@ class BrowseView {
             else
                 model.viewCommentActionEnabled = false
              
+            def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
             rows.each {
-                downloadActionEnabled &= mvcGroup.parentGroup.parentGroup.model.canDownload(model.results[it].infohash)
+                downloadActionEnabled &= mainFrameGroup.model.canDownload(model.results[it].infohash)
             }
             model.downloadActionEnabled = downloadActionEnabled
             
