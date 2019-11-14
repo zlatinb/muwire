@@ -32,29 +32,33 @@ class ChatServerModel {
     
     void mvcGroupInit(Map<String, String> params) {
         disconnectActionEnabled = host != core.me // can't disconnect from myself
+        core.eventBus.register(ChatConnectionEvent.class, this)
 
         connect()        
     }
     
     void connect() {
+        core.eventBus.publish(new UIConnectChatEvent(host : host))
+    }
+    
+    void mvcGroupDestroy() {
+        stopPoller()
+        core.eventBus.unregister(ChatConnectionEvent.class, this)
+    }
+    
+    private void startPoller() {
         if (running)
             return
         running = true
-        
-        core.eventBus.with {
-            register(ChatConnectionEvent.class, this)
-            publish(new UIConnectChatEvent(host : host))
-        }
-
         poller = new Thread({eventLoop()} as Runnable)
         poller.setDaemon(true)
         poller.start()
     }
     
-    void mvcGroupDestroy() {
-        core.eventBus.unregister(ChatConnectionEvent.class, this)
+    private void stopPoller() {
         running = false
         poller?.interrupt()
+        link = null
     }
     
     void onChatConnectionEvent(ChatConnectionEvent e) {
@@ -65,17 +69,24 @@ class ChatServerModel {
             status = e.status
         }
 
-        ChatLink link = e.connection
-        if (link == null)
-            return
-        this.link = e.connection
-        
-        mvcGroup.childrenGroups.each {k,v -> 
-            v.controller.rejoinRoom()
+        if (e.status == ChatConnectionAttemptStatus.SUCCESSFUL) {
+            ChatLink link = e.connection
+            if (link == null)
+                return
+            this.link = e.connection
+            
+            startPoller()
+
+            mvcGroup.childrenGroups.each {k,v ->
+                v.controller.rejoinRoom()
+            }
+        } else {
+            stopPoller()
         }
     }
     
     private void eventLoop() {
+        Thread.sleep(1000)
         while(running) {
             ChatLink link = this.link
             if (link == null || !link.isUp()) {
