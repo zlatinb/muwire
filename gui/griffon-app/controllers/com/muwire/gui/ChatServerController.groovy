@@ -15,6 +15,14 @@ class ChatServerController {
 
     @ControllerAction
     void disconnect() {
-        model.core.eventBus.publish(new UIDisconnectChatEvent(host : model.host))
+        switch(model.buttonText) {
+            case "Disconnect" :
+                model.buttonText = "Connect"
+                model.core.eventBus.publish(new UIDisconnectChatEvent(host : model.host))
+                break
+            case "Connect" :
+                 model.connect()
+                 break
+        }
     }
 }

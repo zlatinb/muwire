@@ -24,6 +24,7 @@ class ChatServerModel {
     Core core
     
     @Observable boolean disconnectActionEnabled
+    @Observable String buttonText
     @Observable ChatConnectionAttemptStatus status
 
     volatile ChatLink link    
@@ -70,6 +71,9 @@ class ChatServerModel {
         }
 
         if (e.status == ChatConnectionAttemptStatus.SUCCESSFUL) {
+            runInsideUIAsync {
+                buttonText = "Disconnect"
+            }
             ChatLink link = e.connection
             if (link == null)
                 return

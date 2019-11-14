@@ -31,7 +31,7 @@ class ChatServerView {
                 gridLayout(rows : 1, cols : 3)
                 panel {}
                 panel {
-                    button(text : "Disconnect", enabled : bind {model.disconnectActionEnabled}, disconnectAction)
+                    button(text : bind {model.buttonText}, enabled : bind {model.disconnectActionEnabled}, disconnectAction)
                 }
                 panel {
                     label(text : "Connection Status ")
