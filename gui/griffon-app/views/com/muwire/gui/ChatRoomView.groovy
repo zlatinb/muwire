@@ -12,6 +12,7 @@ import javax.swing.SwingConstants
 import javax.swing.SpringLayout.Constraints
 
 import com.muwire.core.Persona
+import com.muwire.core.chat.ChatConnectionAttemptStatus
 
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
@@ -38,6 +39,7 @@ class ChatRoomView {
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
+        def parentModel = mvcGroup.parentGroup.model
         if (model.console || model.privateChat) {
             pane = builder.panel {
                 borderLayout()
@@ -50,8 +52,8 @@ class ChatRoomView {
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     label(text : "Say something here: ", constraints : BorderLayout.WEST)
-                    sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(text : "Say", constraints : BorderLayout.EAST, sayAction)
+                    sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    button(enabled : bind {parentModel.sayActionEnabled},text : "Say", constraints : BorderLayout.EAST, sayAction)
                 }
             }
         } else {
@@ -82,8 +84,8 @@ class ChatRoomView {
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     label(text : "Say something here: ", constraints : BorderLayout.WEST)
-                    sayField = textField(actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(text : "Say", constraints : BorderLayout.EAST, sayAction)
+                    sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    button(enabled : bind {parentModel.sayActionEnabled}, text : "Say", constraints : BorderLayout.EAST, sayAction)
                 }
 
             }
