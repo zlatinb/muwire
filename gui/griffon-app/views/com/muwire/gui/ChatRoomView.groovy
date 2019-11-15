@@ -32,6 +32,7 @@ class ChatRoomView {
     def parent
     def sayField
     def roomTextArea
+    def textScrollPane
     def membersTable
     def lastMembersTableSortEvent
     
@@ -42,7 +43,7 @@ class ChatRoomView {
                 borderLayout()
                 panel(constraints : BorderLayout.CENTER) {
                     gridLayout(rows : 1, cols : 1)
-                    scrollPane {
+                    textScrollPane = scrollPane {
                         roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
                     }
                 }
@@ -72,7 +73,7 @@ class ChatRoomView {
                         }
                         panel {
                             gridLayout(rows : 1, cols : 1)
-                            scrollPane {
+                            textScrollPane = scrollPane {
                                 roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
                             }
                         }
@@ -87,6 +88,8 @@ class ChatRoomView {
 
             }
         }
+        
+        SmartScroller smartScroller = new SmartScroller(textScrollPane)
     }
     
     void mvcGroupInit(Map<String,String> args) {
