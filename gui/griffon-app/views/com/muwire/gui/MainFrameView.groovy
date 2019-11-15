@@ -434,8 +434,8 @@ class MainFrameView {
                                     button(text : "Subscribe", enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
                                     button(text : "Mark Neutral", enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
                                     button(text : "Mark Distrusted", enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
-                                    button(text : "Browse", constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
-                                    button(text : "Chat", constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
+                                    button(text : "Browse", enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
+                                    button(text : "Chat", enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -775,10 +775,14 @@ class MainFrameView {
                 model.subscribeButtonEnabled = false
                 model.markDistrustedButtonEnabled = false
                 model.markNeutralFromTrustedButtonEnabled = false
+                model.chatFromTrustedButtonEnabled = false
+                model.browseFromTrustedButtonEnabled = false
             } else {
                 model.subscribeButtonEnabled = true
                 model.markDistrustedButtonEnabled = true
                 model.markNeutralFromTrustedButtonEnabled = true
+                model.chatFromTrustedButtonEnabled = true
+                model.browseFromTrustedButtonEnabled = true
             }
         })
         

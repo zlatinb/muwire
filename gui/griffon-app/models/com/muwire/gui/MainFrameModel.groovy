@@ -106,6 +106,8 @@ class MainFrameModel {
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled
+    @Observable boolean browseFromTrustedButtonEnabled
+    @Observable boolean chatFromTrustedButtonEnabled
     @Observable boolean markNeutralFromDistrustedButtonEnabled
     @Observable boolean markTrustedButtonEnabled
     @Observable boolean reviewButtonEnabled
