@@ -458,6 +458,7 @@ class MainFrameController {
             def params = [:]
             params['core'] = model.core
             params['host'] = model.core.me
+            params['chatNotificator'] = view.chatNotificator
             mvcGroup.createMVCGroup("chat-server","local-chat-server", params)
         }
     }
@@ -489,6 +490,7 @@ class MainFrameController {
             def params = [:]
             params['core'] = model.core
             params['host'] = p
+            params['chatNotificator'] = view.chatNotificator
             mvcGroup.createMVCGroup("chat-server", p.getHumanReadableName(), params)
         } else 
             mvcGroup.getChildrenGroups().get(p.getHumanReadableName()).model.connect()

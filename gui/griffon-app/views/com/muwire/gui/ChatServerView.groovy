@@ -19,14 +19,17 @@ class ChatServerView {
     ChatServerModel model
     @MVCMember @Nonnull
     ChatServerController controller
+    
+    ChatNotificator chatNotificator
 
     def pane
     def parent
+    def childPane
 
     void initUI() {
         pane = builder.panel {
             borderLayout()
-            tabbedPane(id : model.host.getHumanReadableName()+"-chat-rooms", constraints : BorderLayout.CENTER)
+            childPane = tabbedPane(id : model.host.getHumanReadableName()+"-chat-rooms", constraints : BorderLayout.CENTER)
             panel(constraints : BorderLayout.SOUTH) {
                 gridLayout(rows : 1, cols : 3)
                 panel {}
@@ -39,6 +42,9 @@ class ChatServerView {
                 }
             }
         }
+        pane.putClientProperty("mvcId",mvcGroup.mvcId)
+        pane.putClientProperty("childPane", childPane)
+        childPane.addChangeListener({e -> chatNotificator.roomTabChanged(e.getSource())})
     }
 
     void mvcGroupInit(Map<String,String> args) {
@@ -69,6 +75,7 @@ class ChatServerView {
         params['roomTabName'] = 'Console'
         params['console'] = true
         params['host'] = model.host
+        params['chatNotificator'] = chatNotificator
         mvcGroup.createMVCGroup("chat-room",model.host.getHumanReadableName()+"-"+ChatServer.CONSOLE, params) 
     }
 

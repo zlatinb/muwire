@@ -29,6 +29,8 @@ class ChatRoomView {
     @MVCMember @Nonnull
     ChatRoomController controller
 
+    ChatNotificator chatNotificator
+    
     def pane
     def parent
     def sayField
@@ -92,6 +94,7 @@ class ChatRoomView {
         }
         
         SmartScroller smartScroller = new SmartScroller(textScrollPane)
+        pane.putClientProperty("mvcId", mvcGroup.mvcId)
     }
     
     void mvcGroupInit(Map<String,String> args) {
@@ -173,6 +176,7 @@ class ChatRoomView {
         int index = parent.indexOfComponent(pane)
         parent.removeTabAt(index)
         controller.leaveRoom()
+        chatNotificator.roomClosed(mvcGroup.mvcId)
         mvcGroup.destroy()
     }
 }

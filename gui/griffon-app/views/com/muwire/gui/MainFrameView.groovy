@@ -78,8 +78,10 @@ class MainFrameView {
     
 
     UISettings settings
+    ChatNotificator chatNotificator
     
     void initUI() {
+        chatNotificator = new ChatNotificator(application.getMvcGroupManager())
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         builder.with {
@@ -522,6 +524,7 @@ class MainFrameView {
         
         mainFrame.addWindowListener(new WindowAdapter(){
                     public void windowClosing(WindowEvent e) {
+                        chatNotificator.mainWindowDeactivated()
                         if (application.getContext().get("tray-icon")) {
                             if (settings.closeWarning) {
                                 runInsideUIAsync {
@@ -535,6 +538,13 @@ class MainFrameView {
                         } else {
                             closeApplication()
                         }
+                    }
+                    public void windowDeactivated(WindowEvent e) {
+                        chatNotificator.mainWindowDeactivated()
+                    }
+                    public void windowActivated(WindowEvent e) {
+                        if (!model.chatPaneButtonEnabled)
+                            chatNotificator.mainWindowActivated()
                     }})
 
         // search field
@@ -831,6 +841,10 @@ class MainFrameView {
             }
         })
         
+        // chat tabs
+        def chatTabbedPane = builder.getVariable("chat-tabs")
+        chatTabbedPane.addChangeListener({e -> chatNotificator.serverTabChanged(e.getSource())})
+        
         // show tree by default
         showSharedFilesTree.call()
         
@@ -1033,6 +1047,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
     }
 
     def showDownloadsWindow = {
@@ -1044,6 +1059,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
     }
 
     def showUploadsWindow = {
@@ -1055,6 +1071,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
     }
 
     def showMonitorWindow = {
@@ -1066,6 +1083,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
     }
 
     def showTrustWindow = {
@@ -1077,6 +1095,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
     }
     
     def showChatWindow = {
@@ -1088,6 +1107,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
+        chatNotificator.mainWindowActivated()
     }
     
     def showSharedFilesTable = {

@@ -71,6 +71,7 @@ class ChatRoomController {
                 params['console'] = false
                 params['host'] = model.host
                 params['roomTabName'] = newRoom
+                params['chatNotificator'] = view.chatNotificator
 
                 mvcGroup.parentGroup.createMVCGroup("chat-room", model.host.getHumanReadableName()+"-"+newRoom, params)
             }
@@ -110,6 +111,7 @@ class ChatRoomController {
             params['privateChat'] = true
             params['host'] = model.host
             params['roomTabName'] = p.getHumanReadableName()
+            params['chatNotificator'] = view.chatNotificator
             
             mvcGroup.parentGroup.createMVCGroup("chat-room", groupId, params)
         }
@@ -191,6 +193,7 @@ class ChatRoomController {
         runInsideUIAsync {
             view.roomTextArea.append(toDisplay)
             trimLines()
+            view.chatNotificator.onMessage(mvcGroup.mvcId)
         }
     }
     

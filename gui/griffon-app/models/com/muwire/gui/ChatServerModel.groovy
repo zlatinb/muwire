@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import java.util.logging.Level
 
+import javax.annotation.Nonnull
+
 import com.muwire.core.Core
 import com.muwire.core.Persona
 import com.muwire.core.chat.ChatCommand
@@ -13,6 +15,7 @@ import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.UIConnectChatEvent
 
 import griffon.core.artifact.GriffonModel
+import griffon.inject.MVCMember
 import griffon.transform.Observable
 import groovy.util.logging.Log
 import griffon.metadata.ArtifactProviderFor
@@ -20,6 +23,9 @@ import griffon.metadata.ArtifactProviderFor
 @Log
 @ArtifactProviderFor(GriffonModel)
 class ChatServerModel {
+    @MVCMember @Nonnull
+    ChatServerView view
+    
     Persona host
     Core core
     
@@ -133,6 +139,7 @@ class ChatServerModel {
                 params['privateChat'] = true
                 params['host'] = host
                 params['roomTabName'] = e.sender.getHumanReadableName() 
+                params['chatNotificator'] = view.chatNotificator
 
                 mvcGroup.createMVCGroup("chat-room",groupId, params)
             }
