@@ -72,6 +72,7 @@ class ChatClient implements Closeable {
             
             if (code == 429) {
                 eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.REJECTED, persona : host))
+                try { dos.close() } catch (IOException ignore) {}
                 endpoint.close()
                 lastRejectionTime = System.currentTimeMillis()
                 return
@@ -94,7 +95,10 @@ class ChatClient implements Closeable {
                 connection : connection))
         } catch (Exception e) {
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.FAILED, persona : host))
-            endpoint?.close()
+            if (endpoint != null) {
+                try {endpoint.getOutputStream().close() } catch (IOException ignore) {}
+                endpoint.close()
+            }
         } finally {
             connectInProgress = false
             connectThread = null

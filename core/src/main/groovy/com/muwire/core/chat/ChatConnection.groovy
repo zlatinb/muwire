@@ -109,6 +109,7 @@ class ChatConnection implements ChatLink {
         } catch (Exception e) {
           log.log(Level.WARNING,"unhandled exception in reader", e)  
         } finally {
+            try {endpoint.getOutputStream().close()} catch (IOException ignore) {}
             close()
         }
     }
@@ -123,6 +124,7 @@ class ChatConnection implements ChatLink {
         } catch (Exception e) {
             log.log(Level.WARNING,"unhandled exception in writer",e)
         } finally {
+            try {endpoint.getOutputStream().close()} catch (IOException ignore) {}
             close()
         }
     }
