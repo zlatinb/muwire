@@ -72,4 +72,27 @@ class BrowseModel {
     void setPercentageLabel(Label percentage) {
         this.percentage = percentage
     }
+    
+    void sort(SortType type) {
+        Comparator<UIResultEvent> chosen
+        switch(type) {
+            case SortType.NAME_ASC : chosen = ResultComparators.NAME_ASC; break
+            case SortType.NAME_DESC : chosen = ResultComparators.NAME_DESC; break
+            case SortType.SIZE_ASC : chosen = ResultComparators.SIZE_ASC; break
+            case SortType.SIZE_DESC : chosen = ResultComparators.SIZE_DESC; break
+        }
+        
+        List<UIResultEvent> l = new ArrayList<>(rootToResult.values())
+        Collections.sort(l, chosen)
+        
+        int rowCount = model.getRowCount()
+        rowCount.times { model.removeRow(0) }
+        
+        l.each { e ->
+            String size = DataHelper.formatSize2Decimal(e.size, false) + "B"
+            String infoHash = Base64.encode(e.infohash.getRoot())
+            String comment = String.valueOf(e.comment != null)
+            model.addRow(e.name, size, infoHash, comment, e.certificates)
+        }
+    }
 }

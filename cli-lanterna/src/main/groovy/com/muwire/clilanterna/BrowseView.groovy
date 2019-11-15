@@ -58,11 +58,17 @@ class BrowseView extends BasicWindow {
         }
         contentPanel.addComponent(table, layoutData)
         
+        Panel buttonsPanel = new Panel()
+        buttonsPanel.setLayoutManager(new GridLayout(2))
+        Button sortButton = new Button("Sort...", {sort()})
         Button closeButton = new Button("Close",{
             model.unregister()
             close()
         })
-        contentPanel.addComponent(closeButton, layoutData)
+        buttonsPanel.addComponent(sortButton, layoutData)
+        buttonsPanel.addComponent(closeButton, layoutData)
+        
+        contentPanel.addComponent(buttonsPanel, layoutData)
         setComponent(contentPanel)
         
     }
@@ -119,5 +125,12 @@ class BrowseView extends BasicWindow {
         ViewCertificatesModel model = new ViewCertificatesModel(result, core, textGUI.getGUIThread())
         ViewCertificatesView view = new ViewCertificatesView(model, textGUI, core, terminalSize)
         textGUI.addWindowAndWait(view)
+    }
+    
+    private void sort() {
+        SortPrompt prompt = new SortPrompt(textGUI)
+        SortType type = prompt.prompt()
+        if (type != null)
+            model.sort(type)
     }
 }
