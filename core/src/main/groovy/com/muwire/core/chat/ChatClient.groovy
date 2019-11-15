@@ -1,5 +1,6 @@
 package com.muwire.core.chat
 
+import java.lang.System.Logger.Level
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -46,11 +47,11 @@ class ChatClient implements Closeable {
     void connectIfNeeded() {
         if (connection != null || connectInProgress || (System.currentTimeMillis() - lastRejectionTime < REJECTION_BACKOFF))
             return
+        connectInProgress = true
         CONNECTOR.execute({connect()})
     }
     
     private void connect() {
-        connectInProgress = true
         connectThread = Thread.currentThread()
         Endpoint endpoint = null
         try {
@@ -94,6 +95,7 @@ class ChatClient implements Closeable {
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 
                 connection : connection))
         } catch (Exception e) {
+            log.log(java.util.logging.Level.WARNING, "connect failed", e)
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.FAILED, persona : host))
             if (endpoint != null) {
                 try {endpoint.getOutputStream().close() } catch (IOException ignore) {}
