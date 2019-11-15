@@ -193,7 +193,8 @@ class ChatRoomController {
         runInsideUIAsync {
             view.roomTextArea.append(toDisplay)
             trimLines()
-            view.chatNotificator.onMessage(mvcGroup.mvcId)
+            if (!model.console)
+                view.chatNotificator.onMessage(mvcGroup.mvcId)
         }
     }
     
