@@ -51,17 +51,19 @@ class FilesView extends BasicWindow {
         contentPanel.addComponent(table, layoutData)
         
         Panel buttonsPanel = new Panel()
-        buttonsPanel.setLayoutManager(new GridLayout(4))
+        buttonsPanel.setLayoutManager(new GridLayout(5))
         
         Button shareFile = new Button("Share File", {shareFile()})
         Button shareDirectory = new Button("Share Directory", {shareDirectory()})
         Button unshareDirectory = new Button("Unshare Directory",{unshareDirectory()})
+        Button sort = new Button("Sort...",{sort()})
         Button close = new Button("Close", {close()})
         
         buttonsPanel.with { 
             addComponent(shareFile, layoutData)
             addComponent(shareDirectory, layoutData)
             addComponent(unshareDirectory, layoutData)
+            addComponent(sort, layoutData)
             addComponent(close, layoutData)
         }
         
@@ -133,5 +135,12 @@ class FilesView extends BasicWindow {
         directory = directory.getCanonicalFile()
         core.eventBus.publish(new DirectoryUnsharedEvent(directory : directory))
         MessageDialog.showMessageDialog(textGUI, "Directory Unshared", directory.getName()+" has been unshared", MessageDialogButton.OK)
+    }
+    
+    private void sort() {
+        SortPrompt prompt = new SortPrompt(textGUI)
+        SortType type = prompt.prompt()
+        if (type != null)
+            model.sort(type)
     }
 }

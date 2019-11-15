@@ -78,4 +78,32 @@ class FilesModel {
             model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment, certified, hits, downloaders)
         }
     }
+    
+    private void sort(SortType type) {
+        Comparator<SharedFile> chosen
+        switch(type) {
+            case SortType.NAME_ASC : chosen = NAME_ASC; break
+            case SortType.NAME_DESC : chosen = NAME_DESC; break
+            case SortType.SIZE_ASC : chosen = SIZE_ASC; break
+            case SortType.SIZE_DESC : chosen = SIZE_DESC; break
+        }
+        
+        Collections.sort(sharedFiles, chosen)
+    }
+    
+    private static final Comparator<SharedFile> NAME_ASC = new Comparator<SharedFile>() {
+        public int compare(SharedFile a, SharedFile b) {
+            a.getFile().getName().compareTo(b.getFile().getName())
+        }
+    }
+    
+    private static final Comparator<SharedFile> NAME_DESC = NAME_ASC.reversed()
+    
+    private static final Comparator<SharedFile> SIZE_ASC = new Comparator<SharedFile>() {
+        public int compare(SharedFile a, SharedFile b) {
+            Long.compare(a.getCachedLength(), b.getCachedLength())
+        }
+    }
+    
+    private static final Comparator<SharedFile> SIZE_DESC = SIZE_ASC.reversed()
 }
