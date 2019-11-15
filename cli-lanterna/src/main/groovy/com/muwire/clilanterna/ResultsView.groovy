@@ -43,9 +43,14 @@ class ResultsView extends BasicWindow {
         table.setTableModel(model.model)
         table.setVisibleRows(terminalSize.getRows())
         contentPanel.addComponent(table, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false))
-        
+
+        Panel buttonsPanel = new Panel()
+        buttonsPanel.setLayoutManager(new GridLayout(2))
+        Button sortButton = new Button("Sort...",{sort()})
+        buttonsPanel.addComponent(sortButton)        
         Button closeButton = new Button("Close", {close()})
-        contentPanel.addComponent(closeButton, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false))
+        buttonsPanel.addComponent(closeButton)
+        contentPanel.addComponent(buttonsPanel, GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false))
         
         setComponent(contentPanel)
         closeButton.takeFocus()    
@@ -108,5 +113,12 @@ class ResultsView extends BasicWindow {
         ViewCertificatesModel model = new ViewCertificatesModel(result, core, textGUI.getGUIThread())
         ViewCertificatesView view = new ViewCertificatesView(model, textGUI, core, terminalSize)
         textGUI.addWindowAndWait(view)
+    }
+    
+    private void sort() {
+        SortPrompt prompt = new SortPrompt(textGUI)
+        SortType type = prompt.prompt()
+        if (type != null)
+            model.sort(type)
     }
 }
