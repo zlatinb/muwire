@@ -44,6 +44,7 @@ class MainWindowView extends BasicWindow {
     private final UploadsModel uploadsModel
     private final FilesModel filesModel
     private final TrustModel trustModel
+    private final ChatConsoleModel chatModel
     
     private final Label connectionCount, incoming, outgoing
     private final Label known, failing, hopeless
@@ -63,6 +64,9 @@ class MainWindowView extends BasicWindow {
         uploadsModel = new UploadsModel(textGUI.getGUIThread(), core, props)
         filesModel = new FilesModel(textGUI.getGUIThread(),core)
         trustModel = new TrustModel(textGUI.getGUIThread(), core)
+        chatModel = new ChatConsoleModel(core, textGUI.getGUIThread())
+        if (core.muOptions.startChatServer)
+            core.chatServer.start()
         
         setHints([Window.Hint.EXPANDED])
         Panel contentPanel = new Panel()
@@ -74,7 +78,7 @@ class MainWindowView extends BasicWindow {
         Panel buttonsPanel = new Panel()
         contentPanel.addComponent(buttonsPanel, BorderLayout.Location.TOP)
         
-        GridLayout gridLayout = new GridLayout(7)
+        GridLayout gridLayout = new GridLayout(8)
         buttonsPanel.setLayoutManager(gridLayout)
         
         searchTextBox = new TextBox(new TerminalSize(40, 1))
@@ -83,6 +87,7 @@ class MainWindowView extends BasicWindow {
         Button uploadsButton = new Button("Uploads", {upload()})
         Button filesButton = new Button("Files", { files() })
         Button trustButton = new Button("Trust", {trust()})
+        Button chatButton = new Button("Chat", {chat()})
         Button quitButton = new Button("Quit", {close()})
         
         LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER)
@@ -94,6 +99,7 @@ class MainWindowView extends BasicWindow {
             addComponent(uploadsButton, layoutData)
             addComponent(filesButton, layoutData)
             addComponent(trustButton, layoutData)
+            addComponent(chatButton, layoutData)
             addComponent(quitButton, layoutData)
         }
         
@@ -269,6 +275,10 @@ class MainWindowView extends BasicWindow {
     
     private void trust() {
         textGUI.addWindowAndWait(new TrustView(trustModel, textGUI, core, sizeForTables()))
+    }
+    
+    private void chat() {
+        textGUI.addWindowAndWait(new ChatConsoleView(core, chatModel, textGUI, sizeForTables()))
     }
     
     private void refreshStats() {

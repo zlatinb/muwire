@@ -34,6 +34,7 @@ class ChatServer {
     private final Map<Destination, ChatLink> connections = new ConcurrentHashMap()
     private final Map<String, Set<Persona>> rooms = new ConcurrentHashMap<>()
     private final Map<Persona, Set<String>> memberships = new ConcurrentHashMap<>()
+    private final Map<String, Persona> shortNames = new ConcurrentHashMap<>()
     
     private final AtomicBoolean running = new AtomicBoolean()
     
@@ -49,9 +50,11 @@ class ChatServer {
     }
     
     public void start() {
-        running.set(true)
+        if (!running.compareAndSet(false, true))
+            return
         connections.put(me.destination, LocalChatLink.INSTANCE)
         joinRoom(me, CONSOLE)
+        shortNames.put(me.getHumanReadableName(), me)
         echo("/SAY Welcome to my chat server!  Type /HELP for list of available commands.",me.destination)
     }
     
@@ -105,6 +108,7 @@ class ChatServer {
         ChatConnection connection = new ChatConnection(eventBus, endpoint, client, true, trustService, settings)
         connections.put(endpoint.destination, connection)
         joinRoom(client, CONSOLE)
+        shortNames.put(client.getHumanReadableName(), client)
         connection.start()
         echo("/SAY Welcome to my chat server!  Type /HELP for help on available commands",connection.endpoint.destination)
     }
@@ -120,6 +124,7 @@ class ChatServer {
                 leaveRoom(e.persona, it)
             }
         }
+        shortNames.remove(e.persona.getHumanReadableName())
         connections.each { k, v ->
             v.sendLeave(e.persona)
         }
@@ -187,6 +192,9 @@ class ChatServer {
             (!command.action.console && e.room == CONSOLE) ||
             !command.action.user)
             return
+        
+        if (command.action.local && e.sender != me)
+            return
             
         switch(command.action) {
             case ChatAction.JOIN : processJoin(command.payload, e); break
@@ -195,6 +203,8 @@ class ChatServer {
             case ChatAction.LIST : processList(e.sender.destination); break
             case ChatAction.INFO : processInfo(e.sender.destination); break
             case ChatAction.HELP : processHelp(e.sender.destination); break
+            case ChatAction.TRUST : processTrust(command.payload, TrustLevel.TRUSTED); break
+            case ChatAction.DISTRUST : processTrust(command.payload, TrustLevel.DISTRUSTED); break
         }
     }
     
@@ -264,12 +274,14 @@ class ChatServer {
     
     private void processHelp(Destination d) {
         String help = """/SAY 
-            Available commands: /JOIN /LEAVE /SAY /LIST /INFO /HELP
+            Available commands: /JOIN /LEAVE /SAY /LIST /INFO /TRUST /DISTRUST /HELP
             /JOIN <room name>  - joins a room, or creates one if it does not exist.  You must type this in the console
             /LEAVE             - leaves a room.  You must type this in the room you want to leave
             /SAY               - optional, says something in the room you're in
             /LIST              - lists the existing rooms on this server.  You must type this in the console
             /INFO              - shows information about this server.  You must type this in the console
+            /TRUST <user>      - marks user as trusted.  This is only available to the server owner
+            /DISTRUST <user>   - marks user as distrusted.  This is only available to the server owner
             /HELP              - prints this help message
             """
         echo(help, d)
@@ -290,6 +302,13 @@ class ChatServer {
             sig : sig
             )
         connections[d]?.sendChat(echo)
+    }
+    
+    private void processTrust(String shortName, TrustLevel level) {
+        Persona p = shortNames.get(shortName)
+        if (p == null)
+            return
+        eventBus.publish(new TrustEvent(persona : p, level : level))
     }
     
     void stop() {
