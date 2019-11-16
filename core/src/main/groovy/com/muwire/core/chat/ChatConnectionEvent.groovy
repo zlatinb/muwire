@@ -7,4 +7,8 @@ class ChatConnectionEvent extends Event {
     ChatConnectionAttemptStatus status
     Persona persona
     ChatLink connection
+    
+    public String toString() {
+        super.toString() + " " + persona.getHumanReadableName() + " " + status.toString()
+    }
 }
