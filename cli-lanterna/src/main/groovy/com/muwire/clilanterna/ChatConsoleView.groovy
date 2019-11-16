@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.BasicWindow
 import com.googlecode.lanterna.gui2.Button
 import com.googlecode.lanterna.gui2.GridLayout
 import com.googlecode.lanterna.gui2.GridLayout.Alignment
+import com.googlecode.lanterna.gui2.Label
 import com.googlecode.lanterna.gui2.LayoutData
 import com.googlecode.lanterna.gui2.Panel
 import com.googlecode.lanterna.gui2.TextBox
@@ -26,6 +27,7 @@ class ChatConsoleView extends BasicWindow {
     
     private final TextBox textBox
     private final TextBox sayField
+    private final TextBox roomField
     
     ChatConsoleView(Core core, ChatConsoleModel model, TextGUI textGUI, TerminalSize terminalSize) {
         super("Chat Server Console")
@@ -36,6 +38,7 @@ class ChatConsoleView extends BasicWindow {
         model.textBox = textBox
         model.start()
         this.sayField = new TextBox("", TextBox.Style.SINGLE_LINE)
+        this.roomField = new TextBox("__CONSOLE__", TextBox.Style.SINGLE_LINE)
         
         
         setHints([Window.Hint.EXPANDED])
@@ -44,8 +47,18 @@ class ChatConsoleView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(1))
         contentPanel.addComponent(textBox, layoutData)
         
+        Panel inputPanel = new Panel()
+        inputPanel.with { 
+            setLayoutManager(new GridLayout(2))
+            addComponent(new Label("Say something here"), layoutData)
+            addComponent(sayField, layoutData)
+            addComponent(new Label("In room:"), layoutData)
+            addComponent(roomField, layoutData)
+        }
+        contentPanel.addComponent(inputPanel, layoutData)
+        
         Panel bottomPanel = new Panel()
-        bottomPanel.setLayoutManager(new GridLayout(5))
+        bottomPanel.setLayoutManager(new GridLayout(4))
         
         Button sayButton = new Button("Say",{say()})
         Button startButton = new Button("Start Server",{model.start()})
@@ -53,7 +66,6 @@ class ChatConsoleView extends BasicWindow {
         Button closeButton = new Button("Close",{close()})    
         
         bottomPanel.with { 
-            addComponent(sayField,layoutData)
             addComponent(sayButton, layoutData)
             addComponent(startButton, layoutData)
             addComponent(stopButton, layoutData)
@@ -66,20 +78,21 @@ class ChatConsoleView extends BasicWindow {
     private void say() {
         String command = sayField.getText()
         sayField.setText("")
+        String room = roomField.getText()
         
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
         
-        String toAppend = DataHelper.formatTime(now) + " <" + core.me.getHumanReadableName() + "> [Console] " + command
+        String toAppend = DataHelper.formatTime(now) + " <" + core.me.getHumanReadableName() + "> [$room] " + command
         textBox.addLine(toAppend)
         
-        byte[] sig = ChatConnection.sign(uuid, now, ChatServer.CONSOLE, command, core.me, core.me, core.spk)
+        byte[] sig = ChatConnection.sign(uuid, now, room, command, core.me, core.me, core.spk)
         
         def event = new ChatMessageEvent( uuid : uuid,
             payload : command,
             sender : core.me,
             host : core.me,
-            room : ChatServer.CONSOLE,
+            room : room,
             chatTime : now,
             sig : sig
             )
