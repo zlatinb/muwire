@@ -80,7 +80,8 @@ class ChatServerView {
     }
 
     def closeTab = {
-        controller.disconnect()
+        if (model.buttonText == "Disconnect")
+            controller.disconnect()
         int index = parent.indexOfComponent(pane)
         parent.removeTabAt(index)
         mvcGroup.destroy()
