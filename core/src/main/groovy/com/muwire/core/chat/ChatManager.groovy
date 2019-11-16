@@ -51,7 +51,7 @@ class ChatManager {
             return
         if (e.sender != me)
             return
-        clients[e.host]?.connection?.sendChat(e)
+        clients[e.host]?.sendChat(e)
     }
     
     void onChatDisconnectionEvent(ChatDisconnectionEvent e) {

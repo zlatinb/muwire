@@ -29,10 +29,10 @@ class ChatClient implements Closeable {
     private final TrustService trustService
     private final MuWireSettings settings
     
-    private volatile ChatConnection connection
-    private volatile boolean connectInProgress
-    private volatile long lastRejectionTime
-    private volatile Thread connectThread
+    private ChatConnection connection
+    private boolean connectInProgress
+    private long lastRejectionTime
+    private Thread connectThread
     
     ChatClient(I2PConnector connector, EventBus eventBus, Persona host, Persona me, TrustService trustService,
         MuWireSettings settings) {
@@ -44,7 +44,7 @@ class ChatClient implements Closeable {
         this.settings = settings
     }
     
-    void connectIfNeeded() {
+    synchronized void connectIfNeeded() {
         if (connection != null || connectInProgress || (System.currentTimeMillis() - lastRejectionTime < REJECTION_BACKOFF))
             return
         connectInProgress = true
@@ -52,7 +52,11 @@ class ChatClient implements Closeable {
     }
     
     private void connect() {
-        connectThread = Thread.currentThread()
+        synchronized(this) {
+            if (!connectInProgress)
+                return
+            connectThread = Thread.currentThread()
+        }
         Endpoint endpoint = null
         try {
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.CONNECTING, persona : host))
@@ -75,7 +79,9 @@ class ChatClient implements Closeable {
                 eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.REJECTED, persona : host))
                 try { dos.close() } catch (IOException ignore) {}
                 endpoint.close()
-                lastRejectionTime = System.currentTimeMillis()
+                synchronized(this) {
+                    lastRejectionTime = System.currentTimeMillis()
+                }
                 return
             }
             
@@ -90,8 +96,12 @@ class ChatClient implements Closeable {
             if (version != Constants.CHAT_VERSION)
                 throw new Exception("Unknown chat version $version")
             
-            connection = new ChatConnection(eventBus, endpoint, host, false, trustService, settings)
-            connection.start()
+            synchronized(this) {
+                if (!connectInProgress)
+                    return
+                connection = new ChatConnection(eventBus, endpoint, host, false, trustService, settings)
+                connection.start()
+            }
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 
                 connection : connection))
         } catch (Exception e) {
@@ -102,24 +112,31 @@ class ChatClient implements Closeable {
                 endpoint.close()
             }
         } finally {
-            connectInProgress = false
-            connectThread = null
+            synchronized(this) {
+                connectInProgress = false
+                connectThread = null
+            }
         }
     }
     
-    void disconnected() {
+    synchronized void disconnected() {
         connectInProgress = false
         connection = null
     }
     
     @Override
-    public void close() {
+    synchronized public void close() {
+        connectInProgress = false
         connectThread?.interrupt()
         connection?.close()
         eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.DISCONNECTED, persona : host))
     }
     
-    void ping() {
+    synchronized void ping() {
         connection?.sendPing()
+    }
+    
+    synchronized void sendChat(ChatMessageEvent e) {
+        connection?.sendChat(e)
     }
 }
