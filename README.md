@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.6.5 is avaiable for download at https://muwire.com.  You can find technical documentation in the "doc" folder.
+The current stable release - 0.6.6 is avaiable for download at https://muwire.com.  You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various documentation.
 
 ### Building
 
@@ -49,3 +49,5 @@ You can find the full key at https://keybase.io/zlatinb
 
 
 [Default I2CP port]: https://geti2p.net/en/docs/ports
+[Wiki]: https://github.com/zlatinb/muwire/wiki
+[doc]: https://github.com/zlatinb/muwire/tree/master/doc
