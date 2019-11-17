@@ -1,6 +1,5 @@
 package com.muwire.core.chat
 
-import java.lang.System.Logger.Level
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
