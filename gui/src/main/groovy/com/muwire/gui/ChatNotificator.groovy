@@ -24,6 +24,12 @@ class ChatNotificator {
     
     void serverTabChanged(JTabbedPane source) {
         JPanel panel = source.getSelectedComponent()
+        if (panel == null) {
+            currentServerTab = null
+            currentRoomTab = null
+            return
+        }
+            
         String mvcId = panel.getClientProperty("mvcId")
         def group = groupManager.getGroups().get(mvcId)
         JTabbedPane childPane = panel.getClientProperty("childPane")
@@ -40,6 +46,10 @@ class ChatNotificator {
     
     void roomTabChanged(JTabbedPane source) {
         JPanel panel = source.getSelectedComponent()
+        if (panel == null) {
+            currentRoomTab = null
+            return
+        }
         currentRoomTab = panel.getClientProperty("mvcId")
         roomsWithMessages.remove(currentRoomTab)
         updateBadge()
