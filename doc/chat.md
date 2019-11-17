@@ -17,14 +17,14 @@ Clients issue commands to the chat server in order to perform operations.  Some 
 
 There are several chat commands that MuWire supports, more can be added later.  Commands consist of a prefix and payload.  The prefix always beings with forward slash `/`.  Below is the list of commands a MuWire chat server supports as of version 0.6.6:
 
-/HELP - this command can be issued only in the __CONSOLE__ room.  It results in the server echoing back a help message of the commands it supports.
-/SAY - this command can be issued only in a regular chat room or private chat.  It's payload is the content of what the user wishes to say.
-/INFO - this command can be issued only in the __CONSOLE__ room.  It results in the server printing a status message.  As of 0.6.6, this consists of the base64-encoded address of the server as well as a list of user who are currently connected.
-/LIST - this command can be issued only in the __CONSOLE__ room.  It results in the server echoing the list of rooms which currently have at least one member.
-/JOIN - this command can be issued only in the __CONSOLE_ room.  The payload of the command is the name of the room that the user wishes to join.  This results in server-side state being updated to add the user to the membership list of the room.
-/LEAVE - this command can be issued only in a regular room.  It has no payload, and the result is that the server removes the user issuing the command from the room.
-/TRUST - this command can be issued only in the __CONSOLE__ room and only over the loopback connection, i.e. it is reserved for the owner of the server.  It's payload is the human-readable representation of a user the owner wishes to mark as trusted.  It results in adding the specified user to the owner's trust list.
-/DISTRUST - similar to /TRUST, this command results in the opposite; the user specified in the payload being added to the distrusted list.  This also results in the user getting disconnected from the server, i.e. kick/ban-ned.
+##### /HELP - this command can be issued only in the __CONSOLE__ room.  It results in the server echoing back a help message of the commands it supports.
+##### /SAY - this command can be issued only in a regular chat room or private chat.  It's payload is the content of what the user wishes to say.
+##### /INFO - this command can be issued only in the __CONSOLE__ room.  It results in the server printing a status message.  As of 0.6.6, this consists of the base64-encoded address of the server as well as a list of user who are currently connected.
+##### /LIST - this command can be issued only in the __CONSOLE__ room.  It results in the server echoing the list of rooms which currently have at least one member.
+##### /JOIN - this command can be issued only in the __CONSOLE_ room.  The payload of the command is the name of the room that the user wishes to join.  This results in server-side state being updated to add the user to the membership list of the room.
+##### /LEAVE - this command can be issued only in a regular room.  It has no payload, and the result is that the server removes the user issuing the command from the room.
+##### /TRUST - this command can be issued only in the __CONSOLE__ room and only over the loopback connection, i.e. it is reserved for the owner of the server.  It's payload is the human-readable representation of a user the owner wishes to mark as trusted.  It results in adding the specified user to the owner's trust list.
+##### /DISTRUST - similar to /TRUST, this command results in the opposite; the user specified in the payload being added to the distrusted list.  This also results in the user getting disconnected from the server, i.e. kick/ban-ned.
 
 There is a command called "/JOINED" which is issued from the server to the client upon the client joining a room.  The payload of the command is a comma-separated list of base64-encoded representations of the personas of the users already in that room.
 
