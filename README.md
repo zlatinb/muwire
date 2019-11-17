@@ -19,7 +19,7 @@ If you want to run the unit tests, type
 ./gradlew clean build
 ```
 
-If you want to build binary bundles that do not depend on Java or I2P, see the https://github.com/zlatinb/muwire-pkg project
+If you want to build binary bundles that do not depend on Java or I2P, see the [muwire-pkg] project
 
 ### Running the GUI
 
@@ -31,7 +31,7 @@ If you have an I2P router running on the same machine that is all you need to do
 
 ### Running the CLI
 
-Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z-all.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.  However, the CLI does not have an options window yet, so if you need to change any options you will need to edit the configuration files.  The CLI options are documented here https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
+Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z-all.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.  However, the CLI does not have an options window yet, so if you need to change any options you will need to edit the configuration files.  The CLI options are documented here [cli options]
 
 The CLI is under active development and doesn't have all the features of the GUI.
 
@@ -51,3 +51,5 @@ You can find the full key at https://keybase.io/zlatinb
 [Default I2CP port]: https://geti2p.net/en/docs/ports
 [Wiki]: https://github.com/zlatinb/muwire/wiki
 [doc]: https://github.com/zlatinb/muwire/tree/master/doc
+[muwire-pkg]: https://github.com/zlatinb/muwire-pkg 
+[cli options]: https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
