@@ -275,7 +275,7 @@ class ChatRoomController {
     void serverDisconnected() {
         runInsideUIAsync {
             model.members.clear()
-            view.membersTable?.fireTableDataChanged()
+            view.membersTable?.model.fireTableDataChanged()
         }
     }
 }
