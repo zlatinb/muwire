@@ -12,6 +12,7 @@ import com.googlecode.lanterna.gui2.TextBox
 import com.googlecode.lanterna.gui2.TextGUI
 import com.googlecode.lanterna.gui2.Window
 import com.muwire.core.Core
+import com.muwire.core.chat.ChatCommand
 import com.muwire.core.chat.ChatConnection
 import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.ChatServer
@@ -78,6 +79,15 @@ class ChatConsoleView extends BasicWindow {
     private void say() {
         String command = sayField.getText()
         sayField.setText("")
+        
+        ChatCommand chatCommand
+        try {
+            chatCommand = new ChatCommand(command)
+        } catch (Exception e) {
+            chatCommand = new ChatCommand("/SAY $command")
+        }
+        command = chatCommand.source
+        
         String room = roomField.getText()
         
         UUID uuid = UUID.randomUUID()
