@@ -25,6 +25,7 @@ class ChatConsoleView extends BasicWindow {
     private final Core core
     
     private final LayoutData layoutData = GridLayout.createLayoutData(Alignment.CENTER, Alignment.CENTER, true, false)
+    private final LayoutData layoutDataFill = GridLayout.createLayoutData(Alignment.FILL, Alignment.FILL, true, false)
     
     private final TextBox textBox
     private final TextBox sayField
@@ -39,8 +40,9 @@ class ChatConsoleView extends BasicWindow {
         this.textBox = textBox
         model.textBox = textBox
         model.start()
-        this.sayField = new TextBox("", TextBox.Style.SINGLE_LINE)
-        this.roomField = new TextBox("__CONSOLE__", TextBox.Style.SINGLE_LINE)
+        TerminalSize textFieldSize = new TerminalSize((terminalSize.getColumns() / 2).toInteger(), 1)
+        this.sayField = new TextBox(textFieldSize,"", TextBox.Style.SINGLE_LINE)
+        this.roomField = new TextBox(textFieldSize,"__CONSOLE__", TextBox.Style.SINGLE_LINE)
         
         
         setHints([Window.Hint.EXPANDED])
@@ -53,9 +55,9 @@ class ChatConsoleView extends BasicWindow {
         inputPanel.with { 
             setLayoutManager(new GridLayout(2))
             addComponent(new Label("Say something here"), layoutData)
-            addComponent(sayField, layoutData)
+            addComponent(sayField, layoutDataFill)
             addComponent(new Label("In room:"), layoutData)
-            addComponent(roomField, layoutData)
+            addComponent(roomField, layoutDataFill)
         }
         contentPanel.addComponent(inputPanel, layoutData)
         
