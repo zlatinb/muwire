@@ -91,9 +91,12 @@ public class DataUtil {
     }
 
     public static String readTillRN(InputStream is) throws IOException {
+        final long start = System.currentTimeMillis();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while(baos.size() < (Constants.MAX_HEADER_SIZE)) {
             int read = is.read();
+            if (System.currentTimeMillis() - start > Constants.MAX_HEADER_TIME)
+                throw new IOException("header taking too long");
             if (read == -1)
                 throw new IOException();
             if (read == '\r') {
