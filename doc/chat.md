@@ -34,14 +34,14 @@ The client wishing to connect to a server establishes an I2P connection and send
 
 As of version 0.6.6 the following headers are required:
 
-"Version" - this header indicates the version of the chat protocol that will be used over this connection.  Currently fixed at 1.
-"Persona" - this header contains the base64-encoded representation of the persona of the client.
+* "Version" - this header indicates the version of the chat protocol that will be used over this connection.  Currently fixed at 1.
+* "Persona" - this header contains the base64-encoded representation of the persona of the client.
 
 The server responds with a status code encoded as an aSCII string, terminated with "\r\n", which can be one of the following:
 
-200 - connection accepted
-400 - connection not allowed.  This can be issued if the server is down for example.
-429 - connection rejected.  This can be issued when the server is overloaded or the client is already connected to the server.  Clients are encouraged to not re-attempt connecting for a short period of time.
+* 200 - connection accepted
+* 400 - connection not allowed.  This can be issued if the server is down for example.
+* 429 - connection rejected.  This can be issued when the server is overloaded or the client is already connected to the server.  Clients are encouraged to not re-attempt connecting for a short period of time.
 
 After the code, the server responds with a "Version" header followed by a "\r\n" on an empty line.
 
@@ -76,12 +76,12 @@ This message is sent by both server and client whenever an event occurs, such as
 ```
 In order to prevent spoofing and replay attacks, each Chat Command message contains a signature.  The signature covers the following fields in this order:
 
-uuid - toString() representation of the UUID
-host - binary representation of the persona in the host field
-sender - binary representation of the persona in the sender field
-chatTime - big endian representation of the timestamp of the message (8 bytes)
-room - UTF-8 representation of the room field
-payload - UTF-8 representation of the payload field.
+1. uuid - toString() representation of the UUID
+2. host - binary representation of the persona in the host field
+3. sender - binary representation of the persona in the sender field
+4. chatTime - big endian representation of the timestamp of the message (8 bytes)
+5. room - UTF-8 representation of the room field
+6. payload - UTF-8 representation of the payload field.
 
 The signature is created with the signing private key (SPK) of the sender.
 
