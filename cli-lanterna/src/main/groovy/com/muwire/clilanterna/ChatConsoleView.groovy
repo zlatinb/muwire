@@ -35,7 +35,8 @@ class ChatConsoleView extends BasicWindow {
         this.core = core
         this.model = model
         this.textGUI = textGUI
-        this.textBox = new TextBox(terminalSize,"", TextBox.Style.MULTI_LINE)
+        TextBox textBox = model.textBox == null ? new TextBox(terminalSize,"", TextBox.Style.MULTI_LINE) : model.textBox 
+        this.textBox = textBox
         model.textBox = textBox
         model.start()
         this.sayField = new TextBox("", TextBox.Style.SINGLE_LINE)
