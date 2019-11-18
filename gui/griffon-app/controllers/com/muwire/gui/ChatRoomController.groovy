@@ -271,4 +271,11 @@ class ChatRoomController {
         )
         model.core.eventBus.publish(event)
     }
+    
+    void serverDisconnected() {
+        runInsideUIAsync {
+            model.members.clear()
+            view.membersTable?.fireTableDataChanged()
+        }
+    }
 }
