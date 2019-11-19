@@ -63,7 +63,8 @@ class ChatRoomController {
         
         if (command.action == ChatAction.JOIN) {
             String newRoom = command.payload
-            if (!mvcGroup.parentGroup.childrenGroups.containsKey(newRoom)) {
+            String groupId = model.host.getHumanReadableName()+"-"+newRoom
+            if (!mvcGroup.parentGroup.childrenGroups.containsKey(groupId)) {
                 def params = [:]
                 params['core'] = model.core
                 params['tabName'] = model.host.getHumanReadableName() + "-chat-rooms"
@@ -73,7 +74,7 @@ class ChatRoomController {
                 params['roomTabName'] = newRoom
                 params['chatNotificator'] = view.chatNotificator
 
-                mvcGroup.parentGroup.createMVCGroup("chat-room", model.host.getHumanReadableName()+"-"+newRoom, params)
+                mvcGroup.parentGroup.createMVCGroup("chat-room", groupId, params)
             }
         }
         if (command.action == ChatAction.LEAVE && !model.console) {
