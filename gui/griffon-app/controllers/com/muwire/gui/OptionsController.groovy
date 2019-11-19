@@ -155,6 +155,9 @@ class OptionsController {
         int maxChatLines = Integer.parseInt(view.maxChatLinesField.text)
         model.maxChatLines = maxChatLines
         uiSettings.maxChatLines = maxChatLines
+        
+        if (model.chatWelcomeFile != null)
+            settings.chatWelcomeFile = new File(model.chatWelcomeFile)
 
         core.saveMuSettings()
 
@@ -235,6 +238,19 @@ class OptionsController {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
             model.incompleteLocation = chooser.getSelectedFile().getAbsolutePath()
+    }
+    
+    @ControllerAction
+    void chooseChatFile() {
+        def chooser = new JFileChooser()
+        chooser.with { 
+            setFileHidingEnabled(false)
+            setDialogTitle("Select location of chat server welcome file")
+            setFileSelectionMode(JFileChooser.FILES_ONLY)
+            int rv = chooser.showOpenDialog(null)
+            if (rv == JFileChooser.APPROVE_OPTION)
+                model.chatWelcomeFile = getSelectedFile().getAbsolutePath()
+        }
     }
     
     @ControllerAction

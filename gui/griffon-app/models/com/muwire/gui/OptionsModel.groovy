@@ -61,6 +61,7 @@ class OptionsModel {
     @Observable int maxChatConnections
     @Observable boolean advertiseChat
     @Observable int maxChatLines
+    @Observable String chatWelcomeFile
 
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
@@ -114,5 +115,6 @@ class OptionsModel {
         maxChatConnections = settings.maxChatConnections
         advertiseChat = settings.advertiseChat
         maxChatLines = uiSettings.maxChatLines
+        chatWelcomeFile = settings.chatWelcomeFile?.getAbsolutePath()
     }
 }

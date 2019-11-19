@@ -280,13 +280,16 @@ class OptionsView {
                 constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
                 label(text : "Start chat server on startup", constraints : gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:1, gridy:0, anchor:GridBagConstraints.LINE_END))
+                startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:2, gridy:0, anchor:GridBagConstraints.LINE_END))
                 label(text : "Maximum chat connections (-1 means unlimited)", constraints : gbc(gridx: 0, gridy:1, anchor:GridBagConstraints.LINE_START, weightx:100))
-                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 1, gridy : 1, anchor:GridBagConstraints.LINE_END))
+                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 2, gridy : 1, anchor:GridBagConstraints.LINE_END))
                 label(text : "Advertise chat ability in search results", constraints : gbc(gridx: 0, gridy:2, anchor:GridBagConstraints.LINE_START, weightx:100))
-                advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:1, gridy:2, anchor:GridBagConstraints.LINE_END))
+                advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
                 label(text : "Maximum lines of scrollback (-1 means unlimited)", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:1, gridy: 3, anchor: GridBagConstraints.LINE_END))
+                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END))
+                label(text : "Welcome message file", constraints : gbc(gridx : 0, gridy : 4, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 4))
+                button(text : "Choose", constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
             }
             panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }

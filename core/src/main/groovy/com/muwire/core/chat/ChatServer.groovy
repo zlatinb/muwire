@@ -25,6 +25,8 @@ import net.i2p.util.ConcurrentHashSet
 @Log
 class ChatServer {
     public static final String CONSOLE = "__CONSOLE__"
+    private static final String DEFAULT_WELCOME = "Welcome to my chat server!  Type /HELP for list of available commands"
+    
     private final EventBus eventBus
     private final MuWireSettings settings
     private final TrustService trustService
@@ -55,7 +57,14 @@ class ChatServer {
         connections.put(me.destination, LocalChatLink.INSTANCE)
         joinRoom(me, CONSOLE)
         shortNames.put(me.getHumanReadableName(), me)
-        echo("/SAY Welcome to my chat server!  Type /HELP for list of available commands.",me.destination)
+        echo(getWelcome(),me.destination)
+    }
+    
+    private String getWelcome() {
+        String welcome = DEFAULT_WELCOME
+        if (settings.chatWelcomeFile != null)
+            welcome = settings.chatWelcomeFile.text
+        "/SAY $welcome"
     }
     
     private void sendPings() {
@@ -110,7 +119,7 @@ class ChatServer {
         joinRoom(client, CONSOLE)
         shortNames.put(client.getHumanReadableName(), client)
         connection.start()
-        echo("/SAY Welcome to my chat server!  Type /HELP for help on available commands",connection.endpoint.destination)
+        echo(getWelcome(),connection.endpoint.destination)
     }
     
     void onChatDisconnectionEvent(ChatDisconnectionEvent e) {
