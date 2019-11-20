@@ -62,17 +62,19 @@ class ChatConsoleView extends BasicWindow {
         contentPanel.addComponent(inputPanel, layoutData)
         
         Panel bottomPanel = new Panel()
-        bottomPanel.setLayoutManager(new GridLayout(4))
+        bottomPanel.setLayoutManager(new GridLayout(5))
         
         Button sayButton = new Button("Say",{say()})
         Button startButton = new Button("Start Server",{model.start()})
         Button stopButton = new Button("Stop Server", {model.stop()})
+        Button clearButton = new Button("Clear",{textBox.setText("")})
         Button closeButton = new Button("Close",{close()})    
         
         bottomPanel.with { 
             addComponent(sayButton, layoutData)
             addComponent(startButton, layoutData)
             addComponent(stopButton, layoutData)
+            addComponent(clearButton, layoutData)
             addComponent(closeButton, layoutData)
         }    
         contentPanel.addComponent(bottomPanel, layoutData)
