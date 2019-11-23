@@ -22,7 +22,7 @@ class MyEvent extends Event {
 }
 ```
 
-2. Define one or more classes thatt will be notified of your events:
+2. Define one or more classes that will be notified of your events:
 ```
 package mypackage
 
@@ -51,4 +51,9 @@ eventBus.publish(myEvent)
 
 Threading: the event bus creates a dedicated thread and all events are dispatched on that thread, regardless which thread publishes them.
 
+### Sharing files
+The UI publishes an event of type `com.muwire.core.files.FileSharedEvent` which contains a `java.io.File` reference to the file the user has chosen to share.  A component in the core called `HasherService` listens for these events, and when it receives notification that a FileSharedEvent has been posted it pereforms some sanity checks, then offloads the actual hashing to a dedicated thread.
 
+Before the hashing begins, another event of type `com.muwire.core.files.FileHashingEvent` is published that contains the name of the file.  At the moment that event serves only to update the UI with the current file being hashed.
+
+When the hashing completes, a `com.muwire.core.files.FileHashedEvent` is published by the HasherService.  The UI listens to this event and updates its list of shared files.  Another core component called `FileManager` also listens for such events and updates the interenal search index from the file name.
