@@ -251,7 +251,7 @@ class ChatRoomController {
     }
     
     void rejoinRoom() {
-        if (model.room == "Console")
+        if (model.console || model.privateChat)
             return
         
         model.members.clear()
@@ -276,7 +276,7 @@ class ChatRoomController {
     void serverDisconnected() {
         runInsideUIAsync {
             model.members.clear()
-            view.membersTable?.model.fireTableDataChanged()
+            view.membersTable?.model?.fireTableDataChanged()
         }
     }
 }
