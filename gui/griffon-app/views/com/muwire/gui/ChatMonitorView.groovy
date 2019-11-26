@@ -5,6 +5,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
+import javax.swing.JFrame
 import javax.swing.SwingConstants
 
 import java.awt.BorderLayout
@@ -20,18 +21,15 @@ class ChatMonitorView {
     @MVCMember @Nonnull
     ChatMonitorModel model
 
-    def mainFrame
-    def dialog
-    def panel
+    def window
     def roomsTable
     
     void initUI() {
-        mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.getAsInt("row-height")
-        dialog = new JDialog(mainFrame, "Chat Monitor", false)
-        dialog.setResizable(true)
         
-        panel = builder.panel {
+        window = builder.frame (visible : false, locationRelativeTo : null,
+            defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
+            iconImage : builder.imageIcon("/MuWire-48x48.png").image){
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 label("Chat rooms with unread messages")
@@ -53,15 +51,12 @@ class ChatMonitorView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        dialog.getContentPane().add(panel)
-        dialog.pack()
-        dialog.setLocationRelativeTo(mainFrame)
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.addWindowListener(new WindowAdapter() {
+        window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 mvcGroup.destroy()
             }
         })
-        dialog.show()
+        window.pack()
+        window.setVisible(true)
     }
 }
