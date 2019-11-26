@@ -121,4 +121,9 @@ mvcGroups {
         view = 'com.muwire.gui.ChatRoomView'
         controller = 'com.muwire.gui.ChatRoomController'
     }
+    'chat-monitor' {
+        model = 'com.muwire.gui.ChatMonitorModel'
+        view = 'com.muwire.gui.ChatMonitorView'
+        controller = 'com.muwire.gui.ChatMonitorController'
+    }
 }

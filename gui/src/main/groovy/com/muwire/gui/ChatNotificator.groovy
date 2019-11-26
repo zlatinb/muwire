@@ -10,6 +10,10 @@ import griffon.core.mvc.MVCGroupManager
 
 class ChatNotificator {
     
+    public static interface Listener {
+        void update()
+    }
+    
     private final MVCGroupManager groupManager
     
     private boolean chatInFocus
@@ -17,6 +21,8 @@ class ChatNotificator {
     private String currentRoomTab
     
     private final Map<String, Integer> roomsWithMessages = new HashMap<>()
+    
+    private Listener listener
     
     ChatNotificator(MVCGroupManager groupManager) {
         this.groupManager = groupManager
@@ -83,6 +89,7 @@ class ChatNotificator {
     }
     
     private void updateBadge() {
+        listener?.update()
         if (!Taskbar.isTaskbarSupported())
             return
         def taskBar = Taskbar.getTaskbar()

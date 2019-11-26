@@ -131,6 +131,13 @@ class MainFrameView {
                             env['core'] = model.core
                             mvcGroup.createMVCGroup("certificate-control",env)
                         })
+                        menuItem("Chat Room Monitor", actionPerformed : {
+                            if (!mvcGroup.getChildrenGroups().containsKey("chat-monitor")) {
+                                def env = [:]
+                                env['chatNotificator'] = chatNotificator
+                                mvcGroup.createMVCGroup("chat-monitor","chat-monitor",env)
+                            }
+                        })
                     }
                 }
                 borderLayout()
