@@ -156,7 +156,7 @@ class ChatRoomController {
     }
     
     void leaveRoom() {
-        if (leftRoom)
+        if (leftRoom || model.privateChat)
             return
         leftRoom = true
         long now = System.currentTimeMillis()
