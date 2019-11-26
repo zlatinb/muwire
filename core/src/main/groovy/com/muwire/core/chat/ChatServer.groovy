@@ -145,7 +145,7 @@ class ChatServer {
         if (settings.allowUntrusted && e.level == TrustLevel.NEUTRAL)
             return
         
-        ChatConnection connection = connections.remove(e.persona.destination)
+        ChatConnection connection = connections.get(e.persona.destination)
         connection?.close()
     }
     
