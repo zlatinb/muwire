@@ -159,6 +159,7 @@ public class Core {
             Properties routerProps = new Properties()
             routerProps.setProperty("i2p.dir.base", home.getAbsolutePath())
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
+            routerProps.setProperty("geoip.dir", home.getAbsolutePath() + File.separator + "geoip")
             routerProps.setProperty("router.excludePeerCaps", "KLM")
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
