@@ -23,6 +23,8 @@ class I2PStatusController {
         Router router = core.router
         model.networkStatus = router._context.commSystem().status.toStatusString()
         model.floodfill = router._context.netDb().floodfillEnabled()
+        model.myCountry = router._context.commSystem().getOurCountry()
+        model.strictCountry = router._context.commSystem().isInStrictCountry()
         model.ntcpConnections = router._context.commSystem().getTransports()["NTCP"].countPeers()
         model.ssuConnections = router._context.commSystem().getTransports()["SSU"].countPeers()
         model.participatingTunnels = router._context.tunnelManager().getParticipatingCount()

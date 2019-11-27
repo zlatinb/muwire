@@ -16,6 +16,8 @@ class I2PStatusModel {
     @Observable int ssuConnections
     @Observable String networkStatus
     @Observable boolean floodfill
+    @Observable String myCountry
+    @Observable boolean strictCountry
     @Observable int participatingTunnels
     @Observable int activePeers
     @Observable int receiveBps

@@ -45,6 +45,10 @@ class I2PStatusView {
                 label(text : bind {model.floodfill}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 label(text : "Active Peers", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.activePeers}, constraints : gbc(gridx: 1, gridy:2, anchor : GridBagConstraints.LINE_END))
+                label(text : "Our Country", constraints : gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.myCountry}, constraints : gbc(gridx : 1, gridy: 3, anchor :  GridBagConstraints.LINE_END))
+                label(text : "Strict Country", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : bind {model.strictCountry}, constraints : gbc(gridx : 1, gridy : 4, anchor : GridBagConstraints.LINE_END))
             }
             panel(border : titledBorder(title : "Connections", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
