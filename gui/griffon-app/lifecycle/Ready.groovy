@@ -58,7 +58,11 @@ class Ready extends AbstractLifecycleHandler {
                 nickname = JOptionPane.showInputDialog(null,
                         "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
                         "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
-                if (nickname == null || nickname.trim().length() == 0) {
+                if (nickname == null) {
+                    JOptionPane.showMessageDialog(null, "MuWire cannot start without a nickname and will now exit", JOptionPane.PLAIN_MESSAGE)
+                    System.exit(0)
+                }
+                if (nickname.trim().length() == 0) {
                     JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
                         JOptionPane.WARNING_MESSAGE)
                     continue
