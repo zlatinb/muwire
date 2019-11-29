@@ -1,0 +1,5 @@
+clientApp.0.main=com.muwire.webui.MuWireClient
+clientApp.0.name=MuWire
+clientApp.0.startOnLoad=false
+clientApp.0.delay=5
+clientApp.0.classpath=${libname}

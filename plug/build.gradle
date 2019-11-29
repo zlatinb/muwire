@@ -47,6 +47,17 @@ task pluginConfig {
     }
 }
 
+task clientsConfig {
+    doLast {
+        def binding = [ "libname" : libDirPath()]
+        def templateFile = new File("$projectDir/templates/clients.config.template")
+        def engine = new groovy.text.SimpleTemplateEngine()
+        def output = engine.createTemplate(templateFile).make(binding)
+        def outputFile = new File(zipDir, "clients.config")
+        outputFile.text = output
+    }
+}
+
 task pluginDir {
     dependsOn ':webui:assemble'
     doLast { task ->
