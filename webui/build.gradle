@@ -1,0 +1,46 @@
+configurations {
+    warArtifact
+}
+
+apply plugin : 'war'
+
+dependencies {
+    providedCompile project(':core')
+}
+
+war {
+    webInf { 
+        from "$buildDir/compiledJsps" 
+        into "classes"
+    }
+    excludes = new HashSet(['**/*.jsp'])
+    webXml = file("$buildDir/tmp_jsp/web.xml")
+}
+
+task precompileJsp {
+    doLast {
+        ant.taskdef (name : 'jasper', 
+            classname: 'org.apache.jasper.JspC', 
+            classpath: configurations.compile.asPath)
+        def generated = new File("$buildDir/tmp_jsp")
+        generated.mkdirs()
+        ant.jasper(package: 'com.muwire.webui',
+                    uriroot: webAppDir,
+                    outputDir: "$buildDir/tmp_jsp",
+                    compilerSourceVM: "1.8",
+                    compilerTargetVM: "1.8",
+                    webXml: "$buildDir/tmp_jsp/web.xml") // maybe change this to a fragment?
+        def output = new File("$buildDir/compiledJsps")
+        output.mkdirs()
+        ant.javac(srcDir: 'build/tmp_jsp',
+                    destDir:file("$buildDir/compiledJsps"),
+                    classpath: configurations.compile.asPath)
+
+    }
+}
+
+war.dependsOn precompileJsp
+
+artifacts {
+    warArtifact war
+}
