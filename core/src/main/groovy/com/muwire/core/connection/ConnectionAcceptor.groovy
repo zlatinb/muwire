@@ -369,7 +369,12 @@ class ConnectionAcceptor {
 
             def sharedFiles = fileManager.getSharedFiles().values()
 
-            os.write("Count: ${sharedFiles.size()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count: ${sharedFiles.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            boolean chat = chatServer.running.get() && settings.advertiseChat
+            os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()

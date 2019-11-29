@@ -68,6 +68,7 @@ class BrowseView {
                 button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
                 button(text : "View Comment", enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
                 button(text : "View Certificates", enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                button(text : "Chat", enabled : bind {model.chatActionEnabled}, chatAction)
                 button(text : "Dismiss", dismissAction)
                 label(text : "Download sequentially")
                 sequentialDownloadCheckbox = checkBox()

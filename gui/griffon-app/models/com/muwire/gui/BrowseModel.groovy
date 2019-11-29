@@ -15,6 +15,7 @@ class BrowseModel {
     @Observable boolean downloadActionEnabled
     @Observable boolean viewCommentActionEnabled
     @Observable boolean viewCertificatesActionEnabled
+    @Observable boolean chatActionEnabled
     @Observable int totalResults
     @Observable int resultCount
     

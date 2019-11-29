@@ -55,6 +55,8 @@ class BrowseManager {
                 
                 int results = Integer.parseInt(headers['Count'])
                 
+                boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
+                
                 // at this stage, start pulling the results
                 eventBus.publish(new BrowseStatusEvent(status : BrowseStatus.FETCHING, totalResults : results))
                 
@@ -67,6 +69,7 @@ class BrowseManager {
                     dis.readFully(tmp)
                     def json = slurper.parse(tmp)
                     UIResultEvent result = ResultsParser.parse(e.host, uuid, json)
+                    result.chat = chat
                     eventBus.publish(result)
                 }
                 

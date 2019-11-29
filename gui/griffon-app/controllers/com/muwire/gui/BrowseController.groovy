@@ -47,6 +47,7 @@ class BrowseController {
     
     void onUIResultEvent(UIResultEvent e) {
         runInsideUIAsync {
+            model.chatActionEnabled = e.chat
             model.results << e
             model.resultCount = model.results.size()
             view.resultsTable.model.fireTableDataChanged()
@@ -115,5 +116,14 @@ class BrowseController {
         params['result'] = result
         params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
+    }
+    
+    @ControllerAction
+    void chat() {
+        dismiss()
+        def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
+        
+        mainFrameGroup.controller.startChat(model.host)
+        mainFrameGroup.view.showChatWindow.call()
     }
 }
