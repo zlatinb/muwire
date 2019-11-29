@@ -6,6 +6,7 @@ apply plugin : 'war'
 
 dependencies {
     providedCompile project(':core')
+    compile fileTree("../i2pjars") { include '*.jar' }
 }
 
 war {
