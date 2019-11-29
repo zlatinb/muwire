@@ -14,6 +14,8 @@ import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
 import java.nio.charset.StandardCharsets
 
@@ -483,6 +485,22 @@ class MainFrameController {
         }
      
         startChat(p)   
+    }
+    
+    @ControllerAction
+    void copyShort() {
+        copy(model.core.me.getHumanReadableName())
+    }
+    
+    @ControllerAction
+    void copyFull() {
+        copy(model.core.me.toBase64())
+    }
+    
+    private void copy(String s) {
+        StringSelection selection = new StringSelection(s)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
     }
     
     void startChat(Persona p) {

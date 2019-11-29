@@ -499,7 +499,11 @@ class MainFrameView {
                 }
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
-                    label(text : bind {model.me}, constraints: BorderLayout.CENTER)
+                    panel (constraints : BorderLayout.WEST) {
+                        label(text : bind {model.me})
+                        button(text : "Copy Short", copyShortAction)
+                        button(text : "Copy Full", copyFullAction)
+                    }
                     panel (constraints : BorderLayout.EAST) {
                         label("Connections:")
                         label(text : bind {model.connections})
