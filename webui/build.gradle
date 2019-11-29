@@ -30,7 +30,7 @@ task precompileJsp {
                     outputDir: "$buildDir/tmp_jsp",
                     compilerSourceVM: "1.8",
                     compilerTargetVM: "1.8",
-                    webXml: "$buildDir/tmp_jsp/web.xml") // maybe change this to a fragment?
+                    webXmlFragment: "$buildDir/tmp_jsp/web.xml.jasper")
         def output = new File("$buildDir/compiledJsps")
         output.mkdirs()
         ant.javac(srcDir: 'build/tmp_jsp',
@@ -40,7 +40,19 @@ task precompileJsp {
     }
 }
 
-war.dependsOn precompileJsp
+task generateWebXML {
+    doLast {
+        def template = new File("$projectDir/templates/web.xml.template")
+        def templateText = template.text
+        def jasper = new File("$buildDir/tmp_jsp/web.xml.jasper")
+        templateText = templateText.replaceAll("__JASPER__", jasper.text)
+        def webXml = new File("$buildDir/tmp_jsp/web.xml")
+        webXml.text = templateText
+    }
+}
+
+generateWebXML.dependsOn precompileJsp
+war.dependsOn generateWebXML
 
 artifacts {
     warArtifact war
