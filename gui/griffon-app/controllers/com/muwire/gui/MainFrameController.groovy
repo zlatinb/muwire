@@ -89,8 +89,19 @@ class MainFrameController {
         search = search.trim()
         if (search.length() == 0)
             return
-        if (search.length() > 128)
-            search = search.substring(0,128)
+        if (search.length() > 128) {
+            try {
+                Persona p = new Persona(new ByteArrayInputStream(Base64.decode(search)))
+                String groupId = p.getHumanReadableName() + "-browse"
+                def params = [:]
+                params['host'] = p
+                params['core'] = model.core
+                mvcGroup.createMVCGroup("browse",groupId,params)
+                return
+            } catch (Exception notPersona) {
+                search = search.substring(0,128)
+            }
+        }
         def uuid = UUID.randomUUID()
         Map<String, Object> params = new HashMap<>()
         params["search-terms"] = search
