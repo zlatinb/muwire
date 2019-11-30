@@ -6,7 +6,13 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import com.muwire.core.Core;
 import com.muwire.core.MuWireSettings;
@@ -15,6 +21,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
+import net.i2p.util.Log;
 
 public class MuWireClient {
     
@@ -35,6 +42,17 @@ public class MuWireClient {
     public void start() throws Throwable {
         if (needsMWInit())
             return;
+        
+        Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames();
+        while(loggerNames.hasMoreElements()) {
+            String name = loggerNames.nextElement();
+            Logger logger = LogManager.getLogManager().getLogger(name);
+            for (Handler h : logger.getHandlers()) {
+                logger.removeHandler(h);
+                h.close();
+            }
+            logger.addHandler(new I2PLogHandler(ctx));
+        }
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mwProps), StandardCharsets.UTF_8));
         Properties props = new Properties();
