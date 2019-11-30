@@ -1,3 +1,6 @@
 apply plugin : 'application'
 mainClassName = 'com.muwire.update.UpdateServer'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+dependencies {
+    compile "net.i2p:i2p:${i2pVersion}"
+}
