@@ -40,7 +40,7 @@ public class MuWireServlet extends HttpServlet {
             resp.sendRedirect("/MuWire/MuWire.jsp");
         } else {
             resp.setContentType("text/html");
-            resp.getWriter().println("<html>MW is initialized</html");
+            resp.getWriter().println("<html>MW is initialized</html>");
         }
     }
 
