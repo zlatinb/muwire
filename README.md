@@ -4,7 +4,7 @@ MuWire is an easy to use file-sharing program which offers anonymity using [I2P 
 
 It is inspired by the LimeWire Gnutella client and developped by a former LimeWire developer.
 
-The current stable release - 0.6.6 is avaiable for download at https://muwire.com.  You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various documentation.
+The current stable release - 0.6.7 is avaiable for download at https://muwire.com.  You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various documentation.
 
 ### Building
 
@@ -37,7 +37,7 @@ The CLI is under active development and doesn't have all the features of the GUI
 
 ### Web UI
 
-If you are a Grails/Scala/JRuby/Kotlin developer and are interested in building a Web UI for MuWire, please get in touch.  The MuWire core is written in Groovy and should be easy to integrate with any JVM-based language.
+There is a web UI under development.  It is written in JSP.  If you would like to contribute and are comfortable with html and css, please get in touch.
 
 ### GPG Fingerprint
 
