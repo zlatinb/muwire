@@ -11,7 +11,6 @@ public class MuWireBean implements Serializable {
     
     public MuWireBean() {
         mwClient = ((RouterContext)I2PAppContext.getGlobalContext()).clientAppManager().getRegisteredApp("MuWire");
-        System.out.println("mwClient is "+mwClient);
     }
     
     public Object getMwClient() {

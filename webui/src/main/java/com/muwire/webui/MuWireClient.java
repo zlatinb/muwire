@@ -133,4 +133,8 @@ public class MuWireClient implements RouterApp {
     public Core getCore() {
         return core;
     }
+    
+    public String getHome() {
+        return home;
+    }
 }
