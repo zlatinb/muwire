@@ -14,7 +14,7 @@
     		String incompleteLocation = request.getParameter("incomplete_location");
 
 			session.setAttribute("downloadLocation", new File(downloadLocation));
-			session.setAttribute("incompleteLocation", new File("incompleteLocation"));    		
+			session.setAttribute("incompleteLocation", new File(incompleteLocation));    		
 			session.setAttribute("nickname",nickname);
     	%>
     	<c:set var="initResult" scope="session" value="${mwClient.initMWProps(nickname,downloadLocation,incompleteLocation)}"/>
