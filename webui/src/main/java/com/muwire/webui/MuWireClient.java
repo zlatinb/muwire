@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 
 import com.muwire.core.Core;
 import com.muwire.core.MuWireSettings;
+import com.muwire.core.download.DownloadStartedEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 
 import net.i2p.app.ClientAppManager;
@@ -112,7 +113,11 @@ public class MuWireClient {
         SearchManager searchManager = new SearchManager(core);
         core.getEventBus().register(UIResultBatchEvent.class, searchManager);
         
+        DownloadManager downloadManager = new DownloadManager(core);
+        core.getEventBus().register(DownloadStartedEvent.class, downloadManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
+        servletContext.setAttribute("downloadManager", downloadManager);
     }
     
     public String getHome() {

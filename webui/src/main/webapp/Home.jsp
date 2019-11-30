@@ -33,6 +33,7 @@
 		<hr/>
 		<%
 			SearchManager searchManager = (SearchManager) client.getServletContext().getAttribute("searchManager");
+			DownloadManager downloadManager = (DownloadManager) client.getServletContext().getAttribute("downloadManager");
 			if (request.getParameter("uuid") == null) {
 				out.print("Active Searches<br/>");
 				for (SearchResults results : searchManager.getResults().values()) {
@@ -81,9 +82,15 @@
 					sb.append("<tr>");
 					sb.append("<td>").append(result.getName()).append("</td>");
 					sb.append("<td>").append(DataHelper.formatSize2Decimal(result.getSize(),false)).append("B").append("</td>");
-					sb.append("<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='");
-					sb.append(net.i2p.data.Base64.encode(result.getInfohash().getRoot()));
-					sb.append("'/><input type='submit' value='Download'></form></td>");
+					if (downloadManager.isDownloading(result.getInfohash())) {
+						sb.append("<td>Downloading</td>");
+					} else {
+						sb.append("<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='");
+						sb.append(net.i2p.data.Base64.encode(result.getInfohash().getRoot()));
+						sb.append("'/><input type='hidden' name='uuid' value='");
+						sb.append(uuid.toString());
+						sb.append("'/><input type='hidden' name='action' value='start'><input type='submit' value='Download'></form></td>");
+					}
 					sb.append("</tr>");
 				});
 				sb.append("</table>");

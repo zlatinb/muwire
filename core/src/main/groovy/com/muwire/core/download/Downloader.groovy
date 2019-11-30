@@ -92,6 +92,22 @@ public class Downloader {
     public synchronized InfoHash getInfoHash() {
         infoHash
     }
+    
+    public File getFile() {
+        file
+    }
+    
+    public int getNPieces() {
+        nPieces
+    }
+
+    public int getPieceSize() {
+        pieceSize
+    }    
+    
+    public long getLength() {
+        length
+    }
 
     private synchronized void setInfoHash(InfoHash infoHash) {
         this.infoHash = infoHash
