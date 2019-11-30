@@ -9,11 +9,16 @@
 <servlet>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <servlet-class>com.muwire.webui.MuWireServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <init-param>
+        <param-name>version</param-name>
+        <param-value>__VERSION__</param-value>
+    </init-param>
 </servlet>
 
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
-    <url-pattern>/</url-pattern>
+    <url-pattern>/index.jsp</url-pattern>
 </servlet-mapping>
 
 

@@ -133,6 +133,6 @@ task sign {
 webappConfig.dependsOn pluginDir
 clientsConfig.dependsOn webappConfig
 pack.dependsOn webappConfig
-pluginZip.dependsOn(webappConfig,pluginConfig,clientsConfig,pack)
+pluginZip.dependsOn(webappConfig,pluginConfig,pack)
 sign.dependsOn pluginZip
 assemble.dependsOn sign

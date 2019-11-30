@@ -50,6 +50,7 @@ task generateWebXML {
         def templateText = template.text
         def jasper = new File("$buildDir/tmp_jsp/web.xml.jasper")
         templateText = templateText.replaceAll("__JASPER__", jasper.text)
+        templateText = templateText.replaceAll("__VERSION__", project.version)
         def webXml = new File("$buildDir/tmp_jsp/web.xml")
         webXml.text = templateText
     }
