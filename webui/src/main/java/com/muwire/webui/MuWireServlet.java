@@ -34,7 +34,7 @@ public class MuWireServlet extends HttpServlet {
         String home = ctx.getConfigDir()+File.separator+"plugins"+File.separator+"MuWire";
         String version = config.getInitParameter("version");
         
-        client = new MuWireClient(ctx, home, version);
+        client = new MuWireClient(ctx, home, version, config.getServletContext());
         try {
             client.start();
         } catch (Throwable bad) {

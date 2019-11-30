@@ -16,11 +16,22 @@
     </init-param>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.SearchServlet</servlet-name>
+    <servlet-class>com.muwire.webui.SearchServlet</servlet-class>
+</servlet>
+
+
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.SearchServlet</servlet-name>
+    <url-pattern>/Search</url-pattern>
+</servlet-mapping>
 
 __JASPER__
 

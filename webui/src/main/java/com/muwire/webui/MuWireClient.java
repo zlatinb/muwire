@@ -14,6 +14,8 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
+
 import com.muwire.core.Core;
 import com.muwire.core.MuWireSettings;
 
@@ -26,14 +28,16 @@ import net.i2p.util.Log;
 public class MuWireClient {
     
     private final RouterContext ctx;
+    private final ServletContext servletContext;
     private final String version;
     private final String home;
     private final File mwProps;
     
     private volatile Core core;
     
-    public MuWireClient(RouterContext ctx, String home, String version) {
+    public MuWireClient(RouterContext ctx, String home, String version, ServletContext servletContext) {
         this.ctx = ctx;
+        this.servletContext = servletContext;
         this.version = version;
         this.home = home;
         this.mwProps = new File(home, "MuWire.properties");
@@ -96,8 +100,14 @@ public class MuWireClient {
         return core;
     }
     
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+    
     void setCore(Core core) {
         this.core = core;
+        servletContext.setAttribute("core", core);
+        servletContext.setAttribute("searchManager", new SearchManager(core));
     }
     
     public String getHome() {
