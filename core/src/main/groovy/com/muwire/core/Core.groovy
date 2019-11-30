@@ -150,10 +150,12 @@ public class Core {
         }
 
         if (!props.embeddedRouter) {
-            log.info "Initializing I2P context"
-            I2PAppContext.getGlobalContext().logManager()
-            I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
-            router = null
+            if (!(I2PAppContext.getGlobalContext() instanceof RouterContext)) {
+                log.info "Initializing I2P context"
+                I2PAppContext.getGlobalContext().logManager()
+                I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
+                router = null
+            }
         } else {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
