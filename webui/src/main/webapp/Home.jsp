@@ -5,7 +5,7 @@
 <%@ page import="com.muwire.webui.*" %>
 <%@ page import="com.muwire.core.*" %>
 <%@ page import="com.muwire.core.search.*" %>
-<%@ page import="net.i2p.data.Base64" %>
+<%@ page import="net.i2p.data.*" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -71,14 +71,22 @@
 				SearchResults searchResults = searchManager.getResults().get(uuid);
 				
 				String senderB64 = request.getParameter("sender");
-				Persona sender = new Persona(new ByteArrayInputStream(Base64.decode(senderB64)));
+				Persona sender = new Persona(new ByteArrayInputStream(net.i2p.data.Base64.decode(senderB64)));
 				
 				Set<UIResultEvent> results = searchResults.getBySender().get(sender);
 				
 				StringBuilder sb = new StringBuilder();
+				sb.append("<table width='100%'>");
 				results.forEach(result -> {
-					sb.append(result.getName()).append("  size:  ").append(result.getSize()).append("</br>");
+					sb.append("<tr>");
+					sb.append("<td>").append(result.getName()).append("</td>");
+					sb.append("<td>").append(DataHelper.formatSize2Decimal(result.getSize(),false)).append("B").append("</td>");
+					sb.append("<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='");
+					sb.append(net.i2p.data.Base64.encode(result.getInfohash().getRoot()));
+					sb.append("'/><input type='submit' value='Download'></form></td>");
+					sb.append("</tr>");
 				});
+				sb.append("</table>");
 				out.print(sb.toString());
 				
 			}

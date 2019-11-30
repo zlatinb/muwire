@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
@@ -43,6 +45,13 @@ public class SearchResults {
     
     public Map<Persona, Set<UIResultEvent>> getBySender() {
         return bySender;
+    }
+    
+    public Set<UIResultEvent> getByInfoHash(InfoHash infoHash) {
+        return bySender.values().stream().
+            flatMap(r -> r.stream()).
+            filter(r -> r.getInfohash().equals(infoHash)).
+            collect(Collectors.toSet());
     }
 
 }
