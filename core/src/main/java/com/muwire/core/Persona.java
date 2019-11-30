@@ -68,6 +68,10 @@ public class Persona {
             humanReadableName = name.getName() + "@" + destination.toBase32().substring(0,32);
         return humanReadableName;
     }
+    
+    public Destination getDestination() {
+        return destination;
+    }
 
     public String toBase64() throws DataFormatException, IOException {
         if (base64 == null) {

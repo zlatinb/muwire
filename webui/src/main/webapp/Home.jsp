@@ -3,6 +3,8 @@
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.*" %>
 <%@ page import="com.muwire.webui.*" %>
+<%@ page import="com.muwire.core.*" %>
+<%@ page import="com.muwire.core.search.*" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -31,8 +33,18 @@
 		Active Searches:<br/>
 		<%
 			SearchManager searchManager = (SearchManager) client.getServletContext().getAttribute("searchManager");
-			for (String search : searchManager.getSearches()) {
-				out.print(search);
+			for (SearchResults results : searchManager.getSearches()) {
+				out.print(results.getSearch());
+				out.print("  senders:  ");
+				Map<Persona, Set<UIResultEvent>> bySender = results.getBySender();
+				out.print(bySender.size());
+				
+				int total = 0;
+				for (Set<UIResultEvent> s : bySender.values()) {
+					total += s.size();
+				}
+				out.print(" results:  ");
+				out.print(total);
 				out.print("<br/>");
 			}
 		%>
