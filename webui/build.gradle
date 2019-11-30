@@ -1,5 +1,6 @@
 configurations {
     warArtifact
+    jarArtifact
 }
 
 apply plugin : 'war'
@@ -56,4 +57,5 @@ war.dependsOn generateWebXML
 
 artifacts {
     warArtifact war
+    jarArtifact jar
 }

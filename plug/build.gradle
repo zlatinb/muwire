@@ -49,7 +49,7 @@ task pluginConfig {
 
 task clientsConfig {
     doLast {
-        def binding = [ "libname" : libDirPath()]
+        def binding = [ "libname" : libDirPath(), "version" : project.version ]
         def templateFile = new File("$projectDir/templates/clients.config.template")
         def engine = new groovy.text.SimpleTemplateEngine()
         def output = engine.createTemplate(templateFile).make(binding)
@@ -70,10 +70,13 @@ task pluginDir {
                         java.nio.file.Files.copy(it.toPath(), dest.toPath())
             }
         }
+        def jarFile = webapp.configurations.jarArtifact.getAllArtifacts().file[0]
+        def dest = new File(libDir, jarFile.getName())
+        java.nio.file.Files.copy(jarFile.toPath(), dest.toPath())
         
         webAppDir.mkdirs()
         def warFile = webapp.configurations.warArtifact.getAllArtifacts().file[0]
-        def dest = new File(webAppDir, "MuWire.war")
+        dest = new File(webAppDir, "MuWire.war")
         java.nio.file.Files.copy(warFile.toPath(), dest.toPath())
         "zip -d ${dest.toString()} *.jar".execute()
     }
@@ -128,7 +131,8 @@ task sign {
 }
 
 webappConfig.dependsOn pluginDir
+clientsConfig.dependsOn webappConfig
 pack.dependsOn webappConfig
-pluginZip.dependsOn(webappConfig,pluginConfig,pack)
+pluginZip.dependsOn(webappConfig,pluginConfig,clientsConfig,pack)
 sign.dependsOn pluginZip
 assemble.dependsOn sign

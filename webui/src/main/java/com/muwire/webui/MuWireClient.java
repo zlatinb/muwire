@@ -10,6 +10,7 @@ public class MuWireClient implements RouterApp {
     private final RouterContext ctx;
     private final ClientAppManager mgr;
     private final String[] args;
+    private final String version;
     
     private ClientAppState state;
     
@@ -17,12 +18,17 @@ public class MuWireClient implements RouterApp {
         this.ctx = ctx;
         this.mgr = mgr;
         this.args = args;
+        String version = null;
+        for (String arg : args) {
+            String [] split = arg.split("=");
+            if (split[0].equals("version"))
+                version = split[1];
+        }
+        this.version = version;
     }
 
     @Override
     public void startup() throws Throwable {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
