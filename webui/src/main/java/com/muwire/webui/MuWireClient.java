@@ -11,6 +11,7 @@ public class MuWireClient implements RouterApp {
     private final ClientAppManager mgr;
     private final String[] args;
     private final String version;
+    private final String home;
     
     private ClientAppState state;
     
@@ -19,12 +20,16 @@ public class MuWireClient implements RouterApp {
         this.mgr = mgr;
         this.args = args;
         String version = null;
+        String home = null;
         for (String arg : args) {
             String [] split = arg.split("=");
             if (split[0].equals("version"))
                 version = split[1];
+            else if (split[0].equals("home"))
+                home = split[1];
         }
         this.version = version;
+        this.home = home;
     }
 
     @Override
