@@ -95,6 +95,7 @@ public class Core {
     final Properties i2pOptions
     final MuWireSettings muOptions
 
+    private final I2PSession i2pSession;
     private final TrustService trustService
     private final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
@@ -188,7 +189,6 @@ public class Core {
 
 
         // options like tunnel length and quantity
-        I2PSession i2pSession
         I2PSocketManager socketManager
         keyDat.withInputStream {
             socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
@@ -403,6 +403,8 @@ public class Core {
         chatManager.shutdown()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
+        log.info("killing i2p session")
+        i2pSession.destroySession()
         if (router != null) {
             log.info("shutting down embedded router")
             router.shutdown(0)
