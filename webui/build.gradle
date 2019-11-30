@@ -29,6 +29,7 @@ task precompileJsp {
         def generated = new File("$buildDir/tmp_jsp")
         generated.mkdirs()
         ant.jasper(package: 'com.muwire.webui',
+                    classPath : sourceSets.main.runtimeClasspath.asPath,
                     uriroot: webAppDir,
                     outputDir: "$buildDir/tmp_jsp",
                     compilerSourceVM: "1.8",
@@ -37,8 +38,8 @@ task precompileJsp {
         def output = new File("$buildDir/compiledJsps")
         output.mkdirs()
         ant.javac(srcDir: 'build/tmp_jsp',
-                    destDir:file("$buildDir/compiledJsps"),
-                    classpath: configurations.compile.asPath)
+                    classPath : sourceSets.main.runtimeClasspath.asPath,
+                    destDir:file("$buildDir/compiledJsps"))
 
     }
 }
@@ -54,6 +55,7 @@ task generateWebXML {
     }
 }
 
+precompileJsp.dependsOn compileJava
 generateWebXML.dependsOn precompileJsp
 war.dependsOn generateWebXML
 

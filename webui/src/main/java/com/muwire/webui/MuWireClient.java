@@ -44,6 +44,7 @@ public class MuWireClient implements RouterApp {
         this.home = home;
         this.mwProps = new File(home, "MuWire.properties");
         this.state = ClientAppState.INITIALIZED;
+        mgr.register(this);
     }
 
     @Override
