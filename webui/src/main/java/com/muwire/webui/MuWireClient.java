@@ -60,8 +60,8 @@ public class MuWireClient {
         reader.close();
         
         MuWireSettings settings = new MuWireSettings(props);
-        core = new Core(settings, new File(home), version);
-        core.startServices();
+        MWStarter starter = new MWStarter(settings, new File(home), version, this);
+        starter.start();
     }
     
     public void stop() throws Throwable {
@@ -94,6 +94,10 @@ public class MuWireClient {
     
     public Core getCore() {
         return core;
+    }
+    
+    void setCore(Core core) {
+        this.core = core;
     }
     
     public String getHome() {

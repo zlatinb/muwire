@@ -91,6 +91,7 @@ public class Core {
 
     final EventBus eventBus
     final Persona me
+    final String version;
     final File home
     final Properties i2pOptions
     final MuWireSettings muOptions
@@ -123,6 +124,7 @@ public class Core {
 
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home
+        this.version = myVersion
         this.muOptions = props
 
         i2pOptions = new Properties()
