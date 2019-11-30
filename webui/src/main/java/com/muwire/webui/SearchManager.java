@@ -87,8 +87,8 @@ class SearchManager {
         }
     }
     
-    Iterable<SearchResults> getSearches() {
-        return results.values();
+    public Map<UUID,SearchResults> getResults() {
+        return results;
     }
 
     public void onUIResultBatchEvent(UIResultBatchEvent e) {
