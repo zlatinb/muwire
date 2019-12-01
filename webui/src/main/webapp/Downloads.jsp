@@ -11,6 +11,7 @@
 
 <%
 	MuWireClient client = (MuWireClient) session.getAttribute("mwClient");
+	ConnectionCounter connectionCounter = (ConnectionCounter) client.getServletContext().getAttribute("connectionCounter");
 %>
 <html>
     <head>
@@ -18,8 +19,24 @@
     </head>
     <body>
     	
-        <p>Welcome to MuWire ${persona}</p>
-        <p><a href="/MuWire/Home.jsp">Back to search</a></p>
+        <table width="100%">
+        <tr>
+        <td>
+        	Welcome to MuWire ${persona}
+        </td>
+        <td>
+        	Connections <%= connectionCounter.getConnections() %>
+       	</td>
+       	</tr>
+       	</table>
+       	
+        <table width="100%">
+        <tr>
+        <td>
+        	<a href="/MuWire/Home.jsp">Search</a>
+        </td>
+        </tr>
+        </table>
 
 		<hr/>
 		<p>Downloads:</p>

@@ -11,6 +11,8 @@
 
 <%
 	MuWireClient client = (MuWireClient) session.getAttribute("mwClient");
+	ConnectionCounter connectionCounter = (ConnectionCounter) client.getServletContext().getAttribute("connectionCounter");
+	
 	String persona = client.getCore().getMe().getHumanReadableName();
 	String version = client.getCore().getVersion();
 	
@@ -24,12 +26,31 @@
     </head>
     <body>
     	
-        <p>Welcome to MuWire ${persona}</p>
+    	<table width="100%">
+    	<tr>
+    	<td>
+        	Welcome to MuWire ${persona}
+        </td>
+        <td>
+        	Connections <%= connectionCounter.getConnections() %>
+        </td>
+        </tr>
+        </table>
+        
+        <table width="100%">
+        <tr>
+        <td>
         <form action="/MuWire/Search" method="post">
         	<input type="text", name="search" />
         	<input type="submit", value="Search" />
       	</form>
-
+		</td>
+		<td>
+			<a href="/MuWire/Downloads.jsp">Downloads</a>
+		</td>
+		</tr>
+		</table>
+		
 		<hr/>
 		<%
 			SearchManager searchManager = (SearchManager) client.getServletContext().getAttribute("searchManager");
