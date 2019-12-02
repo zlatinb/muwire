@@ -10,7 +10,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
-	MuWireClient client = (MuWireClient) session.getAttribute("mwClient");
+	MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
 	ConnectionCounter connectionCounter = (ConnectionCounter) client.getServletContext().getAttribute("connectionCounter");
 %>
 <html>

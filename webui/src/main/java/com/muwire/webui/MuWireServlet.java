@@ -45,7 +45,6 @@ public class MuWireServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getSession().setAttribute("mwClient", client);
         if (client.needsMWInit()) {
             resp.sendRedirect("/MuWire/MuWire.jsp");
         } else {
