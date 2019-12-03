@@ -48,6 +48,9 @@ public class DownloadServlet extends HttpServlet {
             event.setSources(searchManager.getResults().get(uuid).getPossibleSources(infoHash));
             event.setTarget(new File(core.getMuOptions().getDownloadLocation(), resultsArray[0].getName()));
             core.getEventBus().publish(event);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
         } else if (action.equals("cancel")) {
             downloadManager.getDownloaders().stream().filter(d -> d.getInfoHash().equals(infoHash)).findAny().
                     ifPresent(d -> {
