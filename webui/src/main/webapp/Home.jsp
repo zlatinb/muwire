@@ -99,10 +99,15 @@
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append("<table width='100%'>");
+				sb.append("<tr><td>Name</td><td>Size</td><td>Direct Sources</td><td>Possible Sources</td><td>Download</td></tr>");
 				results.forEach(result -> {
 					sb.append("<tr>");
 					sb.append("<td>").append(result.getName()).append("</td>");
 					sb.append("<td>").append(DataHelper.formatSize2Decimal(result.getSize(),false)).append("B").append("</td>");
+					sb.append("<td>").append(searchResults.getByInfoHash(result.getInfohash()).size()).append("</td>");
+					sb.append("<td>").append(searchResults.getPossibleSources(result.getInfohash()).size()).append("</td>");
+					
+					
 					if (downloadManager.isDownloading(result.getInfohash())) {
 						sb.append("<td>Downloading</td>");
 					} else {

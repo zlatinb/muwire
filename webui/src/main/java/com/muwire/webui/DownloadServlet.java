@@ -45,8 +45,7 @@ public class DownloadServlet extends HttpServlet {
             UIResultEvent[] resultsArray = results.toArray(new UIResultEvent[0]);
             event.setResult(resultsArray);
             // TODO: sequential
-            // TODO: possible sources
-            event.setSources(Collections.emptySet());
+            event.setSources(searchManager.getResults().get(uuid).getPossibleSources(infoHash));
             event.setTarget(new File(core.getMuOptions().getDownloadLocation(), resultsArray[0].getName()));
             core.getEventBus().publish(event);
         } else if (action.equals("cancel")) {

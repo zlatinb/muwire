@@ -1,6 +1,7 @@
 package com.muwire.webui;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,11 +15,16 @@ import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
 
+import net.i2p.data.Destination;
+import net.i2p.util.ConcurrentHashSet;
+
 public class SearchResults {
     
     private final UUID uuid;
     private final String search;
     private final Map<Persona, Set<UIResultEvent>> bySender = new ConcurrentHashMap<>();
+    private final Map<InfoHash, Set<UIResultEvent>> byInfohash = new ConcurrentHashMap<>();
+    private final Map<InfoHash, Set<Destination>> possibleSources = new ConcurrentHashMap<>();
     
     public SearchResults(UUID uuid, String search) {
         this.uuid = uuid;
@@ -29,10 +35,26 @@ public class SearchResults {
         Persona sender = e.getResults()[0].getSender();
         Set<UIResultEvent> existing = bySender.get(sender);
         if (existing == null) {
-            existing = new HashSet<>();
+            existing = new ConcurrentHashSet<>();
             bySender.put(sender, existing);
         }
         existing.addAll(Arrays.asList(e.getResults()));
+        
+        for(UIResultEvent result : e.getResults()) {
+            existing = byInfohash.get(result.getInfohash());
+            if (existing == null) {
+                existing = new ConcurrentHashSet<>();
+                byInfohash.put(result.getInfohash(), existing);
+            }
+            existing.add(result);
+            
+            Set<Destination> sources = possibleSources.get(result.getInfohash());
+            if (sources == null) {
+                sources = new ConcurrentHashSet<>();
+                possibleSources.put(result.getInfohash(), sources);
+            }
+            sources.addAll(result.getSources());
+        }
     }
     
     public UUID getUUID() {
@@ -48,10 +70,11 @@ public class SearchResults {
     }
     
     public Set<UIResultEvent> getByInfoHash(InfoHash infoHash) {
-        return bySender.values().stream().
-            flatMap(r -> r.stream()).
-            filter(r -> r.getInfohash().equals(infoHash)).
-            collect(Collectors.toSet());
+        return byInfohash.get(infoHash);
+    }
+    
+    public Set<Destination> getPossibleSources(InfoHash infoHash) {
+        return possibleSources.getOrDefault(infoHash, Collections.emptySet());
     }
 
 }
