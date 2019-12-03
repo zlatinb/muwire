@@ -46,7 +46,7 @@ There is a Web-based UI under development.  It is intended to be run as a plugin
 3. Create a directory under the MuWire source tree called `i2pjars` and copy all jars from the i2p `pkg-temp/lib` directory there.
 4. Un-comment the `webui` and `plug` projects in MuWire's `settings.gradle`.  (By default those are commented out)
 5. Edit `gradle.properties` to change the signer.  You need to sign your plugin for the I2P router to load it.  More information TODO
-6. Run `./gradlew assemble`
+6. Run `./gradlew -PbuildNumber=<integer> assemble`
 7. If all goes well, there will be a file `plug/build/MuWire.su3`.  Install that file from the I2P router console.
 
 
