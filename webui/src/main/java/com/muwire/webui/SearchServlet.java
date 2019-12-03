@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultEvent;
 
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+
 public class SearchServlet extends HttpServlet {
     
     private SearchManager searchManager;
@@ -45,6 +48,29 @@ public class SearchServlet extends HttpServlet {
                     total += s.size();
                 }
                 sb.append("<Results>").append(total).append("</Results>");
+                sb.append("<ResultsBySender>");
+                bySender.forEach((sender, resultsFromSender) -> {
+                    sb.append("<ResultsFromSender>");
+                    sb.append("<Sender>");
+                    sb.append(sender.getHumanReadableName());
+                    sb.append("</Sender>");
+                    resultsFromSender.forEach(result -> {
+                        sb.append("<Result>");
+                        sb.append("<Name>");
+                        sb.append(result.getName());
+                        sb.append("</Name>");
+                        sb.append("<Size>");
+                        sb.append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B");
+                        sb.append("</Size>");
+                        String infohash = Base64.encode(result.getInfohash().getRoot());
+                        sb.append("<InfoHash>");
+                        sb.append(infohash);
+                        sb.append("</InfoHash>");
+                        sb.append("</Result>");
+                    });
+                    sb.append("</ResultsFromSender>");
+                });
+                sb.append("</ResultsBySender>");
                 sb.append("</Search>");
             }
             sb.append("</Searches>");        

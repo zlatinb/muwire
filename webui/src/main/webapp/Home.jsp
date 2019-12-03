@@ -64,6 +64,8 @@
 		</table>
 		<script>
 			var uuid = null;
+			var sender = null;
+			var lastXML = null;
 			
 			function refreshConnectionsCount() {
 				var xmlhttp = new XMLHttpRequest();
@@ -80,9 +82,27 @@
 				xmlhttp.send();
 			}
 			
+			function updateSender(senderName) {
+				sender = senderName;
+				// TODO: update results table
+			}
+			
 			function updateUUID(resultUUID) {
 				uuid = resultUUID;
-				// TODO: update results table
+				var resultsDiv = document.getElementById("results");
+				var table = "<table><tr><th>Sender</th></tr>";
+				var x = lastXML.getElementsByTagName("ResultsBySender");
+				x = x[0].getElementsByTagName("ResultsFromSender");
+				var i;
+				for (i = 0; i < x.length; i++) {
+					var senderName = x[i].getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+					table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
+					table += senderName;
+					table += "</a></td></tr>";
+				}
+				table += "</table>";
+				if (x.length > 0)
+					resultsDiv.innerHTML = table;
 			}
 			
 			function refreshActiveSearches() {
@@ -90,13 +110,14 @@
 				xmlhttp.onreadystatechange = function () {
 					if (this.readyState == 4 && this.status == 200) {
 						var xmlDoc = this.responseXML;
+						lastXML = xmlDoc;
 						var i;
 						var table = "<table><tr><th>Search</th><th>Senders</th><th>Results</th></tr>";
 						var activeSearchesDiv = document.getElementById("activeSearches");
 						var x = xmlDoc.getElementsByTagName("Search");
 						for (i = 0; i < x.length; i ++) {
 							var resultUUID = x[i].getElementsByTagName("uuid")[0].childNodes[0].nodeValue;
-							table += "<tr><td><a href='#' onclick='updateUUID(resultUUID);return false;'>"
+							table += "<tr><td><a href='#' onclick='updateUUID(\"" + resultUUID+ "\");return false;'>"
 							table += x[i].getElementsByTagName("Query")[0].childNodes[0].nodeValue;
 							table += "</a></td><td>";
 							table += x[i].getElementsByTagName("Senders")[0].childNodes[0].nodeValue;
@@ -105,8 +126,11 @@
 							table += "</td></tr>"
 						}
 						table += "</table>"
-						if (x.length > 0)
+						if (x.length > 0) 
 							activeSearchesDiv.innerHTML = table;
+						if (uuid != null)
+							updateUUID(uuid);
+						
 					}
 				}
 				xmlhttp.open("GET", "/MuWire/Search?section=activeSearches", true);
