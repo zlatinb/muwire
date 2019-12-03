@@ -23,7 +23,10 @@ If you want to build binary bundles that do not depend on Java or I2P, see the [
 
 ### Running the GUI
 
-After you build the application, look inside `gui/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar gui-x.y.z-all.jar` in a terminal or command prompt.
+Type
+```
+./gradlew gui:run
+```
 
 If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.  On Windows that file should go into `%HOME%\AppData\Roaming\MuWire`, on Mac into `$HOME/Library/Application Support/MuWire` and on Linux `$HOME/.MuWire`
 
