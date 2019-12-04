@@ -12,7 +12,7 @@
     		String downloadLocation = request.getParameter("download_location");
     		String incompleteLocation = request.getParameter("incomplete_location");
 
-			MuWireClient client = (MuWireClient) session.getAttribute("mwClient");
+			MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
 			client.initMWProps(nickname, new File(downloadLocation), new File(incompleteLocation));
 			client.start();
     	%>
