@@ -14,7 +14,9 @@ dependencies {
 
 war {
     from 'src/main/css'
-    from 'src/main/images'
+    from ('src/main/images', {
+        into "images"
+    })
     webInf { 
         from "$buildDir/compiledJsps" 
         into "classes"
