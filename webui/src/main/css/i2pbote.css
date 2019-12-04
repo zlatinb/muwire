@@ -1,0 +1,934 @@
+@import url("roboto.css");
+@import url("noto.css");
+
+/* General */
+
+a:link {
+    text-decoration: none;
+    word-wrap: break-word;
+}
+a:visited {
+    color: #555;
+    text-decoration: none;	
+}
+a:hover {
+    color: #4CA7FF;
+    text-decoration: underline;
+}
+a:active {
+    color: #909090;
+    text-decoration: underline;
+}
+body {
+    background: #f5f5f5; /* Grey 100 */
+    color: #202020;
+    font: 62.5%/150% "Roboto", "NotoSans", arial, sans-serif;
+    margin: 0;
+    padding: 0em;
+}
+button, button:visited {
+    background: rgba(102, 90, 90, 0.2); /* 20% #999999 */
+    border: medium none;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+    color: #555;
+    cursor: pointer;
+    font-weight: 700;
+    height: 36px;
+    margin: 6px 0;
+    min-width: 88px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition-duration: 0.25s;
+    transition-property: box-shadow;
+    vertical-align: middle;
+}
+button:active {
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2), 0 10px 14px rgba(0, 0, 0, 0.1);
+}
+button[disabled] {
+    background: rgba(0, 0, 0, 0.12); /* 12% #000000 */
+    box-shadow: none;
+    color: rgba(0, 0, 0, 0.26); /* 26% #000000 */
+    cursor: default;
+}
+h1 {font-size: 2em}  /* displayed at 24px */
+h2 {font-size: 1.5em}  /* displayed at 18px */
+h3 {font-size: 1.25em}  /* displayed at 15px */
+h4 {font-size: 1em}  /* displayed at 12px */
+img {
+    border: none;
+}
+input, select, th, td {font-size: 1em}
+input {
+    background: white;
+    color: #202020;
+    margin: 10px 10px 10px 10px;
+    border: 1px solid white;
+    padding: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    min-width: 110px;
+}
+input, input:visited {
+    border: 1px outset #999;
+    background: white;
+    color: #202020;
+    margin: 5px;
+    font-weight: bold;
+    padding: 1px 2px;
+    text-decoration: none;
+    min-width: 110px;
+    color: #006;
+    opacity: 0.9;
+}
+input:hover {
+    background: white;
+    color: #202020;
+    border: 1px solid #f60;
+    opacity: 1.0;
+}
+input:active {
+    background: white;
+    color: #202020;
+    border: 1px solid #f60;
+    opacity: 1.0;
+}
+input[type=text] {
+    background: white;
+    color: #001;
+    margin: 5px;
+    padding: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    border: 1px solid #001;
+    text-decoration: none;
+}
+input[type=checkbox] {
+    min-width: 10px;   /* for Chrome */
+    border: 0 !important;
+}
+select {
+    background: white;
+    color: #202020;
+    padding: 2px;
+    margin: 5px;
+    border: 1px solid #001;
+    text-align: left !important;
+}
+submit {
+    background: #f00;
+    color: #eef;
+    margin: 10px 2px 10px 0;
+    padding: 2px;
+    font-weight: bold;
+    border: 1px solid #001;
+    text-decoration: none;
+}
+textarea {
+    width: 80%;
+    padding: 5px;
+    margin: 5px;
+    background: white;
+    color: #003;
+    line-height: 130%;
+    min-height: 100px;
+    border: 1px solid #001;
+}
+wbr:after { content: "\00200B" }   /* For Opera */
+
+
+/* iframe styling */
+
+iframe {
+    border: none;
+}
+.iframe-body {
+    background-color: transparent;
+    border: none;
+    margin: 0px;
+}
+.button-frame {
+    height: 78px;
+    width: 100%;
+}
+.folders-frame {
+    height: 266px;
+    width: 100%;
+}
+.status-frame {
+    height: auto;
+    max-height: 98px;
+    width: 100%;
+}
+.status-frame-connect {
+    text-align: center;
+}
+
+
+/* Header */
+
+.titlebar {
+    background: #3f51b5; /* Indigo 500 */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: white;
+    min-height: 64px;
+    position: relative;
+    white-space: normal;
+    z-index: 8;
+}
+.title {
+    font-size: 2em;
+    padding: 22px 0 8px 28px;
+}
+.subtitle {
+    display: inline-block;
+    font-size: 1.4em;
+    padding: 0 0 22px 28px;
+    width: 212px;
+}
+.pagetitle {
+    display: inline-block;
+    font-size: 2em;
+    padding-left: 28px;
+}
+.password {
+    height: 24px;
+    position: absolute;
+    right: 16px;
+    top: 22px;
+    width: 24px;
+}
+
+
+/* Side menu */
+
+aside {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    float: left;
+    position: relative;
+    width: 240px;
+    z-index: 8;
+}
+.menubox {
+    clear: left;
+}
+.menubox, .folderbox, .statusbox {
+    font-size: 1.4em;
+}
+.menubox h2, .folderbox h2 {
+    color: rgba(0, 0, 0, 0.54); /* 54% #000000 */
+    font-size: 1em;
+    font-weight: 500;
+    height: 48px;
+    line-height: 48px;
+    margin: 0 16px 0 28px;
+    overflow: hidden;
+    text-transform: none;
+}
+.menubox-divider {
+    border-bottom: 1px solid #eeeeee;
+    margin: 8px 0;
+}
+.menuitem {
+    color: rgba(0, 0, 0, 0.87) !important; /* 87% #000000 */
+    display: block;
+    font-weight: 500;
+    line-height: 24px;
+    min-height: 24px;
+    padding: 12px 0 12px 28px;
+}
+.menuitem:hover, .menuitem.selected {
+    background: #e8e8e8; /* Grey 300 */
+    color: #3f51b5 !important; /* Indigo 500 */
+    text-decoration: none;	
+}
+.menuitem div {
+    display: inline-block;
+    vertical-align: middle;
+}
+.menu-icon {
+    height: 24px;
+    width: 24px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+.menu-icon img {
+    height: 24px;
+    outline: medium none;
+    width: 24px;
+}
+.menu-text {
+    margin: 0 24px;
+}
+.menubox h2 a {
+    font-size: 1em;
+    color: white;
+    letter-spacing: 0.05em;
+    font-weight: 100;
+    word-wrap: none;
+}
+.checkmail {
+    font-size: 1.2em;
+    margin-left: 28px;
+    margin-top: 12px;
+}
+.checkmail img {
+    vertical-align: middle;
+}
+.compose.frame {
+    display: none;
+}
+.lastcheck {
+    font-size: 1.2em;
+    margin-left: 28px;
+    margin-top: .25em;
+}
+/*
+http://nicolasgallagher.com/css-image-replacement-with-pseudo-elements/
+See also .menu-icon
+*/
+.folder .menu-icon:before, .menuitem.identities .menu-icon:before, .menuitem.address-book .menu-icon:before, .menuitem.settings .menu-icon:before {
+    display: inline-block;
+    font-size: 0;
+    line-height: 0;
+}
+.folder.Inbox .menu-icon:before {
+    content: url("images/inbox.png");
+}
+.folder.Outbox .menu-icon:before {
+    content: url("images/outbox.png");
+}
+.folder.Sent .menu-icon:before {
+    content: url("images/sent.png");
+}
+.folder.Trash .menu-icon:before {
+    content: url("images/delete.png");
+}
+.folder-new {
+    text-align: right;
+}
+.folder-incomplete {
+    font-size: 0.857143em;
+    font-weight: 300;
+    margin: 0 24px 0 48px;
+}
+.menuitem.identities .menu-icon:before {
+    content: url("images/identities.png");
+}
+.menuitem.address-book .menu-icon:before {
+    content: url("images/addressbook.png");
+}
+.menuitem.settings .menu-icon:before {
+    content: url("images/settings.png");
+}
+
+
+/* Main content */
+
+.main {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #202020;
+    font-size: 1.4em;
+    line-height: 1.4em;
+    margin: 0px 0px 0px 240px;
+    padding: 16px 28px 16px 28px;
+    text-align: left;
+}
+.main nav {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    float: right;
+    margin: -16px -16px 16px 16px;
+    max-width: 240px;
+    padding-right: 1em;
+}
+@media screen and (min-width: 960px) {
+     .main {
+         margin-right: 240px;
+     }
+    .main nav {
+        margin-right: -256px;
+    }
+    .foldermain, .emailmain {
+        margin-right: 120px;
+    }
+}
+.main form {
+    color: #202020;
+    font-size: 1em;
+    margin-left: 1em;
+}
+.main form.onebutton {
+    display: inline-block;
+}
+.main h1 {
+    display: none;
+}
+.main p {
+    font-size: 1em;
+    margin-left: 1em;
+}
+.main noscript {
+}
+.snackbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 10;
+}
+.snackbar > div {
+    align-items: center;
+    background-color: #323232;
+    border-radius: 2px;
+    color: white;
+    display: inline-flex;
+    font-size: 1.07692em;
+    justify-content: space-between;
+    line-height: 1.69231em;
+    max-width: 568px;
+    min-height: 20px;
+    min-width: 288px;
+    padding: 14px 24px;
+    text-align: left;
+}
+.snackbar > div > .action {
+    color:  #ffab40; /* Orange A200 */
+    font-weight: 500;
+    margin-left: 48px;
+    text-transform: uppercase;
+}
+.errorMessage::before {
+    content: url("images/connect_error.png");
+    display: block;
+    float: left;
+    margin-right: 0.5em;
+}
+.stackTrace {
+    white-space: pre;
+}
+.subheading {
+    font-weight: bold;
+}
+.warning {
+    color: red;
+}
+.underline {
+    border-bottom: 1px solid #000022;
+    padding: 5px 0px 5px 0px;
+    margin: 0px 0px 10px 0px;
+}
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+
+/* Tables */
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+table td, th {
+    padding-left: 10px;
+    padding-top: 3px;
+    background: white;
+    white-space: nowrap;
+    overflow-x: hidden;
+    font-size: 1em;
+    font-weight: normal;
+}
+th[class^="header-column"] {
+    font-size: 0.923077em;
+}
+th[class^="header-column"], th[class^="header-column"] a {
+    color: #333;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.even-table-cell td {
+    background: white;
+    color: #202020;
+}
+.odd-table-cell td {
+    background: white;
+    color: #202020;
+}
+td a:link, td a:visited {
+    color: #202020;
+}
+
+
+/* Email folders */
+
+.compose.float button {
+    background-color: #ff9100; /* Orange A400 */
+    border: medium none;
+    border-radius: 50%;
+    bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
+    height: 56px;
+    margin: 0;
+    min-width: auto;
+    padding: 0;
+    position: fixed;
+    right: 24px;
+    transition-duration: 0.25s;
+    transition-property: background-color, box-shadow;
+    width: 56px;
+    z-index: 1;
+}
+.compose.float button:hover {
+    background-color: #ffab40; /* Orange A200 */
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2), 0 10px 14px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+}
+.compose.float img {
+    height: 24px;
+    width: 24px;
+}
+.emailmain {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+.emailtext {
+    background: white;
+    border: medium none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    margin: 40px 60px 20px;
+    padding: 0 15px 15px 25px;
+}
+.header-column-replied {
+    width: 6px; 
+}
+.header-column-from {
+    width: 18%;
+}
+.header-column-known {
+    width: 6%;
+}
+.header-column-delivery {
+    width: 8%;
+}
+.header-column-to {
+    width: 18%;
+}
+.header-column-subject {
+    width: 30%;
+}
+.header-column-attachment {
+    width: 24px;
+}
+.header-column-date {
+    width: 18%;
+}
+.header-column-status {
+    width: 100px;
+}
+.header-column-trash {
+    width: 24px;
+}
+.sig-invalid {
+    color: red;
+    text-align: center;
+}
+.anon-sender {
+    font-style: italic;
+}
+.sender-known {
+    text-align: center;
+}
+.deliveryComplete {
+    color: green;
+    text-align: center;
+}
+.deliveryIncomplete {
+    color: black;
+    text-align: center;
+}
+.folder-item-new a {
+    font-weight: bold;
+}
+.folder-item-old a {
+    font-weight: normal;
+}
+
+
+/* Identities */
+
+.header-column-default, .header-column-check-mail {
+    width: 24px;
+}
+.data-column-default {
+    text-align: center;
+}
+.header-column-public-name {
+    width: 20%;
+}
+.header-column-description {
+    width: 30%;
+}
+.header-column-id-email-dest {
+    width: 40%;
+}
+.header-column-check-email {
+    width: 24px;
+}
+.header-column-check {
+    width: 20px;
+}
+.header-column-name {
+    width: 20%;
+}
+.header-column-text {
+    width: 30%;
+}
+.header-column-addr-email-dest {
+    width: 40%;
+}
+
+
+/* Edit address */
+
+.deleteIdentityBtn {
+    text-align: right;
+}
+
+.addtl-text {
+   font-weight: 100;
+   font-size: 0.7em;
+}
+
+.field-label {
+    font-weight: bold;
+    font-size: 1em;
+    height: 1em;
+}
+
+.field-label-multiline {
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.destination {
+    color: #003;
+    font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+    word-wrap: break-word;
+}
+
+.hidden-text {
+    display: none;
+}
+
+.identity-form-label {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+.identity-form-value {
+    top: 0px;
+    margin-left: 230px;
+    margin-right: 5px;
+    margin-top: 10px;
+}
+.identity-form-checkbox {
+    top: 0px;
+    margin-left: 230px;
+    margin-right: 5px;
+    margin-top: 7px;
+}
+.identity-form-picture img {
+    top: 0px;
+    margin-left: 230px;
+    margin-right: 5px;
+    margin-top: 10px;
+    width: 100px;
+}
+.identity-form-text {
+    top: 0px;
+    margin-left: 230px;
+    margin-right: 5px;
+    margin-top: 10px;
+    white-space: pre;
+    font-family: monospace;
+    white-space: -pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.identity-buttons {
+    text-align: left;
+}
+.identity-delete {
+    text-align: right;
+}
+.identity-buttons, .identity-delete {
+    display: inline-block;
+    width: 250px;
+}
+.full-identity {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.publish-form-label {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+.publish-form-value {
+    top: 0px;
+    margin-left: 180px;
+    margin-right: 5px;
+    margin-top: 10px;
+}
+.publish-form-value textarea {
+    width: 600px;
+}
+
+.contact-detail-container {
+    margin: 0px auto;
+    overflow: hidden;
+}
+.contact-detail-left {
+    width: 100px;
+    float: left;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-right: 15px;
+    padding-bottom: 10px;
+}
+.contact-detail-left img {
+    width: 100%;
+    padding-bottom: 5px;
+}
+.contact-detail-text {
+    width: 100%;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    white-space: pre;
+    font-family: monospace;
+    white-space: -pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.contact-detail-dest {
+    width: 100%;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    word-wrap: break-word;
+}
+.contact-form-label {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+.contact-form-value {
+    top: 0px;
+    margin-left: 150px;
+    margin-right: 5px;
+    margin-top: 10px;
+}
+.contact-form-picture img {
+    top: 0px;
+    margin-left: 120px;
+    margin-right: 5px;
+    margin-top: 10px;
+    width: 100px;
+}
+.contact-form-text {
+    top: 0px;
+    margin-left: 120px;
+    margin-right: 5px;
+    margin-top: 10px;
+    white-space: pre;
+    font-family: monospace;
+    white-space: -pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+
+/* New email */
+
+.email-form-button-send {
+    height: 24px;
+    position: absolute;
+    right: 56px;
+    top: 22px;
+    width: 24px;
+    z-index: 10;
+}
+.email-form-button-send button {
+    background: none;
+    box-shadow: none;
+    height: 24px;
+    margin: 0;
+    min-width: auto;
+    overflow: hidden;
+    padding: 0;
+    width: 24px;
+}
+.email-form-button-send button:before {
+    content: url("images/send_white.png");
+    display: inline-block;
+    font-size: 0;
+    line-height: 0;
+}
+.email-form-button-row {
+    top: 0px;
+    margin-left: 120px;
+    text-align: right;
+    width: 585px;
+    white-space: nowrap;
+}
+.email-form-label {
+	font-size: 1.07692em;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-top: 10px;
+    position: absolute;
+}
+.email-form-recipient-label {
+    padding-top: 7px;
+    position: absolute;
+}
+.email-form-recipient-value {
+    top: 0px;
+    margin-left: 120px;
+    max-width: 600px;
+    white-space: nowrap;
+}
+
+.email-form-recipient-value img, .email-form-button-row img {
+    vertical-align: middle;
+}
+.email-form-recipient-field {
+    width: 475px;
+}
+.email-form-value {
+    top: 0px;
+    margin-left: 120px;
+    margin-right: 5px;
+}
+.email-form-subject-field {
+    margin-right: 5px;
+    width: 567px;
+}
+.email-form-attach-label {
+    position: absolute;
+    padding-left: 5px;
+    padding-top: 16px;
+}
+.email-form-attach-files {
+    padding-left: 5px;
+    padding-bottom: 3px;
+    white-space: nowrap;
+}
+.email-form-attach-item {
+    position: absolute;
+    width: 300px;
+    overflow-x: hidden;
+}
+.email-form-attach-size {
+    color: #777;
+}
+.email-form-attach-remove {
+    margin-left: 305px;
+}
+.email-form-attach-small {
+    font-size: 0.8em;
+    padding-left: 5px;
+}
+
+/* Show email */
+
+.show-email-value {
+    margin-left: 120px;
+    margin-right: 5px;
+    padding-top: 10px;
+    min-height: 1em;
+    color: #202020;
+}
+.show-email-value a {
+    color: #202020;
+}
+.show-email-invalid-sig {
+    color: red;
+}
+.show-email-reply {
+    position: absolute;
+}
+.show-email-delete {
+    margin-left: 120px;
+}
+
+
+/* Settings */
+
+.settings h3 {
+    border-bottom: 2px solid #ddd;
+    color: #aaa;
+    font-size: 0.923077em;
+    font-weight: 500;
+    line-height: 16px;
+    margin: 16px 0 4px;
+    overflow: hidden;
+    padding: 7px 0 0 28px;
+    text-transform: uppercase;
+}
+
+
+/* Set password */
+
+.password-label {
+    position: absolute;
+    padding-top: 5px;
+}
+.password-field {
+    margin-left: 115px;
+}
+
+
+/* Network status */
+
+.network-charts .chart {
+    display: inline-block;
+    position: relative;
+    width: 400px;
+}
+.network-charts .chart-text {
+    font-size: 3em;
+    position: absolute;
+    text-align: center;
+    top: 143px;
+    width: 100%;
+}
+
+
+/* About */
+
+.contributor-category {
+    font-weight: bold;
+}
+.contributor-name {
+    margin-left: 100px;
+    position: absolute;
+}
+.contributor-role {
+    color: #555;
+    margin-left: 250px;
+    margin-top: 3px;
+}
+
