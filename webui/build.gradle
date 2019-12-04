@@ -43,6 +43,7 @@ task precompileJsp {
         output.mkdirs()
         ant.javac(srcDir: 'build/tmp_jsp',
                     classPath : sourceSets.main.runtimeClasspath.asPath,
+                    debug : true,
                     destDir:file("$buildDir/compiledJsps"))
 
     }
