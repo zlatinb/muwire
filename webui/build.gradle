@@ -13,6 +13,7 @@ dependencies {
 }
 
 war {
+    from 'src/main/css'
     webInf { 
         from "$buildDir/compiledJsps" 
         into "classes"

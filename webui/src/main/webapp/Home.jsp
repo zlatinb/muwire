@@ -20,6 +20,7 @@
 <html>
 	<head>
 		<title>MuWire ${version}</title>
+		<link rel="stylesheet" href="/MuWire/muwire.css">
 	</head>
 	<body>
     	<table width="100%">
@@ -47,32 +48,6 @@
 		</tr>
 		</table>
 		<hr/>
-		<style>
-				#table-wrapper {
-				  position:relative;
-				}
-				#table-scroll {
-				  height:150px;
-				  overflow:auto;  
-				  margin-top:20px;
-				}
-				#table-wrapper table {
-				  width:100%;
-				
-				}
-				#table-wrapper table * {
-				  background:yellow;
-				  color:black;
-				}
-				#table-wrapper table thead th .text {
-				  position:absolute;   
-				  top:-20px;
-				  z-index:2;
-				  height:20px;
-				  width:35%;
-				  border:1px solid red;
-				}
-		</style>
 <% if (groupBy.equals("sender")) { %>
 		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>
 <% } else { %>
