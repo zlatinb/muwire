@@ -44,25 +44,109 @@
 		</table>
 		
 		<hr/>
-		<table width="100%">
-			<tr>
-				<th>
-					Active Searches
-				</th>
-				<th>
-					Results
-				</th>
-			</tr>
-			<tr>
-				<td>
-					<div id="activeSearches"></div>
-				</td>
-				<td>
-					<div id="results"></div>
-				</td>
-			</tr>
-		</table>
+		
+		<style>
+				#table-wrapper {
+				  position:relative;
+				}
+				#table-scroll {
+				  height:150px;
+				  overflow:auto;  
+				  margin-top:20px;
+				}
+				#table-wrapper table {
+				  width:100%;
+				
+				}
+				#table-wrapper table * {
+				  background:yellow;
+				  color:black;
+				}
+				#table-wrapper table thead th .text {
+				  position:absolute;   
+				  top:-20px;
+				  z-index:2;
+				  height:20px;
+				  width:35%;
+				  border:1px solid red;
+				}
+		</style>
+		
+		<div id="top-table">
+			<table width="100%">
+				<tr>
+					<th>
+						Active Searches
+					</th>
+					<th>
+						Senders
+					</th>
+				</tr>
+				<tr>
+					<td>
+						<div id="table-wrapper">
+							<div id="table-scroll">
+								<div id="activeSearches"></div>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div id="table-wrapper">
+							<div id="table-scroll">
+								<div id="senders"></div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="table-wrapper">
+			<div id="table-scroll">
+				<div id="results">
+			</div>
+		</div>
+		
 		<script>
+		
+			class Search {
+				constructor(xmlNode) {
+					this.uuid = xmlNode.getElementsByTagName("uuid")[0].childNodes[0].nodeValue;
+					this.query = xmlNode.getElementsByTagName("Query")[0].childNodes[0].nodeValue;
+					this.resultBatches = new Map();
+					
+					var resultsBySender = xmlNode.getElementsByTagName("ResultsBySender")[0];
+					var resultsFromSenders = resultsBySender.getElementsByTagName("ResultsFromSender");
+					var i;
+					for (i = 0; i < resultsFromSenders.length; i++) {
+						var results = new Results(resultsFromSenders[i]);
+						this.resultBatches.set(results.sender, results);
+					}
+				}
+			}
+			
+			class Results {
+				constructor(xmlNode) {
+					this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+					this.results = [];
+					var resultNodes = xmlNode.getElementsByTagName("Result");
+					var i;
+					for (i = 0 ; i < resultNodes.length; i ++) {
+						var result = new Result(resultNodes[i]);
+						this.results.push(result);
+					}
+				}
+			}
+			
+			class Result {
+				constructor(xmlNode) {
+					this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
+					this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
+					this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
+				}
+			}
+		
+			var searches = new Map();
+		
 			var uuid = null;
 			var sender = null;
 			var lastXML = null;
@@ -84,25 +168,41 @@
 			
 			function updateSender(senderName) {
 				sender = senderName;
-				// TODO: update results table
+				var resultsDiv = document.getElementById("results");
+				var table = "<table><thead><tr><th>Name</th><th>Size</th></tr></thead><tbody>"
+				var x = searches.get(uuid)
+				x = x.resultBatches.get(sender).results;
+				var i;
+				for (i = 0; i < x.length; i++) {
+					table += "<tr>";
+					table += "<td>";
+					table += x[i].name;
+					table += "</td>";
+					table += "<td>";
+					table += x[i].size;
+					table += "</td>";
+					table += "</tr>";
+				}
+				table += "</tbody></table>";
+				if (x.length > 0)
+					resultsDiv.innerHTML = table
 			}
 			
 			function updateUUID(resultUUID) {
 				uuid = resultUUID;
-				var resultsDiv = document.getElementById("results");
-				var table = "<table><tr><th>Sender</th></tr>";
-				var x = lastXML.getElementsByTagName("ResultsBySender");
-				x = x[0].getElementsByTagName("ResultsFromSender");
-				var i;
-				for (i = 0; i < x.length; i++) {
-					var senderName = x[i].getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+				var sendersDiv = document.getElementById("senders");
+				var table = "<table><thead><tr><th>Sender</th></thead></tr><tbody>";
+				var x = searches.get(uuid).resultBatches;
+				for (var [senderName, ignored] of x) {
 					table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
 					table += senderName;
 					table += "</a></td></tr>";
 				}
-				table += "</table>";
-				if (x.length > 0)
-					resultsDiv.innerHTML = table;
+				table += "</tbody></table>";
+				if (x.size > 0)
+					sendersDiv.innerHTML = table;
+				if (sender != null)
+					updateSender(sender);
 			}
 			
 			function refreshActiveSearches() {
@@ -111,21 +211,31 @@
 					if (this.readyState == 4 && this.status == 200) {
 						var xmlDoc = this.responseXML;
 						lastXML = xmlDoc;
+						searches.clear();
 						var i;
-						var table = "<table><tr><th>Search</th><th>Senders</th><th>Results</th></tr>";
-						var activeSearchesDiv = document.getElementById("activeSearches");
 						var x = xmlDoc.getElementsByTagName("Search");
-						for (i = 0; i < x.length; i ++) {
-							var resultUUID = x[i].getElementsByTagName("uuid")[0].childNodes[0].nodeValue;
-							table += "<tr><td><a href='#' onclick='updateUUID(\"" + resultUUID+ "\");return false;'>"
-							table += x[i].getElementsByTagName("Query")[0].childNodes[0].nodeValue;
-							table += "</a></td><td>";
-							table += x[i].getElementsByTagName("Senders")[0].childNodes[0].nodeValue;
-							table += "</td><td>";
-							table += x[i].getElementsByTagName("Results")[0].childNodes[0].nodeValue;
-							table += "</td></tr>"
+						for (i = 0; i < x.length; i++) {
+							var search = new Search(x[i]);
+							searches.set(search.uuid, search);
 						}
-						table += "</table>"
+						
+						var table = "<table><thead><tr><th>Search</th><th>Senders</th><th>Results</th></tr></thead><tbody>";
+						var activeSearchesDiv = document.getElementById("activeSearches");
+						for (var [resultsUUID, search] of searches) {
+							table += "<tr><td><a href='#' onclick='updateUUID(\"" + resultsUUID+ "\");return false;'>"
+							table += search.query;
+							table += "</a></td>";
+							table += "<td>"
+							table += search.resultBatches.size;
+							table += "</td>";
+							var totalResults = 0;
+							search.resultBatches.forEach(resultBatch => totalResults+=resultBatch.results.length);
+							table += "<td>";
+							table += totalResults;
+							table += "</td>"
+							table += "</tr>"
+						}
+						table += "</tbody></table>"
 						if (x.length > 0) 
 							activeSearchesDiv.innerHTML = table;
 						if (uuid != null)
