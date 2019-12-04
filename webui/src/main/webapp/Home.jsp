@@ -257,7 +257,7 @@
 				resultsFromSpan.innerHTML = "Results From "+sender;
 				
 				var resultsDiv = document.getElementById("bottomTable");
-				var table = "<table><thead><tr><th>Name</th><th>Size</th></tr></thead><tbody>"
+				var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
 				var x = searches.get(uuid)
 				x = x.resultBatches.get(sender).results;
 				var i;
@@ -268,6 +268,11 @@
 					table += "</td>";
 					table += "<td>";
 					table += x[i].size;
+					table += "</td>";
+					table += "<td>";
+					table += "<form action='/MuWire/Download' target='_blank' method='post'><input type='hidden' name='infoHash' value='"+x[i].infoHash;
+					table += "'><input type='hidden' name='action' value='start'><input type='hidden' name='uuid' value='"+uuid;
+					table += "'><input type='submit' value='Download'></form>";
 					table += "</td>";
 					table += "</tr>";
 				}
@@ -327,7 +332,7 @@
 				currentSearchSpan.innerHTML = searches.get(uuid).query + " Results";
 				
 				var topTableDiv = document.getElementById("topTable");
-				var table = "<table><thead><tr><th>Name</th><th>Size</th></tr></thead><tbody>";
+				var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>";
 				var x = searches.get(uuid).resultBatches;
 				for (var [fileInfoHash, file] of x) {
 					table += "<tr><td><a href='#' onclick='updateFile(\""+fileInfoHash+"\");return false;'>";
@@ -335,6 +340,11 @@
 					table += "</a></td>";
 					table += "<td>";
 					table += file.size;
+					table += "</td>";
+					table += "<td>";
+					table += "<form action='/MuWire/Download' target='_blank' method='post'><input type='hidden' name='infoHash' value='"+fileInfoHash;
+					table += "'><input type='hidden' name='action' value='start'><input type='hidden' name='uuid' value='"+uuid;
+					table += "'><input type='submit' value='Download'></form>";
 					table += "</td></tr>";
 				}
 				table += "</tbody></table>";
