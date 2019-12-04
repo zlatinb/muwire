@@ -20,6 +20,7 @@ import com.muwire.core.download.UIDownloadEvent;
 import com.muwire.core.search.UIResultEvent;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 
 public class DownloadServlet extends HttpServlet {
 
@@ -33,6 +34,22 @@ public class DownloadServlet extends HttpServlet {
         core = (Core) config.getServletContext().getAttribute("core");
     }
     
+    
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+        sb.append("<Downloads>");
+        downloadManager.getDownloaders().forEach(d -> {
+            sb.append("<Name>").append(d.getFile().getName()).append("</Name>");
+            sb.append("<State>").append(d.getCurrentState().toString()).append("</State>");
+            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(d.speed())).append("B/sec").append("</Speed>");
+        });
+    }
+
+
+
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String infoHashB64 = req.getParameter("infoHash");
         InfoHash infoHash = new InfoHash(Base64.decode(infoHashB64));

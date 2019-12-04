@@ -7,7 +7,7 @@
 
 <html>
     <head>
-        <title>MuWire</title>
+<%@include file="css.jsi"%>
     </head>
     <body>
     	<%

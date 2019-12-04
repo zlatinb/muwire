@@ -1,0 +1,6 @@
+<%
+	MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
+	ConnectionCounter connectionCounter = (ConnectionCounter) client.getServletContext().getAttribute("connectionCounter");
+	String persona = client.getCore().getMe().getHumanReadableName();
+	String version = client.getCore().getVersion();
+%>

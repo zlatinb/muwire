@@ -15,6 +15,7 @@ import net.i2p.router.RouterContext;
 public class MuWireServlet extends HttpServlet {
 
     private volatile MuWireClient client;
+    private volatile String version;
     
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -32,7 +33,7 @@ public class MuWireServlet extends HttpServlet {
             
         
         String home = ctx.getConfigDir()+File.separator+"plugins"+File.separator+"MuWire";
-        String version = config.getInitParameter("version");
+        version = config.getInitParameter("version");
         
         client = new MuWireClient(ctx, home, version, config.getServletContext());
         try {
@@ -48,9 +49,16 @@ public class MuWireServlet extends HttpServlet {
         if (client.needsMWInit()) {
             resp.sendRedirect("/MuWire/MuWire.jsp");
         } else {
-            resp.setContentType("text/html");
             if (client.getCore() == null) {
-                resp.getWriter().println("<html>MW is initializing, please wait</html>");
+                resp.setContentType("text/html");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().println("<html><head>\n" +
+                                         "<title>MuWire " + version + "</title>\n" +
+                                         "<link href=\"i2pbote.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
+                                         "<link href=\"muwire.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
+                                         "</head><body>\n" +
+                                         "<p>MuWire is initializing, please wait</p>\n" +
+                                         "</body></html>");
                 resp.setIntHeader("Refresh", 5);
             } else
                 resp.sendRedirect("/MuWire/Home.jsp");

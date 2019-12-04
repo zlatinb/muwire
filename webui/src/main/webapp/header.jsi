@@ -1,0 +1,24 @@
+<header class="titlebar">
+  <div class="title">
+       <a href="Home.jsp"><img src="images/muwire.png" alt=""></a>
+       Welcome to MuWire
+  </div>
+  <div class="subtitle">
+    ${persona}
+    <br>
+    Connections: <%=connectionCounter.getConnections() %>
+    <br>
+<% if ("Home".equals(pagetitle)) { %>
+        <form action="/MuWire/Search" method="post">
+          <input type="text" name="search" />
+          <input type="submit" value="Search" />
+      </form>
+      <a href="Downloads.jsp">Downloads</a>
+<% } else { %>
+    <a href="Home.jsp">Search</a>
+<% } %>
+  </div>
+  <div class="pagetitle">
+    <%=pagetitle%>
+  </div>
+</header>

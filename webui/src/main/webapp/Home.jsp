@@ -6,10 +6,9 @@
 <%@ page import="com.muwire.core.search.*" %>
 <%@ page import="net.i2p.data.*" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@include file="initcode.jsi"%>
 <%
-	MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
-	String persona = client.getCore().getMe().getHumanReadableName();
-	String version = client.getCore().getVersion();
+        String pagetitle="Home";
 	session.setAttribute("persona", persona);
 	session.setAttribute("version", version);
 	
@@ -19,35 +18,10 @@
 %>
 <html>
 	<head>
-		<title>MuWire ${version}</title>
-		<link rel="stylesheet" href="/MuWire/muwire.css">
+<%@include file="css.jsi"%>
 	</head>
 	<body>
-    	<table width="100%">
-    	<tr>
-    	<td>
-        	Welcome to MuWire ${persona}
-        </td>
-        <td>
-        	<span id="connectionsCount">Connections : 0</span>
-        </td>
-        </tr>
-        </table>
-        
-        <table width="100%">
-        <tr>
-        <td>
-        <form action="/MuWire/Search" method="post">
-        	<input type="text", name="search" />
-        	<input type="submit", value="Search" />
-      	</form>
-		</td>
-		<td>
-			<a href="/MuWire/Downloads.jsp">Downloads</a>
-		</td>
-		</tr>
-		</table>
-		<hr/>
+<%@include file="header.jsi"%>
 <% if (groupBy.equals("sender")) { %>
 		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>
 <% } else { %>

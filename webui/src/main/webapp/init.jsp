@@ -6,6 +6,9 @@
 <%@ page import="com.muwire.webui.MuWireClient" %>
 
 <html>
+<head>
+<%@include file="css.jsi"%>
+</head>
 	<body>
     	<%
     		String nickname = request.getParameter("nickname");
