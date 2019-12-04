@@ -42,10 +42,36 @@ public class DownloadServlet extends HttpServlet {
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         sb.append("<Downloads>");
         downloadManager.getDownloaders().forEach(d -> {
+            sb.append("<Download>");
+            sb.append("<InfoHash>").append(Base64.encode(d.getInfoHash().getRoot())).append("</InfoHash>");
             sb.append("<Name>").append(d.getFile().getName()).append("</Name>");
             sb.append("<State>").append(d.getCurrentState().toString()).append("</State>");
-            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(d.speed())).append("B/sec").append("</Speed>");
+            int speed = d.speed();
+            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
+            
+            String ETA;
+            if (speed == 0)
+                ETA = "Unknown";
+            else {
+                long remaining = (d.getNPieces() - d.donePieces()) * d.getPieceSize() / speed;
+                ETA = DataHelper.formatDuration(remaining * 1000);
+            }
+            sb.append("<ETA>").append(ETA).append("</ETA>");
+            
+            int percent = -1;
+            if (d.getNPieces() != 0)
+                percent = (int)(d.donePieces() * 100 / d.getNPieces());
+            String totalSize = DataHelper.formatSize2Decimal(d.getLength(), false) + "B";
+            String progress = String.format("%2d", percent) + "% of "+totalSize;
+            sb.append("<Progress>").append(progress).append("</Progress>");
+            
+            // TODO: more details for the downloader details view
+            sb.append("</Download>");
         });
+        sb.append("</Downloads>");
+        resp.setContentType("text/xml");
+        resp.getWriter().write(sb.toString());
+        resp.getWriter().flush();
     }
 
 

@@ -8,46 +8,19 @@
 <%@ page import="net.i2p.data.*" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@include file="initcode.jsi"%>
 
-<%
-	MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
-	String persona = client.getCore().getMe().getHumanReadableName();
-	String version = client.getCore().getVersion();
-	session.setAttribute("persona", persona);
-	session.setAttribute("version", version);
-	
-%>
+<% String pagetitle="Downloads"; %>
+
 <html>
     <head>
-        <title>MuWire ${version}</title>
-        <link rel="stylesheet" href="/MuWire/muwire.css">
+<%@include file="css.jsi"%>
     </head>
     <body>
-    	
-        <table width="100%">
-        <tr>
-        <td>
-        	Welcome to MuWire ${persona}
-        </td>
-        <td>
-        	<span id="connectionsCount">Connections : 0</span>
-       	</td>
-       	</tr>
-       	</table>
-       	
-        <table width="100%">
-        <tr>
-        <td>
-        	<a href="/MuWire/Home.jsp">Search</a>
-        </td>
-        </tr>
-        </table>
-
-		<hr/>
-		<p>Downloads:</p>
+<%@include file="header.jsi"%>    	
+        <p>Downloads:</p>
 
 		<div id="table-wrapper">
-			<div id="table-scroll">
 				<div id="downloads"></div>
 			</div>
 		</div>		
@@ -88,7 +61,7 @@
 			var downloaders = new Map()
 			
 			function updateDownloader(infoHash) {
-				var selected = downloader.get(infoHash);
+				var selected = downloaders.get(infoHash);
 				
 				var downloadDetailsDiv = document.getElementById("downloadDetails");
 				downloadDetailsDiv.innerHTML = "<p>Details for "+selected.name+"</p>"
@@ -107,9 +80,9 @@
 							downloaders.set(download.infoHash, download);
 						}
 						
-						var table = "<table><thead><tr><th>Name</th><th>State</th><th>Speed</th><th>ETA</th><th>Progress</th></tr></thead></tbody>";
+						var table = "<table><thead><tr><th>Name</th><th>State</th><th>Speed</th><th>ETA</th><th>Progress</th><th>Cancel</th></tr></thead></tbody>";
 						var downloadsDiv = document.getElementById("downloads");
-						for (var [infoHash, download) of downloaders) {
+						for (var [infoHash, download] of downloaders) {
 							table += "<tr><td><a href='#' onclick='updateDownloader(\""+infoHash+"\");return false;'>";
 							table += download.name;
 							table += "</a></td>";
@@ -118,11 +91,11 @@
 							table += "<td>"+download.ETA+"</td>";
 							table += "<td>"+download.progress+"</td>";
 							
-							table += "<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='"+
-									+ infoHash + "'><input type='hidden' name='action' value='cancel'><input type='submit' value='Cancel'></form></td>";
+							table += "<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='" +
+									infoHash + "'><input type='hidden' name='action' value='cancel'><input type='submit' value='Cancel'></form></td>";
 							
 							table += "</tr>";
-						});
+						}
 						table += "</tbody></table>";
 						if (downloaders.size > 0)
 							downloadsDiv.innerHTML = table;
