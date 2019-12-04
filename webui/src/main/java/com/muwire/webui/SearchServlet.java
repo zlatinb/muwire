@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultEvent;
 
@@ -35,19 +36,13 @@ public class SearchServlet extends HttpServlet {
         String section = req.getParameter("section");
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-        if (section.equals("activeSearches")) {
+        if (section.equals("groupBySender")) {
             sb.append("<Searches>");
             for (SearchResults results : searchManager.getResults().values()) {
                 sb.append("<Search>");
                 sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
                 sb.append("<Query>").append(results.getSearch()).append("</Query>");
                 Map<Persona, Set<UIResultEvent>> bySender = results.getBySender();
-                sb.append("<Senders>").append(bySender.size()).append("</Senders>");
-                int total = 0;
-                for (Set<UIResultEvent> s : bySender.values()) {
-                    total += s.size();
-                }
-                sb.append("<Results>").append(total).append("</Results>");
                 sb.append("<ResultsBySender>");
                 bySender.forEach((sender, resultsFromSender) -> {
                     sb.append("<ResultsFromSender>");
@@ -73,7 +68,32 @@ public class SearchServlet extends HttpServlet {
                 sb.append("</ResultsBySender>");
                 sb.append("</Search>");
             }
-            sb.append("</Searches>");        
+            sb.append("</Searches>");  
+        } else if (section.equals("groupByFile")) {
+            sb.append("<Searches>");
+            for (SearchResults results : searchManager.getResults().values()) {     
+                sb.append("<Search>");
+                sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
+                sb.append("<Query>").append(results.getSearch()).append("</Query>");
+                Map<InfoHash, Set<UIResultEvent>> byInfohash = results.getByInfoHash();
+                sb.append("<ResultsByFile>");
+                byInfohash.forEach((infoHash, resultSet) -> {
+                    sb.append("<ResultsForFile>");
+                    UIResultEvent first = resultSet.iterator().next();
+                    sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
+                    sb.append("<Name>").append(first.getName()).append("</Name>");
+                    sb.append("<Size>").append(DataHelper.formatSize2Decimal(first.getSize(), false)).append("B").append("</Size>");
+                    resultSet.forEach(result -> {
+                        sb.append("<Result>");
+                        sb.append("<Sender>").append(result.getSender().getHumanReadableName()).append("</Sender>");
+                        sb.append("</Result>");
+                    });
+                    sb.append("</ResultsForFile>");
+                });
+                sb.append("</ResultsByFile>");
+                sb.append("</Search>");
+            }
+            sb.append("</Searches>");
         } else if (section.equals("connectionsCount")) {
             sb.append("<Connections>");
             sb.append(connectionCounter.getConnections());

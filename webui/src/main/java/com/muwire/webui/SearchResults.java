@@ -69,6 +69,10 @@ public class SearchResults {
         return bySender;
     }
     
+    public Map<InfoHash, Set<UIResultEvent>> getByInfoHash() {
+        return byInfohash;
+    }
+    
     public Set<UIResultEvent> getByInfoHash(InfoHash infoHash) {
         return byInfohash.get(infoHash);
     }
