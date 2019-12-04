@@ -11,4 +11,5 @@ min-java-version=11
 consoleLinkName=MuWire
 consoleLinkTooltip=Anonymous File Sharing
 consoleLinkURL=/MuWire/index.jsp
+console-icon=images/muwire.png
 <% println "date="+System.currentTimeMillis() %>
