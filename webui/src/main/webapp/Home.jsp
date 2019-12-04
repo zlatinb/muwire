@@ -42,9 +42,7 @@
 		</td>
 		</tr>
 		</table>
-		
 		<hr/>
-		
 		<style>
 				#table-wrapper {
 				  position:relative;
@@ -71,40 +69,79 @@
 				  border:1px solid red;
 				}
 		</style>
-		
-		<div id="top-table">
-			<table width="100%">
-				<tr>
-					<th>
-						Active Searches
-					</th>
-					<th>
-						Senders
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<div id="table-wrapper">
-							<div id="table-scroll">
-								<div id="activeSearches"></div>
-							</div>
-						</div>
-					</td>
-					<td>
-						<div id="table-wrapper">
-							<div id="table-scroll">
-								<div id="senders"></div>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div id="table-wrapper">
-			<div id="table-scroll">
-				<div id="results">
-			</div>
-		</div>
+		<table width="100%">
+			<tr>
+				<td width="20%">
+						<table width="100%">
+							<tr>
+								<th>
+									Active Searches
+								</th>
+							</tr>
+							<tr>
+								<td>
+									<div id="table-wrapper">
+										<div id="table-scroll">
+											<div id="activeSearches"></div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="table-wrapper">
+										<div id="table-scroll">
+											<div id="unused"></div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+				</td>
+				<td width="80%">
+						<table width="100%">
+							<tr>
+								<th>
+									<span id="currentSearch">Results</span>
+								</th>
+							</tr>
+							<tr>
+								<td>
+									<div id="table-wrapper">
+										<div id="table-scroll">
+											<div id="senders"></div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<table width="100%">
+										<thead>
+											<tr>
+												<th>
+													<span id="resultsFrom"></span>
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<div id="table-wrapper">
+														<div id="table-scroll">
+															<div id="results">
+														</div>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+				</td>
+			</tr>
+		</table>
 		
 		<script>
 		
@@ -168,6 +205,10 @@
 			
 			function updateSender(senderName) {
 				sender = senderName;
+				
+				var resultsFromSpan = document.getElementById("resultsFrom");
+				resultsFromSpan.innerHTML = "Results From "+sender;
+				
 				var resultsDiv = document.getElementById("results");
 				var table = "<table><thead><tr><th>Name</th><th>Size</th></tr></thead><tbody>"
 				var x = searches.get(uuid)
@@ -190,6 +231,10 @@
 			
 			function updateUUID(resultUUID) {
 				uuid = resultUUID;
+				
+				var currentSearchSpan = document.getElementById("currentSearch");
+				currentSearchSpan.innerHTML = searches.get(uuid).query + " Results";
+				
 				var sendersDiv = document.getElementById("senders");
 				var table = "<table><thead><tr><th>Sender</th></thead></tr><tbody>";
 				var x = searches.get(uuid).resultBatches;
