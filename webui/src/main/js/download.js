@@ -12,6 +12,19 @@ class Downloader {
 var downloader = null;
 var downloaders = new Map()
 
+function cancelDownload(infoHash) {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var downloadSpan = document.getElementById("download-"+infoHash);
+			downloadSpan.innerHTML = "";
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Download", true);
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=cancel&infoHash="+infoHash));
+}
+
 function updateDownloader(infoHash) {
 	var selected = downloaders.get(infoHash);
 	
@@ -43,8 +56,7 @@ function refreshDownloader() {
 				table += "<td>"+download.ETA+"</td>";
 				table += "<td>"+download.progress+"</td>";
 				
-				table += "<td><form action='/MuWire/Download' method='post'><input type='hidden' name='infoHash' value='" +
-						infoHash + "'><input type='hidden' name='action' value='cancel'><input type='submit' value='Cancel'></form></td>";
+				table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>Cancel</a></span></td>";
 				
 				table += "</tr>";
 			}

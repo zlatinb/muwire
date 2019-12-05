@@ -34,7 +34,7 @@ public class DownloadManager {
     }
     
     void cancel(InfoHash infoHash) {
-        Downloader d = downloaders.remove(infoHash);
+        Downloader d = downloaders.get(infoHash);
         if (d == null)
             return;
         d.cancel();
