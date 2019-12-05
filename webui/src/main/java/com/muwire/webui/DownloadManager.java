@@ -30,7 +30,8 @@ public class DownloadManager {
     }
     
     public boolean isDownloading(InfoHash infoHash) {
-        return downloaders.containsKey(infoHash);
+        return downloaders.containsKey(infoHash) &&
+                downloaders.get(infoHash).getCurrentState() != Downloader.DownloadState.CANCELLED;
     }
     
     void cancel(InfoHash infoHash) {
