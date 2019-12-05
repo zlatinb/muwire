@@ -5,7 +5,7 @@ function refreshConnectionsCount() {
 			var connections = this.responseXML.getElementsByTagName("Connections");
 			var count = connections[0].childNodes[0].nodeValue
 			var connectionCountSpan = document.getElementById("connectionsCount");
-			var countString = "Connections: "+count;
+			var countString = ""+count;
 			connectionCountSpan.innerHTML = countString;
 		}
 	}

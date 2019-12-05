@@ -19,8 +19,8 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
-	</head>
 	<script src="js/search.js" type="text/javascript"></script>
+	</head>
 <%@include file="header.jsi"%>
 <% if (groupBy.equals("sender")) { %>
 		<body onload="initConnectionsCount();initGroupBySender();">

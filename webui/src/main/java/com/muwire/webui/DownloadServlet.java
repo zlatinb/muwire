@@ -38,13 +38,17 @@ public class DownloadServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (downloadManager == null) {
+            resp.sendError(403, "Not initialized");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         sb.append("<Downloads>");
         downloadManager.getDownloaders().forEach(d -> {
             sb.append("<Download>");
             sb.append("<InfoHash>").append(Base64.encode(d.getInfoHash().getRoot())).append("</InfoHash>");
-            sb.append("<Name>").append(d.getFile().getName()).append("</Name>");
+            sb.append("<Name>").append(DataHelper.escapeHTML(d.getFile().getName())).append("</Name>");
             sb.append("<State>").append(d.getCurrentState().toString()).append("</State>");
             int speed = d.speed();
             sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
@@ -70,6 +74,10 @@ public class DownloadServlet extends HttpServlet {
         });
         sb.append("</Downloads>");
         resp.setContentType("text/xml");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
         resp.getWriter().write(sb.toString());
         resp.getWriter().flush();
     }
@@ -80,7 +88,15 @@ public class DownloadServlet extends HttpServlet {
         String infoHashB64 = req.getParameter("infoHash");
         InfoHash infoHash = new InfoHash(Base64.decode(infoHashB64));
         String action = req.getParameter("action");
+        if (action == null) {
+            resp.sendError(403, "Bad action param");
+            return;
+        }
         if (action.equals("start")) {
+            if (core == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
             UUID uuid = UUID.fromString(req.getParameter("uuid"));
             Set<UIResultEvent> results = searchManager.getResults().get(uuid).getByInfoHash(infoHash);
             
@@ -95,6 +111,10 @@ public class DownloadServlet extends HttpServlet {
                 Thread.sleep(100);
             } catch (InterruptedException e) {}
         } else if (action.equals("cancel")) {
+            if (downloadManager == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
             downloadManager.getDownloaders().stream().filter(d -> d.getInfoHash().equals(infoHash)).findAny().
                     ifPresent(d -> {
                         d.cancel();

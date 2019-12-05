@@ -1,5 +1,5 @@
 <%
 	MuWireClient client = (MuWireClient) application.getAttribute("mwClient");
-	String persona = client.getCore().getMe().getHumanReadableName();
-	String version = client.getCore().getVersion();
+	String persona = client != null ? net.i2p.data.DataHelper.escapeHTML(client.getCore().getMe().getHumanReadableName()) : "";
+	String version = client != null ? client.getCore().getVersion() : "";
 %>

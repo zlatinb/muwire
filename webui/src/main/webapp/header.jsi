@@ -6,7 +6,7 @@
   <div class="subtitle">
     ${persona}
     <br>
-    <span id="connectionsCount">Connections : 0</span>
+    Connections: <span id="connectionsCount">0</span>
     <br>
 <% if ("Home".equals(pagetitle)) { %>
         <form action="/MuWire/Search" method="post">

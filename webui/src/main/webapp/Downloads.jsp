@@ -15,8 +15,8 @@
 <html>
     <head>
 <%@include file="css.jsi"%>
-    </head>
     <script src="js/download.js" type="text/javascript"></script>
+    </head>
     <body onload="initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
         <p>Downloads:</p>

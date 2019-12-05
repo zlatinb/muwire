@@ -24,6 +24,10 @@ public class SearchServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (searchManager == null) {
+            resp.sendError(403, "Not initialized");
+            return;
+        }
         String search = req.getParameter("search");
         searchManager.newSearch(search);
         resp.sendRedirect("/MuWire/Home.jsp");
@@ -34,25 +38,33 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String section = req.getParameter("section");
+        if (section == null) {
+            resp.sendError(403, "Bad section param");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         if (section.equals("groupBySender")) {
+            if (searchManager == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
             sb.append("<Searches>");
             for (SearchResults results : searchManager.getResults().values()) {
                 sb.append("<Search>");
                 sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
-                sb.append("<Query>").append(results.getSearch()).append("</Query>");
+                sb.append("<Query>").append(DataHelper.escapeHTML(results.getSearch())).append("</Query>");
                 Map<Persona, Set<UIResultEvent>> bySender = results.getBySender();
                 sb.append("<ResultsBySender>");
                 bySender.forEach((sender, resultsFromSender) -> {
                     sb.append("<ResultsFromSender>");
                     sb.append("<Sender>");
-                    sb.append(sender.getHumanReadableName());
+                    sb.append(DataHelper.escapeHTML(sender.getHumanReadableName()));
                     sb.append("</Sender>");
                     resultsFromSender.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Name>");
-                        sb.append(result.getName());
+                        sb.append(DataHelper.escapeHTML(result.getName()));
                         sb.append("</Name>");
                         sb.append("<Size>");
                         sb.append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B");
@@ -70,22 +82,26 @@ public class SearchServlet extends HttpServlet {
             }
             sb.append("</Searches>");  
         } else if (section.equals("groupByFile")) {
+            if (searchManager == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
             sb.append("<Searches>");
             for (SearchResults results : searchManager.getResults().values()) {     
                 sb.append("<Search>");
                 sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
-                sb.append("<Query>").append(results.getSearch()).append("</Query>");
+                sb.append("<Query>").append(DataHelper.escapeHTML(results.getSearch())).append("</Query>");
                 Map<InfoHash, Set<UIResultEvent>> byInfohash = results.getByInfoHash();
                 sb.append("<ResultsByFile>");
                 byInfohash.forEach((infoHash, resultSet) -> {
                     sb.append("<ResultsForFile>");
                     UIResultEvent first = resultSet.iterator().next();
                     sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
-                    sb.append("<Name>").append(first.getName()).append("</Name>");
+                    sb.append("<Name>").append(DataHelper.escapeHTML(first.getName())).append("</Name>");
                     sb.append("<Size>").append(DataHelper.formatSize2Decimal(first.getSize(), false)).append("B").append("</Size>");
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
-                        sb.append("<Sender>").append(result.getSender().getHumanReadableName()).append("</Sender>");
+                        sb.append("<Sender>").append(DataHelper.escapeHTML(result.getSender().getHumanReadableName())).append("</Sender>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsForFile>");
@@ -95,11 +111,22 @@ public class SearchServlet extends HttpServlet {
             }
             sb.append("</Searches>");
         } else if (section.equals("connectionsCount")) {
+            if (connectionCounter == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
             sb.append("<Connections>");
             sb.append(connectionCounter.getConnections());
             sb.append("</Connections>");
+        } else {
+            resp.sendError(403, "Bad section param");
+            return;
         }
         resp.setContentType("text/xml");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
         resp.getWriter().write(sb.toString());
         resp.flushBuffer();
     }
