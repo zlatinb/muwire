@@ -19,14 +19,17 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
-	<script src="js/search.js" type="text/javascript"></script>
+	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 	</head>
-<%@include file="header.jsi"%>
 <% if (groupBy.equals("sender")) { %>
 		<body onload="initConnectionsCount();initGroupBySender();">
-		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>
 <% } else { %>
 		<body onload="initConnectionsCount();initGroupByFile();">
+<% } %>
+<%@include file="header.jsi"%>
+<% if (groupBy.equals("sender")) { %>
+		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>
+<% } else { %>
 		<center><a href="/MuWire/Home.jsp?groupBy=sender">Group By Sender</a></center>
 <% } %>
 		<table width="100%">
@@ -90,6 +93,7 @@
 													<div id="table-wrapper">
 														<div id="table-scroll">
 															<div id="bottomTable">
+															</div>
 														</div>
 													</div>
 												</td>

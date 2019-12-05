@@ -15,7 +15,7 @@
 <html>
     <head>
 <%@include file="css.jsi"%>
-    <script src="js/download.js" type="text/javascript"></script>
+    <script src="js/download.js?<%=version%>" type="text/javascript"></script>
     </head>
     <body onload="initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
@@ -23,9 +23,7 @@
 
 		<div id="table-wrapper">
 				<div id="downloads"></div>
-			</div>
 		</div>		
-		</table>
 		<hr/>
 		<p>Download Details</p>
 		<div id="downloadDetails"><p>Click on a download to view details</p></div>
