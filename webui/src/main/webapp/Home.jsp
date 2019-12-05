@@ -20,7 +20,7 @@
 	<head>
 <%@include file="css.jsi"%>
 	</head>
-	<body>
+	<body onload="initConnectionsCount()">
 <%@include file="header.jsi"%>
 <% if (groupBy.equals("sender")) { %>
 		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>

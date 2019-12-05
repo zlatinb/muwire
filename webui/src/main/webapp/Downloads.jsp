@@ -16,7 +16,7 @@
     <head>
 <%@include file="css.jsi"%>
     </head>
-    <body>
+    <body onload="initConnectionsCount()">
 <%@include file="header.jsi"%>    	
         <p>Downloads:</p>
 

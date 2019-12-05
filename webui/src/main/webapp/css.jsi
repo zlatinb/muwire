@@ -1,3 +1,4 @@
 <title>MuWire ${version}</title>
 <link href="i2pbote.css?${version}" rel="stylesheet" type="text/css">
 <link href="muwire.css?${version}" rel="stylesheet" type="text/css">
+<script src="js/conncount.js" type="text/javascript"></script>

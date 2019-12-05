@@ -17,11 +17,14 @@ war {
     from ('src/main/images', {
         into "images"
     })
+    from ('src/main/js', {
+        into "js"
+    })
     webInf { 
         from "$buildDir/compiledJsps" 
         into "classes"
     }
-    excludes = new HashSet(['**/*.jsp'])
+    excludes = new HashSet(['**/*.jsp', '**/*.jsi'])
     webXml = file("$buildDir/tmp_jsp/web.xml")
 }
 
