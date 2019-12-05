@@ -18,6 +18,7 @@ function cancelDownload(infoHash) {
 		if (this.readyState == 4 && this.status == 200) {
 			var downloadSpan = document.getElementById("download-"+infoHash);
 			downloadSpan.innerHTML = "";
+			refreshDownloader();
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Download", true);
@@ -56,8 +57,10 @@ function refreshDownloader() {
 				table += "<td>"+download.ETA+"</td>";
 				table += "<td>"+download.progress+"</td>";
 				
-				table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>Cancel</a></span></td>";
-				
+				if (download.state != "CANCELLED")
+					table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>Cancel</a></span></td>";
+				else
+					table += "<td></td>";
 				table += "</tr>";
 			}
 			table += "</tbody></table>";
