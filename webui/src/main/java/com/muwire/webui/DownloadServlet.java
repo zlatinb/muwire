@@ -115,15 +115,7 @@ public class DownloadServlet extends HttpServlet {
                 resp.sendError(403, "Not initialized");
                 return;
             }
-            downloadManager.getDownloaders().stream().filter(d -> d.getInfoHash().equals(infoHash)).findAny().
-                    ifPresent(d -> {
-                        d.cancel();
-                        downloadManager.getDownloaders().remove(d);
-                        UIDownloadCancelledEvent event = new UIDownloadCancelledEvent();
-                        event.setDownloader(d);
-                        core.getEventBus().publish(event);
-                    });
+            downloadManager.cancel(infoHash);
         }
-        resp.sendRedirect("/MuWire/Downloads.jsp");
     }
 }

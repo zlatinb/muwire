@@ -21,6 +21,7 @@ public class SearchServlet extends HttpServlet {
     
     private SearchManager searchManager;
     private ConnectionCounter connectionCounter;
+    private DownloadManager downloadManager;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,7 +46,7 @@ public class SearchServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         if (section.equals("groupBySender")) {
-            if (searchManager == null) {
+            if (searchManager == null || downloadManager == null) {
                 resp.sendError(403, "Not initialized");
                 return;
             }
@@ -73,6 +74,7 @@ public class SearchServlet extends HttpServlet {
                         sb.append("<InfoHash>");
                         sb.append(infohash);
                         sb.append("</InfoHash>");
+                        sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsFromSender>");
@@ -82,7 +84,7 @@ public class SearchServlet extends HttpServlet {
             }
             sb.append("</Searches>");  
         } else if (section.equals("groupByFile")) {
-            if (searchManager == null) {
+            if (searchManager == null || downloadManager == null) {
                 resp.sendError(403, "Not initialized");
                 return;
             }
@@ -97,6 +99,7 @@ public class SearchServlet extends HttpServlet {
                     sb.append("<ResultsForFile>");
                     UIResultEvent first = resultSet.iterator().next();
                     sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
+                    sb.append("<Downloading>").append(downloadManager.isDownloading(infoHash)).append("</Downloading>");
                     sb.append("<Name>").append(DataHelper.escapeHTML(first.getName())).append("</Name>");
                     sb.append("<Size>").append(DataHelper.formatSize2Decimal(first.getSize(), false)).append("B").append("</Size>");
                     resultSet.forEach(result -> {
@@ -137,6 +140,7 @@ public class SearchServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         searchManager = (SearchManager) config.getServletContext().getAttribute("searchManager");
         connectionCounter = (ConnectionCounter) config.getServletContext().getAttribute("connectionCounter");
+        downloadManager = (DownloadManager) config.getServletContext().getAttribute("downloadManager");
     }
 
 }

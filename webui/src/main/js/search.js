@@ -63,6 +63,7 @@ class ResultBySender {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
+		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
 	}
 }
 
@@ -78,6 +79,19 @@ var uuid = null;
 var sender = null;
 var lastXML = null;
 var infoHash = null;
+
+function download(resultInfoHash) {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var resultSpan = document.getElementById("download-"+resultInfoHash);
+			resultSpan.innerHTML = "Downloading";
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Download", true);
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=start&infoHash="+resultInfoHash+"&uuid="+uuid));
+}
 
 function updateSender(senderName) {
 	sender = senderName;
@@ -99,9 +113,11 @@ function updateSender(senderName) {
 		table += x[i].size;
 		table += "</td>";
 		table += "<td>";
-		table += "<form action='/MuWire/Download' target='_blank' method='post'><input type='hidden' name='infoHash' value='"+x[i].infoHash;
-		table += "'><input type='hidden' name='action' value='start'><input type='hidden' name='uuid' value='"+uuid;
-		table += "'><input type='submit' value='Download'></form>";
+		if (x[i].downloading == "false") {
+			table += "<span id='download-"+ x[i].infoHash+"'><a href='#' onclick='window.download(\"" + x[i].infoHash + "\");return false;'>Download</a></span>";
+		} else {
+			table += "Downloading";
+		}
 		table += "</td>";
 		table += "</tr>";
 	}
