@@ -48,6 +48,7 @@ class ResultsByFile {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
+		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
 		this.results = [];
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
@@ -187,9 +188,10 @@ function updateUUIDByFile(resultUUID) {
 		table += file.size;
 		table += "</td>";
 		table += "<td>";
-		table += "<form action='/MuWire/Download' target='_blank' method='post'><input type='hidden' name='infoHash' value='"+fileInfoHash;
-		table += "'><input type='hidden' name='action' value='start'><input type='hidden' name='uuid' value='"+uuid;
-		table += "'><input type='submit' value='Download'></form>";
+		if (file.downloading == "false") 
+			table += "<span id='download-"+fileInfoHash+"'><a href='#' onclick='window.download(\""+fileInfoHash+"\"); return false;'>Download</a></span>";
+		else
+			table += "Downloading";
 		table += "</td></tr>";
 	}
 	table += "</tbody></table>";
