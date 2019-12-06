@@ -46,6 +46,31 @@ class FileTree<T> {
         true
     }    
     
+    synchronized void traverse(FileTreeCallback<T> callback) {
+        doTraverse(root, callback);
+    }
+    
+    private void doTraverse(TreeNode<T> node, FileTreeCallback<T> callback) {
+        println "traversing $node"
+        boolean leave = false
+        if (node.file != null) {
+            println "file is $node.file"
+            if (node.file.isFile())
+                callback.onFile(node.file, node.value)
+            else {
+                leave = true
+                callback.onDirectoryEnter(node.file)
+            }
+        }
+        
+        node.children.each { 
+            doTraverse(it, callback)
+        }        
+        
+        if (leave)
+            callback.onDirectoryLeave()
+    }
+    
     public static class TreeNode<T> {
         TreeNode parent
         File file
@@ -53,7 +78,7 @@ class FileTree<T> {
         final Set<TreeNode> children = new HashSet<>()
         
         public int hashCode() {
-            file.hashCode()
+            Objects.hash(file)
         }
         
         public boolean equals(Object o) {

@@ -39,4 +39,54 @@ class FileTreeTest {
         tree.remove(d)
         assert tree.fileToNode.size() == 3
     }
+    
+    @Test
+    public void testTraverse() {
+        Stack stack = new Stack()
+        Set<String> values = new HashSet<>()
+        StringBuilder sb = new StringBuilder()
+        def cb = new FileTreeCallback<String>() {
+
+            @Override
+            public void onDirectoryEnter(File file) {
+                stack.push(file)
+            }
+
+            @Override
+            public void onDirectoryLeave() {
+                stack.pop()
+            }
+
+            @Override
+            public void onFile(File file, String value) {
+                values.add(value)
+            }
+        }
+        
+        File a = new File("a")
+        a.createNewFile()
+        File b = new File("b")
+        b.mkdir()
+        File c = new File(b, "c")
+        c.createNewFile()
+        File d = new File(b, "d")
+        d.mkdir()
+        File e = new File(d, "e")
+        e.createNewFile()
+        FileTree<String> tree = new FileTree<>()
+        
+        tree.add(a, "a")
+        tree.add(b, "b")
+        tree.add(c, "c")
+        tree.add(d, "d")
+        tree.add(e, "e")
+        
+        tree.traverse(cb)
+
+        assert stack.isEmpty()
+        assert values.size() == 3
+        assert values.contains("a")
+        assert values.contains("c")
+        assert values.contains("e")
+    }
 }
