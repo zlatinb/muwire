@@ -54,18 +54,18 @@ public class SearchServlet extends HttpServlet {
             for (SearchResults results : searchManager.getResults().values()) {
                 sb.append("<Search>");
                 sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
-                sb.append("<Query>").append(DataHelper.escapeHTML(results.getSearch())).append("</Query>");
+                sb.append("<Query>").append(Util.escapeHTMLinXML(results.getSearch())).append("</Query>");
                 Map<Persona, Set<UIResultEvent>> bySender = results.getBySender();
                 sb.append("<ResultsBySender>");
                 bySender.forEach((sender, resultsFromSender) -> {
                     sb.append("<ResultsFromSender>");
                     sb.append("<Sender>");
-                    sb.append(DataHelper.escapeHTML(sender.getHumanReadableName()));
+                    sb.append(Util.escapeHTMLinXML(sender.getHumanReadableName()));
                     sb.append("</Sender>");
                     resultsFromSender.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Name>");
-                        sb.append(DataHelper.escapeHTML(result.getName()));
+                        sb.append(Util.escapeHTMLinXML(result.getName()));
                         sb.append("</Name>");
                         sb.append("<Size>");
                         sb.append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B");
@@ -76,7 +76,7 @@ public class SearchServlet extends HttpServlet {
                         sb.append("</InfoHash>");
                         sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
                         if (result.getComment() != null)
-                            sb.append("<Comment>").append(DataHelper.escapeHTML(result.getComment())).append("</Comment>");
+                            sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsFromSender>");
@@ -94,7 +94,7 @@ public class SearchServlet extends HttpServlet {
             for (SearchResults results : searchManager.getResults().values()) {     
                 sb.append("<Search>");
                 sb.append("<uuid>").append(results.getUUID()).append("</uuid>");
-                sb.append("<Query>").append(DataHelper.escapeHTML(results.getSearch())).append("</Query>");
+                sb.append("<Query>").append(Util.escapeHTMLinXML(results.getSearch())).append("</Query>");
                 Map<InfoHash, Set<UIResultEvent>> byInfohash = results.getByInfoHash();
                 sb.append("<ResultsByFile>");
                 byInfohash.forEach((infoHash, resultSet) -> {
@@ -102,13 +102,13 @@ public class SearchServlet extends HttpServlet {
                     UIResultEvent first = resultSet.iterator().next();
                     sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
                     sb.append("<Downloading>").append(downloadManager.isDownloading(infoHash)).append("</Downloading>");
-                    sb.append("<Name>").append(DataHelper.escapeHTML(first.getName())).append("</Name>");
+                    sb.append("<Name>").append(Util.escapeHTMLinXML(first.getName())).append("</Name>");
                     sb.append("<Size>").append(DataHelper.formatSize2Decimal(first.getSize(), false)).append("B").append("</Size>");
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
-                        sb.append("<Sender>").append(DataHelper.escapeHTML(result.getSender().getHumanReadableName())).append("</Sender>");
+                        sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
                         if (result.getComment() != null)
-                            sb.append("<Comment>").append(DataHelper.escapeHTML(result.getComment())).append("</Comment>");
+                            sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsForFile>");

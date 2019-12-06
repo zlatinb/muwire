@@ -48,7 +48,7 @@ public class DownloadServlet extends HttpServlet {
         downloadManager.getDownloaders().forEach(d -> {
             sb.append("<Download>");
             sb.append("<InfoHash>").append(Base64.encode(d.getInfoHash().getRoot())).append("</InfoHash>");
-            sb.append("<Name>").append(DataHelper.escapeHTML(d.getFile().getName())).append("</Name>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(d.getFile().getName())).append("</Name>");
             sb.append("<State>").append(d.getCurrentState().toString()).append("</State>");
             int speed = d.speed();
             sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
