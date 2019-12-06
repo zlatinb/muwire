@@ -17,11 +17,12 @@ function refreshStatus() {
 			var countSpan = document.getElementById("count")
 			countSpan.innerHTML = count
 			
+			var hashingSpan = document.getElementById("hashing")
 			var hashing = xmlDoc.getElementsByTagName("Hashing")
 			if (hashing != null && hashing.length == 1) {
-				var hashingSpan = document.getElementById("hashing")
 				hashingSpan.innerHTML = "Hashing "+hashing[0].childNodes[0].nodeValue
-			}
+			} else
+				hashingSpan.innerHTML = "";
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=status", true)
