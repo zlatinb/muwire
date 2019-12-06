@@ -19,10 +19,5 @@
 			<input type="hidden" name="action" value="share">
 			<input type="submit" value="Share">
 		</form>
-		<form action="/MuWire/Files" method="post">
-			<input type="text" name="file">
-			<input type="hidden" name="action" value="unshare">
-			<input type="submit" value="Unshare">
-		</form>
 	</body>
 </html>

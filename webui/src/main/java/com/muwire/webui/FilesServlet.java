@@ -21,25 +21,35 @@ public class FilesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String section = req.getParameter("section");
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-        sb.append("<Files>");
-        ListCallback cb = new ListCallback(sb);
-        String encodedPath = req.getParameter("path");
-        File current = null;
-        if (encodedPath != null) {
-            String[] split = encodedPath.split(",");
-            for (String element : split) {
-                element = Base64.decodeToString(element);
-                if (current == null) {
-                    current = new File(element);
-                    continue;
+        if (section.equals("status")) {
+            sb.append("<Status>");
+            sb.append("<Count>").append(fileManager.numSharedFiles()).append("</Count>");
+            String hashingFile = fileManager.getHashingFile();
+            if (hashingFile != null)
+                sb.append("<Hashing>").append(Util.escapeHTMLinXML(hashingFile)).append("</Hashing>");
+            sb.append("</Status>");
+        } else if (section.equals("files")) {
+            sb.append("<Files>");
+            ListCallback cb = new ListCallback(sb);
+            String encodedPath = req.getParameter("path");
+            File current = null;
+            if (encodedPath != null) {
+                String[] split = encodedPath.split(",");
+                for (String element : split) {
+                    element = Base64.decodeToString(element);
+                    if (current == null) {
+                        current = new File(element);
+                        continue;
+                    }
+                    current = new File(current, element);
                 }
-                current = new File(current, element);
             }
+            fileManager.list(current, cb);
+            sb.append("</Files>");
         }
-        fileManager.list(current, cb);
-        sb.append("</Files>");
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");
         resp.setDateHeader("Expires", 0);
@@ -72,4 +82,24 @@ public class FilesServlet extends HttpServlet {
             sb.append("<Directory>").append(Util.escapeHTMLinXML(f.getName())).append("</Directory>");
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+        if (action.equals("share")) {
+            String file = Base64.decodeToString(req.getParameter("file"));
+            fileManager.share(file);
+        } else if (action.equals("unshareFile")) {
+            String files = req.getParameter("files");
+            for (String file : files.split(","))
+                fileManager.unshareFile(Base64.decodeToString(file));
+            String directories = req.getParameter("directories");
+            if (directories != null) {
+                for (String directory : directories.split(","))
+                    fileManager.unshareDirectory(Base64.decodeToString(directory));
+            }
+        }
+    }
+    
+    
 }

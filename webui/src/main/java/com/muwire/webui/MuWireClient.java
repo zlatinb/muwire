@@ -23,6 +23,7 @@ import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
+import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 
@@ -129,6 +130,7 @@ public class MuWireClient {
         core.getEventBus().register(FileLoadedEvent.class, fileManager);
         core.getEventBus().register(FileHashedEvent.class, fileManager);
         core.getEventBus().register(FileDownloadedEvent.class, fileManager);
+        core.getEventBus().register(FileHashingEvent.class, fileManager);
         
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
