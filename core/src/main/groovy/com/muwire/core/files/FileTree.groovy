@@ -2,12 +2,12 @@ package com.muwire.core.files
 
 import java.util.concurrent.ConcurrentHashMap
 
-class FileTree {
+class FileTree<T> {
     
     private final TreeNode root = new TreeNode()
     private final Map<File, TreeNode> fileToNode = new ConcurrentHashMap<>()
     
-    synchronized void add(File file) {
+    synchronized void add(File file, T value) {
         List<File> path = new ArrayList<>()
         path.add(file)
         while (file.getParentFile() != null) {
@@ -29,6 +29,7 @@ class FileTree {
             }
             current = existing
         }
+        current.value = value;
     }
 
     synchronized boolean remove(File file) {
@@ -45,9 +46,10 @@ class FileTree {
         true
     }    
     
-    public static class TreeNode {
+    public static class TreeNode<T> {
         TreeNode parent
         File file
+        T value;
         final Set<TreeNode> children = new HashSet<>()
         
         public int hashCode() {

@@ -10,8 +10,8 @@ class FileTreeTest {
         File b = new File(a, "b")
         File c = new File(b, "c")
         
-        FileTree tree = new FileTree()
-        tree.add(c)
+        FileTree<Void> tree = new FileTree<>()
+        tree.add(c,null)
         
         assert tree.root.children.size() == 1
         assert tree.fileToNode.size() == 3
@@ -28,12 +28,12 @@ class FileTreeTest {
         File c = new File(b, "c")
         File d = new File(b, "d")
         
-        FileTree tree = new FileTree()
-        tree.add(c)
+        FileTree<Void> tree = new FileTree<>()
+        tree.add(c,null)
         
         assert tree.fileToNode.size() == 3
         
-        tree.add(d)
+        tree.add(d, null)
         assert tree.fileToNode.size() == 4
         
         tree.remove(d)
