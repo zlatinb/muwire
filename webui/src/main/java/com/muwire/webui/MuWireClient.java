@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 
 import com.muwire.core.Core;
 import com.muwire.core.MuWireSettings;
+import com.muwire.core.UILoadedEvent;
 import com.muwire.core.connection.ConnectionEvent;
 import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
@@ -136,6 +137,8 @@ public class MuWireClient {
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
         servletContext.setAttribute("fileManager", fileManager);
+        
+        core.getEventBus().publish(new UILoadedEvent());
     }
     
     public String getHome() {

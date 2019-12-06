@@ -28,7 +28,7 @@
 
 <servlet>
     <servlet-name>com.muwire.webui.FilesServlet</servlet-name>
-    <servlet-class>com.muwire.webui.FilesServlet</servlet-name>
+    <servlet-class>com.muwire.webui.FilesServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>

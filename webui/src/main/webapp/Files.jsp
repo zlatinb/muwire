@@ -11,7 +11,9 @@
 	</head>
 	<body onload="initConnectionsCount(); initFiles();">
 <%@ include file="header.jsi"%>
-		<p>Shared Files</p>
+		<p>Shared Files <span id="count">0</span></p>
+		<p><span id="hashing"></span></p>
+		<hr/>
 			<div id="sharedTree"></div>
 		<hr/>
 		<form action="/MuWire/Files" method="post">

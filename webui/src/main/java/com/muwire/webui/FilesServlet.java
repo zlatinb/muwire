@@ -87,7 +87,7 @@ public class FilesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
         if (action.equals("share")) {
-            String file = Base64.decodeToString(req.getParameter("file"));
+            String file = req.getParameter("file");
             fileManager.share(file);
         } else if (action.equals("unshareFile")) {
             String files = req.getParameter("files");
@@ -99,7 +99,6 @@ public class FilesServlet extends HttpServlet {
                     fileManager.unshareDirectory(Base64.decodeToString(directory));
             }
         }
+        resp.sendRedirect("/MuWire/Files.jsp");
     }
-    
-    
 }
