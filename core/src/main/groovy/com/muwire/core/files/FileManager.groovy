@@ -24,7 +24,7 @@ class FileManager {
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index = new SearchIndex()
-    final FileTree negativeTree = new FileTree()
+    final FileTree<Void> negativeTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
 
     FileManager(EventBus eventBus, MuWireSettings settings) {
@@ -32,7 +32,7 @@ class FileManager {
         this.eventBus = eventBus
         
         for (String negative : settings.negativeFileTree) {
-            negativeTree.add(new File(negative))
+            negativeTree.add(new File(negative), null)
         }
     }
     
@@ -88,7 +88,7 @@ class FileManager {
         negativeTree.remove(sf.file)
         String parent = sf.getFile().getParent()
         if (parent != null && settings.watchedDirectories.contains(parent)) {
-            negativeTree.add(sf.file.getParentFile())
+            negativeTree.add(sf.file.getParentFile(),null)
         }
         saveNegativeTree()
 
@@ -128,7 +128,7 @@ class FileManager {
 
         fileToSharedFile.remove(sf.file)
         if (!e.deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
-            negativeTree.add(sf.file)
+            negativeTree.add(sf.file,null)
             saveNegativeTree()
         }
 
