@@ -33,12 +33,12 @@ class SearchByFile {
 class ResultsBySender {
 	constructor(xmlNode) {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
-		this.results = [];
+		this.results = new Map();
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
 		for (i = 0 ; i < resultNodes.length; i ++) {
 			var result = new ResultBySender(resultNodes[i]);
-			this.results.push(result);
+			this.results.set(result.infoHash,result);
 		}
 	}
 }
@@ -49,12 +49,12 @@ class ResultsByFile {
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
 		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
-		this.results = [];
+		this.results = new Map();
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
 		for (i = 0; i < resultNodes.length; i++) {
 			var result = new ResultByFile(resultNodes[i]);
-			this.results.push(result);
+			this.results.set(result.sender, result);
 		}
 	}
 }
@@ -65,21 +65,61 @@ class ResultBySender {
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
 		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
+		this.comment = null;
+		var comment = xmlNode.getElementsByTagName("Comment")
+		if (comment.length == 1) 
+			this.comment = comment[0].childNodes[0].nodeValue;
 	}
 }
 
 class ResultByFile {
 	constructor(xmlNode) {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+		this.comment = null;
+		var comment = xmlNode.getElementsByTagName("Comment")
+		if (comment.length == 1) 
+			this.comment = comment[0].childNodes[0].nodeValue;
 	}
 }
 
 var searches = new Map();
+var expandedComments = new Map();
 
 var uuid = null;
 var sender = null;
 var lastXML = null;
 var infoHash = null;
+
+function showCommentBySender(divId, spanId) {
+	var split = divId.split("_");
+	var commentDiv = document.getElementById(divId);
+	var comment = "<p>"+ searches.get(split[1]).resultBatches.get(split[2]).results.get(split[3]).comment + "</p>";
+	commentDiv.innerHTML = comment
+	expandedComments.set(divId, comment);
+	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"Sender\");return false;'>Hide Comment</a>";
+    var linkSpan = document.getElementById(spanId);
+	linkSpan.innerHTML = hideLink;
+}
+
+function showCommentByFile(divId, spanId) {
+	var split = divId.split("_");
+	var commentDiv = document.getElementById(divId);
+	var comment = "<p>"+searches.get(split[1]).resultBatches.get(split[2]).results.get(split[3]).comment + "</p>";
+	commentDiv.innerHTML = comment
+	expandedComments.set(divId, comment);
+	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"File\");return false;'>Hide Comment</a>";
+    var linkSpan = document.getElementById(spanId);
+	linkSpan.innerHTML = hideLink;
+}
+
+function hideComment(divId, spanId, byFile) {
+	expandedComments.delete(divId);
+	var commentDiv = document.getElementById(divId);
+	commentDiv.innerHTML = ""
+	var showLink = "<a href='#' onclick='window.showCommentBy"+byFile+"(\"" + divId + "\",\"" + spanId + "\"); return false;'>Show Comment</a>";
+	var linkSpan = document.getElementById(spanId);
+	linkSpan.innerHTML = showLink;
+}
 
 function download(resultInfoHash) {
 	var xmlhttp = new XMLHttpRequest();
@@ -104,18 +144,33 @@ function updateSender(senderName) {
 	var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
 	var x = searches.get(uuid)
 	x = x.resultBatches.get(sender).results;
-	var i;
-	for (i = 0; i < x.length; i++) {
+	for (var [resultInfoHash, result] of x) {
 		table += "<tr>";
 		table += "<td>";
-		table += x[i].name;
+		table += result.name;
+		if (result.comment != null) {
+			var divId = "comment_" + uuid + "_" + senderName + "_" + resultInfoHash;
+			var spanId = "comment-link-"+resultInfoHash + senderName + uuid;
+			var comment = expandedComments.get(divId);
+			if (comment != null) {
+				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"Sender\");return false;'>Hide Comment</a>";
+				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
+				table += "<div id='" + divId + "'>"+comment+"</div>";				
+			} else {
+				var link = "<a href='#' onclick='window.showCommentBySender(\"" + divId +
+					"\",\""+spanId+"\");"+
+					"return false;'>Show Comment</a>"; 			
+				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
+				table += "<div id='"+divId+"'></div>";
+			}
+		}
 		table += "</td>";
 		table += "<td>";
-		table += x[i].size;
+		table += result.size;
 		table += "</td>";
 		table += "<td>";
-		if (x[i].downloading == "false") {
-			table += "<span id='download-"+ x[i].infoHash+"'><a href='#' onclick='window.download(\"" + x[i].infoHash + "\");return false;'>Download</a></span>";
+		if (result.downloading == "false") {
+			table += "<span id='download-"+ resultInfoHash+"'><a href='#' onclick='window.download(\"" + resultInfoHash + "\");return false;'>Download</a></span>";
 		} else {
 			table += "Downloading";
 		}
@@ -123,7 +178,7 @@ function updateSender(senderName) {
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
-	if (x.length > 0)
+	if (x.size > 0)
 		resultsDiv.innerHTML = table;
 }
 
@@ -138,15 +193,31 @@ function updateFile(fileInfoHash) {
 	var resultsDiv = document.getElementById("bottomTable");
 	var table = "<table><thead><tr><th>Sender</th></tr></thead><tbody>";
 	var i;
-	for (i = 0; i < searchResults.results.length; i++) {
+	for (var [senderName, result] of searchResults.results) {
 		table += "<tr>";
 		table += "<td>";
-		table += searchResults.results[i].sender;
+		table += senderName
+		if (result.comment != null) {
+			var divId = "comment_" + uuid + "_" + fileInfoHash + "_" + senderName;
+			var spanId = "comment-link-" + fileInfoHash + senderName + uuid;
+			var comment = expandedComments.get(divId);
+			if (comment != null) {
+				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"File\");return false;'>Hide Comment</a>";
+				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
+				table += "<div id='" + divId + "'>"+comment+"</div>";
+			} else {
+				var link = "<a href='#' onclick='window.showCommentByFile(\"" + divId +
+					"\",\""+spanId+"\");"+
+					"return false;'>Show Comment</a>"; 			
+				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
+				table += "<div id='"+divId+"'></div>";
+			}
+		}
 		table += "</td>";
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
-	if (searchResults.results.length > 0)
+	if (searchResults.results.size > 0)
 		resultsDiv.innerHTML = table;
 }			
 
@@ -227,7 +298,8 @@ function refreshGroupBySender() {
 				
 				var map = new Map();
 				for ( var [sender, results] of search.resultBatches ) {
-					results.results.forEach(result => map.set(result.infoHash, 1));
+					for (var [fileInfoHash, resultFromSender] of results.results)
+						map.set(resultFromSender.infoHash, 1);
 				}
 				table += "<td>";
 				table += map.size;
@@ -269,7 +341,8 @@ function refreshGroupByFile() {
 				
 				var map = new Map()
 				for (var [fileInfoHash, result] of search.resultBatches) {
-					result.results.forEach(sender => map.set(sender.sender, 1));
+					for (var [senderName, resultFromSender] of result.results)
+						map.set(senderName, 1)
 				}
 				table += "<td>"
 				table += map.size;

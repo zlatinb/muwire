@@ -75,6 +75,8 @@ public class SearchServlet extends HttpServlet {
                         sb.append(infohash);
                         sb.append("</InfoHash>");
                         sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
+                        if (result.getComment() != null)
+                            sb.append("<Comment>").append(DataHelper.escapeHTML(result.getComment())).append("</Comment>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsFromSender>");
@@ -105,6 +107,8 @@ public class SearchServlet extends HttpServlet {
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Sender>").append(DataHelper.escapeHTML(result.getSender().getHumanReadableName())).append("</Sender>");
+                        if (result.getComment() != null)
+                            sb.append("<Comment>").append(DataHelper.escapeHTML(result.getComment())).append("</Comment>");
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsForFile>");
