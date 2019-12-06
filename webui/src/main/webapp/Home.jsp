@@ -28,19 +28,22 @@
 <% } %>
 <%@include file="header.jsi"%>
 		<aside>
+                    <div class="menubox">
 <% if (groupBy.equals("sender")) { %>
-			<h3>Active Searches By Sender</h3>
-			<a href="Home.jsp?groupBy=file">Group By File</a>
+			<h2>Active Searches By Sender</h2>
+			<a class="menuitem" href="Home.jsp?groupBy=file">Group By File</a>
 <% } else { %>
-			<h3>Active Searches By File</h3>
-			<a href="Home.jsp?groupBy=sender">Group By Sender</a>
+			<h2>Active Searches By File</h2>
+			<a class="menuitem" href="Home.jsp?groupBy=sender">Group By Sender</a>
 <% } %>
+                    </div>
 
 									<div id="table-wrapper">
 										<div id="table-scroll">
 											<div id="activeSearches"></div>
 										</div>
 									</div>
+<%@include file="sidebar.jsi"%>    	
 		</aside>
 		<section class="main foldermain">
 			<h3><span id="currentSearch">Results</span></h3>

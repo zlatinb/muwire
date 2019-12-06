@@ -22,6 +22,10 @@ public class FilesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String section = req.getParameter("section");
+        if (section == null) {
+            resp.sendError(403, "Bad section param");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         if (section.equals("status")) {
@@ -37,9 +41,13 @@ public class FilesServlet extends HttpServlet {
             String encodedPath = req.getParameter("path");
             File current = null;
             if (encodedPath != null) {
-                String[] split = encodedPath.split(",");
+                String[] split = DataHelper.split(encodedPath, ",");
                 for (String element : split) {
                     element = Base64.decodeToString(element);
+                    if (element == null) {
+                        resp.sendError(403, "bad path");
+                        return;
+                    }
                     if (current == null) {
                         current = new File(element);
                         continue;
@@ -55,8 +63,9 @@ public class FilesServlet extends HttpServlet {
         resp.setDateHeader("Expires", 0);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
-        resp.getWriter().write(sb.toString());
-        resp.flushBuffer();
+        byte[] out = sb.toString().getBytes("UTF-8");
+        resp.setContentLength(out.length);
+        resp.getOutputStream().write(out);
     }
 
     @Override

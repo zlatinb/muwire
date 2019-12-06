@@ -134,8 +134,9 @@ public class SearchServlet extends HttpServlet {
         resp.setDateHeader("Expires", 0);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
-        resp.getWriter().write(sb.toString());
-        resp.flushBuffer();
+        byte[] out = sb.toString().getBytes("UTF-8");
+        resp.setContentLength(out.length);
+        resp.getOutputStream().write(out);
     }
 
 

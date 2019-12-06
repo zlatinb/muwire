@@ -20,7 +20,10 @@
     <body onload="initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
 	<aside>
-	        <h3>Downloads</h3>
+            <div class="menubox">
+                <h2>Downloads</h2>
+            </div>
+<%@include file="sidebar.jsi"%>    	
 	</aside>
 	<section class="main foldermain">
 		<div id="table-wrapper">

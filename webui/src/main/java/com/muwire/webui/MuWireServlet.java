@@ -57,7 +57,16 @@ public class MuWireServlet extends HttpServlet {
                                          "<link href=\"i2pbote.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
                                          "<link href=\"muwire.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
                                          "</head><body>\n" +
-                                         "<p>MuWire is initializing, please wait</p>\n" +
+                                         "<header class=\"titlebar\">" +
+                                         "<div class=\"title\">" +
+                                         "<img src=\"images/muwire.png\" alt=\"\">" +
+                                         "Welcome to MuWire" +
+                                         "</div>" +
+                                         "<div class=\"subtitle\"><br><br><br><br></div>" +
+                                         "<div class=\"pagetitle\">" +
+                                         "MuWire is initializing, please wait" +
+                                         "</div>" +
+                                         "</header>" +
                                          "</body></html>");
                 resp.setIntHeader("Refresh", 5);
             } else

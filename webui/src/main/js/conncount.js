@@ -7,6 +7,8 @@ function refreshConnectionsCount() {
 			var connectionCountSpan = document.getElementById("connectionsCount");
 			var countString = ""+count;
 			connectionCountSpan.innerHTML = countString;
+		} else {
+			connectionCountSpan.innerHTML = "down";
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Search?section=connectionsCount", true);

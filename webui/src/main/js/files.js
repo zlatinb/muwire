@@ -167,3 +167,27 @@ function refreshStatus() {
 	xmlhttp.open("GET", "/MuWire/Files?section=status", true)
 	xmlhttp.send();
 }
+
+var root = new Node("sharedTree",null,false)
+var nodesById = new Map()
+
+class Node {
+	constructor(nodeId, parent, leaf, path) {
+		this.nodeId = nodeId
+		this.parent = parent
+		this.leaf = leaf
+		this.children = []
+		this.path = path
+	}
+	
+	function updateDiv() {
+		var div = document.getElementById(this.nodeId)
+		if (this.leaf) {
+			div.innerHTML = "<li>"+this.path+</li>
+		} else {
+			if (children.length == 0) {
+				div.innerHTML = "<li><span class='caret'>" + this.path + "</span></li>"
+			}
+		}
+	}
+}
