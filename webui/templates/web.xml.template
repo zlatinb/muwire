@@ -26,6 +26,11 @@
     <servlet-class>com.muwire.webui.DownloadServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.FilesServlet</servlet-name>
+    <servlet-class>com.muwire.webui.FilesServlet</servlet-name>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -39,6 +44,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.DownloadServlet</servlet-name>
     <url-pattern>/Download</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.FilesServlet</servlet-name>
+    <url-pattern>/Files</url-pattern>
 </servlet-mapping>
 
 __JASPER__

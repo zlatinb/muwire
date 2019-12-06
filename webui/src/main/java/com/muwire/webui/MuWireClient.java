@@ -21,6 +21,9 @@ import com.muwire.core.MuWireSettings;
 import com.muwire.core.connection.ConnectionEvent;
 import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
+import com.muwire.core.files.FileDownloadedEvent;
+import com.muwire.core.files.FileHashedEvent;
+import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 
 import net.i2p.app.ClientAppManager;
@@ -122,9 +125,15 @@ public class MuWireClient {
         core.getEventBus().register(ConnectionEvent.class, connectionCounter);
         core.getEventBus().register(DisconnectionEvent.class, connectionCounter);
         
+        FileManager fileManager = new FileManager(core);
+        core.getEventBus().register(FileLoadedEvent.class, fileManager);
+        core.getEventBus().register(FileHashedEvent.class, fileManager);
+        core.getEventBus().register(FileDownloadedEvent.class, fileManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
+        servletContext.setAttribute("fileManager", fileManager);
     }
     
     public String getHome() {
