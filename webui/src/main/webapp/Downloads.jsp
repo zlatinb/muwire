@@ -19,13 +19,16 @@
     </head>
     <body onload="initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
-        <p>Downloads:</p>
-
+	<aside>
+	        <h3>Downloads</h3>
+	</aside>
+	<section class="main foldermain">
 		<div id="table-wrapper">
 				<div id="downloads"></div>
 		</div>		
 		<hr/>
 		<p>Download Details</p>
 		<div id="downloadDetails"><p>Click on a download to view details</p></div>
+	</section>
     </body>
 </html>

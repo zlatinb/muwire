@@ -27,84 +27,35 @@
 		<body onload="initConnectionsCount();initGroupByFile();">
 <% } %>
 <%@include file="header.jsi"%>
+		<aside>
 <% if (groupBy.equals("sender")) { %>
-		<center><a href="/MuWire/Home.jsp?groupBy=file">Group By File</a></center>
+			<h3>Active Searches By Sender</h3>
+			<a href="Home.jsp?groupBy=file">Group By File</a>
 <% } else { %>
-		<center><a href="/MuWire/Home.jsp?groupBy=sender">Group By Sender</a></center>
+			<h3>Active Searches By File</h3>
+			<a href="Home.jsp?groupBy=sender">Group By Sender</a>
 <% } %>
-		<table width="100%">
-			<tr>
-				<td width="20%">
-						<table width="100%">
-							<tr>
-								<th>
-									Active Searches
-								</th>
-							</tr>
-							<tr>
-								<td>
+
 									<div id="table-wrapper">
 										<div id="table-scroll">
 											<div id="activeSearches"></div>
 										</div>
 									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div id="table-wrapper">
-										<div id="table-scroll">
-											<div id="unused"></div>
-										</div>
-									</div>
-								</td>
-							</tr>
-						</table>
-				</td>
-				<td width="80%">
-						<table width="100%">
-							<tr>
-								<th>
-									<span id="currentSearch">Results</span>
-								</th>
-							</tr>
-							<tr>
-								<td>
+		</aside>
+		<section class="main foldermain">
+			<h3><span id="currentSearch">Results</span></h3>
 									<div id="table-wrapper">
 										<div id="table-scroll">
 											<div id="topTable"></div>
 										</div>
 									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<table width="100%">
-										<thead>
-											<tr>
-												<th>
-													<span id="resultsFrom"></span>
-												</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>
+			<h3><span id="resultsFrom"></span></h3>
 													<div id="table-wrapper">
 														<div id="table-scroll">
 															<div id="bottomTable">
 															</div>
 														</div>
 													</div>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
-							</tr>
-						</table>
-				</td>
-			</tr>
-		</table>
+		</section>
 	</body>
 </html>
