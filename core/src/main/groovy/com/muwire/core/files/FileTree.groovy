@@ -71,6 +71,21 @@ class FileTree<T> {
             callback.onDirectoryLeave()
     }
     
+    synchronized void list(File parent, FileListCallback<T> callback) {
+        TreeNode<T> node
+        if (parent == null)
+            node = root
+        else 
+            node = fileToNode.get(parent)
+            
+        node.children.each { 
+            if (it.file.isFile())
+                callback.onFile(it.file, it.value)
+            else
+                callback.onDirectory(it.file)
+        }
+    }
+    
     public static class TreeNode<T> {
         TreeNode parent
         File file

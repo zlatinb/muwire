@@ -89,4 +89,49 @@ class FileTreeTest {
         assert values.contains("c")
         assert values.contains("e")
     }
+    
+    @Test
+    public void testList() {
+        Set<File> directories = new HashSet<>()
+        Set<String> values = new HashSet<>()
+        def cb = new FileListCallback<String>() {
+
+            @Override
+            public void onDirectory(File file) {
+                directories.add(file)
+            }
+
+            @Override
+            public void onFile(File file, String value) {
+                values.add(value)
+            }
+        }
+        
+        File a = new File("a")
+        a.createNewFile()
+        File b = new File("b")
+        b.mkdir()
+        File c = new File(b, "c")
+        c.createNewFile()
+        
+        FileTree<String> tree = new FileTree<>()
+        
+        tree.add(a, "a")
+        tree.add(b, "b")
+        tree.add(c, "c")
+        
+        tree.list(null, cb)
+        
+        assert directories.size() == 1
+        assert directories.contains(b)
+        assert values.size() == 1
+        assert values.contains("a")
+        
+        directories.clear()
+        values.clear()
+        tree.list(b, cb)
+        assert directories.isEmpty()
+        assert values.size() == 1
+        assert values.contains("c")
+    }
 }
