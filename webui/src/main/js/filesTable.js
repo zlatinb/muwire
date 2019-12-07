@@ -24,10 +24,12 @@ function refreshStatus() {
 				hashingSpan.innerHTML = "";
 				
 			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			var refreshDiv = document.getElementById("refresh-link")
 			if (newRevision > tableRevision) {
 				tableRevision = newRevision
-				// TODO: let the user know they can refresh the table
-			}
+				refreshDiv.innerHTML = "<a href='#' onclick='refreshTable();return false;'>Refresh</a>"
+			} else
+				refreshDiv.innerHTML = ""
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=status", true)
