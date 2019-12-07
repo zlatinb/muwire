@@ -112,6 +112,14 @@ public class FileManager {
                 core.getEventBus().publish(e);
             }
             
+            for (File directory : cb.directories) {
+                if (core.getMuOptions().getWatchedDirectories().contains(directory.getAbsolutePath())) {
+                    DirectoryUnsharedEvent e = new DirectoryUnsharedEvent();
+                    e.setDirectory(directory);
+                    core.getEventBus().publish(e);
+                }
+            }
+            
             if (core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath())) {
                 DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
                 event.setDirectory(file);
@@ -144,9 +152,11 @@ public class FileManager {
     
     private static class TraverseCallback implements FileTreeCallback<SharedFile> {
         private final List<SharedFile> found = new ArrayList<>();
+        private final List<File> directories = new ArrayList<>();
 
         @Override
         public void onDirectoryEnter(File file) {
+            directories.add(file);
         }
 
         @Override
