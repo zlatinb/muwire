@@ -102,15 +102,31 @@ public class FilesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
+        if (action == null) {
+            resp.sendError(403,"Bad param");
+            return;
+        }
         if (action.equals("share")) {
             String file = req.getParameter("file");
+            if (file == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
             fileManager.share(file);
             resp.sendRedirect("/MuWire/Files.jsp");
         } else if (action.equals("unshare")) {
             String pathElements = req.getParameter("path");
+            if (pathElements == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
             File current = null;
-            for (String element : pathElements.split(",")) {
+            for (String element : DataHelper.split(pathElements,",")) {
                 element = Util.unescapeHTMLinXML(Base64.decodeToString(element));
+                if (element == null) {
+                    resp.sendError(403,"Bad param");
+                    return;
+                }
                 if (current == null)
                     current = new File(element);
                 else 
