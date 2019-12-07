@@ -113,7 +113,7 @@ public class FilesServlet extends HttpServlet {
                 return;
             }
             fileManager.share(file);
-            resp.sendRedirect("/MuWire/Files.jsp");
+            resp.sendRedirect("/MuWire/SharedFiles.jsp");
         } else if (action.equals("unshare")) {
             String pathElements = req.getParameter("path");
             if (pathElements == null) {

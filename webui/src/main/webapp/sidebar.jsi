@@ -9,6 +9,7 @@
                 <h2>Pages</h2>
                 <a class="menuitem" href="Downloads.jsp">Downloads</a>
                 <a class="menuitem" href="Home.jsp">Search</a>
+                <a class="menuitem" href="SharedFiles.jsp">Shared Files</a>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">

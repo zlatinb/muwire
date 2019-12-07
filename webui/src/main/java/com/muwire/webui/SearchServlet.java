@@ -75,8 +75,11 @@ public class SearchServlet extends HttpServlet {
                         sb.append(infohash);
                         sb.append("</InfoHash>");
                         sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
-                        if (result.getComment() != null)
-                            sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
+                        if (result.getComment() != null) {
+                            sb.append("<Comment>")
+                              .append(Util.escapeHTMLinXML(result.getComment()).replace("\r\n", "<br>").replace("\n", "<br>"))
+                              .append("</Comment>");
+                        }
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsFromSender>");
@@ -107,8 +110,11 @@ public class SearchServlet extends HttpServlet {
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
-                        if (result.getComment() != null)
-                            sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
+                        if (result.getComment() != null) {
+                            sb.append("<Comment>")
+                              .append(Util.escapeHTMLinXML(result.getComment()).replace("\r\n", "<br>").replace("\n", "<br>"))
+                              .append("</Comment>");
+                        }
                         sb.append("</Result>");
                     });
                     sb.append("</ResultsForFile>");
