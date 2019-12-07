@@ -77,25 +77,23 @@ public class FileManager {
         core.getEventBus().publish(event);
     }
     
-    void unshareDirectory(String filePath) {
-        File directory = new File(filePath);
-        if (core.getMuOptions().getWatchedDirectories().contains(directory)) {
-            DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
-            event.setDirectory(directory);
-            core.getEventBus().publish(event);
-        }
-    }
-    
-    void unshareFile(String filePath) {
-        File file = new File(filePath);
-        SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
-        if (sf == null)
-            return;
+    void unshareFile(File file) {
+        if (file.isFile()) {
+            SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+            if (sf == null)
+                return;
 
-        fileTree.remove(file);
-        revision++;
-        FileUnsharedEvent event = new FileUnsharedEvent();
-        event.setUnsharedFile(sf);
-        core.getEventBus().publish(event);
+            fileTree.remove(file);
+            revision++;
+            FileUnsharedEvent event = new FileUnsharedEvent();
+            event.setUnsharedFile(sf);
+            core.getEventBus().publish(event);
+        } else {
+            if (core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath())) {
+                DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
+                event.setDirectory(file);
+                core.getEventBus().publish(event);
+            }
+        }
     }
 }

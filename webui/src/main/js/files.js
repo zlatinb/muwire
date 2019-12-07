@@ -13,7 +13,7 @@ class Node {
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
 		if (this.leaf) {
-			div.innerHTML = "<li>"+this.path+"</li>"
+			div.innerHTML = "<li>"+this.path+"<br/><a href='#' onclick='window.unshare(\"" + this.nodeId + "\");return false;'>Unshare</a></li>"
 		} else {
 			if (this.children.length == 0) {
 				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
@@ -215,8 +215,7 @@ function initFiles() {
 	root.updateDiv()
 }
 
-function expand(nodeId) {
-	var node = nodesById.get(nodeId)
+function encodedPathToRoot(node) {
 	var pathElements = []
 	var tmpNode = node
 	while(tmpNode.parent != null) {
@@ -227,7 +226,12 @@ function expand(nodeId) {
 	while(pathElements.length > 0)
 		reversedPath.push(pathElements.pop())
 	var encodedPath = reversedPath.join(",")
-	
+	return encodedPath	
+}
+
+function expand(nodeId) {
+	var node = nodesById.get(nodeId)
+	var encodedPath = encodedPathToRoot(node)	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -267,4 +271,20 @@ function collapse(nodeId) {
 	var node = nodesById.get(nodeId)
 	node.children = []
 	node.updateDiv()
+}
+
+function unshare(nodeId) {
+	var node = nodesById.get(nodeId)
+	var encodedPath = encodedPathToRoot(node)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var parent = node.parent
+			collapse(parent.nodeId)
+			expand(parent.nodeId)
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Files", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=unshare&path="+encodedPath)
 }

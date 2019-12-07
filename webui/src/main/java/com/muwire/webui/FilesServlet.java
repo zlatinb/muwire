@@ -2,6 +2,9 @@ package com.muwire.webui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -102,16 +105,18 @@ public class FilesServlet extends HttpServlet {
         if (action.equals("share")) {
             String file = req.getParameter("file");
             fileManager.share(file);
-        } else if (action.equals("unshareFile")) {
-            String files = req.getParameter("files");
-            for (String file : files.split(","))
-                fileManager.unshareFile(Base64.decodeToString(file));
-            String directories = req.getParameter("directories");
-            if (directories != null) {
-                for (String directory : directories.split(","))
-                    fileManager.unshareDirectory(Base64.decodeToString(directory));
+            resp.sendRedirect("/MuWire/Files.jsp");
+        } else if (action.equals("unshare")) {
+            String pathElements = req.getParameter("path");
+            File current = null;
+            for (String element : pathElements.split(",")) {
+                element = Base64.decodeToString(element);
+                if (current == null)
+                    current = new File(element);
+                else 
+                    current = new File(current, element);
             }
+            fileManager.unshareFile(current);
         }
-        resp.sendRedirect("/MuWire/Files.jsp");
     }
 }
