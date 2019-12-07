@@ -19,7 +19,7 @@ class Node {
 				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
 					this.path + "</a></span></li>"
 			} else {
-				var l = "<li>Collapse "+this.path+"<ul>"
+				var l = "<li><a href='#' onlick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a><ul>"
 				var i
 				for (i = 0; i < this.children.length; i++) {
 					l += "<li>"
@@ -238,7 +238,7 @@ function expand(nodeId) {
 			for (i = 0; i < fileElements.length; i++) {
 				var fileName = fileElements[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
 				var size = fileElements[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
-				var nodeId = node.nodeId + "_"+ fileName
+				var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
 				var newFileNode = new Node(nodeId, node, true, fileName, size, revision)
 				nodesById.set(nodeId, newFileNode)
 				node.children.push(newFileNode)
@@ -247,7 +247,7 @@ function expand(nodeId) {
 			var dirElements = xmlDoc.getElementsByTagName("Directory")
 			for (i = 0; i < dirElements.length; i++) {
 				var dirName = dirElements[i].childNodes[0].nodeValue
-				var nodeId = node.nodeId + "_"+ dirName
+				var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
 				var newDirNode = new Node(nodeId, node, false, dirName, -1, revision)
 				nodesById.set(nodeId, newDirNode)
 				node.children.push(newDirNode)
@@ -261,4 +261,10 @@ function expand(nodeId) {
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=files&path="+encodedPath, true)
 	xmlhttp.send()
+}
+
+function collapse(nodeId) {
+	var node = nodesById.get(nodeId)
+	node.children = []
+	node.updateDiv()
 }
