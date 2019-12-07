@@ -89,6 +89,8 @@ public class FilesServlet extends HttpServlet {
             sb.append("<File>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(f.getName())).append("</Name>");
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(value.getCachedLength())).append("B").append("</Size>");
+            if (value.getComment() != null)
+                sb.append("<Comment>").append(Util.escapeHTMLinXML(value.getComment())).append("</Comment>");
             // TODO: other stuff
             sb.append("</File>");
         }
@@ -120,19 +122,42 @@ public class FilesServlet extends HttpServlet {
                 resp.sendError(403,"Bad param");
                 return;
             }
-            File current = null;
-            for (String element : DataHelper.split(pathElements,",")) {
-                element = Util.unescapeHTMLinXML(Base64.decodeToString(element));
-                if (element == null) {
-                    resp.sendError(403,"Bad param");
-                    return;
-                }
-                if (current == null)
-                    current = new File(element);
-                else 
-                    current = new File(current, element);
+            File file = getFromPathElements(pathElements);
+            if (file == null) {
+                resp.sendError(403, "Bad param");
+                return;
             }
-            fileManager.unshareFile(current);
+            fileManager.unshareFile(file);
+        } else if (action.equals("comment")) {
+            String pathElements = req.getParameter("path");
+            if (pathElements == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            File file = getFromPathElements(pathElements);
+            if (file == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            String comment = req.getParameter("comment"); // null is ok
+            if (comment.isEmpty())
+                comment = null;
+            fileManager.comment(file, comment);
         }
+    }
+    
+    private static File getFromPathElements(String pathElements) {
+        File current = null;
+        for (String element : DataHelper.split(pathElements,",")) {
+            element = Util.unescapeHTMLinXML(Base64.decodeToString(element));
+            if (element == null) {
+                return null;
+            }
+            if (current == null)
+                current = new File(element);
+            else 
+                current = new File(current, element);
+        }
+        return current;
     }
 }

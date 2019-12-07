@@ -20,6 +20,7 @@ import com.muwire.core.files.FileSharedEvent;
 import com.muwire.core.files.FileTree;
 import com.muwire.core.files.FileTreeCallback;
 import com.muwire.core.files.FileUnsharedEvent;
+import com.muwire.core.files.UICommentEvent;
 
 import net.i2p.data.Base64;
 
@@ -109,6 +110,28 @@ public class FileManager {
                 DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
                 event.setDirectory(file);
                 core.getEventBus().publish(event);
+            }
+        }
+    }
+    
+    void comment(File file, String comment) {
+    
+        if (file.isFile()) {
+            SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+            if (sf == null)
+                return;
+            UICommentEvent e = new UICommentEvent();
+            e.setOldComment(sf.getComment());
+            sf.setComment(comment);
+            e.setSharedFile(sf);
+            revision++;
+            core.getEventBus().publish(e);
+        } else {
+            TraverseCallback cb = new TraverseCallback();
+            fileTree.traverse(file, cb);
+            
+            for (SharedFile found : cb.found) {
+                comment(found.getFile(), comment);
             }
         }
     }
