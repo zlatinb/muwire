@@ -87,10 +87,19 @@ public class DownloadServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String infoHashB64 = req.getParameter("infoHash");
-        InfoHash infoHash = new InfoHash(Base64.decode(infoHashB64));
+        if (infoHashB64 == null) {
+            resp.sendError(403, "Bad param");
+            return;
+        }
+        byte[] h = Base64.decode(infoHashB64);
+        if (h == null || h.length != InfoHash.SIZE) {
+            resp.sendError(403, "Bad param");
+            return;
+        }
+        InfoHash infoHash = new InfoHash(h);
         String action = req.getParameter("action");
         if (action == null) {
-            resp.sendError(403, "Bad action param");
+            resp.sendError(403, "Bad param");
             return;
         }
         if (action.equals("start")) {
@@ -118,5 +127,7 @@ public class DownloadServlet extends HttpServlet {
             }
             downloadManager.cancel(infoHash);
         }
+        // P-R-G
+        resp.sendRedirect("/MuWire/Downloads.jsp");
     }
 }

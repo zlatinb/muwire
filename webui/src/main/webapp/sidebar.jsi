@@ -1,5 +1,17 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
+                <h2>Status</h2>
+                <div class="menu-icon"></div>
+                <div class="menu-text">Connections: <span id="connectionsCount">0</span></div>
+            </div>
+            <div class="menubox-divider"></div>
+            <div class="menubox">
+                <h2>Pages</h2>
+                <a class="menuitem" href="Downloads.jsp">Downloads</a>
+                <a class="menuitem" href="Home.jsp">Search</a>
+            </div>
+            <div class="menubox-divider"></div>
+            <div class="menubox">
                 <h2>Configuration</h2>
                 <a class="menuitem settings" href="settings.jsp">
                   <div class="menu-icon"></div>

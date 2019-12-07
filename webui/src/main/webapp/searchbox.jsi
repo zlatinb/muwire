@@ -1,0 +1,12 @@
+            <div class="menubox-divider"></div>
+            <div class="menubox">
+              <div class="searchbox">
+                <h2>Search</h2>
+                <div class="menu-icon"></div>
+                  <form action="/MuWire/Search" method="post">
+                     <input type="text" name="search" />
+                     <input type="submit" value="Search" />
+                  </form>
+              </div>
+            </div>
+            <div class="menubox-divider"></div>

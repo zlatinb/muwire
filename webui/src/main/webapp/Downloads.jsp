@@ -20,6 +20,7 @@
     <body onload="initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
 	<aside>
+<%@include file="searchbox.jsi"%>    	
             <div class="menubox">
                 <h2>Downloads</h2>
             </div>

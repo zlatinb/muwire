@@ -28,6 +28,7 @@
 <% } %>
 <%@include file="header.jsi"%>
 		<aside>
+<%@include file="searchbox.jsi"%>    	
                     <div class="menubox">
 <% if (groupBy.equals("sender")) { %>
 			<h2>Active Searches By Sender</h2>
