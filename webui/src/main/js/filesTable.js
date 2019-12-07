@@ -62,8 +62,11 @@ function refreshTable() {
 			}
 			
 			for (var [path, file] of filesByPath) {
+				
+				var unshareLink = "<a href='#' onclick='window.unshare(\"" + path + "\");return false;'>Unshare</a>"
+				
 				tableHtml += "<tr>"
-				tableHtml += "<td>"+file.name+"</td>"
+				tableHtml += "<td>"+file.name+"<br/>"+unshareLink+"</td>"
 				tableHtml += "<td>"+file.size+"</td>"
 				tableHtml += "<td>"+(file.comment != null)+"</td>"
 				tableHtml += "</tr>"
@@ -86,3 +89,16 @@ function initFiles() {
 	setTimeout(refreshTable, 1)	
 }
 
+function unshare(fileId) {
+	var file = filesByPath.get(fileId)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			filesByPath.delete(fileId)
+			refreshTable()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Files", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=unshare&path="+fileId)
+}
