@@ -19,7 +19,7 @@ class Node {
 				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
 					this.path + "</a></span></li>"
 			} else {
-				var l = "<li><a href='#' onlick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a><ul>"
+				var l = "<li><a href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a><ul>"
 				var i
 				for (i = 0; i < this.children.length; i++) {
 					l += "<li>"
