@@ -39,7 +39,7 @@ public class FilesServlet extends HttpServlet {
             if (hashingFile != null)
                 sb.append("<Hashing>").append(Util.escapeHTMLinXML(hashingFile)).append("</Hashing>");
             sb.append("</Status>");
-        } else if (section.equals("files")) {
+        } else if (section.equals("fileTree")) {
             sb.append("<Files>");
             sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
             
@@ -63,7 +63,13 @@ public class FilesServlet extends HttpServlet {
             }
             fileManager.list(current, cb);
             sb.append("</Files>");
+        } else if (section.equals("fileTable")) {
+            sb.append("<Files>");
+            sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
+            fileManager.getAllFiles().forEach(sf -> sharedFileToXML(sf, sb));
+            sb.append("</Files>");
         }
+        
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");
         resp.setDateHeader("Expires", 0);
@@ -86,19 +92,24 @@ public class FilesServlet extends HttpServlet {
         }
         @Override
         public void onFile(File f, SharedFile value) {
-            sb.append("<File>");
-            sb.append("<Name>").append(Util.escapeHTMLinXML(f.getName())).append("</Name>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(value.getCachedLength())).append("B").append("</Size>");
-            if (value.getComment() != null)
-                sb.append("<Comment>").append(Util.escapeHTMLinXML(value.getComment())).append("</Comment>");
-            // TODO: other stuff
-            sb.append("</File>");
+            sharedFileToXML(value, sb);
         }
         @Override
         public void onDirectory(File f) {
             String name = f.getName().isEmpty() ? f.toString() : f.getName();
             sb.append("<Directory>").append(Util.escapeHTMLinXML(name)).append("</Directory>");
         }
+    }
+    
+    private static void sharedFileToXML(SharedFile sf, StringBuilder sb) {
+        sb.append("<File>");
+        sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
+        sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
+        sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
+        if (sf.getComment() != null)
+            sb.append("<Comment>").append(Util.escapeHTMLinXML(sf.getComment())).append("</Comment>");
+        // TODO: other stuff
+        sb.append("</File>");
     }
 
     @Override

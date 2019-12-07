@@ -62,6 +62,12 @@ public class FileManager {
         fileTree.list(parent, callback);
     }
     
+    List<SharedFile> getAllFiles() {
+        TraverseCallback cb = new TraverseCallback();
+        fileTree.traverse(cb);
+        return cb.found;
+    }
+    
     String getHashingFile() {
         return hashingFile;
     }

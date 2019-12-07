@@ -275,7 +275,7 @@ function expand(nodeId) {
 			}
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Files?section=files&path="+encodedPath, true)
+	xmlhttp.open("GET", "/MuWire/Files?section=fileTree&path="+encodedPath, true)
 	xmlhttp.send()
 }
 
