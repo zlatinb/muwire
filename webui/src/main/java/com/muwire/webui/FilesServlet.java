@@ -110,7 +110,7 @@ public class FilesServlet extends HttpServlet {
             String pathElements = req.getParameter("path");
             File current = null;
             for (String element : pathElements.split(",")) {
-                element = Base64.decodeToString(element);
+                element = Util.unescapeHTMLinXML(Base64.decodeToString(element));
                 if (current == null)
                     current = new File(element);
                 else 

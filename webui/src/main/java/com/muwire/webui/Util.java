@@ -4,6 +4,8 @@ public class Util {
     
     private static final String escapeChars[] = {"&", "\"", "<", ">", "'"};
     private static final String escapeCodes[] = {"&amp;amp;", "&amp;quot;", "&amp;lt;", "&amp;gt;", "&amp;apos;"};
+    
+    private static final String escapedCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;", "&apos;"};
 
     /**
      * Double-Escape an HTML string for inclusion in XML
@@ -17,5 +19,14 @@ public class Util {
             escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
+    }
+    
+    public static String unescapeHTMLinXML(String escaped) {
+        if (escaped == null) return null;
+        String unescaped = escaped;
+        for (int i = 0; i < escapedCodes.length; i++) {
+            unescaped = unescaped.replace(escapedCodes[i], escapeChars[i]);
+        }
+        return unescaped;
     }
 }
