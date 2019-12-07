@@ -60,7 +60,6 @@ class FileTree<T> {
     private void doTraverse(TreeNode<T> node, FileTreeCallback<T> callback) {
         boolean leave = false
         if (node.file != null) {
-            println "file is $node.file"
             if (node.file.isFile())
                 callback.onFile(node.file, node.value)
             else {
