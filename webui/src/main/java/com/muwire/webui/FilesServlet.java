@@ -31,16 +31,19 @@ public class FilesServlet extends HttpServlet {
         if (section.equals("status")) {
             sb.append("<Status>");
             sb.append("<Count>").append(fileManager.numSharedFiles()).append("</Count>");
+            sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
             String hashingFile = fileManager.getHashingFile();
             if (hashingFile != null)
                 sb.append("<Hashing>").append(Util.escapeHTMLinXML(hashingFile)).append("</Hashing>");
             sb.append("</Status>");
         } else if (section.equals("files")) {
             sb.append("<Files>");
+            sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
+            
             ListCallback cb = new ListCallback(sb);
             String encodedPath = req.getParameter("path");
             File current = null;
-            if (encodedPath != null) {
+            if (encodedPath != null && encodedPath.length() > 0) {
                 String[] split = DataHelper.split(encodedPath, ",");
                 for (String element : split) {
                     element = Base64.decodeToString(element);
@@ -88,7 +91,8 @@ public class FilesServlet extends HttpServlet {
         }
         @Override
         public void onDirectory(File f) {
-            sb.append("<Directory>").append(Util.escapeHTMLinXML(f.getName())).append("</Directory>");
+            String name = f.getName().isEmpty() ? f.toString() : f.getName();
+            sb.append("<Directory>").append(Util.escapeHTMLinXML(name)).append("</Directory>");
         }
     }
 

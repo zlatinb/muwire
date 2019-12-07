@@ -26,6 +26,7 @@ public class FileManager {
     private final FileTree<SharedFile> fileTree = new FileTree<>();
     
     private volatile String hashingFile;
+    private volatile long revision;
     
     public FileManager(Core core) {
         this.core = core;
@@ -33,11 +34,13 @@ public class FileManager {
     
     public void onFileLoadedEvent(FileLoadedEvent e) {
         fileTree.add(e.getLoadedFile().getFile(), e.getLoadedFile());
+        revision++;
     }
     
     public void onFileHashedEvent(FileHashedEvent e) {
         hashingFile = null;
         fileTree.add(e.getSharedFile().getFile(), e.getSharedFile());
+        revision++;
     }
     
     public void onFileHashingEvent(FileHashingEvent e) {
@@ -45,8 +48,10 @@ public class FileManager {
     }
     
     public void onFileDownloadedEvent(FileDownloadedEvent e) {
-        if (core.getMuOptions().getShareDownloadedFiles())
+        if (core.getMuOptions().getShareDownloadedFiles()) {
             fileTree.add(e.getDownloadedFile().getFile(), e.getDownloadedFile());
+            revision++;
+        }
     }
     
     void list(File parent, FileListCallback<SharedFile> callback) {
@@ -59,6 +64,10 @@ public class FileManager {
     
     int numSharedFiles() {
         return core.getFileManager().getFileToSharedFile().size();
+    }
+    
+    long getRevision() {
+        return revision;
     }
     
     void share(String filePath) {
@@ -84,6 +93,7 @@ public class FileManager {
             return;
 
         fileTree.remove(file);
+        revision++;
         FileUnsharedEvent event = new FileUnsharedEvent();
         event.setUnsharedFile(sf);
         core.getEventBus().publish(event);

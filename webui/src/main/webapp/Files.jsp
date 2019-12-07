@@ -14,7 +14,9 @@
 		<p>Shared Files <span id="count">0</span></p>
 		<p><span id="hashing"></span></p>
 		<hr/>
-			<div id="sharedTree"></div>
+			<ul>
+				<div id="root"></div>
+			</ul>
 		<hr/>
 		<form action="/MuWire/Files" method="post">
 			<input type="text" name="file">

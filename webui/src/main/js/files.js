@@ -1,4 +1,38 @@
 
+class Node {
+	constructor(nodeId, parent, leaf, path, size, revision) {
+		this.nodeId = nodeId
+		this.parent = parent
+		this.leaf = leaf
+		this.children = []
+		this.path = path
+		this.size = size
+		this.revision = revision
+	}
+	
+	updateDiv() {
+		var div = document.getElementById(this.nodeId)
+		if (this.leaf) {
+			div.innerHTML = "<li>"+this.path+"</li>"
+		} else {
+			if (this.children.length == 0) {
+				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
+					this.path + "</a></span></li>"
+			} else {
+				var l = "<li>Collapse "+this.path+"<ul>"
+				var i
+				for (i = 0; i < this.children.length; i++) {
+					l += "<li>"
+					l += "<div id='" + this.children[i].nodeId+"'></div>"
+					l += "</li>"
+				}
+				l += "</ul></li>"
+				div.innerHTML = l
+			}
+		}
+	}
+}
+
 /**
 *
 *  Base64 encode / decode
@@ -141,11 +175,6 @@ _utf8_decode : function (utftext) {
 
 }
 
-function initFiles() {
-	setInterval(refreshStatus, 3000)
-	setTimeout(refreshStatus, 1)
-}
-
 function refreshStatus() {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
@@ -162,32 +191,74 @@ function refreshStatus() {
 				hashingSpan.innerHTML = "Hashing "+hashing[0].childNodes[0].nodeValue
 			} else
 				hashingSpan.innerHTML = "";
+				
+			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			if (newRevision > treeRevision) {
+				// TODO: update expanded nodes
+				treeRevision = newRevision
+			}
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=status", true)
 	xmlhttp.send();
 }
 
-var root = new Node("sharedTree",null,false)
+var treeRevision = -1
+var root = new Node("root",null,false,"Shared Files", -1, -1)
 var nodesById = new Map()
 
-class Node {
-	constructor(nodeId, parent, leaf, path) {
-		this.nodeId = nodeId
-		this.parent = parent
-		this.leaf = leaf
-		this.children = []
-		this.path = path
-	}
+function initFiles() {
+	setInterval(refreshStatus, 3000)
+	setTimeout(refreshStatus, 1)
 	
-	function updateDiv() {
-		var div = document.getElementById(this.nodeId)
-		if (this.leaf) {
-			div.innerHTML = "<li>"+this.path+</li>
-		} else {
-			if (children.length == 0) {
-				div.innerHTML = "<li><span class='caret'>" + this.path + "</span></li>"
+	nodesById.set("root",root)
+	root.updateDiv()
+}
+
+function expand(nodeId) {
+	var node = nodesById.get(nodeId)
+	var pathElements = []
+	var tmpNode = node
+	while(tmpNode.parent != null) {
+		pathElements.push(Base64.encode(tmpNode.path))
+		tmpNode = tmpNode.parent
+	}
+	var reversedPath = []
+	while(pathElements.length > 0)
+		reversedPath.push(pathElements.pop())
+	var encodedPath = reversedPath.join(",")
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var xmlDoc = this.responseXML
+			var revision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			var fileElements = xmlDoc.getElementsByTagName("File")
+			var i
+			for (i = 0; i < fileElements.length; i++) {
+				var fileName = fileElements[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
+				var size = fileElements[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
+				var nodeId = node.nodeId + "_"+ fileName
+				var newFileNode = new Node(nodeId, node, true, fileName, size, revision)
+				nodesById.set(nodeId, newFileNode)
+				node.children.push(newFileNode)
+			}
+			
+			var dirElements = xmlDoc.getElementsByTagName("Directory")
+			for (i = 0; i < dirElements.length; i++) {
+				var dirName = dirElements[i].childNodes[0].nodeValue
+				var nodeId = node.nodeId + "_"+ dirName
+				var newDirNode = new Node(nodeId, node, false, dirName, -1, revision)
+				nodesById.set(nodeId, newDirNode)
+				node.children.push(newDirNode)
+			}
+			
+			node.updateDiv()
+		    for (i = 0; i < node.children.length; i++) {
+				node.children[i].updateDiv()
 			}
 		}
 	}
+	xmlhttp.open("GET", "/MuWire/Files?section=files&path="+encodedPath, true)
+	xmlhttp.send()
 }
