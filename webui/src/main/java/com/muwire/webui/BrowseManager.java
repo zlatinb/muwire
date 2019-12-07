@@ -1,0 +1,75 @@
+package com.muwire.webui;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.muwire.core.Core;
+import com.muwire.core.Persona;
+import com.muwire.core.search.BrowseStatus;
+import com.muwire.core.search.BrowseStatusEvent;
+import com.muwire.core.search.UIBrowseEvent;
+import com.muwire.core.search.UIResultEvent;
+
+public class BrowseManager {
+
+    private final Core core;
+    private final Map<Persona, Browse> browses = new ConcurrentHashMap<>();
+    
+    public BrowseManager(Core core) {
+        this.core = core;
+    }
+
+    public void onBrowseStatusEvent(BrowseStatusEvent e) {
+        Browse browse = browses.get(e.getHost());
+        if (browse == null)
+            return; // hmm
+        browse.status = e.getStatus();
+        if (browse.status == BrowseStatus.FETCHING)
+            browse.totalResults = e.getTotalResults();
+    }
+    
+    public void onUIResultEvent(UIResultEvent e) {
+        Browse browse = browses.get(e.getSender());
+        if (browse == null)
+            return;
+        browse.results.add(e);
+    }
+    
+    void browse(Persona p) {
+        Browse browse = new Browse(p);
+        browses.put(p, browse);
+        UIBrowseEvent event = new UIBrowseEvent();
+        event.setHost(p);
+        core.getEventBus().publish(event);
+    }
+    
+    Map<Persona, Browse> getBrowses(){
+        return browses;
+    }
+    
+    static class Browse {
+        private final Persona persona;
+        private volatile BrowseStatus status;
+        private volatile int totalResults;
+        private final List<UIResultEvent> results = Collections.synchronizedList(new ArrayList<>());
+        
+        Browse(Persona persona) {
+            this.persona = persona;
+        }
+
+        public BrowseStatus getStatus() {
+            return status;
+        }
+
+        public int getTotalResults() {
+            return totalResults;
+        }
+
+        public List<UIResultEvent> getResults() {
+            return results;
+        }
+    }
+}

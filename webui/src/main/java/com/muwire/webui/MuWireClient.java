@@ -26,7 +26,9 @@ import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
+import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIResultBatchEvent;
+import com.muwire.core.search.UIResultEvent;
 
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
@@ -133,10 +135,15 @@ public class MuWireClient {
         core.getEventBus().register(FileDownloadedEvent.class, fileManager);
         core.getEventBus().register(FileHashingEvent.class, fileManager);
         
+        BrowseManager browseManager = new BrowseManager(core);
+        core.getEventBus().register(BrowseStatusEvent.class, browseManager);
+        core.getEventBus().register(UIResultEvent.class, browseManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
         servletContext.setAttribute("fileManager", fileManager);
+        servletContext.setAttribute("browseManager", browseManager);
         
         core.getEventBus().publish(new UILoadedEvent());
     }

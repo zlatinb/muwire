@@ -73,10 +73,14 @@ public class Persona {
         return destination;
     }
 
-    public String toBase64() throws DataFormatException, IOException {
+    public String toBase64() {
         if (base64 == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            write(baos);
+            try {
+                write(baos);
+            } catch (Exception impossible) {
+                throw new RuntimeException(impossible);
+            }
             base64 = Base64.encode(baos.toByteArray());
         }
         return base64;
