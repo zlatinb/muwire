@@ -65,8 +65,10 @@ function refreshTable() {
 				
 				var unshareLink = "<a href='#' onclick='window.unshare(\"" + path + "\");return false;'>Unshare</a>"
 				
+				var commentLink = "<span id='comment-link-"+ path +"'>" + generateCommentLink(path) + "</span>"
+				
 				tableHtml += "<tr>"
-				tableHtml += "<td>"+file.name+"<br/>"+unshareLink+"</td>"
+				tableHtml += "<td>"+file.name+"<br/>" + unshareLink + commentLink + "<div id='comment-" + path + "'></div></td>"
 				tableHtml += "<td>"+file.size+"</td>"
 				tableHtml += "<td>"+(file.comment != null)+"</td>"
 				tableHtml += "</tr>"
@@ -101,4 +103,47 @@ function unshare(fileId) {
 	xmlhttp.open("POST", "/MuWire/Files", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=unshare&path="+fileId)
+}
+
+function showCommentForm(nodeId) {
+	var linkSpan = document.getElementById("comment-link-"+nodeId)
+	linkSpan.innerHTML=""
+	var commentDiv = document.getElementById("comment-"+nodeId)
+	
+	var node = filesByPath.get(nodeId)
+	var existingComment = node.comment == null ? "" : node.comment
+	
+	var textArea = "<textarea id='comment-text-" + nodeId + "'>"+existingComment+"</textarea>" 
+	var saveCommentLink = "<a href='#' onclick='saveComment(\"" + nodeId + "\");return false;'>Save</a>"
+	var cancelCommentLink = "<a href='#' onclick='cancelComment(\"" + nodeId + "\");return false;'>Cancel</a>"
+	
+	var html = textArea + "<br/>" + saveCommentLink + "  " + cancelCommentLink
+	
+	commentDiv.innerHTML = html
+}
+
+function cancelComment(nodeId) {
+	var commentDiv = document.getElementById("comment-"+nodeId)
+	commentDiv.innerHTML = ""
+	var linkSpan = document.getElementById("comment-link-"+nodeId)
+	linkSpan.innerHTML = generateCommentLink(nodeId)
+}	
+
+function saveComment(fileId) {
+	var comment = document.getElementById("comment-text-"+fileId).value
+	var file = filesByPath.get(fileId)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			cancelComment(fileId)
+			refreshTable()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Files", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=comment&path="+fileId+ "&comment="+comment))
+}
+
+function generateCommentLink(nodeId) {
+	return "<a href='#' onclick='showCommentForm(\"" + nodeId + "\");return false;'>Comment</a>"
 }
