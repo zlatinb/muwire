@@ -15,7 +15,7 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-
+<script src="js/util.js"?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
 	<script src="js/files.js"?<%=version%>" type="text/javascript"></script>
 <% } else { %>
@@ -47,9 +47,17 @@ if (viewAs == null)
 		<p>Shared Files <span id="count">0</span></p>
 		<p><span id="hashing"></span></p>
 		<hr/>
+<% if (viewAs.equals("tree")) { %>
 			<ul>
 				<div id="root"></div>
 			</ul>
+<% } else { %>
+			<div id="table-wrapper">
+				<div id="table-scroll">
+					<div id="filesTable"></div>
+				</div>
+			</div>
+<% } %>
 		<hr/>
 	    </section>
 	</body>

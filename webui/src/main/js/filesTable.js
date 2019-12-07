@@ -1,4 +1,10 @@
-
+class SharedFile {
+	constructor(name, size, comment) {
+		this.name = name
+		this.size = size
+		this.comment = comment
+	}
+}
 
 function refreshStatus() {
 	var xmlhttp = new XMLHttpRequest();
@@ -29,11 +35,54 @@ function refreshStatus() {
 }
 
 var tableRevision = -1
+var filesByPath = new Map()
+
+function refreshTable() {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var xmlDoc = this.responseXML
+			
+			var tableHtml = "<table><thead><tr><th>File</th><th>Size</th><th>Comment</th></tr></thead><tbody>"
+			
+			var files = xmlDoc.getElementsByTagName("File")
+			var i
+			for(i = 0; i < files.length; i++) {
+				var fileName = files[i].getElementsByTagName("Path")[0].childNodes[0].nodeValue
+				var size = files[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
+				var comment = files[i].getElementsByTagName("Comment")
+				if (comment != null && comment.length == 1)
+					comment = comment[0].childNodes[0].nodeValue
+				else
+					comment = null
+				
+				var nodeId = Base64.encode(fileName)
+				var newSharedFile = new SharedFile(fileName, size, comment)
+				filesByPath.set(nodeId, newSharedFile)
+			}
+			
+			for (var [path, file] of filesByPath) {
+				tableHtml += "<tr>"
+				tableHtml += "<td>"+file.name+"</td>"
+				tableHtml += "<td>"+file.size+"</td>"
+				tableHtml += "<td>"+(file.comment != null)+"</td>"
+				tableHtml += "</tr>"
+			}
+			
+			tableHtml += "</tbody></table>"
+			
+			var tableDiv = document.getElementById("filesTable")
+			tableDiv.innerHTML = tableHtml
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Files?section=fileTable", true)
+	xmlhttp.send()
+}
 
 function initFiles() {
 	setInterval(refreshStatus, 3000)
 	setTimeout(refreshStatus, 1)
-	
-	nodesById.set("root",root)
+
+	setTimeout(refreshTable, 1)	
 }
 
