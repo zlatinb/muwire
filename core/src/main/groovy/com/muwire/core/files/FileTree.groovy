@@ -49,9 +49,15 @@ class FileTree<T> {
     synchronized void traverse(FileTreeCallback<T> callback) {
         doTraverse(root, callback);
     }
-    
+
+    synchronized void traverse(File from, FileTreeCallback<T> callback) {
+        TreeNode node = fileToNode.get(from);
+        if (node == null)
+            return
+        doTraverse(node, callback);
+    }
+        
     private void doTraverse(TreeNode<T> node, FileTreeCallback<T> callback) {
-        println "traversing $node"
         boolean leave = false
         if (node.file != null) {
             println "file is $node.file"

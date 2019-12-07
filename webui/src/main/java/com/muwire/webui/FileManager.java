@@ -1,8 +1,10 @@
 package com.muwire.webui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.muwire.core.Core;
@@ -16,6 +18,7 @@ import com.muwire.core.files.FileListCallback;
 import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.files.FileSharedEvent;
 import com.muwire.core.files.FileTree;
+import com.muwire.core.files.FileTreeCallback;
 import com.muwire.core.files.FileUnsharedEvent;
 
 import net.i2p.data.Base64;
@@ -89,11 +92,41 @@ public class FileManager {
             event.setUnsharedFile(sf);
             core.getEventBus().publish(event);
         } else {
+            
+            TraverseCallback cb = new TraverseCallback();
+            fileTree.traverse(file, cb);
+            
+            fileTree.remove(file);
+            revision++;
+            
+            for (SharedFile found : cb.found) {
+                FileUnsharedEvent e = new FileUnsharedEvent();
+                e.setUnsharedFile(found);
+                core.getEventBus().publish(e);
+            }
+            
             if (core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath())) {
                 DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
                 event.setDirectory(file);
                 core.getEventBus().publish(event);
             }
+        }
+    }
+    
+    private static class TraverseCallback implements FileTreeCallback<SharedFile> {
+        private final List<SharedFile> found = new ArrayList<>();
+
+        @Override
+        public void onDirectoryEnter(File file) {
+        }
+
+        @Override
+        public void onDirectoryLeave() {
+        }
+
+        @Override
+        public void onFile(File file, SharedFile value) {
+            found.add(value);
         }
     }
 }

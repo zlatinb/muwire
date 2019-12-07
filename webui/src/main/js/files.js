@@ -12,14 +12,15 @@ class Node {
 	
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
+		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>Unshare</a>"
 		if (this.leaf) {
-			div.innerHTML = "<li>"+this.path+"<br/><a href='#' onclick='window.unshare(\"" + this.nodeId + "\");return false;'>Unshare</a></li>"
+			div.innerHTML = "<li>"+this.path+"<br/>"+ unshareLink + "</li>"
 		} else {
 			if (this.children.length == 0) {
 				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
-					this.path + "</a></span></li>"
+					this.path + "</a>   " + unshareLink + "</span></li>"
 			} else {
-				var l = "<li><a href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a><ul>"
+				var l = "<li><a href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>   " + unshareLink + "<ul>"
 				var i
 				for (i = 0; i < this.children.length; i++) {
 					l += "<li>"
