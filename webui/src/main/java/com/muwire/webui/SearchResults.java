@@ -25,13 +25,19 @@ public class SearchResults {
     private final Map<Persona, Set<UIResultEvent>> bySender = new ConcurrentHashMap<>();
     private final Map<InfoHash, Set<UIResultEvent>> byInfohash = new ConcurrentHashMap<>();
     private final Map<InfoHash, Set<Destination>> possibleSources = new ConcurrentHashMap<>();
+    private volatile long revision;
     
     public SearchResults(UUID uuid, String search) {
         this.uuid = uuid;
         this.search = search;
     }
     
+    long getRevision() {
+        return revision;
+    }
+    
     void addResults(UIResultBatchEvent e) {
+        revision++;
         Persona sender = e.getResults()[0].getSender();
         Set<UIResultEvent> existing = bySender.get(sender);
         if (existing == null) {
@@ -79,6 +85,17 @@ public class SearchResults {
     
     public Set<Destination> getPossibleSources(InfoHash infoHash) {
         return possibleSources.getOrDefault(infoHash, Collections.emptySet());
+    }
+    
+    int getSenderCount() {
+        return bySender.size();
+    }
+    
+    int totalResults() {
+        int total = 0;
+        for(Set<UIResultEvent> results : bySender.values())
+            total += results.size();
+        return total;
     }
 
 }

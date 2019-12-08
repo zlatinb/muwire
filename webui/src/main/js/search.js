@@ -1,7 +1,15 @@
+class SearchStatus {
+	constructor(xmlNode) {
+		this.revision = xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+		this.query = xmlNode.getElementsByTagName("Query")[0].childNodes[0].nodeValue
+		this.uuid = xmlNode.getElementsByTagName("uuid")[0].childNodes[0].nodeValue
+		this.senders = xmlNode.getElementsByTagName("Senders")[0].childNodes[0].nodeValue
+		this.results = xmlNode.getElementsByTagName("Results")[0].childNodes[0].nodeValue
+	}
+}
+
 class SearchBySender {
 	constructor(xmlNode) {
-		this.uuid = xmlNode.getElementsByTagName("uuid")[0].childNodes[0].nodeValue;
-		this.query = xmlNode.getElementsByTagName("Query")[0].childNodes[0].nodeValue;
 		this.resultBatches = new Map();
 		
 		var resultsBySender = xmlNode.getElementsByTagName("ResultsBySender")[0];
@@ -16,8 +24,6 @@ class SearchBySender {
 
 class SearchByFile {
 	constructor(xmlNode) {
-		this.uuid = xmlNode.getElementsByTagName("uuid")[0].childNodes[0].nodeValue;
-		this.query = xmlNode.getElementsByTagName("Query")[0].childNodes[0].nodeValue;
 		this.resultBatches = new Map();
 		
 		var resultsByFile = xmlNode.getElementsByTagName("ResultsByFile")[0];
@@ -88,7 +94,9 @@ class ResultByFile {
 	}
 }
 
-var searches = new Map();
+var statusByUUID = new Map()
+var currentSearchBySender = null
+var currentSearchByFile = null
 var expandedComments = new Map();
 
 var uuid = null;
@@ -148,7 +156,7 @@ function updateSender(senderName) {
 	
 	var resultsDiv = document.getElementById("bottomTable");
 	var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
-	var x = searches.get(uuid)
+	var x = currentSearchBySender
 	x = x.resultBatches.get(sender).results;
 	for (var [resultInfoHash, result] of x) {
 		table += "<tr>";
@@ -191,7 +199,7 @@ function updateSender(senderName) {
 function updateFile(fileInfoHash) {
 	infoHash = fileInfoHash;
 	
-	var searchResults = searches.get(uuid).resultBatches.get(infoHash);
+	var searchResults = currentSearchByFile.resultBatches.get(infoHash);
 	
 	var resultsFromSpan = document.getElementById("resultsFrom");
 	resultsFromSpan.innerHTML = "Results For "+searchResults.name;
@@ -238,11 +246,11 @@ function updateUUIDBySender(resultUUID) {
 	uuid = resultUUID;
 	
 	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = searches.get(uuid).query + " Results";
+	currentSearchSpan.innerHTML = currentSearchBySender.query + " Results";
 	
 	var sendersDiv = document.getElementById("topTable");
 	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
-	var x = searches.get(uuid).resultBatches;
+	var x = currentSearchBySender.resultBatches;
 	for (var [senderName, senderBatch] of x) {
 		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
 		table += senderName;
@@ -265,12 +273,14 @@ function updateUUIDBySender(resultUUID) {
 function updateUUIDByFile(resultUUID) {
 	uuid = resultUUID;
 	
+	var currentStatus = statusByUUID.get(uuid)
+	
 	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = searches.get(uuid).query + " Results";
+	currentSearchSpan.innerHTML = currentStatus.query + " Results";
 	
 	var topTableDiv = document.getElementById("topTable");
 	var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>";
-	var x = searches.get(uuid).resultBatches;
+	var x = currentSearchByFile.resultBatches;
 	for (var [fileInfoHash, file] of x) {
 		table += "<tr><td><a href='#' onclick='updateFile(\""+fileInfoHash+"\");return false;'>";
 		table += file.name;
@@ -292,97 +302,30 @@ function updateUUIDByFile(resultUUID) {
 		updateFile(infoHash);
 }
 
-function refreshGroupBySender() {
+function refreshGroupBySender(searchUUID) {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML;
-			lastXML = xmlDoc;
-			searches.clear();
-			var i;
-			var x = xmlDoc.getElementsByTagName("Search");
-			for (i = 0; i < x.length; i++) {
-				var search = new SearchBySender(x[i]);
-				searches.set(search.uuid, search);
-			}
-			
-			var table = "<table><thead><tr><th>Search</th><th>Senders</th><th>Results</th></tr></thead><tbody>";
-			var activeSearchesDiv = document.getElementById("activeSearches");
-			for (var [resultsUUID, search] of searches) {
-				table += "<tr><td><a href='#' onclick='updateUUIDBySender(\"" + resultsUUID+ "\");return false;'>"
-				table += search.query;
-				table += "</a></td>";
-				table += "<td>"
-				table += search.resultBatches.size;
-				table += "</td>";
-				
-				var map = new Map();
-				for ( var [sender, results] of search.resultBatches ) {
-					for (var [fileInfoHash, resultFromSender] of results.results)
-						map.set(resultFromSender.infoHash, 1);
-				}
-				table += "<td>";
-				table += map.size;
-				table += "</td>"
-				table += "</tr>"
-			}
-			table += "</tbody></table>"
-			if (x.length > 0) 
-				activeSearchesDiv.innerHTML = table;
-			if (uuid != null)
-				updateUUIDBySender(uuid);
-			
+			currentSearchBySender = new SearchBySender(xmlDoc)
+			updateUUIDBySender(searchUUID);
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=groupBySender", true);
+	xmlhttp.open("GET", "/MuWire/Search?section=groupBySender&uuid="+searchUUID, true);
 	xmlhttp.send();
 }
 
-function refreshGroupByFile() {
+function refreshGroupByFile(searchUUID) {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML;
-			lastXML = xmlDoc;
-			searches.clear();
-			var i;
-			var x = xmlDoc.getElementsByTagName("Search");
-			for (i = 0; i < x.length; i++) {
-				var search = new SearchByFile(x[i]);
-				searches.set(search.uuid, search);
-			}
 			
-			var table = "<table><thead><tr><th>Search</th><th>Senders</th><th>Results</th></tr></thead><tbody>";
-			var activeSearchesDiv = document.getElementById("activeSearches");
-			for (var [resultsUUID, search] of searches) {
-				table += "<tr><td><a href='#' onclick='updateUUIDByFile(\"" + resultsUUID+ "\");return false;'>"
-				table += search.query;
-				table += "</a></td>";
-				
-				var map = new Map()
-				for (var [fileInfoHash, result] of search.resultBatches) {
-					for (var [senderName, resultFromSender] of result.results)
-						map.set(senderName, 1)
-				}
-				table += "<td>"
-				table += map.size;
-				table += "</td>";
-				
-				
-				table += "<td>";
-				table += search.resultBatches.size;
-				table += "</td>"
-				table += "</tr>"
-			}
-			table += "</tbody></table>"
-			if (x.length > 0) 
-				activeSearchesDiv.innerHTML = table;
-			if (uuid != null)
-				updateUUIDByFile(uuid);
-			
+			currentSearchByFile = new SearchByFile(xmlDoc)
+			updateUUIDByFile(searchUUID)
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=groupByFile", true);
+	xmlhttp.open("GET", "/MuWire/Search?section=groupByFile&uuid="+searchUUID, true);
 	xmlhttp.send();
 }
 
@@ -403,12 +346,60 @@ function browse(host) {
 	xmlhttp.send("action=browse&host="+host)
 }
 
+function refreshStatus() {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var currentSearch = null
+			if (uuid != null)
+				currentSearch = statusByUUID.get(uuid)
+			statusByUUID.clear()
+			
+			var activeSearches = this.responseXML.getElementsByTagName("Search")
+			var i
+			for(i = 0; i < activeSearches.length; i++) {
+				var searchStatus = new SearchStatus(activeSearches[i])
+				statusByUUID.set(searchStatus.uuid, searchStatus)
+			}
+			
+			
+			var table = "<table><thead><tr><th>Query</th><th>Senders</th><th>Results</th></tr></thead><tbody>"
+			for (var [searchUUID, status] of statusByUUID) {
+				table += "<tr>"
+				table += "<td>" + "<a href='#' onclick='refreshGroupBy" + refreshType + "(\"" + searchUUID + "\");return false;'>" + status.query + "</a></td>"
+				table += "<td>" + status.senders + "</td>"
+				table += "<td>" + status.results + "</td>"
+				table += "</tr>"
+			}
+			table += "</tbody></table>"
+			
+			var activeDiv = document.getElementById("activeSearches")
+			activeDiv.innerHTML = table
+			
+			if (uuid != null) {
+				var newStatus = statusByUUID.get(uuid)
+				if (newStatus.revision > currentSearch.revision)
+					refreshFunction(uuid)
+			}
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Search?section=status", true)
+	xmlhttp.send()
+}
+
+var refreshFunction = null
+var refreshType = null
+
 function initGroupBySender() {
-	setInterval(refreshGroupBySender, 3000);
-	setTimeout(refreshGroupBySender, 1);
+	refreshFunction = refreshGroupBySender
+	refreshType = "Sender"
+	setInterval(refreshStatus, 3000);
+	setTimeout(refreshStatus, 1);
 }
 
 function initGroupByFile() {
-	setInterval(refreshGroupByFile, 3000);
-	setTimeout(refreshGroupByFile, 1);
+	refreshFunction = refreshGroupByFile
+	refreshType = "File"
+	setInterval ( refreshStatus, 3000);
+	setTimeout ( refreshStatus, 1);
 }
