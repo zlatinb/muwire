@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.muwire.core.Core;
 import com.muwire.core.Persona;
 import com.muwire.core.trust.RemoteTrustList;
+import com.muwire.core.trust.TrustService;
 import com.muwire.core.trust.TrustService.TrustEntry;
 
 import net.i2p.data.Base64;
@@ -84,13 +85,13 @@ public class TrustServlet extends HttpServlet {
             
             sb.append("<Trusted>");
             for (TrustEntry te : list.getGood()) {
-                TEtoXML(te, sb);
+                TEtoXML(te, sb, core.getTrustService());
             }
             sb.append("</Trusted>");
             
             sb.append("<Distrusted>");
             for (TrustEntry te : list.getBad()) {
-                TEtoXML(te, sb);
+                TEtoXML(te, sb, core.getTrustService());
             }
             sb.append("</Distrusted>");
             
@@ -124,6 +125,15 @@ public class TrustServlet extends HttpServlet {
         sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
         sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
         sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        sb.append("</Persona>");
+    }
+    
+    private static void TEtoXML(TrustEntry te, StringBuilder sb, TrustService trustService) {
+        sb.append("<Persona>");
+        sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
+        sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
+        sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        sb.append("<Status>").append(trustService.getLevel(te.getPersona().getDestination())).append("</Status>");
         sb.append("</Persona>");
     }
 }
