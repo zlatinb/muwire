@@ -1,9 +1,10 @@
 class Result {
-	constructor(name, size, comment, infoHash) {
+	constructor(name, size, comment, infoHash, downloading) {
 		this.name = name
 		this.size = size
 		this.infoHash = infoHash
 		this.comment = comment
+		this.downloading = downloading
 	}
 }
 
@@ -89,6 +90,7 @@ function showResults(host) {
 			for (i = 0; i < results.length; i++) {
 				var name = results[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
 				var size = results[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
+				var downloading = results[i].getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
 				var infoHash = results[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 				var comment = results[i].getElementsByTagName("Comment")
 				if (comment != null && comment.length == 1)
@@ -96,18 +98,22 @@ function showResults(host) {
 				else
 					comment = null
 					
-				var result = new Result(name, size, comment, infoHash)
+				var result = new Result(name, size, comment, infoHash, downloading)
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
-			var tableHtml = "<table><thead><tr><th>Name</th><th>Size</th></tr></thead><tbody>"
+			var tableHtml = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
 			
 			for (var [infoHash, result] of resultsByInfoHash) {
 				
 				tableHtml += "<tr>"
 				tableHtml += "<td>" + result.name + "</td>"
 				tableHtml += "<td>" + result.size + "</td>"
-				// TODO: download and show comment link
+				if (result.downloading == "true")
+					tableHtml += "<td>Downloading</td>"
+				else
+					tableHtml += "<td>" + getDownloadLink(host, infoHash) + "</td>"
+				// TODO: show comment link
 				tableHtml += "</tr>"
 			}
 			
@@ -119,4 +125,22 @@ function showResults(host) {
 	}
 	xmlhttp.open("GET", "/MuWire/Browse?section=results&host="+browse.hostB64, true)
 	xmlhttp.send()
+}
+
+function getDownloadLink(host, infoHash) {
+	return "<a href='#' onclick='window.download(\"" + host + "\",\"" + infoHash + "\");return false;'>Download</a>"
+}
+
+function download(host,infoHash) {
+	var result = resultsByInfoHash.get(infoHash)
+	var hostB64 = browsesByHost.get(host).hostB64
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			showResults(host)
+		}
+	}	
+	xmlhttp.open("POST", "/MuWire/Browse", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=download&infoHash="+infoHash+"&host="+hostB64)
 }
