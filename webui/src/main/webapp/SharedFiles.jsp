@@ -4,7 +4,7 @@
 
 <% 
 
-String pagetitle="Shared Files"; 
+String pagetitle= Util._t("Shared Files");
 
 String viewAs = request.getParameter("viewAs");
 if (viewAs == null)
@@ -15,11 +15,11 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js"?<%=version%>" type="text/javascript"></script>
+<script src="js/util.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
-	<script src="js/files.js"?<%=version%>" type="text/javascript"></script>
+	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>
-	<script src="js/filesTable.js"?<%=version%> type="text/javascript"></script>
+	<script src="js/filesTable.js?<%=version%>" type="text/javascript"></script>
 <% } %>
 
 	</head>
@@ -28,23 +28,23 @@ if (viewAs == null)
 	    <aside>
 		<div class="menubox-divider"></div>
 		<div class="menubox">
-			<h2>Share</h2>
+			<h2><%=Util._t("Share")%></h2>
 			<form action="/MuWire/Files" method="post">
 				<input type="text" name="file">
 				<input type="hidden" name="action" value="share">
-				<input type="submit" value="Share">
+				<input type="submit" value="<%=Util._t("Share")%>">
 			</form>
 <% if (viewAs.equals("tree")) { %>
-			<a class="menuitem" href="SharedFiles.jsp?viewAs=table">View As Table</a>
+			<a class="menuitem" href="SharedFiles.jsp?viewAs=table"><%=Util._t("View As Table")%></a>
 <% } else { %>
-			<a class="menuitem" href="SharedFiles.jsp?viewAs=tree">View As Tree</a>
+			<a class="menuitem" href="SharedFiles.jsp?viewAs=tree"><%=Util._t("View As Tree")%></a>
 <% } %>
 		</div>
 		<div class="menubox-divider"></div>
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
-		<p>Shared Files <span id="count">0</span></p>
+		<p><%=Util._t("Shared Files")%> <span id="count">0</span></p>
 		<p><span id="hashing"></span></p>
 		<hr/>
 <% if (viewAs.equals("tree")) { %>

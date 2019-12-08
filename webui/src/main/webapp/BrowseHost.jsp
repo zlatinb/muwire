@@ -11,8 +11,8 @@ String pagetitle="Browse Host";
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js"?<%=version%>" type="text/javascript"></script>
-<script src="js/browse.js"?<%=version%> type="text/javascript"></script>
+<script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 	</head>
 	<body onload="initConnectionsCount(); initBrowse();">

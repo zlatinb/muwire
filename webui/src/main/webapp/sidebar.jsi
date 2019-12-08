@@ -1,29 +1,29 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2>Status</h2>
+                <h2><%=Util._t("Status")%></h2>
                 <div class="menu-icon"></div>
-                <div class="menu-text">Connections: <span id="connectionsCount">0</span></div>
+                <div class="menu-text"><%=Util._t("Connections")%>: <span id="connectionsCount">0</span></div>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2>Pages</h2>
-                <a class="menuitem" href="Downloads.jsp">Downloads</a>
-                <a class="menuitem" href="Home.jsp">Search</a>
-                <a class="menuitem" href="SharedFiles.jsp">Shared Files</a>
-                <a class="menuitem" href="BrowseHost.jsp">Browse</a>
+                <h2><%=Util._t("Pages")%></h2>
+                <a class="menuitem" href="Downloads.jsp"><%=Util._t("Downloads")%></a>
+                <a class="menuitem" href="Home.jsp"><%=Util._t("Search")%></a>
+                <a class="menuitem" href="SharedFiles.jsp"><%=Util._t("Shared Files")%></a>
+                <a class="menuitem" href="BrowseHost.jsp">Util._t("Browse")</a>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2>Configuration</h2>
+                <h2><%=Util._t("Configuration")%></h2>
                 <a class="menuitem settings" href="settings.jsp">
                   <div class="menu-icon"></div>
-                  <div class="menu-text">Settings</div>
+                  <div class="menu-text"><%=Util._t("Settings")%></div>
                 </a>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2>Help</h2>
-                <a class="menuitem" href="userGuide.jsp">User Guide</a>
-                <a class="menuitem" href="faq.jsp">FAQ</a>
-                <a class="menuitem" href="about.jsp">About</a>
+                <h2><%=Util._t("Help")%></h2>
+                <a class="menuitem" href="userGuide.jsp"><%=Util._t("User Guide")%></a>
+                <a class="menuitem" href="faq.jsp"><%=Util._t("FAQ")%></a>
+                <a class="menuitem" href="about.jsp"><%=Util._t("About")%></a>
             </div>
