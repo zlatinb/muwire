@@ -27,6 +27,7 @@ public class BrowseManager {
         if (browse == null)
             return; // hmm
         browse.status = e.getStatus();
+        browse.revision++;
         if (browse.status == BrowseStatus.FETCHING)
             browse.totalResults = e.getTotalResults();
     }
@@ -36,6 +37,7 @@ public class BrowseManager {
         if (browse == null)
             return;
         browse.results.add(e);
+        browse.revision++;
     }
     
     void browse(Persona p) {
@@ -62,6 +64,7 @@ public class BrowseManager {
         private final Persona persona;
         private volatile BrowseStatus status;
         private volatile int totalResults;
+        private volatile long revision;
         private final List<UIResultEvent> results = Collections.synchronizedList(new ArrayList<>());
         
         Browse(Persona persona) {
@@ -78,6 +81,10 @@ public class BrowseManager {
 
         public List<UIResultEvent> getResults() {
             return results;
+        }
+        
+        public long getRevision() {
+            return revision;
         }
     }
 }

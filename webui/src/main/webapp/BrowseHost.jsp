@@ -37,7 +37,6 @@ String pagetitle="Browse Host";
 				</div>
 			</div>
 			<hr/>
-			<div id="refresh-link"></div>
 			<div id="table-wrapper">
 				<div id="table-scroll">
 					<div id="resultsTable"></div>

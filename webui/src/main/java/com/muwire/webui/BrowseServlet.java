@@ -49,6 +49,7 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("<BrowseStatus>").append(browse.getStatus()).append("</BrowseStatus>");
                 sb.append("<TotalResults>").append(browse.getTotalResults()).append("</TotalResults>");
                 sb.append("<ResultsCount>").append(browse.getResults().size()).append("</ResultsCount>");
+                sb.append("<Revision>").append(browse.getRevision()).append("</Revision>");
                 sb.append("</Browse>");
             });
             sb.append("</Status>");

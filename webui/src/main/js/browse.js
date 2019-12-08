@@ -9,12 +9,13 @@ class Result {
 }
 
 class Browse {
-	constructor(host, hostB64, status, totalResults, receivedResults) {
+	constructor(host, hostB64, status, totalResults, receivedResults, revision) {
 		this.host = host
 		this.hostB64 = hostB64
 		this.totalResults = totalResults
 		this.receivedResults = receivedResults
 		this.status = status
+		this.revision = revision
 	}
 }
 
@@ -31,6 +32,11 @@ function refreshActive() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			
+			var currentBrowse = null
+			if (currentHost != null)
+				currentBrowse = browsesByHost.get(currentHost)
+			
 			var xmlDoc = this.responseXML
 			var browses = xmlDoc.getElementsByTagName("Browse")
 			var i
@@ -40,8 +46,9 @@ function refreshActive() {
 				var status = browses[i].getElementsByTagName("BrowseStatus")[0].childNodes[0].nodeValue;
 				var totalResults = browses[i].getElementsByTagName("TotalResults")[0].childNodes[0].nodeValue;
 				var count = browses[i].getElementsByTagName("ResultsCount")[0].childNodes[0].nodeValue;
+				var revision = browses[i].getElementsByTagName("Revision")[0].childNodes[0].nodeValue;
 				
-				var browse = new Browse(host, hostB64, status, totalResults, count)
+				var browse = new Browse(host, hostB64, status, totalResults, count, revision)
 				browsesByHost.set(host, browse)
 			}
 			
@@ -62,6 +69,12 @@ function refreshActive() {
 			
 			var tableDiv = document.getElementById("activeBrowses")
 			tableDiv.innerHTML = tableHtml
+			
+			if (currentBrowse != null) {
+				var newBrowse = browsesByHost.get(currentHost)
+				if (currentBrowse.revision < newBrowse.revision)
+					showResults(currentHost)
+			}
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Browse?section=status", true)
@@ -73,10 +86,6 @@ function getBrowseLink(host, text) {
 }
 
 function showResults(host) {
-	
-	var refreshLink = getBrowseLink(host, "Refresh")
-	var linkDiv = document.getElementById("refresh-link")
-	linkDiv.innerHTML = refreshLink
 	
 	var browse = browsesByHost.get(host)
 	var xmlhttp = new XMLHttpRequest()
