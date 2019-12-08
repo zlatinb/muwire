@@ -195,7 +195,7 @@ function updateFile(fileInfoHash) {
 	resultsFromSpan.innerHTML = "Results For "+searchResults.name;
 	
 	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>Sender</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
 	var i;
 	for (var [senderName, result] of searchResults.results) {
 		table += "<tr>";
@@ -218,6 +218,7 @@ function updateFile(fileInfoHash) {
 			}
 		}
 		table += "</td>";
+		table += "<td>" + result.browse + "</td>"
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
@@ -232,12 +233,17 @@ function updateUUIDBySender(resultUUID) {
 	currentSearchSpan.innerHTML = searches.get(uuid).query + " Results";
 	
 	var sendersDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>Sender</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
 	var x = searches.get(uuid).resultBatches;
-	for (var [senderName, ignored] of x) {
+	for (var [senderName, senderBatch] of x) {
 		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
 		table += senderName;
-		table += "</a></td></tr>";
+		table += "</a></td>";
+		if (senderBatch.browse) 
+			table += "<td>true</td>"
+		else
+	  		table += "<td>false</td>"
+		table += "</tr>";
 	}
 	table += "</tbody></table>";
 	if (x.size > 0)

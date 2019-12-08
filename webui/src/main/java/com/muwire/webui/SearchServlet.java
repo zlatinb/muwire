@@ -112,7 +112,7 @@ public class SearchServlet extends HttpServlet {
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
-                        sb.append("<SenderB64").append(result.getSender().toBase64()).append("</SenderB64>");
+                        sb.append("<SenderB64>").append(result.getSender().toBase64()).append("</SenderB64>");
                         sb.append("<Browse>").append(result.getBrowse()).append("</Browse>");
                         if (result.getComment() != null) {
                             sb.append("<Comment>")
