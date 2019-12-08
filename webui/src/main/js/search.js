@@ -33,6 +33,8 @@ class SearchByFile {
 class ResultsBySender {
 	constructor(xmlNode) {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
+		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
 		this.results = new Map();
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
@@ -75,6 +77,8 @@ class ResultBySender {
 class ResultByFile {
 	constructor(xmlNode) {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
+		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
+		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
 		this.comment = null;
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 

@@ -62,6 +62,8 @@ public class SearchServlet extends HttpServlet {
                     sb.append("<Sender>");
                     sb.append(Util.escapeHTMLinXML(sender.getHumanReadableName()));
                     sb.append("</Sender>");
+                    sb.append("<SenderB64>").append(sender.toBase64()).append("</SenderB64>");
+                    sb.append("<Browse>").append(resultsFromSender.iterator().next().getBrowse()).append("</Browse>");
                     resultsFromSender.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Name>");
@@ -110,6 +112,8 @@ public class SearchServlet extends HttpServlet {
                     resultSet.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
+                        sb.append("<SenderB64").append(result.getSender().toBase64()).append("</SenderB64>");
+                        sb.append("<Browse>").append(result.getBrowse()).append("</Browse>");
                         if (result.getComment() != null) {
                             sb.append("<Comment>")
                               .append(Util.escapeHTMLinXML(result.getComment()))
