@@ -10,8 +10,8 @@ import net.i2p.util.ConcurrentHashSet
 class RemoteTrustList {
     public enum Status { NEW, UPDATING, UPDATED, UPDATE_FAILED }
 
-    private final Persona persona
-    private final Set<TrustEntry> good, bad
+    final Persona persona
+    final Set<TrustEntry> good, bad
     volatile long timestamp
     volatile boolean forceUpdate
     Status status = Status.NEW

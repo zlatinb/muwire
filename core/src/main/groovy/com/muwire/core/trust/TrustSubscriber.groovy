@@ -26,7 +26,7 @@ class TrustSubscriber {
     private final I2PConnector i2pConnector
     private final MuWireSettings settings
 
-    private final Map<Destination, RemoteTrustList> remoteTrustLists = new ConcurrentHashMap<>()
+    final Map<Destination, RemoteTrustList> remoteTrustLists = new ConcurrentHashMap<>()
 
     private final Object waitLock = new Object()
     private volatile boolean shutdown
@@ -50,7 +50,7 @@ class TrustSubscriber {
         thread?.interrupt()
         updateThreads.shutdownNow()
     }
-
+    
     void onTrustSubscriptionEvent(TrustSubscriptionEvent e) {
         if (!e.subscribe) {
             remoteTrustLists.remove(e.persona.destination)

@@ -97,8 +97,8 @@ public class Core {
     final MuWireSettings muOptions
 
     private final I2PSession i2pSession;
-    private final TrustService trustService
-    private final TrustSubscriber trustSubscriber
+    final TrustService trustService
+    final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
     private final HostCache hostCache
     private final ConnectionManager connectionManager

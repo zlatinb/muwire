@@ -1,0 +1,129 @@
+package com.muwire.webui;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.muwire.core.Core;
+import com.muwire.core.Persona;
+import com.muwire.core.trust.RemoteTrustList;
+import com.muwire.core.trust.TrustService.TrustEntry;
+
+import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
+
+public class TrustServlet extends HttpServlet {
+    
+    private TrustManager trustManager;
+    private Core core;
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+        if (action == null) {
+            resp.sendError(403, "Bad action param");
+            return;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+        
+        if (action.equals("revision")) {
+            sb.append("<Revision>").append(trustManager.getRevision()).append("</Revision>");
+        } else if (action.equals("users")) {
+            sb.append("<Users>");
+            
+            sb.append("<Trusted>");
+            for (TrustEntry te : core.getTrustService().getGood().values()) {
+                TEtoXML(te,sb);
+            }
+            sb.append("</Trusted>");
+            
+            sb.append("<Distrusted>");
+            for (TrustEntry te : core.getTrustService().getBad().values()) {
+                TEtoXML(te, sb);
+            }
+            sb.append("</Distrusted>");
+            
+            sb.append("</Users>");
+            
+        } else if (action.equals("subscriptions")) {
+            sb.append("<Subscriptions>");
+            
+            for (RemoteTrustList list : core.getTrustSubscriber().getRemoteTrustLists().values()) {
+                sb.append("<Subscription>");
+                sb.append("<User>").append(Util.escapeHTMLinXML(list.getPersona().getHumanReadableName())).append("</User>");
+                sb.append("<UserB64>").append(list.getPersona().toBase64()).append("</UserB64>");
+                sb.append("<Status>").append(list.getStatus()).append("</Status>");
+                sb.append("<Timestamp>").append(DataHelper.formatTime(list.getTimestamp())).append("</Timestamp>");
+                sb.append("</Subscription>");
+            }
+            
+            sb.append("</Subscriptions>");
+            
+        } else if (action.equals("list")) {
+            String userB64 = req.getParameter("user");
+            Persona p;
+            try {
+                p = new Persona(new ByteArrayInputStream(Base64.decode(userB64)));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            
+            RemoteTrustList list = core.getTrustSubscriber().getRemoteTrustLists().get(p.getDestination());
+            if (list == null) 
+                return;
+            
+            sb.append("<List>");
+            
+            sb.append("<Trusted>");
+            for (TrustEntry te : list.getGood()) {
+                TEtoXML(te, sb);
+            }
+            sb.append("</Trusted>");
+            
+            sb.append("<Distrusted>");
+            for (TrustEntry te : list.getBad()) {
+                TEtoXML(te, sb);
+            }
+            sb.append("</Distrusted>");
+            
+            sb.append("</List>");
+        }
+        
+        resp.setContentType("text/xml");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setDateHeader("Expires", 0);
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
+        byte[] out = sb.toString().getBytes("UTF-8");
+        resp.setContentLength(out.length);
+        resp.getOutputStream().write(out);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // TODO Auto-generated method stub
+        super.doPost(req, resp);
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        core = (Core) config.getServletContext().getAttribute("core");
+        trustManager = (TrustManager) config.getServletContext().getAttribute("trustManager");
+    }
+
+    private static void TEtoXML(TrustEntry te, StringBuilder sb) {
+        sb.append("<Persona>");
+        sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
+        sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
+        sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        sb.append("</Persona>");
+    }
+}

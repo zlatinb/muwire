@@ -130,8 +130,8 @@ class TrustService extends Service {
     }
     
     public static class TrustEntry {
-        private final Persona persona
-        private final String reason
+        final Persona persona
+        final String reason
         TrustEntry(Persona persona, String reason) {
             this.persona = persona
             this.reason = reason
