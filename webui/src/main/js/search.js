@@ -42,6 +42,7 @@ class ResultsBySender {
 		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
 		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
+		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue;
 		this.results = new Map();
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
@@ -87,6 +88,7 @@ class ResultByFile {
 		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
 		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
+		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue;
 		this.comment = null;
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 
@@ -205,7 +207,7 @@ function updateFile(fileInfoHash) {
 	resultsFromSpan.innerHTML = "Results For "+searchResults.name;
 	
 	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>Sender</th><th>Browse</th><th>Trust</th></tr></thead><tbody>";
 	var i;
 	for (var [senderName, result] of searchResults.results) {
 		table += "<tr>";
@@ -235,6 +237,7 @@ function updateFile(fileInfoHash) {
 				table += "<td><span id='browse-link-" + result.senderB64 + "'>" + getBrowseLink(result.senderB64) + "</span></td>"
 			}
 		}
+		table += "<td>" + result.trust + "</td>"
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
@@ -251,7 +254,7 @@ function updateUUIDBySender(resultUUID) {
 	currentSearchSpan.innerHTML = currentStatus.query + " Results";
 	
 	var sendersDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>Sender</th><th>Browse</th><th>Trust</th></tr></thead><tbody>";
 	var x = currentSearchBySender.resultBatches;
 	for (var [senderName, senderBatch] of x) {
 		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
@@ -263,6 +266,7 @@ function updateUUIDBySender(resultUUID) {
 			else 
 				table += "<td><span id='browse-link-" + senderBatch.senderB64 + "'>" + getBrowseLink(senderBatch.senderB64) + "</span></td>"
 		} 
+		table += "<td>" + senderBatch.trust + "</td>"
 		table += "</tr>";
 	}
 	table += "</tbody></table>";

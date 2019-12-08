@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.muwire.core.Core;
 import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultEvent;
@@ -20,6 +21,7 @@ import net.i2p.data.DataHelper;
 
 public class SearchServlet extends HttpServlet {
     
+    private Core core;
     private SearchManager searchManager;
     private ConnectionCounter connectionCounter;
     private DownloadManager downloadManager;
@@ -92,6 +94,7 @@ public class SearchServlet extends HttpServlet {
                 sb.append("<SenderB64>").append(sender.toBase64()).append("</SenderB64>");
                 sb.append("<Browse>").append(resultsFromSender.iterator().next().getBrowse()).append("</Browse>");
                 sb.append("<Browsing>").append(browseManager.isBrowsing(sender)).append("</Browsing>");
+                sb.append("<Trust>").append(core.getTrustService().getLevel(sender.getDestination())).append("</Trust>");
                 resultsFromSender.forEach(result -> {
                     sb.append("<Result>");
                     sb.append("<Name>");
@@ -148,6 +151,7 @@ public class SearchServlet extends HttpServlet {
                     sb.append("<SenderB64>").append(result.getSender().toBase64()).append("</SenderB64>");
                     sb.append("<Browse>").append(result.getBrowse()).append("</Browse>");
                     sb.append("<Browsing>").append(browseManager.isBrowsing(result.getSender())).append("</Browsing>");
+                    sb.append("<Trust>").append(core.getTrustService().getLevel(result.getSender().getDestination())).append("</Trust>");
                     if (result.getComment() != null) {
                         sb.append("<Comment>")
                         .append(Util.escapeHTMLinXML(result.getComment()))
@@ -188,6 +192,7 @@ public class SearchServlet extends HttpServlet {
         connectionCounter = (ConnectionCounter) config.getServletContext().getAttribute("connectionCounter");
         downloadManager = (DownloadManager) config.getServletContext().getAttribute("downloadManager");
         browseManager = (BrowseManager) config.getServletContext().getAttribute("browseManager");
+        core = (Core) config.getServletContext().getAttribute("core");
     }
 
 }
