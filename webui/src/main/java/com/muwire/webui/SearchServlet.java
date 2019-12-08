@@ -22,6 +22,7 @@ public class SearchServlet extends HttpServlet {
     private SearchManager searchManager;
     private ConnectionCounter connectionCounter;
     private DownloadManager downloadManager;
+    private BrowseManager browseManager;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -64,6 +65,7 @@ public class SearchServlet extends HttpServlet {
                     sb.append("</Sender>");
                     sb.append("<SenderB64>").append(sender.toBase64()).append("</SenderB64>");
                     sb.append("<Browse>").append(resultsFromSender.iterator().next().getBrowse()).append("</Browse>");
+                    sb.append("<Browsing>").append(browseManager.isBrowsing(sender)).append("</Browsing>");
                     resultsFromSender.forEach(result -> {
                         sb.append("<Result>");
                         sb.append("<Name>");
@@ -114,6 +116,7 @@ public class SearchServlet extends HttpServlet {
                         sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
                         sb.append("<SenderB64>").append(result.getSender().toBase64()).append("</SenderB64>");
                         sb.append("<Browse>").append(result.getBrowse()).append("</Browse>");
+                        sb.append("<Browsing>").append(browseManager.isBrowsing(result.getSender())).append("</Browsing>");
                         if (result.getComment() != null) {
                             sb.append("<Comment>")
                               .append(Util.escapeHTMLinXML(result.getComment()))
@@ -156,6 +159,7 @@ public class SearchServlet extends HttpServlet {
         searchManager = (SearchManager) config.getServletContext().getAttribute("searchManager");
         connectionCounter = (ConnectionCounter) config.getServletContext().getAttribute("connectionCounter");
         downloadManager = (DownloadManager) config.getServletContext().getAttribute("downloadManager");
+        browseManager = (BrowseManager) config.getServletContext().getAttribute("browseManager");
     }
 
 }

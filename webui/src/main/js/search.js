@@ -35,6 +35,7 @@ class ResultsBySender {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
 		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
+		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
 		this.results = new Map();
 		var resultNodes = xmlNode.getElementsByTagName("Result");
 		var i;
@@ -79,6 +80,7 @@ class ResultByFile {
 		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
 		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
+		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
 		this.comment = null;
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 
@@ -218,7 +220,13 @@ function updateFile(fileInfoHash) {
 			}
 		}
 		table += "</td>";
-		table += "<td>" + result.browse + "</td>"
+		if (result.browse == "true") {
+			if (result.browsing == "true")
+				table += "<td>Browsing</td>"
+			else {
+				table += "<td><span id='browse-link-" + result.senderB64 + "'>" + getBrowseLink(result.senderB64) + "</span></td>"
+			}
+		}
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
@@ -239,10 +247,12 @@ function updateUUIDBySender(resultUUID) {
 		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
 		table += senderName;
 		table += "</a></td>";
-		if (senderBatch.browse) 
-			table += "<td>true</td>"
-		else
-	  		table += "<td>false</td>"
+		if (senderBatch.browse == "true") {
+			if (senderBatch.browsing == "true") 
+				table += "<td>Browsing</td>"
+			else 
+				table += "<td><span id='browse-link-" + senderBatch.senderB64 + "'>" + getBrowseLink(senderBatch.senderB64) + "</span></td>"
+		} 
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
@@ -374,6 +384,23 @@ function refreshGroupByFile() {
 	}
 	xmlhttp.open("GET", "/MuWire/Search?section=groupByFile", true);
 	xmlhttp.send();
+}
+
+function getBrowseLink(host) {
+	return "<a href='#' onclick='window.browse(\"" + host + "\"); return false;'>Browse</a>"
+}
+
+function browse(host) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var linkSpan = document.getElementById("browse-link-"+host)
+			linkSpan.innerHTML = "Browsing"
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Browse", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=browse&host="+host)
 }
 
 function initGroupBySender() {

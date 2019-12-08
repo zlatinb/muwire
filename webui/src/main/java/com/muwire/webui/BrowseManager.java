@@ -46,6 +46,14 @@ public class BrowseManager {
         core.getEventBus().publish(event);
     }
     
+    boolean isBrowsing(Persona p) {
+        Browse browse = browses.get(p);
+        if (browse == null)
+            return false;
+        return browse.status == BrowseStatus.CONNECTING || 
+                browse.status == BrowseStatus.FETCHING;
+    }
+    
     Map<Persona, Browse> getBrowses(){
         return browses;
     }

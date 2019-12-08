@@ -116,7 +116,6 @@ public class BrowseServlet extends HttpServlet {
                 return;
             }
             browseManager.browse(host);
-            resp.sendRedirect("/MuWire/BrowseHost.jsp");
         } else if (action.equals("download")) {
             if (core == null) {
                 resp.sendError(403, "Not initialized");
