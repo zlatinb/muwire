@@ -63,7 +63,7 @@ public class DataUtil {
                 ((int)header[2] & 0xFF);
     }
 
-    static String readi18nString(byte [] encoded) {
+    public static String readi18nString(byte [] encoded) {
         if (encoded.length < 2)
             throw new IllegalArgumentException("encoding too short $encoded.length");
         int length = ((encoded[0] & 0xFF) << 8) | (encoded[1] & 0xFF);

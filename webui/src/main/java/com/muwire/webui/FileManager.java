@@ -21,6 +21,7 @@ import com.muwire.core.files.FileTree;
 import com.muwire.core.files.FileTreeCallback;
 import com.muwire.core.files.FileUnsharedEvent;
 import com.muwire.core.files.UICommentEvent;
+import com.muwire.core.util.DataUtil;
 
 import net.i2p.data.Base64;
 
@@ -136,7 +137,7 @@ public class FileManager {
                 return;
             UICommentEvent e = new UICommentEvent();
             e.setOldComment(sf.getComment());
-            sf.setComment(comment);
+            sf.setComment(Base64.encode(DataUtil.encodei18nString(comment)));
             e.setSharedFile(sf);
             revision++;
             core.getEventBus().publish(e);

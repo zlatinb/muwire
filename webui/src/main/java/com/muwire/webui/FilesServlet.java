@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.muwire.core.SharedFile;
+import com.muwire.core.util.DataUtil;
 import com.muwire.core.files.FileListCallback;
 
 import net.i2p.data.Base64;
@@ -106,8 +107,10 @@ public class FilesServlet extends HttpServlet {
         sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
         sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
         sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
-        if (sf.getComment() != null)
-            sb.append("<Comment>").append(Util.escapeHTMLinXML(sf.getComment())).append("</Comment>");
+        if (sf.getComment() != null) {
+            String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
+            sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
+        }
         // TODO: other stuff
         sb.append("</File>");
     }
