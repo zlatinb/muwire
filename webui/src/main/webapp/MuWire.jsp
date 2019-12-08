@@ -18,7 +18,7 @@
     	%>
     	
         <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
-        <form action="/MuWire/init.jsp" method="post">
+        <form action="/MuWire/init" method="post">
         <%=Util._t("Nickname")%>:
         <input type="text" name="nickname"><br>
         <%=Util._t("Directory for saving downloaded files")%>:

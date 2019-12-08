@@ -7,15 +7,15 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Pages")%></h2>
-                <a class="menuitem" href="Downloads.jsp"><%=Util._t("Downloads")%></a>
-                <a class="menuitem" href="Home.jsp"><%=Util._t("Search")%></a>
-                <a class="menuitem" href="SharedFiles.jsp"><%=Util._t("Shared Files")%></a>
-                <a class="menuitem" href="BrowseHost.jsp">Util._t("Browse")</a>
+                <a class="menuitem" href="Downloads"><%=Util._t("Downloads")%></a>
+                <a class="menuitem" href="Home"><%=Util._t("Search")%></a>
+                <a class="menuitem" href="SharedFiles"><%=Util._t("Shared Files")%></a>
+                <a class="menuitem" href="BrowseHost"><%=Util._t("Browse")%></a>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Configuration")%></h2>
-                <a class="menuitem settings" href="settings.jsp">
+                <a class="menuitem settings" href="settings">
                   <div class="menu-icon"></div>
                   <div class="menu-text"><%=Util._t("Settings")%></div>
                 </a>
@@ -23,7 +23,7 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Help")%></h2>
-                <a class="menuitem" href="userGuide.jsp"><%=Util._t("User Guide")%></a>
-                <a class="menuitem" href="faq.jsp"><%=Util._t("FAQ")%></a>
-                <a class="menuitem" href="about.jsp"><%=Util._t("About")%></a>
+                <a class="menuitem" href="userGuide"><%=Util._t("User Guide")%></a>
+                <a class="menuitem" href="faq"><%=Util._t("FAQ")%></a>
+                <a class="menuitem" href="about"><%=Util._t("About")%></a>
             </div>

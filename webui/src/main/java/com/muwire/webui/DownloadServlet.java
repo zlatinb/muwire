@@ -128,6 +128,6 @@ public class DownloadServlet extends HttpServlet {
             downloadManager.cancel(infoHash);
         }
         // P-R-G
-        resp.sendRedirect("/MuWire/Downloads.jsp");
+        resp.sendRedirect("/MuWire/Downloads");
     }
 }

@@ -19,6 +19,6 @@
 			client.initMWProps(nickname, new File(downloadLocation), new File(incompleteLocation));
 			client.start();
     	%>
-    	<c:redirect url="/index.jsp"/>
+    	<c:redirect url="/index"/>
 	</body>
 </html>

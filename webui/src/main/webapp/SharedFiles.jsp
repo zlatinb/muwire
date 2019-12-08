@@ -35,9 +35,9 @@ if (viewAs == null)
 				<input type="submit" value="<%=Util._t("Share")%>">
 			</form>
 <% if (viewAs.equals("tree")) { %>
-			<a class="menuitem" href="SharedFiles.jsp?viewAs=table"><%=Util._t("View As Table")%></a>
+			<a class="menuitem" href="SharedFiles?viewAs=table"><%=Util._t("View As Table")%></a>
 <% } else { %>
-			<a class="menuitem" href="SharedFiles.jsp?viewAs=tree"><%=Util._t("View As Tree")%></a>
+			<a class="menuitem" href="SharedFiles?viewAs=tree"><%=Util._t("View As Tree")%></a>
 <% } %>
 		</div>
 		<div class="menubox-divider"></div>

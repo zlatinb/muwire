@@ -1,6 +1,6 @@
 <header class="titlebar">
   <div class="title">
-       <a href="Home.jsp"><img src="images/muwire.png" alt=""></a>
+       <a href="Home"><img src="images/muwire.png" alt=""></a>
        <br><%=Util._t("Welcome to MuWire")%>
   </div>
   <div class="subtitle">

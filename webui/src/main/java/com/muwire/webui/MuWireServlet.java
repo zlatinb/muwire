@@ -48,7 +48,7 @@ public class MuWireServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (client.needsMWInit()) {
-            resp.sendRedirect("/MuWire/MuWire.jsp");
+            resp.sendRedirect("/MuWire/MuWire");
         } else {
             if (client.getCore() == null) {
                 resp.setContentType("text/html");
@@ -71,7 +71,7 @@ public class MuWireServlet extends HttpServlet {
                                          "</body></html>");
                 resp.setIntHeader("Refresh", 5);
             } else
-                resp.sendRedirect("/MuWire/Home.jsp");
+                resp.sendRedirect("/MuWire/Home");
         }
     }
 

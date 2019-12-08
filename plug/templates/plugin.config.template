@@ -10,6 +10,6 @@ min-i2p-version=${i2pVersion}
 min-java-version=11
 consoleLinkName=MuWire
 consoleLinkTooltip=Anonymous File Sharing
-consoleLinkURL=/MuWire/index.jsp
+consoleLinkURL=/MuWire/
 console-icon=images/muwire.png
 <% println "date="+System.currentTimeMillis() %>

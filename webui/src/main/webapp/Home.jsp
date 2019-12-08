@@ -32,10 +32,10 @@
                     <div class="menubox">
 <% if (groupBy.equals("sender")) { %>
 			<h2><%=Util._t("Active Searches By Sender")%></h2>
-			<a class="menuitem" href="Home.jsp?groupBy=file"><%=Util._t("Group By File")%></a>
+			<a class="menuitem" href="Home?groupBy=file"><%=Util._t("Group By File")%></a>
 <% } else { %>
 			<h2><%=Util._t("Active Searches By File")%></h2>
-			<a class="menuitem" href="Home.jsp?groupBy=sender"><%=Util._t("Group By Sender")%></a>
+			<a class="menuitem" href="Home?groupBy=sender"><%=Util._t("Group By Sender")%></a>
 <% } %>
                     </div>
 

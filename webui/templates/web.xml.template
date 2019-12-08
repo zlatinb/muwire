@@ -63,4 +63,49 @@
 
 __JASPER__
 
+<!--
+Mappings without the .jsp suffix
+-->
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
+    <!-- empty pattern handles the root -->
+    <url-pattern></url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
+    <url-pattern>/index</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.BrowseHost_jsp</servlet-name>
+    <url-pattern>/BrowseHost</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.Downloads_jsp</servlet-name>
+    <url-pattern>/Downloads</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.Home_jsp</servlet-name>
+    <url-pattern>/Home</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.MuWire_jsp</servlet-name>
+    <url-pattern>/MuWire</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.SharedFiles_jsp</servlet-name>
+    <url-pattern>/SharedFiles</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.init_jsp</servlet-name>
+    <url-pattern>/init</url-pattern>
+</servlet-mapping>
+
 </web-app>

@@ -32,7 +32,7 @@ public class SearchServlet extends HttpServlet {
         }
         String search = req.getParameter("search");
         searchManager.newSearch(search);
-        resp.sendRedirect("/MuWire/Home.jsp");
+        resp.sendRedirect("/MuWire/Home");
     }
     
     
