@@ -28,8 +28,8 @@ public class TrustServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("action");
-        if (action == null) {
+        String section = req.getParameter("section");
+        if (section == null) {
             resp.sendError(403, "Bad action param");
             return;
         }
@@ -37,9 +37,9 @@ public class TrustServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         
-        if (action.equals("revision")) {
+        if (section.equals("revision")) {
             sb.append("<Revision>").append(trustManager.getRevision()).append("</Revision>");
-        } else if (action.equals("users")) {
+        } else if (section.equals("users")) {
             sb.append("<Users>");
             
             sb.append("<Trusted>");
@@ -56,7 +56,7 @@ public class TrustServlet extends HttpServlet {
             
             sb.append("</Users>");
             
-        } else if (action.equals("subscriptions")) {
+        } else if (section.equals("subscriptions")) {
             sb.append("<Subscriptions>");
             
             for (RemoteTrustList list : core.getTrustSubscriber().getRemoteTrustLists().values()) {
@@ -70,7 +70,7 @@ public class TrustServlet extends HttpServlet {
             
             sb.append("</Subscriptions>");
             
-        } else if (action.equals("list")) {
+        } else if (section.equals("list")) {
             String userB64 = req.getParameter("user");
             Persona p;
             try {

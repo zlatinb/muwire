@@ -118,4 +118,9 @@ Mappings without the .jsp suffix
     <url-pattern>/init</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.TrustUsers_jsp</servlet-name>
+    <url-pattern>/TrustUsers</url-pattern>
+</servlet-mapping>
+
 </web-app>
