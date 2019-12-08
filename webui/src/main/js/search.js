@@ -51,6 +51,33 @@ class ResultsBySender {
 			this.results.set(result.infoHash,result);
 		}
 	}
+	
+	getTrustLinks() {
+		if (this.trust == "NEUTRAL")
+			return this.getTrustLink() + this.getDistrustLink()
+		else if (this.trust == "TRUSTED")
+			return this.getNeutralLink() + this.getDistrustLink()
+		else
+			return this.getTrustLink() + this.getNeutralLink()
+	}
+	
+	getTrustLink() {
+		return "<span id='trusted-link-" + this.senderB64 + "'>" +
+				"<a href='#' onclick='window.markTrusted(\"" + 
+				this.senderB64 + "\"); return false;'>Mark Trusted</a></span><span id='trusted-" + 
+				this.senderB64 + "'></span>"
+	}
+	
+	getNeutralLink() {
+		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>Mark Neutral</a>"
+	}
+	
+	getDistrustLink() {
+		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
+				"<a href='#' onclick='window.markDistrusted(\"" + 
+				this.senderB64 + "\"); return false;'>Mark Distrusted</a></span><span id='distrusted-" + 
+				this.senderB64 + "'></span>"
+	}
 }
 
 class ResultsByFile {
@@ -93,6 +120,33 @@ class ResultByFile {
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 
 			this.comment = comment[0].childNodes[0].nodeValue;
+	}
+	
+	getTrustLinks() {
+		if (this.trust == "NEUTRAL")
+			return this.getTrustLink() + this.getDistrustLink()
+		else if (this.trust == "TRUSTED")
+			return this.getNeutralLink() + this.getDistrustLink()
+		else
+			return this.getTrustLink() + this.getNeutralLink()
+	}
+	
+	getTrustLink() {
+		return "<span id='trusted-link-" + this.senderB64 + "'>" +
+				"<a href='#' onclick='window.markTrusted(\"" + 
+				this.senderB64 + "\"); return false;'>Mark Trusted</a></span><span id='trusted-" + 
+				this.senderB64 + "'></span>"
+	}
+	
+	getNeutralLink() {
+		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>Mark Neutral</a>"
+	}
+	
+	getDistrustLink() {
+		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
+				"<a href='#' onclick='window.markDistrusted(\"" + 
+				this.senderB64 + "\"); return false;'>Mark Distrusted</a></span><span id='distrusted-" + 
+				this.senderB64 + "'></span>"
 	}
 }
 
@@ -148,6 +202,72 @@ function download(resultInfoHash) {
 	xmlhttp.open("POST", "/MuWire/Download", true);
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send(encodeURI("action=start&infoHash="+resultInfoHash+"&uuid="+uuid));
+}
+
+function markTrusted(host) {
+	var linkSpan = document.getElementById("trusted-link-"+host)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("trusted-"+host)
+	
+	var textbox = "<textarea id='trust-reason-" + host + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function markNeutral(host) {
+	publishTrust(host, null, "NEUTRAL")
+}
+
+function markDistrusted(host) {
+	var linkSpan = document.getElementById("distrusted-link-"+host)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("distrusted-"+host)
+	
+	var textbox = "<textarea id='distrust-reason-" + host + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function submitTrust(host) {
+	var reason = document.getElementById("trust-reason-"+host).value
+	publishTrust(host, reason, "TRUSTED")
+}
+
+function submitDistrust(host) {
+	var reason = document.getElementById("trust-reason-"+host).value
+	publishTrust(host, reason, "DISTRUSTED")
+}
+
+function cancelTrust(host) {
+	var textAreaSpan = document.getElementById("trusted-" + host)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("trusted-link-"+host)
+	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>Mark Trusted</a>"
+	linkSpan.innerHTML = html
+}
+
+function cancelDistrust(host) {
+	var textAreaSpan = document.getElementById("distrusted-" + host)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("distrusted-link-"+host)
+	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>Mark Distrusted</a>"
+	linkSpan.innerHTML = html
+}
+
+function publishTrust(host, reason, trust) {
+	
 }
 
 function updateSender(senderName) {
@@ -237,7 +357,7 @@ function updateFile(fileInfoHash) {
 				table += "<td><span id='browse-link-" + result.senderB64 + "'>" + getBrowseLink(result.senderB64) + "</span></td>"
 			}
 		}
-		table += "<td>" + result.trust + "</td>"
+		table += "<td>" + result.trust + " " + result.getTrustLinks() + "</td>"
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
@@ -266,7 +386,7 @@ function updateUUIDBySender(resultUUID) {
 			else 
 				table += "<td><span id='browse-link-" + senderBatch.senderB64 + "'>" + getBrowseLink(senderBatch.senderB64) + "</span></td>"
 		} 
-		table += "<td>" + senderBatch.trust + "</td>"
+		table += "<td>" + senderBatch.trust + " "+senderBatch.getTrustLinks() + "</td>"
 		table += "</tr>";
 	}
 	table += "</tbody></table>";
