@@ -220,7 +220,7 @@ function markTrusted(host) {
 }
 
 function markNeutral(host) {
-	publishTrust(host, null, "NEUTRAL")
+	publishTrust(host, "", "neutral")
 }
 
 function markDistrusted(host) {
@@ -240,12 +240,12 @@ function markDistrusted(host) {
 
 function submitTrust(host) {
 	var reason = document.getElementById("trust-reason-"+host).value
-	publishTrust(host, reason, "TRUSTED")
+	publishTrust(host, reason, "trust")
 }
 
 function submitDistrust(host) {
 	var reason = document.getElementById("trust-reason-"+host).value
-	publishTrust(host, reason, "DISTRUSTED")
+	publishTrust(host, reason, "distrust")
 }
 
 function cancelTrust(host) {
@@ -267,7 +267,18 @@ function cancelDistrust(host) {
 }
 
 function publishTrust(host, reason, trust) {
-	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (refreshType == "Sender")
+				refreshGroupBySender(uuid)
+			else if (refreshType == "File")
+				refreshGroupByFile(uuid)
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=" + trust + "&reason=" + reason + "&persona=" + host)
 }
 
 function updateSender(senderName) {
