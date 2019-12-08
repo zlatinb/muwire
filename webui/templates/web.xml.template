@@ -36,6 +36,11 @@
     <servlet-class>com.muwire.webui.BrowseServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.TrustServlet</servlet-name>
+    <servlet-class>com.muwire.webui.TrustServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -59,6 +64,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.BrowseServlet</servlet-name>
     <url-pattern>/Browse</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.TrustServlet</servlet-name>
+    <url-pattern>/Trust</url-pattern>
 </servlet-mapping>
 
 __JASPER__
