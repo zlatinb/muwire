@@ -245,8 +245,10 @@ function updateFile(fileInfoHash) {
 function updateUUIDBySender(resultUUID) {
 	uuid = resultUUID;
 	
+	var currentStatus = statusByUUID.get(uuid)
+	
 	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = currentSearchBySender.query + " Results";
+	currentSearchSpan.innerHTML = currentStatus.query + " Results";
 	
 	var sendersDiv = document.getElementById("topTable");
 	var table = "<table><thead><tr><th>Sender</th><th>Browse</th></tr></thead><tbody>";
