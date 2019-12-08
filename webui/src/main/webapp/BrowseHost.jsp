@@ -27,15 +27,16 @@ String pagetitle="Browse Host";
 				<input type="submit" value="Browse">
 			</form>
 		</div>
-		<div id="table-wrapper">
-			<div id="table-scroll">
-				<div id="activeBrowses"></div>
-			</div>
-		</div>
 		<div class="menubox-divider"></div>
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
+		    <div id="table-wrapper">
+				<div id="table-scroll">
+					<div id="activeBrowses"></div>
+				</div>
+			</div>
+			<hr/>
 			<div id="refresh-link"></div>
 			<div id="table-wrapper">
 				<div id="table-scroll">
