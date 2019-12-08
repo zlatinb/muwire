@@ -107,7 +107,7 @@ var infoHash = null;
 function showCommentBySender(divId, spanId) {
 	var split = divId.split("_");
 	var commentDiv = document.getElementById(divId);
-	var comment = "<pre>"+ searches.get(split[1]).resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
+	var comment = "<pre>"+ currentSearchBySender.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
 	commentDiv.innerHTML = comment
 	expandedComments.set(divId, comment);
 	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"Sender\");return false;'>Hide Comment</a>";
@@ -118,7 +118,7 @@ function showCommentBySender(divId, spanId) {
 function showCommentByFile(divId, spanId) {
 	var split = divId.split("_");
 	var commentDiv = document.getElementById(divId);
-	var comment = "<pre>"+searches.get(split[1]).resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
+	var comment = "<pre>"+currentSearchByFile.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
 	commentDiv.innerHTML = comment
 	expandedComments.set(divId, comment);
 	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"File\");return false;'>Hide Comment</a>";
