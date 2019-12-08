@@ -65,6 +65,7 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("<Result>");
                 sb.append("<Name>").append(Util.escapeHTMLinXML(result.getName())).append("</Name>");
                 sb.append("<Size>").append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B").append("</Size>");
+                sb.append("<InfoHash>").append(Base64.encode(result.getInfohash().getRoot())).append("</InfoHash>");
                 if (result.getComment() != null) {
                     sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
                 }
