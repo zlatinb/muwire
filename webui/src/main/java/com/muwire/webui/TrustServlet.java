@@ -12,8 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.muwire.core.Core;
 import com.muwire.core.Persona;
 import com.muwire.core.trust.RemoteTrustList;
+import com.muwire.core.trust.TrustEvent;
+import com.muwire.core.trust.TrustLevel;
 import com.muwire.core.trust.TrustService;
 import com.muwire.core.trust.TrustService.TrustEntry;
+import com.muwire.core.trust.TrustSubscriptionEvent;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -110,8 +113,51 @@ public class TrustServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        super.doPost(req, resp);
+        if (core == null) {
+            resp.sendError(403, "Not initialized");
+            return;
+        }
+       
+        String action = req.getParameter("action");
+        if (action == null) {
+            resp.sendError(403, "Bad param");
+            return;
+        }
+
+        String persona = req.getParameter("persona");
+        Persona p;
+        try {
+            p = new Persona(new ByteArrayInputStream(Base64.decode(persona)));
+        } catch (Exception bad) {
+            resp.sendError(403, "Bad param");
+            return;
+        }
+        
+        if (action.equals("subscribe")) {
+            TrustSubscriptionEvent event = new TrustSubscriptionEvent();
+            event.setPersona(p);
+            event.setSubscribe(true);
+            core.getEventBus().publish(event);
+        } else if (action.equals("unsubscribe")) {
+            TrustSubscriptionEvent event = new TrustSubscriptionEvent();
+            event.setPersona(p);
+            event.setSubscribe(false);
+            core.getEventBus().publish(event);
+        } else if (action.equals("trust")) {
+            doTrust(p, TrustLevel.TRUSTED, req.getParameter("reason"));
+        } else if (action.equals("neutral")) {
+            doTrust(p, TrustLevel.NEUTRAL, req.getParameter("reason"));
+        } else if (action.equals("distrust")) {
+            doTrust(p, TrustLevel.DISTRUSTED, req.getParameter("reason"));
+        }
+    }
+    
+    private void doTrust(Persona p, TrustLevel level, String reason) {
+        TrustEvent event = new TrustEvent();
+        event.setLevel(TrustLevel.TRUSTED);
+        event.setPersona(p);
+        event.setReason(reason);
+        core.getEventBus().publish(event);
     }
 
     @Override
