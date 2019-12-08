@@ -23,6 +23,7 @@ function initBrowse() {
 	setInterval(refreshActive, 3000)
 }
 
+var currentHost = null
 var browsesByHost = new Map()
 var resultsByInfoHash = new Map()
 
@@ -81,6 +82,7 @@ function showResults(host) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			currentHost = host
 			var xmlDoc = this.responseXML
 			
 			resultsByInfoHash.clear()
@@ -107,7 +109,14 @@ function showResults(host) {
 			for (var [infoHash, result] of resultsByInfoHash) {
 				
 				tableHtml += "<tr>"
-				tableHtml += "<td>" + result.name + "</td>"
+				
+				var showComments = ""
+				if (result.comment != null) {
+					showComments = "<br/><span id='show-comment-" + infoHash +"'>" + getShowCommentLink(infoHash) + "</span>"
+					showComments += "<div id='comment-" + infoHash + "'></div>"
+				}
+				
+				tableHtml += "<td>" + result.name + showComments + "</td>"
 				tableHtml += "<td>" + result.size + "</td>"
 				if (result.downloading == "true")
 					tableHtml += "<td>Downloading</td>"
@@ -143,4 +152,26 @@ function download(host,infoHash) {
 	xmlhttp.open("POST", "/MuWire/Browse", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=download&infoHash="+infoHash+"&host="+hostB64)
+}
+
+function getShowCommentLink(infoHash) {
+	return "<a href='#' onclick='window.showComment(\"" + infoHash + "\"); return false;'>Show Comment</a>"
+}
+
+function showComment(infoHash) {
+	var linkSpan = document.getElementById("show-comment-"+infoHash)
+	var hideComment = "<a href='#' onclick='window.hideComment(\"" + infoHash + "\"); return false;'>Hide Comment</a>"
+	linkSpan.innerHTML = hideComment
+	
+	var commentSpan = document.getElementById("comment-"+infoHash)
+	var comment = resultsByInfoHash.get(infoHash).comment
+	commentSpan.innerHTML = "<pre>" + comment + "</pre>"
+}
+
+function hideComment(infoHash) {
+	var linkSpan = document.getElementById("show-comment-"+infoHash)
+	linkSpan.innerHTML = getShowCommentLink(infoHash)
+	
+	var commentSpan = document.getElementById("comment-"+infoHash)
+	commentSpan.innerHTML = ""
 }
