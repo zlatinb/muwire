@@ -154,7 +154,7 @@ public class TrustServlet extends HttpServlet {
     
     private void doTrust(Persona p, TrustLevel level, String reason) {
         TrustEvent event = new TrustEvent();
-        event.setLevel(TrustLevel.TRUSTED);
+        event.setLevel(level);
         event.setPersona(p);
         event.setReason(reason);
         core.getEventBus().publish(event);
