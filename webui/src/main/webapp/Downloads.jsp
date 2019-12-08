@@ -10,7 +10,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="initcode.jsi"%>
 
-<% String pagetitle="Downloads"; %>
+<% String pagetitle=Util._t("Downloads"); %>
 
 <html>
     <head>
@@ -22,7 +22,7 @@
 	<aside>
 <%@include file="searchbox.jsi"%>    	
             <div class="menubox">
-                <h2>Downloads</h2>
+                <h2><%=Util._t("Downloads")%></h2>
             </div>
 <%@include file="sidebar.jsi"%>    	
 	</aside>
@@ -31,8 +31,8 @@
 				<div id="downloads"></div>
 		</div>		
 		<hr/>
-		<p>Download Details</p>
-		<div id="downloadDetails"><p>Click on a download to view details</p></div>
+		<p><%=Util._t("Download Details")%></p>
+		<div id="downloadDetails"><p><%=Util._t("Click on a download to view details")%></p></div>
 	</section>
     </body>
 </html>

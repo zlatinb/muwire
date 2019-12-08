@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
+import static com.muwire.webui.Util._t;
 
 public class MuWireServlet extends HttpServlet {
 
@@ -53,18 +54,18 @@ public class MuWireServlet extends HttpServlet {
                 resp.setContentType("text/html");
                 resp.setCharacterEncoding("UTF-8");
                 resp.getWriter().println("<html><head>\n" +
-                                         "<title>MuWire " + version + "</title>\n" +
+                                         "<title>" + _t("MuWire") + ' ' + version + "</title>\n" +
                                          "<link href=\"i2pbote.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
                                          "<link href=\"muwire.css?" + version + "\" rel=\"stylesheet\" type=\"text/css\">\n" +
                                          "</head><body>\n" +
                                          "<header class=\"titlebar\">" +
                                          "<div class=\"title\">" +
                                          "<img src=\"images/muwire.png\" alt=\"\">" +
-                                         "Welcome to MuWire" +
+                                         _t("Welcome to MuWire") +
                                          "</div>" +
                                          "<div class=\"subtitle\"><br><br><br><br></div>" +
                                          "<div class=\"pagetitle\">" +
-                                         "MuWire is initializing, please wait" +
+                                         _t("MuWire is initializing, please wait") +
                                          "</div>" +
                                          "</header>" +
                                          "</body></html>");

@@ -17,14 +17,14 @@
     		session.setAttribute("defaultIncompletesLocation",defaultIncompletesLocation);
     	%>
     	
-        <p>Welcome to MuWire!  Please select a nickname and download locations</p>
+        <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
         <form action="/MuWire/init.jsp" method="post">
-        Nickname:
+        <%=Util._t("Nickname")%>:
         <input type="text" name="nickname"><br>
-        Directory for saving downloaded files:
+        <%=Util._t("Directory for saving downloaded files")%>:
         <input type='text' name='download_location' value="${defaultDownloadLocation}"><br/>
-        Directory for storing incomplete files:
+        <%=Util._t("Directory for storing incomplete files")%>:
         <input type='text' name='incomplete_location' value="${defaultIncompletesLocation}"><br/>
-        <input type="submit" value="Submit">
+        <input type="submit" value="<%=Util._t("Submit")%>">
     </body>
 </html>

@@ -1,11 +1,11 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
               <div class="searchbox">
-                <h2>Search</h2>
+                <h2><%=Util._t("Search")%></h2>
                 <div class="menu-icon"></div>
                   <form action="/MuWire/Search" method="post">
                      <input type="text" name="search" />
-                     <input type="submit" value="Search" />
+                     <input type="submit" value="<%=Util._t("Search")%>" />
                   </form>
               </div>
             </div>

@@ -1,0 +1,168 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P MuWire\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-07 20:58+0000\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:141
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:169
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:178
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:203
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:159
+msgid "Downloads"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:156
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:169
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:141
+#: src/main/java/com/muwire/webui/MuWireServlet.java:64
+msgid "Welcome to MuWire"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:164
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:166
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:180
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:177
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:179
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:205
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:161
+msgid "Search"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:172
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:197
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:153
+msgid "Status"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:174
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:199
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:155
+msgid "Connections"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:176
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:201
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:157
+msgid "Pages"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:182
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:207
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:126
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:163
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:178
+msgid "Shared Files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:184
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:209
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:165
+msgid "Configuration"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:186
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:211
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:167
+msgid "Settings"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:188
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:213
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:169
+msgid "Help"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:190
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:215
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:171
+msgid "User Guide"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:192
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:217
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:173
+msgid "FAQ"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:194
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:219
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:175
+msgid "About"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:197
+msgid "Download Details"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:199
+msgid "Click on a download to view details"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:141
+msgid "Home"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:184
+msgid "Active Searches By Sender"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:186
+msgid "Group By File"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:190
+msgid "Active Searches By File"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:192
+msgid "Group By Sender"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:222
+msgid "Results"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:137
+msgid "Welcome to MuWire!  Please select a nickname and download locations"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:139
+msgid "Nickname"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:141
+msgid "Directory for saving downloaded files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:145
+msgid "Directory for storing incomplete files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:149
+msgid "Submit"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:148
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:150
+msgid "Share"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/MuWireServlet.java:57
+msgid "MuWire"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/MuWireServlet.java:68
+msgid "MuWire is initializing, please wait"
+msgstr ""

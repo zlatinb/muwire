@@ -8,7 +8,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="initcode.jsi"%>
 <%
-        String pagetitle="Home";
+        String pagetitle=Util._t("Home");
 	session.setAttribute("persona", persona);
 	session.setAttribute("version", version);
 	
@@ -31,11 +31,11 @@
 <%@include file="searchbox.jsi"%>    	
                     <div class="menubox">
 <% if (groupBy.equals("sender")) { %>
-			<h2>Active Searches By Sender</h2>
-			<a class="menuitem" href="Home.jsp?groupBy=file">Group By File</a>
+			<h2><%=Util._t("Active Searches By Sender")%></h2>
+			<a class="menuitem" href="Home.jsp?groupBy=file"><%=Util._t("Group By File")%></a>
 <% } else { %>
-			<h2>Active Searches By File</h2>
-			<a class="menuitem" href="Home.jsp?groupBy=sender">Group By Sender</a>
+			<h2><%=Util._t("Active Searches By File")%></h2>
+			<a class="menuitem" href="Home.jsp?groupBy=sender"><%=Util._t("Group By Sender")%></a>
 <% } %>
                     </div>
 
@@ -47,7 +47,7 @@
 <%@include file="sidebar.jsi"%>    	
 		</aside>
 		<section class="main foldermain">
-			<h3><span id="currentSearch">Results</span></h3>
+			<h3><span id="currentSearch"><%=Util._t("Results")%></span></h3>
 									<div id="table-wrapper">
 										<div id="table-scroll">
 											<div id="topTable"></div>

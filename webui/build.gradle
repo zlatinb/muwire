@@ -66,9 +66,41 @@ task generateWebXML {
     }
 }
 
+// compile the po files and put them in the jar
+task bundle {
+    doLast {
+        // run bundle-messages.sh
+        println 'starting bundle-messages'
+        println "webui/bundle-messages.sh".execute().text
+        println 'finished bundle-messages'
+        // compile java files in build/messages-src
+        ant.mkdir(dir: "$buildDir/compiledMessages")
+        ant.javac(srcDir: "$buildDir/messages-src",
+                    classPath : sourceSets.main.runtimeClasspath.asPath,
+                    includeAntRuntime : false,
+                    destDir:file("$buildDir/compiledMessages"))
+        // add resulting classes to build/libs/webui-(version).jar
+        ant.jar(destfile: "$buildDir/libs/webui-${version}.jar",
+                basedir: "$buildDir/compiledMessages",
+                includes: '**/messages_*.class',
+                update: 'true')
+    }
+}
+
+// rebuild the english po file for uploading to transifex
+task poupdate {
+    doLast {
+        // run bundle-messages.sh
+        println 'starting bundle-messages -p'
+        println "webui/bundle-messages.sh -p".execute().text
+        println 'finished bundle-messages -p'
+    }
+}
+
 precompileJsp.dependsOn compileJava
 generateWebXML.dependsOn precompileJsp
-war.dependsOn generateWebXML
+bundle.dependsOn precompileJsp
+war.dependsOn generateWebXML, bundle
 
 artifacts {
     warArtifact war
