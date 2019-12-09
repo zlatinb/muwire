@@ -21,7 +21,7 @@ function updateTable(map, divId) {
 		tableHtml += "<td>" + user.reason + "</td>"
 		
 		if (isTrusted)
-			tableHtml += "<td>Mark Neutral Mark Distrusted</td>
+			tableHtml += "<td>Mark Neutral Mark Distrusted</td>"
 		else
 			tableHtml += "<td>Mark Neutral Mark Trusted</td>"
 		
@@ -37,7 +37,7 @@ function refreshUsers() {
 		if (this.readyState == 4 && this.status == 200) {
 			trusted.clear()
 			distrusted.clear()
-			var trustedElement = this.responseXML.getElementsByTagName("Trusted")
+			var trustedElement = this.responseXML.getElementsByTagName("Trusted")[0]
 			var trustedUsers = trustedElement.getElementsByTagName("Persona")
 			var i
 			for (i = 0; i < trustedUsers.length; i++) {
@@ -45,7 +45,7 @@ function refreshUsers() {
 				trusted.set(persona.user, persona)
 			}
 			
-			var distrustedElement = this.responseXML.getElementsByTagName("Distrusted")
+			var distrustedElement = this.responseXML.getElementsByTagName("Distrusted")[0]
 			var distrustedUsers = distrustedElement.getElementsByTagName("Persona")
 			for (i = 0; i < distrustedUsers.length; i++) {
 				var persona = new Persona(distrustedUsers[i])
@@ -66,7 +66,7 @@ function fetchRevision() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML
-			var newRevision = xmlDoc.childNodes[0].nodeValue
+			var newRevision = xmlDoc.childNodes[0].childNodes[0].nodeValue
 			if (newRevision > revision) {
 				revision = newRevision
 				refreshUsers()
