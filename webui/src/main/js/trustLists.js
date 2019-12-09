@@ -164,7 +164,7 @@ function refreshLists() {
 			document.getElementById("trustLists").innerHTML = html
 			
 			if (currentUser != null)
-				displayUser(currentUser)
+				displayList(currentUser)
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Trust?section=subscriptions", true)
