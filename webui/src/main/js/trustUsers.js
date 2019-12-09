@@ -4,11 +4,98 @@ class Persona {
 		this.userB64 = xmlNode.getElementsByTagName("UserB64")[0].childNodes[0].nodeValue
 		this.reason = xmlNode.getElementsByTagName("Reason")[0].childNodes[0].nodeValue
 	}
-}
+	
+	getTrustedLink() {
+		return "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>Mark Trusted</a>"
+	}
+	
+	getNeutralLink() {
+		return "<a herf='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>Mark Neutral</a>"
+	}
+	
+	getDistrustedLink() {
+		return "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>Mark Distrusted</a>"
+	}
+} 
 
 var trusted = new Map()
 var distrusted = new Map()
 var revision = -1
+
+function markTrusted(host) {
+	var linkSpan = document.getElementById("trusted-link-"+host)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("trusted-"+host)
+	
+	var textbox = "<textarea id='trust-reason-" + host + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function markNeutral(host) {
+	publishTrust(host, "", "neutral")
+}
+
+function markDistrusted(host) {
+	var linkSpan = document.getElementById("distrusted-link-"+host)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("distrusted-"+host)
+	
+	var textbox = "<textarea id='distrust-reason-" + host + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function submitTrust(host) {
+	var reason = document.getElementById("trust-reason-"+host).value
+	publishTrust(host, reason, "trust")
+}
+
+function submitDistrust(host) {
+	var reason = document.getElementById("distrust-reason-"+host).value
+	publishTrust(host, reason, "distrust")
+}
+
+
+function publishTrust(host, reason, trust) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshUsers()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=" + trust + "&reason=" + reason + "&persona=" + host)
+}
+
+function cancelTrust(host) {
+	var textAreaSpan = document.getElementById("trusted-" + host)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("trusted-link-"+host)
+	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>Mark Trusted</a>"
+	linkSpan.innerHTML = html
+}
+
+function cancelDistrust(host) {
+	var textAreaSpan = document.getElementById("distrusted-" + host)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("distrusted-link-"+host)
+	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>Mark Distrusted</a>"
+	linkSpan.innerHTML = html
+}
 
 function updateTable(map, divId) {
 	var divElement = document.getElementById(divId)
@@ -20,10 +107,15 @@ function updateTable(map, divId) {
 		tableHtml += "<td>" + user.user + "</td>"
 		tableHtml += "<td>" + user.reason + "</td>"
 		
-		if (isTrusted)
-			tableHtml += "<td>Mark Neutral Mark Distrusted</td>"
-		else
-			tableHtml += "<td>Mark Neutral Mark Trusted</td>"
+		tableHtml += "<td>"
+		if (isTrusted) {
+			tableHtml += user.getNeutralLink() + " <span id='distrusted-link-" + user.userB64 + "'>" + user.getDistrustedLink() + "</span>" +
+						"<span id='distrusted-" + user.userB64 + "'></span>"
+		} else {
+			tableHtml += user.getNeutralLink() + " <span id='trusted-link-" + user.userB64 + "'>" + user.getTrustedLink() + "</span>" +
+						"<span id='trusted-" + user.userB64 + "'></span>"
+		}
+		tableHtml += "</td>"
 		
 		tableHtml += "</tr>"
 	}
