@@ -21,6 +21,16 @@ class Persona {
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 	}
 	
+	getTrustBlock() {
+		return "<span id='trusted-link-" + this.userB64 + "'>" + this.getTrustLink() + "</span>" +
+				"<span id='trusted-" + this.userB64 + "'></span>"
+	}
+	
+	getDistrustBlock() {
+		return "<span id='distrusted-link-" + this.userB64 + "'>" + this.getDistrustLink() + "</span>" +
+				"<span id='distrusted-" + this.userB64 + "'></span>"
+	}
+	
 	getTrustLink() {
 		return "<a href='#' onclick='markTrusted(\"" + this.userB64 + "\");return false;'>Mark Trusted</a>"
 	}
@@ -35,11 +45,11 @@ class Persona {
 	
 	getTrustActions() {
 		if (this.status == "TRUSTED")
-			return [this.getNeutralLink(), this.getDistrustLink()]
+			return [this.getNeutralLink(), this.getDistrustBlock()]
 		if (this.status == "NEUTRAL")
-			return [this.getTrustLink(), this.getDistrustLink()]
+			return [this.getTrustBlock(), this.getDistrustBlock()]
 		if (this.status == "DISTRUSTED")
-			return [this.getTrustLink(), this.getNeutralLink()]
+			return [this.getTrustBlock(), this.getNeutralLink()]
 		return null
 	}
 }
@@ -49,7 +59,32 @@ var revision = -1
 var currentUser = null
 
 function markTrusted(user) {
-	publishTrust(user, "", "trust")
+	var linkSpan = document.getElementById("trusted-link-" + user)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("trusted-" + user)
+	
+	var textbox = "<textarea id='trust-reason-" + user + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + user + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + user + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function submitTrust(user) {
+	var reason = document.getElementById("trust-reason-" + user).value
+	publishTrust(user, reason, "trust")
+}
+
+function cancelTrust(user) {
+	var textAreaSpan = document.getElementById("trusted-" + user)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("trusted-link-" + user)
+	var html = "<a href='#' onclick='markTrusted(\"" + user + "\");return false;'>Mark Trusted</a>"
+	linkSpan.innerHTML = html
 }
 
 function markNeutral(user) {
@@ -57,7 +92,32 @@ function markNeutral(user) {
 }
 
 function markDistrusted(user) {
-	publishTrust(user, "", "distrust")
+	var linkSpan = document.getElementById("distrusted-link-" + user)
+	linkSpan.innerHTML = ""
+	
+	var textAreaSpan = document.getElementById("distrusted-" + user)
+	
+	var textbox = "<textarea id='distrust-reason-" + user + "'></textarea>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + user + "\");return false;'>Submit</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + user + "\");return false;'>Cancel</a>"
+	
+	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	
+	textAreaSpan.innerHTML = html
+}
+
+function submitDistrust(user) {
+	var reason = document.getElementById("distrust-reason-" + user).value
+	publishTrust(user, reason, "distrust")
+}
+
+function cancelDistrust(user) {
+	var textAreaSpan = document.getElementById("distrusted-" + user)
+	textAreaSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("distrusted-link-" + user)
+	var html = "<a href='#' onclick='markDistrusted(\"" + user + "\");return false;'>Mark Distrusted</a>"
+	linkSpan.innerHTML = html
 }
 
 function publishTrust(host, reason, trust) {
