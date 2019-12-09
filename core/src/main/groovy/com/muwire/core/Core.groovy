@@ -389,6 +389,10 @@ public class Core {
         saveMuSettings()
         log.info("shutting down trust subscriber")
         trustSubscriber.stop()
+        log.info("shutting down trust service")
+        trustService.stop()
+        log.info("shutting down persister service")
+        persisterService.stop()
         log.info("shutting down download manager")
         downloadManager.shutdown()
         log.info("shutting down connection acceptor")
@@ -411,6 +415,8 @@ public class Core {
             log.info("shutting down embedded router")
             router.shutdown(0)
         }
+        log.info("shutting down event bus");
+        eventBus.shutdown()
         log.info("shutdown complete")
     }
     

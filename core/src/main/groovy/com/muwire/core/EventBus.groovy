@@ -2,6 +2,7 @@ package com.muwire.core
 
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.logging.Level
 
@@ -12,7 +13,7 @@ import groovy.util.logging.Log
 class EventBus {
 
     private Map handlers = new HashMap()
-    private final Executor executor = Executors.newSingleThreadExecutor {r ->
+    private final ExecutorService executor = Executors.newSingleThreadExecutor {r ->
         def rv = new Thread(r)
         rv.setDaemon(true)
         rv.setName("event-bus")
@@ -52,5 +53,9 @@ class EventBus {
     synchronized void unregister(Class<? extends Event> eventType, def handler) {
         log.info("Unregistering $handler for type $eventType")
         handlers[eventType]?.remove(handler)
+    }
+    
+    void shutdown() {
+        executor.shutdownNow()
     }
 }
