@@ -32,7 +32,7 @@ function updateDiv(name, list) {
 		html += "<td>" + list[i].user + "</td>"
 		html += "<td>" + list[i].reason + "</td>"  // maybe in <pre>
 		html += "<td>" + list[i].status + "</td>"
-		html += "</tr">
+		html += "</tr>"
 	}
 	
 	document.getElementById(name).innerHTML = html

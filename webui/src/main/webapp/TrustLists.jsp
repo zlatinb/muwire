@@ -30,7 +30,7 @@ String pagetitle="Trust Lists";
 			<div id="table-wrapper">
 				<div id="table-scroll">
 					<center><div id="currentList"></div></center>
-					<thead><tr><th>Trusted</th><th>Distrusted></th></tr></thead>
+					<thead><tr><th>Trusted</th><th>Distrusted</th></tr></thead>
 					<tbody>
 						<tr>
 							<td><div id="trusted"></div></td>
