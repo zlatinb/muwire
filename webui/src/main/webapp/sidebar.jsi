@@ -12,6 +12,10 @@
                 <a class="menuitem" href="SharedFiles"><%=Util._t("Shared Files")%></a>
                 <a class="menuitem" href="BrowseHost"><%=Util._t("Browse")%></a>
             </div>
+            <div class="menubox">
+            	<h2><%=Util._t("Trust")%></h2>
+            	<a class="menuitem" href="TrustUsers"><%=Util._t("Users")%></a>
+            </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Configuration")%></h2>
