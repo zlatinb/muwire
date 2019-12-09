@@ -13,7 +13,11 @@ class Persona {
 	constructor(xmlNode) {
 		this.user = xmlNode.getElementsByTagName("User")[0].childNodes[0].nodeValue
 		this.userB64 = xmlNode.getElementsByTagName("UserB64")[0].childNodes[0].nodeValue
-		this.reason = xmlNode.getElementsByTagName("Reason")[0].childNodes[0].nodeValue
+		try {
+			this.reason = xmlNode.getElementsByTagName("Reason")[0].childNodes[0].nodeValue
+		} catch (ignore) {
+			this.reason = ""
+		}
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 	}
 }
@@ -21,6 +25,18 @@ class Persona {
 var lists = new Map()
 var revision = -1
 var currentUser = null
+
+function unsubscribe(user) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshLists()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=unsubscribe&persona=" + user)
+}
 
 function updateDiv(name, list) {
 	
@@ -76,6 +92,7 @@ function refreshLists() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			lists.clear()
 			var subs = this.responseXML.getElementsByTagName("Subscription")
 			var i
 			for (i = 0; i < subs.length; i++) {
@@ -87,12 +104,12 @@ function refreshLists() {
 			var html = "<table><thead><tr><th>Name</th><th>Trusted</th><th>Distrusted</th><th>Status</th><th>Last Updated</th><th>Unsubscribe</th></tr></thead><tbody>"
 			for (var [user, list] of lists) {
 				html += "<tr>"
-				html += "<td>" + list.user + "</td>"
+				html += "<td>" + "<a href='#' onclick='window.displayList(\"" + list.user + "\");return false;'>" + list.user + "</a></td>"
 				html += "<td>" + list.trusted + "</td>"
 				html += "<td>" + list.distrusted +"</td>"
 				html += "<td>" + list.status + "</td>"
 				html += "<td>" + list.timestamp + "</td>"
-				html += "<td>" + "Unsubscribe" + "</td>"
+				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>Unsubscribe</a></td>"
 				html += "</tr>"
 			}
 			html += "</tbody></table>"

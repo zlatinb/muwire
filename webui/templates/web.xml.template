@@ -123,4 +123,9 @@ Mappings without the .jsp suffix
     <url-pattern>/TrustUsers</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.TrustLists_jsp</servlet-name>
+    <url-pattern>/TrustLists</url-pattern>
+</servlet-mapping>
+
 </web-app>
