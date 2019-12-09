@@ -32,7 +32,7 @@ function markTrusted(host) {
 	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>Submit</a>"
 	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>Cancel</a>"
 	
-	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
@@ -51,7 +51,7 @@ function markDistrusted(host) {
 	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>Submit</a>"
 	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>Cancel</a>"
 	
-	var html = "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
