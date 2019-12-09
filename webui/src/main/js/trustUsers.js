@@ -2,7 +2,11 @@ class Persona {
 	constructor(xmlNode) {
 		this.user = xmlNode.getElementsByTagName("User")[0].childNodes[0].nodeValue
 		this.userB64 = xmlNode.getElementsByTagName("UserB64")[0].childNodes[0].nodeValue
-		this.reason = xmlNode.getElementsByTagName("Reason")[0].childNodes[0].nodeValue
+		this.subscribed = xmlNode.getElementsByTagName("Subscribed")[0].childNodes[0].nodeValue
+		this.reason = ""
+		try {
+			this.reason = xmlNode.getElementsByTagName("Reason")[0].childNodes[0].nodeValue
+		} catch (ignore) {}
 	}
 	
 	getTrustedLink() {
@@ -16,11 +20,27 @@ class Persona {
 	getDistrustedLink() {
 		return "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>Mark Distrusted</a>"
 	}
+	
+	getSubscribeLink() {
+		return "<a href='#' onclick='window.subscribe(\"" + this.userB64 + "\"); return false;'>Subscribe</a>"
+	}
 } 
 
 var trusted = new Map()
 var distrusted = new Map()
 var revision = -1
+
+function subscribe(host) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshUsers()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=subscribe&persona=" + host)
+}
 
 function markTrusted(host) {
 	var linkSpan = document.getElementById("trusted-link-"+host)
@@ -99,7 +119,7 @@ function cancelDistrust(host) {
 
 function updateTable(map, divId) {
 	var divElement = document.getElementById(divId)
-	var tableHtml = "<table><thead><tr><th>User</th><th>Reason</th><th>Actions</th></tr></thead><tbody>"
+	var tableHtml = "<table><thead><tr><th>User</th><th>Reason</th><th>Actions</th><th>Subscribe</th></tr></thead><tbody>"
 	
 	var isTrusted = (map == trusted)
 	for (var [ignored, user] of map) {
@@ -116,6 +136,13 @@ function updateTable(map, divId) {
 						"<span id='trusted-" + user.userB64 + "'></span>"
 		}
 		tableHtml += "</td>"
+		
+		if (user.subscribed == "true") {
+			tableHtml += "<td>Subscribed</td>"
+		} else if (isTrusted) {
+			tableHtml += "<td>" + user.getSubscribeLink() + "</td>"
+		}
+		
 		
 		tableHtml += "</tr>"
 	}

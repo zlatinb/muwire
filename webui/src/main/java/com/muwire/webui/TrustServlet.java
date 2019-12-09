@@ -16,6 +16,7 @@ import com.muwire.core.trust.TrustEvent;
 import com.muwire.core.trust.TrustLevel;
 import com.muwire.core.trust.TrustService;
 import com.muwire.core.trust.TrustService.TrustEntry;
+import com.muwire.core.trust.TrustSubscriber;
 import com.muwire.core.trust.TrustSubscriptionEvent;
 
 import net.i2p.data.Base64;
@@ -44,13 +45,13 @@ public class TrustServlet extends HttpServlet {
             
             sb.append("<Trusted>");
             for (TrustEntry te : core.getTrustService().getGood().values()) {
-                TEtoXML(te,sb);
+                TEtoXML(te,sb, core.getTrustSubscriber());
             }
             sb.append("</Trusted>");
             
             sb.append("<Distrusted>");
             for (TrustEntry te : core.getTrustService().getBad().values()) {
-                TEtoXML(te, sb);
+                TEtoXML(te, sb, core.getTrustSubscriber());
             }
             sb.append("</Distrusted>");
             
@@ -168,11 +169,12 @@ public class TrustServlet extends HttpServlet {
         trustManager = (TrustManager) config.getServletContext().getAttribute("trustManager");
     }
 
-    private static void TEtoXML(TrustEntry te, StringBuilder sb) {
+    private static void TEtoXML(TrustEntry te, StringBuilder sb, TrustSubscriber trustSubscriber) {
         sb.append("<Persona>");
         sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
         sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
         sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        sb.append("<Subscribed>").append(trustSubscriber.isSubscribed(te.getPersona())).append("</Subscribed>");
         sb.append("</Persona>");
     }
     

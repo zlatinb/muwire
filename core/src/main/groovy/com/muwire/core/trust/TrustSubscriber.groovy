@@ -62,6 +62,10 @@ class TrustSubscriber {
             }
         }
     }
+    
+    public boolean isSubscribed(Persona p) {
+        remoteTrustLists.containsKey(p.destination)
+    }
 
     private void checkLoop() {
         try {
