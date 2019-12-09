@@ -65,7 +65,10 @@ public class TrustServlet extends HttpServlet {
                 sb.append("<User>").append(Util.escapeHTMLinXML(list.getPersona().getHumanReadableName())).append("</User>");
                 sb.append("<UserB64>").append(list.getPersona().toBase64()).append("</UserB64>");
                 sb.append("<Status>").append(list.getStatus()).append("</Status>");
-                sb.append("<Timestamp>").append(DataHelper.formatTime(list.getTimestamp())).append("</Timestamp>");
+                String timestamp = "Never";
+                if (list.getTimestamp() > 0)
+                    timestamp = DataHelper.formatTime(list.getTimestamp());
+                sb.append("<Timestamp>").append(timestamp).append("</Timestamp>");
                 sb.append("<Trusted>").append(list.getGood().size()).append("</Trusted>");
                 sb.append("<Distrusted>").append(list.getBad().size()).append("</Distrusted>");
                 sb.append("</Subscription>");
@@ -175,7 +178,10 @@ public class TrustServlet extends HttpServlet {
         sb.append("<Persona>");
         sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
         sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
-        sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        String reason = "";
+        if (te.getReason() != null)
+            reason = te.getReason();
+        sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
         sb.append("<Subscribed>").append(trustSubscriber.isSubscribed(te.getPersona())).append("</Subscribed>");
         sb.append("</Persona>");
     }
@@ -184,7 +190,10 @@ public class TrustServlet extends HttpServlet {
         sb.append("<Persona>");
         sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
         sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
-        sb.append("<Reason>").append(Util.escapeHTMLinXML(te.getReason())).append("</Reason>");
+        String reason = "";
+        if (te.getReason() != null)
+            reason = te.getReason();
+        sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
         sb.append("<Status>").append(trustService.getLevel(te.getPersona().getDestination())).append("</Status>");
         sb.append("</Persona>");
     }
