@@ -10,16 +10,19 @@ import net.i2p.crypto.DSAEngine
 import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
 import net.i2p.data.SigningPublicKey
+import net.i2p.data.Base64
 
 class Certificate {
     private final byte version
     private final InfoHash infoHash
-    private final Name name, comment
-    private final long timestamp
-    private final Persona issuer
+    final Name name, comment
+    final long timestamp
+    final Persona issuer
     private final byte[] sig
     
     private volatile byte [] payload
+    
+    private String base64;
     
     Certificate(InputStream is) {
         version = (byte) (is.read() & 0xFF)
@@ -129,6 +132,15 @@ class Certificate {
             payload = baos.toByteArray()
         }
         os.write(payload)
+    }
+    
+    public String toBase64() {
+        if (base64 == null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream()
+            write(baos)
+            base64 = Base64.encode(baos.toByteArray())
+        }
+        return base64;
     }
     
     @Override

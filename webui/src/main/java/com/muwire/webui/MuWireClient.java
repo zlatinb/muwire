@@ -22,6 +22,8 @@ import com.muwire.core.UILoadedEvent;
 import com.muwire.core.connection.ConnectionEvent;
 import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
+import com.muwire.core.filecert.CertificateFetchEvent;
+import com.muwire.core.filecert.CertificateFetchedEvent;
 import com.muwire.core.files.AllFilesLoadedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
@@ -148,12 +150,17 @@ public class MuWireClient {
         TrustManager trustManager = new TrustManager();
         core.getEventBus().register(TrustEvent.class, trustManager);
         
+        CertificateManager certificateManager = new CertificateManager(core);
+        core.getEventBus().register(CertificateFetchedEvent.class, certificateManager);
+        core.getEventBus().register(CertificateFetchEvent.class, certificateManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
         servletContext.setAttribute("fileManager", fileManager);
         servletContext.setAttribute("browseManager", browseManager);
         servletContext.setAttribute("trustManager", trustManager);
+        servletContext.setAttribute("certificateManager", certificateManager);
         
         core.getEventBus().publish(new UILoadedEvent());
     }

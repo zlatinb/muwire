@@ -32,7 +32,8 @@ class CertificateClient {
         fetcherThread.execute({
             Endpoint endpoint = null
             try {
-                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.CONNECTING))
+                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.CONNECTING,
+                    user : e.host, infoHash : e.infoHash))
                 endpoint = connector.connect(e.host.destination)
                 
                 String infoHashString = Base64.encode(e.infoHash.getRoot())
@@ -62,7 +63,8 @@ class CertificateClient {
                 int count = Integer.parseInt(headers['Count'])
                 
                 // start pulling the certs
-                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.FETCHING, count : count))
+                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.FETCHING, count : count,
+                    user : e.host, infoHash : e.infoHash))
                 
                 DataInputStream dis = new DataInputStream(is)
                 for (int i = 0; i < count; i++) {
@@ -77,11 +79,14 @@ class CertificateClient {
                         continue
                     }
                     if (cert.infoHash == e.infoHash)
-                        eventBus.publish(new CertificateFetchedEvent(certificate : cert))
+                        eventBus.publish(new CertificateFetchedEvent(certificate : cert, user : e.host, infoHash : e.infoHash))
                 }
+                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.DONE, count : count,
+                    user : e.host, infoHash : e.infoHash))
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Fetching certificates failed", bad)
-                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.FAILED))
+                eventBus.publish(new CertificateFetchEvent(status : CertificateFetchStatus.FAILED,
+                    user : e.host, infoHash : e.infoHash))
             } finally {
                 endpoint?.close()
             }
