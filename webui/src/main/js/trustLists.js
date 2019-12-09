@@ -20,11 +20,57 @@ class Persona {
 		}
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 	}
+	
+	getTrustLink() {
+		return "<a href='#' onclick='markTrusted(\"" + this.userB64 + "\");return false;'>Mark Trusted</a>"
+	}
+	
+	getNeutralLink() {
+		return "<a href='#' onclick='markNeutral(\"" + this.userB64 + "\");return false;'>Mark Neutral</a>"
+	}
+	
+	getDistrustLink() {
+		return "<a href='#' onclick='markDistrusted(\"" + this.userB64 + "\");return false;'>Mark Distrusted</a>"
+	}
+	
+	getTrustActions() {
+		if (this.status == "TRUSTED")
+			return [this.getNeutralLink(), this.getDistrustLink()]
+		if (this.status == "NEUTRAL")
+			return [this.getTrustLink(), this.getDistrustLink()]
+		if (this.status == "DISTRUSTED")
+			return [this.getTrustLink(), this.getNeutralLink()]
+		return null
+	}
 }
 
 var lists = new Map()
 var revision = -1
 var currentUser = null
+
+function markTrusted(user) {
+	publishTrust(user, "", "trust")
+}
+
+function markNeutral(user) {
+	publishTrust(user, "", "neutral")
+}
+
+function markDistrusted(user) {
+	publishTrust(user, "", "distrust")
+}
+
+function publishTrust(host, reason, trust) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshLists()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=" + trust + "&reason=" + reason + "&persona=" + host)
+}
 
 function unsubscribe(user) {
 	var xmlhttp = new XMLHttpRequest()
@@ -40,7 +86,7 @@ function unsubscribe(user) {
 
 function updateDiv(name, list) {
 	
-	var html = "<table><thead><tr><th>User</th><th>Reason</th><th>Your Trust</th></tr></thead><tbody>"
+	var html = "<table><thead><tr><th>User</th><th>Reason</th><th>Your Trust</th><th>Actions</th></tr></thead><tbody>"
 	
 	var i
 	for (i = 0; i < list.length; i++) {
@@ -48,6 +94,7 @@ function updateDiv(name, list) {
 		html += "<td>" + list[i].user + "</td>"
 		html += "<td>" + list[i].reason + "</td>"  // maybe in <pre>
 		html += "<td>" + list[i].status + "</td>"
+		html += "<td>" + list[i].getTrustActions().join(" ") + "</td>"
 		html += "</tr>"
 	}
 	
