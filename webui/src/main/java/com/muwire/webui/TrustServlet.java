@@ -65,6 +65,8 @@ public class TrustServlet extends HttpServlet {
                 sb.append("<UserB64>").append(list.getPersona().toBase64()).append("</UserB64>");
                 sb.append("<Status>").append(list.getStatus()).append("</Status>");
                 sb.append("<Timestamp>").append(DataHelper.formatTime(list.getTimestamp())).append("</Timestamp>");
+                sb.append("<Trusted>").append(list.getGood().size()).append("</Trusted>");
+                sb.append("<Distrusted>").append(list.getBad().size()).append("</Distrusted>");
                 sb.append("</Subscription>");
             }
             

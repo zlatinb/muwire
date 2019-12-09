@@ -1,6 +1,7 @@
 package com.muwire.webui;
 
 import com.muwire.core.trust.TrustEvent;
+import com.muwire.core.trust.TrustSubscriptionUpdatedEvent;
 
 public class TrustManager {
 
@@ -11,6 +12,10 @@ public class TrustManager {
     }
     
     public void onTrustEvent(TrustEvent e) {
+        revision++;
+    }
+    
+    public void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
         revision++;
     }
 }
