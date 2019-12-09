@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.muwire.core.Core;
 import com.muwire.core.SharedFile;
+import com.muwire.core.filecert.CertificateManager;
 import com.muwire.core.util.DataUtil;
 import com.muwire.core.files.FileListCallback;
 
@@ -22,6 +24,7 @@ import net.i2p.data.DataHelper;
 public class FilesServlet extends HttpServlet {
     
     private FileManager fileManager;
+    private Core core;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -67,7 +70,7 @@ public class FilesServlet extends HttpServlet {
         } else if (section.equals("fileTable")) {
             sb.append("<Files>");
             sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
-            fileManager.getAllFiles().forEach(sf -> sharedFileToXML(sf, sb));
+            fileManager.getAllFiles().forEach(sf -> sharedFileToXML(sf, sb, core.getCertificateManager()));
             sb.append("</Files>");
         }
         
@@ -84,16 +87,17 @@ public class FilesServlet extends HttpServlet {
     @Override
     public void init(ServletConfig cfg) throws ServletException {
         fileManager = (FileManager) cfg.getServletContext().getAttribute("fileManager");
+        core = (Core) cfg.getServletContext().getAttribute("core");
     }
 
-    private static class ListCallback implements FileListCallback<SharedFile> {
+    private class ListCallback implements FileListCallback<SharedFile> {
         private final StringBuilder sb;
         ListCallback(StringBuilder sb) {
             this.sb = sb;
         }
         @Override
         public void onFile(File f, SharedFile value) {
-            sharedFileToXML(value, sb);
+            sharedFileToXML(value, sb, core.getCertificateManager());
         }
         @Override
         public void onDirectory(File f) {
@@ -102,7 +106,7 @@ public class FilesServlet extends HttpServlet {
         }
     }
     
-    private static void sharedFileToXML(SharedFile sf, StringBuilder sb) {
+    private static void sharedFileToXML(SharedFile sf, StringBuilder sb, CertificateManager certificateManager) {
         sb.append("<File>");
         sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
         sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
@@ -111,6 +115,7 @@ public class FilesServlet extends HttpServlet {
             String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
             sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
         }
+        sb.append("<Certified>").append(certificateManager.hasLocalCertificate(sf.getInfoHash())).append("</Certified>");
         // TODO: other stuff
         sb.append("</File>");
     }

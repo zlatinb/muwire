@@ -119,7 +119,7 @@ class CertificateManager {
         added
     }
     
-    boolean hasLocalCertificate(InfoHash infoHash) {
+    public boolean hasLocalCertificate(InfoHash infoHash) {
         if (!byInfoHash.containsKey(infoHash))
             return false
         Set<Certificate> set = byInfoHash.get(infoHash)
