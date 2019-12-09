@@ -1,8 +1,9 @@
 class SharedFile {
-	constructor(name, size, comment) {
+	constructor(name, size, comment, certified) {
 		this.name = name
 		this.size = size
 		this.comment = comment
+		this.certified = certified
 	}
 }
 
@@ -57,20 +58,27 @@ function refreshTable() {
 					comment = comment[0].childNodes[0].nodeValue
 				else
 					comment = null
+				var certified = files[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
 				var nodeId = Base64.encode(fileName)
-				var newSharedFile = new SharedFile(fileName, size, comment)
+				var newSharedFile = new SharedFile(fileName, size, comment, certified)
 				filesByPath.set(nodeId, newSharedFile)
 			}
 			
 			for (var [path, file] of filesByPath) {
 				
-				var unshareLink = "<a href='#' onclick='window.unshare(\"" + path + "\");return false;'>Unshare</a>"
+				var unshareLink = "<a href='#' onclick='window.unshare(\"" + path + "\");return false;'>" + _t("Unshare") + "</a>"
+				
+				var certifyLink = "<a href='#' onclick='window.certify(\"" + path + "\");return false;'>" + _t("Certify") + "</a>"
+				var certified = ""
+				if (file.certified == "true")
+					certified = _t("Certified")
 				
 				var commentLink = "<span id='comment-link-"+ path +"'>" + generateCommentLink(path) + "</span>"
 				
 				tableHtml += "<tr>"
-				tableHtml += "<td>"+file.name+"<br/>" + unshareLink + commentLink + "<div id='comment-" + path + "'></div></td>"
+				tableHtml += "<td>"+file.name+"<br/>" + unshareLink + "   " + certifyLink + "   " + certified + "   " + 
+					commentLink + "<div id='comment-" + path + "'></div></td>"
 				tableHtml += "<td>"+file.size+"</td>"
 				tableHtml += "<td>"+(file.comment != null)+"</td>"
 				tableHtml += "</tr>"
@@ -148,4 +156,16 @@ function saveComment(fileId) {
 
 function generateCommentLink(nodeId) {
 	return "<a href='#' onclick='showCommentForm(\"" + nodeId + "\");return false;'>" + _t("Comment") + "</a>"
+}
+
+function certify(path) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshTable()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=certify&file=" + path)
 }
