@@ -1,6 +1,7 @@
 package com.muwire.webui;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -114,6 +115,14 @@ public class CertificateServlet extends HttpServlet {
                 return;
             }
             certificateManager.importCertificate(certificate);
+        } else if (action.equals("certify")) {
+            String path = req.getParameter("file");
+            if (path == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            File file = Util.getFromPathElements(path);
+            certificateManager.certify(file);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.muwire.webui;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,10 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.muwire.core.Core;
 import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
+import com.muwire.core.SharedFile;
 import com.muwire.core.filecert.Certificate;
 import com.muwire.core.filecert.CertificateFetchEvent;
 import com.muwire.core.filecert.CertificateFetchStatus;
 import com.muwire.core.filecert.CertificateFetchedEvent;
+import com.muwire.core.filecert.UICreateCertificateEvent;
 import com.muwire.core.filecert.UIFetchCertificatesEvent;
 import com.muwire.core.filecert.UIImportCertificateEvent;
 
@@ -71,6 +74,15 @@ public class CertificateManager {
     void importCertificate(Certificate certificate) {
         UIImportCertificateEvent event = new UIImportCertificateEvent();
         event.setCertificate(certificate);
+        core.getEventBus().publish(event);
+    }
+    
+    void certify(File file) {
+        SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+        if (sf == null)
+            return;
+        UICreateCertificateEvent event = new UICreateCertificateEvent();
+        event.setSharedFile(sf);
         core.getEventBus().publish(event);
     }
     

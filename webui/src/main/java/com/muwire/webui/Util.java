@@ -1,11 +1,13 @@
 package com.muwire.webui;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Translate;
 
@@ -87,6 +89,21 @@ public class Util {
             unescaped = unescaped.replace(escapedCodes[i], escapeChars[i]);
         }
         return unescaped;
+    }
+    
+    public static File getFromPathElements(String pathElements) {
+        File current = null;
+        for (String element : DataHelper.split(pathElements,",")) {
+            element = unescapeHTMLinXML(Base64.decodeToString(element));
+            if (element == null) {
+                return null;
+            }
+            if (current == null)
+                current = new File(element);
+            else 
+                current = new File(current, element);
+        }
+        return current;
     }
 
     /**

@@ -136,7 +136,7 @@ public class FilesServlet extends HttpServlet {
                 resp.sendError(403,"Bad param");
                 return;
             }
-            File file = getFromPathElements(pathElements);
+            File file = Util.getFromPathElements(pathElements);
             if (file == null) {
                 resp.sendError(403, "Bad param");
                 return;
@@ -148,7 +148,7 @@ public class FilesServlet extends HttpServlet {
                 resp.sendError(403,"Bad param");
                 return;
             }
-            File file = getFromPathElements(pathElements);
+            File file = Util.getFromPathElements(pathElements);
             if (file == null) {
                 resp.sendError(403, "Bad param");
                 return;
@@ -159,19 +159,5 @@ public class FilesServlet extends HttpServlet {
             fileManager.comment(file, comment);
         }
     }
-    
-    private static File getFromPathElements(String pathElements) {
-        File current = null;
-        for (String element : DataHelper.split(pathElements,",")) {
-            element = Util.unescapeHTMLinXML(Base64.decodeToString(element));
-            if (element == null) {
-                return null;
-            }
-            if (current == null)
-                current = new File(element);
-            else 
-                current = new File(current, element);
-        }
-        return current;
-    }
+ 
 }
