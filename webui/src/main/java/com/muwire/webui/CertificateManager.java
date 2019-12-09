@@ -19,12 +19,13 @@ import com.muwire.core.filecert.UIImportCertificateEvent;
 
 public class CertificateManager {
     private final Core core;
-    
+    private final FileManager fileManager;
     
     private final Map<Persona, Map<InfoHash,CertificateRequest>> requests = new ConcurrentHashMap<>();
     
-    public CertificateManager(Core core) {
+    public CertificateManager(Core core, FileManager fileManager) {
         this.core = core;
+        this.fileManager = fileManager;
     }
     
     public void onCertificateFetchEvent(CertificateFetchEvent e) {
@@ -78,12 +79,20 @@ public class CertificateManager {
     }
     
     void certify(File file) {
-        SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
-        if (sf == null)
-            return;
-        UICreateCertificateEvent event = new UICreateCertificateEvent();
-        event.setSharedFile(sf);
-        core.getEventBus().publish(event);
+        if (file.isFile()) {
+            SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+            if (sf == null)
+                return;
+            UICreateCertificateEvent event = new UICreateCertificateEvent();
+            event.setSharedFile(sf);
+            core.getEventBus().publish(event);
+        } else {
+            for (SharedFile sf : fileManager.getAllFiles(file)) {
+                UICreateCertificateEvent event = new UICreateCertificateEvent();
+                event.setSharedFile(sf);
+                core.getEventBus().publish(event);
+            }
+        }
     }
     
     static class CertificateRequest {

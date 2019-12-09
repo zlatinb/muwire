@@ -64,8 +64,12 @@ public class FileManager {
     }
     
     List<SharedFile> getAllFiles() {
+        return getAllFiles(null);
+    }
+    
+    List<SharedFile> getAllFiles(File parent) {
         TraverseCallback cb = new TraverseCallback();
-        fileTree.traverse(cb);
+        fileTree.traverse(parent, cb);
         return cb.found;
     }
     

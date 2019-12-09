@@ -150,7 +150,7 @@ public class MuWireClient {
         TrustManager trustManager = new TrustManager();
         core.getEventBus().register(TrustEvent.class, trustManager);
         
-        CertificateManager certificateManager = new CertificateManager(core);
+        CertificateManager certificateManager = new CertificateManager(core, fileManager);
         core.getEventBus().register(CertificateFetchedEvent.class, certificateManager);
         core.getEventBus().register(CertificateFetchEvent.class, certificateManager);
         

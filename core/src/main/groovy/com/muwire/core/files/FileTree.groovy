@@ -51,10 +51,14 @@ class FileTree<T> {
     }
 
     synchronized void traverse(File from, FileTreeCallback<T> callback) {
-        TreeNode node = fileToNode.get(from);
-        if (node == null)
-            return
-        doTraverse(node, callback);
+        if (from == null) {
+            doTraverse(root, callback);
+        } else {
+            TreeNode node = fileToNode.get(from);
+            if (node == null)
+                return
+            doTraverse(node, callback);
+        }
     }
         
     private void doTraverse(TreeNode<T> node, FileTreeCallback<T> callback) {

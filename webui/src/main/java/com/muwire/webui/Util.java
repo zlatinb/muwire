@@ -23,6 +23,8 @@ public class Util {
     // a file, but it's not worth it for just a handful.
     private static final String[] jsStrings = {
         _x("View Certificates"),
+        _x("Certify"),
+        _x("Certified"),
         _x("Import"),
         _x("Imported"),
         _x("Unsubscribe"),
