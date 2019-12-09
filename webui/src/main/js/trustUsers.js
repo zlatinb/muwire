@@ -10,19 +10,19 @@ class Persona {
 	}
 	
 	getTrustedLink() {
-		return "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>Mark Trusted</a>"
+		return "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
 	}
 	
 	getNeutralLink() {
-		return "<a herf='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>Mark Neutral</a>"
+		return "<a herf='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustedLink() {
-		return "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>Mark Distrusted</a>"
+		return "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
 	}
 	
 	getSubscribeLink() {
-		return "<a href='#' onclick='window.subscribe(\"" + this.userB64 + "\"); return false;'>Subscribe</a>"
+		return "<a href='#' onclick='window.subscribe(\"" + this.userB64 + "\"); return false;'>" + _t("Subscribe") + "</a>"
 	}
 } 
 
@@ -49,10 +49,10 @@ function markTrusted(host) {
 	var textAreaSpan = document.getElementById("trusted-"+host)
 	
 	var textbox = "<textarea id='trust-reason-" + host + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>" + _t("Cancel") + "</a>"
 	
-	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>" + _t("Enter Reason (Optional)") + "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
@@ -68,10 +68,10 @@ function markDistrusted(host) {
 	var textAreaSpan = document.getElementById("distrusted-"+host)
 	
 	var textbox = "<textarea id='distrust-reason-" + host + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>" + _t("Cancel") + "</a>"
 	
-	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>" + _t("Enter Reason (Optional)") + "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
@@ -104,7 +104,7 @@ function cancelTrust(host) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("trusted-link-"+host)
-	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>Mark Trusted</a>"
+	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
@@ -113,13 +113,13 @@ function cancelDistrust(host) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-"+host)
-	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>Mark Distrusted</a>"
+	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
 function updateTable(map, divId) {
 	var divElement = document.getElementById(divId)
-	var tableHtml = "<table><thead><tr><th>User</th><th>Reason</th><th>Actions</th><th>Subscribe</th></tr></thead><tbody>"
+	var tableHtml = "<table><thead><tr><th>" + _t("User") + "</th><th>" + _t("Reason") + "</th><th>" + _t("Actions") + "</th><th>" + _t("Subscribe") + "</th></tr></thead><tbody>"
 	
 	var isTrusted = (map == trusted)
 	for (var [ignored, user] of map) {
@@ -138,7 +138,7 @@ function updateTable(map, divId) {
 		tableHtml += "</td>"
 		
 		if (user.subscribed == "true") {
-			tableHtml += "<td>Subscribed</td>"
+			tableHtml += "<td>" + _t("Subscribed") + "</td>"
 		} else if (isTrusted) {
 			tableHtml += "<td>" + user.getSubscribeLink() + "</td>"
 		}

@@ -22,9 +22,9 @@
 	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 	</head>
 <% if (groupBy.equals("sender")) { %>
-		<body onload="initConnectionsCount();initGroupBySender();">
+		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender();">
 <% } else { %>
-		<body onload="initConnectionsCount();initGroupByFile();">
+		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupByFile();">
 <% } %>
 <%@include file="header.jsi"%>
 		<aside>

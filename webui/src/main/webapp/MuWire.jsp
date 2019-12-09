@@ -17,6 +17,9 @@
     		session.setAttribute("defaultIncompletesLocation",defaultIncompletesLocation);
     	%>
     	
+        <noscript>
+          <center><b><%=Util._t("MuWire requires JavaScript. Please enable JavaScript in your browser.")%></b></center>
+        </noscript>
         <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
         <form action="/MuWire/init" method="post">
         <%=Util._t("Nickname")%>:

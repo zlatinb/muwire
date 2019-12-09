@@ -52,7 +52,7 @@ function refreshActive() {
 				browsesByHost.set(host, browse)
 			}
 			
-			var tableHtml = "<table><thead><tr><th>Host</th><th>Status</th><th>Results</th></tr></thead></tbody>";
+			var tableHtml = "<table><thead><tr><th>" + _t("Host") + "</th><th>" + _t("Status") + "</th><th>" + _t("Results") + "</th></tr></thead></tbody>";
 			for (var [host, browse] of browsesByHost) {
 				var browseLink = getBrowseLink(host, host)
 				
@@ -113,7 +113,7 @@ function showResults(host) {
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
-			var tableHtml = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
+			var tableHtml = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
 			
 			for (var [infoHash, result] of resultsByInfoHash) {
 				
@@ -128,7 +128,7 @@ function showResults(host) {
 				tableHtml += "<td>" + result.name + showComments + "</td>"
 				tableHtml += "<td>" + result.size + "</td>"
 				if (result.downloading == "true")
-					tableHtml += "<td>Downloading</td>"
+					tableHtml += "<td>" + _t("Downloading") + "</td>"
 				else
 					tableHtml += "<td>" + getDownloadLink(host, infoHash) + "</td>"
 				// TODO: show comment link
@@ -146,7 +146,7 @@ function showResults(host) {
 }
 
 function getDownloadLink(host, infoHash) {
-	return "<a href='#' onclick='window.download(\"" + host + "\",\"" + infoHash + "\");return false;'>Download</a>"
+	return "<a href='#' onclick='window.download(\"" + host + "\",\"" + infoHash + "\");return false;'>" + _t("Download") + "</a>"
 }
 
 function download(host,infoHash) {
@@ -164,12 +164,12 @@ function download(host,infoHash) {
 }
 
 function getShowCommentLink(infoHash) {
-	return "<a href='#' onclick='window.showComment(\"" + infoHash + "\"); return false;'>Show Comment</a>"
+	return "<a href='#' onclick='window.showComment(\"" + infoHash + "\"); return false;'>" + _t("Show Comment") + "</a>"
 }
 
 function showComment(infoHash) {
 	var linkSpan = document.getElementById("show-comment-"+infoHash)
-	var hideComment = "<a href='#' onclick='window.hideComment(\"" + infoHash + "\"); return false;'>Hide Comment</a>"
+	var hideComment = "<a href='#' onclick='window.hideComment(\"" + infoHash + "\"); return false;'>" + _t("Hide Comment") + "</a>"
 	linkSpan.innerHTML = hideComment
 	
 	var commentSpan = document.getElementById("comment-"+infoHash)

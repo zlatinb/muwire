@@ -4,7 +4,7 @@
 
 <% 
 
-String pagetitle="Trust Users"; 
+String pagetitle=Util._t("Trust Users"); 
 
 %>
 
@@ -15,7 +15,7 @@ String pagetitle="Trust Users";
 <script src="js/trustUsers.js?<%=version%>" type="text/javascript"></script>
 
 	</head>
-	<body onload="initConnectionsCount(); initTrustUsers();">
+	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initTrustUsers();">
 <%@ include file="header.jsi"%>
 	    <aside>
 <%@include file="sidebar.jsi"%>    	

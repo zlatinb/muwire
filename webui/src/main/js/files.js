@@ -13,8 +13,8 @@ class Node {
 	
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
-		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>Unshare</a>"
-		var commentLink = "<span id='comment-link-"+this.nodeId+"'><a href='#' onclick='window.showCommentForm(\"" + this.nodeId + "\");return false;'>Comment</a></span>";
+		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
+		var commentLink = "<span id='comment-link-"+this.nodeId+"'><a href='#' onclick='window.showCommentForm(\"" + this.nodeId + "\");return false;'>" + _t("Comment") + "</a></span>";
 		if (this.leaf) {
 			div.innerHTML = "<li>"+this.path+"<br/>"+ unshareLink + "   " + commentLink + "<div id='comment-" + this.nodeId+ "'></div></li>"
 		} else {
@@ -170,8 +170,8 @@ function showCommentForm(nodeId) {
 	var existingComment = node.comment == null ? "" : node.comment
 	
 	var textArea = "<textarea id='comment-text-" + nodeId + "'>"+existingComment+"</textarea>" 
-	var saveCommentLink = "<a href='#' onclick='saveComment(\"" + nodeId + "\");return false;'>Save</a>"
-	var cancelCommentLink = "<a href='#' onclick='cancelComment(\"" + nodeId + "\");return false;'>Cancel</a>"
+	var saveCommentLink = "<a href='#' onclick='saveComment(\"" + nodeId + "\");return false;'>" + _t("Save") + "</a>"
+	var cancelCommentLink = "<a href='#' onclick='cancelComment(\"" + nodeId + "\");return false;'>" + _t("Cancel") + "</a>"
 	
 	var html = textArea + "<br/>" + saveCommentLink + "  " + cancelCommentLink
 	

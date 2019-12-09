@@ -19,7 +19,7 @@ function refreshStatus() {
 			var hashingSpan = document.getElementById("hashing")
 			var hashing = xmlDoc.getElementsByTagName("Hashing")
 			if (hashing != null && hashing.length == 1) {
-				hashingSpan.innerHTML = "Hashing "+hashing[0].childNodes[0].nodeValue
+				hashingSpan.innerHTML = _t("Hashing") + " " +hashing[0].childNodes[0].nodeValue
 			} else
 				hashingSpan.innerHTML = "";
 				
@@ -27,7 +27,7 @@ function refreshStatus() {
 			var refreshDiv = document.getElementById("refresh-link")
 			if (newRevision > tableRevision) {
 				tableRevision = newRevision
-				refreshDiv.innerHTML = "<a href='#' onclick='refreshTable();return false;'>Refresh</a>"
+				refreshDiv.innerHTML = "<a href='#' onclick='refreshTable();return false;'>" + _t("Refresh") + "</a>"
 			} else
 				refreshDiv.innerHTML = ""
 		}
@@ -116,8 +116,8 @@ function showCommentForm(nodeId) {
 	var existingComment = node.comment == null ? "" : node.comment
 	
 	var textArea = "<textarea id='comment-text-" + nodeId + "'>"+existingComment+"</textarea>" 
-	var saveCommentLink = "<a href='#' onclick='saveComment(\"" + nodeId + "\");return false;'>Save</a>"
-	var cancelCommentLink = "<a href='#' onclick='cancelComment(\"" + nodeId + "\");return false;'>Cancel</a>"
+	var saveCommentLink = "<a href='#' onclick='saveComment(\"" + nodeId + "\");return false;'>" + _t("Save") + "</a>"
+	var cancelCommentLink = "<a href='#' onclick='cancelComment(\"" + nodeId + "\");return false;'>" + _t("Cancel") + "</a>"
 	
 	var html = textArea + "<br/>" + saveCommentLink + "  " + cancelCommentLink
 	
@@ -147,5 +147,5 @@ function saveComment(fileId) {
 }
 
 function generateCommentLink(nodeId) {
-	return "<a href='#' onclick='showCommentForm(\"" + nodeId + "\");return false;'>Comment</a>"
+	return "<a href='#' onclick='showCommentForm(\"" + nodeId + "\");return false;'>" + _t("Comment") + "</a>"
 }

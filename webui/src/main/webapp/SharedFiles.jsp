@@ -23,7 +23,7 @@ if (viewAs == null)
 <% } %>
 
 	</head>
-	<body onload="initConnectionsCount(); initFiles();">
+	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initFiles();">
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>
@@ -32,6 +32,9 @@ if (viewAs == null)
 			<form action="/MuWire/Files" method="post">
 				<input type="text" name="file">
 				<input type="hidden" name="action" value="share">
+<% if (viewAs.equals("table")) { %>
+				<input type="hidden" name="viewAs" value="table">
+<% } %>
 				<input type="submit" value="<%=Util._t("Share")%>">
 			</form>
 <% if (viewAs.equals("tree")) { %>

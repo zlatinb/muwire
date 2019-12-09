@@ -64,18 +64,18 @@ class ResultsBySender {
 	getTrustLink() {
 		return "<span id='trusted-link-" + this.senderB64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.senderB64 + "\"); return false;'>Mark Trusted</a></span><span id='trusted-" + 
+				this.senderB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
 				this.senderB64 + "'></span>"
 	}
 	
 	getNeutralLink() {
-		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>Mark Neutral</a>"
+		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustLink() {
 		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.senderB64 + "\"); return false;'>Mark Distrusted</a></span><span id='distrusted-" + 
+				this.senderB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
 				this.senderB64 + "'></span>"
 	}
 }
@@ -134,18 +134,18 @@ class ResultByFile {
 	getTrustLink() {
 		return "<span id='trusted-link-" + this.senderB64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.senderB64 + "\"); return false;'>Mark Trusted</a></span><span id='trusted-" + 
+				this.senderB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
 				this.senderB64 + "'></span>"
 	}
 	
 	getNeutralLink() {
-		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>Mark Neutral</a>"
+		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustLink() {
 		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.senderB64 + "\"); return false;'>Mark Distrusted</a></span><span id='distrusted-" + 
+				this.senderB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
 				this.senderB64 + "'></span>"
 	}
 }
@@ -166,7 +166,7 @@ function showCommentBySender(divId, spanId) {
 	var comment = "<pre>"+ currentSearchBySender.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
 	commentDiv.innerHTML = comment
 	expandedComments.set(divId, comment);
-	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"Sender\");return false;'>Hide Comment</a>";
+	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"Sender\");return false;'>" + _t("Hide Comment") + "</a>";
     var linkSpan = document.getElementById(spanId);
 	linkSpan.innerHTML = hideLink;
 }
@@ -177,7 +177,7 @@ function showCommentByFile(divId, spanId) {
 	var comment = "<pre>"+currentSearchByFile.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
 	commentDiv.innerHTML = comment
 	expandedComments.set(divId, comment);
-	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"File\");return false;'>Hide Comment</a>";
+	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"File\");return false;'>" + _t("Hide Comment") + "</a>";
     var linkSpan = document.getElementById(spanId);
 	linkSpan.innerHTML = hideLink;
 }
@@ -186,7 +186,7 @@ function hideComment(divId, spanId, byFile) {
 	expandedComments.delete(divId);
 	var commentDiv = document.getElementById(divId);
 	commentDiv.innerHTML = ""
-	var showLink = "<a href='#' onclick='window.showCommentBy"+byFile+"(\"" + divId + "\",\"" + spanId + "\"); return false;'>Show Comment</a>";
+	var showLink = "<a href='#' onclick='window.showCommentBy"+byFile+"(\"" + divId + "\",\"" + spanId + "\"); return false;'>" + _t("Show Comment") + "</a>";
 	var linkSpan = document.getElementById(spanId);
 	linkSpan.innerHTML = showLink;
 }
@@ -196,7 +196,7 @@ function download(resultInfoHash) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var resultSpan = document.getElementById("download-"+resultInfoHash);
-			resultSpan.innerHTML = "Downloading";
+			resultSpan.innerHTML = _t("Downloading");
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Download", true);
@@ -211,8 +211,8 @@ function markTrusted(host) {
 	var textAreaSpan = document.getElementById("trusted-"+host)
 	
 	var textbox = "<textarea id='trust-reason-" + host + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + host + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + host + "\");return false;'>" + _t("Cancel") + "</a>"
 	
 	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
@@ -230,8 +230,8 @@ function markDistrusted(host) {
 	var textAreaSpan = document.getElementById("distrusted-"+host)
 	
 	var textbox = "<textarea id='distrust-reason-" + host + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + host + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + host + "\");return false;'>" + _t("Cancel") + "</a>"
 	
 	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
@@ -253,7 +253,7 @@ function cancelTrust(host) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("trusted-link-"+host)
-	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>Mark Trusted</a>"
+	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
@@ -262,7 +262,7 @@ function cancelDistrust(host) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-"+host)
-	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>Mark Distrusted</a>"
+	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
@@ -285,10 +285,10 @@ function updateSender(senderName) {
 	sender = senderName;
 	
 	var resultsFromSpan = document.getElementById("resultsFrom");
-	resultsFromSpan.innerHTML = "Results From "+sender;
+	resultsFromSpan.innerHTML = _t("Results From {0}", sender);
 	
 	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>"
+	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
 	var x = currentSearchBySender
 	x = x.resultBatches.get(sender).results;
 	for (var [resultInfoHash, result] of x) {
@@ -300,13 +300,13 @@ function updateSender(senderName) {
 			var spanId = "comment-link-"+resultInfoHash + senderName + uuid;
 			var comment = expandedComments.get(divId);
 			if (comment != null) {
-				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"Sender\");return false;'>Hide Comment</a>";
+				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"Sender\");return false;'>" + _t("Hide Comment") + "</a>";
 				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
 				table += "<div id='" + divId + "'>"+comment+"</div>";				
 			} else {
 				var link = "<a href='#' onclick='window.showCommentBySender(\"" + divId +
 					"\",\""+spanId+"\");"+
-					"return false;'>Show Comment</a>"; 			
+					"return false;'>" + _t("Show Comment") + "</a>"; 			
 				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
 				table += "<div id='"+divId+"'></div>";
 			}
@@ -317,9 +317,9 @@ function updateSender(senderName) {
 		table += "</td>";
 		table += "<td>";
 		if (result.downloading == "false") {
-			table += "<span id='download-"+ resultInfoHash+"'><a href='#' onclick='window.download(\"" + resultInfoHash + "\");return false;'>Download</a></span>";
+			table += "<span id='download-"+ resultInfoHash+"'><a href='#' onclick='window.download(\"" + resultInfoHash + "\");return false;'>" + _t("Download") + "</a></span>";
 		} else {
-			table += "Downloading";
+			table += _t("Downloading");
 		}
 		table += "</td>";
 		table += "</tr>";
@@ -338,7 +338,7 @@ function updateFile(fileInfoHash) {
 	resultsFromSpan.innerHTML = "Results For "+searchResults.name;
 	
 	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>Sender</th><th>Browse</th><th>Trust</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>" + _t("Sender") + "</th><th>" + _t("Browse") + "</th></tr></thead><tbody>";
 	var i;
 	for (var [senderName, result] of searchResults.results) {
 		table += "<tr>";
@@ -349,13 +349,13 @@ function updateFile(fileInfoHash) {
 			var spanId = "comment-link-" + fileInfoHash + senderName + uuid;
 			var comment = expandedComments.get(divId);
 			if (comment != null) {
-				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"File\");return false;'>Hide Comment</a>";
+				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"File\");return false;'>" + _t("Hide Comment") + "</a>";
 				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
 				table += "<div id='" + divId + "'>"+comment+"</div>";
 			} else {
 				var link = "<a href='#' onclick='window.showCommentByFile(\"" + divId +
 					"\",\""+spanId+"\");"+
-					"return false;'>Show Comment</a>"; 			
+					"return false;'>" + _t("Show Comment") + "</a>"; 			
 				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
 				table += "<div id='"+divId+"'></div>";
 			}
@@ -363,7 +363,7 @@ function updateFile(fileInfoHash) {
 		table += "</td>";
 		if (result.browse == "true") {
 			if (result.browsing == "true")
-				table += "<td>Browsing</td>"
+				table += "<td>" + _t("Browsing") + "</td>"
 			else {
 				table += "<td><span id='browse-link-" + result.senderB64 + "'>" + getBrowseLink(result.senderB64) + "</span></td>"
 			}
@@ -385,7 +385,7 @@ function updateUUIDBySender(resultUUID) {
 	currentSearchSpan.innerHTML = currentStatus.query + " Results";
 	
 	var sendersDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>Sender</th><th>Browse</th><th>Trust</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>" + _t("Sender") + "</th><th>" + _t("Browse") + "</th><th>" + _t("Trust") + "</th></tr></thead><tbody>";
 	var x = currentSearchBySender.resultBatches;
 	for (var [senderName, senderBatch] of x) {
 		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
@@ -393,7 +393,7 @@ function updateUUIDBySender(resultUUID) {
 		table += "</a></td>";
 		if (senderBatch.browse == "true") {
 			if (senderBatch.browsing == "true") 
-				table += "<td>Browsing</td>"
+				table += "<td>" + _t("Browsing") + "</td>"
 			else 
 				table += "<td><span id='browse-link-" + senderBatch.senderB64 + "'>" + getBrowseLink(senderBatch.senderB64) + "</span></td>"
 		} 
@@ -416,7 +416,7 @@ function updateUUIDByFile(resultUUID) {
 	currentSearchSpan.innerHTML = currentStatus.query + " Results";
 	
 	var topTableDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>Name</th><th>Size</th><th>Download</th></tr></thead><tbody>";
+	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>";
 	var x = currentSearchByFile.resultBatches;
 	for (var [fileInfoHash, file] of x) {
 		table += "<tr><td><a href='#' onclick='updateFile(\""+fileInfoHash+"\");return false;'>";
@@ -427,9 +427,9 @@ function updateUUIDByFile(resultUUID) {
 		table += "</td>";
 		table += "<td>";
 		if (file.downloading == "false") 
-			table += "<span id='download-"+fileInfoHash+"'><a href='#' onclick='window.download(\""+fileInfoHash+"\"); return false;'>Download</a></span>";
+			table += "<span id='download-"+fileInfoHash+"'><a href='#' onclick='window.download(\""+fileInfoHash+"\"); return false;'>" + _t("Download") + "</a></span>";
 		else
-			table += "Downloading";
+			table += _t("Downloading");
 		table += "</td></tr>";
 	}
 	table += "</tbody></table>";
@@ -467,7 +467,7 @@ function refreshGroupByFile(searchUUID) {
 }
 
 function getBrowseLink(host) {
-	return "<a href='#' onclick='window.browse(\"" + host + "\"); return false;'>Browse</a>"
+	return "<a href='#' onclick='window.browse(\"" + host + "\"); return false;'>" + _t("Browse") + "</a>"
 }
 
 function browse(host) {
@@ -475,7 +475,7 @@ function browse(host) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var linkSpan = document.getElementById("browse-link-"+host)
-			linkSpan.innerHTML = "Browsing"
+			linkSpan.innerHTML = _t("Browsing");
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Browse", true)
@@ -500,7 +500,7 @@ function refreshStatus() {
 			}
 			
 			
-			var table = "<table><thead><tr><th>Query</th><th>Senders</th><th>Results</th></tr></thead><tbody>"
+			var table = "<table><thead><tr><th>" + _t("Query") + "</th><th>" + _t("Senders") + "</th><th>" + _t("Results") + "</th></tr></thead><tbody>"
 			for (var [searchUUID, status] of statusByUUID) {
 				table += "<tr>"
 				table += "<td>" + "<a href='#' onclick='refreshGroupBy" + refreshType + "(\"" + searchUUID + "\");return false;'>" + status.query + "</a></td>"

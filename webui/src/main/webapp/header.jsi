@@ -12,3 +12,6 @@
     <%=pagetitle%>
   </div>
 </header>
+<noscript>
+    <center><b><%=Util._t("MuWire requires JavaScript. Please enable JavaScript in your browser.")%></b></center>
+</noscript>

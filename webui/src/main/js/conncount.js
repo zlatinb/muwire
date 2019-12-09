@@ -9,7 +9,7 @@ function refreshConnectionsCount() {
 			var countString = ""+count;
 			connectionCountSpan.innerHTML = countString;
 		  } else {
-			connectionCountSpan.innerHTML = "down";
+			connectionCountSpan.innerHTML = _t("Down");
 		  }
 		}
 	}

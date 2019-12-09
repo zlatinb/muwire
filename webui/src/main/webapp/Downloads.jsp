@@ -17,7 +17,7 @@
 <%@include file="css.jsi"%>
     <script src="js/download.js?<%=version%>" type="text/javascript"></script>
     </head>
-    <body onload="initConnectionsCount(); initDownloads();">
+    <body onload="initTranslate(jsTranslations); initConnectionsCount(); initDownloads();">
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

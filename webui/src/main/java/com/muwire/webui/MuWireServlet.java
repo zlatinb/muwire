@@ -68,6 +68,9 @@ public class MuWireServlet extends HttpServlet {
                                          _t("MuWire is initializing, please wait") +
                                          "</div>" +
                                          "</header>" +
+                                         "<noscript><center><b>" +
+                                         _t("MuWire requires JavaScript. Please enable JavaScript in your browser.") +
+                                         "</b></center></noscript>" +
                                          "</body></html>");
                 resp.setIntHeader("Refresh", 5);
             } else

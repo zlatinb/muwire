@@ -24,6 +24,7 @@ fi
 if [ "$1" = "-p" ]
 then
 	POUPDATE=1
+	LG2=en
 fi
 
 # on windows, one must specify the path of commnad find

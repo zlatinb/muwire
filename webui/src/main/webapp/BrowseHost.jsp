@@ -15,7 +15,7 @@ String pagetitle="Browse Host";
 <script src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 	</head>
-	<body onload="initConnectionsCount(); initBrowse();">
+	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse();">
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

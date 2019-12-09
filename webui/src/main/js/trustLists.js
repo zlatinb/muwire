@@ -32,15 +32,15 @@ class Persona {
 	}
 	
 	getTrustLink() {
-		return "<a href='#' onclick='markTrusted(\"" + this.userB64 + "\");return false;'>Mark Trusted</a>"
+		return "<a href='#' onclick='markTrusted(\"" + this.userB64 + "\");return false;'>" + _t("Mark Trusted") + "</a>"
 	}
 	
 	getNeutralLink() {
-		return "<a href='#' onclick='markNeutral(\"" + this.userB64 + "\");return false;'>Mark Neutral</a>"
+		return "<a href='#' onclick='markNeutral(\"" + this.userB64 + "\");return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustLink() {
-		return "<a href='#' onclick='markDistrusted(\"" + this.userB64 + "\");return false;'>Mark Distrusted</a>"
+		return "<a href='#' onclick='markDistrusted(\"" + this.userB64 + "\");return false;'>" + _t("Mark Distrusted") + "</a>"
 	}
 	
 	getTrustActions() {
@@ -65,10 +65,10 @@ function markTrusted(user) {
 	var textAreaSpan = document.getElementById("trusted-" + user)
 	
 	var textbox = "<textarea id='trust-reason-" + user + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + user + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + user + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitTrust(\"" + user + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelTrust(\"" + user + "\");return false;'>" + _t("Cancel") + "</a>"
 	
-	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>" + _t("Enter Reason (Optional)") + "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
@@ -83,7 +83,7 @@ function cancelTrust(user) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("trusted-link-" + user)
-	var html = "<a href='#' onclick='markTrusted(\"" + user + "\");return false;'>Mark Trusted</a>"
+	var html = "<a href='#' onclick='markTrusted(\"" + user + "\");return false;'>" + _t("Mark Trusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
@@ -98,10 +98,10 @@ function markDistrusted(user) {
 	var textAreaSpan = document.getElementById("distrusted-" + user)
 	
 	var textbox = "<textarea id='distrust-reason-" + user + "'></textarea>"
-	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + user + "\");return false;'>Submit</a>"
-	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + user + "\");return false;'>Cancel</a>"
+	var submitLink = "<a href='#' onclick='window.submitDistrust(\"" + user + "\");return false;'>" + _t("Submit") + "</a>"
+	var cancelLink = "<a href='#' onclick='window.cancelDistrust(\"" + user + "\");return false;'>" + _t("Cancel") + "</a>"
 	
-	var html = "<br/>Enter Reason (Optional)<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
+	var html = "<br/>" + _t("Enter Reason (Optional)") + "<br/>" + textbox + "<br/>" + submitLink + " " + cancelLink + "<br/>"
 	
 	textAreaSpan.innerHTML = html
 }
@@ -116,7 +116,7 @@ function cancelDistrust(user) {
 	textAreaSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-" + user)
-	var html = "<a href='#' onclick='markDistrusted(\"" + user + "\");return false;'>Mark Distrusted</a>"
+	var html = "<a href='#' onclick='markDistrusted(\"" + user + "\");return false;'>" + _t("Mark Distrusted") + "</a>"
 	linkSpan.innerHTML = html
 }
 
@@ -158,7 +158,7 @@ function forceUpdate(user) {
 
 function updateDiv(name, list) {
 	
-	var html = "<table><thead><tr><th>User</th><th>Reason</th><th>Your Trust</th><th>Actions</th></tr></thead><tbody>"
+	var html = "<table><thead><tr><th>" + _t("User") + "</th><th>" + _t("Reason") + "</th><th>" + _t("Your Trust") + "</th><th>" + _t("Actions") + "</th></tr></thead><tbody>"
 	
 	var i
 	for (i = 0; i < list.length; i++) {
@@ -220,7 +220,7 @@ function refreshLists() {
 			}
 			
 			
-			var html = "<table><thead><tr><th>Name</th><th>Trusted</th><th>Distrusted</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead><tbody>"
+			var html = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Trusted") + "</th><th>" + _t("Distrusted") + "</th><th>" + _t("Status") + "</th><th>" + _t("Last Updated") + "</th><th>" + _t("Actions") + "</th></tr></thead><tbody>"
 			for (var [user, list] of lists) {
 				html += "<tr>"
 				html += "<td>" + "<a href='#' onclick='window.displayList(\"" + list.user + "\");return false;'>" + list.user + "</a></td>"

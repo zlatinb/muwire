@@ -1,6 +1,12 @@
 package com.muwire.webui;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Translate;
 
 public class Util {
@@ -10,6 +16,49 @@ public class Util {
     private static final String escapeChars[] = {"&", "\"", "<", ">", "'"};
     private static final String escapeCodes[] = {"&amp;amp;", "&amp;quot;", "&amp;lt;", "&amp;gt;", "&amp;apos;"};
     private static final String escapedCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;", "&apos;"};
+
+    // if we had a lot of these we could scan for them in the build and generate
+    // a file, but it's not worth it for just a handful.
+    private static final String[] jsStrings = {
+        _x("Actions"),
+        _x("Browse"),
+        _x("Browsing"),
+        _x("Cancel"),
+        _x("Details For {0}"),
+        _x("Down"),
+        _x("Download"),
+        _x("Downloading"),
+        _x("Enter Reason (Optional)"),
+        _x("ETA"),
+        _x("File"),
+        _x("Hide Comment"),
+        _x("Host"),
+        _x("Last Updated"),
+        _x("Mark Distrusted"),
+        _x("Mark Neutral"),
+        _x("Mark Trusted"),
+        _x("Name"),
+        _x("Progress"),
+        _x("Query"),
+        _x("Reason"),
+        _x("Refresh"),
+        _x("Results"),
+        _x("Results From {0}"),
+        _x("Save"),
+        _x("Search"),
+        _x("Sender"),
+        _x("Senders"),
+        _x("Show Comment"),
+        _x("Size"),
+        _x("Speed"),
+        _x("State"),
+        _x("Status"),
+        _x("Subscribe"),
+        _x("Subscribed"),
+        _x("Trust"),
+        _x("User"),
+        _x("Your Trust"),
+    };
 
     private static final String BUNDLE_NAME = "com.muwire.webui.messages";
 
@@ -35,6 +84,19 @@ public class Util {
         }
         return unescaped;
     }
+
+    /**
+     * @return a JSON-encoded mapping of translations needed for the javascript,
+     *         HTML-escaped.
+     */
+    public static String getJSTranslations() {
+        Map<String, String> map = new HashMap<String, String>(jsStrings.length);
+        for (String s : jsStrings) {
+            map.put(s, _t(s));
+        }
+        return JSONObject.toJSONString(map);
+    }
+
 
     /** translate a string */
     public static String _t(String s) {

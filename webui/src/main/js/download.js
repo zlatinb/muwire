@@ -30,7 +30,7 @@ function updateDownloader(infoHash) {
 	var selected = downloaders.get(infoHash);
 	
 	var downloadDetailsDiv = document.getElementById("downloadDetails");
-	downloadDetailsDiv.innerHTML = "<p>Details for "+selected.name+"</p>"
+	downloadDetailsDiv.innerHTML = "<p>" + _t("Details for {0}", selected.name) + "</p>"
 }
 
 function refreshDownloader() {
@@ -46,7 +46,7 @@ function refreshDownloader() {
 				downloaders.set(download.infoHash, download);
 			}
 			
-			var table = "<table><thead><tr><th>Name</th><th>State</th><th>Speed</th><th>ETA</th><th>Progress</th><th>Cancel</th></tr></thead></tbody>";
+			var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("State") + "</th><th>" + _t("Speed") + "</th><th>" + _t("ETA") + "</th><th>" + _t("Progress") + "</th><th>" + _t("Cancel") + "</th></tr></thead></tbody>";
 			var downloadsDiv = document.getElementById("downloads");
 			for (var [infoHash, download] of downloaders) {
 				table += "<tr><td><a href='#' onclick='updateDownloader(\""+infoHash+"\");return false;'>";
@@ -58,7 +58,7 @@ function refreshDownloader() {
 				table += "<td>"+download.progress+"</td>";
 				
 				if (download.state != "CANCELLED")
-					table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>Cancel</a></span></td>";
+					table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>" + _t("Cancel") + "</a></span></td>";
 				else
 					table += "<td></td>";
 				table += "</tr>";
