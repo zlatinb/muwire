@@ -1,6 +1,6 @@
 
 class Node {
-	constructor(nodeId, parent, leaf, path, size, comment, revision) {
+	constructor(nodeId, parent, leaf, path, size, comment, certified, revision) {
 		this.nodeId = nodeId
 		this.parent = parent
 		this.leaf = leaf
@@ -8,6 +8,7 @@ class Node {
 		this.path = path
 		this.size = size
 		this.comment = comment
+		this.certified = certified
 		this.revision = revision
 	}
 	
@@ -15,15 +16,21 @@ class Node {
 		var div = document.getElementById(this.nodeId)
 		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
 		var commentLink = "<span id='comment-link-"+this.nodeId+"'><a href='#' onclick='window.showCommentForm(\"" + this.nodeId + "\");return false;'>" + _t("Comment") + "</a></span>";
+		var certifyLink = "<a href='#' onclick='window.certify(\"" + this.nodeId + "\");return false;'>" + _t("Certify") + "</a>"
 		if (this.leaf) {
-			div.innerHTML = "<li>"+this.path+"<br/>"+ unshareLink + "   " + commentLink + "<div id='comment-" + this.nodeId+ "'></div></li>"
+			var certified = ""
+			if (this.certified == "true") 
+				certified = _t("Certified")
+			
+			div.innerHTML = "<li>"+this.path+"<br/>"+ unshareLink + "   " + certifyLink + "   " + certified + "   " + 
+				commentLink + "<div id='comment-" + this.nodeId+ "'></div></li>"
 		} else {
 			if (this.children.length == 0) {
 				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
-					this.path + "</a>   " + unshareLink + "</span>" + commentLink + "<div id='comment-" + this.nodeId + "'></div></li>"
+					this.path + "</a>   " + unshareLink + "</span>" + "   " + certifyLink + "  " + commentLink + "<div id='comment-" + this.nodeId + "'></div></li>"
 			} else {
 				var l = "<li><a href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>   " + unshareLink
-				l += "  " + commentLink+"<div id='comment-" + this.nodeId + "'></div>"
+				l += "  " + certifyLink + "   " + commentLink+"<div id='comment-" + this.nodeId + "'></div>"
 				
 				l += "<ul>"
 				var i
@@ -70,7 +77,7 @@ function refreshStatus() {
 }
 
 var treeRevision = -1
-var root = new Node("root",null,false,"Shared Files", -1, null, -1)
+var root = new Node("root",null,false,"Shared Files", -1, null, false, -1)
 var nodesById = new Map()
 
 function initFiles() {
@@ -113,9 +120,10 @@ function expand(nodeId) {
 					comment = comment[0].childNodes[0].nodeValue
 				else
 					comment = null
+				var certified = fileElements[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
 				var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
-				var newFileNode = new Node(nodeId, node, true, fileName, size, comment, revision)
+				var newFileNode = new Node(nodeId, node, true, fileName, size, comment, certified, revision)
 				nodesById.set(nodeId, newFileNode)
 				node.children.push(newFileNode)
 			}
@@ -124,7 +132,7 @@ function expand(nodeId) {
 			for (i = 0; i < dirElements.length; i++) {
 				var dirName = dirElements[i].childNodes[0].nodeValue
 				var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
-				var newDirNode = new Node(nodeId, node, false, dirName, -1, null, revision)
+				var newDirNode = new Node(nodeId, node, false, dirName, -1, null, false, revision)
 				nodesById.set(nodeId, newDirNode)
 				node.children.push(newDirNode)
 			}
@@ -201,4 +209,19 @@ function saveComment(nodeId) {
 	xmlhttp.open("POST", "/MuWire/Files", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send(encodeURI("action=comment&path="+encodedPath+ "&comment="+comment))
+}
+
+function certify(nodeId) {
+	var node = nodesById.get(nodeId)
+	var encodedPath = encodedPathToRoot(node)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			collapse(node.parent.nodeId)
+			expand(node.parent.nodeId)
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=certify&file=" + encodedPath)
 }

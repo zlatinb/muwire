@@ -41,6 +41,11 @@
     <servlet-class>com.muwire.webui.TrustServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.CertificateServlet</servlet-name>
+    <servlet-class>com.muwire.webui.CertificateServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -69,6 +74,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.TrustServlet</servlet-name>
     <url-pattern>/Trust</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.CertificateServlet</servlet-name>
+    <url-pattern>/Certificate</url-pattern>
 </servlet-mapping>
 
 __JASPER__
