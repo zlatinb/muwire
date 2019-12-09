@@ -144,6 +144,18 @@ function unsubscribe(user) {
 	xmlhttp.send("action=unsubscribe&persona=" + user)
 }
 
+function forceUpdate(user) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshLists()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Trust", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=subscribe&persona=" + user)
+}
+
 function updateDiv(name, list) {
 	
 	var html = "<table><thead><tr><th>User</th><th>Reason</th><th>Your Trust</th><th>Actions</th></tr></thead><tbody>"
@@ -208,7 +220,7 @@ function refreshLists() {
 			}
 			
 			
-			var html = "<table><thead><tr><th>Name</th><th>Trusted</th><th>Distrusted</th><th>Status</th><th>Last Updated</th><th>Unsubscribe</th></tr></thead><tbody>"
+			var html = "<table><thead><tr><th>Name</th><th>Trusted</th><th>Distrusted</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead><tbody>"
 			for (var [user, list] of lists) {
 				html += "<tr>"
 				html += "<td>" + "<a href='#' onclick='window.displayList(\"" + list.user + "\");return false;'>" + list.user + "</a></td>"
@@ -216,7 +228,9 @@ function refreshLists() {
 				html += "<td>" + list.distrusted +"</td>"
 				html += "<td>" + list.status + "</td>"
 				html += "<td>" + list.timestamp + "</td>"
-				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>Unsubscribe</a></td>"
+				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>Unsubscribe</a>" +
+					"   <a href='#' onclick='window.forceUpdate(\"" + list.userB64 + "\");return false;'>Refresh</a>" +
+					"</td>"
 				html += "</tr>"
 			}
 			html += "</tbody></table>"
