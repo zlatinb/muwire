@@ -228,8 +228,8 @@ function refreshLists() {
 				html += "<td>" + list.distrusted +"</td>"
 				html += "<td>" + list.status + "</td>"
 				html += "<td>" + list.timestamp + "</td>"
-				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>Unsubscribe</a>" +
-					"   <a href='#' onclick='window.forceUpdate(\"" + list.userB64 + "\");return false;'>Refresh</a>" +
+				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>" + _t("Unsubscribe") + "</a>" +
+					"   <a href='#' onclick='window.forceUpdate(\"" + list.userB64 + "\");return false;'>" + _t("Refresh") + "</a>" +
 					"</td>"
 				html += "</tr>"
 			}

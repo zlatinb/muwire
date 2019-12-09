@@ -20,6 +20,10 @@ public class Util {
     // if we had a lot of these we could scan for them in the build and generate
     // a file, but it's not worth it for just a handful.
     private static final String[] jsStrings = {
+        _x("View Certificates"),
+        _x("Import"),
+        _x("Imported"),
+        _x("Unsubscribe"),
         _x("Actions"),
         _x("Browse"),
         _x("Browsing"),
