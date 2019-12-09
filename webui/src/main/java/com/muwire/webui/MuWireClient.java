@@ -22,14 +22,17 @@ import com.muwire.core.UILoadedEvent;
 import com.muwire.core.connection.ConnectionEvent;
 import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
+import com.muwire.core.files.AllFilesLoadedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
+import com.muwire.core.files.FileSharedEvent;
 import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
 import com.muwire.core.trust.TrustEvent;
+import com.muwire.core.trust.TrustSubscriptionEvent;
 
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
@@ -120,6 +123,8 @@ public class MuWireClient {
         this.core = core;
         servletContext.setAttribute("core", core);
         
+        core.getEventBus().register(AllFilesLoadedEvent.class, this);
+        
         SearchManager searchManager = new SearchManager(core);
         core.getEventBus().register(UIResultBatchEvent.class, searchManager);
         
@@ -155,5 +160,21 @@ public class MuWireClient {
     
     public String getHome() {
         return home;
+    }
+    
+    public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+        core.getMuOptions().getWatchedDirectories().stream().map(File::new).
+            forEach(f -> {
+                FileSharedEvent event = new FileSharedEvent();
+                event.setFile(f);
+                core.getEventBus().publish(event);
+            });
+        
+        core.getMuOptions().getTrustSubscriptions().forEach( p -> {
+            TrustSubscriptionEvent event = new TrustSubscriptionEvent();
+            event.setPersona(p);
+            event.setSubscribe(true);
+            core.getEventBus().publish(event);
+        });
     }
 }

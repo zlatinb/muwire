@@ -137,11 +137,13 @@ public class TrustServlet extends HttpServlet {
         }
         
         if (action.equals("subscribe")) {
+            core.getMuOptions().getTrustSubscriptions().add(p);
             TrustSubscriptionEvent event = new TrustSubscriptionEvent();
             event.setPersona(p);
             event.setSubscribe(true);
             core.getEventBus().publish(event);
         } else if (action.equals("unsubscribe")) {
+            core.getMuOptions().getTrustSubscriptions().remove(p);
             TrustSubscriptionEvent event = new TrustSubscriptionEvent();
             event.setPersona(p);
             event.setSubscribe(false);
