@@ -108,6 +108,17 @@ class ResultBySender {
 			this.comment = comment[0].childNodes[0].nodeValue;
 		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 	}
+	
+	getCertificatesBlock() {
+		if (this.certificates == "0")
+			return ""
+		var linkText = _t("View {0} Certificates", this.certificates)
+		var link = "<a href='#' onclick='window.viewCertificatesBySender(\"" + this.infoHash + "\",\"" + this.certificates + "\");return false;'>" + 
+			linkText + "</a>"
+		var id = senderB64 + "_" + this.infoHash
+		var html = "<div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>"
+		return html
+	}
 }
 
 class ResultByFile {
@@ -130,7 +141,7 @@ class ResultByFile {
 		var linkText = _t("View {0} Certificates", this.certificates)
 		var link = "<a href='#' onclick='window.viewCertificatesByFile(\"" + this.senderB64 + "\",\"" + this.certificates + "\");return false;'>" + linkText + "</a>"
 		var id = this.senderB64 + "_" + infoHash
-		var html = "    <div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>    "
+		var html = "<div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>"
 		return html
 	}
 	
@@ -180,6 +191,7 @@ var certificateFetches = new Map()
 
 var uuid = null;
 var sender = null;
+var senderB64 = null
 var lastXML = null;
 var infoHash = null;
 
@@ -313,7 +325,9 @@ function updateSender(senderName) {
 	var resultsDiv = document.getElementById("bottomTable");
 	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
 	var x = currentSearchBySender
-	x = x.resultBatches.get(sender).results;
+	var senderBatch = x.resultBatches.get(sender)
+	senderB64 = senderBatch.senderB64
+	x = senderBatch.results;
 	for (var [resultInfoHash, result] of x) {
 		table += "<tr>";
 		table += "<td>";
@@ -334,6 +348,7 @@ function updateSender(senderName) {
 				table += "<div id='"+divId+"'></div>";
 			}
 		}
+		table += result.getCertificatesBlock()
 		table += "</td>";
 		table += "<td>";
 		table += result.size;
@@ -507,20 +522,20 @@ function browse(host) {
 	xmlhttp.send("action=browse&host="+host)
 }
 
-function viewCertificatesByFile(senderB64, count) {
-	var fetch = new CertificateFetch(senderB64, infoHash)
+function viewCertificatesByFile(fileSenderB64, count) {
+	var fetch = new CertificateFetch(fileSenderB64, infoHash)
 	certificateFetches.set(fetch.divId, fetch)
 	
 	var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
-	var hideLink = "<a href='#' onclick='window.hideCertificatesByFile(\"" + senderB64 + "\",\"" + count + "\");return false;'>" + _t("Hide Certificates") + "</a>"
+	var hideLink = "<a href='#' onclick='window.hideCertificatesByFile(\"" + fileSenderB64 + "\",\"" + count + "\");return false;'>" + _t("Hide Certificates") + "</a>"
 	linkSpan.innerHTML = hideLink
 	
 	var fetchSpan = document.getElementById("certificates-" + fetch.divId)
 	fetchSpan.innerHTML = _t("Fetching Certificates")
 }
 
-function hideCertificatesByFile(senderB64, count) {
-	var id = senderB64 + "_" + infoHash
+function hideCertificatesByFile(fileSenderB64, count) {
+	var id = fileSenderB64 + "_" + infoHash
 	certificateFetches.delete(id)  // TODO: propagate cancel to core
 	
 	var fetchSpan = document.getElementById("certificates-" + id)
@@ -528,7 +543,34 @@ function hideCertificatesByFile(senderB64, count) {
 	
 	var linkSpan = document.getElementById("certificates-link-" + id)
 	var linkText = _t("View {0} Certificates", count)
-	var showLink = "<a href='#' onclick='window.viewCertificatesByFile(\"" + senderB64 + "\",\"" + count + "\");return false;'>" + linkText + "</a>"
+	var showLink = "<a href='#' onclick='window.viewCertificatesByFile(\"" + fileSenderB64 + "\",\"" + count + "\");return false;'>" + linkText + "</a>"
+	linkSpan.innerHTML = showLink
+}
+
+function viewCertificatesBySender(fileInfoHash, count) {
+	var fetch = new CertificateFetch(senderB64, fileInfoHash)
+	certificateFetches.set(fetch.divId, fetch)
+	
+	var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
+	var hideLink = "<a href='#' onclick='window.hideCertificatesBySender(\"" + fileInfoHash + "\",\"" + count + "\");return false;'>" +
+		_t("Hide Certificates") + "</a>"
+	linkSpan.innerHTML = hideLink
+	
+	var fetchSpan = document.getElementById("certificates-" + fetch.divId)
+	fetchSpan.innerHTML = _t("Fetching Certificates")
+}
+
+function hideCertificatesBySender(fileInfoHash, count) {
+	var id = senderB64 + "_" + fileInfoHash
+	certificateFetches.delete(id) // TODO: propagate cancel to core
+	
+	var fetchSpan = document.getElementById("certificates-" + id)
+	fetchSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("certificates-link-" + id)
+	var linkText = _t("View {0} Certificates", count)
+	var showLink = "<a href='#' onclick='window.viewCertificatesBySender(\"" + fileInfoHash + "\",\"" + count + "\");return false;'>" +
+		linkText + "</a>"
 	linkSpan.innerHTML = showLink
 }
 
