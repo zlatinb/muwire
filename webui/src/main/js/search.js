@@ -245,12 +245,19 @@ class CertificateFetch {
 		var xmlhttp = new XMLHttpRequest()
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				
+				var response = new CertificateResponse(this.responseXML)
 				var block = document.getElementById("certificates-" + this.divId)
+				block.innerHTML = response.renderTable()
 			}			
 		}
 		xmlhttp.open("GET", "/MuWire/Certificate", true)
 		xmlhttp.send()
+	}
+}
+
+function refreshCertificates() {
+	for (var [ignored, fetch] of certificateFetches) {
+		fetch.updateTable()
 	}
 }
 
@@ -696,6 +703,8 @@ function initGroupBySender() {
 	refreshType = "Sender"
 	setInterval(refreshStatus, 3000);
 	setTimeout(refreshStatus, 1);
+	setInterval(refreshCertificates, 3000)
+	setTimeout(refreshCertificates, 1)
 }
 
 function initGroupByFile() {
@@ -703,4 +712,6 @@ function initGroupByFile() {
 	refreshType = "File"
 	setInterval ( refreshStatus, 3000);
 	setTimeout ( refreshStatus, 1);
+	setInterval(refreshCertificates, 3000)
+	setTimeout(refreshCertificates, 1)
 }
