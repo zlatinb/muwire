@@ -186,6 +186,12 @@ class Certificate {
 		this.imported = xmlNode.getElementsByTagName("Imported")[0].childNodes[0].nodeValue
 	}
 	
+	getImportLink() {
+		var linkText = _t("Import")
+		var link = "<a href='#' onclick='window.importCertificate(\"" + this.base64 + "\"); return false;'>" + linkText + "</a>"
+		return link
+	}
+	
 	renderRow() {
 		var commentPresent = "false"
 		if (this.comment != null)
@@ -200,7 +206,7 @@ class Certificate {
 		if (this.imported == "true")
 			html += "<td>" + _t("Imported") + "</td>"
 		else
-			html += "<td>" + _t("Import") + "</td>"
+			html += "<td>" + this.getImportLink() + "</td>"
 		
 		html += "</tr>"
 		return html
@@ -679,6 +685,18 @@ function hideCertificatesBySender(fileInfoHash, count) {
 	var showLink = "<a href='#' onclick='window.viewCertificatesBySender(\"" + fileInfoHash + "\",\"" + count + "\");return false;'>" +
 		linkText + "</a>"
 	linkSpan.innerHTML = showLink
+}
+
+function importCertificate(b64) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshCertificates()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=import&base64=" + b64)
 }
 
 function refreshStatus() {
