@@ -1,11 +1,23 @@
 class Result {
-	constructor(name, size, comment, infoHash, downloading, certificates) {
+	constructor(name, size, comment, infoHash, downloading, certificates, hostB64) {
 		this.name = name
 		this.size = size
 		this.infoHash = infoHash
 		this.comment = comment
 		this.downloading = downloading
 		this.certificates = certificates
+		this.hostB64 = hostB64
+	}
+	
+	getCertificateBlock() {
+		if (this.certificates == "0")
+			return ""
+		var id = this.hostB64 + "_" + this.infoHash
+		var linkText = _t("View {0} Certificates", this.certificates)
+		var link = "<a href='#' onclick='window.showCertificates(\"" + this.hostB64 + "\",\"" + this.infoHash + "\");return false;'>" + linkText + "</a>"
+		var linkBlock = "<div id='certificates-link-" + id + "'>" + link + "</div>"
+		linkBlock += "<div id='certificates-" + id + "'></div>"
+		return linkBlock
 	}
 }
 
@@ -28,6 +40,42 @@ function initBrowse() {
 var currentHost = null
 var browsesByHost = new Map()
 var resultsByInfoHash = new Map()
+
+function showCertificates(hostB64, infoHash) {
+	var fetch = new CertificateFetch(hostB64, infoHash)
+	certificateFetches.set(fetch.divId, fetch)
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var hideLinkText = _t("Hide Certificates")
+			var hideLink = "<a href='#' onclick='window.hideCertificates(\"" + hostB64 + "\",\"" + infoHash + "\"); return false;'>" + hideLinkText + "</a>"
+			var hideLinkSpan = document.getElementById("certificates-link-" + fetch.divId)
+			hideLinkSpan.innerHTML = hideLink
+			
+			var certSpan = document.getElementById("certificates-" + fetch.divId)
+			certSpan.innerHTML = _t("Fetching Certificates")
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)	
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=fetch&user=" + hostB64 + "&infoHash=" + infoHash)
+}
+
+function hideCertificates(hostB64, infoHash) {
+	var id = hostB64 + "_" + infoHash
+	certificateFetches.delete(id)
+	
+	var certSpan = document.getElementById("certificates-" + id)
+	certSpan.innerHTML = ""
+	
+	var result = resultsByInfoHash.get(infoHash)
+	var showLinkText = _t("View {0} Certificates", result.certificates)
+	var showLink = "<a href='#' onclick='window.showCertificates(\"" + hostB64 + "\",\"" + infoHash + "\");return false;'>" + showLinkText + "</a>"
+	
+	var linkSpan = document.getElementById("certificates-link-" + id)
+	linkSpan.innerHTML = showLink
+}
 
 function refreshActive() {
 	var xmlhttp = new XMLHttpRequest()
@@ -111,7 +159,7 @@ function showResults(host) {
 					comment = null
 				var certificates = results[i].getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 					
-				var result = new Result(name, size, comment, infoHash, downloading, certificates)
+				var result = new Result(name, size, comment, infoHash, downloading, certificates, browse.hostB64)
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
@@ -127,7 +175,7 @@ function showResults(host) {
 					showComments += "<div id='comment-" + infoHash + "'></div>"
 				}
 				
-				tableHtml += "<td>" + result.name + showComments + "</td>"
+				tableHtml += "<td>" + result.name + showComments + result.getCertificateBlock() + "</td>"
 				tableHtml += "<td>" + result.size + "</td>"
 				if (result.downloading == "true")
 					tableHtml += "<td>" + _t("Downloading") + "</td>"

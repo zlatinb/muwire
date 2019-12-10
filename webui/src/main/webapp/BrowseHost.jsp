@@ -12,10 +12,11 @@ String pagetitle="Browse Host";
 	<head>
 <%@ include file="css.jsi"%>
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script src="js/certificates.js?<%=version%> type="text/javascript"></script>
 <script src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse();">
+	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse(); initCertificates();">
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>
