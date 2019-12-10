@@ -176,6 +176,7 @@ class ResultByFile {
 function showCertificateComment(divId, base64) {
 	var certificateResponse = certificateFetches.get(divId).lastResponse
 	var certificate = certificateResponse.certificatesBy64.get(base64)
+	expandedCertificateComments.set(divId + "_" + base64, true)
 
 	var linkDiv = document.getElementById("certificate-comment-link-" + divId + "_" + base64)
 	var linkText = _t("Hide Comment")
@@ -191,6 +192,7 @@ function showCertificateComment(divId, base64) {
 function hideCertificateComment(divId, base64) {
 	var certificateResponse = certificateFetches.get(divId).lastResponse
 	var certificate = certificateResponse.certificatesBy64.get(base64)
+	expandedCertificateComments.delete(divId + "_" + base64)
 	
 	var linkDiv = document.getElementById("certificate-comment-link-" + divId + "_" + base64)
 	var linkText = _t("Show Comment")
@@ -218,11 +220,23 @@ class Certificate {
 	getViewCommentBlock() {
 		if (this.comment == null)
 			return ""
-		var linkText = _t("Show Comment")
-		var link = "<a href='#' onclick='window.showCertificateComment(\"" + this.divId + "\",\"" + this.base64 + "\");return false;'>" + linkText + "</a>"
-		var linkBlock = "<div id='certificate-comment-link-" + this.divId + "_" + this.base64 + "'>" + link + "</div>" +
-			"<div id='certificate-comment-" + this.divId + "_" + this.base64 + "'></div>"
-		return linkBlock 
+		var id = this.divId + "_" + this.base64
+		
+		if (expandedCertificateComments.get(id)) {
+			var linkText = _t("Hide Comment")
+			var link = "<a href='#' onclick='window.hideCertificateComment(\"" + this.divId + "\",\"" + this.base64 + "\");return false;'>" + linkText + "</a>"
+			var html = "<div id='certificate-comment-link-" + id + "'>" + link + "</div>"
+			html += "<div id='certificate-comment-" + id + "'>"
+			html += "<pre>" + this.comment + "</pre>"
+			html += "</div>"
+			return html
+		} else {
+			var linkText = _t("Show Comment")
+			var link = "<a href='#' onclick='window.showCertificateComment(\"" + this.divId + "\",\"" + this.base64 + "\");return false;'>" + linkText + "</a>"
+			var linkBlock = "<div id='certificate-comment-link-" + id + "'>" + link + "</div>" +
+				"<div id='certificate-comment-" + id + "'></div>"
+			return linkBlock
+		} 
 	}
 	
 	getImportLink() {
