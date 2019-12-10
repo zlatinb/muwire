@@ -183,6 +183,7 @@ class Certificate {
 		} catch(ignore) {}
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
 		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeValue
+		this.imported = xmlNode.getElementsByTagName("Imported")[0].childNodes[0].nodeValue
 	}
 	
 	renderRow() {
@@ -195,6 +196,12 @@ class Certificate {
 		html += "<td>" + this.name + "</td>"
 		html += "<td>" + commentPresent + "</td>"
 		html += "<td>" + this.timestamp + "</td>"
+		
+		if (this.imported == "true")
+			html += "<td>" + _t("Imported") + "</td>"
+		else
+			html += "<td>" + _t("Import") + "</td>"
+		
 		html += "</tr>"
 		return html
 	}
@@ -221,7 +228,7 @@ class CertificateResponse {
 		html += "  "
 		html += _t("Certificates") + "  " + this.certificates.length + "/" + this.total
 		 
-		var headers = [_t("Issuer"), _t("Name"), _t("Comment"), _t("Timestamp")]
+		var headers = [_t("Issuer"), _t("Name"), _t("Comment"), _t("Timestamp"), _t("Import")]
 		html += "<br/>"
 		html += "<table><thead><tr><th>" + headers.join("</th><th>") + "</th></thead><tbody>"
 		var i

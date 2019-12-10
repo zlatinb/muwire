@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.muwire.core.Core;
 import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.filecert.Certificate;
@@ -21,6 +22,7 @@ import net.i2p.data.DataHelper;
 public class CertificateServlet extends HttpServlet {
     
     private CertificateManager certificateManager;
+    private Core core;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -62,6 +64,7 @@ public class CertificateServlet extends HttpServlet {
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(certificate.getComment().getName())).append("</Comment>");
             sb.append("<Timestamp>").append(DataHelper.formatTime(certificate.getTimestamp())).append("</Timestamp>");
             sb.append("<Base64>").append(certificate.toBase64()).append("</Base64>");
+            sb.append("<Imported>").append(core.getCertificateManager().isImported(certificate)).append("</Imported>");
             sb.append("</Certificate>");
         }
         sb.append("</Certificates>");
@@ -129,6 +132,7 @@ public class CertificateServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         certificateManager = (CertificateManager) config.getServletContext().getAttribute("certificateManager");
+        core = (Core) config.getServletContext().getAttribute("core");
     }
     
     

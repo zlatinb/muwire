@@ -1,5 +1,6 @@
 package com.muwire.webui;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.muwire.core.filecert.UICreateCertificateEvent;
 import com.muwire.core.filecert.UIFetchCertificatesEvent;
 import com.muwire.core.filecert.UIImportCertificateEvent;
 
+import net.i2p.data.Base64;
 import net.i2p.util.ConcurrentHashSet;
 
 public class CertificateManager {

@@ -130,6 +130,13 @@ class CertificateManager {
         return false
     }
     
+    public boolean isImported(Certificate certificate) {
+        Set<Certificate> forInfoHash = byInfoHash.get(certificate.infoHash)
+        if (forInfoHash == null)
+            return false
+        forInfoHash.contains(certificate)
+    }
+    
     Set<Certificate> getByInfoHash(InfoHash infoHash) {
         Set<Certificate> rv = new HashSet<>()
         if (byInfoHash.containsKey(infoHash))
