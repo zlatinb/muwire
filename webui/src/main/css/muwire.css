@@ -2,7 +2,7 @@
   position:relative;
 }
 #table-scroll {
-  height:150px;
+  max-height: 300px;
   overflow:auto;
   margin-top:20px;
 }
@@ -21,6 +21,34 @@
   height:20px;
   width:35%;
   border:1px solid red;
+}
+
+div#activeSearches table thead th:first-child {
+  width: 40%;
+}
+div#topTable table thead th:first-child {
+  width: 50%;
+}
+div#topTable table thead th:nth-child(2) {
+  width: 15%;
+}
+div#topTable table thead th:first-child {
+  width: 75%;
+}
+
+div#activeBrowses table thead th:first-child {
+  width: 50%;
+}
+
+div#filesTable table thead th:first-child {
+  width: 70%;
+}
+
+div#trustedUsers table thead th:first-child {
+  width: 50%;
+}
+div#trustLists table thead th:first-child {
+  width: 50%;
 }
 
 /* File tree CSS */

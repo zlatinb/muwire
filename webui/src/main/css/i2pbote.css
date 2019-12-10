@@ -261,7 +261,7 @@ aside {
     width: 24px;
 }
 .menu-text {
-    margin: 0 24px;
+    margin: 0 6px 0 12px;
 }
 .menubox h2 a {
     font-size: 1em;
@@ -323,6 +323,15 @@ See also .menu-icon
 }
 .menuitem.settings .menu-icon:before {
     content: url("images/settings.png");
+}
+.menuitem.downloads .menu-icon:before {
+    content: url("images/inbox.png");
+}
+.menuitem.search .menu-icon:before {
+    content: url("images/delay.png");
+}
+.menuitem.shared .menu-icon:before {
+    content: url("images/folder.png");
 }
 
 
