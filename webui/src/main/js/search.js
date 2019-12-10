@@ -174,7 +174,8 @@ class ResultByFile {
 }
 
 class Certificate {
-	constructor(xmlNode) {
+	constructor(xmlNode, divId) {
+		this.divId = divId
 		this.issuer = xmlNode.getElementsByTagName("Issuer")[0].childNodes[0].nodeValue
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.comment = null
@@ -184,6 +185,16 @@ class Certificate {
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
 		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeValue
 		this.imported = xmlNode.getElementsByTagName("Imported")[0].childNodes[0].nodeValue
+	}
+	
+	getViewCommentBlock() {
+		if (this.comment == null)
+			return ""
+		var linkText = _t("Show Comment")
+		var link = "<a href='#' onclick='window.showCertificateComment(\"" + this.divId + "\",\"" + this.base64 + "\");return false;'>" + linkText + "</a>"
+		var linkBlock = "<div id='certificate-comment-link-" + this.divId + "_" + this.base64 + "'>" + link + "</div>" +
+			"<div id='certificate-comment-" + this.divId + "_" + this.base64 + "'></div>"
+		return linkBlock 
 	}
 	
 	getImportLink() {
@@ -198,9 +209,8 @@ class Certificate {
 			commentPresent = "true"
 		
 		var html = "<tr>"
-		html += "<td>" + this.issuer + "</td>"
+		html += "<td>" + this.issuer + this.getViewCommentBlock() + "</td>"
 		html += "<td>" + this.name + "</td>"
-		html += "<td>" + commentPresent + "</td>"
 		html += "<td>" + this.timestamp + "</td>"
 		
 		if (this.imported == "true")
@@ -214,15 +224,19 @@ class Certificate {
 }
 
 class CertificateResponse {
-	constructor(xmlNode) {
+	constructor(xmlNode, divId) {
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 		this.total = xmlNode.getElementsByTagName("Total")[0].childNodes[0].nodeValue
+		this.divId = divId
 		
 		var certNodes = xmlNode.getElementsByTagName("Certificates")[0].getElementsByTagName("Certificate")
 		var i
 		this.certificates = []
+		this.certificatesBy64 = new Map()
 		for (i = 0; i < certNodes.length; i++) {
-			this.certificates.push( new Certificate(certNodes[i]))
+			var certificate = new Certificate(certNodes[i], this.divId)
+			this.certificates.push(certificate)
+			this.certificatesBy64.set(certificate.base64, certificate)
 		}
 	}
 	
@@ -234,7 +248,7 @@ class CertificateResponse {
 		html += "  "
 		html += _t("Certificates") + "  " + this.certificates.length + "/" + this.total
 		 
-		var headers = [_t("Issuer"), _t("Name"), _t("Comment"), _t("Timestamp"), _t("Import")]
+		var headers = [_t("Issuer"), _t("Name"), _t("Timestamp"), _t("Import")]
 		html += "<br/>"
 		html += "<table><thead><tr><th>" + headers.join("</th><th>") + "</th></thead><tbody>"
 		var i
@@ -252,6 +266,7 @@ class CertificateFetch {
 		this.senderB64 = senderB64
 		this.fileInfoHash = fileInfoHash
 		this.divId = senderB64 + "_" + fileInfoHash
+		this.lastResponse = null
 	}
 	
 	updateTable() {
@@ -260,8 +275,8 @@ class CertificateFetch {
 		var xmlhttp = new XMLHttpRequest()
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				var response = new CertificateResponse(this.responseXML)
-				block.innerHTML = response.renderTable()
+				this.lastResponse = new CertificateResponse(this.responseXML, this.divId)
+				block.innerHTML = this.lastResponse.renderTable()
 			}			
 		}
 		xmlhttp.open("GET", "/MuWire/Certificate?user=" + this.senderB64 + "&infoHash=" + this.fileInfoHash, true)
