@@ -174,7 +174,7 @@ function showResults(host, key, descending) {
 			if (descending == "descending")
 				descending = "ascending"
 			else
-				descending = "ascending"
+				descending = "descending"
 			
 			var table = new Table(["Name", "Size", "Download"], "sort", key, descending)
 			

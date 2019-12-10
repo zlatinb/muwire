@@ -4,6 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -71,8 +75,22 @@ public class BrowseServlet extends HttpServlet {
             if (browse == null)
                 return; // hmm
             
+            String key = req.getParameter("key");
+            String order = req.getParameter("order");
+            
+            Comparator<Result> comparator = COMPARATORS.get(key);
+            if (comparator != null && order.equals("ascending"))
+                comparator = comparator.reversed();
+            
+            List<Result> wrapped = browse.getResults().stream().map(event -> {
+                return new Result(event, downloadManager.isDownloading(event.getInfohash()));
+            }).collect(Collectors.toList());
+            
+            if (comparator != null)
+                Collections.sort(wrapped, comparator);
+            
             sb.append("<Results>");
-            browse.getResults().forEach(result -> {
+            wrapped.stream().map(Result::getEvent).forEach(result -> {
                 sb.append("<Result>");
                 sb.append("<Name>").append(Util.escapeHTMLinXML(result.getName())).append("</Name>");
                 sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
@@ -182,5 +200,36 @@ public class BrowseServlet extends HttpServlet {
         downloadManager = (DownloadManager) cfg.getServletContext().getAttribute("downloadManager");
         core = (Core) cfg.getServletContext().getAttribute("core");
     }
+    
+    private static class Result {
+        private final UIResultEvent event;
+        private final boolean downloading;
+        Result(UIResultEvent event, boolean downloading) {
+            this.event = event;
+            this.downloading = downloading;
+        }
+        
+        UIResultEvent getEvent() {
+            return event;
+        }
+    }
+    
+    private static final Comparator<Result> BY_NAME = (k, v) -> {
+        return k.event.getName().compareTo(v.event.getName());
+    };
+    
+    private static final Comparator<Result> BY_SIZE = (k, v) -> {
+        return Long.compare(k.event.getSize(), v.event.getSize());  
+    };
 
+    private static final Comparator<Result> BY_DOWNLOADING = (k, v) -> {
+        return Boolean.compare(k.downloading, v.downloading);   
+    };
+    
+    private static final Map<String, Comparator<Result>> COMPARATORS = new HashMap<>();
+    static {
+        COMPARATORS.put("Name", BY_NAME);
+        COMPARATORS.put("Size", BY_SIZE);
+        COMPARATORS.put("Download", BY_DOWNLOADING);
+    }
 }
