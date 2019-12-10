@@ -175,14 +175,14 @@ class ResultByFile {
 
 class Certificate {
 	constructor(xmlNode) {
-		this.issuer = xmlNode.getElementsByTagName("Issuer")[0].childNodes[0].nodeVlue
-		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeVlue
+		this.issuer = xmlNode.getElementsByTagName("Issuer")[0].childNodes[0].nodeValue
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.comment = null
 		try {
-			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeVlue
+			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
 		} catch(ignore) {}
-		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeVlue
-		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeVlue
+		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
+		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeValue
 	}
 	
 	renderRow() {
@@ -209,7 +209,7 @@ class CertificateResponse {
 		var i
 		this.certificates = []
 		for (i = 0; i < certNodes.length; i++) {
-			certificates.push( new Certificate(certNodes[i]))
+			this.certificates.push( new Certificate(certNodes[i]))
 		}
 	}
 	
@@ -242,15 +242,16 @@ class CertificateFetch {
 	}
 	
 	updateTable() {
+		var block = document.getElementById("certificates-" + this.divId)
+		
 		var xmlhttp = new XMLHttpRequest()
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				var response = new CertificateResponse(this.responseXML)
-				var block = document.getElementById("certificates-" + this.divId)
 				block.innerHTML = response.renderTable()
 			}			
 		}
-		xmlhttp.open("GET", "/MuWire/Certificate", true)
+		xmlhttp.open("GET", "/MuWire/Certificate?user=" + this.senderB64 + "&infoHash=" + this.fileInfoHash, true)
 		xmlhttp.send()
 	}
 }
@@ -606,12 +607,20 @@ function viewCertificatesByFile(fileSenderB64, count) {
 	var fetch = new CertificateFetch(fileSenderB64, infoHash)
 	certificateFetches.set(fetch.divId, fetch)
 	
-	var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
-	var hideLink = "<a href='#' onclick='window.hideCertificatesByFile(\"" + fileSenderB64 + "\",\"" + count + "\");return false;'>" + _t("Hide Certificates") + "</a>"
-	linkSpan.innerHTML = hideLink
-	
-	var fetchSpan = document.getElementById("certificates-" + fetch.divId)
-	fetchSpan.innerHTML = _t("Fetching Certificates")
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
+			var hideLink = "<a href='#' onclick='window.hideCertificatesByFile(\"" + fileSenderB64 + "\",\"" + count + "\");return false;'>" + _t("Hide Certificates") + "</a>"
+			linkSpan.innerHTML = hideLink
+			
+			var fetchSpan = document.getElementById("certificates-" + fetch.divId)
+			fetchSpan.innerHTML = _t("Fetching Certificates")
+		}	
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)	
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=fetch&user=" + fileSenderB64 + "&infoHash=" + infoHash)
 }
 
 function hideCertificatesByFile(fileSenderB64, count) {
@@ -631,13 +640,24 @@ function viewCertificatesBySender(fileInfoHash, count) {
 	var fetch = new CertificateFetch(senderB64, fileInfoHash)
 	certificateFetches.set(fetch.divId, fetch)
 	
-	var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
-	var hideLink = "<a href='#' onclick='window.hideCertificatesBySender(\"" + fileInfoHash + "\",\"" + count + "\");return false;'>" +
-		_t("Hide Certificates") + "</a>"
-	linkSpan.innerHTML = hideLink
 	
-	var fetchSpan = document.getElementById("certificates-" + fetch.divId)
-	fetchSpan.innerHTML = _t("Fetching Certificates")
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
+			var hideLink = "<a href='#' onclick='window.hideCertificatesBySender(\"" + fileInfoHash + "\",\"" + count + "\");return false;'>" +
+				_t("Hide Certificates") + "</a>"
+			linkSpan.innerHTML = hideLink
+			
+			var fetchSpan = document.getElementById("certificates-" + fetch.divId)
+			fetchSpan.innerHTML = _t("Fetching Certificates")
+			
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)	
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=fetch&user=" + senderB64 + "&infoHash=" + fileInfoHash)
+		
 }
 
 function hideCertificatesBySender(fileInfoHash, count) {

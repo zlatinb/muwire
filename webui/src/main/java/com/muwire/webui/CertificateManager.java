@@ -17,6 +17,8 @@ import com.muwire.core.filecert.UICreateCertificateEvent;
 import com.muwire.core.filecert.UIFetchCertificatesEvent;
 import com.muwire.core.filecert.UIImportCertificateEvent;
 
+import net.i2p.util.ConcurrentHashSet;
+
 public class CertificateManager {
     private final Core core;
     private final FileManager fileManager;
@@ -100,7 +102,7 @@ public class CertificateManager {
         private final InfoHash infoHash;
         private volatile CertificateFetchStatus status;
         private volatile int totalCertificates;
-        private Set<Certificate> certificates;
+        private final Set<Certificate> certificates = new ConcurrentHashSet<>();
         
         CertificateRequest(Persona user, InfoHash infoHash) {
             this.user = user;
