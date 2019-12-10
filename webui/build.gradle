@@ -20,6 +20,9 @@ war {
     from ('src/main/js', {
         into "js"
     })
+    from ('src/main/resources', {
+        into "WEB-INF/classes/com/muwire/webui"
+    })
     webInf { 
         from "$buildDir/compiledJsps" 
         into "classes"
@@ -100,6 +103,7 @@ task poupdate {
 precompileJsp.dependsOn compileJava
 generateWebXML.dependsOn precompileJsp
 bundle.dependsOn precompileJsp
+poupdate.dependsOn precompileJsp
 war.dependsOn generateWebXML, bundle
 
 artifacts {
