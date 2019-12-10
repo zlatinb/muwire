@@ -173,6 +173,34 @@ class ResultByFile {
 	}
 }
 
+function showCertificateComment(divId, base64) {
+	var certificateResponse = certificateFetches.get(divId).lastResponse
+	var certificate = certificateResponse.certificatesBy64.get(base64)
+
+	var linkDiv = document.getElementById("certificate-comment-link-" + divId + "_" + base64)
+	var linkText = _t("Hide Comment")
+	var link = "<a href='#', onclick='window.hideCertificateComment(\"" + divId + "\",\"" + base64 + "\");return false;'>" + linkText + "</a>"
+	linkDiv.innerHTML = link
+	
+	var commentDiv = document.getElementById("certificate-comment-" + divId + "_" + base64)
+	var commentHtml = "<pre>" + certificate.comment + "</pre>"
+	commentDiv.innerHTML = commentHtml
+	
+}
+
+function hideCertificateComment(divId, base64) {
+	var certificateResponse = certificateFetches.get(divId).lastResponse
+	var certificate = certificateResponse.certificatesBy64.get(base64)
+	
+	var linkDiv = document.getElementById("certificate-comment-link-" + divId + "_" + base64)
+	var linkText = _t("Show Comment")
+	var link = "<a href='#' onclick='window.showCertificateComment(\"" + divId + "\",\"" + base64 + "\");return false;'>" + linkText + "</a>"
+	linkDiv.innerHTML = link
+	
+	var commentDiv = document.getElementById("certificate-comment-" + divId + "_" + base64)
+	commentDiv.innerHTML = ""
+}
+
 class Certificate {
 	constructor(xmlNode, divId) {
 		this.divId = divId
@@ -270,13 +298,14 @@ class CertificateFetch {
 	}
 	
 	updateTable() {
+		var fetch = this
 		var block = document.getElementById("certificates-" + this.divId)
 		
 		var xmlhttp = new XMLHttpRequest()
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
-				this.lastResponse = new CertificateResponse(this.responseXML, this.divId)
-				block.innerHTML = this.lastResponse.renderTable()
+				fetch.lastResponse = new CertificateResponse(this.responseXML, fetch.divId)
+				block.innerHTML = fetch.lastResponse.renderTable()
 			}			
 		}
 		xmlhttp.open("GET", "/MuWire/Certificate?user=" + this.senderB64 + "&infoHash=" + this.fileInfoHash, true)
@@ -297,6 +326,7 @@ var currentSender = null
 var currentFile = null
 var expandedComments = new Map();
 var certificateFetches = new Map()
+var expandedCertificateComments = new Map()
 
 var uuid = null;
 var sender = null;
