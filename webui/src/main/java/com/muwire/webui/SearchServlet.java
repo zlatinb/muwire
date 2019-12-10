@@ -113,6 +113,7 @@ public class SearchServlet extends HttpServlet {
                         .append(Util.escapeHTMLinXML(result.getComment()))
                         .append("</Comment>");
                     }
+                    sb.append("<Certificates>").append(result.getCertificates()).append("</Certificates>");
                     sb.append("</Result>");
                 });
                 sb.append("</ResultsFromSender>");
@@ -157,6 +158,7 @@ public class SearchServlet extends HttpServlet {
                         .append(Util.escapeHTMLinXML(result.getComment()))
                         .append("</Comment>");
                     }
+                    sb.append("<Certificates>").append(result.getCertificates()).append("</Certificates>");
                     sb.append("</Result>");
                 });
                 sb.append("</ResultsForFile>");

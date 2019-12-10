@@ -106,6 +106,7 @@ class ResultBySender {
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 
 			this.comment = comment[0].childNodes[0].nodeValue;
+		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 	}
 }
 
@@ -120,6 +121,17 @@ class ResultByFile {
 		var comment = xmlNode.getElementsByTagName("Comment")
 		if (comment.length == 1) 
 			this.comment = comment[0].childNodes[0].nodeValue;
+		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
+	}
+	
+	getCertificatesBlock() {
+		if (this.certificates == "0")
+			return ""
+		var linkText = _t("View {0} Certificates", this.certificates)
+		var link = "<a href='#' onclick='window.viewCertificatesByFile(\"" + this.senderB64 + "\",\"" + this.certificates + "\");return false;'>" + linkText + "</a>"
+		var id = this.senderB64 + "_" + infoHash
+		var html = "    <div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>    "
+		return html
 	}
 	
 	getTrustLinks() {
@@ -150,10 +162,21 @@ class ResultByFile {
 	}
 }
 
+class CertificateFetch {
+	constructor(senderB64, fileInfoHash) {
+		this.senderB64 = senderB64
+		this.fileInfoHash = fileInfoHash
+		this.divId = senderB64 + "_" + fileInfoHash
+	}
+}
+
 var statusByUUID = new Map()
 var currentSearchBySender = null
 var currentSearchByFile = null
+var currentSender = null
+var currentFile = null
 var expandedComments = new Map();
+var certificateFetches = new Map()
 
 var uuid = null;
 var sender = null;
@@ -360,6 +383,7 @@ function updateFile(fileInfoHash) {
 				table += "<div id='"+divId+"'></div>";
 			}
 		}
+		table += result.getCertificatesBlock()
 		table += "</td>";
 		if (result.browse == "true") {
 			if (result.browsing == "true")
@@ -413,7 +437,7 @@ function updateUUIDByFile(resultUUID) {
 	var currentStatus = statusByUUID.get(uuid)
 	
 	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = currentStatus.query + " Results";
+	currentSearchSpan.innerHTML = _t("Results for {0}", currentStatus.query)
 	
 	var topTableDiv = document.getElementById("topTable");
 	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>";
@@ -481,6 +505,31 @@ function browse(host) {
 	xmlhttp.open("POST", "/MuWire/Browse", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=browse&host="+host)
+}
+
+function viewCertificatesByFile(senderB64, count) {
+	var fetch = new CertificateFetch(senderB64, infoHash)
+	certificateFetches.set(fetch.divId, fetch)
+	
+	var linkSpan = document.getElementById("certificates-link-" + fetch.divId)
+	var hideLink = "<a href='#' onclick='window.hideCertificatesByFile(\"" + senderB64 + "\",\"" + count + "\");return false;'>" + _t("Hide Certificates") + "</a>"
+	linkSpan.innerHTML = hideLink
+	
+	var fetchSpan = document.getElementById("certificates-" + fetch.divId)
+	fetchSpan.innerHTML = _t("Fetching Certificates")
+}
+
+function hideCertificatesByFile(senderB64, count) {
+	var id = senderB64 + "_" + infoHash
+	certificateFetches.delete(id)  // TODO: propagate cancel to core
+	
+	var fetchSpan = document.getElementById("certificates-" + id)
+	fetchSpan.innerHTML = ""
+	
+	var linkSpan = document.getElementById("certificates-link-" + id)
+	var linkText = _t("View {0} Certificates", count)
+	var showLink = "<a href='#' onclick='window.viewCertificatesByFile(\"" + senderB64 + "\",\"" + count + "\");return false;'>" + linkText + "</a>"
+	linkSpan.innerHTML = showLink
 }
 
 function refreshStatus() {
