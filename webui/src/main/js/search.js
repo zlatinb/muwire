@@ -173,11 +173,84 @@ class ResultByFile {
 	}
 }
 
+class Certificate {
+	constructor(xmlNode) {
+		this.issuer = xmlNode.getElementsByTagName("Issuer")[0].childNodes[0].nodeVlue
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeVlue
+		this.comment = null
+		try {
+			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeVlue
+		} catch(ignore) {}
+		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeVlue
+		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeVlue
+	}
+	
+	renderRow() {
+		var commentPresent = "false"
+		if (this.comment != null)
+			commentPresent = "true"
+		
+		var html = "<tr>"
+		html += "<td>" + this.issuer + "</td>"
+		html += "<td>" + this.name + "</td>"
+		html += "<td>" + commentPresent + "</td>"
+		html += "<td>" + this.timestamp + "</td>"
+		html += "</tr>"
+		return html
+	}
+}
+
+class CertificateResponse {
+	constructor(xmlNode) {
+		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
+		this.total = xmlNode.getElementsByTagName("Total")[0].childNodes[0].nodeValue
+		
+		var certNodes = xmlNode.getElementsByTagName("Certificates")[0].getElementsByTagName("Certificate")
+		var i
+		this.certificates = []
+		for (i = 0; i < certNodes.length; i++) {
+			certificates.push( new Certificate(certNodes[i]))
+		}
+	}
+	
+	renderTable() {
+		var html = _t("Status") + "  " + this.status
+		if (this.certificates.length == 0)
+			return html
+		
+		html += "  "
+		html += _t("Certificates") + "  " + this.certificates.length + "/" + this.total
+		 
+		var headers = [_t("Issuer"), _t("Name"), _t("Comment"), _t("Timestamp")]
+		html += "<br/>"
+		html += "<table><thead><tr><th>" + headers.join("</th><th>") + "</th></thead><tbody>"
+		var i
+		for(i = 0; i < this.certificates.length; i++) {
+			html += this.certificates[i].renderRow()
+		}
+		html += "</tbody></table>"
+		
+		return html
+	}
+}
+
 class CertificateFetch {
 	constructor(senderB64, fileInfoHash) {
 		this.senderB64 = senderB64
 		this.fileInfoHash = fileInfoHash
 		this.divId = senderB64 + "_" + fileInfoHash
+	}
+	
+	updateTable() {
+		var xmlhttp = new XMLHttpRequest()
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				
+				var block = document.getElementById("certificates-" + this.divId)
+			}			
+		}
+		xmlhttp.open("GET", "/MuWire/Certificate", true)
+		xmlhttp.send()
 	}
 }
 
