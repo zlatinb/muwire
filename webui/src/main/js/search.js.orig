@@ -393,7 +393,7 @@ function updateSender(senderName) {
 	sender = senderName;
 	
 	var resultsFromSpan = document.getElementById("resultsFrom");
-	resultsFromSpan.innerHTML = _t("Results from {0}", sender);
+	resultsFromSpan.innerHTML = _t("Results From {0}", sender);
 	
 	var resultsDiv = document.getElementById("bottomTable");
 	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
@@ -446,7 +446,7 @@ function updateFile(fileInfoHash) {
 	var searchResults = currentSearchByFile.resultBatches.get(infoHash);
 	
 	var resultsFromSpan = document.getElementById("resultsFrom");
-	resultsFromSpan.innerHTML = _t("Results for {0}", searchResults.name);
+	resultsFromSpan.innerHTML = "Results For "+searchResults.name;
 	
 	var resultsDiv = document.getElementById("bottomTable");
 	var table = "<table><thead><tr><th>" + _t("Sender") + "</th><th>" + _t("Browse") + "</th></tr></thead><tbody>";

@@ -11,7 +11,7 @@
 
 }
 #table-wrapper table * {
-  background:yellow;
+  background: #ceeee8;
   color:black;
 }
 #table-wrapper table thead th .text {

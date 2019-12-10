@@ -22,28 +22,27 @@ public class Util {
     // if we had a lot of these we could scan for them in the build and generate
     // a file, but it's not worth it for just a handful.
     private static final String[] jsStrings = {
-        _x("Fetching Certificates"),
-        _x("Hide Certificates"),
-        _x("Results For {0}"),
-        _x("View {0} Certificates"),
-        _x("Certify"),
-        _x("Certified"),
-        _x("Import"),
-        _x("Imported"),
-        _x("Unsubscribe"),
+        // alphabetical please
         _x("Actions"),
         _x("Browse"),
         _x("Browsing"),
         _x("Cancel"),
-        _x("Details For {0}"),
+        _x("Certified"),
+        _x("Certify"),
+        _x("Comment"),
+        _x("Details for {0}"),
         _x("Down"),
         _x("Download"),
         _x("Downloading"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
+        _x("Fetching Certificates"),
         _x("File"),
+        _x("Hide Certificates"),
         _x("Hide Comment"),
         _x("Host"),
+        _x("Import"),
+        _x("Imported"),
         _x("Last Updated"),
         _x("Mark Distrusted"),
         _x("Mark Neutral"),
@@ -54,11 +53,13 @@ public class Util {
         _x("Reason"),
         _x("Refresh"),
         _x("Results"),
-        _x("Results From {0}"),
+        _x("Results for {0}"),
+        _x("Results from {0}"),
         _x("Save"),
         _x("Search"),
         _x("Sender"),
         _x("Senders"),
+        _x("Shared Files"),
         _x("Show Comment"),
         _x("Size"),
         _x("Speed"),
@@ -67,7 +68,10 @@ public class Util {
         _x("Subscribe"),
         _x("Subscribed"),
         _x("Trust"),
+        _x("Unshare"),
+        _x("Unsubscribe"),
         _x("User"),
+        _x("View {0} Certificates"),
         _x("Your Trust"),
     };
 
@@ -116,9 +120,13 @@ public class Util {
      *         HTML-escaped.
      */
     public static String getJSTranslations() {
+        if (Translate.getLanguage(_context).equals("en"))
+            return "{}";
         Map<String, String> map = new HashMap<String, String>(jsStrings.length);
         for (String s : jsStrings) {
-            map.put(s, _t(s));
+            String tx = _t(s);
+            if (!s.equals(tx))
+                map.put(s, tx);
         }
         return JSONObject.toJSONString(map);
     }

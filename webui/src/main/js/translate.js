@@ -21,10 +21,9 @@ function _t(s) {
 // p will replace {0}
 function _t(s, p) {
     var rv = translations.get(s);
-    if (rv != null) {
-        rv = rv.replace("{0}", p);
-    } else {
+    if (rv == null) {
         rv = s;
     }
+    rv = rv.replace("{0}", p);
     return rv;
 }

@@ -55,7 +55,7 @@ public class DownloadServlet extends HttpServlet {
             
             String ETA;
             if (speed == 0)
-                ETA = "Unknown";
+                ETA = Util._t("Unknown");
             else {
                 long remaining = (d.getNPieces() - d.donePieces()) * d.getPieceSize() / speed;
                 ETA = DataHelper.formatDuration(remaining * 1000);
@@ -66,6 +66,7 @@ public class DownloadServlet extends HttpServlet {
             if (d.getNPieces() != 0)
                 percent = (int)(d.donePieces() * 100 / d.getNPieces());
             String totalSize = DataHelper.formatSize2Decimal(d.getLength(), false) + "B";
+            // FIXME translate
             String progress = String.format("%2d", percent) + "% of "+totalSize;
             sb.append("<Progress>").append(progress).append("</Progress>");
             

@@ -77,7 +77,7 @@ function refreshStatus() {
 }
 
 var treeRevision = -1
-var root = new Node("root",null,false,"Shared Files", -1, null, false, -1)
+var root = new Node("root",null,false,_t("Shared Files"), -1, null, false, -1)
 var nodesById = new Map()
 
 function initFiles() {

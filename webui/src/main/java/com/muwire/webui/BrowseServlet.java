@@ -85,6 +85,9 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("</Result>");
             });
             sb.append("</Results>");
+        } else {
+            resp.sendError(403, "Bad param");
+            return;
         }
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");

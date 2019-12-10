@@ -65,7 +65,7 @@ public class TrustServlet extends HttpServlet {
                 sb.append("<User>").append(Util.escapeHTMLinXML(list.getPersona().getHumanReadableName())).append("</User>");
                 sb.append("<UserB64>").append(list.getPersona().toBase64()).append("</UserB64>");
                 sb.append("<Status>").append(list.getStatus()).append("</Status>");
-                String timestamp = "Never";
+                String timestamp = Util._t("Never");
                 if (list.getTimestamp() > 0)
                     timestamp = DataHelper.formatTime(list.getTimestamp());
                 sb.append("<Timestamp>").append(timestamp).append("</Timestamp>");
