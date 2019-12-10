@@ -13,6 +13,7 @@ String pagetitle="Browse Host";
 <%@ include file="css.jsi"%>
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
 <script src="js/certificates.js?<%=version%> type="text/javascript"></script>
+<script src="js/tables.js?<%=version%> type="text/javascript"></script>
 <script src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 	</head>

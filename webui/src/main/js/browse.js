@@ -29,6 +29,18 @@ class Browse {
 		this.receivedResults = receivedResults
 		this.status = status
 		this.revision = revision
+		this.key = null
+		this.descending = null
+	}
+	
+	setSort(key, descending) {
+		this.key = key
+		this.descending = descending
+	}
+	
+	getBrowseLink() {
+		return "<a href='#' onclick='window.showResults(\"" + this.host + "\",\"" + this.key + "\",\"" + this.descending + 
+			"\");return false;'>" + this.host + "</a>"		
 	}
 }
 
@@ -103,7 +115,7 @@ function refreshActive() {
 			
 			var tableHtml = "<table><thead><tr><th>" + _t("Host") + "</th><th>" + _t("Status") + "</th><th>" + _t("Results") + "</th></tr></thead></tbody>";
 			for (var [host, browse] of browsesByHost) {
-				var browseLink = getBrowseLink(host, host)
+				var browseLink = browse.getBrowseLink()
 				
 				tableHtml += "<tr>"
 				tableHtml += "<td>" + browseLink + "</td>"
@@ -122,7 +134,7 @@ function refreshActive() {
 			if (currentBrowse != null) {
 				var newBrowse = browsesByHost.get(currentHost)
 				if (currentBrowse.revision < newBrowse.revision)
-					showResults(currentHost)
+					showResults(currentHost, currentBrowse.key, currentBrowse.descending)
 			}
 		}
 	}
@@ -130,11 +142,7 @@ function refreshActive() {
 	xmlhttp.send()
 }
 
-function getBrowseLink(host, text) {
-	return "<a href='#' onclick='window.showResults(\"" + host + "\");return false;'>" + text + "</a>"
-}
-
-function showResults(host) {
+function showResults(host, key, descending) {
 	
 	var browse = browsesByHost.get(host)
 	var xmlhttp = new XMLHttpRequest()
@@ -163,11 +171,14 @@ function showResults(host) {
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
-			var tableHtml = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
+			if (descending == "descending")
+				descending = "ascending"
+			else
+				descending = "ascending"
+			
+			var table = new Table(["Name", "Size", "Download"], "sort", key, descending)
 			
 			for (var [infoHash, result] of resultsByInfoHash) {
-				
-				tableHtml += "<tr>"
 				
 				var showComments = ""
 				if (result.comment != null) {
@@ -175,24 +186,39 @@ function showResults(host) {
 					showComments += "<div id='comment-" + infoHash + "'></div>"
 				}
 				
-				tableHtml += "<td>" + result.name + showComments + result.getCertificateBlock() + "</td>"
-				tableHtml += "<td>" + result.size + "</td>"
+				var nameCell = result.name + showComments + result.getCertificateBlock()
+				var sizeCell = result.size
+				var downloadCell = null
+				
 				if (result.downloading == "true")
-					tableHtml += "<td>" + _t("Downloading") + "</td>"
+					downloadCell = _t("Downloading")
 				else
-					tableHtml += "<td>" + getDownloadLink(host, infoHash) + "</td>"
-				// TODO: show comment link
-				tableHtml += "</tr>"
+					downloadCell = getDownloadLink(host, infoHash)
+					
+				var mapping = new Map()
+				mapping.set("Name", nameCell)
+				mapping.set("Size", sizeCell)
+				mapping.set("Download", downloadCell)
+				
+				table.addRow(mapping)
 			}
 			
-			tableHtml += "</tbody></table>"
-			
 			var tableDiv = document.getElementById("resultsTable")
-			tableDiv.innerHTML = tableHtml
+			tableDiv.innerHTML = table.render()
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Browse?section=results&host="+browse.hostB64, true)
+	var paramString = "/MuWire/Browse?section=results&host=" + browse.hostB64
+	if (key != null) 
+		paramString += "&key=" + key + "&order=" + descending
+	
+	xmlhttp.open("GET", paramString, true)
 	xmlhttp.send()
+}
+
+function sort(key, descending) {
+	var currentBrowse = browsesByHost.get(currentHost)
+	currentBrowse.setSort(key, descending)
+	showResults(currentHost, key, descending)
 }
 
 function getDownloadLink(host, infoHash) {
@@ -200,12 +226,13 @@ function getDownloadLink(host, infoHash) {
 }
 
 function download(host,infoHash) {
+	var currentBrowse = browsesByHost.get(host)
 	var result = resultsByInfoHash.get(infoHash)
-	var hostB64 = browsesByHost.get(host).hostB64
+	var hostB64 = currentBrowse.hostB64
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
-			showResults(host)
+			showResults(host, currentBrowse.key, currentBrowse.descending)
 		}
 	}	
 	xmlhttp.open("POST", "/MuWire/Browse", true)
