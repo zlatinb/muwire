@@ -81,6 +81,7 @@ public class BrowseServlet extends HttpServlet {
                 if (result.getComment() != null) {
                     sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");
                 }
+                sb.append("<Certificates>").append(result.getCertificates()).append("</Certificates>");
                 // TODO: add more fields
                 sb.append("</Result>");
             });

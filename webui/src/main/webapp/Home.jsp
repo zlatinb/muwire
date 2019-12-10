@@ -19,12 +19,13 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
+	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 	</head>
 <% if (groupBy.equals("sender")) { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender();">
+		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender(); initCertificates();">
 <% } else { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupByFile();">
+		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupByFile(); initCertificates();">
 <% } %>
 <%@include file="header.jsi"%>
 		<aside>

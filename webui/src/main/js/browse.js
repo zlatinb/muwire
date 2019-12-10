@@ -1,10 +1,11 @@
 class Result {
-	constructor(name, size, comment, infoHash, downloading) {
+	constructor(name, size, comment, infoHash, downloading, certificates) {
 		this.name = name
 		this.size = size
 		this.infoHash = infoHash
 		this.comment = comment
 		this.downloading = downloading
+		this.certificates = certificates
 	}
 }
 
@@ -108,8 +109,9 @@ function showResults(host) {
 					comment = comment[0].childNodes[0].nodeValue
 				else
 					comment = null
+				var certificates = results[i].getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 					
-				var result = new Result(name, size, comment, infoHash, downloading)
+				var result = new Result(name, size, comment, infoHash, downloading, certificates)
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
