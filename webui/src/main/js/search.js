@@ -77,10 +77,13 @@ class Sender {
 class Senders {
 	constructor(xmlNode) {
 		this.senders = []
+		this.sendersMap = new Map()
 		var senderNodes = xmlNode.getElementsByTagName("Sender")
 		var i
 		for (i = 0; i < senderNodes.length; i++) {
-			this.senders.push(new Sender(senderNodes[i]))
+			var sender = new Sender(senderNodes[i])
+			this.senders.push(sender)
+			this.sendersMap.set(sender.b64, sender)
 		}
 	}
 	
@@ -129,13 +132,25 @@ class ResultFromSender {
 	getCommentBlock() {
 		if (this.comment == null)
 			return ""
-		var html = "<div id='comment-link-" + this.infoHash + "'>"
-		html += "<a href='#' onclick='window.showComment(\"" + this.infoHash + "\");return false;'>"
-		html += _t("Show Comment")
-		html += "</a>"
-		html += "</div>"
-		html += "<div id='comment-" + this.infoHash + "'></div>"
-		return html
+		if (expandedComments.get(this.infoHash)) {
+			var html = "<div id='comment-link-" + this.infoHash + "'>"
+			html += "<a href='#' onclick='window.hideComment(\"" + this.infoHash + "\");return false;'>"
+			html += _t("Hide Comment")
+			html += "</a>"
+			html += "</div>"
+			html += "<div id='comment-" + this.infoHash + "'>"
+			html += "<pre>" + this.comment + "</pre>"
+			html += "</div>"
+			return html
+		} else {
+			var html = "<div id='comment-link-" + this.infoHash + "'>"
+			html += "<a href='#' onclick='window.showCommentBySender(\"" + this.infoHash + "\");return false;'>"
+			html += _t("Show Comment")
+			html += "</a>"
+			html += "</div>"
+			html += "<div id='comment-" + this.infoHash + "'></div>"
+			return html
+		}
 	}
 	
 	getCertificatesBlock() {
@@ -156,10 +171,13 @@ class ResultFromSender {
 class ResultsFromSender {
 	constructor(xmlNode) {
 		this.resultsFromSender = []
+		this.resultsMap = new Map()
 		var resultNodes = xmlNode.getElementsByTagName("Result")
 		var i
 		for (i = 0; i < resultNodes.length; i++) {
-			this.resultsFromSender.push(new ResultFromSender(resultNodes[i]))
+			var result = new ResultFromSender(resultNodes[i])
+			this.resultsFromSender.push(result)
+			this.resultsMap.set(result.infoHash, result)
 		}
 	}
 	
@@ -210,10 +228,13 @@ class Result {
 class Results {
 	constructor(xmlNode) {
 		this.results = []
+		this.resultsMap = new Map()
 		var resultNodes = xmlNode.getElementsByTagName("Result")
 		var i
 		for (i = 0; i < resultNodes.length; i++) {
-			this.results.push(new Result(resultNodes[i]))
+			var result = new Result(resultNodes[i])
+			this.results.push(result)
+			this.resultsMap.set(result.infoHash, result)
 		}
 	}
 	
@@ -256,7 +277,34 @@ class SenderForResult {
 	}
 	
 	getNameBlock() {
-		return this.name
+		return this.name + this.getCommentBlock() + this.getCertificatesBlock()
+	}
+	
+	getCommentBlock() {
+		if (this.comment == null)
+			return ""
+		if (expandedComments.get(this.b64)) {
+			var html = "<div id='comment-link-" + this.b64 + "'>"
+			html += "<a href='#' onclick='window.hideComment(\"" + this.b64 + "\");return false;'>"
+			html += _t("Hide Comment")
+			html += "</a>"
+			html += "</div>"
+			html += "<div id='comment-" + this.b64 + "'>"
+			html += "<pre>" + this.comment + "</pre>"
+			html += "</div>"
+			return html
+		} else {
+			var link = "<a href='#' onclick='showCommentByFile(\"" + this.b64 + "\");return false;'>" + _t("Show Comment") + "</a>"
+			var block = "<div id='comment-link-" + this.b64 + "'>" + link + "</div>"
+			block += "<div id='comment-" + this.b64 + "'></div>"
+			return block
+		}
+	}
+	
+	getCertificatesBlock() {
+		if (this.certificates == "0")
+			return ""
+		return _t("View {0} Certificates", this.certificates)
 	}
 	
 	getBrowseBlock() {
@@ -304,10 +352,13 @@ class SenderForResult {
 class SendersForResult {
 	constructor(xmlNode) {
 		this.sendersForResult = []
+		this.sendersMap = new Map()
 		var senderNodes = xmlNode.getElementsByTagName("Sender")
 		var i
 		for (i = 0; i < senderNodes.length; i++) {
-			this.sendersForResult.push(new SenderForResult(senderNodes[i]))
+			var sender = new SenderForResult(senderNodes[i])
+			this.sendersForResult.push(sender)
+			this.sendersMap.set(sender.b64, sender)
 		}
 	}
 	
@@ -350,45 +401,56 @@ var results
 var currentResult
 var sendersForResult
 
+// expanded comments
+var expandedComments = new Map()
+
 // status fields
 var uuid = null;
 var statusByUUID = new Map()
-
-// expanded comments
-var expandedComments = new Map();
 
 // pointers based on current view type
 var refreshFunction = null
 var refreshType = null
 
-function showCommentBySender(divId, spanId) {
-	var split = divId.split("_");
-	var commentDiv = document.getElementById(divId);
-	var comment = "<pre>"+ currentSearchBySender.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
+function showCommentBySender(infoHash) {
+	
+	expandedComments.set(infoHash, true)
+	
+	var commentText = resultsFromSender.resultsMap.get(infoHash).comment
+	
+	var commentDiv = document.getElementById("comment-" + infoHash);
+	var comment = "<pre>"+ commentText + "</pre>";
 	commentDiv.innerHTML = comment
-	expandedComments.set(divId, comment);
-	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"Sender\");return false;'>" + _t("Hide Comment") + "</a>";
-    var linkSpan = document.getElementById(spanId);
+	
+	
+	var hideLink = "<a href='#' onclick='window.hideComment(\"" + infoHash + "\");return false;'>" + _t("Hide Comment") + "</a>";
+    var linkSpan = document.getElementById("comment-link-" + infoHash);
 	linkSpan.innerHTML = hideLink;
 }
 
-function showCommentByFile(divId, spanId) {
-	var split = divId.split("_");
-	var commentDiv = document.getElementById(divId);
-	var comment = "<pre>"+currentSearchByFile.resultBatches.get(split[2]).results.get(split[3]).comment + "</pre>";
+function showCommentByFile(b64) {
+	
+	expandedComments.set(b64, true)
+	
+	var commentText = sendersForResult.sendersMap.get(b64).comment
+	
+	var commentDiv = document.getElementById("comment-" + b64)
+	var comment = "<pre>" + commentText + "</pre>"
 	commentDiv.innerHTML = comment
-	expandedComments.set(divId, comment);
-	var hideLink = "<a href='#' onclick='window.hideComment(\""+divId+"\",\""+spanId+"\",\"File\");return false;'>" + _t("Hide Comment") + "</a>";
-    var linkSpan = document.getElementById(spanId);
+	
+	var hideLink = "<a href='#' onclick='window.hideComment(\"" + b64 + "\");return false;'>" + _t("Hide Comment") + "</a>";
+	var linkSpan = document.getElementById("comment-link-" + b64);
 	linkSpan.innerHTML = hideLink;
 }
 
-function hideComment(divId, spanId, byFile) {
-	expandedComments.delete(divId);
-	var commentDiv = document.getElementById(divId);
+function hideComment(id) {
+	expandedComments.delete(id)
+	
+	var commentDiv = document.getElementById("comment-" + id);
 	commentDiv.innerHTML = ""
-	var showLink = "<a href='#' onclick='window.showCommentBy"+byFile+"(\"" + divId + "\",\"" + spanId + "\"); return false;'>" + _t("Show Comment") + "</a>";
-	var linkSpan = document.getElementById(spanId);
+	
+	var showLink = "<a href='#' onclick='window.showCommentBy" + refreshType + "(\"" + id + "\"); return false;'>" + _t("Show Comment") + "</a>";
+	var linkSpan = document.getElementById("comment-link-"+id);
 	linkSpan.innerHTML = showLink;
 }
 
