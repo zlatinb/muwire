@@ -1,5 +1,6 @@
 package com.muwire.webui;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,17 +98,22 @@ public class SearchServlet extends HttpServlet {
             if (results == null)
                 return;
             
-            sb.append("<Senders>");
+            List<Sender> senders = new ArrayList<>();
             results.getBySender().forEach( (persona, resultsFromSender) -> {
                 Sender sender = new Sender(persona,
                         core.getTrustService().getLevel(persona.getDestination()),
                         resultsFromSender.iterator().next().getBrowse(),
                         browseManager.isBrowsing(persona),
                         resultsFromSender.size());
-                sender.toXML(sb);
+                senders.add(sender);
             });
+            
+            sort(senders, req, SENDER_COMPARATORS);
+            
+            sb.append("<Senders>");
+            senders.forEach(sender -> sender.toXML(sb));
             sb.append("</Senders>");
-        } else if (section.equals("groupBySender")) {
+        } else if (section.equals("resultsFromSender")) {
             if (searchManager == null || downloadManager == null) {
                 resp.sendError(403, "Not initialized");
                 return;
@@ -121,46 +127,30 @@ public class SearchServlet extends HttpServlet {
             
             UUID uuid = UUID.fromString(uuidString);
             
-            SearchResults results = searchManager.getResults().get(uuid);
-            if (results == null)
+            String senderB64 = req.getParameter("sender");
+            Persona sender;
+            try {
+                sender = new Persona(new ByteArrayInputStream(Base64.decode(senderB64)));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
                 return;
+            }
             
-            Map<Persona, Set<UIResultEvent>> bySender = results.getBySender();
-            sb.append("<ResultsBySender>");
-            bySender.forEach((sender, resultsFromSender) -> {
-                sb.append("<ResultsFromSender>");
-                sb.append("<Sender>");
-                sb.append(Util.escapeHTMLinXML(sender.getHumanReadableName()));
-                sb.append("</Sender>");
-                sb.append("<SenderB64>").append(sender.toBase64()).append("</SenderB64>");
-                sb.append("<Browse>").append(resultsFromSender.iterator().next().getBrowse()).append("</Browse>");
-                sb.append("<Browsing>").append(browseManager.isBrowsing(sender)).append("</Browsing>");
-                sb.append("<Trust>").append(core.getTrustService().getLevel(sender.getDestination())).append("</Trust>");
-                resultsFromSender.forEach(result -> {
-                    sb.append("<Result>");
-                    sb.append("<Name>");
-                    sb.append(Util.escapeHTMLinXML(result.getName()));
-                    sb.append("</Name>");
-                    sb.append("<Size>");
-                    sb.append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B");
-                    sb.append("</Size>");
-                    String infohash = Base64.encode(result.getInfohash().getRoot());
-                    sb.append("<InfoHash>");
-                    sb.append(infohash);
-                    sb.append("</InfoHash>");
-                    sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
-                    if (result.getComment() != null) {
-                        sb.append("<Comment>")
-                        .append(Util.escapeHTMLinXML(result.getComment()))
-                        .append("</Comment>");
-                    }
-                    sb.append("<Certificates>").append(result.getCertificates()).append("</Certificates>");
-                    sb.append("</Result>");
-                });
-                sb.append("</ResultsFromSender>");
+            SearchResults searchResults = searchManager.getResults().get(uuid);
+            Set<UIResultEvent> results = searchResults.getBySender().get(sender);
+            List<ResultFromSender> resultsFromSender = new ArrayList<>();
+            results.forEach(result -> {
+                ResultFromSender resultFromSender = new ResultFromSender(result,
+                        downloadManager.isDownloading(result.getInfohash()));
+                resultsFromSender.add(resultFromSender);
             });
-            sb.append("</ResultsBySender>");
-        } else if (section.equals("groupByFile")) {
+            
+            sort(resultsFromSender, req, RESULT_FROM_SENDER_COMPARATORS);
+            
+            sb.append("<ResultsFromSender>");
+            resultsFromSender.forEach(result -> result.toXML(sb));
+            sb.append("</ResultsFromSender>");
+        } else if (section.equals("results")) {
             if (searchManager == null || downloadManager == null) {
                 resp.sendError(403, "Not initialized");
                 return;
@@ -173,38 +163,73 @@ public class SearchServlet extends HttpServlet {
             }
             
             UUID uuid = UUID.fromString(uuidString);
-            
-            SearchResults results = searchManager.getResults().get(uuid);
-            if (results == null)
+            SearchResults searchResults = searchManager.getResults().get(uuid);
+            if (searchResults == null)
                 return;
-
-            Map<InfoHash, Set<UIResultEvent>> byInfohash = results.getByInfoHash();
-            sb.append("<ResultsByFile>");
-            byInfohash.forEach((infoHash, resultSet) -> {
-                sb.append("<ResultsForFile>");
-                UIResultEvent first = resultSet.iterator().next();
-                sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
-                sb.append("<Downloading>").append(downloadManager.isDownloading(infoHash)).append("</Downloading>");
-                sb.append("<Name>").append(Util.escapeHTMLinXML(first.getName())).append("</Name>");
-                sb.append("<Size>").append(DataHelper.formatSize2Decimal(first.getSize(), false)).append("B").append("</Size>");
-                resultSet.forEach(result -> {
-                    sb.append("<Result>");
-                    sb.append("<Sender>").append(Util.escapeHTMLinXML(result.getSender().getHumanReadableName())).append("</Sender>");
-                    sb.append("<SenderB64>").append(result.getSender().toBase64()).append("</SenderB64>");
-                    sb.append("<Browse>").append(result.getBrowse()).append("</Browse>");
-                    sb.append("<Browsing>").append(browseManager.isBrowsing(result.getSender())).append("</Browsing>");
-                    sb.append("<Trust>").append(core.getTrustService().getLevel(result.getSender().getDestination())).append("</Trust>");
-                    if (result.getComment() != null) {
-                        sb.append("<Comment>")
-                        .append(Util.escapeHTMLinXML(result.getComment()))
-                        .append("</Comment>");
-                    }
-                    sb.append("<Certificates>").append(result.getCertificates()).append("</Certificates>");
-                    sb.append("</Result>");
-                });
-                sb.append("</ResultsForFile>");
+            Map<InfoHash, Set<UIResultEvent>> byInfohash = searchResults.getByInfoHash();
+            
+            List<Result> results = new ArrayList<>();
+            byInfohash.forEach( (infoHash, resultSet) -> {
+                UIResultEvent event = resultSet.iterator().next();
+                Result result = new Result(event.getName(),
+                        event.getSize(),
+                        downloadManager.isDownloading(infoHash),
+                        infoHash);
+                results.add(result);
             });
-            sb.append("</ResultsByFile>");
+            
+            sort(results, req, RESULT_COMPARATORS);
+            
+            sb.append("<Results>");
+            results.forEach(result -> result.toXML(sb));
+            sb.append("</Results>");
+        } else if (section.equals("sendersForResult")) {
+            if (searchManager == null || downloadManager == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
+            
+            String uuidString = req.getParameter("uuid");
+            if (uuidString == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            
+            UUID uuid = UUID.fromString(uuidString);
+            SearchResults searchResults = searchManager.getResults().get(uuid);
+            if (searchResults == null)
+                return;
+            
+            String infoHashB64 = req.getParameter("infoHash");
+            InfoHash infoHash;
+            try {
+                infoHash = new InfoHash(Base64.decode(infoHashB64));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            
+            Set<UIResultEvent> resultSet = searchResults.getByInfoHash(infoHash);
+            if (resultSet == null) 
+                return;
+            
+            List<SenderForResult> sendersForResult = new ArrayList<>();
+            resultSet.forEach(event -> {
+                SenderForResult senderForResult = new SenderForResult(event.getSender(),
+                        event.getBrowse(),
+                        browseManager.isBrowsing(event.getSender()),
+                        event.getComment(),
+                        event.getCertificates(),
+                        core.getTrustService().getLevel(event.getSender().getDestination()));
+                sendersForResult.add(senderForResult);
+            });
+            
+            sort(sendersForResult, req, SENDER_FOR_RESULT_COMPARATORS);
+            
+            sb.append("<Senders>");
+            sendersForResult.forEach(sender -> sender.toXML(sb));
+            sb.append("</Senders>");
+            
         } else if (section.equals("connectionsCount")) {
             if (connectionCounter == null) {
                 resp.sendError(403, "Not initialized");
@@ -217,6 +242,7 @@ public class SearchServlet extends HttpServlet {
             resp.sendError(403, "Bad section param");
             return;
         }
+        
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");
         resp.setDateHeader("Expires", 0);
@@ -238,7 +264,7 @@ public class SearchServlet extends HttpServlet {
         core = (Core) config.getServletContext().getAttribute("core");
     }
     
-    private class Sender {
+    private static class Sender {
         private final Persona persona;
         private final TrustLevel trustLevel;
         private final boolean browse;
@@ -263,6 +289,100 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Results>").append(results).append("</Results>");
             sb.append("</Sender>");
         }
+    }
+    
+    private static class ResultFromSender {
+        private final String name;
+        private final long size;
+        private final InfoHash infoHash;
+        private final boolean downloading;
+        private final String comment;
+        private final int certificates;
+        
+        ResultFromSender(UIResultEvent e, boolean downloading) {
+            this.name = e.getName();
+            this.size = e.getSize();
+            this.infoHash = e.getInfohash();
+            this.downloading = downloading;
+            this.comment = e.getComment();
+            this.certificates = e.getCertificates();
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Result>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
+            sb.append("<Downloading>").append(downloading).append("</Downloading>");
+            if (comment != null)
+                sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
+            sb.append("<Certificates>").append(certificates).append("</Certificates>");
+            sb.append("</Result>");
+        }
+    }
+    
+    private static class Result {
+        private final String name;
+        private final long size;
+        private final boolean downloading;
+        private final InfoHash infoHash;
+        
+        Result(String name, long size, boolean downloading, InfoHash infoHash) {
+            this.name = name;
+            this.size = size;
+            this.downloading = downloading;
+            this.infoHash = infoHash;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Result>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
+            sb.append("<Downloading>").append(downloading).append("</Downloading>");
+            sb.append("</Result>");
+        }
+    }
+    
+    
+    private static class SenderForResult {
+        private final Persona sender;
+        private final boolean browse;
+        private final boolean browsing;
+        private final String comment;
+        private final int certificates;
+        private final TrustLevel trustLevel;
+        
+        SenderForResult(Persona sender, boolean browse, boolean browsing, String comment, int certificates, TrustLevel trustLevel) {
+            this.sender = sender;
+            this.browse = browse;
+            this.trustLevel = trustLevel;
+            this.browsing = browsing;
+            this.comment = comment;
+            this.certificates = certificates;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Sender>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(sender.getHumanReadableName())).append("</Name>");
+            sb.append("<B64>").append(sender.toBase64()).append("</B64>");
+            sb.append("<Browse>").append(browse).append("</Browse>");
+            sb.append("<Trust>").append(trustLevel.toString()).append("</Trust>");
+            sb.append("<Browsing>").append(browsing).append("</Browsing>");
+            if (comment != null)
+                sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
+            sb.append("<Certificates>").append(certificates).append("</Certificates>");
+            sb.append("</Sender>");
+        }
+        
+    }
+    
+    private static <T> void sort(List<T> items, HttpServletRequest req, ColumnComparators<T> comparators) {
+        String key = req.getParameter("key");
+        String order = req.getParameter("order");
+        Comparator<T> comparator = comparators.get(key, order);
+        if (comparator != null)
+            Collections.sort(items, comparator);
     }
     
     private static final Comparator<SearchResults> SEARCH_BY_NAME = (k, v) -> {
@@ -302,5 +422,61 @@ public class SearchServlet extends HttpServlet {
         SENDER_COMPARATORS.add("Trust", SENDER_BY_TRUST);
         SENDER_COMPARATORS.add("Results", SENDER_BY_RESULTS);
     }
+    
+    private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_NAME = (k, v) -> {
+        return k.name.compareTo(v.name);
+    };
+    
+    private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_SIZE = (k, v) -> {
+        return Long.compare(k.size, v.size);
+    };
+    
+    private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_DOWNLOAD = (k, v) -> {
+        return Boolean.compare(k.downloading, v.downloading);
+    };
+    
+    private static final ColumnComparators<ResultFromSender> RESULT_FROM_SENDER_COMPARATORS = new ColumnComparators<>();
+    static {
+        RESULT_FROM_SENDER_COMPARATORS.add("Name", RESULT_FROM_SENDER_BY_NAME);
+        RESULT_FROM_SENDER_COMPARATORS.add("Size", RESULT_FROM_SENDER_BY_SIZE);
+        RESULT_FROM_SENDER_COMPARATORS.add("Download", RESULT_FROM_SENDER_BY_DOWNLOAD);
+    }
+    
+    private static final Comparator<Result> RESULT_BY_NAME = (k, v) -> {
+        return k.name.compareTo(v.name);
+    };
+    
+    private static final Comparator<Result> RESULT_BY_SIZE = (k, v) -> {
+        return Long.compare(k.size, v.size);
+    };
+    
+    private static final Comparator<Result> RESULT_BY_DOWNLOAD = (k, v) -> {
+        return Boolean.compare(k.downloading, v.downloading);
+    };
+    
+    private static final ColumnComparators<Result> RESULT_COMPARATORS = new ColumnComparators<>();
+    static {
+        RESULT_COMPARATORS.add("Name", RESULT_BY_NAME);
+        RESULT_COMPARATORS.add("Size", RESULT_BY_SIZE);
+        RESULT_COMPARATORS.add("Download", RESULT_BY_DOWNLOAD);
+    }
 
+    private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_SENDER = (k, v) -> {
+        return k.sender.getHumanReadableName().compareTo(v.sender.getHumanReadableName());
+    };
+    
+    private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_BROWSING = (k, v) -> {
+        return Boolean.compare(k.browsing, v.browsing);
+    };
+    
+    private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_TRUST = (k, v) -> {
+        return k.trustLevel.toString().compareTo(v.trustLevel.toString());
+    };
+    
+    private static final ColumnComparators<SenderForResult> SENDER_FOR_RESULT_COMPARATORS = new ColumnComparators<>();
+    static {
+        SENDER_FOR_RESULT_COMPARATORS.add("Sender", SENDER_FOR_RESULT_BY_SENDER);
+        SENDER_FOR_RESULT_COMPARATORS.add("Browse", SENDER_FOR_RESULT_BY_BROWSING);
+        SENDER_FOR_RESULT_COMPARATORS.add("Trust", SENDER_FOR_RESULT_BY_TRUST);
+    }
 }

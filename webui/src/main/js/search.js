@@ -8,48 +8,32 @@ class SearchStatus {
 	}
 }
 
-class SearchBySender {
-	constructor(xmlNode) {
-		this.resultBatches = new Map();
-		
-		var resultsBySender = xmlNode.getElementsByTagName("ResultsBySender")[0];
-		var resultsFromSenders = resultsBySender.getElementsByTagName("ResultsFromSender");
-		var i;
-		for (i = 0; i < resultsFromSenders.length; i++) {
-			var results = new ResultsBySender(resultsFromSenders[i]);
-			this.resultBatches.set(results.sender, results);
-		}
-	}
-}
 
-class SearchByFile {
+class Sender {
 	constructor(xmlNode) {
-		this.resultBatches = new Map();
-		
-		var resultsByFile = xmlNode.getElementsByTagName("ResultsByFile")[0];
-		var resultsForFile = resultsByFile.getElementsByTagName("ResultsForFile");
-		var i;
-		for (i = 0; i < resultsForFile.length; i++) {
-			var results = new ResultsByFile(resultsForFile[i]);
-			this.resultBatches.set(results.infoHash, results);
-		}
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+		this.b64 = xmlNode.getElementsByTagName("B64")[0].childNodes[0].nodeValue
+		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
+		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue
+		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue
+		this.results = xmlNode.getElementsByTagName("Results")[0].childNodes[0].nodeValue
 	}
-}
-
-class ResultsBySender {
-	constructor(xmlNode) {
-		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
-		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
-		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
-		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
-		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue;
-		this.results = new Map();
-		var resultNodes = xmlNode.getElementsByTagName("Result");
-		var i;
-		for (i = 0 ; i < resultNodes.length; i ++) {
-			var result = new ResultBySender(resultNodes[i]);
-			this.results.set(result.infoHash,result);
-		}
+	
+	getMapping() {
+		var mapping = new Map()
+		mapping.set("Sender", this.getSenderLink())
+		mapping.set("Results", this.results)
+		
+		var trustHtml = this.trust + this.getTrustLinks()
+		mapping.set("Trust", trustHtml)
+		
+		mapping.set("Browse", this.getBrowseBlock())
+		
+		return mapping
+	}
+	
+	getSenderLink() {
+		return "<a href='#' onclick='window.refreshResultsFromSender(\"" + this.b64 + "\");return false'>" + this.name + "</a>"
 	}
 	
 	getTrustLinks() {
@@ -62,87 +46,231 @@ class ResultsBySender {
 	}
 	
 	getTrustLink() {
-		return "<span id='trusted-link-" + this.senderB64 + "'>" +
+		return "<span id='trusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.senderB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
-				this.senderB64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
+				this.b64 + "'></span>"
 	}
 	
 	getNeutralLink() {
-		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
+		return "<a href'#' onclick='window.markNeutral(\"" + this.b64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustLink() {
-		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
+		return "<span id='distrusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.senderB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
-				this.senderB64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
+				this.b64 + "'></span>"
+	}
+	
+	getBrowseBlock() {
+		if (this.browse == "false")
+			return ""
+		if (this.browsing == "true")
+			return _t("Browsing")
+		var link = "<a href='#' onclick='window.browse(\"" + this.b64 + "\"); return false;'>" + _t("Browse") + "</a>"
+		var block = "<span id='browse-link-" + this.b64 + "'>" + link + "</span>"
+		return block
 	}
 }
 
-class ResultsByFile {
+class Senders {
 	constructor(xmlNode) {
-		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
-		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
-		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
-		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
-		this.results = new Map();
-		var resultNodes = xmlNode.getElementsByTagName("Result");
-		var i;
+		this.senders = []
+		var senderNodes = xmlNode.getElementsByTagName("Sender")
+		var i
+		for (i = 0; i < senderNodes.length; i++) {
+			this.senders.push(new Sender(senderNodes[i]))
+		}
+	}
+	
+	render(preserveSortOrder) {
+		if (!preserveSortOrder) {
+			if (sendersSortOrder == "descending")
+				sendersSortOrder = "ascending"
+			else
+				sendersSortOrder = "descending"
+		}
+		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, sendersSortOrder)
+		var i
+		for (i = 0; i < this.senders.length; i++) {
+			table.addRow(this.senders[i].getMapping())
+		}
+		return table.render()
+	}
+}
+
+class ResultFromSender {
+	constructor(xmlNode) {
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
+		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
+		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+		this.comment = null
+		try {
+			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
+		} catch (ignored) {}
+		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
+	}
+	
+	getMapping() {
+		var mapping = new Map()
+		
+		var nameHtml = this.name
+		nameHtml += this.getCommentBlock()
+		nameHtml += this.getCertificatesBlock()
+		mapping.set("Name", nameHtml)
+		mapping.set("Size", this.size)
+		mapping.set("Download", this.getDownloadBlock())
+		
+		return mapping
+	}
+	
+	getCommentBlock() {
+		if (this.comment == null)
+			return ""
+		var html = "<div id='comment-link-" + this.infoHash + "'>"
+		html += "<a href='#' onclick='window.showComment(\"" + this.infoHash + "\");return false;'>"
+		html += _t("Show Comment")
+		html += "</a>"
+		html += "</div>"
+		html += "<div id='comment-" + this.infoHash + "'></div>"
+		return html
+	}
+	
+	getCertificatesBlock() {
+		if (this.certificates == "0")
+			return ""
+		return _t("View {0} Certificates", this.certificates)
+	}
+	
+	getDownloadBlock() {
+		if (this.downloading == "true")
+			return _t("Downloading")
+		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
+		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
+		return block
+	}
+}
+
+class ResultsFromSender {
+	constructor(xmlNode) {
+		this.resultsFromSender = []
+		var resultNodes = xmlNode.getElementsByTagName("Result")
+		var i
 		for (i = 0; i < resultNodes.length; i++) {
-			var result = new ResultByFile(resultNodes[i]);
-			this.results.set(result.sender, result);
+			this.resultsFromSender.push(new ResultFromSender(resultNodes[i]))
 		}
 	}
-}
-
-class ResultBySender {
-	constructor(xmlNode) {
-		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
-		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue;
-		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
-		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue;
-		this.comment = null;
-		var comment = xmlNode.getElementsByTagName("Comment")
-		if (comment.length == 1) 
-			this.comment = comment[0].childNodes[0].nodeValue;
-		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
-	}
 	
-	getCertificatesBlock() {
-		if (this.certificates == "0")
-			return ""
-		var linkText = _t("View {0} Certificates", this.certificates)
-		var link = "<a href='#' onclick='window.viewCertificatesBySender(\"" + this.infoHash + "\",\"" + this.certificates + "\");return false;'>" + 
-			linkText + "</a>"
-		var id = senderB64 + "_" + this.infoHash
-		var html = "<div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>"
-		return html
+	render(preserveSortOrder) {
+		if (!preserveSortOrder) {
+			if (resultsFromSenderSortOrder == "descending")
+				resultsFromSenderSortOrder = "ascending"
+			else
+				resultsFromSenderSortOrder = "descending"
+		}
+		var table = new Table(["Name","Size","Download"], "sortResultsFromSenderTable", resultsFromSenderSortKey, resultsFromSenderSortOrder)
+		var i
+		for (i = 0 ; i < this.resultsFromSender.length; i++) {
+			table.addRow(this.resultsFromSender[i].getMapping())
+		}
+		return table.render()
 	}
 }
 
-class ResultByFile {
+class Result {
 	constructor(xmlNode) {
-		this.sender = xmlNode.getElementsByTagName("Sender")[0].childNodes[0].nodeValue;
-		this.senderB64 = xmlNode.getElementsByTagName("SenderB64")[0].childNodes[0].nodeValue;
-		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue;
-		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue;
-		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue;
-		this.comment = null;
-		var comment = xmlNode.getElementsByTagName("Comment")
-		if (comment.length == 1) 
-			this.comment = comment[0].childNodes[0].nodeValue;
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
+		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
+		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+	}
+	
+	getMapping() {
+		var mapping = new Map()
+		mapping.set("Name", this.getNameBlock())
+		mapping.set("Size", this.size)
+		mapping.set("Download", this.getDownloadBlock())
+		return mapping
+	}
+	
+	getNameBlock() {
+		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\");return false;'>" + this.name + "</a>"
+	}
+	getDownloadBlock() {
+		if (this.downloading == "true")
+			return _t("Downloading")
+		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
+		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
+		return block
+	}
+}
+
+class Results {
+	constructor(xmlNode) {
+		this.results = []
+		var resultNodes = xmlNode.getElementsByTagName("Result")
+		var i
+		for (i = 0; i < resultNodes.length; i++) {
+			this.results.push(new Result(resultNodes[i]))
+		}
+	}
+	
+	render(preserveSortOrder) {
+		if (!preserveSortOrder) {
+			if(resultsSortOrder == "descending")
+				resultsSortOrder = "ascending"
+			else
+				resultsSortOrder = "descending"
+		}
+		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, resultsSortOrder)
+		var i
+		for (i = 0; i < this.results.length; i++) {
+			table.addRow(this.results[i].getMapping())
+		}
+		return table.render()
+	}
+}
+
+class SenderForResult {
+	constructor(xmlNode) {
+		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+		this.b64 = xmlNode.getElementsByTagName("B64")[0].childNodes[0].nodeValue
+		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue
+		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue
+		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
+		this.comment = null
+		try {
+			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
+		} catch (ignored) {}
 		this.certificates = xmlNode.getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 	}
 	
-	getCertificatesBlock() {
-		if (this.certificates == "0")
+	getMapping() {
+		var mapping = new Map()
+		mapping.set("Sender", this.getNameBlock())
+		mapping.set("Browse", this.getBrowseBlock())
+		mapping.set("Trust", this.getTrustBlock())
+		return mapping
+	}
+	
+	getNameBlock() {
+		return this.name
+	}
+	
+	getBrowseBlock() {
+		if (this.browse != "true")
 			return ""
-		var linkText = _t("View {0} Certificates", this.certificates)
-		var link = "<a href='#' onclick='window.viewCertificatesByFile(\"" + this.senderB64 + "\",\"" + this.certificates + "\");return false;'>" + linkText + "</a>"
-		var id = this.senderB64 + "_" + infoHash
-		var html = "<div id='certificates-link-" + id +"'>" + link + "</div><div id='certificates-" + id +"'></div>"
-		return html
+		if (this.browsing == "true")
+			return _t("Browsing")
+		var link = "<a href='#' onclick='window.browse(\"" + this.b64 + "\");return false;'>" + _t("Browse") + "</a>"
+		var block = "<span id='browse-link-" + this.b64 + "'>" + link + "</span>"
+		return block
+	}
+	
+	getTrustBlock() {
+		return this.trust + this.getTrustLinks()
 	}
 	
 	getTrustLinks() {
@@ -155,40 +283,83 @@ class ResultByFile {
 	}
 	
 	getTrustLink() {
-		return "<span id='trusted-link-" + this.senderB64 + "'>" +
+		return "<span id='trusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.senderB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
-				this.senderB64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
+				this.b64 + "'></span>"
 	}
 	
 	getNeutralLink() {
-		return "<a href'#' onclick='window.markNeutral(\"" + this.senderB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
+		return "<a href'#' onclick='window.markNeutral(\"" + this.b64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustLink() {
-		return "<span id='distrusted-link-" + this.senderB64 + "'>" +
+		return "<span id='distrusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.senderB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
-				this.senderB64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
+				this.b64 + "'></span>"
+	}
+}
+
+class SendersForResult {
+	constructor(xmlNode) {
+		this.sendersForResult = []
+		var senderNodes = xmlNode.getElementsByTagName("Sender")
+		var i
+		for (i = 0; i < senderNodes.length; i++) {
+			this.sendersForResult.push(new SenderForResult(senderNodes[i]))
+		}
+	}
+	
+	render(preserveSortOrder) {
+		if (!preserveSortOrder) {
+			if (sendersForResultSortOrder == "descending")
+				sendersForResultSortOrder = "ascending"
+			else
+				sendersForResultsSortOrder = "descending"
+		}
+		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, sendersForResultSortOrder)
+		var i
+		for (i = 0; i < this.sendersForResult.length; i++) {
+			table.addRow(this.sendersForResult[i].getMapping())
+		}
+		return table.render()
 	}
 }
 
 
-var statusByUUID = new Map()
-var currentSearchBySender = null
-var currentSearchByFile = null
-var currentSender = null
-var currentFile = null
-var expandedComments = new Map();
+// sort fields
+var sendersSortKey
+var sendersSortOrder
+var resultsFromSenderSortKey
+var resultsFromSenderSortOrder
 
-var uuid = null;
-var sender = null;
-var senderB64 = null
-var lastXML = null;
-var infoHash = null;
+var resultsSortKey
+var resultsSortOrder
+var sendersForResultSortKey
+var sendersForResultSortOrder
 
 var statusKey = null
 var statusOrder = null
+
+// global fields
+var senders
+var currentSender
+var resultsFromSender
+var results
+var currentResult
+var sendersForResult
+
+// status fields
+var uuid = null;
+var statusByUUID = new Map()
+
+// expanded comments
+var expandedComments = new Map();
+
+// pointers based on current view type
+var refreshFunction = null
+var refreshType = null
 
 function showCommentBySender(divId, spanId) {
 	var split = divId.split("_");
@@ -301,207 +472,14 @@ function publishTrust(host, reason, trust) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			if (refreshType == "Sender")
-				refreshGroupBySender(uuid)
+				refreshSender(uuid)
 			else if (refreshType == "File")
-				refreshGroupByFile(uuid)
+				refreshFile(uuid)
 		}
 	}
 	xmlhttp.open("POST","/MuWire/Trust", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=" + trust + "&reason=" + reason + "&persona=" + host)
-}
-
-function updateSender(senderName) {
-	sender = senderName;
-	
-	var resultsFromSpan = document.getElementById("resultsFrom");
-	resultsFromSpan.innerHTML = _t("Results from {0}", sender);
-	
-	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>"
-	var x = currentSearchBySender
-	var senderBatch = x.resultBatches.get(sender)
-	senderB64 = senderBatch.senderB64
-	x = senderBatch.results;
-	for (var [resultInfoHash, result] of x) {
-		table += "<tr>";
-		table += "<td>";
-		table += result.name;
-		if (result.comment != null) {
-			var divId = "comment_" + uuid + "_" + senderName + "_" + resultInfoHash;
-			var spanId = "comment-link-"+resultInfoHash + senderName + uuid;
-			var comment = expandedComments.get(divId);
-			if (comment != null) {
-				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"Sender\");return false;'>" + _t("Hide Comment") + "</a>";
-				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
-				table += "<div id='" + divId + "'>"+comment+"</div>";				
-			} else {
-				var link = "<a href='#' onclick='window.showCommentBySender(\"" + divId +
-					"\",\""+spanId+"\");"+
-					"return false;'>" + _t("Show Comment") + "</a>"; 			
-				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
-				table += "<div id='"+divId+"'></div>";
-			}
-		}
-		table += result.getCertificatesBlock()
-		table += "</td>";
-		table += "<td>";
-		table += result.size;
-		table += "</td>";
-		table += "<td>";
-		if (result.downloading == "false") {
-			table += "<span id='download-"+ resultInfoHash+"'><a href='#' onclick='window.download(\"" + resultInfoHash + "\");return false;'>" + _t("Download") + "</a></span>";
-		} else {
-			table += _t("Downloading");
-		}
-		table += "</td>";
-		table += "</tr>";
-	}
-	table += "</tbody></table>";
-	if (x.size > 0)
-		resultsDiv.innerHTML = table;
-}
-
-function updateFile(fileInfoHash) {
-	infoHash = fileInfoHash;
-	
-	var searchResults = currentSearchByFile.resultBatches.get(infoHash);
-	
-	var resultsFromSpan = document.getElementById("resultsFrom");
-	resultsFromSpan.innerHTML = _t("Results for {0}", searchResults.name);
-	
-	var resultsDiv = document.getElementById("bottomTable");
-	var table = "<table><thead><tr><th>" + _t("Sender") + "</th><th>" + _t("Browse") + "</th></tr></thead><tbody>";
-	var i;
-	for (var [senderName, result] of searchResults.results) {
-		table += "<tr>";
-		table += "<td>";
-		table += senderName
-		if (result.comment != null) {
-			var divId = "comment_" + uuid + "_" + fileInfoHash + "_" + senderName;
-			var spanId = "comment-link-" + fileInfoHash + senderName + uuid;
-			var comment = expandedComments.get(divId);
-			if (comment != null) {
-				var link = "<a href='#' onclick='window.hideComment(\""+divId +"\",\"" + spanId + "\",\"File\");return false;'>" + _t("Hide Comment") + "</a>";
-				table += "<br/><span id='"+spanId+"'>" + link + "</span><br/>";
-				table += "<div id='" + divId + "'>"+comment+"</div>";
-			} else {
-				var link = "<a href='#' onclick='window.showCommentByFile(\"" + divId +
-					"\",\""+spanId+"\");"+
-					"return false;'>" + _t("Show Comment") + "</a>"; 			
-				table += "<br/><span id='"+spanId+"'>"+link+"</span>";
-				table += "<div id='"+divId+"'></div>";
-			}
-		}
-		table += result.getCertificatesBlock()
-		table += "</td>";
-		if (result.browse == "true") {
-			if (result.browsing == "true")
-				table += "<td>" + _t("Browsing") + "</td>"
-			else {
-				table += "<td><span id='browse-link-" + result.senderB64 + "'>" + getBrowseLink(result.senderB64) + "</span></td>"
-			}
-		}
-		table += "<td>" + result.trust + " " + result.getTrustLinks() + "</td>"
-		table += "</tr>";
-	}
-	table += "</tbody></table>";
-	if (searchResults.results.size > 0)
-		resultsDiv.innerHTML = table;
-}			
-
-function updateUUIDBySender(resultUUID) {
-	uuid = resultUUID;
-	
-	var currentStatus = statusByUUID.get(uuid)
-	
-	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = currentStatus.query + " Results";
-	
-	var sendersDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>" + _t("Sender") + "</th><th>" + _t("Browse") + "</th><th>" + _t("Trust") + "</th></tr></thead><tbody>";
-	var x = currentSearchBySender.resultBatches;
-	for (var [senderName, senderBatch] of x) {
-		table += "<tr><td><a href='#' onclick='updateSender(\""+senderName+"\");return false;'>"
-		table += senderName;
-		table += "</a></td>";
-		if (senderBatch.browse == "true") {
-			if (senderBatch.browsing == "true") 
-				table += "<td>" + _t("Browsing") + "</td>"
-			else 
-				table += "<td><span id='browse-link-" + senderBatch.senderB64 + "'>" + getBrowseLink(senderBatch.senderB64) + "</span></td>"
-		} 
-		table += "<td>" + senderBatch.trust + " "+senderBatch.getTrustLinks() + "</td>"
-		table += "</tr>";
-	}
-	table += "</tbody></table>";
-	if (x.size > 0)
-		sendersDiv.innerHTML = table;
-	if (sender != null)
-		updateSender(sender);
-}
-
-function updateUUIDByFile(resultUUID) {
-	uuid = resultUUID;
-	
-	var currentStatus = statusByUUID.get(uuid)
-	
-	var currentSearchSpan = document.getElementById("currentSearch");
-	currentSearchSpan.innerHTML = _t("Results for {0}", currentStatus.query)
-	
-	var topTableDiv = document.getElementById("topTable");
-	var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Size") + "</th><th>" + _t("Download") + "</th></tr></thead><tbody>";
-	var x = currentSearchByFile.resultBatches;
-	for (var [fileInfoHash, file] of x) {
-		table += "<tr><td><a href='#' onclick='updateFile(\""+fileInfoHash+"\");return false;'>";
-		table += file.name;
-		table += "</a></td>";
-		table += "<td>";
-		table += file.size;
-		table += "</td>";
-		table += "<td>";
-		if (file.downloading == "false") 
-			table += "<span id='download-"+fileInfoHash+"'><a href='#' onclick='window.download(\""+fileInfoHash+"\"); return false;'>" + _t("Download") + "</a></span>";
-		else
-			table += _t("Downloading");
-		table += "</td></tr>";
-	}
-	table += "</tbody></table>";
-	if (x.size > 0) 
-		topTableDiv.innerHTML = table;
-	if (infoHash != null)
-		updateFile(infoHash);
-}
-
-function refreshGroupBySender(searchUUID) {
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			var xmlDoc = this.responseXML;
-			currentSearchBySender = new SearchBySender(xmlDoc)
-			updateUUIDBySender(searchUUID);
-		}
-	}
-	xmlhttp.open("GET", "/MuWire/Search?section=groupBySender&uuid="+searchUUID, true);
-	xmlhttp.send();
-}
-
-function refreshGroupByFile(searchUUID) {
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			var xmlDoc = this.responseXML;
-			
-			currentSearchByFile = new SearchByFile(xmlDoc)
-			updateUUIDByFile(searchUUID)
-		}
-	}
-	xmlhttp.open("GET", "/MuWire/Search?section=groupByFile&uuid="+searchUUID, true);
-	xmlhttp.send();
-}
-
-function getBrowseLink(host) {
-	return "<a href='#' onclick='window.browse(\"" + host + "\"); return false;'>" + _t("Browse") + "</a>"
 }
 
 function browse(host) {
@@ -588,6 +566,81 @@ function hideCertificatesBySender(fileInfoHash, count) {
 	linkSpan.innerHTML = showLink
 }
 
+function refreshResultsFromSender(sender) {
+	currentSender = sender
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			resultsFromSender = new ResultsFromSender(this.responseXML)
+			var tableHtml = resultsFromSender.render(true)
+			
+			var bottomTableDiv = document.getElementById("bottomTable")
+			bottomTableDiv.innerHTML = tableHtml
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Search?section=resultsFromSender&uuid=" + uuid + "&sender=" + sender)
+	xmlhttp.send()
+}
+
+function refreshSendersForResult(result) {
+	currentResult = result
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			sendersForResult = new SendersForResult(this.responseXML)
+			var tableHtml = sendersForResult.render(true)
+			
+			var bottomTableDiv = document.getElementById("bottomTable")
+			bottomTableDiv.innerHTML = tableHtml
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Search?section=sendersForResult&uuid=" + uuid + "&infoHash=" + currentResult)
+	xmlhttp.send()
+}
+
+function refreshSender(searchUUID) {
+	uuid = searchUUID
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			senders = new Senders(this.responseXML)
+			var tableHtml = senders.render(true)
+			
+			var topTableDiv = document.getElementById("topTable")
+			topTableDiv.innerHTML = tableHtml
+			
+			if (currentSender != null)
+				refreshResultsFromSender(currentSender)
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Search?section=senders&uuid=" + uuid, true)
+	xmlhttp.send()
+	
+}
+
+function refreshFile(searchUUID) {
+	uuid = searchUUID
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			results = new Results(this.responseXML)
+			var tableHtml = results.render(true)
+			
+			var topTableDiv = document.getElementById("topTable")
+			topTableDiv.innerHTML = tableHtml
+			
+			if (currentResult != null)
+				refreshSendersForResult(currentResult)
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Search?section=results&uuid=" + uuid, true)
+	xmlhttp.send()
+}
+
 function refreshStatus() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
@@ -617,7 +670,7 @@ function refreshStatus() {
 				var status = statuses[i]
 				
 				var mappings = new Map()
-				var queryLink = "<a href='#' onclick='refreshGroupBy" + refreshType + "(\"" + status.uuid + "\");return false;'>" + status.query + "</a>"
+				var queryLink = "<a href='#' onclick='refresh" + refreshType + "(\"" + status.uuid + "\");return false;'>" + status.query + "</a>"
 				mappings.set("Query", queryLink)
 				mappings.set("Senders", status.senders)
 				mappings.set("Results", status.results)
@@ -645,18 +698,15 @@ function sortStatuses(key, order) {
 	refreshStatus()
 }
 
-var refreshFunction = null
-var refreshType = null
-
 function initGroupBySender() {
-	refreshFunction = refreshGroupBySender
+	refreshFunction = refreshSender
 	refreshType = "Sender"
 	setInterval(refreshStatus, 3000);
 	setTimeout(refreshStatus, 1);
 }
 
 function initGroupByFile() {
-	refreshFunction = refreshGroupByFile
+	refreshFunction = refreshFile
 	refreshType = "File"
 	setInterval ( refreshStatus, 3000);
 	setTimeout ( refreshStatus, 1);
