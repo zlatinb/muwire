@@ -63,6 +63,13 @@ public class SearchResults {
         }
     }
     
+    int getResultCount() {
+        int total = 0;
+        for (Set<UIResultEvent> set : bySender.values())
+            total += set.size();
+        return total;
+    }
+    
     public UUID getUUID() {
         return uuid;
     }

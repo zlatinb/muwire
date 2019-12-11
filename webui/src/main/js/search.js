@@ -187,6 +187,9 @@ var senderB64 = null
 var lastXML = null;
 var infoHash = null;
 
+var statusKey = null
+var statusOrder = null
+
 function showCommentBySender(divId, spanId) {
 	var split = divId.split("_");
 	var commentDiv = document.getElementById(divId);
@@ -594,26 +597,35 @@ function refreshStatus() {
 				currentSearch = statusByUUID.get(uuid)
 			statusByUUID.clear()
 			
+			var statuses = []
 			var activeSearches = this.responseXML.getElementsByTagName("Search")
 			var i
 			for(i = 0; i < activeSearches.length; i++) {
 				var searchStatus = new SearchStatus(activeSearches[i])
 				statusByUUID.set(searchStatus.uuid, searchStatus)
+				statuses.push(searchStatus)
 			}
 			
 			
-			var table = "<table><thead><tr><th>" + _t("Query") + "</th><th>" + _t("Senders") + "</th><th>" + _t("Results") + "</th></tr></thead><tbody>"
-			for (var [searchUUID, status] of statusByUUID) {
-				table += "<tr>"
-				table += "<td>" + "<a href='#' onclick='refreshGroupBy" + refreshType + "(\"" + searchUUID + "\");return false;'>" + status.query + "</a></td>"
-				table += "<td>" + status.senders + "</td>"
-				table += "<td>" + status.results + "</td>"
-				table += "</tr>"
+			var newOrder
+			if (statusOrder == "descending")
+				newOrder = "ascending"
+			else
+				newOrder = "descending"
+			var table = new Table(["Query", "Senders", "Results"], "sortStatuses", statusKey, newOrder)
+			for (i = 0; i < statuses.length; i++) {
+				var status = statuses[i]
+				
+				var mappings = new Map()
+				var queryLink = "<a href='#' onclick='refreshGroupBy" + refreshType + "(\"" + status.uuid + "\");return false;'>" + status.query + "</a>"
+				mappings.set("Query", queryLink)
+				mappings.set("Senders", status.senders)
+				mappings.set("Results", status.results)
+				table.addRow(mappings)
 			}
-			table += "</tbody></table>"
 			
 			var activeDiv = document.getElementById("activeSearches")
-			activeDiv.innerHTML = table
+			activeDiv.innerHTML = table.render()
 			
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
@@ -622,8 +634,15 @@ function refreshStatus() {
 			}
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=status", true)
+	var params = "section=status&key=" + statusKey + "&order=" + statusOrder
+	xmlhttp.open("GET", "/MuWire/Search?" + params, true)
 	xmlhttp.send()
+}
+
+function sortStatuses(key, order) {
+	statusKey = key
+	statusOrder = order
+	refreshStatus()
 }
 
 var refreshFunction = null

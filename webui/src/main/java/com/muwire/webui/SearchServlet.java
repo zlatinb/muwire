@@ -1,6 +1,10 @@
 package com.muwire.webui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -55,8 +59,16 @@ public class SearchServlet extends HttpServlet {
                 return;
             }
             
+            String key = req.getParameter("key");
+            String order = req.getParameter("order");
+            Comparator<SearchResults> comparator = SEARCH_COMPARATORS.get(key, order);
+            
+            List<SearchResults> searchResults = new ArrayList<>(searchManager.getResults().values());
+            if (comparator != null)
+                Collections.sort(searchResults, comparator);
+            
             sb.append("<Searches>");
-            for (SearchResults results : searchManager.getResults().values()) {
+            for (SearchResults results : searchResults) {
                 sb.append("<Search>");
                 sb.append("<Revision>").append(results.getRevision()).append("</Revision>");
                 sb.append("<Query>").append(Util.escapeHTMLinXML(results.getSearch())).append("</Query>");
@@ -195,6 +207,25 @@ public class SearchServlet extends HttpServlet {
         downloadManager = (DownloadManager) config.getServletContext().getAttribute("downloadManager");
         browseManager = (BrowseManager) config.getServletContext().getAttribute("browseManager");
         core = (Core) config.getServletContext().getAttribute("core");
+    }
+    
+    private static final Comparator<SearchResults> SEARCH_BY_NAME = (k, v) -> {
+        return k.getSearch().compareTo(v.getSearch());
+    };
+    
+    private static final Comparator<SearchResults> SEARCH_BY_SENDERS = (k, v) -> {
+        return Integer.compare(k.getSenderCount(), v.getSenderCount());
+    };
+    
+    private static final Comparator<SearchResults> SEARCH_BY_RESULTS = (k, v) -> {
+        return Integer.compare(k.getResultCount(), v.getResultCount());
+    };
+    
+    private static final ColumnComparators<SearchResults> SEARCH_COMPARATORS = new ColumnComparators<>();
+    static {
+        SEARCH_COMPARATORS.add("Query", SEARCH_BY_NAME);
+        SEARCH_COMPARATORS.add("Senders", SEARCH_BY_SENDERS);
+        SEARCH_COMPARATORS.add("Results", SEARCH_BY_RESULTS);
     }
 
 }

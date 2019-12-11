@@ -19,6 +19,7 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
+	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 	</head>
