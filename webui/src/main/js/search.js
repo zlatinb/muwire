@@ -156,7 +156,12 @@ class ResultFromSender {
 	getCertificatesBlock() {
 		if (this.certificates == "0")
 			return ""
-		return _t("View {0} Certificates", this.certificates)
+		var id = currentSender + "_" + this.infoHash
+		var linkText = _t("View {0} Certificates", this.certificates)
+		var link = "<a href='#' onclick='viewCertificatesBySender(\"" + this.infoHash + "\",\"" + this.certificates + "\");return false'>" + linkText + "</a>"
+		var linkBlock = "<div id='certificates-link-" + id + "'>" + link + "</div>"
+		var certBlock = "<div id='certificates-" + id + "'></div>"
+		return linkBlock + certBlock
 	}
 	
 	getDownloadBlock() {
@@ -304,7 +309,12 @@ class SenderForResult {
 	getCertificatesBlock() {
 		if (this.certificates == "0")
 			return ""
-		return _t("View {0} Certificates", this.certificates)
+		var id = this.b64 + "_" + currentResult
+		var linkText =  _t("View {0} Certificates", this.certificates)
+		var link = "<a href='#' onclick='window.viewCertificatesByFile(\"" + this.b64 + "\",\"" + this.certificates + "\");return false;')>" + linkText + "</a>"
+		var linkBlock = "<div id='certificates-link-" + id + "'>" + link + "</div>"
+		var certBlock = "<div id='certificates-" + id + "'></div>"
+		return linkBlock + certBlock 
 	}
 	
 	getBrowseBlock() {
@@ -558,7 +568,7 @@ function browse(host) {
 }
 
 function viewCertificatesByFile(fileSenderB64, count) {
-	var fetch = new CertificateFetch(fileSenderB64, infoHash)
+	var fetch = new CertificateFetch(fileSenderB64, currentResult)
 	certificateFetches.set(fetch.divId, fetch)
 	
 	var xmlhttp = new XMLHttpRequest()
@@ -574,11 +584,11 @@ function viewCertificatesByFile(fileSenderB64, count) {
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xmlhttp.send("action=fetch&user=" + fileSenderB64 + "&infoHash=" + infoHash)
+	xmlhttp.send("action=fetch&user=" + fileSenderB64 + "&infoHash=" + currentResult)
 }
 
 function hideCertificatesByFile(fileSenderB64, count) {
-	var id = fileSenderB64 + "_" + infoHash
+	var id = fileSenderB64 + "_" + currentResult
 	certificateFetches.delete(id)  // TODO: propagate cancel to core
 	
 	var fetchSpan = document.getElementById("certificates-" + id)
@@ -591,7 +601,7 @@ function hideCertificatesByFile(fileSenderB64, count) {
 }
 
 function viewCertificatesBySender(fileInfoHash, count) {
-	var fetch = new CertificateFetch(senderB64, fileInfoHash)
+	var fetch = new CertificateFetch(currentSender, fileInfoHash)
 	certificateFetches.set(fetch.divId, fetch)
 	
 	
@@ -610,12 +620,12 @@ function viewCertificatesBySender(fileInfoHash, count) {
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xmlhttp.send("action=fetch&user=" + senderB64 + "&infoHash=" + fileInfoHash)
+	xmlhttp.send("action=fetch&user=" + currentSender + "&infoHash=" + fileInfoHash)
 		
 }
 
 function hideCertificatesBySender(fileInfoHash, count) {
-	var id = senderB64 + "_" + fileInfoHash
+	var id = currentSender + "_" + fileInfoHash
 	certificateFetches.delete(id) // TODO: propagate cancel to core
 	
 	var fetchSpan = document.getElementById("certificates-" + id)
