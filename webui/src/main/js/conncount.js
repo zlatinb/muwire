@@ -3,6 +3,7 @@ function refreshConnectionsCount() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4) {
 		  var connectionCountSpan = document.getElementById("connectionsCount");
+		  var connectionIcon = document.getElementById("connectionsIcon");
 		  if (this.status == 200) {
 			var image;
 			var connections = this.responseXML.getElementsByTagName("Connections");
@@ -13,7 +14,6 @@ function refreshConnectionsCount() {
 			    image = "connected.png";
 			else
 			    image = "connecting.png";
-			var connectionIcon = document.getElementById("connectionsIcon");
 			connectionIcon.innerHTML = "<img src=\"images/" + image + "\" alt=\"\">";
 		  } else {
 			connectionCountSpan.innerHTML = _t("Down");

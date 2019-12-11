@@ -14,6 +14,10 @@
   background: #ceeee8;
   color:black;
 }
+#table-wrapper table td, th {
+    padding-right: 10px;
+    padding-bottom: 1px;
+}
 #table-wrapper table thead th .text {
   position:absolute;
   top:-20px;
@@ -23,32 +27,144 @@
   border:1px solid red;
 }
 
-div#activeSearches table thead th:first-child {
-  width: 40%;
+div#activeSearches table thead th:nth-child(2) {
+  width: 55px;
 }
-div#topTable table thead th:first-child {
-  width: 50%;
+div#activeSearches table thead th:nth-child(3) {
+  width: 55px;
 }
+div#activeSearches table td:nth-child(2) {
+  text-align: right;
+}
+div#activeSearches table tbody td:nth-child(3) {
+  text-align: right;
+}
+
 div#topTable table thead th:nth-child(2) {
-  width: 15%;
+  width: 100px;
 }
-div#topTable table thead th:first-child {
-  width: 75%;
+div#topTable table thead th:nth-child(3) {
+  width: 300px;
 }
-
-div#activeBrowses table thead th:first-child {
-  width: 50%;
-}
-
-div#filesTable table thead th:first-child {
-  width: 70%;
+div#topTable table tbody td:nth-child(2) {
+  text-align: center;
 }
 
-div#trustedUsers table thead th:first-child {
-  width: 50%;
+div#bottomTable table thead th:nth-child(2) {
+  width: 100px;
 }
-div#trustLists table thead th:first-child {
-  width: 50%;
+div#bottomTable table thead th:nth-child(3) {
+  width: 100px;
+}
+div#bottomTable table tbody td:nth-child(2) {
+  text-align: right;
+}
+div#bottomTable table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+div#activeBrowses table thead th:nth-child(2) {
+  width: 100px;
+}
+div#activeBrowses table thead th:nth-child(3) {
+  width: 200px;
+}
+
+div#filesTable table thead th:nth-child(2) {
+  width: 100px;
+}
+div#filesTable table thead th:nth-child(3) {
+  width: 100px;
+}
+div#filesTable table tbody td:nth-child(2) {
+  text-align: right;
+}
+div#filesTable table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+div#resultsTable table thead th:nth-child(2) {
+  width: 100px;
+}
+div#resultsTable table thead th:nth-child(3) {
+  width: 100px;
+}
+div#resultsTable table tbody td:nth-child(2) {
+  text-align: right;
+}
+div#resultsTable table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+div#downloads table thead th:nth-child(2) {
+  width: 80px;
+}
+div#downloads table thead th:nth-child(3) {
+  width: 80px;
+}
+div#downloads table thead th:nth-child(4) {
+  width: 80px;
+}
+div#downloads table thead th:nth-child(5) {
+  width: 120px;
+}
+div#downloads table thead th:nth-child(6) {
+  width: 80px;
+}
+div#downloads table tbody td:nth-child(2) {
+  text-align: center;
+}
+div#downloads table tbody td:nth-child(3) {
+  text-align: right;
+}
+div#downloads table tbody td:nth-child(4) {
+  text-align: right;
+}
+div#downloads table tbody td:nth-child(5) {
+  text-align: right;
+}
+div#downloads table tbody td:nth-child(6) {
+  text-align: center;
+}
+
+div#trustedUsers table thead th:nth-child(2) {
+  width: 100px;
+}
+div#trustedUsers table thead th:nth-child(3) {
+  width: 100px;
+}
+div#trustedUsers table thead th:nth-child(4) {
+  width: 100px;
+}
+div#distrustedUsers table thead th:nth-child(2) {
+  width: 100px;
+}
+div#distrustedUsers table thead th:nth-child(3) {
+  width: 100px;
+}
+div#distrustedUsers table thead th:nth-child(4) {
+  width: 100px;
+}
+div#trustLists table thead th:nth-child(2) {
+  width: 100px;
+}
+div#trustLists table thead th:nth-child(3) {
+  width: 100px;
+}
+div#trustLists table thead th:nth-child(4) {
+  width: 100px;
+}
+div#trustLists table thead th:nth-child(5) {
+  width: 100px;
+}
+div#trustLists table thead th:nth-child(6) {
+  width: 100px;
+}
+
+pre {
+  background: #a7d5d5;
+  padding: 5px;
+  margin: 10px 20px 10px 5px;
 }
 
 /* File tree CSS */
@@ -68,6 +184,8 @@ ul, #sharedTree {
 .caret {
   cursor: pointer;
   user-select: none; /* Prevent text selection */
+  padding-right: 30px;
+  color: black;
 }
 
 /* Create the caret/arrow with a unicode, and style it */
@@ -75,7 +193,7 @@ ul, #sharedTree {
   content: "\25B6";
   color: black;
   display: inline-block;
-  margin-right: 6px;
+  margin-right: 10px;
 }
 
 /* Rotate the caret/arrow icon when clicked on (using JavaScript) */

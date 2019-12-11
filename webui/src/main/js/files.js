@@ -26,10 +26,10 @@ class Node {
 				commentLink + "<div id='comment-" + this.nodeId+ "'></div></li>"
 		} else {
 			if (this.children.length == 0) {
-				div.innerHTML = "<li><span><a href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
+				div.innerHTML = "<li><span><a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
 					this.path + "</a>   " + unshareLink + "</span>" + "   " + certifyLink + "  " + commentLink + "<div id='comment-" + this.nodeId + "'></div></li>"
 			} else {
-				var l = "<li><a href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>   " + unshareLink
+				var l = "<li><a class='caret caret-down' href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>   " + unshareLink
 				l += "  " + certifyLink + "   " + commentLink+"<div id='comment-" + this.nodeId + "'></div>"
 				
 				l += "<ul>"

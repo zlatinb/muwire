@@ -42,8 +42,8 @@ task precompileJsp {
                     classPath : sourceSets.main.runtimeClasspath.asPath,
                     uriroot: webAppDir,
                     outputDir: "$buildDir/tmp_jsp",
-                    compilerSourceVM: "1.8",
-                    compilerTargetVM: "1.8",
+                    compilerSourceVM: project.sourceCompatibility,
+                    compilerTargetVM: project.targetCompatibility,
                     webXmlFragment: "$buildDir/tmp_jsp/web.xml.jasper")
         def output = new File("$buildDir/compiledJsps")
         output.mkdirs()
@@ -52,6 +52,8 @@ task precompileJsp {
                     debug : true,
                     includeAntRuntime : false,
                     deprecation : "on",
+                    source: project.sourceCompatibility,
+                    target: project.targetCompatibility,
                     destDir:file("$buildDir/compiledJsps"))
 
     }
@@ -80,7 +82,10 @@ task bundle {
         ant.mkdir(dir: "$buildDir/compiledMessages")
         ant.javac(srcDir: "$buildDir/messages-src",
                     classPath : sourceSets.main.runtimeClasspath.asPath,
+                    debug : false,
                     includeAntRuntime : false,
+                    source: project.sourceCompatibility,
+                    target: project.targetCompatibility,
                     destDir:file("$buildDir/compiledMessages"))
         // add resulting classes to build/libs/webui-(version).jar
         ant.jar(destfile: "$buildDir/libs/webui-${version}.jar",
