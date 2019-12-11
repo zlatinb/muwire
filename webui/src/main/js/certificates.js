@@ -113,6 +113,12 @@ class CertificateFetch {
 		var fetch = this
 		var block = document.getElementById("certificates-" + this.divId)
 		
+		if (block == null) {
+			// can happen if the user clicks away without hiding first
+			certificateFetches.delete(this.divId)
+			return
+		}
+		
 		var xmlhttp = new XMLHttpRequest()
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
