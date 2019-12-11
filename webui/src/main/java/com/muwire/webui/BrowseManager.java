@@ -86,5 +86,9 @@ public class BrowseManager {
         public long getRevision() {
             return revision;
         }
+        
+        public Persona getHost() {
+            return persona;
+        }
     }
 }

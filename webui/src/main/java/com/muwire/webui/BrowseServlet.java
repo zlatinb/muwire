@@ -3,6 +3,7 @@ package com.muwire.webui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,11 +46,20 @@ public class BrowseServlet extends HttpServlet {
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         
         if (section.equals("status")) {
+            
+            String key = req.getParameter("key");
+            String order = req.getParameter("order");
+            Comparator<Browse> comparator = BROWSE_COMPARATORS.get(key, order);
+            
+            List<Browse> browses = new ArrayList<>(browseManager.getBrowses().values());
+            if (comparator != null)
+                Collections.sort(browses, comparator);
+            
             sb.append("<Status>");
-            browseManager.getBrowses().forEach( (persona, browse) -> {
+            browses.forEach( browse -> {
                 sb.append("<Browse>");
-                sb.append("<Host>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</Host>");
-                sb.append("<HostB64>").append(persona.toBase64()).append("</HostB64>");
+                sb.append("<Host>").append(Util.escapeHTMLinXML(browse.getHost().getHumanReadableName())).append("</Host>");
+                sb.append("<HostB64>").append(browse.getHost().toBase64()).append("</HostB64>");
                 sb.append("<BrowseStatus>").append(browse.getStatus()).append("</BrowseStatus>");
                 sb.append("<TotalResults>").append(browse.getTotalResults()).append("</TotalResults>");
                 sb.append("<ResultsCount>").append(browse.getResults().size()).append("</ResultsCount>");
@@ -78,9 +88,7 @@ public class BrowseServlet extends HttpServlet {
             String key = req.getParameter("key");
             String order = req.getParameter("order");
             
-            Comparator<Result> comparator = COMPARATORS.get(key);
-            if (comparator != null && order.equals("ascending"))
-                comparator = comparator.reversed();
+            Comparator<Result> comparator = RESULT_COMPARATORS.get(key, order);
             
             List<Result> wrapped = browse.getResults().stream().map(event -> {
                 return new Result(event, downloadManager.isDownloading(event.getInfohash()));
@@ -226,10 +234,29 @@ public class BrowseServlet extends HttpServlet {
         return Boolean.compare(k.downloading, v.downloading);   
     };
     
-    private static final Map<String, Comparator<Result>> COMPARATORS = new HashMap<>();
+    private static final ColumnComparators<Result> RESULT_COMPARATORS = new ColumnComparators<>();
     static {
-        COMPARATORS.put("Name", BY_NAME);
-        COMPARATORS.put("Size", BY_SIZE);
-        COMPARATORS.put("Download", BY_DOWNLOADING);
+        RESULT_COMPARATORS.add("Name", BY_NAME);
+        RESULT_COMPARATORS.add("Size", BY_SIZE);
+        RESULT_COMPARATORS.add("Download", BY_DOWNLOADING);
+    }
+    
+    private static final Comparator<Browse> BY_HOST = (k, v) -> {
+        return k.getHost().getHumanReadableName().compareTo(v.getHost().getHumanReadableName()); 
+    };
+    
+    private static final Comparator<Browse> BY_STATUS = (k, v) -> {
+        return k.getStatus().toString().compareTo(v.getStatus().toString());
+    };
+    
+    private static final Comparator<Browse> BY_RESULTS = (k, v) -> {
+        return Integer.compare(k.getResults().size(), v.getResults().size());
+    };
+    
+    private static final ColumnComparators<Browse> BROWSE_COMPARATORS = new ColumnComparators<>(); 
+    static {
+        BROWSE_COMPARATORS.add("Host", BY_HOST);
+        BROWSE_COMPARATORS.add("Status", BY_STATUS);
+        BROWSE_COMPARATORS.add("Results", BY_RESULTS);
     }
 }

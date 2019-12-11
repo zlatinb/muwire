@@ -52,6 +52,8 @@ function initBrowse() {
 var currentHost = null
 var browsesByHost = new Map()
 var resultsByInfoHash = new Map()
+var browseKey = null
+var browseOrder = null
 
 function showCertificates(hostB64, infoHash) {
 	var fetch = new CertificateFetch(hostB64, infoHash)
@@ -94,11 +96,14 @@ function refreshActive() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			
+			browsesByHost.clear()
+			
 			var currentBrowse = null
 			if (currentHost != null)
 				currentBrowse = browsesByHost.get(currentHost)
 			
 			var xmlDoc = this.responseXML
+			var activeBrowses = []
 			var browses = xmlDoc.getElementsByTagName("Browse")
 			var i
 			for (i = 0;i < browses.length; i++) {
@@ -111,25 +116,31 @@ function refreshActive() {
 				
 				var browse = new Browse(host, hostB64, status, totalResults, count, revision)
 				browsesByHost.set(host, browse)
+				activeBrowses.push(browse)
 			}
 			
-			var tableHtml = "<table><thead><tr><th>" + _t("Host") + "</th><th>" + _t("Status") + "</th><th>" + _t("Results") + "</th></tr></thead></tbody>";
-			for (var [host, browse] of browsesByHost) {
+			var newBrowseOrder
+			if (browseOrder == "descending")
+				newBrowseOrder = "ascending"
+			else
+				newBrowseOrder = "descending"
+			var table = new Table(["Host", "Status", "Results"], "sortActive", browseKey, newBrowseOrder)
+			for (i = 0;i < activeBrowses.length; i++) {
+				var browse = activeBrowses[i]
 				var browseLink = browse.getBrowseLink()
 				
-				tableHtml += "<tr>"
-				tableHtml += "<td>" + browseLink + "</td>"
-				tableHtml += "<td>" + browse.status + "</td>"
+				var mapping = new Map()
+				mapping.set("Host", browseLink)
+				mapping.set("Status", browse.status)
 				
 				var percent = browse.receivedResults + "/" + browse.totalResults
-				tableHtml += "<td>"+percent+"</td>"
+				mapping.set("Results", percent)
 				
-				tableHtml += "</tr>"
+				table.addRow(mapping)
 			}
-			tableHtml += "</tbody></table>"
 			
 			var tableDiv = document.getElementById("activeBrowses")
-			tableDiv.innerHTML = tableHtml
+			tableDiv.innerHTML = table.render()
 			
 			if (currentBrowse != null) {
 				var newBrowse = browsesByHost.get(currentHost)
@@ -138,7 +149,8 @@ function refreshActive() {
 			}
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Browse?section=status", true)
+	var params = "section=status&key=" + browseKey + "&order=" + browseOrder
+	xmlhttp.open("GET", "/MuWire/Browse?" + params, true)
 	xmlhttp.send()
 }
 
@@ -219,6 +231,12 @@ function sort(key, descending) {
 	var currentBrowse = browsesByHost.get(currentHost)
 	currentBrowse.setSort(key, descending)
 	showResults(currentHost, key, descending)
+}
+
+function sortActive(key, order) {
+	browseKey = key
+	browseOrder = order
+	refreshActive()
 }
 
 function getDownloadLink(host, infoHash) {
