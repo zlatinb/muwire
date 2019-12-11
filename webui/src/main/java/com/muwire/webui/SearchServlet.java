@@ -19,6 +19,7 @@ import com.muwire.core.Core;
 import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultEvent;
+import com.muwire.core.trust.TrustLevel;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -78,6 +79,34 @@ public class SearchServlet extends HttpServlet {
                 sb.append("</Search>");
             }
             sb.append("</Searches>");
+        } else if (section.equals("senders")) {
+            if (searchManager == null || downloadManager == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
+            
+            String uuidString = req.getParameter("uuid");
+            if (uuidString == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            
+            UUID uuid = UUID.fromString(uuidString);
+            
+            SearchResults results = searchManager.getResults().get(uuid);
+            if (results == null)
+                return;
+            
+            sb.append("<Senders>");
+            results.getBySender().forEach( (persona, resultsFromSender) -> {
+                Sender sender = new Sender(persona,
+                        core.getTrustService().getLevel(persona.getDestination()),
+                        resultsFromSender.iterator().next().getBrowse(),
+                        browseManager.isBrowsing(persona),
+                        resultsFromSender.size());
+                sender.toXML(sb);
+            });
+            sb.append("</Senders>");
         } else if (section.equals("groupBySender")) {
             if (searchManager == null || downloadManager == null) {
                 resp.sendError(403, "Not initialized");
@@ -209,6 +238,33 @@ public class SearchServlet extends HttpServlet {
         core = (Core) config.getServletContext().getAttribute("core");
     }
     
+    private class Sender {
+        private final Persona persona;
+        private final TrustLevel trustLevel;
+        private final boolean browse;
+        private final boolean browsing;
+        private final int results;
+        
+        Sender(Persona persona, TrustLevel trustLevel, boolean browse, boolean browsing, int results) {
+            this.persona = persona;
+            this.trustLevel = trustLevel;
+            this.browse = browse;
+            this.browsing = browsing;
+            this.results = results;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Sender>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</Name>");
+            sb.append("<B64>").append(persona.toBase64()).append("</B64>");
+            sb.append("<Trust>").append(trustLevel.toString()).append("</Trust>");
+            sb.append("<Browse>").append(browse).append("</Browse>");
+            sb.append("<Browsing>").append(browsing).append("</Browsing>");
+            sb.append("<Results>").append(results).append("</Results>");
+            sb.append("</Sender>");
+        }
+    }
+    
     private static final Comparator<SearchResults> SEARCH_BY_NAME = (k, v) -> {
         return k.getSearch().compareTo(v.getSearch());
     };
@@ -226,6 +282,25 @@ public class SearchServlet extends HttpServlet {
         SEARCH_COMPARATORS.add("Query", SEARCH_BY_NAME);
         SEARCH_COMPARATORS.add("Senders", SEARCH_BY_SENDERS);
         SEARCH_COMPARATORS.add("Results", SEARCH_BY_RESULTS);
+    }
+    
+    private static final Comparator<Sender> SENDER_BY_NAME = (k, v) -> {
+        return k.persona.getHumanReadableName().compareTo(v.persona.getHumanReadableName());
+    };
+    
+    private static final Comparator<Sender> SENDER_BY_TRUST = (k, v) -> {
+        return k.trustLevel.toString().compareTo(v.trustLevel.toString());
+    };
+    
+    private static final Comparator<Sender> SENDER_BY_RESULTS = (k, v) -> {
+        return Integer.compare(k.results, v.results);
+    };
+    
+    private static final ColumnComparators<Sender> SENDER_COMPARATORS = new ColumnComparators<>();
+    static {
+        SENDER_COMPARATORS.add("Sender", SENDER_BY_NAME);
+        SENDER_COMPARATORS.add("Trust", SENDER_BY_TRUST);
+        SENDER_COMPARATORS.add("Results", SENDER_BY_RESULTS);
     }
 
 }
