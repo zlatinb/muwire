@@ -47,13 +47,8 @@ public class BrowseServlet extends HttpServlet {
         
         if (section.equals("status")) {
             
-            String key = req.getParameter("key");
-            String order = req.getParameter("order");
-            Comparator<Browse> comparator = BROWSE_COMPARATORS.get(key, order);
-            
             List<Browse> browses = new ArrayList<>(browseManager.getBrowses().values());
-            if (comparator != null)
-                Collections.sort(browses, comparator);
+            BROWSE_COMPARATORS.sort(browses, req);
             
             sb.append("<Status>");
             browses.forEach( browse -> {
@@ -85,17 +80,11 @@ public class BrowseServlet extends HttpServlet {
             if (browse == null)
                 return; // hmm
             
-            String key = req.getParameter("key");
-            String order = req.getParameter("order");
-            
-            Comparator<Result> comparator = RESULT_COMPARATORS.get(key, order);
-            
             List<Result> wrapped = browse.getResults().stream().map(event -> {
                 return new Result(event, downloadManager.isDownloading(event.getInfohash()));
             }).collect(Collectors.toList());
-            
-            if (comparator != null)
-                Collections.sort(wrapped, comparator);
+
+            RESULT_COMPARATORS.sort(wrapped, req);
             
             sb.append("<Results>");
             wrapped.stream().map(Result::getEvent).forEach(result -> {

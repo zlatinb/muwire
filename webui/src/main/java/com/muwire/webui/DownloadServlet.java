@@ -2,7 +2,10 @@ package com.muwire.webui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,38 +45,39 @@ public class DownloadServlet extends HttpServlet {
             resp.sendError(403, "Not initialized");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-        sb.append("<Downloads>");
+        
+        List<Download> downloads = new ArrayList<>();
         downloadManager.getDownloaders().forEach(d -> {
-            sb.append("<Download>");
-            sb.append("<InfoHash>").append(Base64.encode(d.getInfoHash().getRoot())).append("</InfoHash>");
-            sb.append("<Name>").append(Util.escapeHTMLinXML(d.getFile().getName())).append("</Name>");
-            sb.append("<State>").append(d.getCurrentState().toString()).append("</State>");
+
             int speed = d.speed();
-            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
-            
-            String ETA;
-            if (speed == 0)
-                ETA = Util._t("Unknown");
-            else {
-                long remaining = (d.getNPieces() - d.donePieces()) * d.getPieceSize() / speed;
-                ETA = DataHelper.formatDuration(remaining * 1000);
-            }
-            sb.append("<ETA>").append(ETA).append("</ETA>");
+            long ETA = Long.MAX_VALUE;
+            if (speed > 0) 
+                ETA = (d.getNPieces() - d.donePieces()) * d.getPieceSize() * 1000 / speed;
             
             int percent = -1;
             if (d.getNPieces() != 0)
                 percent = (int)(d.donePieces() * 100 / d.getNPieces());
-            String totalSize = DataHelper.formatSize2Decimal(d.getLength(), false) + "B";
-            // FIXME translate
-            String progress = String.format("%2d", percent) + "% of "+totalSize;
-            sb.append("<Progress>").append(progress).append("</Progress>");
             
-            // TODO: more details for the downloader details view
-            sb.append("</Download>");
+            Download download = new Download(d.getInfoHash(),
+                    d.getFile().getName(),
+                    d.getCurrentState(),
+                    speed,
+                    ETA,
+                    percent,
+                    d.getLength());
+            
+            downloads.add(download);
         });
+        COMPARATORS.sort(downloads, req);
+        
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+        sb.append("<Downloads>");
+        downloads.forEach(d -> d.toXML(sb));
         sb.append("</Downloads>");
+        
+        
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");
         resp.setDateHeader("Expires", 0);
@@ -130,5 +134,72 @@ public class DownloadServlet extends HttpServlet {
         }
         // P-R-G
         resp.sendRedirect("/MuWire/Downloads");
+    }
+    
+    private static class Download {
+        private final InfoHash infoHash;
+        private final String name;
+        private final Downloader.DownloadState state;
+        private final int speed;
+        private final long ETA;
+        private final int percent;
+        private final long totalSize;
+        
+        Download(InfoHash infoHash, String name, Downloader.DownloadState state,
+                int speed, long ETA, int percent, long totalSize) {
+            this.infoHash = infoHash;
+            this.name = name;
+            this.state = state;
+            this.speed = speed;
+            this.ETA = ETA;
+            this.percent = percent;
+            this.totalSize = totalSize;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Download>");
+            sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
+            sb.append("<Name>").append(name).append("</Name>");
+            sb.append("<State>").append(state.toString()).append("</State>");
+            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed, false)).append("B/sec").append("</Speed>");
+            String ETAString;
+            if (ETA == Long.MAX_VALUE)
+                ETAString = Util._t("Unknown");
+            else
+                ETAString = DataHelper.formatDate(ETA);
+            sb.append("<ETA>").append(ETAString).append("</ETA>");
+            String progress = String.format("%2d", percent) + "% of "+totalSize;
+            sb.append("<Progress>").append(progress).append("</Progress>");
+            sb.append("</Download>");
+        }
+    }
+    
+    private static final Comparator<Download> BY_NAME = (l, r) -> {
+        return l.name.compareTo(r.name);
+    };
+    
+    private static final Comparator<Download> BY_STATE = (l, r) -> {
+        return l.state.toString().compareTo(r.state.toString());
+    };
+    
+    private static final Comparator<Download> BY_SPEED = (l, r) -> {
+        return Integer.compare(l.speed, r.speed);
+    };
+    
+    private static final Comparator<Download> BY_ETA = (l, r) -> {
+        return Long.compare(l.ETA, r.ETA);
+    };
+    
+    private static final Comparator<Download> BY_PROGRESS = (l, r) -> {
+        return Integer.compare(l.percent, r.percent);
+    };
+    
+    private static final ColumnComparators<Download> COMPARATORS = new ColumnComparators<>();
+    static {
+        COMPARATORS.add("Name", BY_NAME);
+        COMPARATORS.add("State", BY_STATE);
+        COMPARATORS.add("Speed", BY_SPEED);
+        COMPARATORS.add("ETA", BY_ETA);
+        COMPARATORS.add("Progress", BY_PROGRESS);
     }
 }

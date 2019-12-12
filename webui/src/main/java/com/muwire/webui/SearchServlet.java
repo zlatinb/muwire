@@ -61,14 +61,8 @@ public class SearchServlet extends HttpServlet {
                 return;
             }
             
-            String key = req.getParameter("key");
-            String order = req.getParameter("order");
-            Comparator<SearchResults> comparator = SEARCH_COMPARATORS.get(key, order);
-            
             List<SearchResults> searchResults = new ArrayList<>(searchManager.getResults().values());
-            if (comparator != null)
-                Collections.sort(searchResults, comparator);
-            
+            SEARCH_COMPARATORS.sort(searchResults, req);
             sb.append("<Searches>");
             for (SearchResults results : searchResults) {
                 sb.append("<Search>");
@@ -108,7 +102,7 @@ public class SearchServlet extends HttpServlet {
                 senders.add(sender);
             });
             
-            sort(senders, req, SENDER_COMPARATORS);
+            SENDER_COMPARATORS.sort(senders, req);
             
             sb.append("<Senders>");
             senders.forEach(sender -> sender.toXML(sb));
@@ -145,7 +139,7 @@ public class SearchServlet extends HttpServlet {
                 resultsFromSender.add(resultFromSender);
             });
             
-            sort(resultsFromSender, req, RESULT_FROM_SENDER_COMPARATORS);
+            RESULT_FROM_SENDER_COMPARATORS.sort(resultsFromSender, req);
             
             sb.append("<ResultsFromSender>");
             resultsFromSender.forEach(result -> result.toXML(sb));
@@ -178,7 +172,7 @@ public class SearchServlet extends HttpServlet {
                 results.add(result);
             });
             
-            sort(results, req, RESULT_COMPARATORS);
+            RESULT_COMPARATORS.sort(results, req);
             
             sb.append("<Results>");
             results.forEach(result -> result.toXML(sb));
@@ -224,7 +218,7 @@ public class SearchServlet extends HttpServlet {
                 sendersForResult.add(senderForResult);
             });
             
-            sort(sendersForResult, req, SENDER_FOR_RESULT_COMPARATORS);
+            SENDER_FOR_RESULT_COMPARATORS.sort(sendersForResult, req);
             
             sb.append("<Senders>");
             sendersForResult.forEach(sender -> sender.toXML(sb));
@@ -375,14 +369,6 @@ public class SearchServlet extends HttpServlet {
             sb.append("</Sender>");
         }
         
-    }
-    
-    private static <T> void sort(List<T> items, HttpServletRequest req, ColumnComparators<T> comparators) {
-        String key = req.getParameter("key");
-        String order = req.getParameter("order");
-        Comparator<T> comparator = comparators.get(key, order);
-        if (comparator != null)
-            Collections.sort(items, comparator);
     }
     
     private static final Comparator<SearchResults> SEARCH_BY_NAME = (k, v) -> {
