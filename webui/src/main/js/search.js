@@ -33,7 +33,7 @@ class Sender {
 	}
 	
 	getSenderLink() {
-		return "<a href='#' onclick='window.refreshResultsFromSender(\"" + this.b64 + "\");return false'>" + this.name + "</a>"
+		return "<a href='#' onclick='window.refreshResultsFromSender(\"" + this.b64 + "\",\"true\");return false'>" + this.name + "</a>"
 	}
 	
 	getTrustLinks() {
@@ -219,7 +219,7 @@ class Result {
 	}
 	
 	getNameBlock() {
-		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\");return false;'>" + this.name + "</a>"
+		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\",\"true\");return false;'>" + this.name + "</a>"
 	}
 	getDownloadBlock() {
 		if (this.downloading == "true")
@@ -377,7 +377,7 @@ class SendersForResult {
 			if (sendersForResultSortOrder == "descending")
 				sendersForResultSortOrder = "ascending"
 			else
-				sendersForResultsSortOrder = "descending"
+				sendersForResultSortOrder = "descending"
 		}
 		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, sendersForResultSortOrder)
 		var i
@@ -421,6 +421,31 @@ var statusByUUID = new Map()
 // pointers based on current view type
 var refreshFunction = null
 var refreshType = null
+
+
+function sortSendersTable(key, order) {
+	sendersSortKey = key
+	sendersSortOrder = order
+	refreshSender(uuid, false)
+}
+
+function sortResultsTable(key, order) {
+	resultsSortKey = key
+	resultsSortOrder = order
+	refreshFile(uuid, false)
+}
+
+function sortResultsFromSenderTable(key, order) {
+	resultsFromSenderSortKey = key
+	resultsFromSenderSortOrder = order
+	refreshResultsFromSender(currentSender, false)
+}
+
+function sortSendersForResultTable(key, order) {
+	sendersForResultSortKey = key
+	sendersForResultSortOrder = order
+	refreshSendersForResult(currentResult, false)
+}
 
 function showCommentBySender(infoHash) {
 	
@@ -544,9 +569,9 @@ function publishTrust(host, reason, trust) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			if (refreshType == "Sender")
-				refreshSender(uuid)
+				refreshSender(uuid, true)
 			else if (refreshType == "File")
-				refreshFile(uuid)
+				refreshFile(uuid, true)
 		}
 	}
 	xmlhttp.open("POST","/MuWire/Trust", true)
@@ -638,78 +663,82 @@ function hideCertificatesBySender(fileInfoHash, count) {
 	linkSpan.innerHTML = showLink
 }
 
-function refreshResultsFromSender(sender) {
+function refreshResultsFromSender(sender, preserveOrder) {
 	currentSender = sender
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			resultsFromSender = new ResultsFromSender(this.responseXML)
-			var tableHtml = resultsFromSender.render(true)
+			var tableHtml = resultsFromSender.render(preserveOrder)
 			
 			var bottomTableDiv = document.getElementById("bottomTable")
 			bottomTableDiv.innerHTML = tableHtml
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=resultsFromSender&uuid=" + uuid + "&sender=" + sender)
+	var sortParam = "&key=" + resultsFromSenderSortKey + "&order=" + resultsFromSenderSortOrder
+	xmlhttp.open("GET", "/MuWire/Search?section=resultsFromSender&uuid=" + uuid + "&sender=" + sender + sortParam)
 	xmlhttp.send()
 }
 
-function refreshSendersForResult(result) {
+function refreshSendersForResult(result, preserveOrder) {
 	currentResult = result
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			sendersForResult = new SendersForResult(this.responseXML)
-			var tableHtml = sendersForResult.render(true)
+			var tableHtml = sendersForResult.render(preserveOrder)
 			
 			var bottomTableDiv = document.getElementById("bottomTable")
 			bottomTableDiv.innerHTML = tableHtml
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=sendersForResult&uuid=" + uuid + "&infoHash=" + currentResult)
+	var sortParam = "&key=" + sendersForResultSortKey + "&order=" + sendersForResultSortOrder
+	xmlhttp.open("GET", "/MuWire/Search?section=sendersForResult&uuid=" + uuid + "&infoHash=" + currentResult + sortParam)
 	xmlhttp.send()
 }
 
-function refreshSender(searchUUID) {
+function refreshSender(searchUUID, preserveOrder) {
 	uuid = searchUUID
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			senders = new Senders(this.responseXML)
-			var tableHtml = senders.render(true)
+			var tableHtml = senders.render(preserveOrder)
 			
 			var topTableDiv = document.getElementById("topTable")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentSender != null)
-				refreshResultsFromSender(currentSender)
+				refreshResultsFromSender(currentSender, true)
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=senders&uuid=" + uuid, true)
+	var sortParam = "&key=" + sendersSortKey + "&order=" + sendersSortOrder
+	xmlhttp.open("GET", "/MuWire/Search?section=senders&uuid=" + uuid + sortParam, true)
 	xmlhttp.send()
 	
 }
 
-function refreshFile(searchUUID) {
+function refreshFile(searchUUID, preserveOrder) {
 	uuid = searchUUID
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			results = new Results(this.responseXML)
-			var tableHtml = results.render(true)
+			var tableHtml = results.render(preserveOrder)
 			
 			var topTableDiv = document.getElementById("topTable")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentResult != null)
-				refreshSendersForResult(currentResult)
+				refreshSendersForResult(currentResult, true)
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Search?section=results&uuid=" + uuid, true)
+	var sortParam = "&key=" + resultsSortKey + "&order=" + resultsSortOrder
+	xmlhttp.open("GET", "/MuWire/Search?section=results&uuid=" + uuid + sortParam, true)
 	xmlhttp.send()
 }
 
@@ -755,7 +784,7 @@ function refreshStatus() {
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
 				if (newStatus.revision > currentSearch.revision)
-					refreshFunction(uuid)
+					refreshFunction(uuid, true)
 			}
 		}
 	}
