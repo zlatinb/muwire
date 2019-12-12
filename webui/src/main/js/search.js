@@ -33,7 +33,7 @@ class Sender {
 	}
 	
 	getSenderLink() {
-		return "<a href='#' onclick='window.refreshResultsFromSender(\"" + this.b64 + "\",\"true\");return false'>" + this.name + "</a>"
+		return "<a href='#' onclick='window.refreshResultsFromSender(\"" + this.b64 + "\");return false'>" + this.name + "</a>"
 	}
 	
 	getTrustLinks() {
@@ -87,14 +87,13 @@ class Senders {
 		}
 	}
 	
-	render(preserveSortOrder) {
-		if (!preserveSortOrder) {
-			if (sendersSortOrder == "descending")
-				sendersSortOrder = "ascending"
-			else
-				sendersSortOrder = "descending"
-		}
-		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, sendersSortOrder)
+	render() {
+		var newOrder
+		if (sendersSortOrder == "descending")
+			newOrder = "ascending"
+		else if (sendersSortOrder == "ascending")
+			newOrder = "descending"
+		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, newOrder)
 		var i
 		for (i = 0; i < this.senders.length; i++) {
 			table.addRow(this.senders[i].getMapping())
@@ -186,14 +185,13 @@ class ResultsFromSender {
 		}
 	}
 	
-	render(preserveSortOrder) {
-		if (!preserveSortOrder) {
-			if (resultsFromSenderSortOrder == "descending")
-				resultsFromSenderSortOrder = "ascending"
-			else
-				resultsFromSenderSortOrder = "descending"
-		}
-		var table = new Table(["Name","Size","Download"], "sortResultsFromSenderTable", resultsFromSenderSortKey, resultsFromSenderSortOrder)
+	render() {
+		var newOrder
+		if (resultsFromSenderSortOrder == "descending")
+			newOrder = "ascending"
+		else if (resultsFromSenderSortOrder == "ascending")
+			newOrder = "descending"
+		var table = new Table(["Name","Size","Download"], "sortResultsFromSenderTable", resultsFromSenderSortKey, newOrder)
 		var i
 		for (i = 0 ; i < this.resultsFromSender.length; i++) {
 			table.addRow(this.resultsFromSender[i].getMapping())
@@ -219,7 +217,7 @@ class Result {
 	}
 	
 	getNameBlock() {
-		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\",\"true\");return false;'>" + this.name + "</a>"
+		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\");return false;'>" + this.name + "</a>"
 	}
 	getDownloadBlock() {
 		if (this.downloading == "true")
@@ -243,14 +241,13 @@ class Results {
 		}
 	}
 	
-	render(preserveSortOrder) {
-		if (!preserveSortOrder) {
-			if(resultsSortOrder == "descending")
-				resultsSortOrder = "ascending"
-			else
-				resultsSortOrder = "descending"
-		}
-		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, resultsSortOrder)
+	render() {
+		var newOrder
+		if(resultsSortOrder == "descending")
+			newOrder = "ascending"
+		else if (resultsSortOrder == "ascending")
+			newOrder = "descending"
+		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, newOrder)
 		var i
 		for (i = 0; i < this.results.length; i++) {
 			table.addRow(this.results[i].getMapping())
@@ -372,14 +369,13 @@ class SendersForResult {
 		}
 	}
 	
-	render(preserveSortOrder) {
-		if (!preserveSortOrder) {
-			if (sendersForResultSortOrder == "descending")
-				sendersForResultSortOrder = "ascending"
-			else
-				sendersForResultSortOrder = "descending"
-		}
-		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, sendersForResultSortOrder)
+	render() {
+		var newOrder
+		if (sendersForResultSortOrder == "descending")
+			newOrder = "ascending"
+		else if (sendersForResultSortOrder == "ascending")
+			newOrder = "descending"
+		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, newOrder)
 		var i
 		for (i = 0; i < this.sendersForResult.length; i++) {
 			table.addRow(this.sendersForResult[i].getMapping())
@@ -426,25 +422,25 @@ var refreshType = null
 function sortSendersTable(key, order) {
 	sendersSortKey = key
 	sendersSortOrder = order
-	refreshSender(uuid, false)
+	refreshSender(uuid)
 }
 
 function sortResultsTable(key, order) {
 	resultsSortKey = key
 	resultsSortOrder = order
-	refreshFile(uuid, false)
+	refreshFile(uuid)
 }
 
 function sortResultsFromSenderTable(key, order) {
 	resultsFromSenderSortKey = key
 	resultsFromSenderSortOrder = order
-	refreshResultsFromSender(currentSender, false)
+	refreshResultsFromSender(currentSender)
 }
 
 function sortSendersForResultTable(key, order) {
 	sendersForResultSortKey = key
 	sendersForResultSortOrder = order
-	refreshSendersForResult(currentResult, false)
+	refreshSendersForResult(currentResult)
 }
 
 function showCommentBySender(infoHash) {
@@ -663,14 +659,14 @@ function hideCertificatesBySender(fileInfoHash, count) {
 	linkSpan.innerHTML = showLink
 }
 
-function refreshResultsFromSender(sender, preserveOrder) {
+function refreshResultsFromSender(sender) {
 	currentSender = sender
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			resultsFromSender = new ResultsFromSender(this.responseXML)
-			var tableHtml = resultsFromSender.render(preserveOrder)
+			var tableHtml = resultsFromSender.render()
 			
 			var bottomTableDiv = document.getElementById("bottomTable")
 			bottomTableDiv.innerHTML = tableHtml
@@ -681,14 +677,14 @@ function refreshResultsFromSender(sender, preserveOrder) {
 	xmlhttp.send()
 }
 
-function refreshSendersForResult(result, preserveOrder) {
+function refreshSendersForResult(result) {
 	currentResult = result
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			sendersForResult = new SendersForResult(this.responseXML)
-			var tableHtml = sendersForResult.render(preserveOrder)
+			var tableHtml = sendersForResult.render()
 			
 			var bottomTableDiv = document.getElementById("bottomTable")
 			bottomTableDiv.innerHTML = tableHtml
@@ -699,20 +695,20 @@ function refreshSendersForResult(result, preserveOrder) {
 	xmlhttp.send()
 }
 
-function refreshSender(searchUUID, preserveOrder) {
+function refreshSender(searchUUID) {
 	uuid = searchUUID
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			senders = new Senders(this.responseXML)
-			var tableHtml = senders.render(preserveOrder)
+			var tableHtml = senders.render()
 			
 			var topTableDiv = document.getElementById("topTable")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentSender != null)
-				refreshResultsFromSender(currentSender, true)
+				refreshResultsFromSender(currentSender)
 		}
 	}
 	var sortParam = "&key=" + sendersSortKey + "&order=" + sendersSortOrder
@@ -721,20 +717,20 @@ function refreshSender(searchUUID, preserveOrder) {
 	
 }
 
-function refreshFile(searchUUID, preserveOrder) {
+function refreshFile(searchUUID) {
 	uuid = searchUUID
 	
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			results = new Results(this.responseXML)
-			var tableHtml = results.render(preserveOrder)
+			var tableHtml = results.render()
 			
 			var topTableDiv = document.getElementById("topTable")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentResult != null)
-				refreshSendersForResult(currentResult, true)
+				refreshSendersForResult(currentResult)
 		}
 	}
 	var sortParam = "&key=" + resultsSortKey + "&order=" + resultsSortOrder
@@ -784,7 +780,7 @@ function refreshStatus() {
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
 				if (newStatus.revision > currentSearch.revision)
-					refreshFunction(uuid, true)
+					refreshFunction(uuid)
 			}
 		}
 	}
