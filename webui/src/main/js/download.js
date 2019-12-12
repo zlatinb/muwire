@@ -7,6 +7,30 @@ class Downloader {
 		this.progress = xmlNode.getElementsByTagName("Progress")[0].childNodes[0].nodeValue;
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue;
 	}
+	
+	getMapping() {
+		var mapping = new Map()
+		mapping.set("Name", this.getNameBlock())
+		mapping.set("State", this.state)
+		mapping.set("Speed", this.speed)
+		mapping.set("ETA", this.ETA)
+		mapping.set("Progress", this.progress)
+		mapping.set("Cancel", this.getCancelBlock())
+		return mapping
+	}
+	
+	getNameBlock() {
+		return "<a href='#' onclick='window.updateDownloader(\"" + this.infoHash + "\");return false'>" + this.name + "</a>"
+	}
+	
+	getCancelBlock() {
+		if (this.state == "CANCELLED" || this.state == "FINISHED")
+			return ""
+		var linkText = _t("Cancel")
+		var link = "<a href='#' onclick='window.cancelDownload(\"" + this.infoHash + "\");return false;'>" + linkText + "</a>"
+		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
+		return block
+	}
 }
 
 var downloader = null;
@@ -38,40 +62,47 @@ function refreshDownloader() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML;
+			
+			var downloaderList = []
 			downloaders.clear();
 			var i;
 			var x = xmlDoc.getElementsByTagName("Download");
 			for (i = 0; i < x.length; i ++) {
 				var download = new Downloader(x[i]);
+				downloaderList.push(download)
 				downloaders.set(download.infoHash, download);
 			}
 			
-			var table = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("State") + "</th><th>" + _t("Speed") + "</th><th>" + _t("ETA") + "</th><th>" + _t("Progress") + "</th><th>" + _t("Cancel") + "</th></tr></thead></tbody>";
-			var downloadsDiv = document.getElementById("downloads");
-			for (var [infoHash, download] of downloaders) {
-				table += "<tr><td><a href='#' onclick='updateDownloader(\""+infoHash+"\");return false;'>";
-				table += download.name;
-				table += "</a></td>";
-				table += "<td>"+download.state+"</td>";
-				table += "<td>"+download.speed+"</td>";
-				table += "<td>"+download.ETA+"</td>";
-				table += "<td>"+download.progress+"</td>";
-				
-				if (download.state != "CANCELLED")
-					table += "<td><span id='download-"+infoHash+"'><a href='#' onclick='window.cancelDownload(\""+infoHash+"\");return false;'>" + _t("Cancel") + "</a></span></td>";
-				else
-					table += "<td></td>";
-				table += "</tr>";
+			var newOrder
+			if (downloadsSortOrder == "descending")
+				newOrder = "ascending"
+			else if (downloadsSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["Name","State","Speed","ETA","Progress","Cancel"], "sortDownloads", downloadsSortKey, newOrder)
+			
+			for(i = 0; i < downloaderList.length; i++) {
+				table.addRow(downloaderList[i].getMapping())
 			}
-			table += "</tbody></table>";
+			
+			var downloadsDiv = document.getElementById("downloads");
 			if (downloaders.size > 0)
-				downloadsDiv.innerHTML = table;
+				downloadsDiv.innerHTML = table.render();
 			if (downloader != null)
 				updateDownloader(downloader);
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Download", true);
+	var sortParam = "key=" + downloadsSortKey + "&order=" + downloadsSortOrder
+	xmlhttp.open("GET", "/MuWire/Download?" + sortParam, true);
 	xmlhttp.send();
+}
+
+var downloadsSortKey
+var downloadsSortOrder
+
+function sortDownloads(key, order) {
+	downloadsSortKey = key
+	downloadsSortOrder = order
+	refreshDownloader()
 }
 
 function initDownloads() {

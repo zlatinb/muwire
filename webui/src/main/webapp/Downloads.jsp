@@ -15,6 +15,7 @@
 <html>
     <head>
 <%@include file="css.jsi"%>
+	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
     <script src="js/download.js?<%=version%>" type="text/javascript"></script>
     </head>
     <body onload="initTranslate(jsTranslations); initConnectionsCount(); initDownloads();">
