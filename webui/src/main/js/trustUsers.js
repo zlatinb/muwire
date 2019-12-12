@@ -9,16 +9,46 @@ class Persona {
 		} catch (ignore) {}
 	}
 	
-	getTrustedLink() {
-		return "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
+	getMapping(trusted) {
+		var mapping = new Map()
+		var nameHtml = this.user
+		if (trusted) {
+			nameHtml += this.getNeutralLink()
+			nameHtml += this.getDistrustedBlock()
+		} else {
+			nameHtml += this.getTrustedBlock()
+			nameHtml += this.getNeutralLink()
+		}
+		
+		mapping.set("User", nameHtml)
+		mapping.set("Reason", this.reason)
+		
+		if (trusted) {
+			var subscribeHtml = _t("Subscribed")
+			if (this.subscribed != "true")
+				subscribeHtml = this.getSubscribeLink()
+			mapping.set("Subscribe", subscribeHtml)
+		}
+		
+		return mapping
+	}
+	
+	getTrustedBlock() {
+		var link = "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
+		var block = "<span id='trusted-link-" + this.userB64 + "'>" + link + "</span>"
+		block += "<span id='trusted-" + this.userB64 + "'></span>"
+		return block
 	}
 	
 	getNeutralLink() {
 		return "<a herf='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
-	getDistrustedLink() {
-		return "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
+	getDistrustedBlock() {
+		var link = "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
+		var block = "<span id='distrusted-link-" + this.userB64 + "'>" + link + "</span>"
+		block += "<span id='distrusted-" + this.userB64 + "'></span>"
+		return block
 	}
 	
 	getSubscribeLink() {
@@ -29,6 +59,11 @@ class Persona {
 var trusted = new Map()
 var distrusted = new Map()
 var revision = -1
+
+var trustedUsersSortKey
+var trustedUsersSortOrder
+var distrustedUsersSortKey
+var distrustedUsersSortOrder
 
 function subscribe(host) {
 	var xmlhttp = new XMLHttpRequest()
@@ -117,67 +152,91 @@ function cancelDistrust(host) {
 	linkSpan.innerHTML = html
 }
 
-function updateTable(map, divId) {
-	var divElement = document.getElementById(divId)
-	var tableHtml = "<table><thead><tr><th>" + _t("User") + "</th><th>" + _t("Reason") + "</th><th>" + _t("Actions") + "</th><th>" + _t("Subscribe") + "</th></tr></thead><tbody>"
-	
-	var isTrusted = (map == trusted)
-	for (var [ignored, user] of map) {
-		tableHtml += "<tr>"
-		tableHtml += "<td>" + user.user + "</td>"
-		tableHtml += "<td>" + user.reason + "</td>"
-		
-		tableHtml += "<td>"
-		if (isTrusted) {
-			tableHtml += user.getNeutralLink() + " <span id='distrusted-link-" + user.userB64 + "'>" + user.getDistrustedLink() + "</span>" +
-						"<span id='distrusted-" + user.userB64 + "'></span>"
-		} else {
-			tableHtml += user.getNeutralLink() + " <span id='trusted-link-" + user.userB64 + "'>" + user.getTrustedLink() + "</span>" +
-						"<span id='trusted-" + user.userB64 + "'></span>"
-		}
-		tableHtml += "</td>"
-		
-		if (user.subscribed == "true") {
-			tableHtml += "<td>" + _t("Subscribed") + "</td>"
-		} else if (isTrusted) {
-			tableHtml += "<td>" + user.getSubscribeLink() + "</td>"
-		}
-		
-		
-		tableHtml += "</tr>"
-	}
-	tableHtml += "</tbody></table>"
-	divElement.innerHTML = tableHtml
+function sortTrustedUsers(key, order) {
+	trustedUsersSortKey = key
+	trustedUsersSortOrder = order
+	refreshTrustedUsers()
 }
 
-function refreshUsers() {
+function sortDistrustedUsers(key, order) {
+	distrustedUsersSortKey = key
+	distrustedUsersSortOrder = order
+	refreshDistrustedUsers()
+}
+
+function refreshDistrustedUsers() {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			distrusted.clear()
+			var distrustedList = []
+			
+			var distrustedNodes = this.responseXML.getElementsByTagName("Persona")
+			var i
+			for (i = 0; i < distrustedNodes.length; i++) {
+				var persona = new Persona(distrustedNodes[i])
+				distrusted.set(persona.user, persona)
+				distrustedList.push(persona)
+			}
+			
+			var newOrder
+			if (distrustedUsersSortOrder == "descending")
+				newOrder = "ascending"
+			else if (distrustedUsersSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["User", "Reason"], "sortDistrustedUsers", distrustedUsersSortKey, newOrder)
+			
+			for (i = 0; i < distrustedList.length; i++) {
+				table.addRow(distrustedList[i].getMapping(false))
+			}
+			
+			var tableDiv = document.getElementById("distrustedUsers")
+			tableDiv.innerHTML = table.render()
+		}
+	}
+	var sortParam = "&key=" + distrustedUsersSortKey + "&order=" + distrustedUsersSortOrder
+	xmlhttp.open("GET", "/MuWire/Trust?section=distrustedUsers" + sortParam)
+	xmlhttp.send()
+}
+
+function refreshTrustedUsers() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			trusted.clear()
-			distrusted.clear()
-			var trustedElement = this.responseXML.getElementsByTagName("Trusted")[0]
-			var trustedUsers = trustedElement.getElementsByTagName("Persona")
+			var trustedList = []
+			
+			var trustedNodes = this.responseXML.getElementsByTagName("Persona")
 			var i
-			for (i = 0; i < trustedUsers.length; i++) {
-				var persona = new Persona(trustedUsers[i])
+			for (i = 0; i < trustedNodes.length; i++) {
+				var persona = new Persona(trustedNodes[i])
 				trusted.set(persona.user, persona)
+				trustedList.push(persona)
 			}
 			
-			var distrustedElement = this.responseXML.getElementsByTagName("Distrusted")[0]
-			var distrustedUsers = distrustedElement.getElementsByTagName("Persona")
-			for (i = 0; i < distrustedUsers.length; i++) {
-				var persona = new Persona(distrustedUsers[i])
-				distrusted.set(persona.user, persona)
+			var newOrder
+			if (trustedUsersSortOrder == "descending")
+				newOrder = "ascending"
+			else if (trustedUsersSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["User" , "Reason", "Subscribe"], "sortTrustedUsers", trustedUsersSortKey, newOrder)
+			
+			for (i = 0; i < trustedList.length; i++) {
+				table.addRow(trustedList[i].getMapping(true))
 			}
-
-			updateTable(trusted, "trustedUsers")
-			updateTable(distrusted, "distrustedUsers")				
-		
+			
+			var tableDiv = document.getElementById("trustedUsers")
+			tableDiv.innerHTML = table.render()
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Trust?section=users", true)
+	var sortParam = "&key=" + trustedUsersSortKey + "&order=" + trustedUsersSortOrder
+	xmlhttp.open("GET", "/MuWire/Trust?section=trustedUsers" + sortParam)
 	xmlhttp.send()
+}
+
+function refreshUsers() {
+	refreshTrustedUsers()
+	refreshDistrustedUsers()
 }
 
 function fetchRevision() {

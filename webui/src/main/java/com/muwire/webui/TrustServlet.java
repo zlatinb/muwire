@@ -2,6 +2,9 @@ package com.muwire.webui;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -40,23 +43,36 @@ public class TrustServlet extends HttpServlet {
         
         if (section.equals("revision")) {
             sb.append("<Revision>").append(trustManager.getRevision()).append("</Revision>");
-        } else if (section.equals("users")) {
+        } else if (section.equals("trustedUsers")) {
+            List<TrustUser> list = new ArrayList<>();
+            for(TrustEntry te : core.getTrustService().getGood().values()) {
+                TrustUser trustUser = new TrustUser(
+                        te.getPersona(),
+                        te.getReason(),
+                        core.getTrustSubscriber().isSubscribed(te.getPersona()));
+                list.add(trustUser);
+            }
+            
+            USER_COMPARATORS.sort(list, req);
+            
             sb.append("<Users>");
-            
-            sb.append("<Trusted>");
-            for (TrustEntry te : core.getTrustService().getGood().values()) {
-                TEtoXML(te,sb, core.getTrustSubscriber());
-            }
-            sb.append("</Trusted>");
-            
-            sb.append("<Distrusted>");
-            for (TrustEntry te : core.getTrustService().getBad().values()) {
-                TEtoXML(te, sb, core.getTrustSubscriber());
-            }
-            sb.append("</Distrusted>");
-            
+            list.forEach(u -> u.toXML(sb));
             sb.append("</Users>");
+        } else if (section.equals("distrustedUsers")) {
+            List<TrustUser> list = new ArrayList<>();
+            for(TrustEntry te : core.getTrustService().getBad().values()) {
+                TrustUser trustUser = new TrustUser(
+                        te.getPersona(),
+                        te.getReason(),
+                        false);
+                list.add(trustUser);
+            }
             
+            USER_COMPARATORS.sort(list, req);
+            
+            sb.append("<Users>");
+            list.forEach(l -> l.toXML(sb));
+            sb.append("</Users>");
         } else if (section.equals("subscriptions")) {
             sb.append("<Subscriptions>");
             
@@ -174,18 +190,6 @@ public class TrustServlet extends HttpServlet {
         trustManager = (TrustManager) config.getServletContext().getAttribute("trustManager");
     }
 
-    private static void TEtoXML(TrustEntry te, StringBuilder sb, TrustSubscriber trustSubscriber) {
-        sb.append("<Persona>");
-        sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
-        sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
-        String reason = "";
-        if (te.getReason() != null)
-            reason = te.getReason();
-        sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
-        sb.append("<Subscribed>").append(trustSubscriber.isSubscribed(te.getPersona())).append("</Subscribed>");
-        sb.append("</Persona>");
-    }
-    
     private static void TEtoXML(TrustEntry te, StringBuilder sb, TrustService trustService) {
         sb.append("<Persona>");
         sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
@@ -197,4 +201,44 @@ public class TrustServlet extends HttpServlet {
         sb.append("<Status>").append(trustService.getLevel(te.getPersona().getDestination())).append("</Status>");
         sb.append("</Persona>");
     }
+    
+    private static class TrustUser {
+        private final Persona persona;
+        private final String reason;
+        private final boolean subscribed;
+        TrustUser(Persona persona, String reason, boolean subscribed) {
+            this.persona = persona;
+            this.reason = reason;
+            this.subscribed = subscribed;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Persona>");
+            sb.append("<User>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</User>");
+            sb.append("<UserB64>").append(persona.toBase64()).append("</UserB64>");
+            sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
+            sb.append("<Subscribed>").append(subscribed).append("</Subscribed>");
+            sb.append("</Persona>");
+        }
+    }
+
+    private static final Comparator<TrustUser> USER_BY_USER = (l, r) -> {
+        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+    };
+    
+    private static final Comparator<TrustUser> USER_BY_REASON = (l, r) -> {
+        return l.reason.compareTo(r.reason);
+    };
+    
+    private static final Comparator<TrustUser> USER_BY_SUBSCRIBED = (l, r) -> {
+        return Boolean.compare(l.subscribed, r.subscribed);
+    };
+    
+    private static final ColumnComparators<TrustUser> USER_COMPARATORS = new ColumnComparators<>();
+    static {
+        USER_COMPARATORS.add("User", USER_BY_USER);
+        USER_COMPARATORS.add("Reason", USER_BY_REASON);
+        USER_COMPARATORS.add("Subscribe", USER_BY_SUBSCRIBED);
+    }
+    
 }
