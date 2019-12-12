@@ -1,3 +1,15 @@
+class Link {
+	constructor(text, call, params) {
+		this.text = text
+		this.call = call
+		this.params = params
+	}
+	
+	render() {
+		return "<a href='#' onclick='window." + this.call +"(\"" + this.params.join("\",\"") + "\");return false;'>" + this.text + "</a>"
+	}
+}
+
 class Column {
 	constructor(key) {
 		this.key = key
@@ -6,8 +18,8 @@ class Column {
 	render(descending, callback) {
 		var html = "<th>"
 		var linkText = _t(this.key)
-		var link = "<a href='#' onclick='" + callback + "(\"" + this.key + "\",\"" + descending + "\");return false;'>" + linkText + "</a>" 
-		html += link + "</th>"
+		var link = new Link(linkText, callback, [this.key, descending])
+		html += link.render() + "</th>"
 		return html
 	}
 }
