@@ -1,9 +1,10 @@
 
 class Node {
-	constructor(nodeId, parent, leaf, path, size, comment, certified, revision) {
+	constructor(nodeId, parent, leaf, infoHash, path, size, comment, certified, revision) {
 		this.nodeId = nodeId
 		this.parent = parent
 		this.leaf = leaf
+		this.infoHash = infoHash
 		this.children = []
 		this.path = path
 		this.size = size
@@ -28,8 +29,13 @@ class Node {
 			if (this.certified == "true") 
 				certified = _t("Certified")
 			
-			div.innerHTML = "<li>"+this.path+"<br/>"+ unshareLink + "   " + certifyLink + "   " + certified + "   " + 
-				commentLink + "<div id='comment-" + this.nodeId+ "'></div></li>"
+			var fetchLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + _t("Fetch") + "</a>"
+			var html = "<li>"+this.path+"<br/>"+ unshareLink + "   " + fetchLink + "   " + certifyLink + "   " + certified + "   " + 
+				commentLink + "<div id='comment-" + this.nodeId+ "'></div>"
+			
+			html += "</li>"
+			
+			div.innerHTML = html
 		} else {
 			if (this.children.length == 0) {
 				div.innerHTML = "<li><span><a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
@@ -53,6 +59,11 @@ class Node {
 }
 
 
+function fetch(infoHash) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.open("GET", "/MuWire/DownloadedContent/" + infoHash)
+	xmlhttp.send()
+}
 
 function refreshStatus() {
 	var xmlhttp = new XMLHttpRequest();
@@ -83,7 +94,7 @@ function refreshStatus() {
 }
 
 var treeRevision = -1
-var root = new Node("root",null,false,_t("Shared Files"), -1, null, false, -1)
+var root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, -1)
 var nodesById = new Map()
 
 function initFiles() {
@@ -120,6 +131,7 @@ function expand(nodeId) {
 			var i
 			for (i = 0; i < fileElements.length; i++) {
 				var fileName = fileElements[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
+				var infoHash = fileElements[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 				var size = fileElements[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
 				var comment = fileElements[i].getElementsByTagName("Comment")
 				if (comment != null && comment.length == 1)
@@ -129,7 +141,7 @@ function expand(nodeId) {
 				var certified = fileElements[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
 				var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
-				var newFileNode = new Node(nodeId, node, true, fileName, size, comment, certified, revision)
+				var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, revision)
 				nodesById.set(nodeId, newFileNode)
 				node.children.push(newFileNode)
 			}
@@ -138,7 +150,7 @@ function expand(nodeId) {
 			for (i = 0; i < dirElements.length; i++) {
 				var dirName = dirElements[i].childNodes[0].nodeValue
 				var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
-				var newDirNode = new Node(nodeId, node, false, dirName, -1, null, false, revision)
+				var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, revision)
 				nodesById.set(nodeId, newDirNode)
 				node.children.push(newDirNode)
 			}

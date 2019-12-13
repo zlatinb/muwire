@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.muwire.core.Core;
+import com.muwire.core.InfoHash;
 import com.muwire.core.SharedFile;
 import com.muwire.core.filecert.CertificateManager;
 import com.muwire.core.util.DataUtil;
@@ -79,6 +80,7 @@ public class FilesServlet extends HttpServlet {
                 if (sf.getComment() != null) 
                     comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
                 FilesTableEntry entry = new FilesTableEntry(sf.getFile().getName(),
+                        sf.getInfoHash(),
                         sf.getCachedPath(),
                         sf.getCachedLength(),
                         comment,
@@ -130,6 +132,7 @@ public class FilesServlet extends HttpServlet {
         sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
         sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
         sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
+        sb.append("<InfoHash>").append(Base64.encode(sf.getInfoHash().getRoot())).append("</InfoHash>");
         if (sf.getComment() != null) {
             String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
             sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
@@ -186,13 +189,15 @@ public class FilesServlet extends HttpServlet {
     
     private static class FilesTableEntry {
         private final String name;
+        private final InfoHash infoHash;
         private final String path;
         private final long size;
         private final String comment;
         private final boolean certified;
         
-        FilesTableEntry(String name, String path, long size, String comment, boolean certified) {
+        FilesTableEntry(String name, InfoHash infoHash, String path, long size, String comment, boolean certified) {
             this.name = name;
+            this.infoHash = infoHash;
             this.path = path;
             this.size = size;
             this.comment = comment;
@@ -202,6 +207,7 @@ public class FilesServlet extends HttpServlet {
         void toXML(StringBuilder sb) {
             sb.append("<File>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<Path>").append(Util.escapeHTMLinXML(path)).append("</Path>");
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             if (comment != null) {
