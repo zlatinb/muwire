@@ -1,9 +1,28 @@
 class SharedFile {
-	constructor(name, size, comment, certified) {
+	constructor(name, path, size, comment, certified) {
 		this.name = name
+		this.path = path
 		this.size = size
 		this.comment = comment
 		this.certified = certified
+	}
+	
+	getMapping() {
+		var mapping = new Map()
+		
+		var unshareLink = new Link(_t("Unshare"), "unshare", [this.path])
+		var certifyLink = new Link(_t("Certify"), "certify", [this.path])
+		var certifyHtml = certifyLink.render()
+		if (this.certified == "true")
+			certifyHtml += " " + _t("Certified")
+		var showCommentHtml = ""
+		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
+		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
+		showCommentHtml += "<div id='comment-" + this.path + "'></div>"
+		mapping.set("File", this.name + " " + unshareLink.render() + " " + certifyHtml + " " + showCommentHtml)
+		mapping.set("Size", this.size)
+		
+		return mapping
 	}
 }
 
@@ -27,7 +46,7 @@ function refreshStatus() {
 			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
 			var refreshDiv = document.getElementById("refresh-link")
 			if (newRevision > tableRevision) {
-				tableRevision = newRevision
+				tableRevision = newRevision // TODO: auto-refresh
 				refreshDiv.innerHTML = "<a href='#' onclick='refreshTable();return false;'>" + _t("Refresh") + "</a>"
 			} else
 				refreshDiv.innerHTML = ""
@@ -39,6 +58,14 @@ function refreshStatus() {
 
 var tableRevision = -1
 var filesByPath = new Map()
+var sortKey
+var sortOrder
+
+function sort(key, order) {
+	sortKey = key
+	sortOrder = order
+	refreshTable()
+}
 
 function refreshTable() {
 	var xmlhttp = new XMLHttpRequest()
@@ -46,8 +73,7 @@ function refreshTable() {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML
 			
-			var tableHtml = "<table><thead><tr><th>File</th><th>Size</th><th>Comment</th></tr></thead><tbody>"
-			
+			var filesList = []			
 			var files = xmlDoc.getElementsByTagName("File")
 			var i
 			for(i = 0; i < files.length; i++) {
@@ -60,37 +86,29 @@ function refreshTable() {
 					comment = null
 				var certified = files[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
-				var nodeId = Base64.encode(fileName)
-				var newSharedFile = new SharedFile(fileName, size, comment, certified)
-				filesByPath.set(nodeId, newSharedFile)
+				var path = Base64.encode(fileName)
+				var newSharedFile = new SharedFile(fileName, path, size, comment, certified)
+				filesByPath.set(path, newSharedFile)
+				filesList.push(newSharedFile)
 			}
 			
-			for (var [path, file] of filesByPath) {
-				
-				var unshareLink = "<a href='#' onclick='window.unshare(\"" + path + "\");return false;'>" + _t("Unshare") + "</a>"
-				
-				var certifyLink = "<a href='#' onclick='window.certify(\"" + path + "\");return false;'>" + _t("Certify") + "</a>"
-				var certified = ""
-				if (file.certified == "true")
-					certified = _t("Certified")
-				
-				var commentLink = "<span id='comment-link-"+ path +"'>" + generateCommentLink(path) + "</span>"
-				
-				tableHtml += "<tr>"
-				tableHtml += "<td>"+file.name+"<br/>" + unshareLink + "   " + certifyLink + "   " + certified + "   " + 
-					commentLink + "<div id='comment-" + path + "'></div></td>"
-				tableHtml += "<td>"+file.size+"</td>"
-				tableHtml += "<td>"+(file.comment != null)+"</td>"
-				tableHtml += "</tr>"
-			}
+			var newOrder
+			if (sortOrder == "descending")
+				newOrder = "ascending"
+			else if (sortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["File","Size"], "sort", sortKey, newOrder)
 			
-			tableHtml += "</tbody></table>"
+			for (i = 0; i < filesList.length; i++) {
+				table.addRow(filesList[i].getMapping())
+			}
 			
 			var tableDiv = document.getElementById("filesTable")
-			tableDiv.innerHTML = tableHtml
+			tableDiv.innerHTML = table.render()
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Files?section=fileTable", true)
+	var sortParam = "&key=" + sortKey + "&order=" + sortOrder
+	xmlhttp.open("GET", "/MuWire/Files?section=fileTable" + sortParam, true)
 	xmlhttp.send()
 }
 
@@ -135,8 +153,11 @@ function showCommentForm(nodeId) {
 function cancelComment(nodeId) {
 	var commentDiv = document.getElementById("comment-"+nodeId)
 	commentDiv.innerHTML = ""
+	
+	var commentLink = new Link(_t("Comment"), "showCommentForm", [nodeId])
+	
 	var linkSpan = document.getElementById("comment-link-"+nodeId)
-	linkSpan.innerHTML = generateCommentLink(nodeId)
+	linkSpan.innerHTML = commentLink.render()
 }	
 
 function saveComment(fileId) {
@@ -152,10 +173,6 @@ function saveComment(fileId) {
 	xmlhttp.open("POST", "/MuWire/Files", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send(encodeURI("action=comment&path="+fileId+ "&comment="+comment))
-}
-
-function generateCommentLink(nodeId) {
-	return "<a href='#' onclick='showCommentForm(\"" + nodeId + "\");return false;'>" + _t("Comment") + "</a>"
 }
 
 function certify(path) {

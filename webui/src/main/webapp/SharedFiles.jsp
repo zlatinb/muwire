@@ -16,6 +16,7 @@ if (viewAs == null)
 	<head>
 <%@ include file="css.jsi"%>
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
 	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>

@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -68,9 +71,24 @@ public class FilesServlet extends HttpServlet {
             fileManager.list(current, cb);
             sb.append("</Files>");
         } else if (section.equals("fileTable")) {
+            
+            List<FilesTableEntry> entries = new ArrayList<>();
+            fileManager.getAllFiles().forEach(sf -> {
+                String comment = null;
+                if (sf.getComment() != null) 
+                    comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
+                FilesTableEntry entry = new FilesTableEntry(sf.getFile().getName(),
+                        sf.getCachedPath(),
+                        sf.getCachedLength(),
+                        comment,
+                        core.getCertificateManager().hasLocalCertificate(sf.getInfoHash()));
+                entries.add(entry);
+            });
+            
+            COMPARATORS.sort(entries, req);
+            
             sb.append("<Files>");
-            sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
-            fileManager.getAllFiles().forEach(sf -> sharedFileToXML(sf, sb, core.getCertificateManager()));
+            entries.forEach(entry -> entry.toXML(sb));
             sb.append("</Files>");
         }
         
@@ -163,6 +181,48 @@ public class FilesServlet extends HttpServlet {
                 comment = null;
             fileManager.comment(file, comment);
         }
+    }
+    
+    private static class FilesTableEntry {
+        private final String name;
+        private final String path;
+        private final long size;
+        private final String comment;
+        private final boolean certified;
+        
+        FilesTableEntry(String name, String path, long size, String comment, boolean certified) {
+            this.name = name;
+            this.path = path;
+            this.size = size;
+            this.comment = comment;
+            this.certified = certified;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<File>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<Path>").append(Util.escapeHTMLinXML(path)).append("</Path>");
+            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            if (comment != null) {
+                sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
+            }
+            sb.append("<Certified>").append(certified).append("</Certified>");
+            sb.append("</File>");
+        }
+    }
+    
+    private static final Comparator<FilesTableEntry> BY_PATH = (l, r) -> {
+        return l.path.compareTo(r.path);
+    };
+    
+    private static final Comparator<FilesTableEntry> BY_SIZE = (l, r) -> {
+        return Long.compare(l.size, r.size);
+    };
+    
+    private static final ColumnComparators<FilesTableEntry> COMPARATORS = new ColumnComparators<>();
+    static {
+        COMPARATORS.add("File", BY_PATH);
+        COMPARATORS.add("Size", BY_SIZE);
     }
  
 }
