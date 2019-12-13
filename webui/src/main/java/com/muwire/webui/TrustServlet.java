@@ -2,6 +2,7 @@ package com.muwire.webui;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -240,11 +241,11 @@ public class TrustServlet extends HttpServlet {
     }
 
     private static final Comparator<TrustUser> USER_BY_USER = (l, r) -> {
-        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+        return Collator.getInstance().compare(l.persona.getHumanReadableName(), r.persona.getHumanReadableName());
     };
     
     private static final Comparator<TrustUser> USER_BY_REASON = (l, r) -> {
-        return l.reason.compareTo(r.reason);
+        return Collator.getInstance().compare(l.reason, r.reason);
     };
     
     private static final Comparator<TrustUser> USER_BY_SUBSCRIBED = (l, r) -> {
@@ -289,11 +290,11 @@ public class TrustServlet extends HttpServlet {
     }
     
     private static final Comparator<Subscription> SUBSCRIPTION_BY_USER = (l, r) -> {
-        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+        return Collator.getInstance().compare(l.persona.getHumanReadableName(), r.persona.getHumanReadableName());
     };
     
     private static final Comparator<Subscription> SUBSCRIPTION_BY_STATUS = (l, r) -> {
-        return l.status.toString().compareTo(r.status.toString());
+        return Collator.getInstance().compare(l.status.toString(), r.status.toString());
     };
     
     private static final Comparator<Subscription> SUBSCRIPTION_BY_TIMESTAMP = (l, r) -> {
@@ -339,15 +340,15 @@ public class TrustServlet extends HttpServlet {
     }
     
     private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_USER = (l, r) -> {
-        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+        return Collator.getInstance().compare(l.persona.getHumanReadableName(), r.persona.getHumanReadableName());
     };
     
     private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_REASON = (l, r) -> {
-        return l.reason.compareTo(r.reason);
+        return Collator.getInstance().compare(l.reason, r.reason);
     };
     
     private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_STATUS = (l, r) -> {
-        return l.status.toString().compareTo(r.status.toString());
+        return Collator.getInstance().compare(l.status.toString(), r.status.toString());
     };
     
     private static final ColumnComparators<TrustListEntry> TRUST_LIST_ENTRY_COMPARATORS = new ColumnComparators<>();

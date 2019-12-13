@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -212,7 +213,7 @@ public class FilesServlet extends HttpServlet {
     }
     
     private static final Comparator<FilesTableEntry> BY_PATH = (l, r) -> {
-        return l.path.compareTo(r.path);
+        return Collator.getInstance().compare(l.path, r.path);
     };
     
     private static final Comparator<FilesTableEntry> BY_SIZE = (l, r) -> {

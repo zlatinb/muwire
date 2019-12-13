@@ -2,6 +2,7 @@ package com.muwire.webui;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -175,11 +176,11 @@ public class DownloadServlet extends HttpServlet {
     }
     
     private static final Comparator<Download> BY_NAME = (l, r) -> {
-        return l.name.compareTo(r.name);
+        return Collator.getInstance().compare(l.name, r.name);
     };
     
     private static final Comparator<Download> BY_STATE = (l, r) -> {
-        return l.state.toString().compareTo(r.state.toString());
+        return Collator.getInstance().compare(l.state.toString(), r.state.toString());
     };
     
     private static final Comparator<Download> BY_SPEED = (l, r) -> {

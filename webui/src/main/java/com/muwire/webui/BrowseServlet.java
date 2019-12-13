@@ -3,6 +3,7 @@ package com.muwire.webui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -212,7 +213,7 @@ public class BrowseServlet extends HttpServlet {
     }
     
     private static final Comparator<Result> BY_NAME = (k, v) -> {
-        return k.event.getName().compareTo(v.event.getName());
+        return Collator.getInstance().compare(k.event.getName(), v.event.getName());
     };
     
     private static final Comparator<Result> BY_SIZE = (k, v) -> {
@@ -231,11 +232,11 @@ public class BrowseServlet extends HttpServlet {
     }
     
     private static final Comparator<Browse> BY_HOST = (k, v) -> {
-        return k.getHost().getHumanReadableName().compareTo(v.getHost().getHumanReadableName()); 
+        return Collator.getInstance().compare(k.getHost().getHumanReadableName(), v.getHost().getHumanReadableName());
     };
     
     private static final Comparator<Browse> BY_STATUS = (k, v) -> {
-        return k.getStatus().toString().compareTo(v.getStatus().toString());
+        return Collator.getInstance().compare(k.getStatus().toString(), v.getStatus().toString());
     };
     
     private static final Comparator<Browse> BY_RESULTS = (k, v) -> {

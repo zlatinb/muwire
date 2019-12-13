@@ -2,6 +2,7 @@ package com.muwire.webui;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -372,7 +373,7 @@ public class SearchServlet extends HttpServlet {
     }
     
     private static final Comparator<SearchResults> SEARCH_BY_NAME = (k, v) -> {
-        return k.getSearch().compareTo(v.getSearch());
+        return Collator.getInstance().compare(k.getSearch(), v.getSearch());
     };
     
     private static final Comparator<SearchResults> SEARCH_BY_SENDERS = (k, v) -> {
@@ -391,11 +392,11 @@ public class SearchServlet extends HttpServlet {
     }
     
     private static final Comparator<Sender> SENDER_BY_NAME = (k, v) -> {
-        return k.persona.getHumanReadableName().compareTo(v.persona.getHumanReadableName());
+        return Collator.getInstance().compare(k.persona.getHumanReadableName(), v.persona.getHumanReadableName());
     };
     
     private static final Comparator<Sender> SENDER_BY_TRUST = (k, v) -> {
-        return k.trustLevel.toString().compareTo(v.trustLevel.toString());
+        return Collator.getInstance().compare(k.trustLevel.toString(), v.trustLevel.toString());
     };
     
     private static final Comparator<Sender> SENDER_BY_RESULTS = (k, v) -> {
@@ -410,7 +411,7 @@ public class SearchServlet extends HttpServlet {
     }
     
     private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_NAME = (k, v) -> {
-        return k.name.compareTo(v.name);
+        return Collator.getInstance().compare(k.name, v.name);
     };
     
     private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_SIZE = (k, v) -> {
@@ -429,7 +430,7 @@ public class SearchServlet extends HttpServlet {
     }
     
     private static final Comparator<Result> RESULT_BY_NAME = (k, v) -> {
-        return k.name.compareTo(v.name);
+        return Collator.getInstance().compare(k.name, v.name);
     };
     
     private static final Comparator<Result> RESULT_BY_SIZE = (k, v) -> {
@@ -448,7 +449,7 @@ public class SearchServlet extends HttpServlet {
     }
 
     private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_SENDER = (k, v) -> {
-        return k.sender.getHumanReadableName().compareTo(v.sender.getHumanReadableName());
+        return Collator.getInstance().compare(k.sender.getHumanReadableName(), v.sender.getHumanReadableName());
     };
     
     private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_BROWSING = (k, v) -> {
@@ -456,7 +457,7 @@ public class SearchServlet extends HttpServlet {
     };
     
     private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_TRUST = (k, v) -> {
-        return k.trustLevel.toString().compareTo(v.trustLevel.toString());
+        return Collator.getInstance().compare(k.trustLevel.toString(), v.trustLevel.toString());
     };
     
     private static final ColumnComparators<SenderForResult> SENDER_FOR_RESULT_COMPARATORS = new ColumnComparators<>();

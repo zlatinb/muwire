@@ -3,6 +3,7 @@ package com.muwire.webui;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -175,11 +176,11 @@ public class CertificateServlet extends HttpServlet {
     }
 
     private static final Comparator<CertificateEntry> BY_ISSUER = (l, r) -> {
-        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+        return Collator.getInstance().compare(l.persona.getHumanReadableName(), r.persona.getHumanReadableName());
     };
     
     private static final Comparator<CertificateEntry> BY_NAME = (l, r) -> {
-        return l.name.compareTo(r.name);
+        return Collator.getInstance().compare(l.name, r.name);
     };
     
     private static final Comparator<CertificateEntry> BY_TIMESTAMP = (l, r) -> {
