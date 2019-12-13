@@ -197,6 +197,9 @@ public class TrustServlet extends HttpServlet {
             event.setPersona(p);
             event.setSubscribe(false);
             core.getEventBus().publish(event);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
         } else if (action.equals("trust")) {
             doTrust(p, TrustLevel.TRUSTED, req.getParameter("reason"));
         } else if (action.equals("neutral")) {
