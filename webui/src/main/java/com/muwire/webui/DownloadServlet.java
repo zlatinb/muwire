@@ -166,9 +166,9 @@ public class DownloadServlet extends HttpServlet {
             if (ETA == Long.MAX_VALUE)
                 ETAString = Util._t("Unknown");
             else
-                ETAString = DataHelper.formatDate(ETA);
+                ETAString = DataHelper.formatDuration(ETA);
             sb.append("<ETA>").append(ETAString).append("</ETA>");
-            String progress = String.format("%2d", percent) + "% of "+totalSize;
+            String progress = String.format("%2d", percent) + "% of "+DataHelper.formatSize2Decimal(totalSize, false) + "B";
             sb.append("<Progress>").append(progress).append("</Progress>");
             sb.append("</Download>");
         }
