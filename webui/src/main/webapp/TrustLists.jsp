@@ -12,6 +12,7 @@ String pagetitle=Util._t("Trust Lists");
 	<head>
 <%@ include file="css.jsi"%>
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <script src="js/trustLists.js?<%=version%>" type="text/javascript"></script>
 
 	</head>

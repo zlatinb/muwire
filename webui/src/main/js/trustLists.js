@@ -7,6 +7,22 @@ class TrustList {
 		this.trusted = xmlNode.getElementsByTagName("Trusted")[0].childNodes[0].nodeValue
 		this.distrusted = xmlNode.getElementsByTagName("Distrusted")[0].childNodes[0].nodeValue
 	}
+	
+	getMapping() {
+		var mapping = new Map()
+		
+		var userLink = new Link(this.user, "displayList", [this.user])
+		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.userB64])
+		var refreshLink = new Link(_t("Refresh"), "forceUpdate", [this.userB64])
+		
+		mapping.set("Name", userLink.render() + unsubscribeLink.render() + refreshLink.render())
+		mapping.set("Status", this.status)
+		mapping.set("Last Updated", this.timestamp)
+		mapping.set("Trusted", this.trusted)
+		mapping.set("Distrusted", this.distrusted)
+		
+		return mapping
+	}
 }
 
 class Persona {
@@ -57,6 +73,9 @@ class Persona {
 var lists = new Map()
 var revision = -1
 var currentUser = null
+
+var listsSortKey
+var listsSortOrder
 
 function markTrusted(user) {
 	var linkSpan = document.getElementById("trusted-link-" + user)
@@ -207,41 +226,45 @@ function displayList(user) {
 	xmlhttp.send()
 }
 
+function sortSubscriptions(key, order) {
+	listsSortKey = key
+	listsSortOrder = order
+	refreshLists()
+}
+
 function refreshLists() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			lists.clear()
+			var listOfLists = []
 			var subs = this.responseXML.getElementsByTagName("Subscription")
 			var i
 			for (i = 0; i < subs.length; i++) {
 				var trustList = new TrustList(subs[i])
-				lists.set(trustList.user, trustList)				
+				lists.set(trustList.user, trustList)
+				listOfLists.push(trustList)				
 			}
 			
+			var newOrder
+			if (listsSortOrder == "descending")
+				newOrder = "ascending"
+			else if (listsSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["Name","Trusted","Distrusted","Status","Last Updated"], "sortSubscriptions", listsSortKey, newOrder)
 			
-			var html = "<table><thead><tr><th>" + _t("Name") + "</th><th>" + _t("Trusted") + "</th><th>" + _t("Distrusted") + "</th><th>" + _t("Status") + "</th><th>" + _t("Last Updated") + "</th><th>" + _t("Actions") + "</th></tr></thead><tbody>"
-			for (var [user, list] of lists) {
-				html += "<tr>"
-				html += "<td>" + "<a href='#' onclick='window.displayList(\"" + list.user + "\");return false;'>" + list.user + "</a></td>"
-				html += "<td>" + list.trusted + "</td>"
-				html += "<td>" + list.distrusted +"</td>"
-				html += "<td>" + list.status + "</td>"
-				html += "<td>" + list.timestamp + "</td>"
-				html += "<td>" + "<a href='#' onclick='window.unsubscribe(\"" + list.userB64 + "\");return false;'>" + _t("Unsubscribe") + "</a>" +
-					"   <a href='#' onclick='window.forceUpdate(\"" + list.userB64 + "\");return false;'>" + _t("Refresh") + "</a>" +
-					"</td>"
-				html += "</tr>"
+			for (i = 0; i < listOfLists.length; i++) {
+				table.addRow(listOfLists[i].getMapping())
 			}
-			html += "</tbody></table>"
 			
-			document.getElementById("trustLists").innerHTML = html
+			document.getElementById("trustLists").innerHTML = table.render()
 			
 			if (currentUser != null)
 				displayList(currentUser)
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Trust?section=subscriptions", true)
+	var sortParam = "&key=" + listsSortKey + "&order=" + listsSortOrder
+	xmlhttp.open("GET", encodeURI("/MuWire/Trust?section=subscriptions" + sortParam), true)
 	xmlhttp.send()
 }
 

@@ -74,22 +74,22 @@ public class TrustServlet extends HttpServlet {
             list.forEach(l -> l.toXML(sb));
             sb.append("</Users>");
         } else if (section.equals("subscriptions")) {
-            sb.append("<Subscriptions>");
+            
+            List<Subscription> subs = new ArrayList<>();
             
             for (RemoteTrustList list : core.getTrustSubscriber().getRemoteTrustLists().values()) {
-                sb.append("<Subscription>");
-                sb.append("<User>").append(Util.escapeHTMLinXML(list.getPersona().getHumanReadableName())).append("</User>");
-                sb.append("<UserB64>").append(list.getPersona().toBase64()).append("</UserB64>");
-                sb.append("<Status>").append(list.getStatus()).append("</Status>");
-                String timestamp = Util._t("Never");
-                if (list.getTimestamp() > 0)
-                    timestamp = DataHelper.formatTime(list.getTimestamp());
-                sb.append("<Timestamp>").append(timestamp).append("</Timestamp>");
-                sb.append("<Trusted>").append(list.getGood().size()).append("</Trusted>");
-                sb.append("<Distrusted>").append(list.getBad().size()).append("</Distrusted>");
-                sb.append("</Subscription>");
+                Subscription sub = new Subscription(list.getPersona(),
+                        list.getStatus(),
+                        list.getTimestamp(),
+                        list.getGood().size(),
+                        list.getBad().size());
+                subs.add(sub);
             }
             
+            SUBSCRIPTION_COMPARATORS.sort(subs, req);
+            
+            sb.append("<Subscriptions>");
+            subs.forEach(sub -> sub.toXML(sb));
             sb.append("</Subscriptions>");
             
         } else if (section.equals("list")) {
@@ -241,4 +241,62 @@ public class TrustServlet extends HttpServlet {
         USER_COMPARATORS.add("Subscribe", USER_BY_SUBSCRIBED);
     }
     
+    private static class Subscription {
+        private final Persona persona;
+        private final RemoteTrustList.Status status;
+        private final long timestamp;
+        private final int trusted, distrusted;
+        
+        Subscription(Persona persona, RemoteTrustList.Status status, long timestamp,
+                int trusted, int distrusted) {
+            this.persona = persona;
+            this.status = status;
+            this.timestamp = timestamp;
+            this.trusted = trusted;
+            this.distrusted = distrusted;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Subscription>");
+            sb.append("<User>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</User>");
+            sb.append("<UserB64>").append(persona.toBase64()).append("</UserB64>");
+            sb.append("<Status>").append(status).append("</Status>");
+            String timestampString = Util._t("Never");
+            if (timestamp > 0)
+                timestampString = DataHelper.formatTime(timestamp);
+            sb.append("<Timestamp>").append(timestampString).append("</Timestamp>");
+            sb.append("<Trusted>").append(trusted).append("</Trusted>");
+            sb.append("<Distrusted>").append(distrusted).append("</Distrusted>");
+            sb.append("</Subscription>");
+        }
+    }
+    
+    private static final Comparator<Subscription> SUBSCRIPTION_BY_USER = (l, r) -> {
+        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+    };
+    
+    private static final Comparator<Subscription> SUBSCRIPTION_BY_STATUS = (l, r) -> {
+        return l.status.toString().compareTo(r.status.toString());
+    };
+    
+    private static final Comparator<Subscription> SUBSCRIPTION_BY_TIMESTAMP = (l, r) -> {
+        return Long.compare(l.timestamp, r.timestamp);
+    };
+    
+    private static final Comparator<Subscription> SUBSCRIPTION_BY_TRUSTED = (l, r) -> {
+        return Integer.compare(l.trusted, r.trusted);
+    };
+    
+    private static final Comparator<Subscription> SUBSCRIPTION_BY_DISTRUSTED = (l, r) -> {
+        return Integer.compare(l.distrusted, r.distrusted);
+    };
+    
+    private static final ColumnComparators<Subscription> SUBSCRIPTION_COMPARATORS = new ColumnComparators<>();
+    static {
+        SUBSCRIPTION_COMPARATORS.add("Name", SUBSCRIPTION_BY_USER);
+        SUBSCRIPTION_COMPARATORS.add("Status", SUBSCRIPTION_BY_STATUS);
+        SUBSCRIPTION_COMPARATORS.add("Last Updated", SUBSCRIPTION_BY_TIMESTAMP);
+        SUBSCRIPTION_COMPARATORS.add("Trusted", SUBSCRIPTION_BY_TRUSTED);
+        SUBSCRIPTION_COMPARATORS.add("Distrusted", SUBSCRIPTION_BY_DISTRUSTED);
+    }
 }
