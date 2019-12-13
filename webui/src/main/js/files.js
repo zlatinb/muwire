@@ -15,8 +15,14 @@ class Node {
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
 		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
+		if (this == root)
+			unshareLink = ""
 		var commentLink = "<span id='comment-link-"+this.nodeId+"'><a href='#' onclick='window.showCommentForm(\"" + this.nodeId + "\");return false;'>" + _t("Comment") + "</a></span>";
+		if (this == root)
+			commentLink = ""
 		var certifyLink = "<a href='#' onclick='window.certify(\"" + this.nodeId + "\");return false;'>" + _t("Certify") + "</a>"
+		if (this == root)
+			certifyLink = ""
 		if (this.leaf) {
 			var certified = ""
 			if (this.certified == "true") 
@@ -160,6 +166,8 @@ function unshare(nodeId) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var parent = node.parent
+			if (parent == null)
+				parent = root
 			collapse(parent.nodeId)
 			expand(parent.nodeId)
 		}
