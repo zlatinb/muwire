@@ -1,5 +1,13 @@
 var certificateFetches = new Map()
 var expandedCertificateComments = new Map()
+var sortParams = new Map()
+
+class SortParams {
+	constructor(key, order) {
+		this.key = key
+		this.order = order
+	}
+}
 
 class Certificate {
 	constructor(xmlNode, divId) {
@@ -13,6 +21,18 @@ class Certificate {
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
 		this.base64 = xmlNode.getElementsByTagName("Base64")[0].childNodes[0].nodeValue
 		this.imported = xmlNode.getElementsByTagName("Imported")[0].childNodes[0].nodeValue
+	}
+	
+	getMapping() {
+		var mapping = new Map()
+		mapping.set("Issuer", this.issuer + this.getViewCommentBlock())
+		mapping.set("Name", this.name)
+		mapping.set("Timestamp", this.timestamp)
+		if (this.imported == "true")
+			mapping.set("Import", _t("Imported"))
+		else
+			mapping.set("Import", this.getImportLink())
+		return mapping
 	}
 	
 	getViewCommentBlock() {
@@ -42,25 +62,6 @@ class Certificate {
 		var link = "<a href='#' onclick='window.importCertificate(\"" + this.base64 + "\"); return false;'>" + linkText + "</a>"
 		return link
 	}
-	
-	renderRow() {
-		var commentPresent = "false"
-		if (this.comment != null)
-			commentPresent = "true"
-		
-		var html = "<tr>"
-		html += "<td>" + this.issuer + this.getViewCommentBlock() + "</td>"
-		html += "<td>" + this.name + "</td>"
-		html += "<td>" + this.timestamp + "</td>"
-		
-		if (this.imported == "true")
-			html += "<td>" + _t("Imported") + "</td>"
-		else
-			html += "<td>" + this.getImportLink() + "</td>"
-		
-		html += "</tr>"
-		return html
-	}
 }
 
 class CertificateResponse {
@@ -85,17 +86,28 @@ class CertificateResponse {
 		if (this.certificates.length == 0)
 			return html
 		
+		var params = sortParams.get(this.divId)
+		if (params == null) {
+			params = new SortParams(null, null)
+			sortParams.set(this.divId, params)
+		}
+		
+		var newOrder
+		if (params.order == "descending")
+			newOrder = "ascending"
+		else if (params.order == "ascending")
+			newOrder = "descending"
+		var table = new Table(["Issuer", "Name", "Timestamp", "Import"], "sort", params.key, newOrder, this.divId)
+		
+		var i
+		for (i = 0; i < this.certificates.length; i++) {
+			table.addRow(this.certificates[i].getMapping())
+		}
+		
 		html += "  "
 		html += _t("Certificates") + "  " + this.certificates.length + "/" + this.total
-		 
-		var headers = [_t("Issuer"), _t("Name"), _t("Timestamp"), _t("Import")]
 		html += "<br/>"
-		html += "<table><thead><tr><th>" + headers.join("</th><th>") + "</th></thead><tbody>"
-		var i
-		for(i = 0; i < this.certificates.length; i++) {
-			html += this.certificates[i].renderRow()
-		}
-		html += "</tbody></table>"
+		html += table.render()
 		
 		return html
 	}
@@ -126,9 +138,21 @@ class CertificateFetch {
 				block.innerHTML = fetch.lastResponse.renderTable()
 			}			
 		}
-		xmlhttp.open("GET", "/MuWire/Certificate?user=" + this.senderB64 + "&infoHash=" + this.fileInfoHash, true)
+		var queryParams = ""
+		var params = sortParams.get(this.divId)
+		if (params != null) {
+			queryParams = "&key=" + params.key + "&order=" + params.order
+		}
+		xmlhttp.open("GET", "/MuWire/Certificate?user=" + this.senderB64 + "&infoHash=" + this.fileInfoHash + queryParams, true)
 		xmlhttp.send()
 	}
+}
+
+function sort(key, order, id) {
+	var params = sortParams.get(id)
+	params.key = key
+	params.order = order
+	refreshCertificates()
 }
 
 function importCertificate(b64) {

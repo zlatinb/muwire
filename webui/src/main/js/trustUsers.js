@@ -184,7 +184,7 @@ function refreshDistrustedUsers() {
 				newOrder = "ascending"
 			else if (distrustedUsersSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["User", "Reason"], "sortDistrustedUsers", distrustedUsersSortKey, newOrder)
+			var table = new Table(["User", "Reason"], "sortDistrustedUsers", distrustedUsersSortKey, newOrder, null)
 			
 			for (i = 0; i < distrustedList.length; i++) {
 				table.addRow(distrustedList[i].getMapping(false))
@@ -219,7 +219,7 @@ function refreshTrustedUsers() {
 				newOrder = "ascending"
 			else if (trustedUsersSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["User" , "Reason", "Subscribe"], "sortTrustedUsers", trustedUsersSortKey, newOrder)
+			var table = new Table(["User" , "Reason", "Subscribe"], "sortTrustedUsers", trustedUsersSortKey, newOrder, null)
 			
 			for (i = 0; i < trustedList.length; i++) {
 				table.addRow(trustedList[i].getMapping(true))

@@ -224,7 +224,7 @@ function displayTrustedList(user) {
 			else if (trustedSortOrder == "ascending")
 				newOrder = "descending"
 				
-			var table = new Table(["User", "Reason", "Your Trust"], "sortTrustedList", trustedSortKey, newOrder)
+			var table = new Table(["User", "Reason", "Your Trust"], "sortTrustedList", trustedSortKey, newOrder, null)
 			var i
 			for(i = 0; i < trusted.length; i++) {
 				table.addRow(trusted[i].getMapping())
@@ -253,7 +253,7 @@ function displayDistrustedList(user) {
 			else if (distrustedSortOrder == "ascending")
 				newOrder = "descending"
 				
-			var table = new Table(["User", "Reason", "Your Trust"], "sortDistrustedList", distrustedSortKey, newOrder)
+			var table = new Table(["User", "Reason", "Your Trust"], "sortDistrustedList", distrustedSortKey, newOrder, null)
 			var i
 			for(i = 0; i < distrusted.length; i++) {
 				table.addRow(distrusted[i].getMapping())
@@ -300,7 +300,7 @@ function refreshLists() {
 				newOrder = "ascending"
 			else if (listsSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["Name","Trusted","Distrusted","Status","Last Updated"], "sortSubscriptions", listsSortKey, newOrder)
+			var table = new Table(["Name","Trusted","Distrusted","Status","Last Updated"], "sortSubscriptions", listsSortKey, newOrder, null)
 			
 			for (i = 0; i < listOfLists.length; i++) {
 				table.addRow(listOfLists[i].getMapping())

@@ -93,7 +93,7 @@ class Senders {
 			newOrder = "ascending"
 		else if (sendersSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, newOrder)
+		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.senders.length; i++) {
 			table.addRow(this.senders[i].getMapping())
@@ -191,7 +191,7 @@ class ResultsFromSender {
 			newOrder = "ascending"
 		else if (resultsFromSenderSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Name","Size","Download"], "sortResultsFromSenderTable", resultsFromSenderSortKey, newOrder)
+		var table = new Table(["Name","Size","Download"], "sortResultsFromSenderTable", resultsFromSenderSortKey, newOrder, null)
 		var i
 		for (i = 0 ; i < this.resultsFromSender.length; i++) {
 			table.addRow(this.resultsFromSender[i].getMapping())
@@ -247,7 +247,7 @@ class Results {
 			newOrder = "ascending"
 		else if (resultsSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, newOrder)
+		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.results.length; i++) {
 			table.addRow(this.results[i].getMapping())
@@ -375,7 +375,7 @@ class SendersForResult {
 			newOrder = "ascending"
 		else if (sendersForResultSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, newOrder)
+		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.sendersForResult.length; i++) {
 			table.addRow(this.sendersForResult[i].getMapping())
@@ -762,7 +762,7 @@ function refreshStatus() {
 				newOrder = "ascending"
 			else
 				newOrder = "descending"
-			var table = new Table(["Query", "Senders", "Results"], "sortStatuses", statusKey, newOrder)
+			var table = new Table(["Query", "Senders", "Results"], "sortStatuses", statusKey, newOrder, null)
 			for (i = 0; i < statuses.length; i++) {
 				var status = statuses[i]
 				

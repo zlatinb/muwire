@@ -11,22 +11,30 @@ class Link {
 }
 
 class Column {
-	constructor(key) {
+	
+	constructor(key, parameter) {
 		this.key = key
+		this.parameter = parameter
 	}
 	
 	render(descending, callback) {
 		var html = "<th>"
 		var linkText = _t(this.key)
-		var link = new Link(linkText, callback, [this.key, descending])
+		var parameters
+		if (this.parameter == null)
+			parameters = [this.key, descending]
+		else
+			parameters = [this.key, descending, this.parameter]
+		var link = new Link(linkText, callback, parameters)
 		html += link.render() + "</th>"
 		return html
 	}
 }
 
 class Table {
-	constructor(columns, callback, key, descending) {
-		this.columns = columns.map(x => new Column(x))
+	
+	constructor(columns, callback, key, descending, parameter) {
+		this.columns = columns.map(x => new Column(x, parameter))
 		this.callback = callback
 		this.rows = []
 		this.key = key

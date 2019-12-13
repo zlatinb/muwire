@@ -95,7 +95,7 @@ function refreshTable() {
 				newOrder = "ascending"
 			else if (sortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["File","Size"], "sort", sortKey, newOrder)
+			var table = new Table(["File","Size"], "sort", sortKey, newOrder, null)
 			
 			for (i = 0; i < filesList.length; i++) {
 				table.addRow(filesList[i].getMapping())

@@ -78,7 +78,7 @@ function refreshDownloader() {
 				newOrder = "ascending"
 			else if (downloadsSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["Name","State","Speed","ETA","Progress","Cancel"], "sortDownloads", downloadsSortKey, newOrder)
+			var table = new Table(["Name","State","Speed","ETA","Progress","Cancel"], "sortDownloads", downloadsSortKey, newOrder, null)
 			
 			for(i = 0; i < downloaderList.length; i++) {
 				table.addRow(downloaderList[i].getMapping())
