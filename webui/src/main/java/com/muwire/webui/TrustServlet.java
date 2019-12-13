@@ -92,7 +92,7 @@ public class TrustServlet extends HttpServlet {
             subs.forEach(sub -> sub.toXML(sb));
             sb.append("</Subscriptions>");
             
-        } else if (section.equals("list")) {
+        } else if (section.equals("listTrusted")) {
             String userB64 = req.getParameter("user");
             Persona p;
             try {
@@ -106,20 +106,49 @@ public class TrustServlet extends HttpServlet {
             if (list == null) 
                 return;
             
+            List<TrustListEntry> entries = new ArrayList<>();
+            list.getGood().forEach(good -> {
+                String reason = good.getReason() == null ? "" : good.getReason();
+                TrustListEntry entry = new TrustListEntry(
+                        good.getPersona(),
+                        reason,
+                        core.getTrustService().getLevel(good.getPersona().getDestination()));
+                entries.add(entry);
+            });
+            
+            TRUST_LIST_ENTRY_COMPARATORS.sort(entries, req);
+            
             sb.append("<List>");
-            
-            sb.append("<Trusted>");
-            for (TrustEntry te : list.getGood()) {
-                TEtoXML(te, sb, core.getTrustService());
+            entries.forEach(entry -> entry.toXML(sb));
+            sb.append("</List>");
+        } else if (section.equals("listDistrusted")) {
+            String userB64 = req.getParameter("user");
+            Persona p;
+            try {
+                p = new Persona(new ByteArrayInputStream(Base64.decode(userB64)));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
+                return;
             }
-            sb.append("</Trusted>");
             
-            sb.append("<Distrusted>");
-            for (TrustEntry te : list.getBad()) {
-                TEtoXML(te, sb, core.getTrustService());
-            }
-            sb.append("</Distrusted>");
+            RemoteTrustList list = core.getTrustSubscriber().getRemoteTrustLists().get(p.getDestination());
+            if (list == null) 
+                return;
             
+            List<TrustListEntry> entries = new ArrayList<>();
+            list.getBad().forEach(bad -> {
+                String reason = bad.getReason() == null ? "" : bad.getReason();
+                TrustListEntry entry = new TrustListEntry(
+                        bad.getPersona(),
+                        reason,
+                        core.getTrustService().getLevel(bad.getPersona().getDestination()));
+                entries.add(entry);
+            });
+            
+            TRUST_LIST_ENTRY_COMPARATORS.sort(entries, req);
+            
+            sb.append("<List>");
+            entries.forEach(entry -> entry.toXML(sb));
             sb.append("</List>");
         }
         
@@ -190,18 +219,6 @@ public class TrustServlet extends HttpServlet {
         trustManager = (TrustManager) config.getServletContext().getAttribute("trustManager");
     }
 
-    private static void TEtoXML(TrustEntry te, StringBuilder sb, TrustService trustService) {
-        sb.append("<Persona>");
-        sb.append("<User>").append(Util.escapeHTMLinXML(te.getPersona().getHumanReadableName())).append("</User>");
-        sb.append("<UserB64>").append(te.getPersona().toBase64()).append("</UserB64>");
-        String reason = "";
-        if (te.getReason() != null)
-            reason = te.getReason();
-        sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
-        sb.append("<Status>").append(trustService.getLevel(te.getPersona().getDestination())).append("</Status>");
-        sb.append("</Persona>");
-    }
-    
     private static class TrustUser {
         private final Persona persona;
         private final String reason;
@@ -299,4 +316,45 @@ public class TrustServlet extends HttpServlet {
         SUBSCRIPTION_COMPARATORS.add("Trusted", SUBSCRIPTION_BY_TRUSTED);
         SUBSCRIPTION_COMPARATORS.add("Distrusted", SUBSCRIPTION_BY_DISTRUSTED);
     }
+    
+    private static class TrustListEntry {
+        private final Persona persona;
+        private final String reason;
+        private final TrustLevel status;
+        
+        TrustListEntry(Persona persona, String reason, TrustLevel status) {
+            this.persona = persona;
+            this.reason = reason;
+            this.status = status;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<Persona>");
+            sb.append("<User>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</User>");
+            sb.append("<UserB64>").append(persona.toBase64()).append("</UserB64>");
+            sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
+            sb.append("<Status>").append(status).append("</Status>");
+            sb.append("</Persona>");
+        }
+    }
+    
+    private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_USER = (l, r) -> {
+        return l.persona.getHumanReadableName().compareTo(r.persona.getHumanReadableName());
+    };
+    
+    private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_REASON = (l, r) -> {
+        return l.reason.compareTo(r.reason);
+    };
+    
+    private static final Comparator<TrustListEntry> TRUST_LIST_ENTRY_BY_STATUS = (l, r) -> {
+        return l.status.toString().compareTo(r.status.toString());
+    };
+    
+    private static final ColumnComparators<TrustListEntry> TRUST_LIST_ENTRY_COMPARATORS = new ColumnComparators<>();
+    static {
+        TRUST_LIST_ENTRY_COMPARATORS.add("User", TRUST_LIST_ENTRY_BY_USER);
+        TRUST_LIST_ENTRY_COMPARATORS.add("Reason", TRUST_LIST_ENTRY_BY_REASON);
+        TRUST_LIST_ENTRY_COMPARATORS.add("Your Trust", TRUST_LIST_ENTRY_BY_STATUS);
+    }
+    
 }

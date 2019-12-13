@@ -37,6 +37,17 @@ class Persona {
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 	}
 	
+	getMapping() {
+		var mapping = new Map()
+		
+		var userHtml = this.user + this.getTrustActions().join("  ")
+		mapping.set("User", userHtml)
+		mapping.set("Reason", this.reason)
+		mapping.set("Your Trust", this.status)
+		
+		return mapping
+	}
+	
 	getTrustBlock() {
 		return "<span id='trusted-link-" + this.userB64 + "'>" + this.getTrustLink() + "</span>" +
 				"<span id='trusted-" + this.userB64 + "'></span>"
@@ -76,6 +87,11 @@ var currentUser = null
 
 var listsSortKey
 var listsSortOrder
+
+var trustedSortKey
+var trustedSortOrder
+var distrustedSortKey
+var distrustedSortOrder
 
 function markTrusted(user) {
 	var linkSpan = document.getElementById("trusted-link-" + user)
@@ -175,21 +191,16 @@ function forceUpdate(user) {
 	xmlhttp.send("action=subscribe&persona=" + user)
 }
 
-function updateDiv(name, list) {
-	
-	var html = "<table><thead><tr><th>" + _t("User") + "</th><th>" + _t("Reason") + "</th><th>" + _t("Your Trust") + "</th><th>" + _t("Actions") + "</th></tr></thead><tbody>"
-	
-	var i
-	for (i = 0; i < list.length; i++) {
-		html += "<tr>"
-		html += "<td>" + list[i].user + "</td>"
-		html += "<td>" + list[i].reason + "</td>"  // maybe in <pre>
-		html += "<td>" + list[i].status + "</td>"
-		html += "<td>" + list[i].getTrustActions().join(" ") + "</td>"
-		html += "</tr>"
-	}
-	
-	document.getElementById(name).innerHTML = html
+function sortTrustedList(key, order) {
+	trustedSortKey = key
+	trustedSortOrder = order
+	displayTrustedList(currentUser)
+}
+
+function sortDistrustedList(key, order) {
+	distrustedSortKey = key
+	distrustedSortOrder = order
+	displayDistrustedList(currentUser)
 }
 
 function parse(xmlNode, list) {
@@ -199,31 +210,69 @@ function parse(xmlNode, list) {
 		list.push(new Persona(users[i]))
 }
 
-function displayList(user) {
-	currentUser = user
-	
-	var currentList = lists.get(currentUser)
-	
+function displayTrustedList(user) {
+	var b64 = lists.get(currentUser).userB64
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var trusted = []
-			var distrusted = []
+			parse(this.responseXML, trusted)
 			
-			var xmlNode = this.responseXML.getElementsByTagName("Trusted")[0]
-			parse(xmlNode, trusted)
-			xmlNode = this.responseXML.getElementsByTagName("Distrusted")[0]
-			parse(xmlNode, distrusted)
+			var newOrder
+			if (trustedSortOrder == "descending")
+				newOrder = "ascending"
+			else if (trustedSortOrder == "ascending")
+				newOrder = "descending"
+				
+			var table = new Table(["User", "Reason", "Your Trust"], "sortTrustedList", trustedSortKey, newOrder)
+			var i
+			for(i = 0; i < trusted.length; i++) {
+				table.addRow(trusted[i].getMapping())
+			}
 			
-			var currentListDiv = document.getElementById("currentList")
-			currentListDiv.innerHTML = "Trust List Of " + user
-		
-			updateDiv("trusted", trusted)
-			updateDiv("distrusted", distrusted)	
+			var trustedDiv = document.getElementById("trusted")
+			trustedDiv.innerHTML = table.render()
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/Trust?section=list&user=" + currentList.userB64)
+	var sortParam = "&key=" + trustedSortKey + "&order=" + trustedSortOrder
+	xmlhttp.open("GET", encodeURI("/MuWire/Trust?section=listTrusted&user=" + b64 + sortParam))
 	xmlhttp.send()
+}
+
+function displayDistrustedList(user) {
+	var b64 = lists.get(currentUser).userB64
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var distrusted = []
+			parse(this.responseXML, distrusted)
+			
+			var newOrder
+			if (distrustedSortOrder == "descending")
+				newOrder = "ascending"
+			else if (distrustedSortOrder == "ascending")
+				newOrder = "descending"
+				
+			var table = new Table(["User", "Reason", "Your Trust"], "sortDistrustedList", distrustedSortKey, newOrder)
+			var i
+			for(i = 0; i < distrusted.length; i++) {
+				table.addRow(distrusted[i].getMapping())
+			}
+			
+			var distrustedDiv = document.getElementById("distrusted")
+			distrustedDiv.innerHTML = table.render()
+		}
+	}
+	var sortParam = "&key=" + distrustedSortKey + "&order=" + distrustedSortOrder
+	xmlhttp.open("GET", encodeURI("/MuWire/Trust?section=listDistrusted&user=" + b64 + sortParam))
+	xmlhttp.send()
+	
+}
+
+function displayList(user) {
+	currentUser = user
+	displayTrustedList(user)
+	displayDistrustedList(user)
 }
 
 function sortSubscriptions(key, order) {
