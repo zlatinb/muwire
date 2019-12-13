@@ -44,12 +44,10 @@ function refreshStatus() {
 				hashingSpan.innerHTML = "";
 				
 			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
-			var refreshDiv = document.getElementById("refresh-link")
 			if (newRevision > tableRevision) {
 				tableRevision = newRevision // TODO: auto-refresh
-				refreshDiv.innerHTML = "<a href='#' onclick='refreshTable();return false;'>" + _t("Refresh") + "</a>"
-			} else
-				refreshDiv.innerHTML = ""
+				refreshTable()
+			} 
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=status", true)

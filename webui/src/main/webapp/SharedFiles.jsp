@@ -56,7 +56,6 @@ if (viewAs == null)
 				<div id="root"></div>
 			</ul>
 <% } else { %>
-			<div id="refresh-link"></div>
 			<div id="table-wrapper">
 				<div id="table-scroll">
 					<div id="filesTable"></div>
