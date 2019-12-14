@@ -19,7 +19,7 @@ Core core = (Core) application.getAttribute("core");
     <head>
 <%@include file="css.jsi"%>
     </head>
-    <body>
+    <body onload="initConnectionsCount();">
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	
