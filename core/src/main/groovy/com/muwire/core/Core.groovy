@@ -424,6 +424,11 @@ public class Core {
         File f = new File(home, "MuWire.properties")
         f.withPrintWriter("UTF-8", { muOptions.write(it) })
     }
+    
+    public void saveI2PSettings() {
+        File f = new File(home, "i2p.properties")
+        f.withOutputStream { i2pOptions.store(it, "I2P Options") }
+    }
 
     static main(args) {
         def home = System.getProperty("user.home") + File.separator + ".MuWire"

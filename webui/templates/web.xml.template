@@ -158,4 +158,9 @@ Mappings without the .jsp suffix
     <url-pattern>/TrustLists</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.ConfigurationPage_jsp</servlet-name>
+    <url-pattern>/ConfigurationPage</url-pattern>
+</servlet-mapping>
+
 </web-app>

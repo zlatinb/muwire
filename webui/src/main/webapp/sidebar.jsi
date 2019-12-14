@@ -56,7 +56,7 @@
             <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Configuration")%></h2>
-                <a class="menuitem settings" href="settings">
+                <a class="menuitem settings" href="ConfigurationPage">
                   <div class="menu-icon"></div>
                   <div class="menu-text"><%=Util._t("Settings")%></div>
                 </a>
