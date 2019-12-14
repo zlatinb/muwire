@@ -27,7 +27,18 @@ Core core = (Core) application.getAttribute("core");
 	</aside>
 	<section class="main foldermain">
 		<form action="/MuWire/Configuration" method="post">
-			Allow Browsing <input type="checkbox" <% if (core.getMuOptions().getBrowseFiles()) out.write("checked"); %> name="browseFiles" value="true">
+			<div class="configuration-section">
+				<table>
+					<tr>
+						<td>Search in comments</td>
+						<td><right><input type="checkbox" <% if (core.getMuOptions().getSearchComments()) out.write("checked"); %> name="searchComments" value="true"></right></td>
+					</tr>
+					<tr>
+						<td>Allow browsing</td>
+						<td><right><input type="checkbox" <% if (core.getMuOptions().getBrowseFiles()) out.write("checked"); %> name="browseFiles" value="true"></right></td>
+					</tr>
+				</table>
+			</div>
 			<input type="submit" value="<%=Util._t("Save")%>">
 		</form>
 	</section>
