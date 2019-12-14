@@ -13,6 +13,11 @@
 <% 
 String pagetitle=Util._t("Configuration");
 Core core = (Core) application.getAttribute("core");
+
+String inboundLength = core.getI2pOptions().getProperty("inbound.length");
+String inboundQuantity = core.getI2pOptions().getProperty("inbound.quantity");
+String outboundLength = core.getI2pOptions().getProperty("outbound.length");
+String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 %>
 
 <html>
@@ -95,7 +100,27 @@ Core core = (Core) application.getAttribute("core");
 					</tr>
 					<tr>
 						<td>Update trust lists every (hours)</td>
-						<td><p align="right"><input type="text" size="1" name="trustListInterval" value="<%= core.getMuOptions().getTrustListInterval() %>"</p></td>
+						<td><p align="right"><input type="text" size="1" name="trustListInterval" value="<%= core.getMuOptions().getTrustListInterval() %>"></p></td>
+					</tr>
+				</table>
+			</div>
+			<div class="configuration-section">
+				<table>
+					<tr>
+						<td>Inbound tunnel length</td>
+						<td><p align="right"><input type="text" size="1" name="inbound.length" value="<%=inboundLength%>"></p></td>
+					</tr>
+					<tr>
+						<td>Inbound tunnel quantity</td>
+						<td><p align="right"><input type="text" size="1" name="inbound.quantity" value="<%=inboundQuantity%>"></p></td>
+					</tr>
+					<tr>
+						<td>Outbound tunnel length</td>
+						<td><p align="right"><input type="text" size="1" name="outbound.length" value="<%=outboundLength%>"></p></td>
+					</tr>
+					<tr>
+						<td>Outbound tunnel quantity</td>
+						<td><p align="right"><input type="text" size="1" name="outbound.quantity" value="<%=outboundQuantity%>"></p></td>
 					</tr>
 				</table>
 			</div>

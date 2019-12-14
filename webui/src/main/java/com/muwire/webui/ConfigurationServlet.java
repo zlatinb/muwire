@@ -60,9 +60,9 @@ public class ConfigurationServlet extends HttpServlet {
         case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(Integer.parseInt(value)); break;
         case "inBw" : core.getMuOptions().setInBw(Integer.parseInt(value)); break;
         case "outBw" : core.getMuOptions().setOutBw(Integer.parseInt(value)); break;
-        case "inbound.length" : core.getI2pOptions().setProperty(name, name); break;
+        case "inbound.length" : core.getI2pOptions().setProperty(name, value); break;
         case "inbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
-        case "outbound.length" : core.getI2pOptions().setProperty(name, name); break;
+        case "outbound.length" : core.getI2pOptions().setProperty(name, value); break;
         case "outbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
         // TODO: ui settings
         }
