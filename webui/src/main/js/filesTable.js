@@ -1,6 +1,7 @@
 class SharedFile {
-	constructor(name, path, size, comment, certified) {
+	constructor(name, infoHash, path, size, comment, certified) {
 		this.name = name
+		this.infoHash = infoHash
 		this.path = path
 		this.size = size
 		this.comment = comment
@@ -19,7 +20,8 @@ class SharedFile {
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
 		showCommentHtml += "<div id='comment-" + this.path + "'></div>"
-		mapping.set("File", this.name + " " + unshareLink.render() + " " + certifyHtml + " " + showCommentHtml)
+		var fetchLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + _t("Fetch") + "</a>"
+		mapping.set("File", this.name + "<div>" + unshareLink.render() + " " + fetchLink + "  " + certifyHtml + " " + showCommentHtml + "</div>")
 		mapping.set("Size", this.size)
 		
 		return mapping
@@ -76,6 +78,7 @@ function refreshTable() {
 			var i
 			for(i = 0; i < files.length; i++) {
 				var fileName = files[i].getElementsByTagName("Path")[0].childNodes[0].nodeValue
+				var infoHash = files[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 				var size = files[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
 				var comment = files[i].getElementsByTagName("Comment")
 				if (comment != null && comment.length == 1)
@@ -85,7 +88,7 @@ function refreshTable() {
 				var certified = files[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
 				var path = Base64.encode(fileName)
-				var newSharedFile = new SharedFile(fileName, path, size, comment, certified)
+				var newSharedFile = new SharedFile(fileName, infoHash, path, size, comment, certified)
 				filesByPath.set(path, newSharedFile)
 				filesList.push(newSharedFile)
 			}
