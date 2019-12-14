@@ -33,6 +33,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 	<section class="main foldermain">
 		<form action="/MuWire/Configuration" method="post">
 			<div class="configuration-section">
+				<h3><%=Util._t("Search Settings")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Search in comments")%></td>
@@ -45,6 +46,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("Download Settings")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Retry failed downloads every (seconds)")%></td>
@@ -61,6 +63,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("Upload Settings")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Total upload slots (-1 means unlimited)")%></td>
@@ -73,6 +76,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("Sharing Settings")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Share downloaded files")%></td>
@@ -85,6 +89,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("Trust Settings")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Allow only trusted connections")%></td>
@@ -105,6 +110,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("I2P Tunnel Settings - Changes Require Plugin Restart")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Inbound tunnel length")%></td>
