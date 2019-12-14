@@ -33,7 +33,7 @@ public class ConfigurationServlet extends HttpServlet {
     }
     
     private void clearAllBooleans() {
-        core.getMuOptions().setAllowUntrusted(false);
+        core.getMuOptions().setAllowUntrusted(true);
         core.getMuOptions().setSearchExtraHop(false);
         core.getMuOptions().setAllowTrustLists(false);
         core.getMuOptions().setShareDownloadedFiles(false);
@@ -44,7 +44,7 @@ public class ConfigurationServlet extends HttpServlet {
     
     private void update(String name, String value) {
         switch(name) {
-        case "allowUntrusted" : core.getMuOptions().setAllowUntrusted(true); break;
+        case "allowUntrusted" : core.getMuOptions().setAllowUntrusted(false); break;
         case "searchExtraHop" : core.getMuOptions().setSearchExtraHop(true); break;
         case "allowTrustLists": core.getMuOptions().setAllowTrustLists(true); break;
         case "trustListInterval" : core.getMuOptions().setTrustListInterval(Integer.parseInt(value)); break;
