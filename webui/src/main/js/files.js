@@ -30,19 +30,23 @@ class Node {
 				certified = _t("Certified")
 			
 			var fetchLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + _t("Fetch") + "</a>"
-			var html = "<li>"+this.path+"<br/>"+ unshareLink + "   " + fetchLink + "   " + certifyLink + "   " + certified + "   " + 
-				commentLink + "<div id='comment-" + this.nodeId+ "'></div>"
-			
+			var html = "<li>" + this.path
+			html += "<div>" + unshareLink + "  " + fetchLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
+			html += "<div id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
 			
 			div.innerHTML = html
 		} else {
 			if (this.children.length == 0) {
-				div.innerHTML = "<li><span><a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + 
-					this.path + "</a>   " + unshareLink + "</span>" + "   " + certifyLink + "  " + commentLink + "<div id='comment-" + this.nodeId + "'></div></li>"
+				
+				var link = "<a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + this.path + "</a>"
+				var commentDiv = "<div id='comment-" + this.nodeId + "'></div>"
+				var html = "<li>" + link + "<span>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv + "</li>"
+				div.innerHTML = html				
 			} else {
-				var l = "<li><a class='caret caret-down' href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>   " + unshareLink
-				l += "  " + certifyLink + "   " + commentLink+"<div id='comment-" + this.nodeId + "'></div>"
+				var link = "<a class='caret caret-down' href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>"
+				var commentDiv = "<div id='comment-" + this.nodeId + "'></div>"
+				var l = "<li>" + link + unshareLink + "  " + commentLink + "  " + certifyLink + commentDiv
 				
 				l += "<ul>"
 				var i
