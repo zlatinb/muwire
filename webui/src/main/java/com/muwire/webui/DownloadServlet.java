@@ -41,6 +41,14 @@ public class DownloadServlet extends HttpServlet {
     
     
     @Override
+    public void destroy() {
+        if (downloadManager != null)
+            downloadManager.shutdown();
+    }
+
+
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (downloadManager == null) {
             resp.sendError(403, "Not initialized");

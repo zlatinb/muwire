@@ -2,6 +2,8 @@ package com.muwire.webui;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
@@ -19,8 +21,16 @@ public class DownloadManager {
     
     private final Map<InfoHash,Downloader> downloaders = new ConcurrentHashMap<>();
     
+    private final Timer retryTimer = new Timer("download-resumer", true);
+    private long lastRetryTime;
+    
     public DownloadManager(Core core) {
         this.core = core;
+        retryTimer.schedule(new ResumeTask(), 1000, 1000);
+    }
+    
+    void shutdown() {
+        retryTimer.cancel();
     }
     
     public void onDownloadStartedEvent(DownloadStartedEvent e) {
@@ -71,5 +81,29 @@ public class DownloadManager {
         UIDownloadResumedEvent event = new UIDownloadResumedEvent();
         core.getEventBus().publish(event);
         delay();
+    }
+    
+    private class ResumeTask extends TimerTask {
+
+        @Override
+        public void run() {
+            if (core.getShutdown().get())
+                return;
+            int retryInterval = core.getMuOptions().getDownloadRetryInterval();
+            if (retryInterval > 0) {
+                retryInterval *= 1000;
+                long now = System.currentTimeMillis();
+                if (now - lastRetryTime > retryInterval) {
+                    lastRetryTime = now;
+                    for (Downloader d : downloaders.values()) {
+                        Downloader.DownloadState state = d.getCurrentState();
+                        if (state == Downloader.DownloadState.FAILED ||
+                                state == Downloader.DownloadState.DOWNLOADING) 
+                            d.resume();
+                    }
+                }
+            }
+        }
+        
     }
 }
