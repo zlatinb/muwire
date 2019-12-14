@@ -25,7 +25,6 @@ public class ConfigurationServlet extends HttpServlet {
         while(patameterNames.hasMoreElements()) {
             String name = patameterNames.nextElement();
             String value = req.getParameter(name);
-            System.out.println("name "+ name + " value " + value);
             update(name, value);
         }
         core.saveMuSettings();
