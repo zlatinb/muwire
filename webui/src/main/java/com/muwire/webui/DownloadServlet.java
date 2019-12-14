@@ -132,6 +132,18 @@ public class DownloadServlet extends HttpServlet {
                 return;
             }
             downloadManager.cancel(infoHash);
+        } else if (action.equals("pause")) {
+            if (core == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
+            downloadManager.pause(infoHash);
+        } else if (action.equals("resume")) {
+            if (core == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
+            downloadManager.resume(infoHash);
         }
         // P-R-G
         resp.sendRedirect("/MuWire/Downloads");

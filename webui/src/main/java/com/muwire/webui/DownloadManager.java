@@ -11,6 +11,8 @@ import com.muwire.core.InfoHash;
 import com.muwire.core.download.DownloadStartedEvent;
 import com.muwire.core.download.Downloader;
 import com.muwire.core.download.UIDownloadCancelledEvent;
+import com.muwire.core.download.UIDownloadPausedEvent;
+import com.muwire.core.download.UIDownloadResumedEvent;
 
 public class DownloadManager {
     private final Core core;
@@ -42,5 +44,32 @@ public class DownloadManager {
         UIDownloadCancelledEvent event = new UIDownloadCancelledEvent();
         event.setDownloader(d);
         core.getEventBus().publish(event);
+        delay();
+    }
+    
+    private static void delay() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {}
+    }
+    
+    void pause(InfoHash infoHash) {
+        Downloader d = downloaders.get(infoHash);
+        if (d == null)
+            return;
+        d.pause();
+        UIDownloadPausedEvent event = new UIDownloadPausedEvent();
+        core.getEventBus().publish(event);
+        delay();
+    }
+    
+    void resume(InfoHash infoHash) {
+        Downloader d = downloaders.get(infoHash);
+        if (d == null)
+            return;
+        d.resume();
+        UIDownloadResumedEvent event = new UIDownloadResumedEvent();
+        core.getEventBus().publish(event);
+        delay();
     }
 }

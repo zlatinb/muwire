@@ -15,12 +15,13 @@ class Downloader {
 		mapping.set("Speed", this.speed)
 		mapping.set("ETA", this.ETA)
 		mapping.set("Progress", this.progress)
-		mapping.set("Cancel", this.getCancelBlock())
 		return mapping
 	}
 	
 	getNameBlock() {
-		return "<a href='#' onclick='window.updateDownloader(\"" + this.infoHash + "\");return false'>" + this.name + "</a>"
+		var html = "<a href='#' onclick='window.updateDownloader(\"" + this.infoHash + "\");return false'>" + this.name + "</a>"
+		html += "<div>" + this.getCancelBlock() + "  " + this.getPauseResumeRetryBlock() + "</div>"
+		return html
 	}
 	
 	getCancelBlock() {
@@ -31,10 +32,49 @@ class Downloader {
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
 	}
+	
+	getPauseResumeRetryBlock() {
+		if (this.state == "FINISHED" || this.state == "CANCELLED")
+			return ""
+		if (this.state == "FAILED") {
+			var retryLink = new Link(_t("Retry"), "resumeDownload", [this.infoHash])
+			return retryLink.render()
+		} else if (this.state == "PAUSED") {
+			var resumeLink = new Link(_t("Resume"), "resumeDownload", [this.infoHash])
+			return resumeLink.render()
+		} else {
+			var pauseLink = new Link(_t("Pause"), "pauseDownload", [this.infoHash])
+			return pauseLink.render()
+		}
+	}
 }
 
 var downloader = null;
 var downloaders = new Map()
+
+function resumeDownload(infoHash) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshDownloader()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Download", "true")
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=resume&infoHash=" + infoHash))
+}
+
+function pauseDownload(infoHash) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshDownloader()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Download", "true")
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=pause&infoHash=" + infoHash))
+}
 
 function cancelDownload(infoHash) {
 	var xmlhttp = new XMLHttpRequest();
@@ -78,7 +118,7 @@ function refreshDownloader() {
 				newOrder = "ascending"
 			else if (downloadsSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["Name","State","Speed","ETA","Progress","Cancel"], "sortDownloads", downloadsSortKey, newOrder, null)
+			var table = new Table(["Name","State","Speed","ETA","Progress"], "sortDownloads", downloadsSortKey, newOrder, null)
 			
 			for(i = 0; i < downloaderList.length; i++) {
 				table.addRow(downloaderList[i].getMapping())
