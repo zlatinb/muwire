@@ -56,11 +56,11 @@ class Sender {
 	
 	getTrustLinks() {
 		if (this.trust == "NEUTRAL")
-			return this.getTrustLink() + this.getDistrustLink()
+			return "  " + this.getTrustLink() + "  " + this.getDistrustLink()
 		else if (this.trust == "TRUSTED")
-			return this.getNeutralLink() + this.getDistrustLink()
+			return "  " + this.getNeutralLink() + "  " + this.getDistrustLink()
 		else
-			return this.getTrustLink() + this.getNeutralLink()
+			return "  " + this.getTrustLink() + "  " + this.getNeutralLink()
 	}
 	
 	getTrustLink() {
