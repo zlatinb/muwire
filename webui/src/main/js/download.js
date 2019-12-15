@@ -91,10 +91,49 @@ function cancelDownload(infoHash) {
 }
 
 function updateDownloader(infoHash) {
-	var selected = downloaders.get(infoHash);
-	
-	var downloadDetailsDiv = document.getElementById("downloadDetails");
-	downloadDetailsDiv.innerHTML = "<p>" + _t("Details for {0}", selected.name) + "</p>"
+	downloader = infoHash
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var path = this.responseXML.getElementsByTagName("Path")[0].childNodes[0].nodeValue
+			var pieceSize = this.responseXML.getElementsByTagName("PieceSize")[0].childNodes[0].nodeValue
+			var knownSources = this.responseXML.getElementsByTagName("KnownSources")[0].childNodes[0].nodeValue
+			var activeSources = this.responseXML.getElementsByTagName("ActiveSources")[0].childNodes[0].nodeValue
+			var totalPieces = this.responseXML.getElementsByTagName("TotalPieces")[0].childNodes[0].nodeValue
+			var donePieces = this.responseXML.getElementsByTagName("DonePieces")[0].childNodes[0].nodeValue
+			
+			var html = "<table>"
+			html += "<tr>"
+			html += "<td>" + _t("Download Location") + "</td>"
+			html += "<td>" + "<p align='right'>" + path + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Known Sources") + "</td>"
+			html += "<td>" + "<p align='right'>" + knownSources + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Active Location") + "</td>"
+			html += "<td>" + "<p align='right'>" + activeSources + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Piece Size") + "</td>"
+			html += "<td>" + "<p align='right'>" + pieceSize + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Total Pieces") + "</td>"
+			html += "<td>" + "<p align='right'>" + totalPieces + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Done Pieces") + "</td>"
+			html += "<td>" + "<p align='right'>" + donePieces + "</p>" + "</td>"
+			html += "</tr>"
+			html += "</table>"
+			var downloadDetailsDiv = document.getElementById("downloadDetails");
+			downloadDetailsDiv.innerHTML = html
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Download?section=details&infoHash=" + infoHash)
+	xmlhttp.send()
 }
 
 function refreshDownloader() {
@@ -134,13 +173,16 @@ function refreshDownloader() {
 			} else {
 				downloadsDiv.innerHTML = ""
 				clearDiv.innerHTML = ""
+				downloader = null
+				var downloadDetailsDiv = document.getElementById("downloadDetails");
+				downloadDetailsDiv.innerHTML = ""
 			}
 			if (downloader != null)
 				updateDownloader(downloader);
 		}
 	}
-	var sortParam = "key=" + downloadsSortKey + "&order=" + downloadsSortOrder
-	xmlhttp.open("GET", "/MuWire/Download?" + sortParam, true);
+	var sortParam = "&key=" + downloadsSortKey + "&order=" + downloadsSortOrder
+	xmlhttp.open("GET", "/MuWire/Download?section=list" + sortParam, true);
 	xmlhttp.send();
 }
 

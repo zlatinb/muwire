@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -54,38 +55,65 @@ public class DownloadServlet extends HttpServlet {
             resp.sendError(403, "Not initialized");
             return;
         }
-        
-        List<Download> downloads = new ArrayList<>();
-        downloadManager.getDownloaders().forEach(d -> {
-
-            int speed = d.speed();
-            long ETA = Long.MAX_VALUE;
-            if (speed > 0) 
-                ETA = (d.getNPieces() - d.donePieces()) * d.getPieceSize() * 1000 / speed;
-            
-            int percent = -1;
-            if (d.getNPieces() != 0)
-                percent = (int)(d.donePieces() * 100 / d.getNPieces());
-            
-            Download download = new Download(d.getInfoHash(),
-                    d.getFile().getName(),
-                    d.getCurrentState(),
-                    speed,
-                    ETA,
-                    percent,
-                    d.getLength());
-            
-            downloads.add(download);
-        });
-        COMPARATORS.sort(downloads, req);
-        
+        String section = req.getParameter("section");
         
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-        sb.append("<Downloads>");
-        downloads.forEach(d -> d.toXML(sb));
-        sb.append("</Downloads>");
-        
+        if (section.equals("list")) {
+            List<Download> downloads = new ArrayList<>();
+            downloadManager.getDownloaders().forEach(d -> {
+
+                int speed = d.speed();
+                long ETA = Long.MAX_VALUE;
+                if (speed > 0) 
+                    ETA = (d.getNPieces() - d.donePieces()) * d.getPieceSize() * 1000 / speed;
+
+                int percent = -1;
+                if (d.getNPieces() != 0)
+                    percent = (int)(d.donePieces() * 100 / d.getNPieces());
+
+                Download download = new Download(d.getInfoHash(),
+                        d.getFile().getName(),
+                        d.getCurrentState(),
+                        speed,
+                        ETA,
+                        percent,
+                        d.getLength());
+
+                downloads.add(download);
+            });
+            COMPARATORS.sort(downloads, req);
+
+
+            sb.append("<Downloads>");
+            downloads.forEach(d -> d.toXML(sb));
+            sb.append("</Downloads>");
+        } else if (section.equals("details")) {
+            String infoHashB64 = req.getParameter("infoHash");
+            InfoHash infoHash;
+            try {
+                infoHash = new InfoHash(Base64.decode(infoHashB64));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            Optional<Downloader> optional = downloadManager.getDownloaders().filter(d -> d.getInfoHash().equals(infoHash)).findFirst();
+            if (optional.isPresent()) {
+                Downloader downloader = optional.get();
+                
+                sb.append("<Details>");
+                sb.append("<Path>").append(Util.escapeHTMLinXML(downloader.getFile().getAbsolutePath())).append("</Path>");
+                sb.append("<PieceSize>").append(downloader.getPieceSize()).append("</PieceSize>");
+                sb.append("<KnownSources>").append(downloader.getTotalWorkers()).append("</KnownSources>");
+                sb.append("<ActiveSources>").append(downloader.activeWorkers()).append("</ActiveSources>");
+                sb.append("<TotalPieces>").append(downloader.getNPieces()).append("</TotalPieces>");
+                sb.append("<DonePieces>").append(downloader.donePieces()).append("</DonePieces>");
+                sb.append("</Details>");
+            } else {
+                resp.sendError(404, "Not found");
+                return;
+            }
+        }
         
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");

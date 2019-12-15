@@ -265,6 +265,10 @@ public class Downloader {
         }
         active
     }
+    
+    public int getTotalWorkers() {
+        return activeWorkers.size();
+    }
 
     public void resume() {
         paused = false
