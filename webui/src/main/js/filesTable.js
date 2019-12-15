@@ -109,7 +109,10 @@ function refreshTable() {
 			}
 			
 			var tableDiv = document.getElementById("filesTable")
-			tableDiv.innerHTML = table.render()
+			if (filesList.length > 0 )
+				tableDiv.innerHTML = table.render()
+			else
+				tableDiv.innerHTML = ""
 		}
 	}
 	var sortParam = "&key=" + sortKey + "&order=" + sortOrder
