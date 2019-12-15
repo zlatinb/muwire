@@ -99,6 +99,7 @@ public class Util {
         _x("User"),
         _x("View {0} Certificates"),
         _x("Your Trust"),
+        _x("{0}% of piece")
     };
 
     private static final String BUNDLE_NAME = "com.muwire.webui.messages";

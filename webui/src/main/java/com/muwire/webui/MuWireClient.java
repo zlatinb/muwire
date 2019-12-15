@@ -35,6 +35,8 @@ import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
 import com.muwire.core.trust.TrustEvent;
 import com.muwire.core.trust.TrustSubscriptionEvent;
+import com.muwire.core.upload.UploadEvent;
+import com.muwire.core.upload.UploadFinishedEvent;
 
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
@@ -154,6 +156,10 @@ public class MuWireClient {
         core.getEventBus().register(CertificateFetchedEvent.class, certificateManager);
         core.getEventBus().register(CertificateFetchEvent.class, certificateManager);
         
+        UploadManager uploadManager = new UploadManager(core);
+        core.getEventBus().register(UploadEvent.class, uploadManager);
+        core.getEventBus().register(UploadFinishedEvent.class, uploadManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
@@ -161,6 +167,7 @@ public class MuWireClient {
         servletContext.setAttribute("browseManager", browseManager);
         servletContext.setAttribute("trustManager", trustManager);
         servletContext.setAttribute("certificateManager", certificateManager);
+        servletContext.setAttribute("uploadManager", uploadManager);
         
         core.getEventBus().publish(new UILoadedEvent());
     }
