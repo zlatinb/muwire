@@ -87,6 +87,10 @@ class SearchManager {
         }
     }
     
+    public void stopSearch(UUID uuid) {
+        results.remove(uuid);
+    }
+    
     public Map<UUID,SearchResults> getResults() {
         return results;
     }

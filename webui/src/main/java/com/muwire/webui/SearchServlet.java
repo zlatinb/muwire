@@ -40,9 +40,17 @@ public class SearchServlet extends HttpServlet {
             resp.sendError(403, "Not initialized");
             return;
         }
-        String search = req.getParameter("search");
-        searchManager.newSearch(search);
-        resp.sendRedirect("/MuWire/Home");
+        String action = req.getParameter("action");
+        
+        if (action.equals("start")) {
+            String search = req.getParameter("search");
+            searchManager.newSearch(search);
+            resp.sendRedirect("/MuWire/Home");
+        } else if (action.equals("stop")) {
+            String uuidString = req.getParameter("uuid");
+            UUID uuid = UUID.fromString(uuidString);
+            searchManager.stopSearch(uuid);
+        }
     }
     
     

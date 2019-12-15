@@ -6,6 +6,20 @@ class SearchStatus {
 		this.senders = xmlNode.getElementsByTagName("Senders")[0].childNodes[0].nodeValue
 		this.results = xmlNode.getElementsByTagName("Results")[0].childNodes[0].nodeValue
 	}
+	
+	getMapping() {
+		var mapping = new Map()
+		
+		var queryLink = new Link(this.query, "refresh" + refreshType, [this.uuid])
+		var stopLink = new Link("X", "stopSearch", [this.uuid])
+		var queryHtml = "<table><tr><td>" + queryLink.render() + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
+		mapping.set("Query", queryHtml)
+		
+		mapping.set("Senders", this.senders)
+		mapping.set("Results", this.results)
+		
+		return mapping
+	}
 }
 
 
@@ -765,13 +779,7 @@ function refreshStatus() {
 			var table = new Table(["Query", "Senders", "Results"], "sortStatuses", statusKey, newOrder, null)
 			for (i = 0; i < statuses.length; i++) {
 				var status = statuses[i]
-				
-				var mappings = new Map()
-				var queryLink = "<a href='#' onclick='refresh" + refreshType + "(\"" + status.uuid + "\");return false;'>" + status.query + "</a>"
-				mappings.set("Query", queryLink)
-				mappings.set("Senders", status.senders)
-				mappings.set("Results", status.results)
-				table.addRow(mappings)
+				table.addRow(status.getMapping())				
 			}
 			
 			var activeDiv = document.getElementById("activeSearches")
@@ -793,6 +801,18 @@ function sortStatuses(key, order) {
 	statusKey = key
 	statusOrder = order
 	refreshStatus()
+}
+
+function stopSearch(searchUUID) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshStatus()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Search", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=stop&uuid=" + searchUUID)
 }
 
 function initGroupBySender() {

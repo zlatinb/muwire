@@ -5,6 +5,7 @@
                 <div class="menu-icon"></div>
                   <form action="/MuWire/Search" method="post">
                      <input type="text" name="search" />
+                     <input type="hidden" name="action" value="start" />
                      <input type="submit" value="<%=Util._t("Search")%>" />
                   </form>
               </div>
