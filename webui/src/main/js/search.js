@@ -183,7 +183,7 @@ class ResultFromSender {
 	
 	getDownloadBlock() {
 		if (this.downloading == "true")
-			return _t("Downloading")
+			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
@@ -241,7 +241,7 @@ class Result {
 	}
 	getDownloadBlock() {
 		if (this.downloading == "true")
-			return _t("Downloading")
+			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
@@ -510,7 +510,7 @@ function download(resultInfoHash) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var resultSpan = document.getElementById("download-"+resultInfoHash);
-			resultSpan.innerHTML = _t("Downloading");
+			resultSpan.innerHTML = "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Download", true);
