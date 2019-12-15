@@ -49,6 +49,8 @@ There is a Web-based UI under development.  It is intended to be run as a plugin
 6. Run `./gradlew -PbuildNumber=<integer> assemble`
 7. If all goes well, there will be a file `plug/build/MuWire.su3`.  Install that file from the I2P router console.
 
+### Translations
+If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
 
 ### GPG Fingerprint
 
