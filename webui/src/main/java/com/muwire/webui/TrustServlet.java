@@ -191,15 +191,14 @@ public class TrustServlet extends HttpServlet {
             event.setPersona(p);
             event.setSubscribe(true);
             core.getEventBus().publish(event);
+            Util.pause();
         } else if (action.equals("unsubscribe")) {
             core.getMuOptions().getTrustSubscriptions().remove(p);
             TrustSubscriptionEvent event = new TrustSubscriptionEvent();
             event.setPersona(p);
             event.setSubscribe(false);
             core.getEventBus().publish(event);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {}
+            Util.pause();
         } else if (action.equals("trust")) {
             doTrust(p, TrustLevel.TRUSTED, req.getParameter("reason"));
         } else if (action.equals("neutral")) {
@@ -215,6 +214,7 @@ public class TrustServlet extends HttpServlet {
         event.setPersona(p);
         event.setReason(reason);
         core.getEventBus().publish(event);
+        Util.pause();
     }
 
     @Override

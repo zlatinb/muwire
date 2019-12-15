@@ -12,6 +12,12 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.Translate;
 
 public class Util {
+    
+    static void pause() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {}
+    }
 
     private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
     
