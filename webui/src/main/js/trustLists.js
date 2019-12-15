@@ -171,6 +171,11 @@ function unsubscribe(user) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			if (currentUser != null) {
+				var currentB64 = lists.get(currentUser).userB64
+				if (user == currentB64)
+					currentUser = null
+			}
 			refreshLists()
 		}
 	}
@@ -231,7 +236,10 @@ function displayTrustedList(user) {
 			}
 			
 			var trustedDiv = document.getElementById("trusted")
-			trustedDiv.innerHTML = table.render()
+			if (trusted.length > 0)
+				trustedDiv.innerHTML = table.render()
+			else
+				trustedDiv.innerHTML = ""
 		}
 	}
 	var sortParam = "&key=" + trustedSortKey + "&order=" + trustedSortOrder
@@ -260,7 +268,10 @@ function displayDistrustedList(user) {
 			}
 			
 			var distrustedDiv = document.getElementById("distrusted")
-			distrustedDiv.innerHTML = table.render()
+			if (distrusted.length > 0)
+				distrustedDiv.innerHTML = table.render()
+			else
+				distrustedDiv.innerHTML = ""
 		}
 	}
 	var sortParam = "&key=" + distrustedSortKey + "&order=" + distrustedSortOrder
@@ -306,10 +317,18 @@ function refreshLists() {
 				table.addRow(listOfLists[i].getMapping())
 			}
 			
-			document.getElementById("trustLists").innerHTML = table.render()
+			var trustListsDiv = document.getElementById("trustLists")
+			if (listOfLists.length > 0)
+				trustListsDiv.innerHTML = table.render()
+			else
+				trustListsDiv.innerHTML = ""
 			
 			if (currentUser != null)
 				displayList(currentUser)
+			else {
+				document.getElementById("trusted").innerHTML = ""
+				document.getElementById("distrusted").innerHTML = ""
+			}
 		}
 	}
 	var sortParam = "&key=" + listsSortKey + "&order=" + listsSortOrder
