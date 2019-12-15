@@ -112,7 +112,7 @@ function updateDownloader(infoHash) {
 			html += "<td>" + "<p align='right'>" + knownSources + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
-			html += "<td>" + _t("Active Location") + "</td>"
+			html += "<td>" + _t("Active Sources") + "</td>"
 			html += "<td>" + "<p align='right'>" + activeSources + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
