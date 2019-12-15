@@ -10,13 +10,14 @@ class SearchStatus {
 	getMapping() {
 		var mapping = new Map()
 		
-		var queryLink = new Link(this.query, "refresh" + refreshType, [this.uuid])
+		var trimmedQuery = this.query 
+		if (this.query.length > 16) 
+			trimmedQuery = this.query.slice(0, 16) + "..."
+			
+		var queryLink = new Link(trimmedQuery, "refresh" + refreshType, [this.uuid])
 		var stopLink = new Link("X", "stopSearch", [this.uuid])
-		var queryHtml = "<table><tr><td>" + queryLink.render() + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
+		var queryHtml = "<table><tr><td>" + queryLink.render() + " <b>("+this.results+")</b>" + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
 		mapping.set("Query", queryHtml)
-		
-		mapping.set("Senders", this.senders)
-		mapping.set("Results", this.results)
 		
 		return mapping
 	}
@@ -776,7 +777,7 @@ function refreshStatus() {
 				newOrder = "ascending"
 			else
 				newOrder = "descending"
-			var table = new Table(["Query", "Senders", "Results"], "sortStatuses", statusKey, newOrder, null)
+			var table = new Table(["Query"], "sortStatuses", statusKey, newOrder, null)
 			for (i = 0; i < statuses.length; i++) {
 				var status = statuses[i]
 				table.addRow(status.getMapping())				
