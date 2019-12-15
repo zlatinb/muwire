@@ -137,6 +137,8 @@ public class BrowseServlet extends HttpServlet {
                 return;
             }
             browseManager.browse(host);
+            pause();
+            resp.sendRedirect("/MuWire/BrowseHost");
         } else if (action.equals("download")) {
             if (core == null) {
                 resp.sendError(403, "Not initialized");
@@ -185,9 +187,7 @@ public class BrowseServlet extends HttpServlet {
             event.setSources(Collections.emptySet());
             event.setTarget(new File(core.getMuOptions().getDownloadLocation(), resultsArray[0].getName()));
             core.getEventBus().publish(event);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignore) {}
+            pause();
         } else if (action.equals("close")) {
             String personaB64 = req.getParameter("host");
             if (personaB64 == null) {
@@ -203,6 +203,12 @@ public class BrowseServlet extends HttpServlet {
             }
             browseManager.getBrowses().remove(host);
         }
+    }
+    
+    private static void pause() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {}
     }
 
     @Override
