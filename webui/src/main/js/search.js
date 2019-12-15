@@ -12,11 +12,14 @@ class SearchStatus {
 		
 		var trimmedQuery = this.query 
 		if (this.query.length > 16) 
-			trimmedQuery = this.query.slice(0, 16) + "..."
+			trimmedQuery = this.query.slice(0, 16) + "&hellip;"
 			
 		var queryLink = new Link(trimmedQuery, "refresh" + refreshType, [this.uuid])
 		var stopLink = new Link("X", "stopSearch", [this.uuid])
-		var queryHtml = "<table><tr><td>" + queryLink.render() + " <b>("+this.results+")</b>" + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
+		var resultsSnippet = ""
+		if (this.results > 0)
+			resultsSnippet = " <b>(" + this.results + ")</b>"
+		var queryHtml = "<table><tr><td>" + queryLink.render() + resultsSnippet + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
 		mapping.set("Query", queryHtml)
 		
 		return mapping
