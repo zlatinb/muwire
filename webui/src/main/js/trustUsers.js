@@ -191,7 +191,10 @@ function refreshDistrustedUsers() {
 			}
 			
 			var tableDiv = document.getElementById("distrustedUsers")
-			tableDiv.innerHTML = table.render()
+			if (distrustedList.length > 0)
+				tableDiv.innerHTML = table.render()
+			else
+				tableDiv.innerHTML = ""
 		}
 	}
 	var sortParam = "&key=" + distrustedUsersSortKey + "&order=" + distrustedUsersSortOrder
@@ -226,7 +229,10 @@ function refreshTrustedUsers() {
 			}
 			
 			var tableDiv = document.getElementById("trustedUsers")
-			tableDiv.innerHTML = table.render()
+			if (trustedList.length > 0)
+				tableDiv.innerHTML = table.render()
+			else
+				tableDiv.innerHTML = ""
 		}
 	}
 	var sortParam = "&key=" + trustedUsersSortKey + "&order=" + trustedUsersSortOrder
