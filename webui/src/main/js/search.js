@@ -558,7 +558,7 @@ function submitTrust(host) {
 }
 
 function submitDistrust(host) {
-	var reason = document.getElementById("trust-reason-"+host).value
+	var reason = document.getElementById("distrust-reason-"+host).value
 	publishTrust(host, reason, "distrust")
 }
 
