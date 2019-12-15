@@ -1,10 +1,13 @@
 package com.muwire.webui;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,20 +18,26 @@ import com.muwire.core.Core;
 public class ConfigurationServlet extends HttpServlet {
     
     private Core core;
+    private ServletContext context;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
-        clearAllBooleans();
-        
-        Enumeration<String> patameterNames = req.getParameterNames();
-        while(patameterNames.hasMoreElements()) {
-            String name = patameterNames.nextElement();
-            String value = req.getParameter(name);
-            update(name, value);
+        try {
+            clearAllBooleans();
+
+            Enumeration<String> patameterNames = req.getParameterNames();
+            while(patameterNames.hasMoreElements()) {
+                String name = patameterNames.nextElement();
+                String value = req.getParameter(name);
+                update(name, value);
+            }
+            core.saveMuSettings();
+            core.saveI2PSettings();
+            context.setAttribute("MWConfigError", null);
+        } catch (Exception e) {
+            context.setAttribute("MWConfigError", e);
         }
-        core.saveMuSettings();
-        core.saveI2PSettings();
+        
         resp.sendRedirect("/MuWire/ConfigurationPage");
     }
     
@@ -70,6 +79,7 @@ public class ConfigurationServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        context = config.getServletContext();
         core = (Core) config.getServletContext().getAttribute("core");
     }
 

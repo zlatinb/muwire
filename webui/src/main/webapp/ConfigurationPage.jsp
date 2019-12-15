@@ -18,6 +18,8 @@ String inboundLength = core.getI2pOptions().getProperty("inbound.length");
 String inboundQuantity = core.getI2pOptions().getProperty("inbound.quantity");
 String outboundLength = core.getI2pOptions().getProperty("outbound.length");
 String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
+
+Exception error = (Exception) application.getAttribute("MWConfigError");
 %>
 
 <html>
@@ -31,6 +33,10 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 <%@include file="sidebar.jsi"%>    	
 	</aside>
 	<section class="main foldermain">
+<% if (error != null) { %>
+<div class="warning"><%=error%></div>
+<% } %>
+
 		<form action="/MuWire/Configuration" method="post">
 			<div class="configuration-section">
 				<h3><%=Util._t("Search")%></h3>
