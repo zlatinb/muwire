@@ -56,6 +56,11 @@
     <servlet-class>com.muwire.webui.ConfigurationServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.UploadServlet</servlet-name>
+    <servlet-class>com.muwire.webui.UploadServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -100,6 +105,12 @@
     <servlet-name>com.muwire.webui.ConfigurationServlet</servlet-name>
     <url-pattern>/Configuration</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.UploadServlet</servlet-name>
+    <url-pattern>/Upload</url-pattern>
+</servlet-mapping>
+
 
 __JASPER__
 
@@ -161,6 +172,11 @@ Mappings without the .jsp suffix
 <servlet-mapping>
     <servlet-name>com.muwire.webui.ConfigurationPage_jsp</servlet-name>
     <url-pattern>/ConfigurationPage</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.Uploads_jsp</servlet-name>
+    <url-pattern>/Uploads</url-pattern>
 </servlet-mapping>
 
 </web-app>

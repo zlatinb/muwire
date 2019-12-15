@@ -67,7 +67,7 @@ public class UploadServlet extends HttpServlet {
             this.name = name;
             this.progress = progress;
             this.downloader = downloader;
-            this.remotePieces = remotePieces;
+            this.remotePieces = progress == 100 ? remotePieces + 1 : remotePieces;
             this.totalPieces = totalPieces;
             this.speed = speed;
         }

@@ -19,6 +19,12 @@
                       <%=Util._t("Downloads")%>
                   </div>
                 </a>
+                <a class="menuitem uploads" href="Uploads">
+                  <div class="menu-icon"></div>
+                  <div class="menu-text">
+                      <%=Util._t("Uploads")%>
+                  </div>
+                </a>
                 <a class="menuitem search" href="Home">
                   <div class="menu-icon"></div>
                   <div class="menu-text">
