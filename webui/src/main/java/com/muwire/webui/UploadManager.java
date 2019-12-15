@@ -1,5 +1,8 @@
 package com.muwire.webui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -11,7 +14,7 @@ import com.muwire.core.upload.Uploader;
 public class UploadManager {
     
     private final Core core;
-    private final List<UploaderWrapper> uploads = new CopyOnWriteArrayList<>();
+    private final List<UploaderWrapper> uploads = Collections.synchronizedList(new ArrayList<>());
     
     public UploadManager(Core core) {
         this.core = core;
@@ -23,10 +26,12 @@ public class UploadManager {
     
     public void onUploadEvent(UploadEvent e) {
         UploaderWrapper wrapper = null;
-        for(UploaderWrapper uw : uploads) {
-            if (uw.uploader == e.getUploader()) {
-                wrapper = uw;
-                break;
+        synchronized(uploads) {
+            for(UploaderWrapper uw : uploads) {
+                if (uw.uploader == e.getUploader()) {
+                    wrapper = uw;
+                    break;
+                }
             }
         }
         if (wrapper != null) {
@@ -42,13 +47,25 @@ public class UploadManager {
     
     public void onUploadFinishedEvent(UploadFinishedEvent e) {
         UploaderWrapper wrapper = null;
-        for(UploaderWrapper uw : uploads) {
-            if (uw.uploader == e.getUploader()) {
-                wrapper = uw;
-                break;
+        synchronized(uploads) {
+            for(UploaderWrapper uw : uploads) {
+                if (uw.uploader == e.getUploader()) {
+                    wrapper = uw;
+                    break;
+                }
             }
         }
         wrapper.finished = true;
+    }
+    
+    public void clearFinished() {
+        synchronized(uploads) {
+            for(Iterator<UploaderWrapper> iter = uploads.iterator(); iter.hasNext();) {
+                UploaderWrapper wrapper = iter.next();
+                if (wrapper.finished)
+                    iter.remove();
+            }
+        }
     }
     
     public static class UploaderWrapper {

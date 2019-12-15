@@ -30,6 +30,7 @@
 	<section class="main foldermain">
 		<div id="table-wrapper">
 				<div id="uploads"></div>
+				<center><span id="clearFinished"></span></center>
 		</div>		
 	</section>
     </body>

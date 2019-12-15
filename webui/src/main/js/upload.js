@@ -44,13 +44,32 @@ function refreshUploads() {
 			}
 			
 			var uploadsDiv = document.getElementById("uploads");
-			if (uploaderList.length > 0)
+			var clearDiv = document.getElementById("clearFinished")
+			if (uploaderList.length > 0) {
 				uploadsDiv.innerHTML = table.render();
+				var clearLink = new Link(_t("Clear Finished"), "clear", ["ignored"])
+				clearDiv.innerHTML = clearLink.render()
+			} else {
+				uploadsDiv.innerHTML = ""
+				clearDiv.innerHTML = ""
+			}
 		}
 	}
 	var sortParam = "key=" + uploadsSortKey + "&order=" + uploadsSortOrder
 	xmlhttp.open("GET", "/MuWire/Upload?" + sortParam, true);
 	xmlhttp.send();
+}
+
+function clear(ignored) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshUploads()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Upload")
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=clear"));
 }
 
 var uploadsSortKey

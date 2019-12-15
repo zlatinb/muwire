@@ -21,16 +21,18 @@ public class UploadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<UploadEntry> entries = new ArrayList<>();
-        for(UploadManager.UploaderWrapper wrapper : uploadManager.getUploads()) {
-            UploadEntry entry = new UploadEntry(
-                    wrapper.getUploader().getName(),
-                    wrapper.getUploader().getProgress(),
-                    wrapper.getUploader().getDownloader(),
-                    wrapper.getUploader().getDonePieces(),
-                    wrapper.getUploader().getTotalPieces(),
-                    wrapper.getUploader().speed()
-                    );
-            entries.add(entry);
+        synchronized(uploadManager.getUploads()) {
+            for(UploadManager.UploaderWrapper wrapper : uploadManager.getUploads()) {
+                UploadEntry entry = new UploadEntry(
+                        wrapper.getUploader().getName(),
+                        wrapper.getUploader().getProgress(),
+                        wrapper.getUploader().getDownloader(),
+                        wrapper.getUploader().getDonePieces(),
+                        wrapper.getUploader().getTotalPieces(),
+                        wrapper.getUploader().speed()
+                        );
+                entries.add(entry);
+            }
         }
         COMPARATORS.sort(entries, req);
         
@@ -55,6 +57,18 @@ public class UploadServlet extends HttpServlet {
         uploadManager = (UploadManager) config.getServletContext().getAttribute("uploadManager");
     }
     
+    
+    
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+        if (action.equals("clear")) {
+            uploadManager.clearFinished();
+        }
+    }
+
+
+
     private static class UploadEntry {
         private final String name;
         private final int progress;
