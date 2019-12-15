@@ -33,7 +33,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 	<section class="main foldermain">
 		<form action="/MuWire/Configuration" method="post">
 			<div class="configuration-section">
-				<h3><%=Util._t("Search Settings")%></h3>
+				<h3><%=Util._t("Search")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Search in comments")%></td>
@@ -46,24 +46,24 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
-				<h3><%=Util._t("Download Settings")%></h3>
+				<h3><%=Util._t("Downloads")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Retry failed downloads every (seconds)")%></td>
+						<td><%=Util._t("Download retry frequency (seconds)")%></td>
 						<td><p align="right"><input type="text" size="1" name="downloadRetryInterval" value="<%= core.getMuOptions().getDownloadRetryInterval()%>"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Save downloaded files to")%></td>
+						<td><%=Util._t("Directory for downloaded files")%></td>
 						<td><p align="right"><input type="text" size="30" name="downloadLocation" value="<%= core.getMuOptions().getDownloadLocation().getAbsoluteFile()%>"></p></td>
 					</tr>
 					<tr> 
-						<td><%=Util._t("Store incomplete files in")%></td>
+						<td><%=Util._t("Directory for incomplete files")%></td>
 						<td><p align="right"><input type="text" size="30" name="incompleteLocation" value="<%= core.getMuOptions().getIncompleteLocation().getAbsoluteFile()%>"></p></td>
 					</tr>
 				</table>
 			</div>
 			<div class="configuration-section">
-				<h3><%=Util._t("Upload Settings")%></h3>
+				<h3><%=Util._t("Upload")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Total upload slots (-1 means unlimited)")%></td>
@@ -76,7 +76,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
-				<h3><%=Util._t("Sharing Settings")%></h3>
+				<h3><%=Util._t("Sharing")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Share downloaded files")%></td>
@@ -89,7 +89,7 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 				</table>
 			</div>
 			<div class="configuration-section">
-				<h3><%=Util._t("Trust Settings")%></h3>
+				<h3><%=Util._t("Trust")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Allow only trusted connections")%></td>
@@ -104,13 +104,13 @@ String outboundQuantity = core.getI2pOptions().getProperty("outbound.quantity");
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAllowTrustLists()) out.write("checked"); %> name="allowTrustLists" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Update trust lists every (hours)")%></td>
+						<td><%=Util._t("Trust list update frequency (hours)")%></td>
 						<td><p align="right"><input type="text" size="1" name="trustListInterval" value="<%= core.getMuOptions().getTrustListInterval() %>"></p></td>
 					</tr>
 				</table>
 			</div>
 			<div class="configuration-section">
-				<h3><%=Util._t("I2P Tunnel Settings - Changes Require Plugin Restart")%></h3>
+				<h3><%=Util._t("I2P Tunnels - Changes Require Plugin Restart")%></h3>
 				<table>
 					<tr>
 						<td><%=Util._t("Inbound tunnel length")%></td>
