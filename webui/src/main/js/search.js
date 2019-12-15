@@ -598,7 +598,7 @@ function browse(host) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var linkSpan = document.getElementById("browse-link-"+host)
-			linkSpan.innerHTML = _t("Browsing");
+			linkSpan.innerHTML = "<a href='/MuWire/BrowseHost'>" + _t("Browsing"); + "</a>"
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Browse", true)
