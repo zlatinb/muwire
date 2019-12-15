@@ -28,18 +28,16 @@ String pagetitle=Util._t("Trust Lists");
 				</div>
 			</div>
 			<hr/>
-			<div id="table-wrapper">
-				<div id="table-scroll">
-					<center><div id="currentList"></div></center>
-					<thead><tr><th>Trusted</th><th>Distrusted</th></tr></thead>
-					<tbody>
-						<tr>
-							<td><div id="trusted"></div></td>
-							<td><div id="distrusted"></div></td>
-						</tr>
-					</tbody>
-				</div>
-			</div>
+				<center><div id="currentList"></div></center>
+				<table>
+				<thead><tr><th>Trusted</th><th>Distrusted</th></tr></thead>
+				<tbody>
+					<tr>
+						<td><div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div></td>
+						<td><div id="table-wrapper"><div id="table-scroll"><div id="distrusted"></div></div></div></td>
+					</tr>
+				</tbody>
+				</table>
 		<hr/>
 	    </section>
 	</body>
