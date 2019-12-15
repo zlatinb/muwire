@@ -100,6 +100,16 @@ public class DownloadServlet extends HttpServlet {
 
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+        if (action == null) {
+            resp.sendError(403, "Bad param");
+            return;
+        }
+        if (action.equals("clear")) {
+            downloadManager.clearFinished();
+            return;
+        }
+        
         String infoHashB64 = req.getParameter("infoHash");
         if (infoHashB64 == null) {
             resp.sendError(403, "Bad param");
@@ -111,11 +121,6 @@ public class DownloadServlet extends HttpServlet {
             return;
         }
         InfoHash infoHash = new InfoHash(h);
-        String action = req.getParameter("action");
-        if (action == null) {
-            resp.sendError(403, "Bad param");
-            return;
-        }
         if (action.equals("start")) {
             if (core == null) {
                 resp.sendError(403, "Not initialized");

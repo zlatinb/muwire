@@ -1,5 +1,6 @@
 package com.muwire.webui;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -55,6 +56,16 @@ public class DownloadManager {
         event.setDownloader(d);
         core.getEventBus().publish(event);
         delay();
+    }
+    
+    void clearFinished() {
+        for(Iterator<Map.Entry<InfoHash, Downloader>> iter = downloaders.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry<InfoHash, Downloader> entry = iter.next();
+            Downloader.DownloadState state = entry.getValue().getCurrentState();
+            if (state == Downloader.DownloadState.CANCELLED ||
+                    state == Downloader.DownloadState.FINISHED)
+                iter.remove();
+        }
     }
     
     private static void delay() {

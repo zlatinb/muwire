@@ -31,6 +31,7 @@
 		<div id="table-wrapper">
 				<div id="downloads"></div>
 		</div>		
+		<center><span id="clearFinished"></span></center>
 		<hr/>
 		<p><%=Util._t("Download Details")%></p>
 		<div id="downloadDetails"><p><%=Util._t("Click on a download to view details")%></p></div>

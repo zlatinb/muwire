@@ -125,8 +125,16 @@ function refreshDownloader() {
 			}
 			
 			var downloadsDiv = document.getElementById("downloads");
-			if (downloaders.size > 0)
+			var clearDiv = document.getElementById("clearFinished")
+			if (downloaders.size > 0) {
 				downloadsDiv.innerHTML = table.render();
+				
+				var clearLink = new Link(_t("Clear Finished"), "clear", ["ignored"])
+				clearDiv.innerHTML = clearLink.render()
+			} else {
+				downloadsDiv.innerHTML = ""
+				clearDiv.innerHTML = ""
+			}
 			if (downloader != null)
 				updateDownloader(downloader);
 		}
@@ -134,6 +142,18 @@ function refreshDownloader() {
 	var sortParam = "key=" + downloadsSortKey + "&order=" + downloadsSortOrder
 	xmlhttp.open("GET", "/MuWire/Download?" + sortParam, true);
 	xmlhttp.send();
+}
+
+function clear(ignored) {
+	xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshDownloader()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Download", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(encodeURI("action=clear"));
 }
 
 var downloadsSortKey

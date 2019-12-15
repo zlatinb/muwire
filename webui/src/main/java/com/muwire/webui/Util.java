@@ -32,6 +32,7 @@ public class Util {
         _x("Cancel"),
         _x("Certified"),
         _x("Certify"),
+        _x("Clear Finished"),
         _x("Comment"),
         _x("Details for {0}"),
         _x("Down"),
