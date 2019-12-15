@@ -177,6 +177,7 @@ public class SearchServlet extends HttpServlet {
                 Result result = new Result(event.getName(),
                         event.getSize(),
                         downloadManager.isDownloading(infoHash),
+                        resultSet.size(),
                         infoHash);
                 results.add(result);
             });
@@ -328,13 +329,15 @@ public class SearchServlet extends HttpServlet {
         private final String name;
         private final long size;
         private final boolean downloading;
+        private final int sources;
         private final InfoHash infoHash;
         
-        Result(String name, long size, boolean downloading, InfoHash infoHash) {
+        Result(String name, long size, boolean downloading, int sources, InfoHash infoHash) {
             this.name = name;
             this.size = size;
             this.downloading = downloading;
             this.infoHash = infoHash;
+            this.sources = sources;
         }
         
         void toXML(StringBuilder sb) {
@@ -343,6 +346,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<Downloading>").append(downloading).append("</Downloading>");
+            sb.append("<Sources>").append(sources).append("</Sources>");
             sb.append("</Result>");
         }
     }
@@ -449,11 +453,16 @@ public class SearchServlet extends HttpServlet {
         return Boolean.compare(k.downloading, v.downloading);
     };
     
+    private static final Comparator<Result> RESULT_BY_SOURCES = (l, r) -> {
+        return Integer.compare(l.sources, r.sources);
+    };
+    
     private static final ColumnComparators<Result> RESULT_COMPARATORS = new ColumnComparators<>();
     static {
         RESULT_COMPARATORS.add("Name", RESULT_BY_NAME);
         RESULT_COMPARATORS.add("Size", RESULT_BY_SIZE);
         RESULT_COMPARATORS.add("Download", RESULT_BY_DOWNLOAD);
+        RESULT_COMPARATORS.add("Sources", RESULT_BY_SOURCES);
     }
 
     private static final Comparator<SenderForResult> SENDER_FOR_RESULT_BY_SENDER = (k, v) -> {

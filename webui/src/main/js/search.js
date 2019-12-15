@@ -224,6 +224,7 @@ class Result {
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+		this.sources = xmlNode.getElementsByTagName("Sources")[0].childNodes[0].nodeValue
 	}
 	
 	getMapping() {
@@ -231,6 +232,7 @@ class Result {
 		mapping.set("Name", this.getNameBlock())
 		mapping.set("Size", this.size)
 		mapping.set("Download", this.getDownloadBlock())
+		mapping.set("Sources", this.sources)
 		return mapping
 	}
 	
@@ -265,7 +267,7 @@ class Results {
 			newOrder = "ascending"
 		else if (resultsSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Name","Size","Download"], "sortResultsTable", resultsSortKey, newOrder, null)
+		var table = new Table(["Name","Size","Sources","Download"], "sortResultsTable", resultsSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.results.length; i++) {
 			table.addRow(this.results[i].getMapping())

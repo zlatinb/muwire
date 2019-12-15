@@ -91,6 +91,7 @@ public class Util {
         _x("Sharing"),
         _x("Show Comment"),
         _x("Size"),
+        _x("Sources"),
         _x("Speed"),
         _x("State"),
         _x("Status"),
