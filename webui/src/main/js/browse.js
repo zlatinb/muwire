@@ -222,7 +222,7 @@ function showResults(host, key, descending) {
 				var downloadCell = null
 				
 				if (result.downloading == "true")
-					downloadCell = _t("Downloading")
+					downloadCell = "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
 				else
 					downloadCell = getDownloadLink(host, infoHash)
 					
