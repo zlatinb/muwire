@@ -44,6 +44,7 @@ public class Util {
         _x("Download"),
         _x("Download Location"),
         _x("Download retry frequency (seconds)"),
+        _x("Download speed smoothing interval (second)"),
         _x("Downloader"),
         _x("Downloading"),
         _x("Enter Reason (Optional)"),

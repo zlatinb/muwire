@@ -15,6 +15,8 @@
     		String defaultIncompletesLocation = System.getProperty("user.home") + File.separator+"MuWire Incompletes";
     		session.setAttribute("defaultDownloadLocation",defaultDownloadLocation);
     		session.setAttribute("defaultIncompletesLocation",defaultIncompletesLocation);
+    		
+    		Throwable error = (Throwable) application.getAttribute("MWInitError");
     	%>
     	
         <noscript>
@@ -22,6 +24,11 @@
           <center><b><%=Util._t("MuWire requires JavaScript. Please enable JavaScript in your browser.")%></b></center>
          </div>
         </noscript>
+        
+<% if (error != null) { %>
+<div class="warning"><%=error.getMessage()%></div>
+<% } %>
+        
         <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
         <form action="/MuWire/init" method="post">
         <%=Util._t("Nickname")%>:

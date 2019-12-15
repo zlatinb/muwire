@@ -93,11 +93,11 @@ public class ConfigurationServlet extends HttpServlet {
     private static File getDirectory(String s) throws Exception {
         File f = new File(s);
         if (!f.exists())
-            throw new Exception(Util._t("Bad input")+ Util._t("{0} does not exist",s));
+            throw new Exception(Util._t("Bad input") + ":" + Util._t("{0} does not exist",s));
         if (!f.isDirectory())
-            throw new Exception(Util._t("Bad input")+ Util._t("{0} is not a directory",s));
+            throw new Exception(Util._t("Bad input") + ":" + Util._t("{0} is not a directory",s));
         if (!f.canWrite())
-            throw new Exception(Util._t("Bad input")+ Util._t("{0} not writeable",s));
+            throw new Exception(Util._t("Bad input") + ":" + Util._t("{0} not writeable",s));
         return f;
     }
 
