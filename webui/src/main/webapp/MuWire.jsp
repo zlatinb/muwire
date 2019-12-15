@@ -30,6 +30,7 @@
 <% } %>
         
         <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
+        <p><%=Util._t("These directories will be created if they do not already exist")%></p>
         <form action="/MuWire/init" method="post">
         <%=Util._t("Nickname")%>:
         <input type="text" name="nickname"><br>
