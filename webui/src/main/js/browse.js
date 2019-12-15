@@ -64,6 +64,8 @@ function close(b64) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			if (currentHost != null && b64 == browsesByHost.get(currentHost).hostB64)
+				currentHost = null
 			refreshActive()
 		}
 	}
@@ -113,11 +115,11 @@ function refreshActive() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			
-			browsesByHost.clear()
-			
 			var currentBrowse = null
 			if (currentHost != null)
 				currentBrowse = browsesByHost.get(currentHost)
+				
+			browsesByHost.clear()
 			
 			var xmlDoc = this.responseXML
 			var activeBrowses = []
@@ -159,12 +161,17 @@ function refreshActive() {
 			}
 			
 			var tableDiv = document.getElementById("activeBrowses")
-			tableDiv.innerHTML = table.render()
+			if (activeBrowses.length > 0)
+				tableDiv.innerHTML = table.render()
+			else 
+				tableDiv.innerHTML = ""
 			
 			if (currentBrowse != null) {
 				var newBrowse = browsesByHost.get(currentHost)
 				if (currentBrowse.revision < newBrowse.revision)
 					showResults(currentHost, currentBrowse.key, currentBrowse.descending)
+			} else {
+				document.getElementById("resultsTable").innerHTML = ""
 			}
 		}
 	}
@@ -235,7 +242,10 @@ function showResults(host, key, descending) {
 			}
 			
 			var tableDiv = document.getElementById("resultsTable")
-			tableDiv.innerHTML = table.render()
+			if (resultsByInfoHash.size > 0)
+				tableDiv.innerHTML = table.render()
+			else
+				tableDiv.innerHTML = ""
 		}
 	}
 	var paramString = "/MuWire/Browse?section=results&host=" + browse.hostB64
