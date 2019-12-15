@@ -42,6 +42,11 @@ class Browse {
 		return "<a href='#' onclick='window.showResults(\"" + this.host + "\",\"" + this.key + "\",\"" + this.descending + 
 			"\");return false;'>" + this.host + "</a>"		
 	}
+	
+	getCloseLink() {
+		var link = new Link("[X]", "close", [this.hostB64])
+		return link.render()
+	}
 }
 
 function initBrowse() {
@@ -54,6 +59,18 @@ var browsesByHost = new Map()
 var resultsByInfoHash = new Map()
 var browseKey = null
 var browseOrder = null
+
+function close(b64) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshActive()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Browse", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=close&host=" + b64)
+}
 
 function showCertificates(hostB64, infoHash) {
 	var fetch = new CertificateFetch(hostB64, infoHash)
@@ -128,9 +145,11 @@ function refreshActive() {
 			for (i = 0;i < activeBrowses.length; i++) {
 				var browse = activeBrowses[i]
 				var browseLink = browse.getBrowseLink()
+				var closeLink = browse.getCloseLink()
+				var nameHtml = "<table><tr><td>" + browseLink + "</td><td><p align='right'>" + closeLink + "</p></td></tr></table>"
 				
 				var mapping = new Map()
-				mapping.set("Host", browseLink)
+				mapping.set("Host", nameHtml)
 				mapping.set("Status", browse.status)
 				
 				var percent = browse.receivedResults + "/" + browse.totalResults

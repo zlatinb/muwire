@@ -188,8 +188,21 @@ public class BrowseServlet extends HttpServlet {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ignore) {}
+        } else if (action.equals("close")) {
+            String personaB64 = req.getParameter("host");
+            if (personaB64 == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            Persona host;
+            try {
+                host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
+            } catch (Exception bad) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            browseManager.getBrowses().remove(host);
         }
-        // TODO: implement canceling of browse
     }
 
     @Override
