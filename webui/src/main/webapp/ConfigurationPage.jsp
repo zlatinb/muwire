@@ -34,7 +34,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 	</aside>
 	<section class="main foldermain">
 <% if (error != null) { %>
-<div class="warning"><%=error%></div>
+<div class="warning"><%=error.getMessage()%></div>
 <% } %>
 
 		<form action="/MuWire/Configuration" method="post">

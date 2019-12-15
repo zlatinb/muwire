@@ -56,19 +56,17 @@ public class ConfigurationServlet extends HttpServlet {
         case "allowUntrusted" : core.getMuOptions().setAllowUntrusted(false); break;
         case "searchExtraHop" : core.getMuOptions().setSearchExtraHop(true); break;
         case "allowTrustLists": core.getMuOptions().setAllowTrustLists(true); break;
-        case "trustListInterval" : core.getMuOptions().setTrustListInterval(getPositiveInteger(value)); break;
-        case "downloadRetryInterval" : core.getMuOptions().setDownloadRetryInterval(getPositiveInteger(value)); break;
-        case "totalUploadSlots" : core.getMuOptions().setTotalUploadSlots(Integer.parseInt(value)); break;
-        case "uploadSlotsPerUser" : core.getMuOptions().setUploadSlotsPerUser(Integer.parseInt(value)); break;
+        case "trustListInterval" : core.getMuOptions().setTrustListInterval(getPositiveInteger(value,"Trust list update frequency (hours)")); break;
+        case "downloadRetryInterval" : core.getMuOptions().setDownloadRetryInterval(getPositiveInteger(value,"Download retry frequency (seconds)")); break;
+        case "totalUploadSlots" : core.getMuOptions().setTotalUploadSlots(getInteger(value,"Total upload slots (-1 means unlimited)")); break;
+        case "uploadSlotsPerUser" : core.getMuOptions().setUploadSlotsPerUser(getInteger(value,"Upload slots per user (-1 means unlimited)")); break;
         case "downloadLocation" : core.getMuOptions().setDownloadLocation(getDirectory(value)); break;
         case "incompleteLocation" : core.getMuOptions().setIncompleteLocation(getDirectory(value)); break;
         case "shareDownloadedFiles" : core.getMuOptions().setShareDownloadedFiles(true); break;
         case "shareHiddenFiles" : core.getMuOptions().setShareHiddenFiles(true); break;
         case "searchComments" : core.getMuOptions().setSearchComments(true); break;
         case "browseFiles" : core.getMuOptions().setBrowseFiles(true); break;
-        case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(getPositiveInteger(value)); break;
-        case "inBw" : core.getMuOptions().setInBw(getPositiveInteger(value)); break;
-        case "outBw" : core.getMuOptions().setOutBw(getPositiveInteger(value)); break;
+        case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(getPositiveInteger(value,"Download speed smoothing interval (second)")); break;
         case "inbound.length" : core.getI2pOptions().setProperty(name, value); break;
         case "inbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
         case "outbound.length" : core.getI2pOptions().setProperty(name, value); break;
@@ -77,21 +75,29 @@ public class ConfigurationServlet extends HttpServlet {
         }
     }
     
-    private static int getPositiveInteger(String s) throws Exception {
-        int rv = Integer.parseInt(s);
+    private static int getInteger(String s, String fieldName) throws Exception {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            throw new Exception(Util._t("Bad input")+ ":  \"" + s + "\"  " + Util._t(fieldName));
+        }
+    }
+    
+    private static int getPositiveInteger(String s, String fieldName) throws Exception {
+        int rv = getInteger(s, fieldName);
         if (rv <= 0)
-            throw new Exception(s + " is negative");
+            throw new Exception(Util._t("Bad input")+ ":  \"" + s + "\"  " + Util._t(fieldName));
         return rv;
     }
     
     private static File getDirectory(String s) throws Exception {
         File f = new File(s);
         if (!f.exists())
-            throw new Exception(s + " does not exist");
+            throw new Exception(Util._t("Bad input")+ Util._t("{0} does not exist",s));
         if (!f.isDirectory())
-            throw new Exception(s + " is not a directory");
+            throw new Exception(Util._t("Bad input")+ Util._t("{0} is not a directory",s));
         if (!f.canWrite())
-            throw new Exception(s + " cannot be written to");
+            throw new Exception(Util._t("Bad input")+ Util._t("{0} not writeable",s));
         return f;
     }
 

@@ -28,6 +28,7 @@ public class Util {
         _x("Allow browsing"),
         _x("Allow only trusted connections"),
         _x("Allow others to view my trust list"),
+        _x("Bad input"),
         _x("Browse"),
         _x("Browsing"),
         _x("Cancel"),
@@ -107,6 +108,9 @@ public class Util {
         _x("User"),
         _x("View {0} Certificates"),
         _x("Your Trust"),
+        _x("{0} does not exist"),
+        _x("{0} is not a directory"),
+        _x("{0} not writeable"),
         _x("{0}% of piece")
     };
 
