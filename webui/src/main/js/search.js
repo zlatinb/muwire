@@ -11,8 +11,8 @@ class SearchStatus {
 		var mapping = new Map()
 		
 		var trimmedQuery = this.query 
-		if (this.query.length > 16) 
-			trimmedQuery = this.query.slice(0, 16) + "&hellip;"
+		if (this.query.length > 19) 
+			trimmedQuery = this.query.slice(0, 19) + "&hellip;"
 			
 		var queryLink = new Link(trimmedQuery, "refresh" + refreshType, [this.uuid])
 		var stopLink = new Link("X", "stopSearch", [this.uuid])
