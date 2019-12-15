@@ -324,6 +324,9 @@ See also .menu-icon
 .menuitem.downloads .menu-icon:before {
     content: url("images/inbox.png");
 }
+.menuitem.uploads .menu-icon:before {
+	content: url("images/uploads.png");
+}
 .menuitem.search .menu-icon:before {
     content: url("images/delay.png");
 }
