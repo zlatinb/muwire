@@ -28,6 +28,7 @@ import com.muwire.webui.BrowseManager.Browse;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 
 public class BrowseServlet extends HttpServlet {
     
@@ -183,8 +184,8 @@ public class BrowseServlet extends HttpServlet {
             UIResultEvent[] resultsArray = results.toArray(new UIResultEvent[0]);
             event.setResult(resultsArray);
             // TODO: sequential
-            // TODO: possible sources
-            event.setSources(Collections.emptySet());
+            Set<Destination> possibleSources = results.stream().flatMap(e -> e.getSources().stream()).collect(Collectors.toSet());
+            event.setSources(possibleSources);
             event.setTarget(new File(core.getMuOptions().getDownloadLocation(), resultsArray[0].getName()));
             core.getEventBus().publish(event);
             pause();
