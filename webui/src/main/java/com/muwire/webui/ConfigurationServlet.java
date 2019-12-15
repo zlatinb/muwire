@@ -67,10 +67,10 @@ public class ConfigurationServlet extends HttpServlet {
         case "searchComments" : core.getMuOptions().setSearchComments(true); break;
         case "browseFiles" : core.getMuOptions().setBrowseFiles(true); break;
         case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(getPositiveInteger(value,"Download speed smoothing interval (second)")); break;
-        case "inbound.length" : core.getI2pOptions().setProperty(name, value); break;
-        case "inbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
-        case "outbound.length" : core.getI2pOptions().setProperty(name, value); break;
-        case "outbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
+        case "inbound.length" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Inbound tunnel length"))); break;
+        case "inbound.quantity" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Inbound tunnel quantity"))); break;
+        case "outbound.length" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Outbound tunnel length"))); break;
+        case "outbound.quantity" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Outbound tunnel quantity"))); break;
         // TODO: ui settings
         }
     }
