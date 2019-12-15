@@ -787,7 +787,10 @@ function refreshStatus() {
 			}
 			
 			var activeDiv = document.getElementById("activeSearches")
-			activeDiv.innerHTML = table.render()
+			if (statuses.length > 0)
+				activeDiv.innerHTML = table.render()
+			else
+				activeDiv.innerHTML = ""
 			
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
