@@ -19,7 +19,7 @@ class SharedFile {
 		var showCommentHtml = ""
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
-		var commentDiv = "<div class='rightcomment' id='comment-" + this.path + "'></div>"
+		var commentDiv = "<div class='centercomment' id='comment-" + this.path + "'></div>"
 		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
 		
 		var html = nameLink + "<div class=\"right\">" + unshareLink.render() + " " + showCommentHtml + "  " + certifyHtml + "</div>"

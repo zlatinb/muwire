@@ -275,11 +275,9 @@ div.right {
   float: right;
 }
 
-div.rightcomment {
+div.centercomment {
 	display: block;
-	text-align: right;
-	float: right;
-	width: 50%;
+	text-align: center;
 }
 
 span.right {
