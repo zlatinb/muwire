@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="com.muwire.webui.*" %>
 <%@include file="initcode.jsi"%>
 
 <% 
 
-String pagetitle="Browse Host"; 
+String pagetitle=Util._t("Browse Host"); 
 
 %>
 
@@ -26,7 +27,7 @@ String pagetitle="Browse Host";
 			<form action="/MuWire/Browse" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="browse">
-				<input type="submit" value="Browse">
+				<input type="submit" value=<%=Util._t("Browse")%>>
 			</form>
 		</div>
 		<div class="menubox-divider"></div>

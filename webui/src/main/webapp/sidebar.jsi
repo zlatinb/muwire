@@ -44,6 +44,7 @@
                   </div>
                 </a>
             </div>
+            <div class="menubox-divider"></div>
             <div class="menubox">
                 <h2><%=Util._t("Trust")%></h2>
                 <a class="menuitem identities" href="TrustUsers">

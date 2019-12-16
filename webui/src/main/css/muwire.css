@@ -2,7 +2,7 @@
   position:relative;
 }
 #table-scroll {
-  max-height: 300px;
+  max-height: 500px;
   overflow:auto;
   margin-top:20px;
 }
@@ -27,16 +27,8 @@
   border:1px solid red;
 }
 
-div#activeSearches table thead th:nth-child(2) {
-  width: 55px;
-}
-div#activeSearches table thead th:nth-child(3) {
-  width: 55px;
-}
 div#activeSearches table td:nth-child(2) {
-  text-align: right;
-}
-div#activeSearches table tbody td:nth-child(3) {
+  width: 30px;
   text-align: right;
 }
 
@@ -44,10 +36,16 @@ div#topTable table thead th:nth-child(2) {
   width: 100px;
 }
 div#topTable table thead th:nth-child(3) {
+  width: 100px;
+}
+div#topTable table thead th:nth-child(4) {
   width: 300px;
 }
 div#topTable table tbody td:nth-child(2) {
   text-align: center;
+}
+div#topTable table tbody td:nth-child(3) {
+  text-align: right;
 }
 
 div#bottomTable table thead th:nth-child(2) {
@@ -67,20 +65,20 @@ div#activeBrowses table thead th:nth-child(2) {
   width: 100px;
 }
 div#activeBrowses table thead th:nth-child(3) {
-  width: 200px;
+  width: 100px;
+}
+div#activeBrowses table tbody td:nth-child(2) {
+  text-align: center;
+}
+div#activeBrowses table tbody td:nth-child(3) {
+  text-align: right;
 }
 
 div#filesTable table thead th:nth-child(2) {
   width: 100px;
 }
-div#filesTable table thead th:nth-child(3) {
-  width: 100px;
-}
 div#filesTable table tbody td:nth-child(2) {
   text-align: right;
-}
-div#filesTable table tbody td:nth-child(3) {
-  text-align: center;
 }
 
 div#resultsTable table thead th:nth-child(2) {
@@ -97,7 +95,7 @@ div#resultsTable table tbody td:nth-child(3) {
 }
 
 div#downloads table thead th:nth-child(2) {
-  width: 80px;
+  width: 120px;
 }
 div#downloads table thead th:nth-child(3) {
   width: 80px;
@@ -107,9 +105,6 @@ div#downloads table thead th:nth-child(4) {
 }
 div#downloads table thead th:nth-child(5) {
   width: 120px;
-}
-div#downloads table thead th:nth-child(6) {
-  width: 80px;
 }
 div#downloads table tbody td:nth-child(2) {
   text-align: center;
@@ -123,9 +118,6 @@ div#downloads table tbody td:nth-child(4) {
 div#downloads table tbody td:nth-child(5) {
   text-align: right;
 }
-div#downloads table tbody td:nth-child(6) {
-  text-align: center;
-}
 
 div#trustedUsers table thead th:nth-child(2) {
   width: 100px;
@@ -133,18 +125,13 @@ div#trustedUsers table thead th:nth-child(2) {
 div#trustedUsers table thead th:nth-child(3) {
   width: 100px;
 }
-div#trustedUsers table thead th:nth-child(4) {
-  width: 100px;
+div#trustedUsers table tbody td:nth-child(3) {
+  text-align: center;
 }
 div#distrustedUsers table thead th:nth-child(2) {
   width: 100px;
 }
-div#distrustedUsers table thead th:nth-child(3) {
-  width: 100px;
-}
-div#distrustedUsers table thead th:nth-child(4) {
-  width: 100px;
-}
+
 div#trustLists table thead th:nth-child(2) {
   width: 100px;
 }
@@ -152,19 +139,48 @@ div#trustLists table thead th:nth-child(3) {
   width: 100px;
 }
 div#trustLists table thead th:nth-child(4) {
-  width: 100px;
+  width: 120px;
 }
 div#trustLists table thead th:nth-child(5) {
+  width: 180px;
+}
+div#trustLists table tbody td:nth-child(2) {
+  text-align: right;
+}
+div#trustLists table tbody td:nth-child(3) {
+  text-align: right;
+}
+div#trustLists table tbody td:nth-child(4) {
+  text-align: center;
+}
+
+div#trusted table thead th:nth-child(2) {
   width: 100px;
 }
-div#trustLists table thead th:nth-child(6) {
+div#trusted table thead th:nth-child(3) {
+  width: 300px;
+}
+div#distrusted table thead th:nth-child(2) {
   width: 100px;
+}
+div#distrusted table thead th:nth-child(3) {
+  width: 300px;
 }
 
 pre {
   background: #a7d5d5;
   padding: 5px;
   margin: 10px 20px 10px 5px;
+}
+
+div.right {
+  display: inline-block;
+  float: right;
+}
+
+span.right {
+  display: inline-block;
+  float: right;
 }
 
 /* File tree CSS */

@@ -2,11 +2,13 @@
             <div class="menubox">
               <div class="searchbox">
                 <h2><%=Util._t("Search")%></h2>
-                <div class="menu-icon"></div>
                   <form action="/MuWire/Search" method="post">
                      <input type="text" name="search" />
                      <input type="hidden" name="action" value="start" />
-                     <input type="submit" value="<%=Util._t("Search")%>" />
+                     <div class="menuitem search">
+                       <div class="menu-icon"></div>
+                       <input type="submit" value="<%=Util._t("Search")%>" />
+                     </div>
                   </form>
               </div>
             </div>
