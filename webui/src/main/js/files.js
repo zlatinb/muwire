@@ -108,6 +108,7 @@ function initFiles() {
 	
 	nodesById.set("root",root)
 	root.updateDiv()
+	expand(root.nodeId)
 }
 
 function encodedPathToRoot(node) {
@@ -167,6 +168,8 @@ function expand(nodeId) {
 		    for (i = 0; i < node.children.length; i++) {
 				node.children[i].updateDiv()
 			}
+			if (node.children.length == 1 && !node.children[0].leaf)
+				expand(node.children[0].nodeId)
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=fileTree&path="+encodedPath, true)
