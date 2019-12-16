@@ -43,7 +43,8 @@ class Persona {
 		var mapping = new Map()
 		
 		var userHtml = this.user + "<div>" + this.getTrustActions().join("  ") + "</div>"
-		mapping.set("User", userHtml)
+		mapping.set("Trusted User", userHtml)
+		mapping.set("Distrusted User", userHtml)
 		mapping.set("Reason", this.reason)
 		mapping.set("Your Trust", this.status)
 		
@@ -231,7 +232,7 @@ function displayTrustedList(user) {
 			else if (trustedSortOrder == "ascending")
 				newOrder = "descending"
 				
-			var table = new Table(["User", "Reason", "Your Trust"], "sortTrustedList", trustedSortKey, newOrder, null)
+			var table = new Table(["Trusted User", "Reason", "Your Trust"], "sortTrustedList", trustedSortKey, newOrder, null)
 			var i
 			for(i = 0; i < trusted.length; i++) {
 				table.addRow(trusted[i].getMapping())
@@ -263,7 +264,7 @@ function displayDistrustedList(user) {
 			else if (distrustedSortOrder == "ascending")
 				newOrder = "descending"
 				
-			var table = new Table(["User", "Reason", "Your Trust"], "sortDistrustedList", distrustedSortKey, newOrder, null)
+			var table = new Table(["Distrusted User", "Reason", "Your Trust"], "sortDistrustedList", distrustedSortKey, newOrder, null)
 			var i
 			for(i = 0; i < distrusted.length; i++) {
 				table.addRow(distrusted[i].getMapping())

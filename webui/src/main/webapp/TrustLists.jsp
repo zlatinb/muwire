@@ -30,7 +30,6 @@ String pagetitle=Util._t("Trust Lists");
 			<hr/>
 				<center><div id="currentList"></div></center>
 				<table>
-				<thead><tr><th>Trusted</th><th>Distrusted</th></tr></thead>
 				<tbody>
 					<tr>
 						<td><div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div></td>

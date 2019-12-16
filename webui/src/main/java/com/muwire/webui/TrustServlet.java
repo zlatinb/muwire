@@ -356,7 +356,8 @@ public class TrustServlet extends HttpServlet {
     
     private static final ColumnComparators<TrustListEntry> TRUST_LIST_ENTRY_COMPARATORS = new ColumnComparators<>();
     static {
-        TRUST_LIST_ENTRY_COMPARATORS.add("User", TRUST_LIST_ENTRY_BY_USER);
+        TRUST_LIST_ENTRY_COMPARATORS.add("Trusted User", TRUST_LIST_ENTRY_BY_USER);
+        TRUST_LIST_ENTRY_COMPARATORS.add("Distrusted User", TRUST_LIST_ENTRY_BY_USER);
         TRUST_LIST_ENTRY_COMPARATORS.add("Reason", TRUST_LIST_ENTRY_BY_REASON);
         TRUST_LIST_ENTRY_COMPARATORS.add("Your Trust", TRUST_LIST_ENTRY_BY_STATUS);
     }
