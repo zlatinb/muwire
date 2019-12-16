@@ -56,7 +56,7 @@
                 <a class="menuitem address-book" href="TrustLists">
                   <div class="menu-icon"></div>
                   <div class="menu-text">
-                      <%=Util._t("Lists")%>
+                      <%=Util._t("Subscriptions")%>
                   </div>
                 </a>
             </div>
