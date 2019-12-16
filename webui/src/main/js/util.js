@@ -1,3 +1,7 @@
+function parseBoolean(s) {
+	return s == "true"
+}
+
 /**
 *
 *  Base64 encode / decode

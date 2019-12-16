@@ -1,6 +1,6 @@
 
 class Node {
-	constructor(nodeId, parent, leaf, infoHash, path, size, comment, certified, revision) {
+	constructor(nodeId, parent, leaf, infoHash, path, size, comment, certified, shared, revision) {
 		this.nodeId = nodeId
 		this.parent = parent
 		this.leaf = leaf
@@ -11,18 +11,19 @@ class Node {
 		this.comment = comment
 		this.certified = certified
 		this.revision = revision
+		this.shared = shared
 	}
 	
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
 		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
-		if (this == root)
+		if (!this.shared)
 			unshareLink = ""
 		var commentLink = "<span id='comment-link-"+this.nodeId+"'><a href='#' onclick='window.showCommentForm(\"" + this.nodeId + "\");return false;'>" + _t("Comment") + "</a></span>";
-		if (this == root)
+		if (!this.shared)
 			commentLink = ""
 		var certifyLink = "<a href='#' onclick='window.certify(\"" + this.nodeId + "\");return false;'>" + _t("Certify") + "</a>"
-		if (this == root)
+		if (!this.shared)
 			certifyLink = ""
 		if (this.leaf) {
 			var certified = ""
@@ -98,7 +99,7 @@ function refreshStatus() {
 }
 
 var treeRevision = -1
-var root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, -1)
+var root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
 var nodesById = new Map()
 
 function initFiles() {
@@ -145,16 +146,19 @@ function expand(nodeId) {
 				var certified = fileElements[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
 				
 				var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
-				var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, revision)
+				var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, true, revision)
 				nodesById.set(nodeId, newFileNode)
 				node.children.push(newFileNode)
 			}
 			
 			var dirElements = xmlDoc.getElementsByTagName("Directory")
 			for (i = 0; i < dirElements.length; i++) {
-				var dirName = dirElements[i].childNodes[0].nodeValue
+				var dirElement = dirElements[i]
+				
+				var dirName = dirElement.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+				var shared = parseBoolean(dirElement.getElementsByTagName("Shared")[0].childNodes[0].nodeValue)
 				var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
-				var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, revision)
+				var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, shared, revision)
 				nodesById.set(nodeId, newDirNode)
 				node.children.push(newDirNode)
 			}
@@ -168,6 +172,7 @@ function expand(nodeId) {
 	xmlhttp.open("GET", "/MuWire/Files?section=fileTree&path="+encodedPath, true)
 	xmlhttp.send()
 }
+
 
 function collapse(nodeId) {
 	var node = nodesById.get(nodeId)

@@ -123,7 +123,11 @@ public class FilesServlet extends HttpServlet {
         @Override
         public void onDirectory(File f) {
             String name = f.getName().isEmpty() ? f.toString() : f.getName();
-            sb.append("<Directory>").append(Util.escapeHTMLinXML(name)).append("</Directory>");
+            boolean shared = core.getMuOptions().getWatchedDirectories().contains(f.getAbsolutePath());
+            sb.append("<Directory>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<Shared>").append(shared).append("</Shared>");
+            sb.append("</Directory>");
         }
     }
     
