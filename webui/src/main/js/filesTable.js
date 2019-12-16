@@ -49,7 +49,7 @@ function refreshStatus() {
 			} else
 				hashingSpan.innerHTML = "";
 				
-			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > tableRevision) {
 				tableRevision = newRevision // TODO: auto-refresh
 				refreshTable()

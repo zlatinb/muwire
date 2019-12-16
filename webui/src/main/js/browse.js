@@ -131,7 +131,7 @@ function refreshActive() {
 				var status = browses[i].getElementsByTagName("BrowseStatus")[0].childNodes[0].nodeValue;
 				var totalResults = browses[i].getElementsByTagName("TotalResults")[0].childNodes[0].nodeValue;
 				var count = browses[i].getElementsByTagName("ResultsCount")[0].childNodes[0].nodeValue;
-				var revision = browses[i].getElementsByTagName("Revision")[0].childNodes[0].nodeValue;
+				var revision = parseInt(browses[i].getElementsByTagName("Revision")[0].childNodes[0].nodeValue);
 				
 				var browse = new Browse(host, hostB64, status, totalResults, count, revision)
 				browsesByHost.set(host, browse)

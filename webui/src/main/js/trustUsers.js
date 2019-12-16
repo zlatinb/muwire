@@ -250,7 +250,7 @@ function fetchRevision() {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML
-			var newRevision = xmlDoc.childNodes[0].childNodes[0].nodeValue
+			var newRevision = parseInt(xmlDoc.childNodes[0].childNodes[0].nodeValue)
 			if (newRevision > revision) {
 				revision = newRevision
 				refreshUsers()

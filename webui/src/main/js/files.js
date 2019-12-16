@@ -86,7 +86,7 @@ function refreshStatus() {
 			} else
 				hashingSpan.innerHTML = "";
 				
-			var newRevision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > treeRevision) {
 				// TODO: update expanded nodes
 				treeRevision = newRevision
@@ -130,7 +130,7 @@ function expand(nodeId) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML
-			var revision = xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+			var revision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			var fileElements = xmlDoc.getElementsByTagName("File")
 			var i
 			for (i = 0; i < fileElements.length; i++) {

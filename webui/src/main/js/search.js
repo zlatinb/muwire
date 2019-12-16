@@ -1,6 +1,6 @@
 class SearchStatus {
 	constructor(xmlNode) {
-		this.revision = xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+		this.revision = parseInt(xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 		this.query = xmlNode.getElementsByTagName("Query")[0].childNodes[0].nodeValue
 		this.uuid = xmlNode.getElementsByTagName("uuid")[0].childNodes[0].nodeValue
 		this.senders = xmlNode.getElementsByTagName("Senders")[0].childNodes[0].nodeValue
