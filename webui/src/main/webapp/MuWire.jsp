@@ -5,10 +5,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
+<%
+	String pagetitle = Util._t("Initial Setup");
+%>
+
 <html>
     <head>
 <%@include file="css.jsi"%>
     </head>
+<%@include file="header.jsi"%>
     <body>
     	<%
     		String defaultDownloadLocation = System.getProperty("user.home")+File.separator+"Downloads";
@@ -29,14 +34,14 @@
 <div class="warning"><%=error.getMessage()%></div>
 <% } %>
         
-        <p><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></p>
+        <h3><%=Util._t("Welcome to MuWire!  Please select a nickname and download locations")%></h3>
         <p><%=Util._t("These directories will be created if they do not already exist")%></p>
         <form action="/MuWire/init" method="post">
-        <%=Util._t("Nickname")%>:
+        <%=Util._t("Nickname")%>:<br/>
         <input type="text" name="nickname"><br>
-        <%=Util._t("Directory for saving downloaded files")%>:
+        <%=Util._t("Directory for saving downloaded files")%>:<br/>
         <input type='text' name='download_location' value="${defaultDownloadLocation}"><br/>
-        <%=Util._t("Directory for storing incomplete files")%>:
+        <%=Util._t("Directory for storing incomplete files")%>:<br/>
         <input type='text' name='incomplete_location' value="${defaultIncompletesLocation}"><br/>
         <input type="submit" value="<%=Util._t("Submit")%>">
     </body>
