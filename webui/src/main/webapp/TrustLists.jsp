@@ -29,15 +29,9 @@ String pagetitle=Util._t("Trust Lists");
 			</div>
 			<hr/>
 				<center><div id="currentList"></div></center>
-				<table>
-				<tbody>
-					<tr>
-						<td><div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div></td>
-						<td><div id="table-wrapper"><div id="table-scroll"><div id="distrusted"></div></div></div></td>
-					</tr>
-				</tbody>
-				</table>
-		<hr/>
+						<div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div>
+						<div id="table-wrapper"><div id="table-scroll"><div id="distrusted"></div></div></div>
+			<hr/>
 	    </section>
 	</body>
 </html>
