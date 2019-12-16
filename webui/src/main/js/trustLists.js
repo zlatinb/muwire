@@ -15,7 +15,9 @@ class TrustList {
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.userB64])
 		var refreshLink = new Link(_t("Refresh"), "forceUpdate", [this.userB64])
 		
-		mapping.set("Name", userLink.render() + unsubscribeLink.render() + refreshLink.render())
+		var nameHtml = "<table><tr><td>" + userLink.render() + "</td><td><p align='right'>" + unsubscribeLink.render() + "  " + refreshLink.render() + "</p></td></tr></table>"
+		
+		mapping.set("Name", nameHtml)
 		mapping.set("Status", this.status)
 		mapping.set("Last Updated", this.timestamp)
 		mapping.set("Trusted", this.trusted)
@@ -40,7 +42,7 @@ class Persona {
 	getMapping() {
 		var mapping = new Map()
 		
-		var userHtml = this.user + this.getTrustActions().join("  ")
+		var userHtml = this.user + "<div>" + this.getTrustActions().join("  ") + "</div>"
 		mapping.set("User", userHtml)
 		mapping.set("Reason", this.reason)
 		mapping.set("Your Trust", this.status)
