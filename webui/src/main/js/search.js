@@ -816,6 +816,13 @@ function stopSearch(searchUUID) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			if (searchUUID == uuid) {
+				uuid = null
+				var element = document.getElementById("topTable" + refreshType)
+				element.innerHTML = ""
+				element = document.getElementById("bottomTable" + refreshType)
+				element.innerHTML = ""
+			}
 			refreshStatus()
 		}
 	}
