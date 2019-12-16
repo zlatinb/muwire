@@ -35,6 +35,7 @@ import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
 import com.muwire.core.trust.TrustEvent;
 import com.muwire.core.trust.TrustSubscriptionEvent;
+import com.muwire.core.trust.TrustSubscriptionUpdatedEvent;
 import com.muwire.core.upload.UploadEvent;
 import com.muwire.core.upload.UploadFinishedEvent;
 
@@ -151,6 +152,7 @@ public class MuWireClient {
         
         TrustManager trustManager = new TrustManager();
         core.getEventBus().register(TrustEvent.class, trustManager);
+        core.getEventBus().register(TrustSubscriptionUpdatedEvent.class, trustManager);
         
         CertificateManager certificateManager = new CertificateManager(core, fileManager);
         core.getEventBus().register(CertificateFetchedEvent.class, certificateManager);
