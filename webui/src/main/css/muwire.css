@@ -178,6 +178,13 @@ div.right {
   float: right;
 }
 
+div.rightcomment {
+	display: block;
+	text-align: right;
+	float: right;
+	width: 50%;
+}
+
 span.right {
   display: inline-block;
   float: right;
