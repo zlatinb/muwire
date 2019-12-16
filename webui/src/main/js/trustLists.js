@@ -42,7 +42,9 @@ class Persona {
 	getMapping() {
 		var mapping = new Map()
 		
-		var userHtml = this.user + "<div>" + this.getTrustActions().join("  ") + "</div>"
+		var userHtml = this.user + "<div class='right'>" + this.getTrustActions().join("  ") + "</div>"
+		userHtml += "<div class='centercomment' id='trusted-" + this.userB64 + "'></div>"
+		userHtml += "<div class='centercomment' id='distrusted-" + this.userB64 + "'></div>"
 		mapping.set("Trusted User", userHtml)
 		mapping.set("Distrusted User", userHtml)
 		mapping.set("Reason", this.reason)
@@ -52,13 +54,11 @@ class Persona {
 	}
 	
 	getTrustBlock() {
-		return "<span id='trusted-link-" + this.userB64 + "'>" + this.getTrustLink() + "</span>" +
-				"<span id='trusted-" + this.userB64 + "'></span>"
+		return "<span id='trusted-link-" + this.userB64 + "'>" + this.getTrustLink() + "</span>"
 	}
 	
 	getDistrustBlock() {
-		return "<span id='distrusted-link-" + this.userB64 + "'>" + this.getDistrustLink() + "</span>" +
-				"<span id='distrusted-" + this.userB64 + "'></span>"
+		return "<span id='distrusted-link-" + this.userB64 + "'>" + this.getDistrustLink() + "</span>"
 	}
 	
 	getTrustLink() {
