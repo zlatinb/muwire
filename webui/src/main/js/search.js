@@ -834,6 +834,10 @@ function stopSearch(searchUUID) {
 function initGroupBySender() {
 	refreshFunction = refreshSender
 	refreshType = "Sender"
+	sendersSortKey = "Sender"
+	sendersSortOrder = "descending"
+	resultsFromSenderSortKey = "Name"
+	resultsFromSenderSortOrder = "descending"
 	setInterval(refreshStatus, 3000);
 	setTimeout(refreshStatus, 1);
 }
@@ -841,6 +845,10 @@ function initGroupBySender() {
 function initGroupByFile() {
 	refreshFunction = refreshFile
 	refreshType = "File"
+	resultsSortKey = "Name"
+	resultsSortOrder = "descending"
+	sendersForResultSortKey = "Sender"
+	sendersForResultSortOrder = "descending"
 	setInterval ( refreshStatus, 3000);
 	setTimeout ( refreshStatus, 1);
 }
