@@ -32,32 +32,73 @@ div#activeSearches table td:nth-child(2) {
   text-align: right;
 }
 
-div#topTable table thead th:nth-child(2) {
+div#topTableSender table thead th:nth-child(2) {
   width: 100px;
 }
-div#topTable table thead th:nth-child(3) {
+div#topTableSender table thead th:nth-child(3) {
   width: 100px;
 }
-div#topTable table thead th:nth-child(4) {
+div#topTableSender table thead th:nth-child(4) {
   width: 300px;
 }
-div#topTable table tbody td:nth-child(2) {
+div#topTableSender table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#topTableSender table tbody td:nth-child(2) {
   text-align: center;
 }
-div#topTable table tbody td:nth-child(3) {
+div#topTableSender table tbody td:nth-child(3) {
   text-align: right;
 }
 
-div#bottomTable table thead th:nth-child(2) {
+div#bottomTableSender table thead th:nth-child(2) {
   width: 100px;
 }
-div#bottomTable table thead th:nth-child(3) {
+div#bottomTableSender table thead th:nth-child(3) {
   width: 100px;
 }
-div#bottomTable table tbody td:nth-child(2) {
+div#bottomTableSender table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#bottomTableSender table tbody td:nth-child(2) {
   text-align: right;
 }
-div#bottomTable table tbody td:nth-child(3) {
+div#bottomTableSender table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+div#topTableFile table thead th:nth-child(2) {
+  width: 100px;
+}
+div#topTableFile table thead th:nth-child(3) {
+  width: 100px;
+}
+div#topTableFile table thead th:nth-child(4) {
+  width: 100px;
+}
+div#topTableFile table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#topTableFile table tbody td:nth-child(2) {
+  text-align: right;
+}
+div#topTableFile table tbody td:nth-child(3) {
+  text-align: right;
+}
+div#topTableFile table tbody td:nth-child(4) {
+  text-align: center;
+}
+
+div#bottomTableFile table thead th:nth-child(2) {
+  width: 100px;
+}
+div#bottomTableFile table thead th:nth-child(3) {
+  width: 300px;
+}
+div#bottomTableFile table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#bottomTableFile table tbody td:nth-child(2) {
   text-align: center;
 }
 
@@ -66,6 +107,9 @@ div#activeBrowses table thead th:nth-child(2) {
 }
 div#activeBrowses table thead th:nth-child(3) {
   width: 100px;
+}
+div#activeBrowses table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
 }
 div#activeBrowses table tbody td:nth-child(2) {
   text-align: center;
@@ -77,6 +121,9 @@ div#activeBrowses table tbody td:nth-child(3) {
 div#filesTable table thead th:nth-child(2) {
   width: 100px;
 }
+div#filesTable table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
 div#filesTable table tbody td:nth-child(2) {
   text-align: right;
 }
@@ -86,6 +133,9 @@ div#resultsTable table thead th:nth-child(2) {
 }
 div#resultsTable table thead th:nth-child(3) {
   width: 100px;
+}
+div#resultsTable table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
 }
 div#resultsTable table tbody td:nth-child(2) {
   text-align: right;
@@ -106,6 +156,9 @@ div#downloads table thead th:nth-child(4) {
 div#downloads table thead th:nth-child(5) {
   width: 120px;
 }
+div#downloads table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
 div#downloads table tbody td:nth-child(2) {
   text-align: center;
 }
@@ -119,6 +172,31 @@ div#downloads table tbody td:nth-child(5) {
   text-align: right;
 }
 
+div#uploads table thead th:nth-child(2) {
+  width: 120px;
+}
+div#uploads table thead th:nth-child(3) {
+  width: 120px;
+}
+div#uploads table thead th:nth-child(4) {
+  width: 100px;
+}
+div#uploads table thead th:nth-child(5) {
+  width: 100px;
+}
+div#uploads table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#uploads table tbody td:nth-child(3) {
+  text-overflow: ellipsis;
+}
+div#uploads table tbody td:nth-child(4) {
+  text-align: right;
+}
+div#uploads table tbody td:nth-child(5) {
+  text-align: right;
+}
+
 div#trustedUsers table thead th:nth-child(2) {
   width: 100px;
 }
@@ -127,6 +205,16 @@ div#trustedUsers table thead th:nth-child(3) {
 }
 div#trustedUsers table tbody td:nth-child(3) {
   text-align: center;
+}
+div#trustedUsers table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
+div#trustedUsers table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+div#distrustedUsers table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
 }
 div#distrustedUsers table thead th:nth-child(2) {
   width: 100px;
@@ -144,6 +232,9 @@ div#trustLists table thead th:nth-child(4) {
 div#trustLists table thead th:nth-child(5) {
   width: 180px;
 }
+div#trustLists table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
 div#trustLists table tbody td:nth-child(2) {
   text-align: right;
 }
@@ -160,11 +251,17 @@ div#trusted table thead th:nth-child(2) {
 div#trusted table thead th:nth-child(3) {
   width: 300px;
 }
+div#trusted table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
+}
 div#distrusted table thead th:nth-child(2) {
   width: 100px;
 }
 div#distrusted table thead th:nth-child(3) {
   width: 300px;
+}
+div#distrusted table tbody td:nth-child(1) {
+  text-overflow: ellipsis;
 }
 
 pre {
@@ -188,6 +285,10 @@ div.rightcomment {
 span.right {
   display: inline-block;
   float: right;
+}
+
+input.right {
+  text-align: right;
 }
 
 /* File tree CSS */

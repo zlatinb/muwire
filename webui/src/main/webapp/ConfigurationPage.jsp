@@ -56,7 +56,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<table>
 					<tr>
 						<td><%=Util._t("Download retry frequency (seconds)")%></td>
-						<td><p align="right"><input type="text" size="1" name="downloadRetryInterval" value="<%= core.getMuOptions().getDownloadRetryInterval()%>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="downloadRetryInterval" class="right" value="<%= core.getMuOptions().getDownloadRetryInterval()%>"></p></td>
 					</tr>
 					<tr>
 						<td><%=Util._t("Directory for downloaded files")%></td>
@@ -73,11 +73,11 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<table>
 					<tr>
 						<td><%=Util._t("Total upload slots (-1 means unlimited)")%></td>
-						<td><p align="right"><input type="text" size="1" name="totalUploadSlots" value="<%= core.getMuOptions().getTotalUploadSlots() %>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="totalUploadSlots" class="right" value="<%= core.getMuOptions().getTotalUploadSlots() %>"></p></td>
 					</tr>
 					<tr>
 						<td><%=Util._t("Upload slots per user (-1 means unlimited)")%></td>
-						<td><p align="right"><input type="text" size="1" name="uploadSlotsPerUser" value="<%= core.getMuOptions().getUploadSlotsPerUser() %>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="uploadSlotsPerUser" class="right" value="<%= core.getMuOptions().getUploadSlotsPerUser() %>"></p></td>
 					</tr>
 				</table>
 			</div>
@@ -111,7 +111,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					</tr>
 					<tr>
 						<td><%=Util._t("Trust list update frequency (hours)")%></td>
-						<td><p align="right"><input type="text" size="1" name="trustListInterval" value="<%= core.getMuOptions().getTrustListInterval() %>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="trustListInterval" class="right" value="<%= core.getMuOptions().getTrustListInterval() %>"></p></td>
 					</tr>
 				</table>
 			</div>
@@ -120,19 +120,19 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<table>
 					<tr>
 						<td><%=Util._t("Inbound tunnel length")%></td>
-						<td><p align="right"><input type="text" size="1" name="inbound.length" value="<%=inboundLength%>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="inbound.length" class="right" value="<%=inboundLength%>"></p></td>
 					</tr>
 					<tr>
 						<td><%=Util._t("Inbound tunnel quantity")%></td>
-						<td><p align="right"><input type="text" size="1" name="inbound.quantity" value="<%=inboundQuantity%>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="inbound.quantity" class="right" value="<%=inboundQuantity%>"></p></td>
 					</tr>
 					<tr>
 						<td><%=Util._t("Outbound tunnel length")%></td>
-						<td><p align="right"><input type="text" size="1" name="outbound.length" value="<%=outboundLength%>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="outbound.length" class="right" value="<%=outboundLength%>"></p></td>
 					</tr>
 					<tr>
 						<td><%=Util._t("Outbound tunnel quantity")%></td>
-						<td><p align="right"><input type="text" size="1" name="outbound.quantity" value="<%=outboundQuantity%>"></p></td>
+						<td><p align="right"><input type="text" size="1" name="outbound.quantity" class="right" value="<%=outboundQuantity%>"></p></td>
 					</tr>
 				</table>
 			</div>

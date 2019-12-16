@@ -22,9 +22,6 @@
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	
-            <div class="menubox">
-                <h2><%=Util._t("Downloads")%></h2>
-            </div>
 <%@include file="sidebar.jsi"%>    	
 	</aside>
 	<section class="main foldermain">
