@@ -15,6 +15,12 @@
 	String groupBy = request.getParameter("groupBy");
 	if (groupBy == null)
 		groupBy = "sender";
+	
+	String topTableId;
+	if (groupBy.equals("sender"))
+		topTableId = "topTableSender";
+	else
+		topTableId = "topTableFile";
 %>
 <html>
 	<head>
@@ -52,7 +58,7 @@
 			<h3><span id="currentSearch"><%=Util._t("Results")%></span></h3>
 									<div id="table-wrapper">
 										<div id="table-scroll">
-											<div id="topTable"></div>
+											<div id="<%=topTableId%>"></div>
 										</div>
 									</div>
 			<h3><span id="resultsFrom"></span></h3>

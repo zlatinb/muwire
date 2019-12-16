@@ -724,7 +724,7 @@ function refreshSender(searchUUID) {
 			senders = new Senders(this.responseXML)
 			var tableHtml = senders.render()
 			
-			var topTableDiv = document.getElementById("topTable")
+			var topTableDiv = document.getElementById("topTableSender")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentSender != null)
@@ -746,7 +746,7 @@ function refreshFile(searchUUID) {
 			results = new Results(this.responseXML)
 			var tableHtml = results.render()
 			
-			var topTableDiv = document.getElementById("topTable")
+			var topTableDiv = document.getElementById("topTableFile")
 			topTableDiv.innerHTML = tableHtml
 			
 			if (currentResult != null)
