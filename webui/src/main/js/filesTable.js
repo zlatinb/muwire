@@ -62,8 +62,8 @@ function refreshStatus() {
 
 var tableRevision = -1
 var filesByPath = new Map()
-var sortKey
-var sortOrder
+var sortKey = "File"
+var sortOrder = "descending"
 
 function sort(key, order) {
 	sortKey = key
