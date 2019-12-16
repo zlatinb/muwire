@@ -30,9 +30,9 @@ class Node {
 			if (this.certified == "true") 
 				certified = _t("Certified")
 			
-			var fetchLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + _t("Fetch") + "</a>"
-			var html = "<li>" + this.path
-			html += "<div>" + unshareLink + "  " + fetchLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
+			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
+			var html = "<li>" + nameLink
+			html += "<div>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
 			html += "<div id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
 			

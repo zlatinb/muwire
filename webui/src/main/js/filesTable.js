@@ -20,9 +20,9 @@ class SharedFile {
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
 		var commentDiv = "<div class='right' id='comment-" + this.path + "'></div>"
-		var fetchLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + _t("Fetch") + "</a>"
+		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
 		
-		var html = this.name + "<div class=\"right\">" + unshareLink.render() + " " + fetchLink + " " + showCommentHtml + "  " + certifyHtml + "</div>"
+		var html = nameLink + "<div class=\"right\">" + unshareLink.render() + " " + showCommentHtml + "  " + certifyHtml + "</div>"
 		html += commentDiv
 		
 		mapping.set("File", html)
