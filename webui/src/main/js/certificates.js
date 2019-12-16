@@ -45,7 +45,7 @@ class Certificate {
 			var link = "<a href='#' onclick='window.hideCertificateComment(\"" + this.divId + "\",\"" + this.base64 + "\");return false;'>" + linkText + "</a>"
 			var html = "<div id='certificate-comment-link-" + id + "'>" + link + "</div>"
 			html += "<div id='certificate-comment-" + id + "'>"
-			html += "<pre>" + this.comment + "</pre>"
+			html += "<pre class='comment'>" + this.comment + "</pre>"
 			html += "</div>"
 			return html
 		} else {
@@ -178,7 +178,7 @@ function showCertificateComment(divId, base64) {
 	linkDiv.innerHTML = link
 	
 	var commentDiv = document.getElementById("certificate-comment-" + divId + "_" + base64)
-	var commentHtml = "<pre>" + certificate.comment + "</pre>"
+	var commentHtml = "<pre class='comment'>" + certificate.comment + "</pre>"
 	commentDiv.innerHTML = commentHtml
 	
 }

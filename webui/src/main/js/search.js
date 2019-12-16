@@ -156,7 +156,7 @@ class ResultFromSender {
 			html += "</a>"
 			html += "</div>"
 			html += "<div id='comment-" + this.infoHash + "'>"
-			html += "<pre>" + this.comment + "</pre>"
+			html += "<pre class='comment'>" + this.comment + "</pre>"
 			html += "</div>"
 			return html
 		} else {
@@ -312,7 +312,7 @@ class SenderForResult {
 			html += "</a>"
 			html += "</div>"
 			html += "<div id='comment-" + this.b64 + "'>"
-			html += "<pre>" + this.comment + "</pre>"
+			html += "<pre class='comment'>" + this.comment + "</pre>"
 			html += "</div>"
 			return html
 		} else {
@@ -470,7 +470,7 @@ function showCommentBySender(infoHash) {
 	var commentText = resultsFromSender.resultsMap.get(infoHash).comment
 	
 	var commentDiv = document.getElementById("comment-" + infoHash);
-	var comment = "<pre>"+ commentText + "</pre>";
+	var comment = "<pre class='comment'>"+ commentText + "</pre>";
 	commentDiv.innerHTML = comment
 	
 	
@@ -486,7 +486,7 @@ function showCommentByFile(b64) {
 	var commentText = sendersForResult.sendersMap.get(b64).comment
 	
 	var commentDiv = document.getElementById("comment-" + b64)
-	var comment = "<pre>" + commentText + "</pre>"
+	var comment = "<pre class='comment'>" + commentText + "</pre>"
 	commentDiv.innerHTML = comment
 	
 	var hideLink = "<a href='#' onclick='window.hideComment(\"" + b64 + "\");return false;'>" + _t("Hide Comment") + "</a>";

@@ -298,7 +298,7 @@ function showComment(infoHash) {
 	
 	var commentSpan = document.getElementById("comment-"+infoHash)
 	var comment = resultsByInfoHash.get(infoHash).comment
-	commentSpan.innerHTML = "<pre>" + comment + "</pre>"
+	commentSpan.innerHTML = "<pre class='comment'>" + comment + "</pre>"
 }
 
 function hideComment(infoHash) {
