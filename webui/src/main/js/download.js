@@ -10,10 +10,18 @@ class Downloader {
 	
 	getMapping() {
 		var mapping = new Map()
+		var speed = this.speed
+		var ETA = this.ETA
+		var finished = (this.state == "FINISHED")
+		if (finished) {
+			speed = ""
+			ETA = ""
+		}
 		mapping.set("Name", this.getNameBlock())
 		mapping.set("State", this.state)
-		mapping.set("Speed", this.speed)
-		mapping.set("ETA", this.ETA)
+		
+		mapping.set("Speed", speed)
+		mapping.set("ETA", ETA)
 		mapping.set("Progress", this.progress)
 		return mapping
 	}
