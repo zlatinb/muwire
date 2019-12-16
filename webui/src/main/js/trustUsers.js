@@ -11,13 +11,19 @@ class Persona {
 	
 	getMapping(trusted) {
 		var mapping = new Map()
-		var nameHtml = this.user
+		var nameHtml = "<table><tr><td>" + this.user + "</td>"
 		if (trusted) {
+			nameHtml += "<td><p align='right'>"
 			nameHtml += this.getNeutralLink()
+			nameHtml += "  "
 			nameHtml += this.getDistrustedBlock()
+			nameHtml += "</p></td></tr></table>"
 		} else {
+			nameHtml += "<td><p align='right'>"
 			nameHtml += this.getTrustedBlock()
+			nameHtml += "  "
 			nameHtml += this.getNeutralLink()
+			nameHtml += "</p></td></tr></table>"
 		}
 		
 		mapping.set("User", nameHtml)
