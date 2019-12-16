@@ -15,11 +15,11 @@ class SearchStatus {
 			trimmedQuery = this.query.slice(0, 19) + "&hellip;"
 			
 		var queryLink = new Link(trimmedQuery, "refresh" + refreshType, [this.uuid])
-		var stopLink = new Link("X", "stopSearch", [this.uuid])
+		var stopLink = new Link("[X]", "stopSearch", [this.uuid])
 		var resultsSnippet = ""
 		if (this.results > 0)
 			resultsSnippet = " <b>(" + this.results + ")</b>"
-		var queryHtml = "<table><tr><td>" + queryLink.render() + resultsSnippet + "</td><td><p align='right'>[" + stopLink.render() + "]</p></td></tr></table>"
+		var queryHtml = queryLink.render() + resultsSnippet + "<span class='right'>" + stopLink.render() + "</span>"
 		mapping.set("Query", queryHtml)
 		
 		return mapping
