@@ -72,8 +72,8 @@ function clear(ignored) {
 	xmlhttp.send(encodeURI("action=clear"));
 }
 
-var uploadsSortKey
-var uploadsSortOrder
+var uploadsSortKey = "Name"
+var uploadsSortOrder = "descending"
 
 function sortUploads(key, order) {
 	uploadsSortKey = key

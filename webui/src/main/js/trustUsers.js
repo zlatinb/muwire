@@ -66,10 +66,10 @@ var trusted = new Map()
 var distrusted = new Map()
 var revision = -1
 
-var trustedUsersSortKey
-var trustedUsersSortOrder
-var distrustedUsersSortKey
-var distrustedUsersSortOrder
+var trustedUsersSortKey = "User"
+var trustedUsersSortOrder = "descending"
+var distrustedUsersSortKey = "User"
+var distrustedUsersSortOrder = "descending"
 
 function subscribe(host) {
 	var xmlhttp = new XMLHttpRequest()

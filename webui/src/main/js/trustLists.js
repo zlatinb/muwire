@@ -88,13 +88,13 @@ var lists = new Map()
 var revision = -1
 var currentUser = null
 
-var listsSortKey
-var listsSortOrder
+var listsSortKey = "Name"
+var listsSortOrder = "descending"
 
-var trustedSortKey
-var trustedSortOrder
-var distrustedSortKey
-var distrustedSortOrder
+var trustedSortKey = "Trusted User"
+var trustedSortOrder = "descending"
+var distrustedSortKey = "Distrusted User"
+var distrustedSortOrder = "descending"
 
 function markTrusted(user) {
 	var linkSpan = document.getElementById("trusted-link-" + user)

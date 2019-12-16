@@ -206,8 +206,8 @@ function clear(ignored) {
 	xmlhttp.send(encodeURI("action=clear"));
 }
 
-var downloadsSortKey
-var downloadsSortOrder
+var downloadsSortKey = "Name"
+var downloadsSortOrder = "descending"
 
 function sortDownloads(key, order) {
 	downloadsSortKey = key
