@@ -688,7 +688,7 @@ function refreshResultsFromSender(sender) {
 			resultsFromSender = new ResultsFromSender(this.responseXML)
 			var tableHtml = resultsFromSender.render()
 			
-			var bottomTableDiv = document.getElementById("bottomTable")
+			var bottomTableDiv = document.getElementById("bottomTableSender")
 			bottomTableDiv.innerHTML = tableHtml
 		}
 	}
@@ -706,7 +706,7 @@ function refreshSendersForResult(result) {
 			sendersForResult = new SendersForResult(this.responseXML)
 			var tableHtml = sendersForResult.render()
 			
-			var bottomTableDiv = document.getElementById("bottomTable")
+			var bottomTableDiv = document.getElementById("bottomTableFile")
 			bottomTableDiv.innerHTML = tableHtml
 		}
 	}

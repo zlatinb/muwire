@@ -16,11 +16,14 @@
 	if (groupBy == null)
 		groupBy = "sender";
 	
-	String topTableId;
-	if (groupBy.equals("sender"))
+	String topTableId, bottomTableId;
+	if (groupBy.equals("sender")) {
 		topTableId = "topTableSender";
-	else
+		bottomTableId = "bottomTableSender";
+	} else {
 		topTableId = "topTableFile";
+		bottomTableId = "bottomTableFile";
+	}
 %>
 <html>
 	<head>
@@ -64,7 +67,7 @@
 			<h3><span id="resultsFrom"></span></h3>
 													<div id="table-wrapper">
 														<div id="table-scroll">
-															<div id="bottomTable">
+															<div id="<%=bottomTableId%>">
 															</div>
 														</div>
 													</div>
