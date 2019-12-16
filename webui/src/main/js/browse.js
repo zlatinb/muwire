@@ -29,8 +29,8 @@ class Browse {
 		this.receivedResults = receivedResults
 		this.status = status
 		this.revision = revision
-		this.key = null
-		this.descending = null
+		this.key = "Name"
+		this.descending = "descending"
 	}
 	
 	setSort(key, descending) {
@@ -57,8 +57,8 @@ function initBrowse() {
 var currentHost = null
 var browsesByHost = new Map()
 var resultsByInfoHash = new Map()
-var browseKey = null
-var browseOrder = null
+var browseKey = "Host"
+var browseOrder = "descending"
 
 function close(b64) {
 	var xmlhttp = new XMLHttpRequest()
