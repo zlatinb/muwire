@@ -40,18 +40,18 @@ class Persona {
 	}
 	
 	getTrustedBlock() {
-		var link = "<a herf='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
+		var link = "<a href='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
 		var block = "<span id='trusted-link-" + this.userB64 + "'>" + link + "</span>"
 		block += "<span id='trusted-" + this.userB64 + "'></span>"
 		return block
 	}
 	
 	getNeutralLink() {
-		return "<a herf='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
+		return "<a href='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
 	}
 	
 	getDistrustedBlock() {
-		var link = "<a herf='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
+		var link = "<a href='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
 		var block = "<span id='distrusted-link-" + this.userB64 + "'>" + link + "</span>"
 		block += "<span id='distrusted-" + this.userB64 + "'></span>"
 		return block
