@@ -148,7 +148,7 @@ function refreshActive() {
 				var browse = activeBrowses[i]
 				var browseLink = browse.getBrowseLink()
 				var closeLink = browse.getCloseLink()
-				var nameHtml = "<table><tr><td>" + browseLink + "</td><td><p align='right'>" + closeLink + "</p></td></tr></table>"
+				var nameHtml = browseLink + "<span class='right'>" + closeLink + "</span>"
 				
 				var mapping = new Map()
 				mapping.set("Host", nameHtml)
