@@ -42,7 +42,7 @@ class Sender {
 		mapping.set("Sender", this.getSenderLink())
 		mapping.set("Results", this.results)
 		
-		var trustHtml = this.trust + this.getTrustLinks()
+		var trustHtml = "<table><tr><td>" + this.trust + "</td><td><p align='right'>" + this.getTrustLinks() + "</p></td></tr></table>"
 		mapping.set("Trust", trustHtml)
 		
 		mapping.set("Browse", this.getBrowseBlock())
@@ -345,7 +345,7 @@ class SenderForResult {
 	}
 	
 	getTrustBlock() {
-		return this.trust + this.getTrustLinks()
+		return "<table><tr><td>" + this.trust +"</td><td><p align='right'>" + this.getTrustLinks() + "</p></td></tr></table>"
 	}
 	
 	getTrustLinks() {
