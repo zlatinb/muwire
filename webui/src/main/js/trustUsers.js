@@ -11,19 +11,21 @@ class Persona {
 	
 	getMapping(trusted) {
 		var mapping = new Map()
-		var nameHtml = "<table><tr><td>" + this.user + "</td>"
+		var nameHtml = this.user
 		if (trusted) {
-			nameHtml += "<td><p align='right'>"
+			nameHtml += "<div class='right'>"
 			nameHtml += this.getNeutralLink()
 			nameHtml += "  "
-			nameHtml += this.getDistrustedBlock()
-			nameHtml += "</p></td></tr></table>"
+			nameHtml += this.getDistrustedLink()
+			nameHtml += "</div>"
+			nameHtml += "<div class='centercomment' id='distrusted-" + this.userB64 + "'></div>"
 		} else {
-			nameHtml += "<td><p align='right'>"
-			nameHtml += this.getTrustedBlock()
+			nameHtml += "<div class='right'>"
+			nameHtml += this.getTrustedLink()
 			nameHtml += "  "
 			nameHtml += this.getNeutralLink()
-			nameHtml += "</p></td></tr></table>"
+			nameHtml += "</div>"
+			nameHtml += "<div class='centercomment' id='trusted-" + this.userB64 + "'></div>"
 		}
 		
 		mapping.set("User", nameHtml)
@@ -39,22 +41,20 @@ class Persona {
 		return mapping
 	}
 	
-	getTrustedBlock() {
-		var link = "<a href='#' onclick='window.markTrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
-		var block = "<span id='trusted-link-" + this.userB64 + "'>" + link + "</span>"
-		block += "<span id='trusted-" + this.userB64 + "'></span>"
-		return block
+	getTrustedLink() {
+		var link = new Link(_t("Mark Trusted"), "markTrusted", [this.userB64])
+		var span = "<span id='trusted-link-" + this.userB64 + "'>" + link.render() + "</span>"
+		return span
+	}
+	
+	getDistrustedLink() {
+		var link = new Link(_t("Mark Distrusted"), "markDistrusted", [this.userB64])
+		var span = "<span id='distrusted-link-" + this.userB64 + "'>" + link.render() + "</span>"
+		return span
 	}
 	
 	getNeutralLink() {
 		return "<a href='#' onclick='window.markNeutral(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Neutral") + "</a>"
-	}
-	
-	getDistrustedBlock() {
-		var link = "<a href='#' onclick='window.markDistrusted(\"" + this.userB64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
-		var block = "<span id='distrusted-link-" + this.userB64 + "'>" + link + "</span>"
-		block += "<span id='distrusted-" + this.userB64 + "'></span>"
-		return block
 	}
 	
 	getSubscribeLink() {
