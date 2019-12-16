@@ -132,7 +132,7 @@ function updateDownloader(infoHash) {
 			html += "<td>" + "<p align='right'>" + totalPieces + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
-			html += "<td>" + _t("Done Pieces") + "</td>"
+			html += "<td>" + _t("Downloaded Pieces") + "</td>"
 			html += "<td>" + "<p align='right'>" + donePieces + "</p>" + "</td>"
 			html += "</tr>"
 			html += "</table>"
