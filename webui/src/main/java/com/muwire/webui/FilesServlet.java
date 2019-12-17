@@ -63,6 +63,7 @@ public class FilesServlet extends HttpServlet {
                         resp.sendError(403, "bad path");
                         return;
                     }
+                    element = Util.unescapeHTMLinXML(element);
                     if (current == null) {
                         current = new File(element);
                         continue;

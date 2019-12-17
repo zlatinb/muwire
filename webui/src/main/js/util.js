@@ -2,6 +2,10 @@ function parseBoolean(s) {
 	return s == "true"
 }
 
+function rfc3986EncodeURIComponent (str) {  
+    return encodeURIComponent(str).replace(/[!'()*]/g, escape);  
+}
+
 /**
 *
 *  Base64 encode / decode
