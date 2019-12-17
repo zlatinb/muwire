@@ -289,6 +289,14 @@ input.right {
   text-align: right;
 }
 
+pre.comment {
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	white-space: break-word;
+}
+
 /* File tree CSS */
 
  /* Remove default bullets */
