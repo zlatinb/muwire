@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class FilesServlet extends HttpServlet {
             sb.append("<Files>");
             sb.append("<Revision>").append(fileManager.getRevision()).append("</Revision>");
             
-            ListCallback cb = new ListCallback(sb);
+            ListCallback cb = new ListCallback();
             String encodedPath = req.getParameter("path");
             File current = null;
             if (encodedPath != null && encodedPath.length() > 0) {
@@ -72,6 +73,14 @@ public class FilesServlet extends HttpServlet {
                 }
             }
             fileManager.list(current, cb);
+            
+            Comparator<TreeEntry> comparator = (l, r) -> {
+                return Collator.getInstance().compare(l.file.getName(), r.file.getName());
+            };
+            
+            Collections.sort(cb.treeEntries, comparator);
+            
+            cb.treeEntries.forEach(e -> e.toXML(sb));
             sb.append("</Files>");
         } else if (section.equals("fileTable")) {
             
@@ -113,38 +122,16 @@ public class FilesServlet extends HttpServlet {
     }
 
     private class ListCallback implements FileListCallback<SharedFile> {
-        private final StringBuilder sb;
-        ListCallback(StringBuilder sb) {
-            this.sb = sb;
-        }
+        private final List<TreeEntry> treeEntries = new ArrayList<>();
+        
         @Override
         public void onFile(File f, SharedFile value) {
-            sharedFileToXML(value, sb, core.getCertificateManager());
+            treeEntries.add(new FileTreeEntry(f, value));
         }
         @Override
         public void onDirectory(File f) {
-            String name = f.getName().isEmpty() ? f.toString() : f.getName();
-            boolean shared = core.getMuOptions().getWatchedDirectories().contains(f.getAbsolutePath());
-            sb.append("<Directory>");
-            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
-            sb.append("<Shared>").append(shared).append("</Shared>");
-            sb.append("</Directory>");
+            treeEntries.add(new DirectoryTreeEntry(f));
         }
-    }
-    
-    private static void sharedFileToXML(SharedFile sf, StringBuilder sb, CertificateManager certificateManager) {
-        sb.append("<File>");
-        sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
-        sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
-        sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
-        sb.append("<InfoHash>").append(Base64.encode(sf.getInfoHash().getRoot())).append("</InfoHash>");
-        if (sf.getComment() != null) {
-            String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
-            sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
-        }
-        sb.append("<Certified>").append(certificateManager.hasLocalCertificate(sf.getInfoHash())).append("</Certified>");
-        // TODO: other stuff
-        sb.append("</File>");
     }
 
     @Override
@@ -237,4 +224,50 @@ public class FilesServlet extends HttpServlet {
         COMPARATORS.add("Size", BY_SIZE);
     }
  
+    private abstract class TreeEntry {
+        protected final File file;
+        TreeEntry(File file) {
+            this.file = file;
+        }
+        
+        abstract void toXML(StringBuilder sb);
+    }
+    
+    private class DirectoryTreeEntry extends TreeEntry {
+        DirectoryTreeEntry(File file) {
+            super(file);
+        }
+        
+        void toXML(StringBuilder sb) {
+            String name = file.getName().isEmpty() ? file.toString() : file.getName();
+            boolean shared = core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath());
+            sb.append("<Directory>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
+            sb.append("<Shared>").append(shared).append("</Shared>");
+            sb.append("</Directory>");
+        }
+    }
+    
+    private class FileTreeEntry extends TreeEntry {
+        private SharedFile sf;
+        FileTreeEntry(File file, SharedFile sf) {
+            super(file);
+            this.sf = sf;
+        }
+        
+        void toXML(StringBuilder sb) {
+            sb.append("<File>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
+            sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
+            sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
+            sb.append("<InfoHash>").append(Base64.encode(sf.getInfoHash().getRoot())).append("</InfoHash>");
+            if (sf.getComment() != null) {
+                String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
+                sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
+            }
+            sb.append("<Certified>").append(core.getCertificateManager().hasLocalCertificate(sf.getInfoHash())).append("</Certified>");
+            // TODO: other stuff
+            sb.append("</File>");
+        }
+    }
 }
