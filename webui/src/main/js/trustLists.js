@@ -47,7 +47,10 @@ class Persona {
 		userHtml += "<div class='centercomment' id='distrusted-" + this.userB64 + "'></div>"
 		mapping.set("Trusted User", userHtml)
 		mapping.set("Distrusted User", userHtml)
-		mapping.set("Reason", "<pre class='comment'>" + this.reason + "</pre>")
+		var reason = ""
+		if (this.reason != "")
+			reason = "<pre class='comment'>" + this.reason + "</pre>"
+		mapping.set("Reason", reason)
 		mapping.set("Your Trust", this.status)
 		
 		return mapping
