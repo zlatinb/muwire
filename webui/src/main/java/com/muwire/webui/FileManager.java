@@ -21,6 +21,7 @@ import com.muwire.core.files.FileTree;
 import com.muwire.core.files.FileTreeCallback;
 import com.muwire.core.files.FileUnsharedEvent;
 import com.muwire.core.files.UICommentEvent;
+import com.muwire.core.files.UIPersistFilesEvent;
 import com.muwire.core.util.DataUtil;
 
 import net.i2p.data.Base64;
@@ -131,6 +132,8 @@ public class FileManager {
                 core.getEventBus().publish(event);
             }
         }
+        core.getEventBus().publish(new UIPersistFilesEvent());
+        Util.pause();
     }
     
     void comment(File file, String comment) {
