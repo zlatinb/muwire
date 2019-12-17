@@ -99,10 +99,11 @@ function refreshStatus() {
 }
 
 var treeRevision = -1
-var root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
+var root
 var nodesById = new Map()
 
 function initFiles() {
+	root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
 	setInterval(refreshStatus, 3000)
 	setTimeout(refreshStatus, 1)
 	
