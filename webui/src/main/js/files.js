@@ -133,35 +133,35 @@ function expand(nodeId) {
 		if (this.readyState == 4 && this.status == 200) {
 			var xmlDoc = this.responseXML
 			var revision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
-			var fileElements = xmlDoc.getElementsByTagName("File")
-			var i
-			for (i = 0; i < fileElements.length; i++) {
-				var fileName = fileElements[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
-				var infoHash = fileElements[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
-				var size = fileElements[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
-				var comment = fileElements[i].getElementsByTagName("Comment")
-				if (comment != null && comment.length == 1)
-					comment = comment[0].childNodes[0].nodeValue
-				else
-					comment = null
-				var certified = fileElements[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
-				
-				var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
-				var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, true, revision)
-				nodesById.set(nodeId, newFileNode)
-				node.children.push(newFileNode)
-			}
 			
-			var dirElements = xmlDoc.getElementsByTagName("Directory")
-			for (i = 0; i < dirElements.length; i++) {
-				var dirElement = dirElements[i]
-				
-				var dirName = dirElement.getElementsByTagName("Name")[0].childNodes[0].nodeValue
-				var shared = parseBoolean(dirElement.getElementsByTagName("Shared")[0].childNodes[0].nodeValue)
-				var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
-				var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, shared, revision)
-				nodesById.set(nodeId, newDirNode)
-				node.children.push(newDirNode)
+			var i
+			var elements = xmlDoc.getElementsByTagName("Files")[0]
+			
+			for (i = 0; i < elements.childNodes.length; i++) {
+				var element = elements.childNodes[i]
+				if (element.nodeName == "File") {
+					var fileName = element.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+					var infoHash = element.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
+					var size = element.getElementsByTagName("Size")[0].childNodes[0].nodeValue
+					var comment = element.getElementsByTagName("Comment")
+					if (comment != null && comment.length == 1)
+						comment = comment[0].childNodes[0].nodeValue
+					else
+						comment = null
+					var certified = element.getElementsByTagName("Certified")[0].childNodes[0].nodeValue
+					
+					var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
+					var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, true, revision)
+					nodesById.set(nodeId, newFileNode)
+					node.children.push(newFileNode)
+				} else if (element.nodeName == "Directory") {
+					var dirName = element.getElementsByTagName("Name")[0].childNodes[0].nodeValue
+					var shared = parseBoolean(element.getElementsByTagName("Shared")[0].childNodes[0].nodeValue)
+					var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
+					var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, shared, revision)
+					nodesById.set(nodeId, newDirNode)
+					node.children.push(newDirNode)
+				}
 			}
 			
 			node.updateDiv()
