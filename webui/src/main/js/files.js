@@ -32,8 +32,8 @@ class Node {
 			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
 			var html = "<li>" + nameLink
-			html += "<div>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
-			html += "<div id='comment-" + this.nodeId + "'></div>"
+			html += "<div class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
+			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
 			
 			div.innerHTML = html
@@ -41,13 +41,13 @@ class Node {
 			if (this.children.length == 0) {
 				
 				var link = "<a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + this.path + "</a>"
-				var commentDiv = "<div id='comment-" + this.nodeId + "'></div>"
-				var html = "<li>" + link + "<span>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv + "</li>"
+				var commentDiv = "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
+				var html = "<li>" + link + "<span class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv + "</li>"
 				div.innerHTML = html				
 			} else {
 				var link = "<a class='caret caret-down' href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>"
-				var commentDiv = "<div id='comment-" + this.nodeId + "'></div>"
-				var l = "<li>" + link + unshareLink + "  " + commentLink + "  " + certifyLink + commentDiv
+				var commentDiv = "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
+				var l = "<li>" + link + "<span class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv
 				
 				l += "<ul>"
 				var i
