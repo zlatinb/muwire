@@ -39,14 +39,23 @@ class Table {
 		this.rows = []
 		this.key = key
 		this.descending = descending
+		this.cssClass = null
 	}
 	
 	addRow(mapping) {
 		this.rows.push(mapping)
 	}
 	
+	setCSSClass(cssClass) {
+		this.cssClass = cssClass
+	}
+	
 	render() {
-		var html = "<table><thead><tr>"
+		var html = "<table>"
+		if (this.cssClass != null) {
+			html = "<table class='" + this.cssClass + "'>"
+		}
+		html += "<thead><tr>"
 		var i
 		for (i = 0;i < this.columns.length; i++) {
 			if (this.columns[i].key == this.key)

@@ -98,6 +98,7 @@ class CertificateResponse {
 		else if (params.order == "ascending")
 			newOrder = "descending"
 		var table = new Table(["Issuer", "Name", "Timestamp", "Import"], "sort", params.key, newOrder, this.divId)
+		table.setCSSClass("certificates")
 		
 		var i
 		for (i = 0; i < this.certificates.length; i++) {
