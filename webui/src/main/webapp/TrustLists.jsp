@@ -4,7 +4,7 @@
 
 <% 
 
-String pagetitle=Util._t("Trust Lists"); 
+String pagetitle=Util._t("Subscriptions"); 
 
 %>
 
