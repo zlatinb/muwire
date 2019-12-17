@@ -29,7 +29,7 @@ class Persona {
 		}
 		
 		mapping.set("User", nameHtml)
-		mapping.set("Reason", this.reason)
+		mapping.set("Reason", "<pre class='comment'>" + this.reason + "</pre>")
 		
 		if (trusted) {
 			var subscribeHtml = _t("Subscribed")
