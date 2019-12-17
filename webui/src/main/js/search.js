@@ -43,6 +43,8 @@ class Sender {
 		mapping.set("Results", this.results)
 		
 		var trustHtml = this.trust + "<span class='right'>" + this.getTrustLinks() + "</span>"
+		trustHtml += "<div class='centercomment' id='trusted-" + this.b64 + "'></div>"
+		trustHtml += "<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 		mapping.set("Trust", trustHtml)
 		
 		mapping.set("Browse", this.getBrowseBlock())
@@ -66,8 +68,7 @@ class Sender {
 	getTrustLink() {
 		return "<span id='trusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
-				this.b64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span>"
 	}
 	
 	getNeutralLink() {
@@ -77,8 +78,7 @@ class Sender {
 	getDistrustLink() {
 		return "<span id='distrusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
-				this.b64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span>"
 	}
 	
 	getBrowseBlock() {
@@ -345,7 +345,9 @@ class SenderForResult {
 	}
 	
 	getTrustBlock() {
-		return this.trust +"<span class='right'>" + this.getTrustLinks() + "</span>"
+		return this.trust +"<span class='right'>" + this.getTrustLinks() + "</span>" +
+			"<div class='centercomment' id='trusted-" + this.b64 + "'></div>" +
+			"<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 	}
 	
 	getTrustLinks() {
@@ -360,8 +362,7 @@ class SenderForResult {
 	getTrustLink() {
 		return "<span id='trusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markTrusted(\"" + 
-				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span><span id='trusted-" + 
-				this.b64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Trusted") + "</a></span>"
 	}
 	
 	getNeutralLink() {
@@ -371,8 +372,7 @@ class SenderForResult {
 	getDistrustLink() {
 		return "<span id='distrusted-link-" + this.b64 + "'>" +
 				"<a href='#' onclick='window.markDistrusted(\"" + 
-				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span><span id='distrusted-" + 
-				this.b64 + "'></span>"
+				this.b64 + "\"); return false;'>" + _t("Mark Distrusted") + "</a></span>"
 	}
 }
 
