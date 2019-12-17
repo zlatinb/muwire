@@ -15,7 +15,7 @@ class TrustList {
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.userB64])
 		var refreshLink = new Link(_t("Refresh"), "forceUpdate", [this.userB64])
 		
-		var nameHtml = "<table><tr><td>" + userLink.render() + "</td><td><p align='right'>" + unsubscribeLink.render() + "  " + refreshLink.render() + "</p></td></tr></table>"
+		var nameHtml = userLink.render() + "<span class='right'>" + unsubscribeLink.render() + "  " + refreshLink.render() + "</span>"
 		
 		mapping.set("Name", nameHtml)
 		mapping.set("Status", this.status)
