@@ -60,13 +60,13 @@ public class MuWireServlet extends HttpServlet {
                                          "</head><body>\n" +
                                          "<header class=\"titlebar\">" +
                                          "<div class=\"title\">" +
-                                         "<img src=\"images/muwire.png\" alt=\"\">" +
+                                         "<img src=\"images/muwire.png\" alt=\"\"><br>" +
                                          _t("Welcome to MuWire") +
                                          "</div>" +
                                          "<div class=\"subtitle\"><br><br><br><br></div>" +
                                          "<div class=\"pagetitle\">" +
                                          _t("MuWire is initializing, please wait") +
-                                         "</div>" +
+                                         "&hellip;</div>" +
                                          "</header>" +
                                          "<noscript><center><b>" +
                                          _t("MuWire requires JavaScript. Please enable JavaScript in your browser.") +

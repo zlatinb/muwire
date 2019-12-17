@@ -39,7 +39,7 @@ div#topTableSender table thead th:nth-child(3) {
   width: 100px;
 }
 div#topTableSender table thead th:nth-child(4) {
-  width: 300px;
+  width: 340px;
 }
 div#topTableSender table tbody td:nth-child(1) {
   text-overflow: ellipsis;
@@ -93,7 +93,7 @@ div#bottomTableFile table thead th:nth-child(2) {
   width: 100px;
 }
 div#bottomTableFile table thead th:nth-child(3) {
-  width: 300px;
+  width: 340px;
 }
 div#bottomTableFile table tbody td:nth-child(1) {
   text-overflow: ellipsis;
@@ -198,7 +198,7 @@ div#uploads table tbody td:nth-child(5) {
 }
 
 div#trustedUsers table thead th:nth-child(2) {
-  width: 100px;
+  width: 200px;
 }
 div#trustedUsers table thead th:nth-child(3) {
   width: 100px;
@@ -217,7 +217,7 @@ div#distrustedUsers table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#distrustedUsers table thead th:nth-child(2) {
-  width: 100px;
+  width: 300px;
 }
 
 div#trustLists table thead th:nth-child(2) {
@@ -246,27 +246,58 @@ div#trustLists table tbody td:nth-child(4) {
 }
 
 div#trusted table thead th:nth-child(2) {
-  width: 100px;
+  width: 200px;
 }
 div#trusted table thead th:nth-child(3) {
-  width: 300px;
+  width: 100px;
 }
 div#trusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
+div#trusted table tbody td:nth-child(3) {
+  text-align: center;
+}
 div#distrusted table thead th:nth-child(2) {
-  width: 100px;
+  width: 200px;
 }
 div#distrusted table thead th:nth-child(3) {
-  width: 300px;
+  width: 100px;
 }
 div#distrusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
+div#distrusted table tbody td:nth-child(3) {
+  text-align: center;
+}
+
+table.certificates * {
+  background: #a5c7e7 !important;
+}
+table.certificates thead th:nth-child(2) {
+  width: 200px !important;
+}
+table.certificates thead th:nth-child(3) {
+  width: 180px !important;
+}
+table.certificates thead th:nth-child(4) {
+  width: 80px !important;
+}
+table.certificates tbody td:nth-child(1) {
+  text-overflow: ellipsis !important;
+}
+table.certificates tbody td:nth-child(2) {
+  text-overflow: ellipsis !important;
+}
+table.certificates tbody td:nth-child(3) {
+  text-overflow: ellipsis !important;
+}
+table.certificates tbody td:nth-child(4) {
+  text-align: center !important;
+}
 
 pre {
   background: #a7d5d5;
-  padding: 5px;
+  padding: 8px;
   margin: 10px 20px 10px 5px;
 }
 
@@ -275,9 +306,17 @@ div.right {
   float: right;
 }
 
+div.right a {
+  color: #1f3b57 !important;
+}
+
 div.centercomment {
 	display: block;
 	text-align: center;
+}
+
+div.centercomment textarea {
+    background: #bcd1e5 !important;
 }
 
 span.right {
@@ -290,6 +329,9 @@ input.right {
 }
 
 pre.comment {
+	background: #bcd1e5 !important;
+	max-height: 80px;
+	overflow: auto;
 	white-space: pre-wrap;
 	white-space: -moz-pre-wrap;
 	white-space: -pre-wrap;

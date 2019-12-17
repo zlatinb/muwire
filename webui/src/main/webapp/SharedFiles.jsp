@@ -36,7 +36,10 @@ if (viewAs == null)
 <% if (viewAs.equals("table")) { %>
 				<input type="hidden" name="viewAs" value="table">
 <% } %>
-				<input type="submit" value="<%=Util._t("Share")%>">
+				<div class="menuitem shared">
+				  <div class="menu-icon"></div>
+				  <input type="submit" value="<%=Util._t("Share")%>">
+				</div>
 			</form>
 <% if (viewAs.equals("tree")) { %>
 			<a class="menuitem" href="SharedFiles?viewAs=table"><%=Util._t("View As Table")%></a>

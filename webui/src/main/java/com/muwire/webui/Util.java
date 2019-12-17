@@ -57,8 +57,6 @@ public class Util {
         _x("Host"),
         _x("Import"),
         _x("Imported"),
-        _x("Inbound tunnel length"),
-        _x("Inbound tunnel quantity"),
         _x("Known Sources"),
         _x("Last Updated"),
         _x("Mark Distrusted"),

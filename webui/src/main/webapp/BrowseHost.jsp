@@ -27,7 +27,10 @@ String pagetitle=Util._t("Browse Host");
 			<form action="/MuWire/Browse" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="browse">
-				<input type="submit" value=<%=Util._t("Browse")%>>
+				<div class="menuitem shared">
+				  <div class="menu-icon"></div>
+				  <input type="submit" value=<%=Util._t("Browse")%>>
+				</div>
 			</form>
 		</div>
 		<div class="menubox-divider"></div>
