@@ -338,7 +338,7 @@ class SenderForResult {
 		if (this.browse != "true")
 			return ""
 		if (this.browsing == "true")
-			return _t("Browsing")
+			return "<a href='/MuWire/BrowseHost'>" + _t("Browsing") + "</a>"
 		var link = "<a href='#' onclick='window.browse(\"" + this.b64 + "\");return false;'>" + _t("Browse") + "</a>"
 		var block = "<span id='browse-link-" + this.b64 + "'>" + link + "</span>"
 		return block
