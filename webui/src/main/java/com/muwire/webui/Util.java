@@ -100,6 +100,7 @@ public class Util {
         _x("Upload"),
         _x("Uploads"),
         _x("User"),
+        _x("View 1 Certificate"),
         _x("View {0} Certificates"),
         _x("Your Trust"),
         _x("{0}% of piece")

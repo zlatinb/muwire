@@ -326,8 +326,12 @@ class SenderForResult {
 	getCertificatesBlock() {
 		if (this.certificates == "0")
 			return ""
+		var linkText
+		if (this.certificates == "1")
+			linkText = _t("View 1 Certificate")
+		else
+			linkText =  _t("View {0} Certificates", this.certificates)
 		var id = this.b64 + "_" + currentResult
-		var linkText =  _t("View {0} Certificates", this.certificates)
 		var link = "<a href='#' onclick='window.viewCertificatesByFile(\"" + this.b64 + "\",\"" + this.certificates + "\");return false;')>" + linkText + "</a>"
 		var linkBlock = "<div id='certificates-link-" + id + "'>" + link + "</div>"
 		var certBlock = "<div id='certificates-" + id + "'></div>"
@@ -636,7 +640,11 @@ function hideCertificatesByFile(fileSenderB64, count) {
 	fetchSpan.innerHTML = ""
 	
 	var linkSpan = document.getElementById("certificates-link-" + id)
-	var linkText = _t("View {0} Certificates", count)
+	var linkText
+	if (count == "1")
+		linkText = _t("View 1 Certificate")
+	else
+		linkText = _t("View {0} Certificates", count)
 	var showLink = "<a href='#' onclick='window.viewCertificatesByFile(\"" + fileSenderB64 + "\",\"" + count + "\");return false;'>" + linkText + "</a>"
 	linkSpan.innerHTML = showLink
 }

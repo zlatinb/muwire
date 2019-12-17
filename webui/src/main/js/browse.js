@@ -13,7 +13,11 @@ class Result {
 		if (this.certificates == "0")
 			return ""
 		var id = this.hostB64 + "_" + this.infoHash
-		var linkText = _t("View {0} Certificates", this.certificates)
+		var linkText
+		if (this.certificates == "1")
+			linkText = _t("View 1 Certificate")
+		else
+			linkText = _t("View {0} Certificates", this.certificates)
 		var link = "<a href='#' onclick='window.showCertificates(\"" + this.hostB64 + "\",\"" + this.infoHash + "\");return false;'>" + linkText + "</a>"
 		var linkBlock = "<div id='certificates-link-" + id + "'>" + link + "</div>"
 		linkBlock += "<div id='certificates-" + id + "'></div>"
@@ -103,7 +107,11 @@ function hideCertificates(hostB64, infoHash) {
 	certSpan.innerHTML = ""
 	
 	var result = resultsByInfoHash.get(infoHash)
-	var showLinkText = _t("View {0} Certificates", result.certificates)
+	var showLinkText
+	if (result.certificates == "1")
+		showLinkText = _t("View 1 Certificate")
+	else
+		showLinkText = _t("View {0} Certificates", result.certificates)
 	var showLink = "<a href='#' onclick='window.showCertificates(\"" + hostB64 + "\",\"" + infoHash + "\");return false;'>" + showLinkText + "</a>"
 	
 	var linkSpan = document.getElementById("certificates-link-" + id)
