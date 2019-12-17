@@ -294,7 +294,7 @@ pre.comment {
 	white-space: -moz-pre-wrap;
 	white-space: -pre-wrap;
 	white-space: -o-pre-wrap;
-	white-space: break-word;
+	word-wrap: break-word;
 }
 
 /* File tree CSS */
