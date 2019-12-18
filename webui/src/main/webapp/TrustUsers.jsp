@@ -4,7 +4,7 @@
 
 <% 
 
-String pagetitle=Util._t("Trust Users"); 
+String pagetitle=Util._t("Users"); 
 
 %>
 
@@ -22,12 +22,14 @@ String pagetitle=Util._t("Trust Users");
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
+	    	<h3><%=Util._t("Trusted Users")%></h3>
 		    <div id="table-wrapper">
 				<div id="table-scroll">
 					<div id="trustedUsers"></div>
 				</div>
 			</div>
 			<hr/>
+			<h3><%=Util._t("Distrusted Users")%></h3>
 			<div id="refresh-link"></div>
 			<div id="table-wrapper">
 				<div id="table-scroll">
