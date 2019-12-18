@@ -64,10 +64,12 @@ public class Util {
         _x("Mark Neutral"),
         _x("Mark Trusted"),
         _x("Name"),
+        // verb
         _x("Pause"),
         _x("Piece Size"),
         _x("Progress"),
         _x("Query"),
+        // noun
         _x("Reason"),
         _x("Refresh"),
         _x("Remote Pieces"),
