@@ -1,0 +1,731 @@
+# I2P
+# Copyright (C) 2019 The MuWire Project
+# This file is distributed under the same license as the MuWire package.
+# To contribute translations, see https://github.com/zlatinb/muwire/wiki/Translate
+# foo <foo@bar>, 2019.
+# 
+# Translators:
+# erinm, 2019
+# Emma Peel, 2019
+# Khairul Agasta <khairuldroids@gmail.com>, 2019
+# Astryd Viandila Dahlan, 2019
+# IDRASSI Mounir <mounir.idrassi@idrix.fr>, 2019
+# Nurahmat Agustianto <sh.indonesia@gmail.com>, 2019
+# Andre Julian <andrejulian30@gmail.com>, 2019
+# Robert Dafis <robertdafis@gmail.com>, 2019
+# Muhammad Yusuf <myusuffin@gmail.com>, 2019
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P MuWire\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-17 17:04+0000\n"
+"Last-Translator: Muhammad Yusuf <myusuffin@gmail.com>, 2019\n"
+"Language-Team: Indonesian (https://www.transifex.com/otf/teams/12694/id/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:131
+msgid "Browse Host"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:158
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:166
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:162
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:186
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:140
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:165
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:153
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:153
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:162
+#: src/main/java/com/muwire/webui/MuWireServlet.java:64
+msgid "Welcome to MuWire"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:164
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:172
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:168
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:192
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:146
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:158
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:171
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:159
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:159
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:168
+#: src/main/java/com/muwire/webui/MuWireServlet.java:72
+msgid "MuWire requires JavaScript. Please enable JavaScript in your browser."
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:167
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:184
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:196
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:192
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:230
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:207
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:177
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:177
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:192
+#: src/main/java/com/muwire/webui/Util.java:34
+msgid "Browse"
+msgstr "Ramban"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:170
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:182
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:178
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:216
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:193
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
+#: src/main/java/com/muwire/webui/Util.java:89
+msgid "Status"
+msgstr "Status"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:172
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:184
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:180
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:218
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:195
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:165
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:165
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:180
+msgid "Connections"
+msgstr "Koneksi"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:174
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:186
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:182
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:220
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:197
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:167
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:167
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:182
+msgid "Pages"
+msgstr "Halaman"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:176
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:188
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:233
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:141
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:184
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:222
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:199
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:169
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:169
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:184
+msgid "Downloads"
+msgstr "Downloads"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:178
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:190
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:186
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:224
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:201
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:171
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Uploads"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:180
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:176
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:178
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:192
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:223
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:172
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:174
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:188
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:196
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:198
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:226
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:203
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:173
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:173
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
+#: src/main/java/com/muwire/webui/Util.java:79
+msgid "Search"
+msgstr "Cari"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:182
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:194
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:190
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:228
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:128
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:205
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:228
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
+#: src/main/java/com/muwire/webui/Util.java:82
+msgid "Shared Files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:186
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:198
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:267
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:194
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:232
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:209
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
+#: src/main/java/com/muwire/webui/Util.java:94
+msgid "Trust"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:188
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:200
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:196
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
+msgid "Users"
+msgstr "Pengguna"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:190
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:202
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:198
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:236
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:213
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:128
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:183
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:183
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:198
+msgid "Subscriptions"
+msgstr "Subskripsi"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:192
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:140
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:204
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:200
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:238
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:215
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:185
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:185
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:200
+msgid "Configuration"
+msgstr "Konfigurasi"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:194
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:206
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:202
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:240
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:217
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:187
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:187
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:202
+msgid "Settings"
+msgstr "Pengaturan"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:196
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:208
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:204
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:242
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:219
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:189
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:189
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:204
+msgid "Help"
+msgstr "Bantuan"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:198
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:210
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:206
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:244
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:221
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:191
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:191
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:206
+msgid "User Guide"
+msgstr "Panduan Pengguna"
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:200
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:212
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:208
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:246
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:223
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:193
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:193
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:208
+msgid "FAQ"
+msgstr "FAQ "
+
+#: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:202
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:214
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:210
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:248
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:225
+#: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:195
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:195
+#: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:210
+msgid "About"
+msgstr "Tentang"
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:225
+msgid "Search in comments"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:229
+msgid "Allow browsing"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:235
+msgid "Download retry frequency (seconds)"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:239
+msgid "Directory for downloaded files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:243
+msgid "Directory for incomplete files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
+#: src/main/java/com/muwire/webui/Util.java:98
+msgid "Upload"
+msgstr "Unggah"
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:249
+msgid "Total upload slots (-1 means unlimited)"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:253
+msgid "Upload slots per user (-1 means unlimited)"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
+#: src/main/java/com/muwire/webui/Util.java:83
+msgid "Sharing"
+msgstr "Berbagi"
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:259
+msgid "Share downloaded files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:263
+msgid "Share hidden files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:269
+msgid "Allow only trusted connections"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:273
+msgid "Search extra hop"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:277
+msgid "Allow others to view my trust list"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:281
+msgid "Trust list update frequency (hours)"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:285
+msgid "I2P Tunnels - Changes Require Plugin Restart"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:287
+msgid "Inbound tunnel length"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:291
+msgid "Inbound tunnel quantity"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:295
+msgid "Outbound tunnel length"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:299
+msgid "Outbound tunnel quantity"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
+#: src/main/java/com/muwire/webui/Util.java:78
+msgid "Save"
+msgstr "Simpan"
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:213
+msgid "Download Details"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:215
+msgid "Click on a download to view details"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:141
+msgid "Home"
+msgstr "Beranda "
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:203
+msgid "Active Searches By Sender"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:205
+msgid "Group By File"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:209
+msgid "Active Searches By File"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:211
+msgid "Group By Sender"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
+#: src/main/java/com/muwire/webui/Util.java:73
+msgid "Results"
+msgstr "Hasil"
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:122
+msgid "Initial Setup"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:166
+msgid "Welcome to MuWire!  Please select a nickname and download locations"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:168
+msgid "These directories will be created if they do not already exist"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:170
+msgid "Nickname"
+msgstr "Nama panggilan"
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:172
+msgid "Directory for saving downloaded files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:176
+msgid "Directory for storing incomplete files"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
+#: src/main/java/com/muwire/webui/Util.java:90
+msgid "Submit"
+msgstr "Kirim"
+
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:174
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:180
+msgid "Share"
+msgstr "Share "
+
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:184
+msgid "View As Table"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:188
+msgid "View As Tree"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
+msgid "Trust Users"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:89
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:96
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:98
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
+msgid "Bad input"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:96
+#, java-format
+msgid "{0} does not exist"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:98
+#, java-format
+msgid "{0} is not a directory"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
+#, java-format
+msgid "{0} not writeable"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/DownloadServlet.java:221
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+#: src/main/java/com/muwire/webui/MuWireServlet.java:57
+msgid "MuWire"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/MuWireServlet.java:68
+msgid "MuWire is initializing, please wait"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/TrustServlet.java:285
+msgid "Never"
+msgstr "Tidak pernah"
+
+#: src/main/java/com/muwire/webui/UploadServlet.java:92
+#: src/main/java/com/muwire/webui/Util.java:104
+#, java-format
+msgid "{0}% of piece"
+msgstr ""
+
+#. alphabetical please
+#: src/main/java/com/muwire/webui/Util.java:32
+msgid "Actions"
+msgstr "Tindakan"
+
+#: src/main/java/com/muwire/webui/Util.java:33
+msgid "Active Sources"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:35
+msgid "Browsing"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:36
+msgid "Cancel"
+msgstr "Batal"
+
+#: src/main/java/com/muwire/webui/Util.java:37
+msgid "Certificates"
+msgstr "Sertifikat"
+
+#: src/main/java/com/muwire/webui/Util.java:38
+msgid "Certified"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:39
+msgid "Certify"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:40
+msgid "Clear Finished"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:41
+msgid "Comment"
+msgstr "Komentar"
+
+#: src/main/java/com/muwire/webui/Util.java:42
+#, java-format
+msgid "Details for {0}"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:43
+msgid "Distrusted User"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:44
+msgid "Down"
+msgstr "Bawah"
+
+#: src/main/java/com/muwire/webui/Util.java:45
+msgid "Download"
+msgstr "Unduh"
+
+#: src/main/java/com/muwire/webui/Util.java:46
+msgid "Download Location"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:47
+msgid "Downloaded Pieces"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:48
+msgid "Downloader"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:49
+msgid "Downloading"
+msgstr "Mengunduh"
+
+#: src/main/java/com/muwire/webui/Util.java:50
+msgid "Enter Reason (Optional)"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:51
+msgid "ETA"
+msgstr "Waktu selesai"
+
+#: src/main/java/com/muwire/webui/Util.java:52
+msgid "Fetching Certificates"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:53
+msgid "File"
+msgstr "File"
+
+#: src/main/java/com/muwire/webui/Util.java:54
+msgid "Hashing"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:55
+msgid "Hide Certificates"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:56
+msgid "Hide Comment"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:57
+msgid "Host"
+msgstr "Host"
+
+#: src/main/java/com/muwire/webui/Util.java:58
+msgid "Import"
+msgstr "Impor"
+
+#: src/main/java/com/muwire/webui/Util.java:59
+msgid "Imported"
+msgstr "Sudah diimpor"
+
+#: src/main/java/com/muwire/webui/Util.java:60
+msgid "Known Sources"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:61
+msgid "Last Updated"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:62
+msgid "Mark Distrusted"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:63
+msgid "Mark Neutral"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:64
+msgid "Mark Trusted"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:65
+msgid "Name"
+msgstr "Nama"
+
+#: src/main/java/com/muwire/webui/Util.java:66
+msgid "Pause"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:67
+msgid "Piece Size"
+msgstr "Besarnya Bagian"
+
+#: src/main/java/com/muwire/webui/Util.java:68
+msgid "Progress"
+msgstr "Progress "
+
+#: src/main/java/com/muwire/webui/Util.java:69
+msgid "Query"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:70
+msgid "Reason"
+msgstr "Alasan"
+
+#: src/main/java/com/muwire/webui/Util.java:71
+msgid "Refresh"
+msgstr "Segarkan"
+
+#: src/main/java/com/muwire/webui/Util.java:72
+msgid "Remote Pieces"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:74
+#, java-format
+msgid "Results for {0}"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:75
+#, java-format
+msgid "Results from {0}"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:76
+msgid "Resume"
+msgstr "Lanjutkan"
+
+#: src/main/java/com/muwire/webui/Util.java:77
+msgid "Retry"
+msgstr "Coba Lagi"
+
+#: src/main/java/com/muwire/webui/Util.java:80
+msgid "Sender"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:81
+msgid "Senders"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:84
+msgid "Show Comment"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:85
+msgid "Size"
+msgstr "Ukuran"
+
+#: src/main/java/com/muwire/webui/Util.java:86
+msgid "Sources"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:87
+msgid "Speed"
+msgstr "Kecepatan"
+
+#: src/main/java/com/muwire/webui/Util.java:88
+msgid "State"
+msgstr "Negara"
+
+#: src/main/java/com/muwire/webui/Util.java:91
+msgid "Subscribe"
+msgstr "Langganan"
+
+#: src/main/java/com/muwire/webui/Util.java:92
+msgid "Subscribed"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:93
+msgid "Total Pieces"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:95
+msgid "Trusted User"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:96
+msgid "Unshare"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:97
+msgid "Unsubscribe"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:100
+msgid "User"
+msgstr "Pengguna"
+
+#: src/main/java/com/muwire/webui/Util.java:101
+msgid "View 1 Certificate"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:102
+#, java-format
+msgid "View {0} Certificates"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:103
+msgid "Your Trust"
+msgstr ""
