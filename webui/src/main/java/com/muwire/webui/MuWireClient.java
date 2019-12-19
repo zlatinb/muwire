@@ -110,6 +110,7 @@ public class MuWireClient {
         settings.setNickname(nickname);
         settings.setDownloadLocation(downloadLocation);
         settings.setIncompleteLocation(incompleteLocation);
+        settings.setPlugin(true);
         
         PrintWriter pw = new PrintWriter(mwProps, "UTF-8");
         settings.write(pw);

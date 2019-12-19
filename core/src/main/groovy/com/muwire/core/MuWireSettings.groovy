@@ -41,6 +41,7 @@ class MuWireSettings {
     int meshExpiration
     int speedSmoothSeconds
     boolean embeddedRouter
+    boolean plugin
     int inBw, outBw
     Set<String> watchedKeywords
     Set<String> watchedRegexes
@@ -76,6 +77,7 @@ class MuWireSettings {
         hostRejectInterval = Integer.valueOf(props.getProperty("hostRejectInterval", "1"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
+        plugin = Boolean.valueOf(props.getProperty("plugin","false"))
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
@@ -130,6 +132,7 @@ class MuWireSettings {
         props.setProperty("hostRejectInterval", String.valueOf(hostRejectInterval))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
         props.setProperty("embeddedRouter", String.valueOf(embeddedRouter))
+        props.setProperty("plugin", String.valueOf(plugin))
         props.setProperty("inBw", String.valueOf(inBw))
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
