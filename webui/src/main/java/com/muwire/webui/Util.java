@@ -45,6 +45,7 @@ public class Util {
         _x("Down"),
         _x("Download"),
         _x("Download Location"),
+        _x("Downloaded"),
         _x("Downloaded Pieces"),
         _x("Downloader"),
         _x("Downloading"),
