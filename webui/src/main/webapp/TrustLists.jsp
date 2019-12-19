@@ -31,7 +31,6 @@ String pagetitle=Util._t("Subscriptions");
 				<center><div id="currentList"></div></center>
 						<div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div>
 						<div id="table-wrapper"><div id="table-scroll"><div id="distrusted"></div></div></div>
-			<hr/>
 	    </section>
 	</body>
 </html>

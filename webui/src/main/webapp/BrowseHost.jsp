@@ -48,7 +48,6 @@ String pagetitle=Util._t("Browse Host");
 					<div id="resultsTable"></div>
 				</div>
 			</div>
-		<hr/>
 	    </section>
 	</body>
 </html>

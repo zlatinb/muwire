@@ -204,6 +204,7 @@ aside {
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     float: left;
+    padding-bottom: 20px;
     position: relative;
     width: 240px;
     z-index: 8;

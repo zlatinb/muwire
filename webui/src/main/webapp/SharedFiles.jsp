@@ -65,7 +65,6 @@ if (viewAs == null)
 				</div>
 			</div>
 <% } %>
-		<hr/>
 	    </section>
 	</body>
 </html>

@@ -36,7 +36,6 @@ String pagetitle=Util._t("Users");
 					<div id="distrustedUsers"></div>
 				</div>
 			</div>
-		<hr/>
 	    </section>
 	</body>
 </html>

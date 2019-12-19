@@ -48,6 +48,7 @@ div#topTableSender table tbody td:nth-child(2) {
   text-align: center;
 }
 div#topTableSender table tbody td:nth-child(3) {
+  padding-right: 40px;
   text-align: right;
 }
 
@@ -55,12 +56,13 @@ div#bottomTableSender table thead th:nth-child(2) {
   width: 100px;
 }
 div#bottomTableSender table thead th:nth-child(3) {
-  width: 100px;
+  width: 130px;
 }
 div#bottomTableSender table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#bottomTableSender table tbody td:nth-child(2) {
+  padding-right: 25px;
   text-align: right;
 }
 div#bottomTableSender table tbody td:nth-child(3) {
@@ -74,15 +76,17 @@ div#topTableFile table thead th:nth-child(3) {
   width: 100px;
 }
 div#topTableFile table thead th:nth-child(4) {
-  width: 100px;
+  width: 130px;
 }
 div#topTableFile table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#topTableFile table tbody td:nth-child(2) {
+  padding-right: 25px;
   text-align: right;
 }
 div#topTableFile table tbody td:nth-child(3) {
+  padding-right: 40px;
   text-align: right;
 }
 div#topTableFile table tbody td:nth-child(4) {
@@ -115,6 +119,7 @@ div#activeBrowses table tbody td:nth-child(2) {
   text-align: center;
 }
 div#activeBrowses table tbody td:nth-child(3) {
+  padding-right: 40px;
   text-align: right;
 }
 
@@ -125,6 +130,7 @@ div#filesTable table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#filesTable table tbody td:nth-child(2) {
+  padding-right: 25px;
   text-align: right;
 }
 
@@ -138,6 +144,7 @@ div#resultsTable table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#resultsTable table tbody td:nth-child(2) {
+  padding-right: 25px;
   text-align: right;
 }
 div#resultsTable table tbody td:nth-child(3) {
@@ -148,7 +155,7 @@ div#downloads table thead th:nth-child(2) {
   width: 120px;
 }
 div#downloads table thead th:nth-child(3) {
-  width: 80px;
+  width: 100px;
 }
 div#downloads table thead th:nth-child(4) {
   width: 80px;
@@ -163,13 +170,29 @@ div#downloads table tbody td:nth-child(2) {
   text-align: center;
 }
 div#downloads table tbody td:nth-child(3) {
+  padding-right: 40px;
   text-align: right;
 }
 div#downloads table tbody td:nth-child(4) {
+  padding-right: 25px;
   text-align: right;
 }
 div#downloads table tbody td:nth-child(5) {
+  padding-right: 20px;
   text-align: right;
+}
+
+div#downloadDetails table * {
+	background: #bcd1e5 !important;
+}
+div#downloadDetails table {
+	width: auto;
+}
+div#downloadDetails table td {
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 div#uploads table thead th:nth-child(2) {
@@ -191,9 +214,11 @@ div#uploads table tbody td:nth-child(3) {
   text-overflow: ellipsis;
 }
 div#uploads table tbody td:nth-child(4) {
+  padding-right: 40px;
   text-align: right;
 }
 div#uploads table tbody td:nth-child(5) {
+  padding-right: 40px;
   text-align: right;
 }
 
@@ -236,9 +261,11 @@ div#trustLists table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#trustLists table tbody td:nth-child(2) {
+  padding-right: 40px;
   text-align: right;
 }
 div#trustLists table tbody td:nth-child(3) {
+  padding-right: 40px;
   text-align: right;
 }
 div#trustLists table tbody td:nth-child(4) {
