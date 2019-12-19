@@ -1,10 +1,10 @@
 class Result {
-	constructor(name, size, comment, infoHash, downloading, certificates, hostB64) {
+	constructor(name, size, comment, infoHash, resultStatus, certificates, hostB64) {
 		this.name = name
 		this.size = size
 		this.infoHash = infoHash
 		this.comment = comment
-		this.downloading = downloading
+		this.resultStatus = resultStatus
 		this.certificates = certificates
 		this.hostB64 = hostB64
 	}
@@ -204,7 +204,7 @@ function showResults(host, key, descending) {
 			for (i = 0; i < results.length; i++) {
 				var name = results[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
 				var size = results[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
-				var downloading = results[i].getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+				var resultStatus = results[i].getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
 				var infoHash = results[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 				var comment = results[i].getElementsByTagName("Comment")
 				if (comment != null && comment.length == 1)
@@ -213,7 +213,7 @@ function showResults(host, key, descending) {
 					comment = null
 				var certificates = results[i].getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 					
-				var result = new Result(name, size, comment, infoHash, downloading, certificates, browse.hostB64)
+				var result = new Result(name, size, comment, infoHash, resultStatus, certificates, browse.hostB64)
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
@@ -236,8 +236,10 @@ function showResults(host, key, descending) {
 				var sizeCell = result.size
 				var downloadCell = null
 				
-				if (result.downloading == "true")
+				if (result.resultStatus == "DOWNLOADING")
 					downloadCell = "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+				else if (result.resultStatus == "SHARED")
+					downloadCell = "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
 				else
 					downloadCell = getDownloadLink(host, infoHash)
 					

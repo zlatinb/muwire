@@ -83,16 +83,22 @@ public class BrowseServlet extends HttpServlet {
                 return; // hmm
             
             List<Result> wrapped = browse.getResults().stream().map(event -> {
-                return new Result(event, downloadManager.isDownloading(event.getInfohash()));
+                ResultStatus resultStatus = ResultStatus.AVAILABLE;
+                if (core.getFileManager().getRootToFiles().containsKey(event.getInfohash()))
+                    resultStatus = ResultStatus.SHARED;
+                else if (downloadManager.isDownloading(event.getInfohash()))
+                    resultStatus = ResultStatus.DOWNLOADING;
+                return new Result(event, resultStatus);
             }).collect(Collectors.toList());
 
             RESULT_COMPARATORS.sort(wrapped, req);
             
             sb.append("<Results>");
-            wrapped.stream().map(Result::getEvent).forEach(result -> {
+            wrapped.stream().forEach(resultWrapper -> {
+                UIResultEvent result = resultWrapper.getEvent();
                 sb.append("<Result>");
                 sb.append("<Name>").append(Util.escapeHTMLinXML(result.getName())).append("</Name>");
-                sb.append("<Downloading>").append(downloadManager.isDownloading(result.getInfohash())).append("</Downloading>");
+                sb.append("<ResultStatus>").append(resultWrapper.resultStatus).append("</ResultStatus>");
                 sb.append("<Size>").append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B").append("</Size>");
                 sb.append("<InfoHash>").append(Base64.encode(result.getInfohash().getRoot())).append("</InfoHash>");
                 if (result.getComment() != null) {
@@ -221,10 +227,10 @@ public class BrowseServlet extends HttpServlet {
     
     private static class Result {
         private final UIResultEvent event;
-        private final boolean downloading;
-        Result(UIResultEvent event, boolean downloading) {
+        private final ResultStatus resultStatus;
+        Result(UIResultEvent event, ResultStatus resultStatus) {
             this.event = event;
-            this.downloading = downloading;
+            this.resultStatus = resultStatus;
         }
         
         UIResultEvent getEvent() {
@@ -240,15 +246,15 @@ public class BrowseServlet extends HttpServlet {
         return Long.compare(k.event.getSize(), v.event.getSize());  
     };
 
-    private static final Comparator<Result> BY_DOWNLOADING = (k, v) -> {
-        return Boolean.compare(k.downloading, v.downloading);   
+    private static final Comparator<Result> BY_RESULT_STATUS = (k, v) -> {
+        return Collator.getInstance().compare(k.resultStatus.toString(), v.resultStatus.toString());
     };
     
     private static final ColumnComparators<Result> RESULT_COMPARATORS = new ColumnComparators<>();
     static {
         RESULT_COMPARATORS.add("Name", BY_NAME);
         RESULT_COMPARATORS.add("Size", BY_SIZE);
-        RESULT_COMPARATORS.add("Download", BY_DOWNLOADING);
+        RESULT_COMPARATORS.add("Download", BY_RESULT_STATUS);
     }
     
     private static final Comparator<Browse> BY_HOST = (k, v) -> {

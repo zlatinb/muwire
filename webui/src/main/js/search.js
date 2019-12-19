@@ -125,7 +125,7 @@ class ResultFromSender {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
-		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+		this.resultStatus = xmlNode.getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
 		this.comment = null
 		try {
 			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
@@ -182,8 +182,10 @@ class ResultFromSender {
 	}
 	
 	getDownloadBlock() {
-		if (this.downloading == "true")
+		if (this.resultStatus == "DOWNLOADING")
 			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+		if (this.resultStatus == "SHARED")
+			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
@@ -223,7 +225,7 @@ class Result {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
-		this.downloading = xmlNode.getElementsByTagName("Downloading")[0].childNodes[0].nodeValue
+		this.resultStatus = xmlNode.getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
 		this.sources = xmlNode.getElementsByTagName("Sources")[0].childNodes[0].nodeValue
 	}
 	
@@ -240,8 +242,10 @@ class Result {
 		return "<a href='#' onclick='window.refreshSendersForResult(\"" + this.infoHash + "\");return false;'>" + this.name + "</a>"
 	}
 	getDownloadBlock() {
-		if (this.downloading == "true")
+		if (this.resultStatus == "DOWNLOADING")
 			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+		if (this.resultStatus == "SHARED")
+			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block

@@ -143,8 +143,13 @@ public class SearchServlet extends HttpServlet {
             Set<UIResultEvent> results = searchResults.getBySender().get(sender);
             List<ResultFromSender> resultsFromSender = new ArrayList<>();
             results.forEach(result -> {
+                ResultStatus resultStatus = ResultStatus.AVAILABLE;
+                if (core.getFileManager().getRootToFiles().containsKey(result.getInfohash()))
+                    resultStatus = ResultStatus.SHARED;
+                else if (downloadManager.isDownloading(result.getInfohash()))
+                    resultStatus = ResultStatus.DOWNLOADING;
                 ResultFromSender resultFromSender = new ResultFromSender(result,
-                        downloadManager.isDownloading(result.getInfohash()));
+                        resultStatus);
                 resultsFromSender.add(resultFromSender);
             });
             
@@ -174,9 +179,14 @@ public class SearchServlet extends HttpServlet {
             List<Result> results = new ArrayList<>();
             byInfohash.forEach( (infoHash, resultSet) -> {
                 UIResultEvent event = resultSet.iterator().next();
+                ResultStatus resultStatus = ResultStatus.AVAILABLE;
+                if (core.getFileManager().getRootToFiles().containsKey(infoHash))
+                    resultStatus = ResultStatus.SHARED;
+                else if (downloadManager.isDownloading(infoHash))
+                    resultStatus = ResultStatus.DOWNLOADING;
                 Result result = new Result(event.getName(),
                         event.getSize(),
-                        downloadManager.isDownloading(infoHash),
+                        resultStatus,
                         resultSet.size(),
                         infoHash);
                 results.add(result);
@@ -299,15 +309,15 @@ public class SearchServlet extends HttpServlet {
         private final String name;
         private final long size;
         private final InfoHash infoHash;
-        private final boolean downloading;
+        private final ResultStatus resultStatus;
         private final String comment;
         private final int certificates;
         
-        ResultFromSender(UIResultEvent e, boolean downloading) {
+        ResultFromSender(UIResultEvent e, ResultStatus resultStatus) {
             this.name = e.getName();
             this.size = e.getSize();
             this.infoHash = e.getInfohash();
-            this.downloading = downloading;
+            this.resultStatus = resultStatus;
             this.comment = e.getComment();
             this.certificates = e.getCertificates();
         }
@@ -317,7 +327,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
-            sb.append("<Downloading>").append(downloading).append("</Downloading>");
+            sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
             if (comment != null)
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             sb.append("<Certificates>").append(certificates).append("</Certificates>");
@@ -328,14 +338,14 @@ public class SearchServlet extends HttpServlet {
     private static class Result {
         private final String name;
         private final long size;
-        private final boolean downloading;
+        private final ResultStatus resultStatus;
         private final int sources;
         private final InfoHash infoHash;
         
-        Result(String name, long size, boolean downloading, int sources, InfoHash infoHash) {
+        Result(String name, long size, ResultStatus resultStatus, int sources, InfoHash infoHash) {
             this.name = name;
             this.size = size;
-            this.downloading = downloading;
+            this.resultStatus = resultStatus;
             this.infoHash = infoHash;
             this.sources = sources;
         }
@@ -345,7 +355,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
-            sb.append("<Downloading>").append(downloading).append("</Downloading>");
+            sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
             sb.append("<Sources>").append(sources).append("</Sources>");
             sb.append("</Result>");
         }
@@ -430,15 +440,15 @@ public class SearchServlet extends HttpServlet {
         return Long.compare(k.size, v.size);
     };
     
-    private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_DOWNLOAD = (k, v) -> {
-        return Boolean.compare(k.downloading, v.downloading);
+    private static final Comparator<ResultFromSender> RESULT_FROM_SENDER_BY_STATUS = (k, v) -> {
+        return Collator.getInstance().compare(k.resultStatus.toString(), v.resultStatus.toString());
     };
     
     private static final ColumnComparators<ResultFromSender> RESULT_FROM_SENDER_COMPARATORS = new ColumnComparators<>();
     static {
         RESULT_FROM_SENDER_COMPARATORS.add("Name", RESULT_FROM_SENDER_BY_NAME);
         RESULT_FROM_SENDER_COMPARATORS.add("Size", RESULT_FROM_SENDER_BY_SIZE);
-        RESULT_FROM_SENDER_COMPARATORS.add("Download", RESULT_FROM_SENDER_BY_DOWNLOAD);
+        RESULT_FROM_SENDER_COMPARATORS.add("Download", RESULT_FROM_SENDER_BY_STATUS);
     }
     
     private static final Comparator<Result> RESULT_BY_NAME = (k, v) -> {
@@ -449,8 +459,8 @@ public class SearchServlet extends HttpServlet {
         return Long.compare(k.size, v.size);
     };
     
-    private static final Comparator<Result> RESULT_BY_DOWNLOAD = (k, v) -> {
-        return Boolean.compare(k.downloading, v.downloading);
+    private static final Comparator<Result> RESULT_BY_STATUS = (k, v) -> {
+        return Collator.getInstance().compare(k.resultStatus.toString(), v.resultStatus.toString());
     };
     
     private static final Comparator<Result> RESULT_BY_SOURCES = (l, r) -> {
@@ -461,7 +471,7 @@ public class SearchServlet extends HttpServlet {
     static {
         RESULT_COMPARATORS.add("Name", RESULT_BY_NAME);
         RESULT_COMPARATORS.add("Size", RESULT_BY_SIZE);
-        RESULT_COMPARATORS.add("Download", RESULT_BY_DOWNLOAD);
+        RESULT_COMPARATORS.add("Download", RESULT_BY_STATUS);
         RESULT_COMPARATORS.add("Sources", RESULT_BY_SOURCES);
     }
 
