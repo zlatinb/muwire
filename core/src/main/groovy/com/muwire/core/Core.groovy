@@ -380,7 +380,7 @@ public class Core {
         connectionAcceptor.start()
         connectionEstablisher.start()
         hostCache.waitForLoad()
-        updateClient.start()
+        updateClient?.start()
     }
 
     public void shutdown() {
