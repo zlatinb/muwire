@@ -65,7 +65,7 @@ input {
     padding: 10px;
     font-weight: bold;
     text-decoration: none;
-    min-width: 110px;
+    min-width: 80px;
 }
 input, input:visited {
     border: 1px outset #999;
@@ -75,7 +75,7 @@ input, input:visited {
     font-weight: bold;
     padding: 1px 2px;
     text-decoration: none;
-    min-width: 110px;
+    min-width: 80px;
     color: #006;
     opacity: 0.9;
 }
@@ -94,12 +94,19 @@ input:active {
 input[type=text] {
     background: white;
     color: #001;
-    margin: 5px;
+    margin: 5px 10px;
     padding: 5px;
     font-size: 1em;
     font-weight: bold;
     border: 1px solid #001;
     text-decoration: none;
+}
+input[type=submit] {
+    background: #d3e6f0;
+    border-radius: 8px;
+    margin: 5px 10px;
+    min-width: 50px;
+    padding: 5px 18px;
 }
 input[type=checkbox] {
     min-width: 10px;   /* for Chrome */
@@ -208,6 +215,9 @@ aside {
     position: relative;
     width: 240px;
     z-index: 8;
+}
+aside input[type=text] {
+    width: 220px;
 }
 .menubox {
     clear: left;
