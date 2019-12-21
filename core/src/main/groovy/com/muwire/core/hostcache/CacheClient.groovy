@@ -1,5 +1,7 @@
 package com.muwire.core.hostcache
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.connection.ConnectionManager
@@ -27,6 +29,7 @@ class CacheClient {
     final long interval
     final MuWireSettings settings
     final Timer timer
+    private final AtomicBoolean stopped = new AtomicBoolean();
 
     public CacheClient(EventBus eventBus, HostCache cache,
         ConnectionManager manager, I2PSession session,
@@ -47,9 +50,12 @@ class CacheClient {
 
     void stop() {
         timer.cancel()
+        stopped.set(true)
     }
 
     private void queryIfNeeded() {
+        if (stopped.get())
+            return
         if (!manager.getConnections().isEmpty())
             return
         if (!cache.getHosts(1).isEmpty())
