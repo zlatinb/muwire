@@ -40,14 +40,7 @@ The CLI is under active development and doesn't have all the features of the GUI
 
 ### Running the Web UI / Plugin
 
-There is a Web-based UI under development.  It is intended to be run as a plugin to the Java I2P router.  To build it, do the following:
-1. Check out the Java I2P code from here [I2P Github]
-2. Build it using `ant clean pkg`
-3. Create a directory under the MuWire source tree called `i2pjars` and copy all jars from the i2p `pkg-temp/lib` directory there.
-4. Un-comment the `webui` and `plug` projects in MuWire's `settings.gradle`.  (By default those are commented out)
-5. Edit `gradle.properties` to change the signer.  You need to sign your plugin for the I2P router to load it.  More information TODO
-6. Run `./gradlew -PbuildNumber=<integer> assemble`
-7. If all goes well, there will be a file `plug/build/MuWire.su3`.  Install that file from the I2P router console.
+There is a Web-based UI under development.  It is intended to be run as a plugin to the Java I2P router.  Instructions how to build it are available at the wiki [Plugin] page.
 
 ### Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
@@ -67,3 +60,4 @@ You can find the full key at https://keybase.io/zlatinb
 [muwire-pkg]: https://github.com/zlatinb/muwire-pkg 
 [cli options]: https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
 [I2P Github]: https://github.com/i2p/i2p.i2p
+[Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
