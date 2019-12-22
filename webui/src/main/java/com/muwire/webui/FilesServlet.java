@@ -143,7 +143,7 @@ public class FilesServlet extends HttpServlet {
         }
         if (action.equals("share")) {
             String file = req.getParameter("file");
-            if (file == null) {
+            if (file == null || file.trim().length() == 0) {
                 resp.sendError(403, "Bad param");
                 return;
             }
