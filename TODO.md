@@ -1,8 +1,6 @@
 # TODO List
 
-Not in any particular order yet
-
-### Big Items
+### Network
 
 ##### Bloom Filters
 
@@ -12,15 +10,29 @@ This reduces query traffic by not sending last hop queries to peers that definit
 
 This helps with scalability
 
-##### Web UI, REST Interface, etc.
+### Core
 
-Basically any non-gui non-cli user interface
-
-##### Metadata editing and search
-
-To enable parsing of metadata from known file types and the user editing it or adding manual metadata
-
-### Small Items
-
-* Wrapper of some kind for in-place upgrades
+* Metadata parsing and search
 * Automatic adjustment of number of I2P tunnels
+* Persist trust immediately
+* Check if user-selected download and incomplete locations exist and are writeable
+* Enum i18n
+
+### Chat
+* echo "unknown/innappropriate command" in the console
+* break up lines on CR/LF, send multiple messages
+* Style timestamps and persona names
+* enforce # in room names or ignore it
+* auto-create/join channel on server start
+
+### Swing GUI
+* I2P Status panel - display message when connected to external router
+* Search box - left identation
+
+### Web UI/Plugin
+* HTML 5 media players
+* Minimal dependency (break up groovy-all.jar)
+* Remove versions from jar names
+* Security: POST nonces, CSP headers
+
+ 
