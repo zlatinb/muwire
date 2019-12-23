@@ -94,7 +94,7 @@ task pack {
     doLast {
         if (project.pack200 == "true") {
             libDir.listFiles().stream().filter( { it.getName().endsWith(".jar") } ).
-                filter({it.length() > 512*1024}).forEach {
+                forEach {
                 println "packing $it"
                 def name = it.toString()
                 println "pack200 --no-gzip ${name}.pack $name".execute().text
