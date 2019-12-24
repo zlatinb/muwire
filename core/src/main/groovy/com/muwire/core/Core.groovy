@@ -390,6 +390,8 @@ public class Core {
         }
         log.info("saving settings")
         saveMuSettings()
+        log.info("shutting down host cache")
+        hostCache.stop()
         log.info("shutting down trust subscriber")
         trustSubscriber.stop()
         log.info("shutting down trust service")
