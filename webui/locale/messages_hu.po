@@ -7,18 +7,18 @@
 # Translators:
 # vargaviktor <viktor.varga@gmail.com>, 2019
 # kytv <killyourtv@i2pmail.org>, 2019
-# AdminLMH <lehetmashogy@i2pmail.org>, 2019
 # erinm, 2019
 # benewfy <benewfy@gmail.com>, 2019
 # IDRASSI Mounir <mounir.idrassi@idrix.fr>, 2019
 # Gergő Doma <domag02@gmail.com>, 2019
+# AdminLMH <lehetmashogy@i2pmail.org>, 2019
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:04+0000\n"
-"Last-Translator: Gergő Doma <domag02@gmail.com>, 2019\n"
+"POT-Creation-Date: 2019-12-19 13:15+0000\n"
+"Last-Translator: AdminLMH <lehetmashogy@i2pmail.org>, 2019\n"
 "Language-Team: Hungarian (https://www.transifex.com/otf/teams/12694/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,7 +80,7 @@ msgstr "Tallóz"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
-#: src/main/java/com/muwire/webui/Util.java:89
+#: src/main/java/com/muwire/webui/Util.java:93
 msgid "Status"
 msgstr "Állapot"
 
@@ -128,7 +128,7 @@ msgstr "Letöltések"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
-#: src/main/java/com/muwire/webui/Util.java:99
+#: src/main/java/com/muwire/webui/Util.java:104
 msgid "Uploads"
 msgstr "Feltöltések"
 
@@ -149,7 +149,7 @@ msgstr "Feltöltések"
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
-#: src/main/java/com/muwire/webui/Util.java:79
+#: src/main/java/com/muwire/webui/Util.java:83
 msgid "Search"
 msgstr "Keresés"
 
@@ -163,7 +163,7 @@ msgstr "Keresés"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
-#: src/main/java/com/muwire/webui/Util.java:82
+#: src/main/java/com/muwire/webui/Util.java:86
 msgid "Shared Files"
 msgstr "Megosztott fájlok"
 
@@ -176,7 +176,7 @@ msgstr "Megosztott fájlok"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
-#: src/main/java/com/muwire/webui/Util.java:94
+#: src/main/java/com/muwire/webui/Util.java:98
 msgid "Trust"
 msgstr "Bizalom"
 
@@ -186,6 +186,7 @@ msgstr "Bizalom"
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
 msgid "Users"
@@ -291,34 +292,34 @@ msgid "Directory for incomplete files"
 msgstr "Befejezetlen fájlok könyvtára"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: src/main/java/com/muwire/webui/Util.java:98
+#: src/main/java/com/muwire/webui/Util.java:103
 msgid "Upload"
 msgstr "Feltöltés"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:249
 msgid "Total upload slots (-1 means unlimited)"
-msgstr ""
+msgstr "Összes feltöltési szál (-1 jelentése: korlátlan)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:253
 msgid "Upload slots per user (-1 means unlimited)"
-msgstr ""
+msgstr "Feltöltési szálak felhasználónként (-1 jelentése: korlátlan)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
-#: src/main/java/com/muwire/webui/Util.java:83
+#: src/main/java/com/muwire/webui/Util.java:87
 msgid "Sharing"
 msgstr "Megosztás"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:259
 msgid "Share downloaded files"
-msgstr ""
+msgstr "Letöltött fájlok megosztása"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:263
 msgid "Share hidden files"
-msgstr ""
+msgstr "Rejtett fájlok megosztása"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:269
 msgid "Allow only trusted connections"
-msgstr ""
+msgstr "Csak a megbízható kapcsolatok engedélyezése"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:273
 msgid "Search extra hop"
@@ -326,44 +327,44 @@ msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:277
 msgid "Allow others to view my trust list"
-msgstr ""
+msgstr "Engedélyezi mások számára hogy megtekinthessék a bizalmi listáját"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:281
 msgid "Trust list update frequency (hours)"
-msgstr ""
+msgstr "Bizalmi lista frissítésének gyakorisága (órában)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:285
 msgid "I2P Tunnels - Changes Require Plugin Restart"
-msgstr ""
+msgstr "I2P Alagutak - A módosításokhoz a beépülő újraindítása szükséges"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:287
 msgid "Inbound tunnel length"
-msgstr ""
+msgstr "Bejövő alagút hossza"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:291
 msgid "Inbound tunnel quantity"
-msgstr ""
+msgstr "Bejövő alagutak mennyisége"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:295
 msgid "Outbound tunnel length"
-msgstr ""
+msgstr "Kimenő alagút hossza"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:299
 msgid "Outbound tunnel quantity"
-msgstr ""
+msgstr "Kimenő alagutak mennyisége"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
-#: src/main/java/com/muwire/webui/Util.java:78
+#: src/main/java/com/muwire/webui/Util.java:82
 msgid "Save"
 msgstr "Mentés"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:213
 msgid "Download Details"
-msgstr ""
+msgstr "Letöltés részletei"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:215
 msgid "Click on a download to view details"
-msgstr ""
+msgstr "A részletek megtekintéséhez kattintson a letöltésre"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:141
 msgid "Home"
@@ -371,7 +372,7 @@ msgstr "Kezdőlap"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:203
 msgid "Active Searches By Sender"
-msgstr ""
+msgstr "Aktív keresések feladónként"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:205
 msgid "Group By File"
@@ -379,28 +380,28 @@ msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:209
 msgid "Active Searches By File"
-msgstr ""
+msgstr "Aktív keresések fájlonként"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:211
 msgid "Group By Sender"
-msgstr ""
+msgstr "Csoportosítás feladónként"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
-#: src/main/java/com/muwire/webui/Util.java:73
+#: src/main/java/com/muwire/webui/Util.java:77
 msgid "Results"
-msgstr ""
+msgstr "Eredmények"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:122
 msgid "Initial Setup"
-msgstr ""
+msgstr "Kezdeti beállítás"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:166
 msgid "Welcome to MuWire!  Please select a nickname and download locations"
-msgstr ""
+msgstr "Üdvözli a MuWire! Kérem válasszon egy becenevet és letöltési helyeket"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:168
 msgid "These directories will be created if they do not already exist"
-msgstr ""
+msgstr "Ezek a könyvtárak létre lesznek hozva ha még nem léteznének"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:170
 msgid "Nickname"
@@ -408,14 +409,14 @@ msgstr "Becenév"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:172
 msgid "Directory for saving downloaded files"
-msgstr ""
+msgstr "Könyvtár a letöltött fájlok elmentésére"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:176
 msgid "Directory for storing incomplete files"
-msgstr ""
+msgstr "Könyvtár a befejezetlen fájlok tárolására"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
-#: src/main/java/com/muwire/webui/Util.java:90
+#: src/main/java/com/muwire/webui/Util.java:94
 msgid "Submit"
 msgstr "Elküld"
 
@@ -432,8 +433,12 @@ msgstr ""
 msgid "View As Tree"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
-msgid "Trust Users"
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:198
+msgid "Trusted Users"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
+msgid "Distrusted Users"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
@@ -447,17 +452,17 @@ msgstr ""
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:96
 #, java-format
 msgid "{0} does not exist"
-msgstr ""
+msgstr "{0} nem létezik"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:98
 #, java-format
 msgid "{0} is not a directory"
-msgstr ""
+msgstr "{0} nem könyvtár"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
 #, java-format
 msgid "{0} not writeable"
-msgstr ""
+msgstr "{0} nem írható"
 
 #: src/main/java/com/muwire/webui/DownloadServlet.java:221
 msgid "Unknown"
@@ -469,14 +474,14 @@ msgstr "MuWire"
 
 #: src/main/java/com/muwire/webui/MuWireServlet.java:68
 msgid "MuWire is initializing, please wait"
-msgstr ""
+msgstr "MuWire elindul, kérem várjon"
 
 #: src/main/java/com/muwire/webui/TrustServlet.java:285
 msgid "Never"
 msgstr "Soha"
 
 #: src/main/java/com/muwire/webui/UploadServlet.java:92
-#: src/main/java/com/muwire/webui/Util.java:104
+#: src/main/java/com/muwire/webui/Util.java:109
 #, java-format
 msgid "{0}% of piece"
 msgstr ""
@@ -488,7 +493,7 @@ msgstr "Események"
 
 #: src/main/java/com/muwire/webui/Util.java:33
 msgid "Active Sources"
-msgstr ""
+msgstr "Aktív források"
 
 #: src/main/java/com/muwire/webui/Util.java:35
 msgid "Browsing"
@@ -504,15 +509,15 @@ msgstr "Tanúsítványok"
 
 #: src/main/java/com/muwire/webui/Util.java:38
 msgid "Certified"
-msgstr ""
+msgstr "Tanúsítva"
 
 #: src/main/java/com/muwire/webui/Util.java:39
 msgid "Certify"
-msgstr ""
+msgstr "Tanúsítás"
 
 #: src/main/java/com/muwire/webui/Util.java:40
 msgid "Clear Finished"
-msgstr ""
+msgstr "Befejezettek kitakarítása"
 
 #: src/main/java/com/muwire/webui/Util.java:41
 msgid "Comment"
@@ -521,211 +526,225 @@ msgstr "Megjegyzés"
 #: src/main/java/com/muwire/webui/Util.java:42
 #, java-format
 msgid "Details for {0}"
-msgstr ""
+msgstr "{0} részletei"
 
 #: src/main/java/com/muwire/webui/Util.java:43
-msgid "Distrusted User"
+msgid "Distrusted"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:44
+msgid "Distrusted User"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:45
 msgid "Down"
 msgstr "Le"
 
-#: src/main/java/com/muwire/webui/Util.java:45
+#: src/main/java/com/muwire/webui/Util.java:46
 msgid "Download"
 msgstr "Letöltés"
 
-#: src/main/java/com/muwire/webui/Util.java:46
-msgid "Download Location"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:47
-msgid "Downloaded Pieces"
-msgstr ""
+msgid "Download Location"
+msgstr "Letöltési hely"
 
 #: src/main/java/com/muwire/webui/Util.java:48
-msgid "Downloader"
-msgstr ""
+msgid "Downloaded"
+msgstr "Letöltött"
 
 #: src/main/java/com/muwire/webui/Util.java:49
+msgid "Downloaded Pieces"
+msgstr "Letöltött részek"
+
+#: src/main/java/com/muwire/webui/Util.java:50
+msgid "Downloader"
+msgstr "Letöltő"
+
+#: src/main/java/com/muwire/webui/Util.java:51
 msgid "Downloading"
 msgstr "Letöltés"
 
-#: src/main/java/com/muwire/webui/Util.java:50
+#: src/main/java/com/muwire/webui/Util.java:52
 msgid "Enter Reason (Optional)"
-msgstr ""
+msgstr "Indoklás megadása (opcionális)"
 
-#: src/main/java/com/muwire/webui/Util.java:51
+#: src/main/java/com/muwire/webui/Util.java:53
 msgid "ETA"
 msgstr "BIE"
 
-#: src/main/java/com/muwire/webui/Util.java:52
+#: src/main/java/com/muwire/webui/Util.java:54
 msgid "Fetching Certificates"
-msgstr ""
+msgstr "Tanúsítványok lekérdezése"
 
-#: src/main/java/com/muwire/webui/Util.java:53
+#: src/main/java/com/muwire/webui/Util.java:55
 msgid "File"
 msgstr "Fájl"
 
-#: src/main/java/com/muwire/webui/Util.java:54
+#: src/main/java/com/muwire/webui/Util.java:56
 msgid "Hashing"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:55
+#: src/main/java/com/muwire/webui/Util.java:57
 msgid "Hide Certificates"
-msgstr ""
+msgstr "Tanúsítványok elrejtése"
 
-#: src/main/java/com/muwire/webui/Util.java:56
+#: src/main/java/com/muwire/webui/Util.java:58
 msgid "Hide Comment"
 msgstr "Megjegyzés elrejtése"
 
-#: src/main/java/com/muwire/webui/Util.java:57
+#: src/main/java/com/muwire/webui/Util.java:59
 msgid "Host"
 msgstr "Állomás"
 
-#: src/main/java/com/muwire/webui/Util.java:58
+#: src/main/java/com/muwire/webui/Util.java:60
 msgid "Import"
 msgstr "Importálás"
 
-#: src/main/java/com/muwire/webui/Util.java:59
-msgid "Imported"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:60
-msgid "Known Sources"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:61
-msgid "Last Updated"
-msgstr ""
+msgid "Imported"
+msgstr "Importálva"
 
 #: src/main/java/com/muwire/webui/Util.java:62
+msgid "Known Sources"
+msgstr "Ismert források"
+
+#: src/main/java/com/muwire/webui/Util.java:63
+msgid "Last Updated"
+msgstr "Legutoljára frissítve"
+
+#: src/main/java/com/muwire/webui/Util.java:64
 msgid "Mark Distrusted"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:63
+#: src/main/java/com/muwire/webui/Util.java:65
 msgid "Mark Neutral"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:64
+#: src/main/java/com/muwire/webui/Util.java:66
 msgid "Mark Trusted"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:65
+#: src/main/java/com/muwire/webui/Util.java:67
 msgid "Name"
 msgstr "Név"
 
-#: src/main/java/com/muwire/webui/Util.java:66
+#. verb
+#: src/main/java/com/muwire/webui/Util.java:69
 msgid "Pause"
-msgstr ""
+msgstr "Szünet"
 
-#: src/main/java/com/muwire/webui/Util.java:67
+#: src/main/java/com/muwire/webui/Util.java:70
 msgid "Piece Size"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:68
+#: src/main/java/com/muwire/webui/Util.java:71
 msgid "Progress"
-msgstr ""
+msgstr "Folyamat"
 
-#: src/main/java/com/muwire/webui/Util.java:69
+#: src/main/java/com/muwire/webui/Util.java:72
 msgid "Query"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:70
+#. noun
+#: src/main/java/com/muwire/webui/Util.java:74
 msgid "Reason"
 msgstr "Oka"
 
-#: src/main/java/com/muwire/webui/Util.java:71
+#: src/main/java/com/muwire/webui/Util.java:75
 msgid "Refresh"
 msgstr "Frissítés"
 
-#: src/main/java/com/muwire/webui/Util.java:72
+#: src/main/java/com/muwire/webui/Util.java:76
 msgid "Remote Pieces"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:74
+#: src/main/java/com/muwire/webui/Util.java:78
 #, java-format
 msgid "Results for {0}"
-msgstr ""
+msgstr "Eredmények ehhez: {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:75
+#: src/main/java/com/muwire/webui/Util.java:79
 #, java-format
 msgid "Results from {0}"
-msgstr ""
+msgstr "Eredmények ebből: {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:76
+#: src/main/java/com/muwire/webui/Util.java:80
 msgid "Resume"
-msgstr ""
+msgstr "Folytat"
 
-#: src/main/java/com/muwire/webui/Util.java:77
+#: src/main/java/com/muwire/webui/Util.java:81
 msgid "Retry"
 msgstr "Újra"
 
-#: src/main/java/com/muwire/webui/Util.java:80
+#: src/main/java/com/muwire/webui/Util.java:84
 msgid "Sender"
 msgstr "Feladó"
 
-#: src/main/java/com/muwire/webui/Util.java:81
+#: src/main/java/com/muwire/webui/Util.java:85
 msgid "Senders"
-msgstr ""
+msgstr "Feladók"
 
-#: src/main/java/com/muwire/webui/Util.java:84
+#: src/main/java/com/muwire/webui/Util.java:88
 msgid "Show Comment"
 msgstr "Megjegyzés mutatása"
 
-#: src/main/java/com/muwire/webui/Util.java:85
+#: src/main/java/com/muwire/webui/Util.java:89
 msgid "Size"
 msgstr "Méret"
 
-#: src/main/java/com/muwire/webui/Util.java:86
+#: src/main/java/com/muwire/webui/Util.java:90
 msgid "Sources"
-msgstr ""
+msgstr "Források"
 
-#: src/main/java/com/muwire/webui/Util.java:87
+#: src/main/java/com/muwire/webui/Util.java:91
 msgid "Speed"
 msgstr "Sebesség "
 
-#: src/main/java/com/muwire/webui/Util.java:88
+#: src/main/java/com/muwire/webui/Util.java:92
 msgid "State"
 msgstr "Állapot"
 
-#: src/main/java/com/muwire/webui/Util.java:91
-msgid "Subscribe"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:92
-msgid "Subscribed"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:93
-msgid "Total Pieces"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:95
-msgid "Trusted User"
-msgstr ""
+msgid "Subscribe"
+msgstr "Feliratkozás"
 
 #: src/main/java/com/muwire/webui/Util.java:96
-msgid "Unshare"
-msgstr ""
+msgid "Subscribed"
+msgstr "Feliratkozva"
 
 #: src/main/java/com/muwire/webui/Util.java:97
-msgid "Unsubscribe"
+msgid "Total Pieces"
+msgstr "Összes rész"
+
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Trusted"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:100
-msgid "User"
-msgstr "Felhasználó"
+msgid "Trusted User"
+msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:101
-msgid "View 1 Certificate"
+msgid "Unshare"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:102
+msgid "Unsubscribe"
+msgstr "Leiratkozás"
+
+#: src/main/java/com/muwire/webui/Util.java:105
+msgid "User"
+msgstr "Felhasználó"
+
+#: src/main/java/com/muwire/webui/Util.java:106
+msgid "View 1 Certificate"
+msgstr "1 tanúsítvány megjelenítése"
+
+#: src/main/java/com/muwire/webui/Util.java:107
 #, java-format
 msgid "View {0} Certificates"
-msgstr ""
+msgstr "{0} tanúsítvány megjelenítése"
 
-#: src/main/java/com/muwire/webui/Util.java:103
+#: src/main/java/com/muwire/webui/Util.java:108
 msgid "Your Trust"
 msgstr ""

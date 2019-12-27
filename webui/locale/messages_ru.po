@@ -7,7 +7,6 @@
 # Translators:
 # Allclear <sypermario@icloud.com>, 2019
 # Nikolay Parukhin <parukhin@gmail.com>, 2019
-# gmind, 2019
 # cthat, 2019
 # Sergey Leschina <mail@putnik.tech>, 2019
 # Dmitriy Mamonov <sassy.but.classic@gmail.com>, 2019
@@ -19,13 +18,16 @@
 # U <uff.hitech@gmail.com>, 2019
 # Evgeny Lavrov <EvgenyLavrov@gmail.com>, 2019
 # j b, 2019
+# gmind, 2019
+# Murzik Cat, 2019
+# zzzi2p, 2019
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:04+0000\n"
-"Last-Translator: j b, 2019\n"
+"POT-Creation-Date: 2019-12-19 13:15+0000\n"
+"Last-Translator: zzzi2p, 2019\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +37,7 @@ msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:131
 msgid "Browse Host"
-msgstr ""
+msgstr "Обзор хоста"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:158
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:166
@@ -87,7 +89,7 @@ msgstr "Просмотр"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
-#: src/main/java/com/muwire/webui/Util.java:89
+#: src/main/java/com/muwire/webui/Util.java:93
 msgid "Status"
 msgstr "Статус"
 
@@ -135,9 +137,9 @@ msgstr "Загрузки"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
-#: src/main/java/com/muwire/webui/Util.java:99
+#: src/main/java/com/muwire/webui/Util.java:104
 msgid "Uploads"
-msgstr ""
+msgstr "Выгрузки"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:180
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:176
@@ -156,7 +158,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
-#: src/main/java/com/muwire/webui/Util.java:79
+#: src/main/java/com/muwire/webui/Util.java:83
 msgid "Search"
 msgstr "Поиск"
 
@@ -170,7 +172,7 @@ msgstr "Поиск"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
-#: src/main/java/com/muwire/webui/Util.java:82
+#: src/main/java/com/muwire/webui/Util.java:86
 msgid "Shared Files"
 msgstr "Общие файлы"
 
@@ -183,9 +185,9 @@ msgstr "Общие файлы"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
-#: src/main/java/com/muwire/webui/Util.java:94
+#: src/main/java/com/muwire/webui/Util.java:98
 msgid "Trust"
-msgstr ""
+msgstr "Доверие"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:188
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:200
@@ -193,6 +195,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
 msgid "Users"
@@ -283,11 +286,11 @@ msgstr "Искать в комментариях"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:229
 msgid "Allow browsing"
-msgstr ""
+msgstr "Разрешить просмотр"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:235
 msgid "Download retry frequency (seconds)"
-msgstr ""
+msgstr "Загрузка частоты повторов (в секундах)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:239
 msgid "Directory for downloaded files"
@@ -298,75 +301,75 @@ msgid "Directory for incomplete files"
 msgstr "Директория для незавершённых файлов"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: src/main/java/com/muwire/webui/Util.java:98
+#: src/main/java/com/muwire/webui/Util.java:103
 msgid "Upload"
 msgstr "Передано"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:249
 msgid "Total upload slots (-1 means unlimited)"
-msgstr ""
+msgstr "Общее количество каналов (-1 значение не ограничено) "
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:253
 msgid "Upload slots per user (-1 means unlimited)"
-msgstr ""
+msgstr "Загрузка каналов на пользователя (-1 значение не ограничено)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
-#: src/main/java/com/muwire/webui/Util.java:83
+#: src/main/java/com/muwire/webui/Util.java:87
 msgid "Sharing"
-msgstr ""
+msgstr "Предоставление общего доступа"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:259
 msgid "Share downloaded files"
-msgstr ""
+msgstr "Предоставить доступ к загруженным файлам"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:263
 msgid "Share hidden files"
-msgstr ""
+msgstr "Предоставить доступ к скрытым файлам"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:269
 msgid "Allow only trusted connections"
-msgstr ""
+msgstr "Разрешить соединения только с надёжными источниками"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:273
 msgid "Search extra hop"
-msgstr ""
+msgstr "Искать дополнительный прыжок"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:277
 msgid "Allow others to view my trust list"
-msgstr ""
+msgstr "Разрешить другим видеть мой список надёжных источников"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:281
 msgid "Trust list update frequency (hours)"
-msgstr ""
+msgstr "Частота обновления списка доверия (в часах)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:285
 msgid "I2P Tunnels - Changes Require Plugin Restart"
-msgstr ""
+msgstr "I2P туннели -изменения требуют перезапуск плагина"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:287
 msgid "Inbound tunnel length"
-msgstr ""
+msgstr "Длина входящего туннеля"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:291
 msgid "Inbound tunnel quantity"
-msgstr ""
+msgstr "Количество входящих туннелий"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:295
 msgid "Outbound tunnel length"
-msgstr ""
+msgstr "Длина исходящего туннеля"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:299
 msgid "Outbound tunnel quantity"
-msgstr ""
+msgstr "Количество исходящих туннелей"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
-#: src/main/java/com/muwire/webui/Util.java:78
+#: src/main/java/com/muwire/webui/Util.java:82
 msgid "Save"
 msgstr "Сохранить"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:213
 msgid "Download Details"
-msgstr ""
+msgstr "Подробности загрузки"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:215
 msgid "Click on a download to view details"
@@ -378,51 +381,53 @@ msgstr "Главная страница"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:203
 msgid "Active Searches By Sender"
-msgstr ""
+msgstr "Активный поиск по отправителю"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:205
 msgid "Group By File"
-msgstr ""
+msgstr "Сортировать по файлу"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:209
 msgid "Active Searches By File"
-msgstr ""
+msgstr "Активный поиск по файлу"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:211
 msgid "Group By Sender"
-msgstr ""
+msgstr "Сортировать по отправителю"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
-#: src/main/java/com/muwire/webui/Util.java:73
+#: src/main/java/com/muwire/webui/Util.java:77
 msgid "Results"
 msgstr "Результаты"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:122
 msgid "Initial Setup"
-msgstr ""
+msgstr "Первоначальная настройка"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:166
 msgid "Welcome to MuWire!  Please select a nickname and download locations"
 msgstr ""
+"Мы рады, видеть вас в MuWire!\n"
+"Выберите псевдоним и укажите своё местоположение."
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:168
 msgid "These directories will be created if they do not already exist"
-msgstr ""
+msgstr "Эти каталоги будут созданы если их ещё нет"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:170
 msgid "Nickname"
-msgstr ""
+msgstr "Псевдоним"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:172
 msgid "Directory for saving downloaded files"
-msgstr ""
+msgstr "Каталог для сохранения загруженных файлов"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:176
 msgid "Directory for storing incomplete files"
-msgstr ""
+msgstr "Каталог для хранения незавершённых файлов"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
-#: src/main/java/com/muwire/webui/Util.java:90
+#: src/main/java/com/muwire/webui/Util.java:94
 msgid "Submit"
 msgstr "Отправить"
 
@@ -439,9 +444,13 @@ msgstr "Просмотр таблицей"
 msgid "View As Tree"
 msgstr "Просмотр деревом"
 
-#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
-msgid "Trust Users"
-msgstr ""
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:198
+msgid "Trusted Users"
+msgstr "Доверенные пользователи"
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
+msgid "Distrusted Users"
+msgstr "Пользователи не вызывающие доверия"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:89
@@ -464,7 +473,7 @@ msgstr "{0} не директория"
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
 #, java-format
 msgid "{0} not writeable"
-msgstr ""
+msgstr "{0} Неподписанный"
 
 #: src/main/java/com/muwire/webui/DownloadServlet.java:221
 msgid "Unknown"
@@ -476,30 +485,30 @@ msgstr "MuWire"
 
 #: src/main/java/com/muwire/webui/MuWireServlet.java:68
 msgid "MuWire is initializing, please wait"
-msgstr ""
+msgstr "MuWire запускается, подождите пожалуста"
 
 #: src/main/java/com/muwire/webui/TrustServlet.java:285
 msgid "Never"
 msgstr "Никогда"
 
 #: src/main/java/com/muwire/webui/UploadServlet.java:92
-#: src/main/java/com/muwire/webui/Util.java:104
+#: src/main/java/com/muwire/webui/Util.java:109
 #, java-format
 msgid "{0}% of piece"
-msgstr ""
+msgstr "{0}% места"
 
 #. alphabetical please
 #: src/main/java/com/muwire/webui/Util.java:32
 msgid "Actions"
-msgstr ""
+msgstr "Действия"
 
 #: src/main/java/com/muwire/webui/Util.java:33
 msgid "Active Sources"
-msgstr ""
+msgstr "Активные источники"
 
 #: src/main/java/com/muwire/webui/Util.java:35
 msgid "Browsing"
-msgstr ""
+msgstr "Просмотр"
 
 #: src/main/java/com/muwire/webui/Util.java:36
 msgid "Cancel"
@@ -511,15 +520,15 @@ msgstr "Сертификаты"
 
 #: src/main/java/com/muwire/webui/Util.java:38
 msgid "Certified"
-msgstr ""
+msgstr "Проверенный"
 
 #: src/main/java/com/muwire/webui/Util.java:39
 msgid "Certify"
-msgstr ""
+msgstr "Удостоверять"
 
 #: src/main/java/com/muwire/webui/Util.java:40
 msgid "Clear Finished"
-msgstr ""
+msgstr "Закончилось успешно"
 
 #: src/main/java/com/muwire/webui/Util.java:41
 msgid "Comment"
@@ -528,211 +537,225 @@ msgstr "Комментарий"
 #: src/main/java/com/muwire/webui/Util.java:42
 #, java-format
 msgid "Details for {0}"
-msgstr ""
+msgstr "Подробности о {0}"
 
 #: src/main/java/com/muwire/webui/Util.java:43
-msgid "Distrusted User"
-msgstr ""
+msgid "Distrusted"
+msgstr "Недоверенный"
 
 #: src/main/java/com/muwire/webui/Util.java:44
+msgid "Distrusted User"
+msgstr "Пользователи без доверия "
+
+#: src/main/java/com/muwire/webui/Util.java:45
 msgid "Down"
 msgstr "Вниз"
 
-#: src/main/java/com/muwire/webui/Util.java:45
+#: src/main/java/com/muwire/webui/Util.java:46
 msgid "Download"
 msgstr "Скачать"
 
-#: src/main/java/com/muwire/webui/Util.java:46
-msgid "Download Location"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:47
-msgid "Downloaded Pieces"
-msgstr ""
+msgid "Download Location"
+msgstr "Загрузка местоположения"
 
 #: src/main/java/com/muwire/webui/Util.java:48
+msgid "Downloaded"
+msgstr "Получено"
+
+#: src/main/java/com/muwire/webui/Util.java:49
+msgid "Downloaded Pieces"
+msgstr "Загруженные части"
+
+#: src/main/java/com/muwire/webui/Util.java:50
 msgid "Downloader"
 msgstr "Загрузчик"
 
-#: src/main/java/com/muwire/webui/Util.java:49
+#: src/main/java/com/muwire/webui/Util.java:51
 msgid "Downloading"
 msgstr "Загрузка"
 
-#: src/main/java/com/muwire/webui/Util.java:50
+#: src/main/java/com/muwire/webui/Util.java:52
 msgid "Enter Reason (Optional)"
-msgstr ""
+msgstr "Введите причину (не обязательно)"
 
-#: src/main/java/com/muwire/webui/Util.java:51
+#: src/main/java/com/muwire/webui/Util.java:53
 msgid "ETA"
 msgstr "Осталось"
 
-#: src/main/java/com/muwire/webui/Util.java:52
+#: src/main/java/com/muwire/webui/Util.java:54
 msgid "Fetching Certificates"
-msgstr ""
+msgstr "Получение сертификатов"
 
-#: src/main/java/com/muwire/webui/Util.java:53
+#: src/main/java/com/muwire/webui/Util.java:55
 msgid "File"
 msgstr "Файл"
 
-#: src/main/java/com/muwire/webui/Util.java:54
+#: src/main/java/com/muwire/webui/Util.java:56
 msgid "Hashing"
-msgstr ""
+msgstr "Хеширование"
 
-#: src/main/java/com/muwire/webui/Util.java:55
+#: src/main/java/com/muwire/webui/Util.java:57
 msgid "Hide Certificates"
 msgstr "Скрыть сертификаты"
 
-#: src/main/java/com/muwire/webui/Util.java:56
+#: src/main/java/com/muwire/webui/Util.java:58
 msgid "Hide Comment"
 msgstr "Скрыть комментарий"
 
-#: src/main/java/com/muwire/webui/Util.java:57
+#: src/main/java/com/muwire/webui/Util.java:59
 msgid "Host"
 msgstr "Имя хоста"
 
-#: src/main/java/com/muwire/webui/Util.java:58
+#: src/main/java/com/muwire/webui/Util.java:60
 msgid "Import"
 msgstr "Импортировать"
 
-#: src/main/java/com/muwire/webui/Util.java:59
+#: src/main/java/com/muwire/webui/Util.java:61
 msgid "Imported"
 msgstr "Импортированы"
 
-#: src/main/java/com/muwire/webui/Util.java:60
+#: src/main/java/com/muwire/webui/Util.java:62
 msgid "Known Sources"
 msgstr "Известные источники"
 
-#: src/main/java/com/muwire/webui/Util.java:61
-msgid "Last Updated"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:62
-msgid "Mark Distrusted"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:63
+msgid "Last Updated"
+msgstr "Последнее обновление"
+
+#: src/main/java/com/muwire/webui/Util.java:64
+msgid "Mark Distrusted"
+msgstr "Пометить как сомнительный"
+
+#: src/main/java/com/muwire/webui/Util.java:65
 msgid "Mark Neutral"
 msgstr "Пометить нейтральные"
 
-#: src/main/java/com/muwire/webui/Util.java:64
+#: src/main/java/com/muwire/webui/Util.java:66
 msgid "Mark Trusted"
 msgstr "Пометить доверенные"
 
-#: src/main/java/com/muwire/webui/Util.java:65
+#: src/main/java/com/muwire/webui/Util.java:67
 msgid "Name"
 msgstr "Имя"
 
-#: src/main/java/com/muwire/webui/Util.java:66
+#. verb
+#: src/main/java/com/muwire/webui/Util.java:69
 msgid "Pause"
 msgstr "Приостановить"
 
-#: src/main/java/com/muwire/webui/Util.java:67
+#: src/main/java/com/muwire/webui/Util.java:70
 msgid "Piece Size"
 msgstr "Размер части"
 
-#: src/main/java/com/muwire/webui/Util.java:68
+#: src/main/java/com/muwire/webui/Util.java:71
 msgid "Progress"
 msgstr "Выполнение"
 
-#: src/main/java/com/muwire/webui/Util.java:69
+#: src/main/java/com/muwire/webui/Util.java:72
 msgid "Query"
-msgstr ""
+msgstr "Запрос"
 
-#: src/main/java/com/muwire/webui/Util.java:70
+#. noun
+#: src/main/java/com/muwire/webui/Util.java:74
 msgid "Reason"
 msgstr "Причина"
 
-#: src/main/java/com/muwire/webui/Util.java:71
+#: src/main/java/com/muwire/webui/Util.java:75
 msgid "Refresh"
 msgstr "Обновить"
 
-#: src/main/java/com/muwire/webui/Util.java:72
+#: src/main/java/com/muwire/webui/Util.java:76
 msgid "Remote Pieces"
 msgstr "Удаленные части"
 
-#: src/main/java/com/muwire/webui/Util.java:74
+#: src/main/java/com/muwire/webui/Util.java:78
 #, java-format
 msgid "Results for {0}"
-msgstr ""
+msgstr "Результаты для {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:75
+#: src/main/java/com/muwire/webui/Util.java:79
 #, java-format
 msgid "Results from {0}"
-msgstr ""
+msgstr "Результаты от {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:76
+#: src/main/java/com/muwire/webui/Util.java:80
 msgid "Resume"
 msgstr "Продолжить"
 
-#: src/main/java/com/muwire/webui/Util.java:77
+#: src/main/java/com/muwire/webui/Util.java:81
 msgid "Retry"
-msgstr ""
+msgstr "Повтор"
 
-#: src/main/java/com/muwire/webui/Util.java:80
+#: src/main/java/com/muwire/webui/Util.java:84
 msgid "Sender"
 msgstr "Отправитель"
 
-#: src/main/java/com/muwire/webui/Util.java:81
+#: src/main/java/com/muwire/webui/Util.java:85
 msgid "Senders"
-msgstr ""
+msgstr "Отправители"
 
-#: src/main/java/com/muwire/webui/Util.java:84
+#: src/main/java/com/muwire/webui/Util.java:88
 msgid "Show Comment"
 msgstr "Показать комментарий"
 
-#: src/main/java/com/muwire/webui/Util.java:85
+#: src/main/java/com/muwire/webui/Util.java:89
 msgid "Size"
 msgstr "Размер"
 
-#: src/main/java/com/muwire/webui/Util.java:86
+#: src/main/java/com/muwire/webui/Util.java:90
 msgid "Sources"
 msgstr "Источники"
 
-#: src/main/java/com/muwire/webui/Util.java:87
+#: src/main/java/com/muwire/webui/Util.java:91
 msgid "Speed"
 msgstr "Скорость"
 
-#: src/main/java/com/muwire/webui/Util.java:88
-msgid "State"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:91
-msgid "Subscribe"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:92
-msgid "Subscribed"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:93
-msgid "Total Pieces"
-msgstr ""
+msgid "State"
+msgstr "Состояние"
 
 #: src/main/java/com/muwire/webui/Util.java:95
+msgid "Subscribe"
+msgstr "Подписка"
+
+#: src/main/java/com/muwire/webui/Util.java:96
+msgid "Subscribed"
+msgstr "Подписан"
+
+#: src/main/java/com/muwire/webui/Util.java:97
+msgid "Total Pieces"
+msgstr "Всего штук"
+
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Trusted"
+msgstr "Доверенные"
+
+#: src/main/java/com/muwire/webui/Util.java:100
 msgid "Trusted User"
 msgstr "Доверенные пользователи"
 
-#: src/main/java/com/muwire/webui/Util.java:96
+#: src/main/java/com/muwire/webui/Util.java:101
 msgid "Unshare"
-msgstr ""
+msgstr "Прекратить общий доступ"
 
-#: src/main/java/com/muwire/webui/Util.java:97
+#: src/main/java/com/muwire/webui/Util.java:102
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Отписаться"
 
-#: src/main/java/com/muwire/webui/Util.java:100
+#: src/main/java/com/muwire/webui/Util.java:105
 msgid "User"
 msgstr "Пользователь"
 
-#: src/main/java/com/muwire/webui/Util.java:101
+#: src/main/java/com/muwire/webui/Util.java:106
 msgid "View 1 Certificate"
 msgstr "Посмотреть 1 сертификат"
 
-#: src/main/java/com/muwire/webui/Util.java:102
+#: src/main/java/com/muwire/webui/Util.java:107
 #, java-format
 msgid "View {0} Certificates"
 msgstr "Посмотреть {0} сертификатов"
 
-#: src/main/java/com/muwire/webui/Util.java:103
+#: src/main/java/com/muwire/webui/Util.java:108
 msgid "Your Trust"
-msgstr ""
+msgstr "Ваше доверие"

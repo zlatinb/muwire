@@ -7,7 +7,6 @@
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2019
 # PolishAnon <b790979@klzlk.com>, 2019
-# polacco <polacco@i2pmail.org>, 2019
 # Andrzej Dopytalski <adudu.andi@gmail.com>, 2019
 # erinm, 2019
 # Steve Dougherty, 2019
@@ -16,20 +15,20 @@
 # Krzys <kborzychowski@gmail.com>, 2019
 # IDRASSI Mounir <mounir.idrassi@idrix.fr>, 2019
 # Taporpo Ne <taporpone@gmail.com>, 2019
-# Marek Wegrzyn <tribunalsuck@gmail.com>, 2019
 # Tomasz Ciborski <zenji.yamada.nihon@gmail.com>, 2019
-# Verdulo :-), 2019
 # Rafał Drewnowski <drewnos@o2.pl>, 2019
 # Michał Nowak <nowak1michal@gmail.com>, 2019
 # Wiktor Kwapisiewicz, 2019
 # Marta M <marta.maria.gorecka@gmail.com>, 2019
+# polacco <polacco@i2pmail.org>, 2019
+# Verdulo :-), 2019
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:04+0000\n"
-"Last-Translator: Marta M <marta.maria.gorecka@gmail.com>, 2019\n"
+"POT-Creation-Date: 2019-12-19 13:15+0000\n"
+"Last-Translator: Verdulo :-), 2019\n"
 "Language-Team: Polish (https://www.transifex.com/otf/teams/12694/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,7 +38,7 @@ msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:131
 msgid "Browse Host"
-msgstr ""
+msgstr "Przeglądaj użytkownika"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:158
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:166
@@ -52,7 +51,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:162
 #: src/main/java/com/muwire/webui/MuWireServlet.java:64
 msgid "Welcome to MuWire"
-msgstr ""
+msgstr "Witamy w MuWire"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:164
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:172
@@ -67,6 +66,8 @@ msgstr ""
 #: src/main/java/com/muwire/webui/MuWireServlet.java:72
 msgid "MuWire requires JavaScript. Please enable JavaScript in your browser."
 msgstr ""
+"MuWire wymaga włączonego JavaScript. Prosimy, abyś włączył JavaScript w "
+"swojej przeglądarce."
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:167
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:184
@@ -89,9 +90,9 @@ msgstr "Przeglądaj"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
-#: src/main/java/com/muwire/webui/Util.java:89
+#: src/main/java/com/muwire/webui/Util.java:93
 msgid "Status"
-msgstr "Status"
+msgstr "Stan"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:184
@@ -102,7 +103,7 @@ msgstr "Status"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:165
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:180
 msgid "Connections"
-msgstr ""
+msgstr "Połączenia"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:186
@@ -126,7 +127,7 @@ msgstr "Strony"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:169
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:184
 msgid "Downloads"
-msgstr "Pobieranie"
+msgstr "Pobierania"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:178
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:190
@@ -137,7 +138,7 @@ msgstr "Pobieranie"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
-#: src/main/java/com/muwire/webui/Util.java:99
+#: src/main/java/com/muwire/webui/Util.java:104
 msgid "Uploads"
 msgstr "Wysyłania"
 
@@ -158,7 +159,7 @@ msgstr "Wysyłania"
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
-#: src/main/java/com/muwire/webui/Util.java:79
+#: src/main/java/com/muwire/webui/Util.java:83
 msgid "Search"
 msgstr "Wyszukaj"
 
@@ -172,9 +173,9 @@ msgstr "Wyszukaj"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
-#: src/main/java/com/muwire/webui/Util.java:82
+#: src/main/java/com/muwire/webui/Util.java:86
 msgid "Shared Files"
-msgstr ""
+msgstr "Udostępniane pliki"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:186
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:198
@@ -185,7 +186,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
-#: src/main/java/com/muwire/webui/Util.java:94
+#: src/main/java/com/muwire/webui/Util.java:98
 msgid "Trust"
 msgstr "Zaufanie"
 
@@ -195,6 +196,7 @@ msgstr "Zaufanie"
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
 msgid "Users"
@@ -222,7 +224,7 @@ msgstr "Subskrypcje"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:185
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:200
 msgid "Configuration"
-msgstr "Ustawienia"
+msgstr "Konfiguracja"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:194
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:206
@@ -255,7 +257,7 @@ msgstr "Pomoc"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:191
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:206
 msgid "User Guide"
-msgstr "Przewodnik Użytkownika"
+msgstr "Przewodnik użytkownika"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:200
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:212
@@ -266,7 +268,7 @@ msgstr "Przewodnik Użytkownika"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:193
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:208
 msgid "FAQ"
-msgstr "FAQ"
+msgstr "Częste pytania"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:202
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:214
@@ -281,152 +283,152 @@ msgstr "O aplikacji"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:225
 msgid "Search in comments"
-msgstr ""
+msgstr "Wyszukaj w komentarzach"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:229
 msgid "Allow browsing"
-msgstr ""
+msgstr "Zezwól na przeglądanie"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:235
 msgid "Download retry frequency (seconds)"
-msgstr ""
+msgstr "Wznów nieudane pobrania po (sekundy)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:239
 msgid "Directory for downloaded files"
-msgstr ""
+msgstr "Katalog na pobrane pliki"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:243
 msgid "Directory for incomplete files"
-msgstr ""
+msgstr "Katalog na niekompletne pliki"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: src/main/java/com/muwire/webui/Util.java:98
+#: src/main/java/com/muwire/webui/Util.java:103
 msgid "Upload"
-msgstr "Wyślij"
+msgstr "Wysyłanie"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:249
 msgid "Total upload slots (-1 means unlimited)"
-msgstr ""
+msgstr "Slotów wysyłania ogółem (-1 oznacza brak limitu)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:253
 msgid "Upload slots per user (-1 means unlimited)"
-msgstr ""
+msgstr "Slotów wysyłania na użytkownika (-1 oznacza brak limitu)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
-#: src/main/java/com/muwire/webui/Util.java:83
+#: src/main/java/com/muwire/webui/Util.java:87
 msgid "Sharing"
-msgstr "Współdzielenie"
+msgstr "Udostępnianie"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:259
 msgid "Share downloaded files"
-msgstr ""
+msgstr "Udostępniaj pobrane pliki"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:263
 msgid "Share hidden files"
-msgstr ""
+msgstr "Udostępniaj ukryte pliki"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:269
 msgid "Allow only trusted connections"
-msgstr ""
+msgstr "Łącz tylko z zaufanymi użytkownikami"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:273
 msgid "Search extra hop"
-msgstr ""
+msgstr "Dodatkowy skok wyszukiwania"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:277
 msgid "Allow others to view my trust list"
-msgstr ""
+msgstr "Pozwól innym przeglądać moją listę zaufania"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:281
 msgid "Trust list update frequency (hours)"
-msgstr ""
+msgstr "Częstotliwość aktualizacji listy zaufania (godziny)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:285
 msgid "I2P Tunnels - Changes Require Plugin Restart"
-msgstr ""
+msgstr "Tunele I2P – zmiana wymaga restartu wtyczki"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:287
 msgid "Inbound tunnel length"
-msgstr ""
+msgstr "Długość tuneli przychodzących"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:291
 msgid "Inbound tunnel quantity"
-msgstr ""
+msgstr "Liczba tuneli przychodzących"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:295
 msgid "Outbound tunnel length"
-msgstr ""
+msgstr "Długość tuneli wychodzących"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:299
 msgid "Outbound tunnel quantity"
-msgstr ""
+msgstr "Liczba tuneli wychodzących"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
-#: src/main/java/com/muwire/webui/Util.java:78
+#: src/main/java/com/muwire/webui/Util.java:82
 msgid "Save"
 msgstr "Zapisz"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:213
 msgid "Download Details"
-msgstr ""
+msgstr "Szczegóły pobierania"
 
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:215
 msgid "Click on a download to view details"
-msgstr ""
+msgstr "Kliknij pobierany plik, aby wyświetlić szczegóły"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:141
 msgid "Home"
-msgstr "Home"
+msgstr "Start"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:203
 msgid "Active Searches By Sender"
-msgstr ""
+msgstr "Aktywne wyszukiwania wg udostępniającego"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:205
 msgid "Group By File"
-msgstr ""
+msgstr "Grupuj wg pliku"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:209
 msgid "Active Searches By File"
-msgstr ""
+msgstr "Aktywne wyszukiwania wg pliku"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:211
 msgid "Group By Sender"
-msgstr ""
+msgstr "Grupuj wg użytkownika"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
-#: src/main/java/com/muwire/webui/Util.java:73
+#: src/main/java/com/muwire/webui/Util.java:77
 msgid "Results"
-msgstr ""
+msgstr "Wyniki"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:122
 msgid "Initial Setup"
-msgstr ""
+msgstr "Wstępna konfiguracja"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:166
 msgid "Welcome to MuWire!  Please select a nickname and download locations"
-msgstr ""
+msgstr "Witamy w Mu|Wire! Proszę wprowadzić ksywkę i wskazać katalog pobierań"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:168
 msgid "These directories will be created if they do not already exist"
-msgstr ""
+msgstr "Te katalogi zostaną utworzone, jeżeli jeszcze nie istnieją"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:170
 msgid "Nickname"
-msgstr "Pseudonim"
+msgstr "Ksywka"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:172
 msgid "Directory for saving downloaded files"
-msgstr ""
+msgstr "Katalog przechowywania pobranych plików"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:176
 msgid "Directory for storing incomplete files"
-msgstr ""
+msgstr "Katalog przechowywania niekompletnych pobranych plików"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
-#: src/main/java/com/muwire/webui/Util.java:90
+#: src/main/java/com/muwire/webui/Util.java:94
 msgid "Submit"
-msgstr "Podsumowując"
+msgstr "Potwierdź"
 
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:180
@@ -435,15 +437,19 @@ msgstr "Udostępnij"
 
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:184
 msgid "View As Table"
-msgstr ""
+msgstr "Wyświetl jako tabelę"
 
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:188
 msgid "View As Tree"
-msgstr ""
+msgstr "Wyświetl jako drzewko"
 
-#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
-msgid "Trust Users"
-msgstr ""
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:198
+msgid "Trusted Users"
+msgstr "Zaufani użytkownicy"
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
+msgid "Distrusted Users"
+msgstr "Niezaufani użytkownicy"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:89
@@ -451,22 +457,22 @@ msgstr ""
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:98
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
 msgid "Bad input"
-msgstr ""
+msgstr "Błędne dane"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:96
 #, java-format
 msgid "{0} does not exist"
-msgstr ""
+msgstr "{0} nie istnieje"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:98
 #, java-format
 msgid "{0} is not a directory"
-msgstr ""
+msgstr "{0} nie jest katalogiem"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:100
 #, java-format
 msgid "{0} not writeable"
-msgstr ""
+msgstr "{0} nie jest zapisywalny"
 
 #: src/main/java/com/muwire/webui/DownloadServlet.java:221
 msgid "Unknown"
@@ -478,30 +484,30 @@ msgstr "MuWire"
 
 #: src/main/java/com/muwire/webui/MuWireServlet.java:68
 msgid "MuWire is initializing, please wait"
-msgstr ""
+msgstr "MuWire się uruchamia, proszę czekać"
 
 #: src/main/java/com/muwire/webui/TrustServlet.java:285
 msgid "Never"
 msgstr "Nigdy"
 
 #: src/main/java/com/muwire/webui/UploadServlet.java:92
-#: src/main/java/com/muwire/webui/Util.java:104
+#: src/main/java/com/muwire/webui/Util.java:109
 #, java-format
 msgid "{0}% of piece"
-msgstr ""
+msgstr "{0}% części"
 
 #. alphabetical please
 #: src/main/java/com/muwire/webui/Util.java:32
 msgid "Actions"
-msgstr "Działania"
+msgstr "Czynności"
 
 #: src/main/java/com/muwire/webui/Util.java:33
 msgid "Active Sources"
-msgstr ""
+msgstr "Aktywne źródła"
 
 #: src/main/java/com/muwire/webui/Util.java:35
 msgid "Browsing"
-msgstr "Przeglądam"
+msgstr "Przeglądaj"
 
 #: src/main/java/com/muwire/webui/Util.java:36
 msgid "Cancel"
@@ -513,7 +519,7 @@ msgstr "Certyfikaty"
 
 #: src/main/java/com/muwire/webui/Util.java:38
 msgid "Certified"
-msgstr ""
+msgstr "Certyfikowany"
 
 #: src/main/java/com/muwire/webui/Util.java:39
 msgid "Certify"
@@ -521,7 +527,7 @@ msgstr "Certyfikuj"
 
 #: src/main/java/com/muwire/webui/Util.java:40
 msgid "Clear Finished"
-msgstr ""
+msgstr "Wyczyść ukończone"
 
 #: src/main/java/com/muwire/webui/Util.java:41
 msgid "Comment"
@@ -530,211 +536,225 @@ msgstr "Komentarz"
 #: src/main/java/com/muwire/webui/Util.java:42
 #, java-format
 msgid "Details for {0}"
-msgstr ""
+msgstr "Szczegóły {0}"
 
 #: src/main/java/com/muwire/webui/Util.java:43
-msgid "Distrusted User"
-msgstr ""
+msgid "Distrusted"
+msgstr "Niezaufany"
 
 #: src/main/java/com/muwire/webui/Util.java:44
+msgid "Distrusted User"
+msgstr "Niezaufany użytkownik"
+
+#: src/main/java/com/muwire/webui/Util.java:45
 msgid "Down"
 msgstr "W Dół"
 
-#: src/main/java/com/muwire/webui/Util.java:45
+#: src/main/java/com/muwire/webui/Util.java:46
 msgid "Download"
 msgstr "Pobierz"
 
-#: src/main/java/com/muwire/webui/Util.java:46
-msgid "Download Location"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:47
-msgid "Downloaded Pieces"
-msgstr ""
+msgid "Download Location"
+msgstr "Katalog pobierania"
 
 #: src/main/java/com/muwire/webui/Util.java:48
-msgid "Downloader"
-msgstr ""
+msgid "Downloaded"
+msgstr "Pobrano"
 
 #: src/main/java/com/muwire/webui/Util.java:49
-msgid "Downloading"
-msgstr "Ściąganie"
+msgid "Downloaded Pieces"
+msgstr "Pobrane kawałki"
 
 #: src/main/java/com/muwire/webui/Util.java:50
-msgid "Enter Reason (Optional)"
-msgstr ""
+msgid "Downloader"
+msgstr "Pobierający"
 
 #: src/main/java/com/muwire/webui/Util.java:51
+msgid "Downloading"
+msgstr "Pobieranie"
+
+#: src/main/java/com/muwire/webui/Util.java:52
+msgid "Enter Reason (Optional)"
+msgstr "Wpisz powód (opcjonalne)"
+
+#: src/main/java/com/muwire/webui/Util.java:53
 msgid "ETA"
 msgstr "Pozostało"
 
-#: src/main/java/com/muwire/webui/Util.java:52
+#: src/main/java/com/muwire/webui/Util.java:54
 msgid "Fetching Certificates"
-msgstr ""
+msgstr "Pobieranie certyfikatów"
 
-#: src/main/java/com/muwire/webui/Util.java:53
+#: src/main/java/com/muwire/webui/Util.java:55
 msgid "File"
 msgstr "Plik"
 
-#: src/main/java/com/muwire/webui/Util.java:54
-msgid "Hashing"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:55
-msgid "Hide Certificates"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:56
-msgid "Hide Comment"
-msgstr ""
+msgid "Hashing"
+msgstr "Haszowanie"
 
 #: src/main/java/com/muwire/webui/Util.java:57
+msgid "Hide Certificates"
+msgstr "Ukryj certyfikaty"
+
+#: src/main/java/com/muwire/webui/Util.java:58
+msgid "Hide Comment"
+msgstr "Ukryj komentarz"
+
+#: src/main/java/com/muwire/webui/Util.java:59
 msgid "Host"
 msgstr "Host"
 
-#: src/main/java/com/muwire/webui/Util.java:58
+#: src/main/java/com/muwire/webui/Util.java:60
 msgid "Import"
-msgstr "Zaimportuj"
+msgstr "Importuj"
 
-#: src/main/java/com/muwire/webui/Util.java:59
+#: src/main/java/com/muwire/webui/Util.java:61
 msgid "Imported"
 msgstr "Zaimportowano"
 
-#: src/main/java/com/muwire/webui/Util.java:60
-msgid "Known Sources"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:61
-msgid "Last Updated"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:62
-msgid "Mark Distrusted"
-msgstr ""
+msgid "Known Sources"
+msgstr "Znane źródła"
 
 #: src/main/java/com/muwire/webui/Util.java:63
-msgid "Mark Neutral"
-msgstr ""
+msgid "Last Updated"
+msgstr "Ostatnio aktualizowany"
 
 #: src/main/java/com/muwire/webui/Util.java:64
-msgid "Mark Trusted"
-msgstr ""
+msgid "Mark Distrusted"
+msgstr "Oznacz jako niezaufany"
 
 #: src/main/java/com/muwire/webui/Util.java:65
+msgid "Mark Neutral"
+msgstr "Oznacz jako neutralny"
+
+#: src/main/java/com/muwire/webui/Util.java:66
+msgid "Mark Trusted"
+msgstr "Oznacz jako zaufany"
+
+#: src/main/java/com/muwire/webui/Util.java:67
 msgid "Name"
 msgstr "Nazwa"
 
-#: src/main/java/com/muwire/webui/Util.java:66
+#. verb
+#: src/main/java/com/muwire/webui/Util.java:69
 msgid "Pause"
-msgstr "Pauza"
+msgstr "Wstrzymaj"
 
-#: src/main/java/com/muwire/webui/Util.java:67
+#: src/main/java/com/muwire/webui/Util.java:70
 msgid "Piece Size"
-msgstr ""
+msgstr "Rozmiar części"
 
-#: src/main/java/com/muwire/webui/Util.java:68
+#: src/main/java/com/muwire/webui/Util.java:71
 msgid "Progress"
 msgstr "Postęp"
 
-#: src/main/java/com/muwire/webui/Util.java:69
+#: src/main/java/com/muwire/webui/Util.java:72
 msgid "Query"
-msgstr ""
+msgstr "Zapytanie"
 
-#: src/main/java/com/muwire/webui/Util.java:70
+#. noun
+#: src/main/java/com/muwire/webui/Util.java:74
 msgid "Reason"
 msgstr "Powód"
 
-#: src/main/java/com/muwire/webui/Util.java:71
+#: src/main/java/com/muwire/webui/Util.java:75
 msgid "Refresh"
 msgstr "Odśwież"
 
-#: src/main/java/com/muwire/webui/Util.java:72
+#: src/main/java/com/muwire/webui/Util.java:76
 msgid "Remote Pieces"
-msgstr ""
+msgstr "Zdalne części"
 
-#: src/main/java/com/muwire/webui/Util.java:74
+#: src/main/java/com/muwire/webui/Util.java:78
 #, java-format
 msgid "Results for {0}"
-msgstr ""
+msgstr "Wyniki dla {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:75
+#: src/main/java/com/muwire/webui/Util.java:79
 #, java-format
 msgid "Results from {0}"
-msgstr ""
+msgstr "Wyniki od {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:76
+#: src/main/java/com/muwire/webui/Util.java:80
 msgid "Resume"
-msgstr "Przywróć"
+msgstr "Wznów"
 
-#: src/main/java/com/muwire/webui/Util.java:77
+#: src/main/java/com/muwire/webui/Util.java:81
 msgid "Retry"
 msgstr "Ponów"
 
-#: src/main/java/com/muwire/webui/Util.java:80
-msgid "Sender"
-msgstr "Nadawca"
-
-#: src/main/java/com/muwire/webui/Util.java:81
-msgid "Senders"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:84
-msgid "Show Comment"
-msgstr ""
+msgid "Sender"
+msgstr "Wysyłający"
 
 #: src/main/java/com/muwire/webui/Util.java:85
+msgid "Senders"
+msgstr "Wysyłający"
+
+#: src/main/java/com/muwire/webui/Util.java:88
+msgid "Show Comment"
+msgstr "Wyświetl komentarz"
+
+#: src/main/java/com/muwire/webui/Util.java:89
 msgid "Size"
 msgstr "Rozmiar"
 
-#: src/main/java/com/muwire/webui/Util.java:86
+#: src/main/java/com/muwire/webui/Util.java:90
 msgid "Sources"
-msgstr ""
+msgstr "Źródła"
 
-#: src/main/java/com/muwire/webui/Util.java:87
+#: src/main/java/com/muwire/webui/Util.java:91
 msgid "Speed"
 msgstr "Szybkość"
 
-#: src/main/java/com/muwire/webui/Util.java:88
+#: src/main/java/com/muwire/webui/Util.java:92
 msgid "State"
 msgstr "Stan"
 
-#: src/main/java/com/muwire/webui/Util.java:91
-msgid "Subscribe"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:92
-msgid "Subscribed"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:93
-msgid "Total Pieces"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:95
-msgid "Trusted User"
-msgstr ""
+msgid "Subscribe"
+msgstr "Abonuj"
 
 #: src/main/java/com/muwire/webui/Util.java:96
-msgid "Unshare"
-msgstr ""
+msgid "Subscribed"
+msgstr "Zaabonowany"
 
 #: src/main/java/com/muwire/webui/Util.java:97
+msgid "Total Pieces"
+msgstr "Wszystkich kawałków"
+
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Trusted"
+msgstr "Zaufany"
+
+#: src/main/java/com/muwire/webui/Util.java:100
+msgid "Trusted User"
+msgstr "Zaufany użytkownik"
+
+#: src/main/java/com/muwire/webui/Util.java:101
+msgid "Unshare"
+msgstr "Nie udostępniaj"
+
+#: src/main/java/com/muwire/webui/Util.java:102
 msgid "Unsubscribe"
 msgstr "Wypisz się"
 
-#: src/main/java/com/muwire/webui/Util.java:100
+#: src/main/java/com/muwire/webui/Util.java:105
 msgid "User"
 msgstr "Użytkownik"
 
-#: src/main/java/com/muwire/webui/Util.java:101
+#: src/main/java/com/muwire/webui/Util.java:106
 msgid "View 1 Certificate"
-msgstr ""
+msgstr "Wyświetl 1 certyfikat"
 
-#: src/main/java/com/muwire/webui/Util.java:102
+#: src/main/java/com/muwire/webui/Util.java:107
 #, java-format
 msgid "View {0} Certificates"
-msgstr ""
+msgstr "Wyświetl {0} certyfikaty"
 
-#: src/main/java/com/muwire/webui/Util.java:103
+#: src/main/java/com/muwire/webui/Util.java:108
 msgid "Your Trust"
-msgstr ""
+msgstr "Twoje zaufanie"

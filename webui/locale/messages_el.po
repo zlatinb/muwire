@@ -14,17 +14,17 @@
 # LaScapigliata <ditri2000@hotmail.com>, 2019
 # Alexandros Dorodoulis <aldor94@gmail.com>, 2019
 # IDRASSI Mounir <mounir.idrassi@idrix.fr>, 2019
-# Elektra M. <safiragon@yahoo.gr>, 2019
-# Wasilis Mandratzis-Walz <inactive+beonex123@transifex.com>, 2019
 # Panagiotis Vasilopoulos, 2019
 # Alexandros Melidis <almel01@gmail.com>, 2019
+# Wasilis Mandratzis-Walz <inactive+beonex123@transifex.com>, 2019
+# Elektra M. <safiragon@yahoo.gr>, 2019
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:04+0000\n"
-"Last-Translator: Alexandros Melidis <almel01@gmail.com>, 2019\n"
+"POT-Creation-Date: 2019-12-19 13:15+0000\n"
+"Last-Translator: Elektra M. <safiragon@yahoo.gr>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/otf/teams/12694/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +47,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:162
 #: src/main/java/com/muwire/webui/MuWireServlet.java:64
 msgid "Welcome to MuWire"
-msgstr ""
+msgstr "Καλώς ήρθατε στο MuWire"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:164
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:172
@@ -62,6 +62,8 @@ msgstr ""
 #: src/main/java/com/muwire/webui/MuWireServlet.java:72
 msgid "MuWire requires JavaScript. Please enable JavaScript in your browser."
 msgstr ""
+"Το MuWire απαιτεί JavaScript. Παρακαλούμε ενεργοποιήστε τη JavaScript στον "
+"φυλλομετρητή σας."
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:167
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:184
@@ -84,7 +86,7 @@ msgstr "Περιήγηση"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
-#: src/main/java/com/muwire/webui/Util.java:89
+#: src/main/java/com/muwire/webui/Util.java:93
 msgid "Status"
 msgstr "Κατάσταση"
 
@@ -132,9 +134,9 @@ msgstr "Λήψεις"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
-#: src/main/java/com/muwire/webui/Util.java:99
+#: src/main/java/com/muwire/webui/Util.java:104
 msgid "Uploads"
-msgstr ""
+msgstr "Μεταφoρτώσεις"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:180
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:176
@@ -153,7 +155,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
-#: src/main/java/com/muwire/webui/Util.java:79
+#: src/main/java/com/muwire/webui/Util.java:83
 msgid "Search"
 msgstr "Αναζήτηση"
 
@@ -167,7 +169,7 @@ msgstr "Αναζήτηση"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
-#: src/main/java/com/muwire/webui/Util.java:82
+#: src/main/java/com/muwire/webui/Util.java:86
 msgid "Shared Files"
 msgstr ""
 
@@ -180,7 +182,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
-#: src/main/java/com/muwire/webui/Util.java:94
+#: src/main/java/com/muwire/webui/Util.java:98
 msgid "Trust"
 msgstr "Εμπιστοσύνη"
 
@@ -190,6 +192,7 @@ msgstr "Εμπιστοσύνη"
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
 msgid "Users"
@@ -205,7 +208,7 @@ msgstr "Χρήστες"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:183
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:198
 msgid "Subscriptions"
-msgstr ""
+msgstr "Συνδρομές"
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:192
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:140
@@ -276,7 +279,7 @@ msgstr "Σχετικα"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:225
 msgid "Search in comments"
-msgstr ""
+msgstr "Αναζήτηση στα σχόλια"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:229
 msgid "Allow browsing"
@@ -295,7 +298,7 @@ msgid "Directory for incomplete files"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: src/main/java/com/muwire/webui/Util.java:98
+#: src/main/java/com/muwire/webui/Util.java:103
 msgid "Upload"
 msgstr "Ανέβασμα"
 
@@ -308,7 +311,7 @@ msgid "Upload slots per user (-1 means unlimited)"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
-#: src/main/java/com/muwire/webui/Util.java:83
+#: src/main/java/com/muwire/webui/Util.java:87
 msgid "Sharing"
 msgstr "Κοινή χρήση"
 
@@ -357,7 +360,7 @@ msgid "Outbound tunnel quantity"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
-#: src/main/java/com/muwire/webui/Util.java:78
+#: src/main/java/com/muwire/webui/Util.java:82
 msgid "Save"
 msgstr "Αποθήκευση"
 
@@ -390,7 +393,7 @@ msgid "Group By Sender"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
-#: src/main/java/com/muwire/webui/Util.java:73
+#: src/main/java/com/muwire/webui/Util.java:77
 msgid "Results"
 msgstr "Αποτελέσματα"
 
@@ -419,7 +422,7 @@ msgid "Directory for storing incomplete files"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
-#: src/main/java/com/muwire/webui/Util.java:90
+#: src/main/java/com/muwire/webui/Util.java:94
 msgid "Submit"
 msgstr "Καταχώρηση"
 
@@ -436,8 +439,12 @@ msgstr ""
 msgid "View As Tree"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
-msgid "Trust Users"
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:198
+msgid "Trusted Users"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
+msgid "Distrusted Users"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
@@ -480,7 +487,7 @@ msgid "Never"
 msgstr "Ποτέ"
 
 #: src/main/java/com/muwire/webui/UploadServlet.java:92
-#: src/main/java/com/muwire/webui/Util.java:104
+#: src/main/java/com/muwire/webui/Util.java:109
 #, java-format
 msgid "{0}% of piece"
 msgstr ""
@@ -528,208 +535,222 @@ msgid "Details for {0}"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:43
-msgid "Distrusted User"
+msgid "Distrusted"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:44
+msgid "Distrusted User"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:45
 msgid "Down"
 msgstr "Κάτω"
 
-#: src/main/java/com/muwire/webui/Util.java:45
+#: src/main/java/com/muwire/webui/Util.java:46
 msgid "Download"
 msgstr "Λήψη"
 
-#: src/main/java/com/muwire/webui/Util.java:46
+#: src/main/java/com/muwire/webui/Util.java:47
 msgid "Download Location"
 msgstr "Λήψη Τοποθεσίας"
 
-#: src/main/java/com/muwire/webui/Util.java:47
-msgid "Downloaded Pieces"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:48
-msgid "Downloader"
+msgid "Downloaded"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:49
-msgid "Downloading"
-msgstr "Γίνεται λήψη"
+msgid "Downloaded Pieces"
+msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:50
-msgid "Enter Reason (Optional)"
+msgid "Downloader"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:51
-msgid "ETA"
-msgstr ""
+msgid "Downloading"
+msgstr "Γίνεται λήψη"
 
 #: src/main/java/com/muwire/webui/Util.java:52
-msgid "Fetching Certificates"
+msgid "Enter Reason (Optional)"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:53
-msgid "File"
-msgstr "Αρχείο"
+msgid "ETA"
+msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:54
-msgid "Hashing"
+msgid "Fetching Certificates"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:55
-msgid "Hide Certificates"
-msgstr ""
+msgid "File"
+msgstr "Αρχείο"
 
 #: src/main/java/com/muwire/webui/Util.java:56
-msgid "Hide Comment"
+msgid "Hashing"
 msgstr ""
 
 #: src/main/java/com/muwire/webui/Util.java:57
+msgid "Hide Certificates"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:58
+msgid "Hide Comment"
+msgstr ""
+
+#: src/main/java/com/muwire/webui/Util.java:59
 msgid "Host"
 msgstr "Οικοδεσπότης"
 
-#: src/main/java/com/muwire/webui/Util.java:58
+#: src/main/java/com/muwire/webui/Util.java:60
 msgid "Import"
 msgstr "Εισαγωγή"
 
-#: src/main/java/com/muwire/webui/Util.java:59
+#: src/main/java/com/muwire/webui/Util.java:61
 msgid "Imported"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:60
+#: src/main/java/com/muwire/webui/Util.java:62
 msgid "Known Sources"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:61
+#: src/main/java/com/muwire/webui/Util.java:63
 msgid "Last Updated"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:62
+#: src/main/java/com/muwire/webui/Util.java:64
 msgid "Mark Distrusted"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:63
+#: src/main/java/com/muwire/webui/Util.java:65
 msgid "Mark Neutral"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:64
+#: src/main/java/com/muwire/webui/Util.java:66
 msgid "Mark Trusted"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:65
+#: src/main/java/com/muwire/webui/Util.java:67
 msgid "Name"
 msgstr "Όνομα"
 
-#: src/main/java/com/muwire/webui/Util.java:66
+#. verb
+#: src/main/java/com/muwire/webui/Util.java:69
 msgid "Pause"
 msgstr "Pause"
 
-#: src/main/java/com/muwire/webui/Util.java:67
+#: src/main/java/com/muwire/webui/Util.java:70
 msgid "Piece Size"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:68
+#: src/main/java/com/muwire/webui/Util.java:71
 msgid "Progress"
 msgstr "Πρόοδος"
 
-#: src/main/java/com/muwire/webui/Util.java:69
+#: src/main/java/com/muwire/webui/Util.java:72
 msgid "Query"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:70
+#. noun
+#: src/main/java/com/muwire/webui/Util.java:74
 msgid "Reason"
 msgstr "Λόγος"
 
-#: src/main/java/com/muwire/webui/Util.java:71
+#: src/main/java/com/muwire/webui/Util.java:75
 msgid "Refresh"
 msgstr "Ανανέωση"
 
-#: src/main/java/com/muwire/webui/Util.java:72
+#: src/main/java/com/muwire/webui/Util.java:76
 msgid "Remote Pieces"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:74
+#: src/main/java/com/muwire/webui/Util.java:78
 #, java-format
 msgid "Results for {0}"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:75
+#: src/main/java/com/muwire/webui/Util.java:79
 #, java-format
 msgid "Results from {0}"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:76
+#: src/main/java/com/muwire/webui/Util.java:80
 msgid "Resume"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:77
+#: src/main/java/com/muwire/webui/Util.java:81
 msgid "Retry"
 msgstr "Ξαναδοκίμασε"
 
-#: src/main/java/com/muwire/webui/Util.java:80
-msgid "Sender"
-msgstr ""
-
-#: src/main/java/com/muwire/webui/Util.java:81
-msgid "Senders"
-msgstr ""
-
 #: src/main/java/com/muwire/webui/Util.java:84
-msgid "Show Comment"
-msgstr ""
+msgid "Sender"
+msgstr "Αποστολέας"
 
 #: src/main/java/com/muwire/webui/Util.java:85
+msgid "Senders"
+msgstr "Αποστολείς"
+
+#: src/main/java/com/muwire/webui/Util.java:88
+msgid "Show Comment"
+msgstr "Προβολή Σχολίου "
+
+#: src/main/java/com/muwire/webui/Util.java:89
 msgid "Size"
 msgstr "Μέγεθος"
 
-#: src/main/java/com/muwire/webui/Util.java:86
+#: src/main/java/com/muwire/webui/Util.java:90
 msgid "Sources"
-msgstr ""
+msgstr "Πηγές"
 
-#: src/main/java/com/muwire/webui/Util.java:87
+#: src/main/java/com/muwire/webui/Util.java:91
 msgid "Speed"
 msgstr "Ταχύτητα"
 
-#: src/main/java/com/muwire/webui/Util.java:88
+#: src/main/java/com/muwire/webui/Util.java:92
 msgid "State"
 msgstr "Κατάσταση"
 
-#: src/main/java/com/muwire/webui/Util.java:91
+#: src/main/java/com/muwire/webui/Util.java:95
 msgid "Subscribe"
 msgstr "Εγγραφή"
 
-#: src/main/java/com/muwire/webui/Util.java:92
+#: src/main/java/com/muwire/webui/Util.java:96
 msgid "Subscribed"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:93
+#: src/main/java/com/muwire/webui/Util.java:97
 msgid "Total Pieces"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:95
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Trusted"
+msgstr "Εμπιστοσύνη"
+
+#: src/main/java/com/muwire/webui/Util.java:100
 msgid "Trusted User"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:96
+#: src/main/java/com/muwire/webui/Util.java:101
 msgid "Unshare"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:97
+#: src/main/java/com/muwire/webui/Util.java:102
 msgid "Unsubscribe"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:100
+#: src/main/java/com/muwire/webui/Util.java:105
 msgid "User"
 msgstr "Χρήστης"
 
-#: src/main/java/com/muwire/webui/Util.java:101
+#: src/main/java/com/muwire/webui/Util.java:106
 msgid "View 1 Certificate"
-msgstr ""
+msgstr "Προβολή 1 Πιστοποιητικού"
 
-#: src/main/java/com/muwire/webui/Util.java:102
+#: src/main/java/com/muwire/webui/Util.java:107
 #, java-format
 msgid "View {0} Certificates"
 msgstr ""
 
-#: src/main/java/com/muwire/webui/Util.java:103
+#: src/main/java/com/muwire/webui/Util.java:108
 msgid "Your Trust"
 msgstr ""

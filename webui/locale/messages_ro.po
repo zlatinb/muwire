@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-17 17:04+0000\n"
+"POT-Creation-Date: 2019-12-19 13:15+0000\n"
 "Last-Translator: polearnik <polearnik@mail.ru>, 2019\n"
 "Language-Team: Romanian (https://www.transifex.com/otf/teams/12694/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -87,7 +87,7 @@ msgstr "Răsfoieşte"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:163
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:178
-#: src/main/java/com/muwire/webui/Util.java:89
+#: src/main/java/com/muwire/webui/Util.java:93
 msgid "Status"
 msgstr "Status"
 
@@ -135,7 +135,7 @@ msgstr "Descărcări"
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:171
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:141
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:186
-#: src/main/java/com/muwire/webui/Util.java:99
+#: src/main/java/com/muwire/webui/Util.java:104
 msgid "Uploads"
 msgstr "încărcările"
 
@@ -156,7 +156,7 @@ msgstr "încărcările"
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:172
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:174
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:188
-#: src/main/java/com/muwire/webui/Util.java:79
+#: src/main/java/com/muwire/webui/Util.java:83
 msgid "Search"
 msgstr "Caută"
 
@@ -170,7 +170,7 @@ msgstr "Caută"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:175
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:190
-#: src/main/java/com/muwire/webui/Util.java:82
+#: src/main/java/com/muwire/webui/Util.java:86
 msgid "Shared Files"
 msgstr "Fișiere partajate"
 
@@ -183,7 +183,7 @@ msgstr "Fișiere partajate"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:179
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:194
-#: src/main/java/com/muwire/webui/Util.java:94
+#: src/main/java/com/muwire/webui/Util.java:98
 msgid "Trust"
 msgstr "Încredere"
 
@@ -193,6 +193,7 @@ msgstr "Încredere"
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:211
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:181
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:181
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:196
 msgid "Users"
@@ -298,7 +299,7 @@ msgid "Directory for incomplete files"
 msgstr "Director pentru fișiere incomplete"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: src/main/java/com/muwire/webui/Util.java:98
+#: src/main/java/com/muwire/webui/Util.java:103
 msgid "Upload"
 msgstr "Încarcă"
 
@@ -311,7 +312,7 @@ msgid "Upload slots per user (-1 means unlimited)"
 msgstr "Încărcați sloturi pentru fiecare utilizator (-1 înseamnă nelimitat)"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:257
-#: src/main/java/com/muwire/webui/Util.java:83
+#: src/main/java/com/muwire/webui/Util.java:87
 msgid "Sharing"
 msgstr "Partajare"
 
@@ -360,7 +361,7 @@ msgid "Outbound tunnel quantity"
 msgstr "Cantitatea de tunel ieșită"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:303
-#: src/main/java/com/muwire/webui/Util.java:78
+#: src/main/java/com/muwire/webui/Util.java:82
 msgid "Save"
 msgstr "Salvare"
 
@@ -393,7 +394,7 @@ msgid "Group By Sender"
 msgstr "Grup după expeditor"
 
 #: build/tmp_jsp/com/muwire/webui/Home_jsp.java:251
-#: src/main/java/com/muwire/webui/Util.java:73
+#: src/main/java/com/muwire/webui/Util.java:77
 msgid "Results"
 msgstr "Rezultate"
 
@@ -424,7 +425,7 @@ msgid "Directory for storing incomplete files"
 msgstr "Director pentru stocarea fișierelor incomplete"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:180
-#: src/main/java/com/muwire/webui/Util.java:90
+#: src/main/java/com/muwire/webui/Util.java:94
 msgid "Submit"
 msgstr "Trimite"
 
@@ -441,9 +442,13 @@ msgstr "Vizualizare ca tabel"
 msgid "View As Tree"
 msgstr "Vizualizare ca copac"
 
-#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:128
-msgid "Trust Users"
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:198
+msgid "Trusted Users"
 msgstr "Utilizatori de încredere"
+
+#: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
+msgid "Distrusted Users"
+msgstr "Utilizatori neîncrezători"
 
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:82
 #: src/main/java/com/muwire/webui/ConfigurationServlet.java:89
@@ -485,7 +490,7 @@ msgid "Never"
 msgstr "Niciodată"
 
 #: src/main/java/com/muwire/webui/UploadServlet.java:92
-#: src/main/java/com/muwire/webui/Util.java:104
+#: src/main/java/com/muwire/webui/Util.java:109
 #, java-format
 msgid "{0}% of piece"
 msgstr "{0}% din bucată"
@@ -533,208 +538,222 @@ msgid "Details for {0}"
 msgstr "Detalii pentru {0}"
 
 #: src/main/java/com/muwire/webui/Util.java:43
+msgid "Distrusted"
+msgstr "suspectă"
+
+#: src/main/java/com/muwire/webui/Util.java:44
 msgid "Distrusted User"
 msgstr "Utilizator de încredere"
 
-#: src/main/java/com/muwire/webui/Util.java:44
+#: src/main/java/com/muwire/webui/Util.java:45
 msgid "Down"
 msgstr "Jos"
 
-#: src/main/java/com/muwire/webui/Util.java:45
+#: src/main/java/com/muwire/webui/Util.java:46
 msgid "Download"
 msgstr "Descărcați"
 
-#: src/main/java/com/muwire/webui/Util.java:46
+#: src/main/java/com/muwire/webui/Util.java:47
 msgid "Download Location"
 msgstr "Descărcați locația"
 
-#: src/main/java/com/muwire/webui/Util.java:47
+#: src/main/java/com/muwire/webui/Util.java:48
+msgid "Downloaded"
+msgstr "Descărcat"
+
+#: src/main/java/com/muwire/webui/Util.java:49
 msgid "Downloaded Pieces"
 msgstr "Piese descărcate"
 
-#: src/main/java/com/muwire/webui/Util.java:48
+#: src/main/java/com/muwire/webui/Util.java:50
 msgid "Downloader"
 msgstr "Downloader"
 
-#: src/main/java/com/muwire/webui/Util.java:49
+#: src/main/java/com/muwire/webui/Util.java:51
 msgid "Downloading"
 msgstr "Se descarcă"
 
-#: src/main/java/com/muwire/webui/Util.java:50
+#: src/main/java/com/muwire/webui/Util.java:52
 msgid "Enter Reason (Optional)"
 msgstr "Introduceți motivul (opțional)"
 
-#: src/main/java/com/muwire/webui/Util.java:51
+#: src/main/java/com/muwire/webui/Util.java:53
 msgid "ETA"
 msgstr "ETA"
 
-#: src/main/java/com/muwire/webui/Util.java:52
+#: src/main/java/com/muwire/webui/Util.java:54
 msgid "Fetching Certificates"
 msgstr "Obținerea certificatelor"
 
-#: src/main/java/com/muwire/webui/Util.java:53
+#: src/main/java/com/muwire/webui/Util.java:55
 msgid "File"
 msgstr "Fişier"
 
-#: src/main/java/com/muwire/webui/Util.java:54
+#: src/main/java/com/muwire/webui/Util.java:56
 msgid "Hashing"
 msgstr "Hashing"
 
-#: src/main/java/com/muwire/webui/Util.java:55
+#: src/main/java/com/muwire/webui/Util.java:57
 msgid "Hide Certificates"
 msgstr "Ascundeți certificatele"
 
-#: src/main/java/com/muwire/webui/Util.java:56
+#: src/main/java/com/muwire/webui/Util.java:58
 msgid "Hide Comment"
 msgstr "Ascunde comentariul"
 
-#: src/main/java/com/muwire/webui/Util.java:57
+#: src/main/java/com/muwire/webui/Util.java:59
 msgid "Host"
 msgstr "Gazdă"
 
-#: src/main/java/com/muwire/webui/Util.java:58
+#: src/main/java/com/muwire/webui/Util.java:60
 msgid "Import"
 msgstr "Importă"
 
-#: src/main/java/com/muwire/webui/Util.java:59
+#: src/main/java/com/muwire/webui/Util.java:61
 msgid "Imported"
 msgstr "Importate"
 
-#: src/main/java/com/muwire/webui/Util.java:60
+#: src/main/java/com/muwire/webui/Util.java:62
 msgid "Known Sources"
 msgstr "Surse cunoscute"
 
-#: src/main/java/com/muwire/webui/Util.java:61
+#: src/main/java/com/muwire/webui/Util.java:63
 msgid "Last Updated"
 msgstr "Ultima actualizare"
 
-#: src/main/java/com/muwire/webui/Util.java:62
+#: src/main/java/com/muwire/webui/Util.java:64
 msgid "Mark Distrusted"
 msgstr "Mark Neîncredere"
 
-#: src/main/java/com/muwire/webui/Util.java:63
+#: src/main/java/com/muwire/webui/Util.java:65
 msgid "Mark Neutral"
 msgstr "Mark Neutral"
 
-#: src/main/java/com/muwire/webui/Util.java:64
+#: src/main/java/com/muwire/webui/Util.java:66
 msgid "Mark Trusted"
 msgstr "Mark de încredere"
 
-#: src/main/java/com/muwire/webui/Util.java:65
+#: src/main/java/com/muwire/webui/Util.java:67
 msgid "Name"
 msgstr "Nume"
 
-#: src/main/java/com/muwire/webui/Util.java:66
+#. verb
+#: src/main/java/com/muwire/webui/Util.java:69
 msgid "Pause"
 msgstr "Pause"
 
-#: src/main/java/com/muwire/webui/Util.java:67
+#: src/main/java/com/muwire/webui/Util.java:70
 msgid "Piece Size"
 msgstr "Dimensiune piesei"
 
-#: src/main/java/com/muwire/webui/Util.java:68
+#: src/main/java/com/muwire/webui/Util.java:71
 msgid "Progress"
 msgstr "Progres"
 
-#: src/main/java/com/muwire/webui/Util.java:69
+#: src/main/java/com/muwire/webui/Util.java:72
 msgid "Query"
 msgstr "întrebare"
 
-#: src/main/java/com/muwire/webui/Util.java:70
+#. noun
+#: src/main/java/com/muwire/webui/Util.java:74
 msgid "Reason"
 msgstr "Motiv"
 
-#: src/main/java/com/muwire/webui/Util.java:71
+#: src/main/java/com/muwire/webui/Util.java:75
 msgid "Refresh"
 msgstr "Reîmprospătează"
 
-#: src/main/java/com/muwire/webui/Util.java:72
+#: src/main/java/com/muwire/webui/Util.java:76
 msgid "Remote Pieces"
 msgstr "Piese la distanță"
 
-#: src/main/java/com/muwire/webui/Util.java:74
+#: src/main/java/com/muwire/webui/Util.java:78
 #, java-format
 msgid "Results for {0}"
 msgstr "Rezultate pentru {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:75
+#: src/main/java/com/muwire/webui/Util.java:79
 #, java-format
 msgid "Results from {0}"
 msgstr "Rezultate din {0}"
 
-#: src/main/java/com/muwire/webui/Util.java:76
+#: src/main/java/com/muwire/webui/Util.java:80
 msgid "Resume"
 msgstr "Reluare"
 
-#: src/main/java/com/muwire/webui/Util.java:77
+#: src/main/java/com/muwire/webui/Util.java:81
 msgid "Retry"
 msgstr "Încearcă din nou"
 
-#: src/main/java/com/muwire/webui/Util.java:80
+#: src/main/java/com/muwire/webui/Util.java:84
 msgid "Sender"
 msgstr "Expeditor"
 
-#: src/main/java/com/muwire/webui/Util.java:81
+#: src/main/java/com/muwire/webui/Util.java:85
 msgid "Senders"
 msgstr "Expeditorii"
 
-#: src/main/java/com/muwire/webui/Util.java:84
+#: src/main/java/com/muwire/webui/Util.java:88
 msgid "Show Comment"
 msgstr "Afișați un comentariu"
 
-#: src/main/java/com/muwire/webui/Util.java:85
+#: src/main/java/com/muwire/webui/Util.java:89
 msgid "Size"
 msgstr "Mărime"
 
-#: src/main/java/com/muwire/webui/Util.java:86
+#: src/main/java/com/muwire/webui/Util.java:90
 msgid "Sources"
 msgstr "surse"
 
-#: src/main/java/com/muwire/webui/Util.java:87
+#: src/main/java/com/muwire/webui/Util.java:91
 msgid "Speed"
 msgstr "Viteză"
 
-#: src/main/java/com/muwire/webui/Util.java:88
+#: src/main/java/com/muwire/webui/Util.java:92
 msgid "State"
 msgstr "Stare"
 
-#: src/main/java/com/muwire/webui/Util.java:91
+#: src/main/java/com/muwire/webui/Util.java:95
 msgid "Subscribe"
 msgstr "Abonati-va"
 
-#: src/main/java/com/muwire/webui/Util.java:92
+#: src/main/java/com/muwire/webui/Util.java:96
 msgid "Subscribed"
 msgstr "subscrisă"
 
-#: src/main/java/com/muwire/webui/Util.java:93
+#: src/main/java/com/muwire/webui/Util.java:97
 msgid "Total Pieces"
 msgstr "Total piese"
 
-#: src/main/java/com/muwire/webui/Util.java:95
+#: src/main/java/com/muwire/webui/Util.java:99
+msgid "Trusted"
+msgstr "Trusted"
+
+#: src/main/java/com/muwire/webui/Util.java:100
 msgid "Trusted User"
 msgstr "Utilizator de încredere"
 
-#: src/main/java/com/muwire/webui/Util.java:96
+#: src/main/java/com/muwire/webui/Util.java:101
 msgid "Unshare"
 msgstr "Anulați distribuirea"
 
-#: src/main/java/com/muwire/webui/Util.java:97
+#: src/main/java/com/muwire/webui/Util.java:102
 msgid "Unsubscribe"
 msgstr "Dezabonare"
 
-#: src/main/java/com/muwire/webui/Util.java:100
+#: src/main/java/com/muwire/webui/Util.java:105
 msgid "User"
 msgstr "Utilizator"
 
-#: src/main/java/com/muwire/webui/Util.java:101
+#: src/main/java/com/muwire/webui/Util.java:106
 msgid "View 1 Certificate"
 msgstr "Vezi 1 certificat"
 
-#: src/main/java/com/muwire/webui/Util.java:102
+#: src/main/java/com/muwire/webui/Util.java:107
 #, java-format
 msgid "View {0} Certificates"
 msgstr "Vezi {0} certificate"
 
-#: src/main/java/com/muwire/webui/Util.java:103
+#: src/main/java/com/muwire/webui/Util.java:108
 msgid "Your Trust"
 msgstr "Încrederea ta"
