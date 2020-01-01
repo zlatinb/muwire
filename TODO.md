@@ -19,6 +19,7 @@ This helps with scalability
 * Enum i18n
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
+* Public Feed feature
 
 ### Chat
 * echo "unknown/innappropriate command" in the console
