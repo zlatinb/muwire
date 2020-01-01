@@ -17,6 +17,8 @@ This helps with scalability
 * Persist trust immediately
 * Check if user-selected download and incomplete locations exist and are writeable
 * Enum i18n
+* Ability to share trust list only with trusted users
+* Confidential files visible only to certain users
 
 ### Chat
 * echo "unknown/innappropriate command" in the console
@@ -24,6 +26,7 @@ This helps with scalability
 * Style timestamps and persona names
 * enforce # in room names or ignore it
 * auto-create/join channel on server start
+* jump from notification window to room with message
 
 ### Swing GUI
 * I2P Status panel - display message when connected to external router
