@@ -108,5 +108,5 @@ You can find the full key at https://keybase.io/zlatinb
 [cli options]: https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
 [I2P Github]: https://github.com/i2p/i2p.i2p
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
-[i2cp_conf.png]: ./images/i2cp_config.png
+[i2cp_config.png]: ./images/i2cp_config.png
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
