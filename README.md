@@ -75,6 +75,7 @@ i2cp.tcp.host=112.13.0.1
 docker run \
     -p 5800:5800 \
     -v output:output \
+    --name muwire \
     muwire
 ```
 
