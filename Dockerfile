@@ -25,6 +25,10 @@ RUN ./gradlew --no-daemon clean assemble \
 
 WORKDIR /muwire
 
+# Give the app a home otherwise MuWire won't be able to do anything
+# especially read configs
+RUN usermod --home /muwire app
+
 # Cleanup
 RUN rm -rf ${TMP_DIR} /root/.gradle /root/.java
 # Leave only the JRE
