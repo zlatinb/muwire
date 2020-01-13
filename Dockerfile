@@ -15,22 +15,21 @@ WORKDIR /$TMP_DIR
 # Put sources into dir
 COPY . .
 
-# Install dependencies.
-RUN apk add --no-cache openjdk${JDK}-jdk openjdk${JDK}-jre
+# Install final dependencies
+RUN apk add --no-cache openjdk${JDK}-jre
 
 # Build and untar in future distribution dir
-RUN ./gradlew --no-daemon clean assemble \
+RUN apk add --no-cache openjdk${JDK}-jdk \
+        && ./gradlew --no-daemon clean assemble \
         && mkdir -p ${APP_HOME} \
         # Extract to ${APP_HOME and ignore the first dir
         # First dir in tar is the "MuWire-<version>"
-        && tar -C ${APP_HOME} --strip 1 -xvf gui/build/distributions/MuWire*.tar
+        && tar -C ${APP_HOME} --strip 1 -xvf gui/build/distributions/MuWire*.tar \
+        # Cleanup
+        && rm -rf "${TMP_DIR}" /root/.gradle /root/.java \
+        && apk del openjdk${JDK}-jdk
 
 WORKDIR ${APP_HOME}
-
-# Cleanup
-RUN rm -rf ${TMP_DIR} /root/.gradle /root/.java
-# Leave only the JRE
-RUN apk del openjdk${JDK}-jdk
 
 # Maximize only the main/initial window.
 RUN \
@@ -44,7 +43,6 @@ RUN \
 
 # Add files.
 COPY docker/rootfs/ /
-RUN chmod +x /startapp.sh
 
 # Set environment variables.
 ENV APP_NAME="MuWire" \
