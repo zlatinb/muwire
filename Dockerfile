@@ -23,12 +23,12 @@ RUN ./gradlew --no-daemon clean assemble \
         # First dir in tar is the "MuWire-<version>"
         && tar -C /muwire --strip 1 -xvf gui/build/distributions/MuWire*.tar
 
+WORKDIR /muwire
+
 # Cleanup
-RUN rm -rf /muwire-tmp /root/.gradle /root/.java
+RUN rm -rf ${TMP_DIR} /root/.gradle /root/.java
 # Leave only the JRE
 RUN apk del openjdk${JDK}-jdk
-
-WORKDIR /muwire
 
 # Maximize only the main/initial window.
 RUN \
@@ -49,7 +49,7 @@ ENV APP_NAME="MuWire" \
     S6_KILL_GRACETIME=8000
 
 # Define mountable directories.
-VOLUME ["/config"]
+VOLUME ["/muwire/.MuWire"]
 VOLUME ["/output"]
 
 
