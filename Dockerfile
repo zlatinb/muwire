@@ -7,6 +7,8 @@ ARG DOCKER_IMAGE_VERSION=unknown
 ARG JDK=9
 ARG TMP_DIR=muwire-tmp
 
+ENV APP_HOME=/muwire
+
 # Define working directory.
 WORKDIR /$TMP_DIR
 
@@ -18,16 +20,12 @@ RUN apk add --no-cache openjdk${JDK}-jdk openjdk${JDK}-jre
 
 # Build and untar in future distribution dir
 RUN ./gradlew --no-daemon clean assemble \
-        && mkdir -p /muwire \
-        # Extract to /muwire and ignore the first dir
+        && mkdir -p ${APP_HOME} \
+        # Extract to ${APP_HOME and ignore the first dir
         # First dir in tar is the "MuWire-<version>"
-        && tar -C /muwire --strip 1 -xvf gui/build/distributions/MuWire*.tar
+        && tar -C ${APP_HOME} --strip 1 -xvf gui/build/distributions/MuWire*.tar
 
-WORKDIR /muwire
-
-# Give the app a home otherwise MuWire won't be able to do anything
-# especially read configs
-RUN usermod --home /muwire app
+WORKDIR ${APP_HOME}
 
 # Cleanup
 RUN rm -rf ${TMP_DIR} /root/.gradle /root/.java
@@ -53,7 +51,7 @@ ENV APP_NAME="MuWire" \
     S6_KILL_GRACETIME=8000
 
 # Define mountable directories.
-VOLUME ["/muwire/.MuWire"]
+VOLUME ["$APP_HOME/.MuWire"]
 VOLUME ["/output"]
 
 
