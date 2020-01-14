@@ -5,12 +5,13 @@ ARG DOCKER_IMAGE_VERSION=unknown
 
 # JDK version
 ARG JDK=9
-ARG TMP_DIR=muwire-tmp
 
+# Important directories
+ARG TMP_DIR=/muwire-tmp
 ENV APP_HOME=/muwire
 
 # Define working directory.
-WORKDIR /$TMP_DIR
+WORKDIR $TMP_DIR
 
 # Put sources into dir
 COPY . .
