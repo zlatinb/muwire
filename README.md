@@ -74,7 +74,9 @@ i2cp.tcp.host=112.13.0.1
 ```bash
 docker run \
     -p 5800:5800 \
-    -v output:output \
+    -v config:/muwire/.MuWire \
+    -v incompletes:/incompletes \
+    -v output:/output \
     --name muwire \
     muwire
 ```
@@ -86,9 +88,15 @@ You will then be able to access the muwire GUI over a browser at http://localhos
 
 | Option       | Description                                  |
 |--------------|--------------------------------------------|
-|`-v output:output`| The `/output` volume should be used to store MuWire's download/upload data |
 |`-v config:/muwire/.MuWire`| This is where the `i2p.properties` and possibly other config should go |
+|`-v incompletes:/incompletes`| The `/incompletes` volume should be used to store MuWire's **incomplete** download/upload data \*|
+|`-v output:/output`| The `/output` volume should be used to store MuWire's download/upload data |
 
+Beware, **by default** incomplete downloads are put in `/muwire/.MuWire/incompletes`.
+It might be prudent to use the `/incompletes` volume and configure MuWire accordingly.
+Your config volume might otherwise fill up.
+
+![muwire_incompletes.png]
 
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
@@ -110,4 +118,5 @@ You can find the full key at https://keybase.io/zlatinb
 [I2P Github]: https://github.com/i2p/i2p.i2p
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
 [i2cp_config.png]: ./images/i2cp_config.png
+[muwire_incompletes.png]: ./images/muwire_incompletes.png
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui

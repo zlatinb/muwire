@@ -51,6 +51,7 @@ ENV APP_NAME="MuWire" \
 
 # Define mountable directories.
 VOLUME ["$APP_HOME/.MuWire"]
+VOLUME ["/incompletes"]
 VOLUME ["/output"]
 
 
