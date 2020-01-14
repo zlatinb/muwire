@@ -3,8 +3,9 @@
 .idea/
 .git/
 
-# Build files
+# Build directories
 build/
+**/build/
 
 # We execute COPY . .
 # Modifying these files would unnecessarily invalidate the build context
