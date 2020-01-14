@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="500"
+   height="500"
+   viewBox="0 0 132.29167 132.29167"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="/home/ubuntu/Programming/Projects/Privacy/muwire/images/icon_µ_24.png"
+   inkscape:export-xdpi="4.6079998"
+   inkscape:export-ydpi="4.6079998">
+  <title
+     id="title1217">MuWire symbol</title>
+  <defs
+     id="defs2">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path915"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="22.12045"
+     inkscape:cy="190.76374"
+     inkscape:document-units="px"
+     inkscape:current-layer="g1233"
+     showgrid="false"
+     inkscape:snap-path-clip="true"
+     inkscape:snap-perpendicular="true"
+     inkscape:snap-tangential="true"
+     inkscape:window-width="1360"
+     inkscape:window-height="701"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     units="px"
+     inkscape:pagecheckerboard="false" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>MuWire symbol</dc:title>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title></dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license
+           rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-164.70834)">
+    <g
+       id="g880"
+       style="display:none">
+      <g
+         id="g885">
+        <path
+           id="path873"
+           style="fill:none;stroke:#000000;stroke-width:2.73546982;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 86.114889,277.94753 c 0,0 11.121131,-0.95087 14.115291,2.16107 m -14.828188,-6.13743 c 0,0 14.044008,1.38308 16.253978,-3.37127 m -15.625085,-4.64921 c 4.234364,0.0611 11.291655,-0.97798 13.711295,-8.31287"
+           inkscape:connector-curvature="0" />
+        <path
+           sodipodi:nodetypes="csccscc"
+           inkscape:connector-curvature="0"
+           d="m 13.279752,286.4875 c -5.6653422,0 -10.2580108,-7.77087 -10.2580129,-17.35669 -1.1e-6,-9.58585 4.5926677,-17.35671 10.2580129,-17.35671 h 68.238075 c 5.665353,0 10.258023,7.77086 10.258023,17.35671 0,9.58582 -4.592684,17.35669 -10.258023,17.35669 z"
+           style="display:inline;opacity:0.59600004;fill:#945b3a;fill-opacity:0.99607843;stroke:#000000;stroke-width:0.12183066;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="circle831" />
+      </g>
+      <path
+         style="display:inline;fill:none;stroke:#000000;stroke-width:5.52582312;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 19.837505,277.63117 c 0,0 13.53472,-93.12866 20.629754,-100.5462 7.095034,-7.41753 6.12753,1.61251 6.12753,1.61251 0,0 -10.27684,42.96833 -8.283467,53.46225 2.487329,13.09432 23.870433,23.85661 36.663604,-0.8945 5.85122,-11.32043 10.023336,-50.51454 13.38826,-53.76507 3.898942,-3.7664 9.364341,-1.08487 8.840481,3.44907 -0.4701,4.06852 -15.456209,42.25346 -13.198695,51.92851 2.257516,9.67505 15.802575,24.51012 25.155128,2.25751"
+         id="path876"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cscsssssc" />
+    </g>
+    <g
+       id="g1201"
+       style="display:inline"
+       inkscape:label="µ with cables">
+      <path
+         sodipodi:nodetypes="cscsssssc"
+         inkscape:connector-curvature="0"
+         id="path1203"
+         d="m 10.982028,289.10279 c 17.373068,-5.87619 28.278408,-105.22797 34.613624,-112.9719 7.255062,-8.86834 6.839962,1.79999 6.839962,1.79999 0,0 -11.471701,47.96413 -9.246564,59.67815 2.776524,14.61677 26.645787,26.63036 40.926386,-0.99849 6.531525,-12.63663 11.188719,-56.38773 14.94485,-60.0162 4.352234,-4.2043 10.453044,-1.21099 9.868284,3.85008 -0.52475,4.54157 -17.253178,47.16617 -14.733189,57.96611 2.519978,10.79994 17.639809,27.35985 28.079759,2.51999"
+         style="display:inline;fill:none;stroke:#0062bb;stroke-width:13.46333599;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="µ" />
+      <g
+         id="g1215"
+         inkscape:label="Cables">
+        <path
+           id="path912"
+           style="fill:none;stroke:#000000;stroke-width:3.73062515;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 19.654762,237.20417 -9.364885,-2.87887 m 107.834393,2.87887 8.49776,-2.57023 m -59.342268,-3.0994 v -9.75179"
+           inkscape:connector-curvature="0"
+           inkscape:label="tips" />
+        <path
+           id="path899"
+           style="display:inline;fill:none;stroke:#000000;stroke-width:9.33979225;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 93.93378,292.08632 c 0,-47.13772 14.27908,-51.86678 24.19049,-54.88215 M 67.279762,290.95239 V 231.53454 M 43.84524,292.08632 C 42.711311,246.45931 29.566158,240.21954 19.654762,237.20417"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cccccc"
+           inkscape:label="cables" />
+      </g>
+      <g
+         id="g1211"
+         inkscape:label="Shielding">
+        <rect
+           style="opacity:1;fill:#808080;fill-opacity:0.78494628;stroke:none;stroke-width:2.32833338;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="rect887"
+           width="102.43155"
+           height="33.639881"
+           x="16.252975"
+           y="282.6369"
+           inkscape:label="bottom" />
+        <rect
+           y="265.32516"
+           x="23.056547"
+           height="13.229166"
+           width="88.824409"
+           id="rect891"
+           style="display:inline;opacity:1;fill:#808080;fill-opacity:0.57526879;stroke:none;stroke-width:1.3596698;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           inkscape:label="top" />
+      </g>
+    </g>
+    <g
+       inkscape:label="Just cables"
+       style="display:none"
+       id="g1233"
+       transform="matrix(1.0979062,0,0,1.5134045,-8.8404155,-156.30996)">
+      <g
+         inkscape:label="Cables"
+         id="g1225">
+        <path
+           inkscape:label="tips"
+           inkscape:connector-curvature="0"
+           d="m 19.654762,237.20417 -9.364885,-2.87887 m 107.834393,2.87887 8.49776,-2.57023 m -59.342268,-3.0994 v -9.75179"
+           style="fill:none;stroke:#000000;stroke-width:3.73062515;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path1221" />
+        <path
+           inkscape:label="cables"
+           sodipodi:nodetypes="cccccc"
+           inkscape:connector-curvature="0"
+           d="m 93.93378,297.99296 c 0,-47.13772 3.081039,-54.24139 24.19049,-60.78879 M 67.279762,297.89722 V 231.53454 M 43.84524,297.68077 c -1.133929,-45.62701 -2.59417,-52.16318 -24.190478,-60.4766"
+           style="display:inline;fill:none;fill-opacity:0.62365591;stroke:#0070b0;stroke-width:9.33979225;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path1223" />
+      </g>
+      <g
+         inkscape:label="Shielding"
+         id="g1231"
+         style="fill:#000000;fill-opacity:0.62365591">
+        <rect
+           inkscape:label="bottom"
+           y="282.6369"
+           x="16.252975"
+           height="33.639881"
+           width="102.43155"
+           id="rect1227"
+           style="opacity:1;fill:#000000;fill-opacity:0.62365591;stroke:none;stroke-width:2.32833338;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+        <rect
+           inkscape:label="top"
+           style="display:inline;opacity:1;fill:#000000;fill-opacity:0.62365591;stroke:none;stroke-width:1.3596698;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="rect1229"
+           width="88.824409"
+           height="13.229166"
+           x="23.056547"
+           y="265.32516" />
+      </g>
+    </g>
+  </g>
+</svg>
