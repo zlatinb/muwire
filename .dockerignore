@@ -1,0 +1,12 @@
+# Dot directories
+.gradle/
+.idea/
+.git/
+
+# Build directories
+build/
+**/build/
+
+# We execute COPY . .
+# Modifying these files would unnecessarily invalidate the build context
+Dockerfile

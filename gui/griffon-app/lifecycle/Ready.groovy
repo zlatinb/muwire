@@ -44,6 +44,8 @@ class Ready extends AbstractLifecycleHandler {
             propsFile.withReader("UTF-8", {
                 props.load(it)
             })
+            if (!props.containsKey("nickname"))
+                props.setProperty("nickname", selectNickname())
             props = new MuWireSettings(props)
             if (props.incompleteLocation == null)
                 props.incompleteLocation = new File(home, "incompletes")
@@ -53,29 +55,7 @@ class Ready extends AbstractLifecycleHandler {
             props.incompleteLocation = new File(home, "incompletes")
             props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
             props.updateType = System.getProperty("updateType","jar")
-            def nickname
-            while (true) {
-                nickname = JOptionPane.showInputDialog(null,
-                        "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
-                        "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
-                if (nickname == null) {
-                    JOptionPane.showMessageDialog(null, "MuWire cannot start without a nickname and will now exit", JOptionPane.PLAIN_MESSAGE)
-                    System.exit(0)
-                }
-                if (nickname.trim().length() == 0) {
-                    JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
-                        JOptionPane.WARNING_MESSAGE)
-                    continue
-                }
-                if (nickname.contains("@")) {
-                    JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another",
-                        "Select another nickname", JOptionPane.WARNING_MESSAGE)
-                    continue
-                }
-                nickname = nickname.trim()
-                break
-            }
-            props.setNickname(nickname)
+            props.setNickname(selectNickname())
 
 
             def portableDownloads = System.getProperty("portable.downloads")
@@ -119,6 +99,32 @@ class Ready extends AbstractLifecycleHandler {
         }
 
         core.eventBus.publish(new UILoadedEvent())
+    }
+    
+    private String selectNickname() {
+        String nickname
+        while (true) {
+            nickname = JOptionPane.showInputDialog(null,
+                    "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
+                    "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
+                    if (nickname == null) {
+                        JOptionPane.showMessageDialog(null, "MuWire cannot start without a nickname and will now exit", JOptionPane.PLAIN_MESSAGE)
+                        System.exit(0)
+                    }
+            if (nickname.trim().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
+                        JOptionPane.WARNING_MESSAGE)
+                continue
+            }
+            if (nickname.contains("@")) {
+                JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another",
+                        "Select another nickname", JOptionPane.WARNING_MESSAGE)
+                continue
+            }
+            nickname = nickname.trim()
+            break
+        }
+        nickname
     }
 }
 
