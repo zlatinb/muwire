@@ -92,12 +92,6 @@ You will then be able to access the muwire GUI over a browser at http://localhos
 |`-v incompletes:/incompletes`| The `/incompletes` volume should be used to store MuWire's **incomplete** download/upload data \*|
 |`-v output:/output`| The `/output` volume should be used to store MuWire's download/upload data |
 
-Beware, **by default** incomplete downloads are put in `/muwire/.MuWire/incompletes`.
-It might be prudent to use the `/incompletes` volume and configure MuWire accordingly.
-Your config volume might otherwise fill up.
-
-![muwire_incompletes.png]
-
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
 
