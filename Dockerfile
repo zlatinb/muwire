@@ -17,10 +17,10 @@ WORKDIR $TMP_DIR
 COPY . .
 
 # Install final dependencies
-RUN apk add --no-cache openjdk${JDK}-jre
+RUN add-pkg openjdk${JDK}-jre
 
 # Build and untar in future distribution dir
-RUN apk add --no-cache openjdk${JDK}-jdk \
+RUN add-pkg --virtual openjdk${JDK}-jdk \
         && ./gradlew --no-daemon clean assemble \
         && mkdir -p ${APP_HOME} \
         # Extract to ${APP_HOME and ignore the first dir
@@ -28,7 +28,7 @@ RUN apk add --no-cache openjdk${JDK}-jdk \
         && tar -C ${APP_HOME} --strip 1 -xvf gui/build/distributions/MuWire*.tar \
         # Cleanup
         && rm -rf "${TMP_DIR}" /root/.gradle /root/.java \
-        && apk del openjdk${JDK}-jdk
+        && del-pkg openjdk${JDK}-jdk
 
 WORKDIR ${APP_HOME}
 
