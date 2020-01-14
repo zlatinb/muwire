@@ -17,4 +17,10 @@ chmod 640 /etc/shadow
 echo "$APP_USER:x:$USER_ID:$GROUP_ID::${APP_HOME:-/dev/null}:/sbin/nologin" >> /etc/passwd
 echo "$APP_USER:x:$GROUP_ID:" >> /etc/group
 
+# Make sure APP_HOME is editable by the user
+if [[ -n "$APP_HOME" ]] ; then
+    chown -R "$APP_USER" "$APP_HOME"
+    chmod -R u+rw "$APP_HOME"
+fi
+
 # vim:ft=sh:ts=4:sw=4:et:sts=4
