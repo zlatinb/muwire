@@ -78,7 +78,7 @@ docker run \
     -v incompletes:/incompletes \
     -v output:/output \
     --name muwire \
-    muwire
+    bisentenialwrug/muwire
 ```
 
 You will then be able to access the muwire GUI over a browser at http://localhost:5800
