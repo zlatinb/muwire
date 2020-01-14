@@ -44,53 +44,7 @@ There is a Web-based UI under development.  It is intended to be run as a plugin
 
 ## Docker
 
-The Docker image is based on the wonderful work in [jlesage/docker-baseimage-gui].
-You can refer to it for environment variables to pass to the container.
-
-If you don't want to use the image on dockerhub, build an image yourself.
-```bash
-MUWIRE_VERSION=`awk -F "=" '/^version/ { gsub(" ","") ; print $2}' gradle.properties`
-docker build -t muwire:latest,muwire:${MUWIRE_VERSION} .
-```
-
-**Necessary configuration**
-
-Since MuWire will be running in a container, it won't have direct access to the host's localhost.
-By default, it will be configured to use `172.17.0.1` as the target host.  
-You'll need to open the I2CP port on that interface.
-If you're running I2P on the localhost, navigate to http://localhost:7657/configi2cp and make the necessary changes.
-
-![i2cp_config.png]
-
-Should you be using a different interface write an `i2p.properties` and then put that into the shared docker volume.
-
-Example configuration file:
-```properties
-i2cp.tcp.host=112.13.0.1
-```
-
-**Running**
-
-```bash
-docker run \
-    -p 5800:5800 \
-    -v config:/muwire/.MuWire \
-    -v incompletes:/incompletes \
-    -v output:/output \
-    --name muwire \
-    zlatinb/muwire
-```
-
-You will then be able to access the muwire GUI over a browser at http://localhost:5800
-
-**Options**
-
-
-| Option       | Description                                  |
-|--------------|--------------------------------------------|
-|`-v config:/muwire/.MuWire`| This is where the `i2p.properties` and possibly other config should go |
-|`-v incompletes:/incompletes`| The `/incompletes` volume should be used to store MuWire's **incomplete** download/upload data \*|
-|`-v output:/output`| The `/output` volume should be used to store MuWire's download/upload data |
+MuWire is available as a Docker image.  For more information see the [Docker] page.
 
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
@@ -111,6 +65,5 @@ You can find the full key at https://keybase.io/zlatinb
 [cli options]: https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
 [I2P Github]: https://github.com/i2p/i2p.i2p
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
-[i2cp_config.png]: ./images/i2cp_config.png
-[muwire_incompletes.png]: ./images/muwire_incompletes.png
+[Docker}: https://github.com/zlatinb/muwire/wiki/Docker
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
