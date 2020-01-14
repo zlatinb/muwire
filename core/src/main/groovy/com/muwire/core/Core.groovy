@@ -128,23 +128,23 @@ public class Core {
         this.muOptions = props
 
         i2pOptions = new Properties()
-        def i2pOptionsFile = new File(home,"i2p.properties")
+        // Read defaults
+        def defaultI2PFile = getClass()
+                .getClassLoader().getResource("defaults/i2p.properties");
+        defaultI2PFile.withInputStream { i2pOptions.load(it) }
+
+        def i2pOptionsFile = new File(home, "i2p.properties")
         if (i2pOptionsFile.exists()) {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
 
             if (!i2pOptions.containsKey("inbound.nickname"))
                 i2pOptions["inbound.nickname"] = "MuWire"
-                if (!i2pOptions.containsKey("outbound.nickname"))
-                    i2pOptions["outbound.nickname"] = "MuWire"
-        } else {
-            i2pOptions["inbound.nickname"] = "MuWire"
-            i2pOptions["outbound.nickname"] = "MuWire"
-            i2pOptions["inbound.length"] = "3"
-            i2pOptions["inbound.quantity"] = "4"
-            i2pOptions["outbound.length"] = "3"
-            i2pOptions["outbound.quantity"] = "4"
-            i2pOptions["i2cp.tcp.host"] = "127.0.0.1"
-            i2pOptions["i2cp.tcp.port"] = "7654"
+            if (!i2pOptions.containsKey("outbound.nickname"))
+                i2pOptions["outbound.nickname"] = "MuWire"
+        }
+        if (!(i2pOptions.hasProperty("i2np.ntcp.port")
+                && i2pOptions.hasProperty("i2np.udp.port")
+        )) {
             Random r = new Random()
             int port = r.nextInt(60000) + 4000
             i2pOptions["i2np.ntcp.port"] = String.valueOf(port)
