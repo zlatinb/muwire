@@ -1,4 +1,11 @@
+# Dot directories
 .gradle/
 .idea/
 .git/
+
+# Build files
+build/
+
+# We execute COPY . .
+# Modifying these files would unnecessarily invalidate the build context
 Dockerfile
