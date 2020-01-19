@@ -155,6 +155,7 @@ class PersisterService extends Service {
 
             File tmp = File.createTempFile("muwire-files", "tmp")
             tmp.deleteOnExit()
+            def startTime = System.currentTimeMillis()
             tmp.withPrintWriter { writer ->
                 sharedFiles.each { k, v ->
                     def json = toJson(k,v)
@@ -162,7 +163,10 @@ class PersisterService extends Service {
                     writer.println json
                 }
             }
+            log.info("Time(ms) to write tmp files.json: "+ (System.currentTimeMillis() - startTime))
+            startTime = System.currentTimeMillis()
             Files.copy(tmp.toPath(), location.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            log.info("Time(ms) to copy tmp files.json: "+ (System.currentTimeMillis() - startTime))
             tmp.delete()
         } as Runnable)
     }
