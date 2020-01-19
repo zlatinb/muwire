@@ -4,7 +4,7 @@ FROM jlesage/baseimage-gui:alpine-3.10-glibc
 ARG DOCKER_IMAGE_VERSION=unknown
 
 # JDK version
-ARG JDK=9
+ARG JDK=11
 
 # Important directories
 ARG TMP_DIR=/muwire-tmp
