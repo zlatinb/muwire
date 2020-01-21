@@ -6,4 +6,5 @@ import com.muwire.core.SharedFile
 class FileLoadedEvent extends Event {
 
     SharedFile loadedFile
+    Class sourceClass
 }

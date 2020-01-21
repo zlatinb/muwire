@@ -2,6 +2,8 @@ package com.muwire.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,6 +52,16 @@ public class SharedFile {
 
     public File getFile() {
         return file;
+    }
+
+    public byte[] getPathHash() throws NoSuchAlgorithmException {
+        var digester = MessageDigest.getInstance("SHA-256");
+        digester.update(file.getAbsolutePath().getBytes());
+        return digester.digest();
+    }
+
+    public String getB64PathHash() throws NoSuchAlgorithmException {
+        return Base64.encode(getPathHash());
     }
 
     public InfoHash getInfoHash() {
