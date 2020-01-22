@@ -264,6 +264,7 @@ public class Core {
         log.info "initializing folder persistence service"
         persisterFolderService = new PersisterFolderService(new File(home, "files"), eventBus)
         eventBus.register(PersisterDoneEvent.class, persisterFolderService)
+        eventBus.register(FileLoadedEvent.class, persisterFolderService)
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
 

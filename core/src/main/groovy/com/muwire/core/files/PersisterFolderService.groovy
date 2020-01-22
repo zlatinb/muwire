@@ -68,8 +68,9 @@ class PersisterFolderService extends BasePersisterService {
         }
     }
     void onFileLoadedEvent(FileLoadedEvent loadedEvent) {
-        if(loadedEvent.sourceClass == PersisterService){
-            log.info("Migrating persisted file from PersisterService")
+        if(loadedEvent.source == "PersisterService"){
+            log.info("Migrating persisted file from PersisterService: "
+                    + loadedEvent.loadedFile.file.absolutePath.toString())
             persistFile(loadedEvent.loadedFile)
         }
     }
@@ -124,7 +125,7 @@ class PersisterFolderService extends BasePersisterService {
             def jsonPath = getJsonPath(sf)
 
             def startTime = System.currentTimeMillis()
-            jsonPath.parent.toFile().mkdir()
+            jsonPath.parent.toFile().mkdirs()
             jsonPath.toFile().withPrintWriter { writer ->
                 def json = toJson sf
                 json = JsonOutput.toJson(json)
