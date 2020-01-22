@@ -49,6 +49,7 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onPersisterDoneEvent(PersisterDoneEvent persisterDoneEvent) {
+        log.info("Old persister done")
         load()
     }
 
@@ -74,6 +75,7 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void load() {
+        log.fine("Loading...")
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
 
         if (location.exists() && location.isDirectory()) {
