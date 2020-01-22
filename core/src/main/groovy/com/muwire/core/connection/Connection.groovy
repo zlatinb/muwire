@@ -88,11 +88,11 @@ abstract class Connection implements Closeable {
             log.log(Level.WARNING, "$name already closed", new Exception() )
             return
         }
-        log.info("closing $name")
+        log.fine("closing $name")
         reader.interrupt()
         writer.interrupt()
         endpoint.close()
-        log.info("closed $name")
+        log.fine("closed $name")
         eventBus.publish(new DisconnectionEvent(destination: endpoint.destination))
     }
 
