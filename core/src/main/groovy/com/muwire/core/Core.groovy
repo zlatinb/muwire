@@ -1,5 +1,6 @@
 package com.muwire.core
 
+import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
 
 import java.nio.charset.StandardCharsets
@@ -262,7 +263,7 @@ public class Core {
 
         log.info "initializing folder persistence service"
         persisterFolderService = new PersisterFolderService(new File(home, "files"), eventBus)
-        eventBus.register(UILoadedEvent.class, persisterFolderService)
+        eventBus.register(PersisterDoneEvent.class, persisterFolderService)
         eventBus.register(UIPersistFilesEvent.class, persisterFolderService)
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)

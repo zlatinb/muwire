@@ -60,16 +60,17 @@ class PersisterService extends BasePersisterService {
                         }
                     }
                 }
-                // TODO: should PersisterFolderService be the one doing this?
-                listener.publish(new AllFilesLoadedEvent())
+                // Backup the old hashes
+                location.renameTo(
+                        new File(location.absolutePath + ".bak")
+                )
+                listener.publish(new PersisterDoneEvent())
             } catch (IllegalArgumentException e) {
                 log.log(Level.WARNING, "couldn't load files",e)
             }
         } else {
-            // TODO: should PersisterFolderService be the one doing this?
-            listener.publish(new AllFilesLoadedEvent())
+            listener.publish(new PersisterDoneEvent())
         }
-        // TODO: Get rid of the files.json
         loaded = true
     }
 

@@ -19,6 +19,8 @@ import java.util.logging.Level
  *
  * The absolute path's 32bit hash to the shared file is used
  * to build the directory and filename.
+ *
+ * This persister only starts working once the old persister has finished loading
  * @see PersisterFolderService#getJsonPath
  */
 @Log
@@ -46,8 +48,8 @@ class PersisterFolderService extends BasePersisterService {
         persisterExecutor.shutdown()
     }
 
-    void onUILoadedEvent(UILoadedEvent e) {
-        timer.schedule({ load() } as TimerTask, 1)
+    void onPersisterDoneEvent(PersisterDoneEvent persisterDoneEvent) {
+        load()
     }
 
     void onUIPersistFilesEvent(UIPersistFilesEvent e) {
