@@ -52,10 +52,6 @@ class PersisterFolderService extends BasePersisterService {
         load()
     }
 
-    void onUIPersistFilesEvent(UIPersistFilesEvent e) {
-        persistFiles()
-    }
-
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
         persistFile(hashedEvent.sharedFile)
     }

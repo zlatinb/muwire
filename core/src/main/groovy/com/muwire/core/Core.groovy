@@ -43,7 +43,7 @@ import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
-import com.muwire.core.files.UIPersistFilesEvent
+
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -264,7 +264,6 @@ public class Core {
         log.info "initializing folder persistence service"
         persisterFolderService = new PersisterFolderService(new File(home, "files"), eventBus)
         eventBus.register(PersisterDoneEvent.class, persisterFolderService)
-        eventBus.register(UIPersistFilesEvent.class, persisterFolderService)
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
 
