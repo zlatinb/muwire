@@ -71,7 +71,7 @@ abstract class BasePersisterService extends Service{
                 sf.hit(searcher, timestamp, query)
             }
         }
-        return new FileLoadedEvent(loadedFile: sf)
+        return new FileLoadedEvent(loadedFile: sf, sourceClass: this.class)
 
     }
 
