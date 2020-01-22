@@ -95,10 +95,6 @@ class PersisterFolderService extends BasePersisterService {
 
     /**
      * Loads every JSON into memory
-     *
-     * TODO: Decide if this is a good idea
-     *       The more shared files, the more we'll load in memory.
-     *       It might not be necessary
      */
     private void _load() {
         int loaded = 0
