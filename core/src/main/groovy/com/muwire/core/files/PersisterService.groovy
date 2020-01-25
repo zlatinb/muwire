@@ -19,9 +19,6 @@ class PersisterService extends BasePersisterService {
     final int interval
     final Timer timer
     final FileManager fileManager
-    final ExecutorService persisterExecutor = Executors.newSingleThreadExecutor({ r -> 
-        new Thread(r, "file persister")
-    } as ThreadFactory)
 
     PersisterService(File location, EventBus listener, int interval, FileManager fileManager) {
         this.location = location
@@ -33,7 +30,6 @@ class PersisterService extends BasePersisterService {
 
     void stop() {
         timer.cancel()
-        persisterExecutor.shutdown()
     }
 
     void onUILoadedEvent(UILoadedEvent e) {
