@@ -28,6 +28,7 @@ class PersisterFolderService extends BasePersisterService {
 
     final static int CUT_LENGTH = 6
 
+    private final Core core;
     final File location
     final EventBus listener
     final int interval
@@ -36,7 +37,8 @@ class PersisterFolderService extends BasePersisterService {
         new Thread(r, "file persister")
     } as ThreadFactory)
 
-    PersisterFolderService(File location, EventBus listener) {
+    PersisterFolderService(Core core, File location, EventBus listener) {
+        this.core = core;
         this.location = location
         this.listener = listener
         this.interval = interval
@@ -58,7 +60,9 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
-        persistFile(downloadedEvent.downloadedFile)
+        if (core.getMuOptions().getShareDownloadedFiles()) {
+            persistFile(downloadedEvent.downloadedFile)
+        }
     }
 
     /**

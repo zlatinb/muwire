@@ -262,7 +262,7 @@ public class Core {
         eventBus.register(UILoadedEvent.class, persisterService)
 
         log.info "initializing folder persistence service"
-        persisterFolderService = new PersisterFolderService(new File(home, "files"), eventBus)
+        persisterFolderService = new PersisterFolderService(this, new File(home, "files"), eventBus)
         eventBus.register(PersisterDoneEvent.class, persisterFolderService)
         eventBus.register(FileDownloadedEvent.class, persisterFolderService)
         eventBus.register(FileLoadedEvent.class, persisterFolderService)
