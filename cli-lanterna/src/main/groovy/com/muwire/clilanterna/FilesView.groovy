@@ -21,7 +21,6 @@ import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
-import com.muwire.core.files.UIPersistFilesEvent
 
 class FilesView extends BasicWindow {
     private final FilesModel model
@@ -84,7 +83,6 @@ class FilesView extends BasicWindow {
         
         Button unshareButton = new Button("Unshare", {
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
-            core.eventBus.publish(new UIPersistFilesEvent())
             MessageDialog.showMessageDialog(textGUI, "File Unshared", "Unshared "+sf.getFile().getName(), MessageDialogButton.OK)
         } )
         Button addCommentButton = new Button("Add Comment", {

@@ -3,15 +3,11 @@ package com.muwire.gui
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
-import griffon.core.mvc.MVCGroup
-import griffon.core.mvc.MVCGroupConfiguration
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import groovy.json.StringEscapeUtils
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
-import net.i2p.data.SigningPrivateKey
 
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -30,15 +26,11 @@ import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.Downloader
-import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
-import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
-import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileUnsharedEvent
-import com.muwire.core.files.UIPersistFilesEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
@@ -371,7 +363,6 @@ class MainFrameController {
         sf.each {  
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : it))
         }
-        core.eventBus.publish(new UIPersistFilesEvent())
     }
     
     @ControllerAction

@@ -1,5 +1,8 @@
 package com.muwire.core
 
+import com.muwire.core.files.PersisterDoneEvent
+import com.muwire.core.files.PersisterFolderService
+
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -31,7 +34,6 @@ import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.filecert.UIImportCertificateEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
-import com.muwire.core.files.FileHashingEvent
 import com.muwire.core.files.FileHasher
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileManager
@@ -41,7 +43,7 @@ import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
-import com.muwire.core.files.UIPersistFilesEvent
+
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -74,10 +76,8 @@ import net.i2p.client.I2PClientFactory
 import net.i2p.client.I2PSession
 import net.i2p.client.streaming.I2PSocketManager
 import net.i2p.client.streaming.I2PSocketManagerFactory
-import net.i2p.client.streaming.I2PSocketOptions
 import net.i2p.client.streaming.I2PSocketManager.DisconnectListener
 import net.i2p.crypto.DSAEngine
-import net.i2p.crypto.SigType
 import net.i2p.data.Destination
 import net.i2p.data.PrivateKey
 import net.i2p.data.Signature
@@ -100,6 +100,7 @@ public class Core {
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
+    private final PersisterFolderService persisterFolderService
     private final HostCache hostCache
     private final ConnectionManager connectionManager
     private final CacheClient cacheClient
@@ -259,7 +260,14 @@ public class Core {
         log.info "initializing persistence service"
         persisterService = new PersisterService(new File(home, "files.json"), eventBus, 60000, fileManager)
         eventBus.register(UILoadedEvent.class, persisterService)
-        eventBus.register(UIPersistFilesEvent.class, persisterService)
+
+        log.info "initializing folder persistence service"
+        persisterFolderService = new PersisterFolderService(this, new File(home, "files"), eventBus)
+        eventBus.register(PersisterDoneEvent.class, persisterFolderService)
+        eventBus.register(FileDownloadedEvent.class, persisterFolderService)
+        eventBus.register(FileLoadedEvent.class, persisterFolderService)
+        eventBus.register(FileHashedEvent.class, persisterFolderService)
+        eventBus.register(FileUnsharedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         File hostStorage = new File(home, "hosts.json")
@@ -398,6 +406,8 @@ public class Core {
         trustService.stop()
         log.info("shutting down persister service")
         persisterService.stop()
+        log.info("shutting down persisterFolder service")
+        persisterFolderService.stop()
         log.info("shutting down download manager")
         downloadManager.shutdown()
         log.info("shutting down connection acceptor")
