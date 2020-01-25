@@ -49,6 +49,7 @@ class PersisterService extends BasePersisterService {
                         def event = fromJson parsed
                         if (event != null) {
                             log.fine("loaded file $event.loadedFile.file")
+                            event.source = "PersisterService"
                             listener.publish event
                             loaded++
                             if (loaded % 10 == 0)

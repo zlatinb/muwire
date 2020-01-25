@@ -53,7 +53,7 @@ abstract class BasePersisterService extends Service{
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
             DownloadedFile df = new DownloadedFile(file, ih, pieceSize, sourceSet)
             df.setComment(json.comment)
-            return new FileLoadedEvent(loadedFile : df, source : "PersisterService")
+            return new FileLoadedEvent(loadedFile : df)
         }
 
 
@@ -71,7 +71,7 @@ abstract class BasePersisterService extends Service{
                 sf.hit(searcher, timestamp, query)
             }
         }
-        return new FileLoadedEvent(loadedFile: sf, source : "PersisterService")
+        return new FileLoadedEvent(loadedFile: sf)
 
     }
 
