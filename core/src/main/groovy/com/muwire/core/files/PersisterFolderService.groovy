@@ -56,6 +56,11 @@ class PersisterFolderService extends BasePersisterService {
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
         persistFile(hashedEvent.sharedFile)
     }
+
+    void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
+        persistFile(downloadedEvent.downloadedFile)
+    }
+
     /**
      * Get rid of the json of unshared files
      * @param unsharedEvent
