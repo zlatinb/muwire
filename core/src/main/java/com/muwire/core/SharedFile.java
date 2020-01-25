@@ -23,7 +23,8 @@ public class SharedFile {
 
     private final String cachedPath;
     private final long cachedLength;
-    
+
+    private String b64PathHash;
     private final String b64EncodedFileName;
     private final String b64EncodedHashRoot;
     private final List<String> b64EncodedHashList;
@@ -40,7 +41,7 @@ public class SharedFile {
         this.cachedLength = file.length();
         this.b64EncodedFileName = Base64.encode(DataUtil.encodei18nString(file.toString()));
         this.b64EncodedHashRoot = Base64.encode(infoHash.getRoot());
-        
+
         List<String> b64List = new ArrayList<String>();
         byte[] tmp = new byte[32];
         for (int i = 0; i < infoHash.getHashList().length / 32; i++) {
@@ -61,7 +62,10 @@ public class SharedFile {
     }
 
     public String getB64PathHash() throws NoSuchAlgorithmException {
-        return Base64.encode(getPathHash());
+        if(b64PathHash == null){
+            b64PathHash = Base64.encode(getPathHash());
+        }
+        return b64PathHash;
     }
 
     public InfoHash getInfoHash() {
