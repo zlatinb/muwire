@@ -261,12 +261,13 @@ public class FilesServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
             sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
-            sb.append("<InfoHash>").append(Base64.encode(sf.getInfoHash().getRoot())).append("</InfoHash>");
+            sb.append("<InfoHash>").append(Base64.encode(sf.getRoot())).append("</InfoHash>");
             if (sf.getComment() != null) {
                 String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             }
-            sb.append("<Certified>").append(core.getCertificateManager().hasLocalCertificate(sf.getInfoHash())).append("</Certified>");
+            InfoHash ih = new InfoHash(sf.getRoot());
+            sb.append("<Certified>").append(core.getCertificateManager().hasLocalCertificate(ih)).append("</Certified>");
             // TODO: other stuff
             sb.append("</File>");
         }
