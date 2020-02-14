@@ -3,6 +3,7 @@ package com.muwire.clilanterna
 import com.googlecode.lanterna.gui2.TextGUIThread
 import com.googlecode.lanterna.gui2.table.TableModel
 import com.muwire.core.Core
+import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -72,7 +73,7 @@ class FilesModel {
         sharedFiles.each { 
             long size = it.getCachedLength()
             boolean comment = it.comment != null
-            boolean certified = core.certificateManager.hasLocalCertificate(it.getInfoHash())
+            boolean certified = core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
             String hits = String.valueOf(it.getHits())
             String downloaders = String.valueOf(it.getDownloaders().size())
             model.addRow(new SharedFileWrapper(it), DataHelper.formatSize2(size, false)+"B", comment, certified, hits, downloaders)
