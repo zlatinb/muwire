@@ -912,7 +912,7 @@ class MainFrameView {
         String roots = ""
         for (Iterator<SharedFile> iterator = selectedFiles.iterator(); iterator.hasNext(); ) {
             SharedFile selected = iterator.next()
-            String root = Base64.encode(selected.infoHash.getRoot())
+            String root = Base64.encode(selected.getRoot())
             roots += root
             if (iterator.hasNext())
                 roots += "\n"
