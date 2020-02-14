@@ -89,12 +89,13 @@ public class FilesServlet extends HttpServlet {
                 String comment = null;
                 if (sf.getComment() != null) 
                     comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));
+                InfoHash ih = new InfoHash(sf.getRoot());
                 FilesTableEntry entry = new FilesTableEntry(sf.getFile().getName(),
-                        sf.getInfoHash(),
+                        ih,
                         sf.getCachedPath(),
                         sf.getCachedLength(),
                         comment,
-                        core.getCertificateManager().hasLocalCertificate(sf.getInfoHash()));
+                        core.getCertificateManager().hasLocalCertificate(ih));
                 entries.add(entry);
             });
             
