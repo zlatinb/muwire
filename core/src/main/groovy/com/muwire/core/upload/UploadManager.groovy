@@ -12,6 +12,7 @@ import com.muwire.core.download.DownloadManager
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.SourceDiscoveredEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.files.PersisterFolderService
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.mesh.MeshManager
 
@@ -22,6 +23,7 @@ import net.i2p.data.Base64
 public class UploadManager {
     private final EventBus eventBus
     private final FileManager fileManager
+    private final PersisterFolderService persisterService
     private final MeshManager meshManager
     private final DownloadManager downloadManager
     private final MuWireSettings props
@@ -34,9 +36,11 @@ public class UploadManager {
 
     public UploadManager(EventBus eventBus, FileManager fileManager,
         MeshManager meshManager, DownloadManager downloadManager,
+        PersisterFolderService persisterService,
         MuWireSettings props) {
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.persisterService = persisterService
         this.meshManager = meshManager
         this.downloadManager = downloadManager
         this.props = props
@@ -162,7 +166,7 @@ public class UploadManager {
 
         InfoHash fullInfoHash
         if (downloader == null) {
-            fullInfoHash = sharedFiles.iterator().next().infoHash
+            fullInfoHash = persisterService.loadInfoHash(sharedFiles.iterator().next())
         } else {
             byte [] hashList = downloader.getInfoHash().getHashList()
             if (hashList != null && hashList.length > 0)

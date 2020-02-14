@@ -119,7 +119,7 @@ class ResultsSender {
                         me.write(os)
                         os.writeShort((short)results.length)
                         results.each {
-                            int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
+                            int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
@@ -141,7 +141,7 @@ class ResultsSender {
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
-                            int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
+                            int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
@@ -170,7 +170,7 @@ class ResultsSender {
         obj.type = "Result"
         obj.version = 2
         obj.name = encodedName
-        obj.infohash = Base64.encode(sf.getInfoHash().getRoot())
+        obj.infohash = Base64.encode(sf.getRoot())
         obj.size = sf.getCachedLength()
         obj.pieceSize = sf.getPieceSize()
 

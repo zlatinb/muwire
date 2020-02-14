@@ -166,4 +166,9 @@ class PersisterFolderService extends BasePersisterService {
                 pathHash.substring(CUT_LENGTH) + ".hashlist"
         )
     }
+    
+    InfoHash loadInfoHash(SharedFile sf) {
+        def path = getHashListPath(sf)
+        InfoHash.fromHashList(path.toFile().bytes)
+    }
 }
