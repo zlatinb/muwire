@@ -363,6 +363,8 @@ class MainFrameModel {
     }
 
     void onFileLoadedEvent(FileLoadedEvent e) {
+        if (e.source == "PersisterService")
+            return
         runInsideUIAsync {
             shared << e.loadedFile
             loadedFiles = shared.size()
