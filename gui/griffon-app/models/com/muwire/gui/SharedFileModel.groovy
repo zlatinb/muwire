@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Core
+import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 
 import griffon.core.artifact.GriffonModel
@@ -21,6 +22,6 @@ class SharedFileModel {
     public void mvcGroupInit(Map<String,String> args) {
         searchers.addAll(sf.getSearches())
         downloaders.addAll(sf.getDownloaders())
-        certificates.addAll(core.certificateManager.byInfoHash.getOrDefault(sf.infoHash,[]))
+        certificates.addAll(core.certificateManager.byInfoHash.getOrDefault(new InfoHash(sf.getRoot()),[]))
     }
 }
