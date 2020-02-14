@@ -83,7 +83,7 @@ class UpdateClient {
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent e) {
-        if (e.downloadedFile.infoHash != updateInfoHash)
+        if (e.infoHash != updateInfoHash)
             return
         updateDownloading = false
         eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, text : text))

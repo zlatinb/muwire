@@ -65,7 +65,8 @@ class HasherService {
             } else {
                 eventBus.publish new FileHashingEvent(hashingFile: f)
                 def hash = hasher.hashFile f
-                eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash, FileHasher.getPieceSize(f.length())))
+                eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length())),
+                    infoHash : hash)
             }
         }
     }

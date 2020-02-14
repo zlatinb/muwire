@@ -51,13 +51,13 @@ abstract class BasePersisterService extends Service{
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
-            DownloadedFile df = new DownloadedFile(file, ih, pieceSize, sourceSet)
+            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sourceSet)
             df.setComment(json.comment)
-            return new FileLoadedEvent(loadedFile : df)
+            return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
 
 
-        SharedFile sf = new SharedFile(file, ih, pieceSize)
+        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
         sf.setComment(json.comment)
         if (json.downloaders != null)
             sf.getDownloaders().addAll(json.downloaders)
@@ -71,18 +71,61 @@ abstract class BasePersisterService extends Service{
                 sf.hit(searcher, timestamp, query)
             }
         }
-        return new FileLoadedEvent(loadedFile: sf)
+        return new FileLoadedEvent(loadedFile: sf, infoHash: ih)
 
+    }
+    
+    protected static FileLoadedEvent fromJsonLite(json) {
+        if (json.file == null || json.length == null || json.root == null)
+            throw new IllegalArgumentException()
+            
+        def file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
+        file = file.getCanonicalFile()
+        if (!file.exists() || file.isDirectory())
+            return null
+        long length = Long.valueOf(json.length)
+        if (length != file.length())
+            return null
+            
+        byte[] root = Base64.decode(json.root)
+        InfoHash ih = new InfoHash(root)
+        
+        int pieceSize = 0
+        if (json.pieceSize != null)
+            pieceSize = json.pieceSize
+
+        if (json.sources != null) {
+            List sources = (List)json.sources
+            Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
+            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sourceSet)
+            df.setComment(json.comment)
+            return new FileLoadedEvent(loadedFile : df, infoHash: ih)
+        }
+
+
+        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
+        sf.setComment(json.comment)
+        if (json.downloaders != null)
+            sf.getDownloaders().addAll(json.downloaders)
+        if (json.searchers != null) {
+            json.searchers.each {
+                Persona searcher = null
+                if (it.searcher != null)
+                    searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
+                long timestamp = it.timestamp
+                String query = it.query
+                sf.hit(searcher, timestamp, query)
+            }
+        }
+        return new FileLoadedEvent(loadedFile: sf, infoHash: ih)
     }
 
     protected static toJson(SharedFile sf) {
         def json = [:]
         json.file = sf.getB64EncodedFileName()
         json.length = sf.getCachedLength()
-        InfoHash ih = sf.getInfoHash()
-        json.infoHash = sf.getB64EncodedHashRoot()
+        json.root = Base64.encode(sf.getRoot())
         json.pieceSize = sf.getPieceSize()
-        json.hashList = sf.getB64EncodedHashList()
         json.comment = sf.getComment()
         json.hits = sf.getHits()
         json.downloaders = sf.getDownloaders()

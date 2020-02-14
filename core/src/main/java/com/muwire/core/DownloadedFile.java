@@ -10,9 +10,9 @@ public class DownloadedFile extends SharedFile {
 
     private final Set<Destination> sources;
 
-    public DownloadedFile(File file, InfoHash infoHash, int pieceSize, Set<Destination> sources)
+    public DownloadedFile(File file, byte[] root, int pieceSize, Set<Destination> sources)
     throws IOException {
-        super(file, infoHash, pieceSize);
+        super(file, root, pieceSize);
         this.sources = sources;
     }
 

@@ -405,8 +405,9 @@ public class Downloader {
                     }
                     eventBus.publish(
                         new FileDownloadedEvent(
-                            downloadedFile : new DownloadedFile(file.getCanonicalFile(), getInfoHash(), pieceSizePow2, successfulDestinations),
-                        downloader : Downloader.this))
+                            downloadedFile : new DownloadedFile(file.getCanonicalFile(), getInfoHash().getRoot(), pieceSizePow2, successfulDestinations),
+                        downloader : Downloader.this,
+                        infoHash: getInfoHash()))
 
                 }
                 endpoint?.close()

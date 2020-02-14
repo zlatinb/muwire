@@ -56,17 +56,17 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
-        persistFile(hashedEvent.sharedFile)
+        persistFile(hashedEvent.sharedFile, hashedEvent.infoHash)
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
         if (core.getMuOptions().getShareDownloadedFiles()) {
-            persistFile(downloadedEvent.downloadedFile)
+            persistFile(downloadedEvent.downloadedFile, downloadedEvent.infoHash)
         }
     }
 
     /**
-     * Get rid of the json of unshared files
+     * Get rid of the json and hashlists of unshared files
      * @param unsharedEvent
      */
     void onFileUnsharedEvent(FileUnsharedEvent unsharedEvent) {
@@ -75,12 +75,17 @@ class PersisterFolderService extends BasePersisterService {
         if(jsonFile.isFile()){
             jsonFile.delete()
         }
+        def hashListPath = getHashListPath(unsharedEvent.unsharedFile)
+        def hashListFile = hashListPath.toFile()
+        if (hashListFile.isFile())
+            hashListFile.delete()
     }
+    
     void onFileLoadedEvent(FileLoadedEvent loadedEvent) {
         if(loadedEvent.source == "PersisterService"){
             log.info("Migrating persisted file from PersisterService: "
                     + loadedEvent.loadedFile.file.absolutePath.toString())
-            persistFile(loadedEvent.loadedFile)
+            persistFile(loadedEvent.loadedFile, loadedEvent.infoHash)
         }
     }
 
@@ -109,10 +114,12 @@ class PersisterFolderService extends BasePersisterService {
         int loaded = 0
         def slurper = new JsonSlurper()
         Files.walk(location.toPath())
-                .filter({ it.fileName.endsWith(".json") })
+                .filter({
+                    it.getFileName().toString().endsWith(".json")
+                })
                 .forEach({
                     def parsed = slurper.parse it.toFile()
-                    def event = fromJson parsed
+                    def event = fromJsonLite parsed
                     if (event == null) return
 
                     log.fine("loaded file $event.loadedFile.file")
@@ -125,7 +132,7 @@ class PersisterFolderService extends BasePersisterService {
         listener.publish(new AllFilesLoadedEvent())
     }
 
-    private void persistFile(SharedFile sf) {
+    private void persistFile(SharedFile sf, InfoHash ih) {
         persisterExecutor.submit({
             def jsonPath = getJsonPath(sf)
 
@@ -136,7 +143,10 @@ class PersisterFolderService extends BasePersisterService {
                 json = JsonOutput.toJson(json)
                 writer.println json
             }
-            log.fine("Time(ms) to write json: " + (System.currentTimeMillis() - startTime))
+            
+            def hashListPath = getHashListPath(sf)
+            hashListPath.toFile().bytes = ih.hashList
+            log.fine("Time(ms) to write json+hashList: " + (System.currentTimeMillis() - startTime))
         } as Runnable)
     }
     private Path getJsonPath(SharedFile sf){
@@ -145,6 +155,15 @@ class PersisterFolderService extends BasePersisterService {
                 location.getAbsolutePath(),
                 pathHash.substring(0, CUT_LENGTH),
                 pathHash.substring(CUT_LENGTH) + ".json"
+        )
+    }
+    
+    private Path getHashListPath(SharedFile sf) {
+        def pathHash = sf.getB64PathHash()
+        return Paths.get(
+                location.getAbsolutePath(),
+                pathHash.substring(0, CUT_LENGTH),
+                pathHash.substring(CUT_LENGTH) + ".hashlist"
         )
     }
 }

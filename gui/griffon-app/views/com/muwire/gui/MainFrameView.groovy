@@ -35,6 +35,7 @@ import javax.swing.tree.TreePath
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
+import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
@@ -289,7 +290,7 @@ class MainFrameView {
                                                     closureColumn(header : "Comments", preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
                                                     closureColumn(header : "Certified", preferredWidth : 50, type : Boolean, read : {
                                                         Core core = application.context.get("core")
-                                                        core.certificateManager.hasLocalCertificate(it.getInfoHash())
+                                                        core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
                                                     })
                                                     closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
                                                     closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})

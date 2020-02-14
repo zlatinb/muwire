@@ -75,7 +75,7 @@ class FileManager {
 
     private void addToIndex(SharedFile sf) {
         log.info("Adding shared file " + sf.getFile())
-        InfoHash infoHash = sf.getInfoHash()
+        InfoHash infoHash = new InfoHash(sf.getRoot())
         Set<SharedFile> existing = rootToFiles.get(infoHash)
         if (existing == null) {
             log.info("adding new root")

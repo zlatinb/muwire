@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,7 @@ import net.i2p.data.Base64;
 public class SharedFile {
 
     private final File file;
-    private final InfoHash infoHash;
+    private final byte[] root;
     private final int pieceSize;
 
     private final String cachedPath;
@@ -26,29 +27,18 @@ public class SharedFile {
 
     private String b64PathHash;
     private final String b64EncodedFileName;
-    private final String b64EncodedHashRoot;
-    private final List<String> b64EncodedHashList;
     
     private volatile String comment;
     private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
     private final Set<SearchEntry> searches = Collections.synchronizedSet(new HashSet<>());
 
-    public SharedFile(File file, InfoHash infoHash, int pieceSize) throws IOException {
+    public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
-        this.infoHash = infoHash;
+        this.root = root;
         this.pieceSize = pieceSize;
         this.cachedPath = file.getAbsolutePath();
         this.cachedLength = file.length();
         this.b64EncodedFileName = Base64.encode(DataUtil.encodei18nString(file.toString()));
-        this.b64EncodedHashRoot = Base64.encode(infoHash.getRoot());
-
-        List<String> b64List = new ArrayList<String>();
-        byte[] tmp = new byte[32];
-        for (int i = 0; i < infoHash.getHashList().length / 32; i++) {
-            System.arraycopy(infoHash.getHashList(), i * 32, tmp, 0, 32);
-            b64List.add(Base64.encode(tmp));
-        }
-        this.b64EncodedHashList = b64List;
     }
 
     public File getFile() {
@@ -56,7 +46,7 @@ public class SharedFile {
     }
 
     public byte[] getPathHash() throws NoSuchAlgorithmException {
-        var digester = MessageDigest.getInstance("SHA-256");
+        MessageDigest digester = MessageDigest.getInstance("SHA-256");
         digester.update(file.getAbsolutePath().getBytes());
         return digester.digest();
     }
@@ -68,8 +58,8 @@ public class SharedFile {
         return b64PathHash;
     }
 
-    public InfoHash getInfoHash() {
-        return infoHash;
+    public byte[] getRoot() {
+        return root;
     }
 
     public int getPieceSize() {
@@ -89,14 +79,6 @@ public class SharedFile {
         return b64EncodedFileName;
     }
     
-    public String getB64EncodedHashRoot() {
-        return b64EncodedHashRoot;
-    }
-    
-    public List<String> getB64EncodedHashList() {
-        return b64EncodedHashList;
-    }
-
     public String getCachedPath() {
         return cachedPath;
     }
@@ -135,7 +117,7 @@ public class SharedFile {
 
     @Override
     public int hashCode() {
-        return file.hashCode() ^ infoHash.hashCode();
+        return file.hashCode() ^ Arrays.hashCode(root);
     }
 
     @Override
@@ -143,7 +125,7 @@ public class SharedFile {
         if (!(o instanceof SharedFile))
             return false;
         SharedFile other = (SharedFile)o;
-        return file.equals(other.file) && infoHash.equals(other.infoHash);
+        return file.equals(other.file) && Arrays.equals(root, other.root);
     }
     
     public static class SearchEntry {
