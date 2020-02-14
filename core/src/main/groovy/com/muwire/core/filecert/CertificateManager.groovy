@@ -70,7 +70,7 @@ class CertificateManager {
     }
     
     void onUICreateCertificateEvent(UICreateCertificateEvent e) {
-        InfoHash infoHash = e.sharedFile.getInfoHash()
+        InfoHash infoHash = new InfoHash(e.sharedFile.getRoot())
         String name = e.sharedFile.getFile().getName()
         long timestamp = System.currentTimeMillis()
         

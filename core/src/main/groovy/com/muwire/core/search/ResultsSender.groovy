@@ -77,11 +77,11 @@ class ResultsSender {
                 if (it.getComment() != null) {
                     comment = DataUtil.readi18nString(Base64.decode(it.getComment()))
                 }
-                int certificates = certificateManager.getByInfoHash(it.getInfoHash()).size()
+                int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
-                    infohash : it.getInfoHash(),
+                    infohash : new InfoHash(it.getRoot()),
                     pieceSize : pieceSize,
                     uuid : uuid,
                     browse : settings.browseFiles,
