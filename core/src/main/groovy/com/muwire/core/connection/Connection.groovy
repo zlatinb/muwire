@@ -255,7 +255,6 @@ abstract class Connection implements Closeable {
             return
         }
         
-        // TODO: make this mandatory at some point
         byte[] sig2 = null        
         long queryTime = 0
         if (search.sig2 != null) {
@@ -278,8 +277,10 @@ abstract class Connection implements Closeable {
                     return
                 }
             }
-        } else
+        } else {
             log.info("no extended signature in query")
+            return
+        }
 
         SearchEvent searchEvent = new SearchEvent(searchTerms : search.keywords,
                                             searchHash : infohash,
