@@ -268,6 +268,7 @@ public class Core {
         eventBus.register(FileLoadedEvent.class, persisterFolderService)
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
+        eventBus.register(UICommentEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         File hostStorage = new File(home, "hosts.json")

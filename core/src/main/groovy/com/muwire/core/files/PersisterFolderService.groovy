@@ -88,6 +88,10 @@ class PersisterFolderService extends BasePersisterService {
             persistFile(loadedEvent.loadedFile, loadedEvent.infoHash)
         }
     }
+    
+    void onUICommentEvent(UICommentEvent e) {
+        persistFile(e.sharedFile,null)
+    }
 
     void load() {
         log.fine("Loading...")
@@ -144,8 +148,10 @@ class PersisterFolderService extends BasePersisterService {
                 writer.println json
             }
             
-            def hashListPath = getHashListPath(sf)
-            hashListPath.toFile().bytes = ih.hashList
+            if (ih != null) {
+                def hashListPath = getHashListPath(sf)
+                hashListPath.toFile().bytes = ih.hashList
+            }
             log.fine("Time(ms) to write json+hashList: " + (System.currentTimeMillis() - startTime))
         } as Runnable)
     }
