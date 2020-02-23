@@ -171,8 +171,6 @@ public class MuWireClient {
         servletContext.setAttribute("trustManager", trustManager);
         servletContext.setAttribute("certificateManager", certificateManager);
         servletContext.setAttribute("uploadManager", uploadManager);
-        
-        core.getEventBus().publish(new UILoadedEvent());
     }
     
     public String getHome() {

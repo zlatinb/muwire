@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.muwire.core.Core;
 import com.muwire.core.MuWireSettings;
+import com.muwire.core.UILoadedEvent;
 
 class MWStarter extends Thread {
     private final MuWireSettings settings;
@@ -22,7 +23,8 @@ class MWStarter extends Thread {
     
     public void run() {
         Core core = new Core(settings, home, version);
-        core.startServices();
         client.setCore(core);
+        core.startServices();
+        core.getEventBus().publish(new UILoadedEvent());
     }
 }

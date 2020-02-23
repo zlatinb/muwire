@@ -194,7 +194,7 @@ public class Core {
         // options like tunnel length and quantity
         I2PSocketManager socketManager
         keyDat.withInputStream {
-            socketManager = new I2PSocketManagerFactory().createManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
+            socketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
         }
         socketManager.getDefaultOptions().setReadTimeout(60000)
         socketManager.getDefaultOptions().setConnectTimeout(30000)
@@ -380,6 +380,7 @@ public class Core {
     }
 
     public void startServices() {
+        i2pSession.connect()
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
