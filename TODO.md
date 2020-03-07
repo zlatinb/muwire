@@ -35,8 +35,9 @@ This helps with scalability
 
 ### Web UI/Plugin
 * HTML 5 media players
-* Minimal dependency (break up groovy-all.jar)
 * Remove versions from jar names
 * Security: POST nonces, CSP headers
+* Upload files from browser to plugin via drag-and-drop
+* Check permissions, display better errors when sharing local folders
 
  
