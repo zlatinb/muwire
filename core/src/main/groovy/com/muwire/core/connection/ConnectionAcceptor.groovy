@@ -15,9 +15,11 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.SharedFile
 import com.muwire.core.chat.ChatServer
 import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateManager
+import com.muwire.core.filefeeds.FeedItems
 import com.muwire.core.files.FileManager
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
@@ -160,6 +162,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'I':
                     processIRC(e)
+                    break
+                case (byte)'F':
+                    processFEED(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -523,6 +528,52 @@ class ConnectionAcceptor {
         if (IRC != "RC\r\n".getBytes(StandardCharsets.US_ASCII))
             throw new Exception("Invalid IRC connection")
         chatServer.handle(e)
+    }
+    
+    private void processFEED(Endpoint e) {
+        try {
+            byte[] EED = new byte[5];
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(EED);
+            if (EED != "EED\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new Exception("Invalid FEED connection")
+
+
+            Map<String, String> headers = DataUtil.readAllHeaders(dis)
+            if (!headers.containsKey("Persona"))
+                throw new Exception("Persona header missing")
+            Persona requestor = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
+            if (requestor.destination != e.destination)
+                throw new Exception("Requestor persona mismatch")
+
+            // TODO: check settings if feed is permitted at all
+
+            long timestamp = 0
+            if (headers.containsKey("Timestamp")) {
+                timestamp = Long.parseLong(headers['Timestamp'])
+            }
+
+            List<SharedFile> published = fileManager.getPublishedSince(timestamp)
+
+            OutputStream os = e.getOutputStream()
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count: ${published.size()}\r\n".getBytes(StandardCharsets.US_ASCII));
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+            JsonOutput jsonOutput = new JsonOutput()
+            published.each {
+                int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
+                def obj = FeedItems.sharedFileToObj(it, certificates)
+                def json = jsonOutput.toJson(obj)
+                dos.writeShort((short)json.length())
+                dos.write(json.getBytes(StandardCharsets.US_ASCII))
+            }
+            dos.flush()
+            dos.close()
+        } finally {
+            e.close()
+        }
     }
 
 }
