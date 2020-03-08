@@ -31,6 +31,8 @@ class MuWireSettings {
     boolean shareHiddenFiles
     boolean searchComments
     boolean browseFiles
+    boolean fileFeed
+    boolean advertiseFeed
     boolean startChatServer
     int maxChatConnections
     boolean advertiseChat
@@ -82,6 +84,8 @@ class MuWireSettings {
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
+        fileFeed = Boolean.valueOf(props.getProperty("fileFeed","true"))
+        advertiseFeed = Boolean.valueOf(props.getProperty("advertiseFeed","true"))
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
@@ -137,6 +141,8 @@ class MuWireSettings {
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
+        props.setProperty("fileFeed", String.valueOf(fileFeed))
+        props.setProperty("advertiseFeed", String.valueOf(advertiseFeed))
         props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
         props.setProperty("uploadSlotsPerUser", String.valueOf(uploadSlotsPerUser))

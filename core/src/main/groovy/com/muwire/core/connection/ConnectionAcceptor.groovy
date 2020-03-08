@@ -379,6 +379,9 @@ class ConnectionAcceptor {
             boolean chat = chatServer.running.get() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
             
+            boolean feed = settings.fileFeed && settings.advertiseFeed
+            os.write("Feed: ${feed}\r\n".getBytes(StandardCharsets.US_ASCII))
+            
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
@@ -538,6 +541,7 @@ class ConnectionAcceptor {
             if (EED != "EED\r\n".getBytes(StandardCharsets.US_ASCII))
                 throw new Exception("Invalid FEED connection")
 
+            OutputStream os = e.getOutputStream()
 
             Map<String, String> headers = DataUtil.readAllHeaders(dis)
             if (!headers.containsKey("Persona"))
@@ -546,7 +550,12 @@ class ConnectionAcceptor {
             if (requestor.destination != e.destination)
                 throw new Exception("Requestor persona mismatch")
 
-            // TODO: check settings if feed is permitted at all
+            if (!settings.fileFeed) {
+                os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.flush()
+                e.close()
+                return
+            }
 
             long timestamp = 0
             if (headers.containsKey("Timestamp")) {
@@ -555,7 +564,6 @@ class ConnectionAcceptor {
 
             List<SharedFile> published = fileManager.getPublishedSince(timestamp)
 
-            OutputStream os = e.getOutputStream()
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Count: ${published.size()}\r\n".getBytes(StandardCharsets.US_ASCII));
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))

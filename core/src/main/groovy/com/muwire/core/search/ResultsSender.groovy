@@ -138,6 +138,8 @@ class ResultsSender {
                         os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
                         boolean chat = chatServer.running.get() && settings.advertiseChat
                         os.write("Chat: $chat\r\n".getBytes(StandardCharsets.US_ASCII))
+                        boolean feed = settings.fileFeed && settings.advertiseFeed
+                        os.write("Feed: $feed\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
