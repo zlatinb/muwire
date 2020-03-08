@@ -122,6 +122,11 @@ public class SharedFile {
         publishedTimestamp = timestamp;
     }
     
+    public void unpublish() {
+        published = false;
+        publishedTimestamp = 0;
+    }
+    
     public boolean isPublished() {
         return published;
     }
