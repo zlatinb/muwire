@@ -32,6 +32,8 @@ import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.filecert.UIImportCertificateEvent
+import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHasher
@@ -269,6 +271,8 @@ public class Core {
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
         eventBus.register(UICommentEvent.class, persisterFolderService)
+        eventBus.register(UIFIlePublishedEvent.class, persisterFolderService)
+        eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         File hostStorage = new File(home, "hosts.json")
