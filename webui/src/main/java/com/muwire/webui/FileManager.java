@@ -44,6 +44,8 @@ public class FileManager {
     
     public void onFileHashedEvent(FileHashedEvent e) {
         hashingFile = null;
+        if (e.getSharedFile() == null) // TODO: think of something better
+            return;
         fileTree.add(e.getSharedFile().getFile(), e.getSharedFile());
         revision++;
     }
