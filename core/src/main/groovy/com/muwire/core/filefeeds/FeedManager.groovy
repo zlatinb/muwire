@@ -129,11 +129,26 @@ class FeedManager {
         Set<FeedItem> set = feedItems.get(publisher)
         if (set == null)
             return // can happen if nothing was published
-            
-        File itemsFile = new File(itemsFolder, publisher.destination.toBase32() + ".json")
         
+        Feed feed = feeds[publisher]
+        if (feed == null) {
+            log.severe("Persisting items for non-existing feed " + publisher.getHumanReadableName())
+            return
+        }         
+         
+        List<FeedItem> list = new ArrayList<>(set)
+        if (list.size() > feed.getItemsToKeep()) {
+            log.info("will persist ${feed.getItemsToKeep()}/${list.size()} items")
+            list.sort({l, r ->
+                Long.compare(r.getTimestamp(), l.getTimestamp())
+            } as Comparator<FeedItem>)
+            list = list[0..feed.getItemsToKeep()]
+        }
+        
+        
+        File itemsFile = new File(itemsFolder, publisher.destination.toBase32() + ".json")
         itemsFile.withPrintWriter { writer -> 
-            set.each { item -> 
+            list.each { item -> 
                 def obj = FeedItems.feedItemToObj(item)
                 def json = JsonOutput.toJson(obj)
                 writer.println(json)
