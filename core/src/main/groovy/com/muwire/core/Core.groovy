@@ -32,11 +32,13 @@ import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.filecert.UIImportCertificateEvent
+import com.muwire.core.filefeeds.FeedClient
 import com.muwire.core.filefeeds.FeedFetchEvent
 import com.muwire.core.filefeeds.FeedItemFetchedEvent
 import com.muwire.core.filefeeds.FeedManager
 import com.muwire.core.filefeeds.UIFIlePublishedEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
+import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
@@ -123,6 +125,7 @@ public class Core {
     final ChatServer chatServer
     final ChatManager chatManager
     final FeedManager feedManager
+    private final FeedClient feedClient
 
     private final Router router
 
@@ -328,6 +331,10 @@ public class Core {
             register(UIFeedConfigurationEvent.class, feedManager)
         }
         
+        log.info("initializing feed client")
+        feedClient = new FeedClient(i2pConnector, eventBus, me, feedManager)
+        eventBus.register(UIFeedUpdateEvent.class, feedClient)
+        
         log.info "initializing results sender"
         ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer)
 
@@ -409,6 +416,7 @@ public class Core {
         hostCache.waitForLoad()
         updateClient?.start()
         feedManager.start()
+        feedClient.start()
     }
 
     public void shutdown() {
@@ -444,6 +452,8 @@ public class Core {
         chatManager.shutdown()
         log.info("shutting down feed manager")
         feedManager.stop()
+        log.info("shutting down feed client")
+        feedClient.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         log.info("killing i2p session")

@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.stream.Collectors
 
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
@@ -44,6 +45,13 @@ class FeedManager {
     
     public Feed getFeed(Persona persona) {
         feeds.get(persona)
+    }
+    
+    public List<Feed> getFeedsToUpdate() {
+        long now = System.currentTimeMillis()
+        feeds.values().stream().
+            filter({Feed f -> f.getLastUpdated() + f.getUpdateInterval() <= now})
+            .collect(Collectors.toList())
     }
     
     void start() {
