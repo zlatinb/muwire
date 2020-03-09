@@ -32,7 +32,11 @@ import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.filecert.UIImportCertificateEvent
+import com.muwire.core.filefeeds.FeedFetchEvent
+import com.muwire.core.filefeeds.FeedItemFetchedEvent
+import com.muwire.core.filefeeds.FeedManager
 import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
@@ -118,6 +122,7 @@ public class Core {
     final CertificateManager certificateManager
     final ChatServer chatServer
     final ChatManager chatManager
+    final FeedManager feedManager
 
     private final Router router
 
@@ -315,6 +320,14 @@ public class Core {
             register(TrustEvent.class, chatServer)
         }
         
+        log.info("initializing feed manager")
+        feedManager = new FeedManager(eventBus, home)
+        eventBus.with { 
+            register(FeedItemFetchedEvent.class, feedManager)
+            register(FeedFetchEvent.class, feedManager)
+            register(UIFeedConfigurationEvent.class, feedManager)
+        }
+        
         log.info "initializing results sender"
         ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer)
 
@@ -395,6 +408,7 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
         updateClient?.start()
+        feedManager.start()
     }
 
     public void shutdown() {
@@ -428,6 +442,8 @@ public class Core {
         chatServer.stop()
         log.info("shutting down chat manager")
         chatManager.shutdown()
+        log.info("shutting down feed manager")
+        feedManager.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         log.info("killing i2p session")
