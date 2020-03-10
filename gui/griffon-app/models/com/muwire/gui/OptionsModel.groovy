@@ -50,6 +50,15 @@ class OptionsModel {
     @Observable String inBw
     @Observable String outBw
 
+    // feed options
+    @Observable boolean fileFeed
+    @Observable boolean advertiseFeed
+    @Observable boolean autoPublishSharedFiles
+    @Observable boolean defaultFeedAutoDownload
+    @Observable String defaultFeedItemsToKeep
+    @Observable boolean defaultFeedSequential
+    @Observable String defaultFeedUpdateInterval
+    
     // trust options
     @Observable boolean onlyTrusted
     @Observable boolean searchExtraHop
@@ -105,6 +114,14 @@ class OptionsModel {
             inBw = String.valueOf(settings.inBw)
             outBw = String.valueOf(settings.outBw)
         }
+        
+        fileFeed = settings.fileFeed
+        advertiseFeed = settings.advertiseFeed
+        autoPublishSharedFiles = settings.autoPublishSharedFiles
+        defaultFeedAutoDownload = settings.defaultFeedAutoDownload
+        defaultFeedItemsToKeep = String.valueOf(settings.defaultFeedItemsToKeep)
+        defaultFeedSequential = settings.defaultFeedSequential
+        defaultFeedUpdateInterval = String.valueOf(settings.defaultFeedUpdateInterval)
 
         onlyTrusted = !settings.allowUntrusted()
         searchExtraHop = settings.searchExtraHop

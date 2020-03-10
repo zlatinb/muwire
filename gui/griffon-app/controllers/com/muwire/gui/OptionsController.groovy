@@ -122,7 +122,38 @@ class OptionsController {
             model.outBw = text
             settings.outBw = Integer.valueOf(text)
         }
+        
+        // feed saving
+        
+        boolean fileFeed = view.fileFeedCheckbox.model.isSelected()
+        model.fileFeed = fileFeed
+        settings.fileFeed = fileFeed
+        
+        boolean advertiseFeed = view.advertiseFeedCheckbox.model.isSelected()
+        model.advertiseFeed = advertiseFeed
+        settings.advertiseFeed = advertiseFeed
+        
+        boolean autoPublishSharedFiles = view.autoPublishSharedFilesCheckbox.model.isSelected()
+        model.autoPublishSharedFiles = autoPublishSharedFiles
+        settings.autoPublishSharedFiles = autoPublishSharedFiles
+        
+        boolean defaultFeedAutoDownload = view.defaultFeedAutoDownloadCheckbox.model.isSelected()
+        model.defaultFeedAutoDownload = defaultFeedAutoDownload
+        settings.defaultFeedAutoDownload = defaultFeedAutoDownload
+        
+        boolean defaultFeedSequential = view.defaultFeedSequentialCheckbox.model.isSelected()
+        model.defaultFeedSequential = defaultFeedSequential
+        settings.defaultFeedSequential = defaultFeedSequential
+        
+        String defaultFeedItemsToKeep = view.defaultFeedItemsToKeepField.text
+        model.defaultFeedItemsToKeep = defaultFeedItemsToKeep
+        settings.defaultFeedItemsToKeep = Integer.parseInt(defaultFeedItemsToKeep)
+        
+        String defaultFeedUpdateInterval = view.defaultFeedUpdateIntervalField.text
+        model.defaultFeedUpdateInterval = defaultFeedUpdateInterval
+        settings.defaultFeedUpdateInterval = Integer.parseInt(defaultFeedUpdateInterval)
 
+        // trust saving
 
         boolean onlyTrusted = view.allowUntrustedCheckbox.model.isSelected()
         model.onlyTrusted = onlyTrusted
