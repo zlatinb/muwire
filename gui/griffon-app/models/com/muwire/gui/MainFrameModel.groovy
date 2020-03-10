@@ -28,6 +28,12 @@ import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.filecert.CertificateCreatedEvent
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.FeedFetchEvent
+import com.muwire.core.filefeeds.FeedItemFetchedEvent
+import com.muwire.core.filefeeds.FeedLoadedEvent
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -61,6 +67,7 @@ import griffon.transform.FXObservable
 import griffon.transform.Observable
 import net.i2p.data.Base64
 import net.i2p.data.Destination
+import net.i2p.util.ConcurrentHashSet
 import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
@@ -89,6 +96,8 @@ class MainFrameModel {
     def trusted = []
     def distrusted = []
     def subscriptions = []
+    def feeds = []
+    def feedItems = []
     
     boolean sessionRestored
 
@@ -103,6 +112,14 @@ class MainFrameModel {
     @Observable boolean previewButtonEnabled
     @Observable String resumeButtonText
     @Observable boolean addCommentButtonEnabled
+    @Observable boolean publishButtonEnabled
+    @Observable String publishButtonText
+    @Observable boolean updateFileFeedButtonEnabled
+    @Observable boolean unsubscribeFileFeedButtonEnabled
+    @Observable boolean configureFileFeedButtonEnabled
+    @Observable boolean downloadFeedItemButtonEnabled
+    @Observable boolean viewFeedItemCommentButtonEnabled
+    @Observable boolean viewFeedItemCertificatesButtonEnabled
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled
@@ -118,6 +135,7 @@ class MainFrameModel {
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
+    @Observable boolean feedsPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
     @Observable boolean chatPaneButtonEnabled
     
@@ -125,7 +143,7 @@ class MainFrameModel {
     
     @Observable Downloader downloader
 
-    private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
+    private final Set<InfoHash> downloadInfoHashes = new ConcurrentHashSet<>()
 
     @Observable volatile Core core
 
@@ -215,6 +233,10 @@ class MainFrameModel {
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
             core.eventBus.register(SearchEvent.class, this)
             core.eventBus.register(CertificateCreatedEvent.class, this)
+            core.eventBus.register(FeedLoadedEvent.class, this)
+            core.eventBus.register(FeedFetchEvent.class, this)
+            core.eventBus.register(FeedItemFetchedEvent.class, this)
+            core.eventBus.register(UIFeedConfigurationEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -253,11 +275,13 @@ class MainFrameModel {
                 distrusted.addAll(core.trustService.bad.values())
 
                 resumeButtonText = "Retry"
+                publishButtonText = "Publish"
                 
                 searchesPaneButtonEnabled = false
                 downloadsPaneButtonEnabled = true
                 uploadsPaneButtonEnabled = true
                 monitorPaneButtonEnabled = true
+                feedsPaneButtonEnabled = true
                 trustPaneButtonEnabled = true
                 chatPaneButtonEnabled = true
                 
@@ -650,5 +674,42 @@ class MainFrameModel {
         Uploader uploader
         int requests
         boolean finished
+    }
+    
+    void onFeedLoadedEvent(FeedLoadedEvent e) {
+        runInsideUIAsync {
+            feeds << e.feed
+            view.refreshFeeds()
+        }
+    }
+    
+    void onFeedFetchEvent(FeedFetchEvent e) {
+        runInsideUIAsync {
+            view.refreshFeeds()
+        }
+    }
+    
+    void onUIFeedConfigurationEvent(UIFeedConfigurationEvent e) {
+        if (!e.newFeed)
+            return
+        runInsideUIAsync {
+            if (feeds.contains(e.feed))
+                return
+            feeds << e.feed
+            view.refreshFeeds()
+        }
+    }
+    
+    void onFeedItemFetchedEvent(FeedItemFetchedEvent e) {
+        Feed feed = core.feedManager.getFeed(e.item.getPublisher())
+        if (feed == null || !feed.isAutoDownload())
+            return
+        if (!canDownload(e.item.getInfoHash()))
+            return
+        if (core.fileManager.isShared(e.item.getInfoHash()))
+            return
+            
+        File target = new File(core.getMuOptions().getDownloadLocation(), e.item.getName())    
+        core.eventBus.publish(new UIDownloadFeedItemEvent(item : e.item, target : target, sequential : feed.isSequential()))
     }
 }

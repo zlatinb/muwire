@@ -1,5 +1,8 @@
 package com.muwire.core.files
 
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
@@ -190,6 +193,10 @@ class FileManager {
     Set<SharedFile> getSharedFiles(byte []root) {
             return rootToFiles.get(new InfoHash(root))
     }
+    
+    boolean isShared(InfoHash infoHash) {
+        rootToFiles.containsKey(infoHash)
+    }
 
     void onSearchEvent(SearchEvent e) {
         // hash takes precedence
@@ -253,5 +260,14 @@ class FileManager {
     private void saveNegativeTree() {
         settings.negativeFileTree.clear()
         settings.negativeFileTree.addAll(negativeTree.fileToNode.keySet().collect { it.getAbsolutePath() })
+    }
+    
+    public List<SharedFile> getPublishedSince(long timestamp) {
+        synchronized(fileToSharedFile) {
+            fileToSharedFile.values().stream().
+                    filter({sf -> sf.isPublished()}).
+                    filter({sf -> sf.getPublishedTimestamp() >= timestamp}).
+                    collect(Collectors.toList())
+        }
     }
 }

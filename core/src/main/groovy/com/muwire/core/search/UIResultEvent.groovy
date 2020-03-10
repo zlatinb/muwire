@@ -18,7 +18,8 @@ class UIResultEvent extends Event {
     boolean browse
     int certificates
     boolean chat
-
+    boolean feed
+    
     @Override
     public String toString() {
         super.toString() + "name:$name size:$size sender:${sender.getHumanReadableName()} pieceSize $pieceSize"

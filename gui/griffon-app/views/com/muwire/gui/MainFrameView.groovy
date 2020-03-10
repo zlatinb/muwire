@@ -39,6 +39,9 @@ import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.FeedFetchStatus
+import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
 import java.awt.BorderLayout
@@ -76,6 +79,8 @@ class MainFrameView {
     def lastSharedSortEvent
     def trustTablesSortEvents = [:]
     def expansionListener = new TreeExpansions()
+    def lastFeedsSortEvent
+    def lastFeedItemsSortEvent
     
 
     UISettings settings
@@ -151,6 +156,7 @@ class MainFrameView {
                         button(text: "Uploads", enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         if (settings.showMonitor)
                             button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
+                        button(text: "Feeds", enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
                         button(text: "Trust", enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
                         button(text: "Chat", enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
                     }
@@ -292,6 +298,7 @@ class MainFrameView {
                                                         Core core = application.context.get("core")
                                                         core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
                                                     })
+                                                    closureColumn(header : "Published", preferredWidth : 50, type : Boolean, read : {row -> row.isPublished()})
                                                     closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
                                                     closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
                                                 }
@@ -316,9 +323,11 @@ class MainFrameView {
                                     radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                 }
                                 panel {
-                                    button(text : "Share", actionPerformed : shareFiles)
-                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
-                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, issueCertificateAction)
+                                    gridBagLayout()
+                                    button(text : "Share", constraints : gbc(gridx: 0), actionPerformed : shareFiles)
+                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), addCommentAction)
+                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 2), issueCertificateAction)
+                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:3), publishAction)
                                 }
                                 panel {
                                     panel {
@@ -422,6 +431,56 @@ class MainFrameView {
                                         })
                                     }
                                 }
+                            }
+                        }
+                    }
+                    panel(constraints : "feeds window") {
+                        gridLayout(rows : 2, cols : 1)
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text: "Subscriptions")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.feeds) {
+                                        closureColumn(header : "Publisher", preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
+                                        closureColumn(header : "Files", preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
+                                        closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
+                                        closureColumn(header : "Status", preferredWidth: 10, type : String, read : {it.getStatus()})
+                                    }
+                                }
+                            }
+                            panel (constraints : BorderLayout.SOUTH) {
+                                button(text : "Update", enabled : bind {model.updateFileFeedButtonEnabled}, updateFileFeedAction)
+                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
+                                button(text : "Configure", enabled : bind {model.configureFileFeedButtonEnabled}, configureFileFeedAction)
+                            }
+                        }
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text : "Published Files")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.feedItems) {
+                                        closureColumn(header : "Name", preferredWidth: 350, type : String, read : {it.getName()})
+                                        closureColumn(header : "Size", preferredWidth: 10, type : Long, read : {it.getSize()})
+                                        closureColumn(header : "Comment", preferredWidth: 10, type : Boolean, read : {it.getComment() != null})
+                                        closureColumn(header : "Certificates", preferredWidth: 10, type : Integer, read : {it.getCertificates()})
+                                        closureColumn(header : "Downloaded", preferredWidth: 10, type : Boolean, read : {
+                                            InfoHash ih = it.getInfoHash()
+                                            model.core.fileManager.isShared(ih)
+                                        })
+                                        closureColumn(header: "Date", type : Long, read : {it.getTimestamp()})
+                                    }
+                                }
+                            }
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : "Download", enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
+                                button(text : "View Comment", enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
+                                button(text : "View Certificates", enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
                             }
                         }
                     }
@@ -682,14 +741,30 @@ class MainFrameView {
             if (selectedFiles == null || selectedFiles.isEmpty())
                 return
             model.addCommentButtonEnabled = true
+            model.publishButtonEnabled = true
+            boolean unpublish = true
+            selectedFiles.each { 
+                unpublish &= it.isPublished()
+            }
+            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
         })
+        
         def sharedFilesTree = builder.getVariable("shared-files-tree")
         sharedFilesTree.addMouseListener(sharedFilesMouseListener)
 
         sharedFilesTree.addTreeSelectionListener({
             def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
             model.addCommentButtonEnabled = selectedNode != null
-
+            model.publishButtonEnabled = selectedNode != null
+            
+            def selectedFiles = selectedSharedFiles()
+            if (selectedFiles == null || selectedFiles.isEmpty())
+                return
+            boolean unpublish = true
+            selectedFiles.each {
+                unpublish &= it.isPublished()
+            }
+            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
         })
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
@@ -745,6 +820,98 @@ class MainFrameView {
                     }
                 })
 
+        // feeds table
+        def feedsTable = builder.getVariable("feeds-table")
+        feedsTable.rowSorter.addRowSorterListener({evt -> lastFeedsSortEvent = evt})
+        feedsTable.rowSorter.setSortsOnUpdates(true)
+        feedsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        feedsTable.setDefaultRenderer(Long.class, new DateRenderer())
+        selectionModel = feedsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            Feed selectedFeed = selectedFeed()
+            if (selectedFeed == null) {
+                model.updateFileFeedButtonEnabled = false
+                model.unsubscribeFileFeedButtonEnabled = false
+                model.configureFileFeedButtonEnabled = false
+                return
+            }
+
+            model.unsubscribeFileFeedButtonEnabled = true
+            model.configureFileFeedButtonEnabled = true
+            model.updateFileFeedButtonEnabled = !selectedFeed.getStatus().isActive()
+            
+            def items = model.core.feedManager.getFeedItems(selectedFeed.getPublisher())
+            model.feedItems.clear()
+            model.feedItems.addAll(items)
+            
+            def feedItemsTable = builder.getVariable("feed-items-table")
+            int selectedItemRow = feedItemsTable.getSelectedRow()
+            feedItemsTable.model.fireTableDataChanged()
+            if (selectedItemRow >= 0 && selectedItemRow < items.size())
+                feedItemsTable.selectionModel.setSelectionInterval(selectedItemRow, selectedItemRow)
+        })
+        feedsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedsPopupMenu(e)
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedsPopupMenu(e)
+            }
+        })
+        
+        
+        // feed items table
+        def feedItemsTable = builder.getVariable("feed-items-table")
+        feedItemsTable.rowSorter.addRowSorterListener({evt -> lastFeedItemsSortEvent = evt})
+        feedItemsTable.rowSorter.setSortsOnUpdates(true)
+        feedItemsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        feedItemsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+        feedItemsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
+        
+        selectionModel = feedItemsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener({
+            List<FeedItem> selectedItems = selectedFeedItems()
+            if (selectedItems == null || selectedItems.isEmpty()) {
+                model.downloadFeedItemButtonEnabled = false
+                model.viewFeedItemCommentButtonEnabled = false
+                model.viewFeedItemCertificatesButtonEnabled = false
+                return
+            }
+            model.downloadFeedItemButtonEnabled = true
+            model.viewFeedItemCommentButtonEnabled = false
+            model.viewFeedItemCertificatesButtonEnabled = false
+            if (selectedItems.size() == 1) {
+                FeedItem item = selectedItems.get(0)
+                model.viewFeedItemCommentButtonEnabled = item.getComment() != null
+                model.viewFeedItemCertificatesButtonEnabled = item.getCertificates() > 0
+            }
+        })
+        feedItemsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                List<FeedItem> selectedItems = selectedFeedItems()
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedItemsPopupMenu(e)
+                else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 &&
+                    selectedItems != null && selectedItems.size() == 1 &&
+                    model.canDownload(selectedItems.get(0).getInfoHash())) {
+                    mvcGroup.controller.downloadFeedItem()
+                }
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedItemsPopupMenu(e)
+            }
+        })
+        
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -1007,6 +1174,52 @@ class MainFrameView {
         showPopupMenu(menu, e)
     }
     
+    void showFeedsPopupMenu(MouseEvent e) {
+        Feed feed = selectedFeed()
+        if (feed == null)
+            return
+        JPopupMenu menu = new JPopupMenu()
+        if (model.updateFileFeedButtonEnabled) {
+            JMenuItem update = new JMenuItem("Update")
+            update.addActionListener({mvcGroup.controller.updateFileFeed()})
+            menu.add(update)
+        }
+        
+        JMenuItem unsubscribe = new JMenuItem("Unsubscribe")
+        unsubscribe.addActionListener({mvcGroup.controller.unsubscribeFileFeed()})
+        menu.add(unsubscribe)
+        
+        JMenuItem configure = new JMenuItem("Configure")
+        configure.addActionListener({mvcGroup.controller.configureFileFeed()})
+        menu.add(configure)
+        
+        showPopupMenu(menu,e)
+    }
+    
+    void showFeedItemsPopupMenu(MouseEvent e) {
+        List<FeedItem> items = selectedFeedItems()
+        if (items == null || items.isEmpty())
+            return
+        // TODO: finish
+        JPopupMenu menu = new JPopupMenu()
+        if (model.downloadFeedItemButtonEnabled) {
+            JMenuItem download = new JMenuItem("Download")
+            download.addActionListener({mvcGroup.controller.downloadFeedItem()})
+            menu.add(download)
+        }
+        if (model.viewFeedItemCommentButtonEnabled) {
+            JMenuItem viewComment = new JMenuItem("View Comment")
+            viewComment.addActionListener({mvcGroup.controller.viewFeedItemComment()})
+            menu.add(viewComment)
+        }
+        if (model.viewFeedItemCertificatesButtonEnabled) {
+            JMenuItem viewCertificates = new JMenuItem("View Certificates")
+            viewCertificates.addActionListener({mvcGroup.controller.viewFeedItemCertificates()})
+            menu.add(viewCertificates)
+        }
+        showPopupMenu(menu, e)
+    }
+    
     def selectedUploader() {
         def uploadsTable = builder.getVariable("uploads-table")
         int selectedRow = uploadsTable.getSelectedRow()
@@ -1057,6 +1270,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1069,6 +1283,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = false
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1081,6 +1296,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = false
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1093,6 +1309,20 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = false
+        model.feedsPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
+    }
+    
+    def showFeedsWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel,"feeds window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1105,6 +1335,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1117,6 +1348,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()
@@ -1171,6 +1403,43 @@ class MainFrameView {
         tree.setSelectionPaths(selectedPaths)
         
         builder.getVariable("shared-files-table").model.fireTableDataChanged()
+    }
+    
+    public void refreshFeeds() {
+        JTable feedsTable = builder.getVariable("feeds-table")
+        int selectedFeed = feedsTable.getSelectedRow()
+        feedsTable.model.fireTableDataChanged()
+        if (selectedFeed >= 0)
+            feedsTable.selectionModel.setSelectionInterval(selectedFeed, selectedFeed)
+        
+        JTable feedItemsTable = builder.getVariable("feed-items-table")
+        feedItemsTable.model.fireTableDataChanged()
+    }
+    
+    Feed selectedFeed() {
+        JTable feedsTable = builder.getVariable("feeds-table")
+        int row = feedsTable.getSelectedRow()
+        if (row < 0)
+            return null
+        if (lastFeedsSortEvent != null)
+            row = feedsTable.rowSorter.convertRowIndexToModel(row)
+        model.feeds[row]
+    }
+    
+    List<FeedItem> selectedFeedItems() {
+        JTable feedItemsTable = builder.getVariable("feed-items-table")
+        int [] selectedRows = feedItemsTable.getSelectedRows()
+        if (selectedRows.length == 0)
+            return null
+        List<FeedItem> rv = new ArrayList<>()
+        if (lastFeedItemsSortEvent != null) {
+            for (int i = 0; i < selectedRows.length; i++) {
+                selectedRows[i] = feedItemsTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+            }
+        }
+        for (int selectedRow : selectedRows)
+            rv.add(model.feedItems[selectedRow])
+        rv
     }
     
     private void closeApplication() {

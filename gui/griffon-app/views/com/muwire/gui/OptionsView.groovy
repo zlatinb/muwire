@@ -32,6 +32,7 @@ class OptionsView {
     def i
     def u
     def bandwidth
+    def feed
     def trust
     def chat
 
@@ -66,6 +67,14 @@ class OptionsView {
 
     def inBwField
     def outBwField
+    
+    def fileFeedCheckbox
+    def advertiseFeedCheckbox
+    def autoPublishSharedFilesCheckbox
+    def defaultFeedAutoDownloadCheckbox
+    def defaultFeedItemsToKeepField
+    def defaultFeedSequentialCheckbox
+    def defaultFeedUpdateIntervalField
 
     def allowUntrustedCheckbox
     def searchExtraHopCheckbox
@@ -257,6 +266,32 @@ class OptionsView {
             }
             panel(constraints : gbc(gridx: 0, gridy: 1, weighty: 100))
         }
+        feed = builder.panel {
+            gridBagLayout()
+            panel (border : titledBorder(title : "General Feed Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+                constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Enable file feed", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                fileFeedCheckbox = checkBox(selected : bind {model.fileFeed}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Advertise feed in search results", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                advertiseFeedCheckbox = checkBox(selected : bind {model.advertiseFeed}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Automatically publish shared files", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                autoPublishSharedFilesCheckbox = checkBox(selected : bind {model.autoPublishSharedFiles}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
+            }
+            panel (border : titledBorder(title : "Default Settings For New Feeds", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+                constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : "Automatically download files from feed", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                defaultFeedAutoDownloadCheckbox = checkBox(selected : bind {model.defaultFeedAutoDownload}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
+                label(text : "Download files from feed sequentially", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                defaultFeedSequentialCheckbox = checkBox(selected : bind {model.defaultFeedSequential}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                label(text : "Feed items to store on disk (-1 means unlimited)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                defaultFeedItemsToKeepField = textField(text : bind {model.defaultFeedItemsToKeep}, constraints:gbc(gridx :1, gridy:2, anchor : GridBagConstraints.LINE_END))
+                label(text : "Feed refresh frequency in minutes", constraints : gbc(gridx: 0, gridy : 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                defaultFeedUpdateIntervalField = textField(text : bind {model.defaultFeedUpdateInterval}, constraints:gbc(gridx :1, gridy:3, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(constraints : gbc(gridx: 0, gridy : 2, weighty: 100))
+        }
         trust = builder.panel {
             gridBagLayout()
             panel (border : titledBorder(title : "Trust Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),
@@ -311,6 +346,7 @@ class OptionsView {
         if (core.router != null) {
             tabbedPane.addTab("Bandwidth", bandwidth)
         }
+        tabbedPane.addTab("Feed", feed)
         tabbedPane.addTab("Trust", trust)
         tabbedPane.addTab("Chat", chat)
 

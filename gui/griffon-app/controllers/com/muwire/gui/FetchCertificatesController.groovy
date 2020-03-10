@@ -28,7 +28,7 @@ class FetchCertificatesController {
         core.eventBus.with { 
             register(CertificateFetchEvent.class, this)
             register(CertificateFetchedEvent.class, this)
-            publish(new UIFetchCertificatesEvent(host : model.result.sender, infoHash : model.result.infohash))
+            publish(new UIFetchCertificatesEvent(host : model.host, infoHash : model.infoHash))
         }
     }
     

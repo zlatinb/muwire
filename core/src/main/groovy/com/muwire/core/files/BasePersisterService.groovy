@@ -47,7 +47,7 @@ abstract class BasePersisterService extends Service{
         int pieceSize = 0
         if (json.pieceSize != null)
             pieceSize = json.pieceSize
-
+            
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
@@ -94,10 +94,19 @@ abstract class BasePersisterService extends Service{
         if (json.pieceSize != null)
             pieceSize = json.pieceSize
 
+        boolean published = false
+        long publishedTimestamp = -1
+        if (json.published != null && json.published) {
+            published = true
+            publishedTimestamp = json.publishedTimestamp
+        }
+
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
             DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sourceSet)
+            if (published)
+                df.publish(publishedTimestamp)
             df.setComment(json.comment)
             return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
@@ -105,6 +114,8 @@ abstract class BasePersisterService extends Service{
 
         SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
         sf.setComment(json.comment)
+        if (published)
+            sf.publish(publishedTimestamp)
         if (json.downloaders != null)
             sf.getDownloaders().addAll(json.downloaders)
         if (json.searchers != null) {
@@ -145,6 +156,11 @@ abstract class BasePersisterService extends Service{
 
         if (sf instanceof DownloadedFile) {
             json.sources = sf.sources.stream().map( {d -> d.toBase64()}).collect(Collectors.toList())
+        }
+        
+        if (sf.isPublished()) {
+            json.published = true
+            json.publishedTimestamp = sf.getPublishedTimestamp()
         }
 
         json

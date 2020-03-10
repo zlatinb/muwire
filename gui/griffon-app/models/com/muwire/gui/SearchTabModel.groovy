@@ -25,6 +25,7 @@ class SearchTabModel {
     @Observable boolean viewCommentActionEnabled
     @Observable boolean viewCertificatesActionEnabled
     @Observable boolean chatActionEnabled
+    @Observable boolean subscribeActionEnabled
     @Observable boolean groupedByFile
 
     Core core

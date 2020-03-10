@@ -31,6 +31,8 @@ public class SharedFile {
     private volatile String comment;
     private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
     private final Set<SearchEntry> searches = Collections.synchronizedSet(new HashSet<>());
+    private volatile boolean published;
+    private volatile long publishedTimestamp;
 
     public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
@@ -113,6 +115,24 @@ public class SharedFile {
     
     public void addDownloader(String name) {
         downloaders.add(name);
+    }
+    
+    public void publish(long timestamp) {
+        published = true;
+        publishedTimestamp = timestamp;
+    }
+    
+    public void unpublish() {
+        published = false;
+        publishedTimestamp = 0;
+    }
+    
+    public boolean isPublished() {
+        return published;
+    }
+    
+    public long getPublishedTimestamp() {
+        return publishedTimestamp;
     }
 
     @Override

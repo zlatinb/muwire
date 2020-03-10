@@ -1,6 +1,9 @@
 package com.muwire.gui
 
+import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.filecert.CertificateFetchStatus
+import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.search.UIResultEvent
 
 import griffon.core.artifact.GriffonModel
@@ -9,7 +12,9 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class FetchCertificatesModel {
-    UIResultEvent result
+    Persona host
+    InfoHash infoHash
+    String name
     
     @Observable CertificateFetchStatus status
     @Observable int totalCertificates

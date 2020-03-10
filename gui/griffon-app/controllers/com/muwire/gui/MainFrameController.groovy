@@ -30,6 +30,13 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.FeedItem
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
+import com.muwire.core.filefeeds.UIFeedDeletedEvent
+import com.muwire.core.filefeeds.UIFeedUpdateEvent
+import com.muwire.core.filefeeds.UIFilePublishedEvent
+import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
@@ -503,6 +510,105 @@ class MainFrameController {
         StringSelection selection = new StringSelection(s)
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
+    }
+    
+    @ControllerAction
+    void publish() {
+        def selectedFiles = view.selectedSharedFiles()
+        if (selectedFiles == null || selectedFiles.isEmpty())
+            return
+        
+        if (model.publishButtonText == "Unpublish") {
+            selectedFiles.each { 
+                it.unpublish()
+                model.core.eventBus.publish(new UIFileUnpublishedEvent(sf : it))
+            }
+        } else {
+            long now = System.currentTimeMillis()
+            selectedFiles.stream().filter({!it.isPublished()}).forEach({
+                it.publish(now)
+                model.core.eventBus.publish(new UIFilePublishedEvent(sf : it))
+            })
+        }
+        view.refreshSharedFiles()
+    }
+    
+    @ControllerAction
+    void updateFileFeed() {
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        model.core.eventBus.publish(new UIFeedUpdateEvent(host: feed.getPublisher()))
+    }
+    
+    @ControllerAction
+    void unsubscribeFileFeed() {
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        model.core.eventBus.publish(new UIFeedDeletedEvent(host : feed.getPublisher()))
+        runInsideUIAsync {
+            model.feeds.remove(feed)
+            model.feedItems.clear()
+            view.refreshFeeds()
+        }
+    }
+    
+    @ControllerAction
+    void configureFileFeed() {
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        
+        def params = [:]
+        params['core'] = core
+        params['feed'] = feed
+        mvcGroup.createMVCGroup("feed-configuration", params)
+    }
+    
+    @ControllerAction
+    void downloadFeedItem() {
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.isEmpty())
+            return
+        Feed f = model.core.getFeedManager().getFeed(items.get(0).getPublisher())
+        items.each { 
+            if (!model.canDownload(it.getInfoHash()))
+                return
+            File target = new File(application.context.get("muwire-settings").downloadLocation, it.getName())
+            model.core.eventBus.publish(new UIDownloadFeedItemEvent(item : it, target : target, sequential : f.isSequential()))
+        }
+        view.showDownloadsWindow.call()
+    }
+    
+    @ControllerAction
+    void viewFeedItemComment() {
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.size() != 1)
+            return
+        FeedItem item = items.get(0)
+        
+        String groupId = Base64.encode(item.getInfoHash().getRoot())
+        Map<String, Object> params = new HashMap<>()
+        params['text'] = DataUtil.readi18nString(Base64.decode(item.getComment()))
+        params['name'] = item.getName()
+        
+        mvcGroup.createMVCGroup("show-comment", groupId, params)
+    }
+    
+    @ControllerAction
+    void viewFeedItemCertificates() {
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.size() != 1)
+            return
+        FeedItem item = items.get(0)
+        
+        def params = [:]
+        params['core'] = core
+        params['host'] = item.getPublisher()
+        params['infoHash'] = item.getInfoHash()
+        params['name'] = item.getName()
+        mvcGroup.createMVCGroup("fetch-certificates", params)
     }
     
     void startChat(Persona p) {

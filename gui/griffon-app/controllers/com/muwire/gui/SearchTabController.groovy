@@ -12,6 +12,8 @@ import javax.swing.JOptionPane
 import com.muwire.core.Core
 import com.muwire.core.Persona
 import com.muwire.core.download.UIDownloadEvent
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
@@ -108,6 +110,22 @@ class SearchTabController {
     }
     
     @ControllerAction
+    void subscribe() {
+        def sender = view.selectedSender()
+        if (sender == null)
+            return
+
+        Feed feed = new Feed(sender)
+        feed.setAutoDownload(core.muOptions.defaultFeedAutoDownload)
+        feed.setSequential(core.muOptions.defaultFeedSequential)
+        feed.setItemsToKeep(core.muOptions.defaultFeedItemsToKeep)
+        feed.setUpdateInterval(core.muOptions.defaultFeedUpdateInterval * 60 * 1000)
+        
+        core.eventBus.publish(new UIFeedConfigurationEvent(feed : feed, newFeed: true))  
+        mvcGroup.parentGroup.view.showFeedsWindow.call()          
+    }
+    
+    @ControllerAction
     void chat() {
         def sender = view.selectedSender()
         if (sender == null)
@@ -139,7 +157,9 @@ class SearchTabController {
             return
 
         def params = [:]
-        params['result'] = event
+        params['host'] = event.getSender()
+        params['infoHash'] = event.getInfohash()
+        params['name'] = event.getName()
         params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }

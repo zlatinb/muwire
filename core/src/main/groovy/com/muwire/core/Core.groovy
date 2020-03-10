@@ -32,6 +32,16 @@ import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.filecert.UIImportCertificateEvent
+import com.muwire.core.filefeeds.FeedClient
+import com.muwire.core.filefeeds.FeedFetchEvent
+import com.muwire.core.filefeeds.FeedItemFetchedEvent
+import com.muwire.core.filefeeds.FeedManager
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
+import com.muwire.core.filefeeds.UIFilePublishedEvent
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
+import com.muwire.core.filefeeds.UIFeedDeletedEvent
+import com.muwire.core.filefeeds.UIFeedUpdateEvent
+import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHasher
@@ -116,6 +126,8 @@ public class Core {
     final CertificateManager certificateManager
     final ChatServer chatServer
     final ChatManager chatManager
+    final FeedManager feedManager
+    private final FeedClient feedClient
 
     private final Router router
 
@@ -269,6 +281,8 @@ public class Core {
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
         eventBus.register(UICommentEvent.class, persisterFolderService)
+        eventBus.register(UIFilePublishedEvent.class, persisterFolderService)
+        eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         File hostStorage = new File(home, "hosts.json")
@@ -311,6 +325,19 @@ public class Core {
             register(TrustEvent.class, chatServer)
         }
         
+        log.info("initializing feed manager")
+        feedManager = new FeedManager(eventBus, home)
+        eventBus.with { 
+            register(FeedItemFetchedEvent.class, feedManager)
+            register(FeedFetchEvent.class, feedManager)
+            register(UIFeedConfigurationEvent.class, feedManager)
+            register(UIFeedDeletedEvent.class, feedManager)
+        }
+        
+        log.info("initializing feed client")
+        feedClient = new FeedClient(i2pConnector, eventBus, me, feedManager)
+        eventBus.register(UIFeedUpdateEvent.class, feedClient)
+        
         log.info "initializing results sender"
         ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer)
 
@@ -322,6 +349,7 @@ public class Core {
         log.info("initializing download manager")
         downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
+        eventBus.register(UIDownloadFeedItemEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
         eventBus.register(FileDownloadedEvent.class, downloadManager)
         eventBus.register(UIDownloadCancelledEvent.class, downloadManager)
@@ -391,6 +419,8 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
         updateClient?.start()
+        feedManager.start()
+        feedClient.start()
     }
 
     public void shutdown() {
@@ -424,6 +454,10 @@ public class Core {
         chatServer.stop()
         log.info("shutting down chat manager")
         chatManager.shutdown()
+        log.info("shutting down feed manager")
+        feedManager.stop()
+        log.info("shutting down feed client")
+        feedClient.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         log.info("killing i2p session")

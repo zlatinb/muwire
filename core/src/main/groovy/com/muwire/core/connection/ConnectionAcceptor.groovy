@@ -15,9 +15,11 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.SharedFile
 import com.muwire.core.chat.ChatServer
 import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateManager
+import com.muwire.core.filefeeds.FeedItems
 import com.muwire.core.files.FileManager
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.trust.TrustLevel
@@ -160,6 +162,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'I':
                     processIRC(e)
+                    break
+                case (byte)'F':
+                    processFEED(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -310,6 +315,9 @@ class ConnectionAcceptor {
             boolean chat = false
             if (headers.containsKey('Chat'))
                 chat = Boolean.parseBoolean(headers['Chat'])
+            boolean feed = false
+            if (headers.containsKey('Feed'))
+                feed = Boolean.parseBoolean(headers['Feed'])
                 
             byte [] personaBytes = Base64.decode(headers['Sender'])
             Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
@@ -329,6 +337,7 @@ class ConnectionAcceptor {
                 def json = slurper.parse(payload)
                 results[i] = ResultsParser.parse(sender, resultsUUID, json)
                 results[i].chat = chat
+                results[i].feed = feed
             }
             eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
         } catch (IOException bad) {
@@ -373,6 +382,9 @@ class ConnectionAcceptor {
             
             boolean chat = chatServer.running.get() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            boolean feed = settings.fileFeed && settings.advertiseFeed
+            os.write("Feed: ${feed}\r\n".getBytes(StandardCharsets.US_ASCII))
             
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
@@ -523,6 +535,57 @@ class ConnectionAcceptor {
         if (IRC != "RC\r\n".getBytes(StandardCharsets.US_ASCII))
             throw new Exception("Invalid IRC connection")
         chatServer.handle(e)
+    }
+    
+    private void processFEED(Endpoint e) {
+        try {
+            byte[] EED = new byte[5];
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(EED);
+            if (EED != "EED\r\n".getBytes(StandardCharsets.US_ASCII))
+                throw new Exception("Invalid FEED connection")
+
+            OutputStream os = e.getOutputStream()
+
+            Map<String, String> headers = DataUtil.readAllHeaders(dis)
+            if (!headers.containsKey("Persona"))
+                throw new Exception("Persona header missing")
+            Persona requestor = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
+            if (requestor.destination != e.destination)
+                throw new Exception("Requestor persona mismatch")
+
+            if (!settings.fileFeed) {
+                os.write("403 Not Allowed\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.flush()
+                e.close()
+                return
+            }
+
+            long timestamp = 0
+            if (headers.containsKey("Timestamp")) {
+                timestamp = Long.parseLong(headers['Timestamp'])
+            }
+
+            List<SharedFile> published = fileManager.getPublishedSince(timestamp)
+
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count: ${published.size()}\r\n".getBytes(StandardCharsets.US_ASCII));
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+            JsonOutput jsonOutput = new JsonOutput()
+            published.each {
+                int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
+                def obj = FeedItems.sharedFileToObj(it, certificates)
+                def json = jsonOutput.toJson(obj)
+                dos.writeShort((short)json.length())
+                dos.write(json.getBytes(StandardCharsets.US_ASCII))
+            }
+            dos.flush()
+            dos.close()
+        } finally {
+            e.close()
+        }
     }
 
 }
