@@ -28,6 +28,8 @@ import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.filecert.CertificateCreatedEvent
+import com.muwire.core.filefeeds.FeedFetchEvent
+import com.muwire.core.filefeeds.FeedLoadedEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -89,6 +91,8 @@ class MainFrameModel {
     def trusted = []
     def distrusted = []
     def subscriptions = []
+    def feeds = []
+    def feedItems = []
     
     boolean sessionRestored
 
@@ -218,6 +222,8 @@ class MainFrameModel {
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
             core.eventBus.register(SearchEvent.class, this)
             core.eventBus.register(CertificateCreatedEvent.class, this)
+            core.eventBus.register(FeedLoadedEvent.class, this)
+            core.eventBus.register(FeedFetchEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -655,5 +661,18 @@ class MainFrameModel {
         Uploader uploader
         int requests
         boolean finished
+    }
+    
+    void onFeedLoadedEvent(FeedLoadedEvent e) {
+        runInsideUIAsync {
+            feeds << e.feed
+            view.refreshFeeds()
+        }
+    }
+    
+    void onFeedFetchEvent(FeedFetchEvent e) {
+        runInsideUIAsync {
+            view.refreshFeeds()
+        }
     }
 }

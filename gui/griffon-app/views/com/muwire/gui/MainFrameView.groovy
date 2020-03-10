@@ -76,6 +76,8 @@ class MainFrameView {
     def lastSharedSortEvent
     def trustTablesSortEvents = [:]
     def expansionListener = new TreeExpansions()
+    def lastFeedsSortEvent
+    def lastFeedItemsSortEvent
     
 
     UISettings settings
@@ -430,7 +432,33 @@ class MainFrameView {
                         }
                     }
                     panel(constraints : "feeds window") {
-                        label(text : "Feeds go here")
+                        gridLayout(rows : 2, cols : 1)
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text: "Subscriptions")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.feeds) {
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text : "Published Items")
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.feedItems) {
+                                        
+                                    }
+                                }
+                            }
+                        }
                     }
                     panel(constraints : "trust window") {
                         gridLayout(rows : 2, cols : 1)
@@ -768,6 +796,13 @@ class MainFrameView {
                     }
                 })
 
+        // feeds table
+        def feedsTable = builder.getVariable("feeds-table")
+        feedsTable.rowSorter.addRowSorterListener({evt -> lastFeedsSortEvent = evt})
+        selectionModel = feedsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        // TODO: hook up with feedItems table
+        
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -1212,6 +1247,14 @@ class MainFrameView {
         tree.setSelectionPaths(selectedPaths)
         
         builder.getVariable("shared-files-table").model.fireTableDataChanged()
+    }
+    
+    public void refreshFeeds() {
+        JTable feedsTable = builder.getVariable("feeds-table")
+        int selectedFeed = feedsTable.getSelectedRow()
+        feedsTable.model.fireTableDataChanged()
+        if (selectedFeed >= 0)
+            feedsTable.selectionModel.setSelectionInterval(selectedFeed, selectedFeed)
     }
     
     private void closeApplication() {
