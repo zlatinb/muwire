@@ -825,8 +825,17 @@ class MainFrameView {
             model.unsubscribeFileFeedButtonEnabled = true
             model.configureFileFeedButtonEnabled = true
             model.updateFileFeedButtonEnabled = !selectedFeed.getStatus().isActive()
+            
+            def items = model.core.feedManager.getFeedItems(selectedFeed.getPublisher())
+            model.feedItems.clear()
+            model.feedItems.addAll(items)
+            
+            def feedItemsTable = builder.getVariable("feed-items-table")
+            int selectedItemRow = feedItemsTable.selectedRow()
+            feedItemsTable.model.fireTableDataChanged()
+            if (selectedItemRow >= 0 && selectedItemRow < items.size())
+                feedItemsTable.selectionModel.setSelectionInterval(selectedItemRow, selectedItemRow)
         })
-        // TODO: hook up with feedItems table
         
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
