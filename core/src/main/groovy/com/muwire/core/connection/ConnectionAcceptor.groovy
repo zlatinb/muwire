@@ -315,6 +315,9 @@ class ConnectionAcceptor {
             boolean chat = false
             if (headers.containsKey('Chat'))
                 chat = Boolean.parseBoolean(headers['Chat'])
+            boolean feed = false
+            if (headers.containsKey('Feed'))
+                feed = Boolean.parseBoolean(headers['Feed'])
                 
             byte [] personaBytes = Base64.decode(headers['Sender'])
             Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
@@ -334,6 +337,7 @@ class ConnectionAcceptor {
                 def json = slurper.parse(payload)
                 results[i] = ResultsParser.parse(sender, resultsUUID, json)
                 results[i].chat = chat
+                results[i].feed = feed
             }
             eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
         } catch (IOException bad) {
