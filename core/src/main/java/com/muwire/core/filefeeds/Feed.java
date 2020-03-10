@@ -8,6 +8,7 @@ public class Feed {
     
     private int updateInterval;
     private long lastUpdated;
+    private volatile long lastUpdateAttempt;
     private int itemsToKeep;
     private boolean autoDownload;
     private boolean sequential;
@@ -68,5 +69,13 @@ public class Feed {
     
     public boolean isSequential() {
         return sequential;
+    }
+    
+    public void setLastUpdateAttempt(long lastUpdateAttempt) {
+        this.lastUpdateAttempt = lastUpdateAttempt;
+    }
+    
+    public long getLastUpdateAttempt() {
+        return lastUpdateAttempt;
     }
 }

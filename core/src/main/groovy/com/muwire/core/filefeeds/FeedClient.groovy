@@ -1,6 +1,6 @@
 package com.muwire.core.filefeeds
 
-import java.lang.System.Logger.Level
+import java.util.logging.Level
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -64,6 +64,7 @@ class FeedClient {
         Endpoint endpoint = null
         try {
             eventBus.publish(new FeedFetchEvent(host : feed.getPublisher(), status : FeedFetchStatus.CONNECTING))
+            feed.setLastUpdateAttempt(System.currentTimeMillis())
             endpoint = connector.connect(feed.getPublisher().getDestination())
             OutputStream os = endpoint.getOutputStream()
             os.write("FEED\r\n".getBytes(StandardCharsets.US_ASCII))

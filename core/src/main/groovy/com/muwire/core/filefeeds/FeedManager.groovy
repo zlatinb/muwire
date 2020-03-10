@@ -54,7 +54,8 @@ class FeedManager {
     public List<Feed> getFeedsToUpdate() {
         long now = System.currentTimeMillis()
         feeds.values().stream().
-            filter({Feed f -> f.getLastUpdated() + f.getUpdateInterval() <= now})
+            filter({Feed f -> !f.getStatus().isActive()}).
+            filter({Feed f -> f.getLastUpdateAttempt() + f.getUpdateInterval() <= now})
             .collect(Collectors.toList())
     }
     
@@ -78,8 +79,10 @@ class FeedManager {
                 Feed feed = new Feed(publisher)
                 feed.setUpdateInterval(parsed.updateInterval)
                 feed.setLastUpdated(parsed.lastUpdated)
+                feed.setLastUpdateAttempt(parsed.lastUpdateAttempt)
                 feed.setItemsToKeep(parsed.itemsToKeep)
                 feed.setAutoDownload(parsed.autoDownload)
+                feed.setSequential(parsed.sequential)
                 
                 feed.setStatus(FeedFetchStatus.IDLE)
                 
@@ -122,18 +125,21 @@ class FeedManager {
         
         Feed feed = feeds.get(e.host)
         if (feed == null) {
-            log.severe("Finished fetching non-existent feed " + e.host.getHumanReadableName())
+            log.severe("Fetching non-existent feed " + e.host.getHumanReadableName())
             return
         }
         
         feed.setStatus(e.status)
         
-        if (e.status != FeedFetchStatus.FINISHED)
+        if (e.status.isActive())
             return
         
-        feed.setStatus(FeedFetchStatus.IDLE)
-        feed.setLastUpdated(e.getTimestamp())
-        // save feed items, then save feed
+        if (e.status == FeedFetchStatus.FINISHED) {
+            feed.setStatus(FeedFetchStatus.IDLE)
+            feed.setLastUpdated(e.getTimestamp())
+        }
+        // save feed items, then save feed.  This will save partial fetches too
+        // which is ok because the items are stored in a Set
         persister.submit({saveFeedItems(e.host)} as Runnable)
         persister.submit({saveFeedMetadata(feed)} as Runnable)
     }
@@ -192,6 +198,8 @@ class FeedManager {
             json.lastUpdated = feed.getLastUpdated()
             json.updateInterval = feed.getUpdateInterval()
             json.autoDownload = feed.isAutoDownload()
+            json.sequential = feed.isSequential()
+            json.lastUpdateAttempt = feed.getLastUpdateAttempt()
             json = JsonOutput.toJson(json)
             writer.println(json)
         }
