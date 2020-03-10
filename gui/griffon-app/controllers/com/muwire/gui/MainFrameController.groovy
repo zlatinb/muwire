@@ -556,7 +556,14 @@ class MainFrameController {
     
     @ControllerAction
     void configureFileFeed() {
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
         
+        def params = [:]
+        params['core'] = core
+        params['feed'] = feed
+        mvcGroup.createMVCGroup("feed-configuration", params)
     }
     
     @ControllerAction

@@ -126,4 +126,9 @@ mvcGroups {
         view = 'com.muwire.gui.ChatMonitorView'
         controller = 'com.muwire.gui.ChatMonitorController'
     }
+    'feed-configuration' {
+        model = 'com.muwire.gui.FeedConfigurationModel'
+        view = 'com.muwire.gui.FeedConfigurationView'
+        controller = 'com.muwire.gui.FeedConfigurationController'
+    }
 }
