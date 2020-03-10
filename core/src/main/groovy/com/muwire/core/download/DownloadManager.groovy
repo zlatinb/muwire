@@ -1,6 +1,7 @@
 package com.muwire.core.download
 
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHasher
 import com.muwire.core.mesh.Mesh
@@ -62,11 +63,6 @@ public class DownloadManager {
 
 
     public void onUIDownloadEvent(UIDownloadEvent e) {
-
-        File incompletes = muSettings.incompleteLocation
-        if (incompletes == null)
-            incompletes = new File(home, "incompletes")
-        incompletes.mkdirs()
         
         def size = e.result[0].size
         def infohash = e.result[0].infohash
@@ -79,12 +75,29 @@ public class DownloadManager {
         destinations.addAll(e.sources)
         destinations.remove(me.destination)
 
-        Pieces pieces = getPieces(infohash, size, pieceSize, e.sequential)
+        doDownload(infohash, e.target, size, pieceSize, e.sequential, destinations)
 
-        def downloader = new Downloader(eventBus, this, me, e.target, size,
-            infohash, pieceSize, connector, destinations,
-            incompletes, pieces)
-        downloaders.put(infohash, downloader)
+    }
+    
+    public void onUIDownloadFeedItemEvent(UIDownloadFeedItemEvent e) {
+        Set<Destination> singleSource = new HashSet<>()
+        singleSource.add(e.item.getPublisher().getDestination())
+        doDownload(e.item.getInfoHash(), e.target, e.item.getSize(), e.item.getPieceSize(), 
+            e.sequential, singleSource)
+    }
+    
+    private void doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
+        boolean sequential, Set<Destination> destinations) {
+        File incompletes = muSettings.incompleteLocation
+        if (incompletes == null)
+            incompletes = new File(home, "incompletes")
+        incompletes.mkdirs()
+        
+        Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
+        def downloader = new Downloader(eventBus, this, me, target, size,
+                infoHash, pieceSize, connector, destinations,
+                incompletes, pieces)
+        downloaders.put(infoHash, downloader)
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))

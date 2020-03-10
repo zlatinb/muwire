@@ -10,6 +10,7 @@ public class Feed {
     private long lastUpdated;
     private int itemsToKeep;
     private boolean autoDownload;
+    private boolean sequential;
     private FeedFetchStatus status;
     
     public Feed(Persona publisher) {
@@ -59,5 +60,13 @@ public class Feed {
     
     public FeedFetchStatus getStatus() {
         return status;
+    }
+    
+    public void setSequential(boolean sequential) {
+        this.sequential = sequential;
+    }
+    
+    public boolean isSequential() {
+        return sequential;
     }
 }

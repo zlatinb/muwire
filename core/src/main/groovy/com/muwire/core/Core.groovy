@@ -36,6 +36,7 @@ import com.muwire.core.filefeeds.FeedClient
 import com.muwire.core.filefeeds.FeedFetchEvent
 import com.muwire.core.filefeeds.FeedItemFetchedEvent
 import com.muwire.core.filefeeds.FeedManager
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.filefeeds.UIFeedDeletedEvent
@@ -348,6 +349,7 @@ public class Core {
         log.info("initializing download manager")
         downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
         eventBus.register(UIDownloadEvent.class, downloadManager)
+        eventBus.register(UIDownloadFeedItemEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
         eventBus.register(FileDownloadedEvent.class, downloadManager)
         eventBus.register(UIDownloadCancelledEvent.class, downloadManager)

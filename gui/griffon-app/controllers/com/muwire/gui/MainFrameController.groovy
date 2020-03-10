@@ -31,6 +31,8 @@ import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.FeedItem
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFeedDeletedEvent
 import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
@@ -559,7 +561,15 @@ class MainFrameController {
     
     @ControllerAction
     void downloadFeedItem() {
-        
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.isEmpty())
+            return
+        Feed f = model.core.getFeedManager().getFeed(items.get(0).getPublisher())
+        items.each { 
+            File target = new File(application.context.get("muwire-settings").downloadLocation, it.getName())
+            model.core.eventBus.publish(new UIDownloadFeedItemEvent(item : it, target : target, sequential : f.isSequential()))
+        }
+        view.showDownloadsWindow.call()
     }
     
     @ControllerAction
