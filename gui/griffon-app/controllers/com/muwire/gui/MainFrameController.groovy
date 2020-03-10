@@ -543,6 +543,21 @@ class MainFrameController {
         
     }
     
+    @ControllerAction
+    void downloadFeedItem() {
+        
+    }
+    
+    @ControllerAction
+    void viewFeedItemComment() {
+        
+    }
+    
+    @ControllerAction
+    void viewFeedItemCertificates() {
+        
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]

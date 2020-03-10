@@ -112,6 +112,9 @@ class MainFrameModel {
     @Observable boolean updateFileFeedButtonEnabled
     @Observable boolean unsubscribeFileFeedButtonEnabled
     @Observable boolean configureFileFeedButtonEnabled
+    @Observable boolean downloadFeedItemButtonEnabled
+    @Observable boolean viewFeedItemCommentButtonEnabled
+    @Observable boolean viewFeedItemCertificatesButtonEnabled
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled

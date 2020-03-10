@@ -41,6 +41,7 @@ import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
 import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedFetchStatus
+import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
 import java.awt.BorderLayout
@@ -459,14 +460,27 @@ class MainFrameView {
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
-                                label(text : "Published Items")
+                                label(text : "Published Files")
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feedItems) {
-                                        
+                                        closureColumn(header : "Name", type : String, read : {it.getName()})
+                                        closureColumn(header : "Size", type : Long, read : {it.getSize()})
+                                        closureColumn(header : "Comment", type : Boolean, read : {it.getComment() != null})
+                                        closureColumn(header : "Certificates", type : Integer, read : {it.getCertificates()})
+                                        closureColumn(header : "Downloaded", type : Boolean, read : {
+                                            InfoHash ih = it.getInfoHash()
+                                            model.core.fileManager.isShared(ih)
+                                        })
+                                        closureColumn(header: "Date", type : Long, read : {it.getTimestamp()})
                                     }
                                 }
+                            }
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : "Download", enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
+                                button(text : "View Comment", enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
+                                button(text : "View Certificates", enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
                             }
                         }
                     }
@@ -809,6 +823,7 @@ class MainFrameView {
         // feeds table
         def feedsTable = builder.getVariable("feeds-table")
         feedsTable.rowSorter.addRowSorterListener({evt -> lastFeedsSortEvent = evt})
+        feedsTable.rowSorter.setSortsOnUpdates(true)
         feedsTable.setDefaultRenderer(Integer.class, centerRenderer)
         feedsTable.setDefaultRenderer(Long.class, new DateRenderer())
         selectionModel = feedsTable.getSelectionModel()
@@ -835,6 +850,34 @@ class MainFrameView {
             feedItemsTable.model.fireTableDataChanged()
             if (selectedItemRow >= 0 && selectedItemRow < items.size())
                 feedItemsTable.selectionModel.setSelectionInterval(selectedItemRow, selectedItemRow)
+        })
+        
+        // feed items table
+        def feedItemsTable = builder.getVariable("feed-items-table")
+        feedItemsTable.rowSorter.addRowSorterListener({evt -> lastFeedItemsSortEvent = evt})
+        feedItemsTable.rowSorter.setSortsOnUpdates(true)
+        feedItemsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        feedItemsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
+        feedItemsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
+        
+        selectionModel = feedItemsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener({
+            List<FeedItem> selectedItems = selectedFeedItems()
+            if (selectedItems == null || selectedItems.isEmpty()) {
+                model.downloadFeedItemButtonEnabled = false
+                model.viewFeedItemCommentButtonEnabled = false
+                model.viewFeedItemCertificatesButtonEnabled = false
+                return
+            }
+            model.downloadFeedItemButtonEnabled = true
+            model.viewFeedItemCommentButtonEnabled = false
+            model.viewFeedItemCertificatesButtonEnabled = false
+            if (selectedItems.size() == 1) {
+                FeedItem item = selectedItems.get(0)
+                model.viewFeedItemCommentButtonEnabled = item.getComment() != null
+                model.viewFeedItemCertificatesButtonEnabled = item.getCertificates() > 0
+            }
         })
         
         // subscription table
@@ -1299,6 +1342,22 @@ class MainFrameView {
         if (lastFeedsSortEvent != null)
             row = table.rowSorter.convertRowIndexToModel(row)
         model.feeds[row]
+    }
+    
+    List<FeedItem> selectedFeedItems() {
+        JTable feedItemsTable = builder.getVariable("feed-items-table")
+        int [] selectedRows = feedItemsTable.getSelectedRows()
+        if (selectedRows.length == 0)
+            return null
+        List<FeedItem> rv = new ArrayList<>()
+        if (lastFeedItemsSortEvent != null) {
+            for (int i = 0; i < selectedRows.length; i++) {
+                selectedRows[i] = feedItemsTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+            }
+        }
+        for (int selectedRow : selectedRows)
+            rv.add(model.feedItems[selectedRow])
+        rv
     }
     
     private void closeApplication() {
