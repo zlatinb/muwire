@@ -444,10 +444,10 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feeds) {
-                                        closureColumn(header : "Publisher", type : String, read : {it.getPublisher().getHumanReadableName()})
-                                        closureColumn(header : "Files", type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
+                                        closureColumn(header : "Publisher", preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
+                                        closureColumn(header : "Files", preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
                                         closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
-                                        closureColumn(header : "Status", type : String, read : {it.getStatus()})
+                                        closureColumn(header : "Status", preferredWidth: 10, type : String, read : {it.getStatus()})
                                     }
                                 }
                             }
@@ -465,11 +465,11 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feedItems) {
-                                        closureColumn(header : "Name", type : String, read : {it.getName()})
-                                        closureColumn(header : "Size", type : Long, read : {it.getSize()})
-                                        closureColumn(header : "Comment", type : Boolean, read : {it.getComment() != null})
-                                        closureColumn(header : "Certificates", type : Integer, read : {it.getCertificates()})
-                                        closureColumn(header : "Downloaded", type : Boolean, read : {
+                                        closureColumn(header : "Name", preferredWidth: 350, type : String, read : {it.getName()})
+                                        closureColumn(header : "Size", preferredWidth: 10, type : Long, read : {it.getSize()})
+                                        closureColumn(header : "Comment", preferredWidth: 10, type : Boolean, read : {it.getComment() != null})
+                                        closureColumn(header : "Certificates", preferredWidth: 10, type : Integer, read : {it.getCertificates()})
+                                        closureColumn(header : "Downloaded", preferredWidth: 10, type : Boolean, read : {
                                             InfoHash ih = it.getInfoHash()
                                             model.core.fileManager.isShared(ih)
                                         })
