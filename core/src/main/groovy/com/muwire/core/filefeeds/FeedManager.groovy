@@ -173,7 +173,7 @@ class FeedManager {
             return
              
         List<FeedItem> list = new ArrayList<>(set)
-        if (list.size() > feed.getItemsToKeep()) {
+        if (feed.getItemsToKeep() > 0 && list.size() > feed.getItemsToKeep()) {
             log.info("will persist ${feed.getItemsToKeep()}/${list.size()} items")
             list.sort({l, r ->
                 Long.compare(r.getTimestamp(), l.getTimestamp())
