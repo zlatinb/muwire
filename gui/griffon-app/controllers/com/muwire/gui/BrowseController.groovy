@@ -113,7 +113,9 @@ class BrowseController {
             return
         
         def params = [:]
-        params['result'] = result
+        params['host'] = result.getSender()
+        params['infoHash'] = result.getInfohash()
+        params['name'] = result.getName()
         params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }

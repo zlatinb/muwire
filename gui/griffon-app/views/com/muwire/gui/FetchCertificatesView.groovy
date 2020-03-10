@@ -38,7 +38,7 @@ class FetchCertificatesView {
     void initUI() {
         int rowHeight = application.context.get("row-height")
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, model.result.name, true)
+        dialog = new JDialog(mainFrame, model.name, true)
         dialog.setResizable(true)
         
         p = builder.panel {

@@ -155,7 +155,9 @@ class SearchTabController {
             return
 
         def params = [:]
-        params['result'] = event
+        params['host'] = event.getSender()
+        params['infoHash'] = event.getInfohash()
+        params['name'] = event.getName()
         params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }

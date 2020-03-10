@@ -589,7 +589,17 @@ class MainFrameController {
     
     @ControllerAction
     void viewFeedItemCertificates() {
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.size() != 1)
+            return
+        FeedItem item = items.get(0)
         
+        def params = [:]
+        params['core'] = core
+        params['host'] = item.getPublisher()
+        params['infoHash'] = item.getInfoHash()
+        params['name'] = item.getName()
+        mvcGroup.createMVCGroup("fetch-certificates", params)
     }
     
     void startChat(Persona p) {
