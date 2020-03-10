@@ -851,6 +851,19 @@ class MainFrameView {
             if (selectedItemRow >= 0 && selectedItemRow < items.size())
                 feedItemsTable.selectionModel.setSelectionInterval(selectedItemRow, selectedItemRow)
         })
+        feedsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedsPopupMenu(e)
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedsPopupMenu(e)
+            }
+        })
+        
         
         // feed items table
         def feedItemsTable = builder.getVariable("feed-items-table")
@@ -1140,6 +1153,29 @@ class MainFrameView {
         }
 
         showPopupMenu(menu, e)
+    }
+    
+    void showFeedsPopupMenu(MouseEvent e) {
+        Feed feed = selectedFeed()
+        if (feed == null)
+            return
+        // TODO: finish
+        JPopupMenu menu = new JPopupMenu()
+        if (model.updateFileFeedButtonEnabled) {
+            JMenuItem update = new JMenuItem("Update")
+            update.addActionListener({mvcGroup.controller.updateFileFeed()})
+            menu.add(update)
+        }
+        
+        JMenuItem unsubscribe = new JMenuItem("Unsubscribe")
+        unsubscribe.addActionListener({mvcGroup.controller.unsubscribeFileFeed()})
+        menu.add(unsubscribe)
+        
+        JMenuItem configure = new JMenuItem("Configure")
+        configure.addActionListener({mvcGroup.controller.configureFileFeed()})
+        menu.add(configure)
+        
+        showPopupMenu(menu,e)
     }
     
     def selectedUploader() {
