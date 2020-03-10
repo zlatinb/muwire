@@ -1344,7 +1344,7 @@ class MainFrameView {
         if (row < 0)
             return null
         if (lastFeedsSortEvent != null)
-            row = table.rowSorter.convertRowIndexToModel(row)
+            row = feedsTable.rowSorter.convertRowIndexToModel(row)
         model.feeds[row]
     }
     
