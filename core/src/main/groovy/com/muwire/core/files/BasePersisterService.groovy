@@ -115,7 +115,7 @@ abstract class BasePersisterService extends Service{
         SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
         sf.setComment(json.comment)
         if (published)
-            sf.published(publishedTimestamp)
+            sf.publish(publishedTimestamp)
         if (json.downloaders != null)
             sf.getDownloaders().addAll(json.downloaders)
         if (json.searchers != null) {
