@@ -44,8 +44,8 @@ class FeedClient {
     }
     
     private void updateAnyFeeds() {
-        feedManager.getFeedsToUpdate().each { 
-            feedFetcher.execute({updateFeed(it)} as Runnable)
+        feedManager.getFeedsToUpdate().each { feed ->
+            feedFetcher.execute({updateFeed(feed)} as Runnable)
         }
     }
     
