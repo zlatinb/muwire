@@ -88,7 +88,8 @@ class ResultsSender {
                     sources : suggested,
                     comment : comment,
                     certificates : certificates,
-                    chat : chatServer.running.get() && settings.advertiseChat
+                    chat : chatServer.running.get() && settings.advertiseChat,
+                    feed : settings.fileFeed && settings.advertiseFeed
                     )
                 uiResultEvents << uiResultEvent
             }
