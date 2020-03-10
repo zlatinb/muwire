@@ -30,6 +30,8 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
+import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
@@ -514,12 +516,15 @@ class MainFrameController {
         if (model.publishButtonText == "Unpublish") {
             selectedFiles.each { 
                 it.unpublish()
+                model.core.eventBus.publish(new UIFileUnpublishedEvent(sf : it))
             }
         } else {
             long now = System.currentTimeMillis()
-            selectedFiles.stream().filter({!it.isPublished()}).forEach({it.publish(now)})
+            selectedFiles.stream().filter({!it.isPublished()}).forEach({
+                it.publish(now)
+                model.core.eventBus.publish(new UIFIlePublishedEvent(sf : it))
+            })
         }
-        // TODO: issue event to core
         view.refreshSharedFiles()
     }
     
