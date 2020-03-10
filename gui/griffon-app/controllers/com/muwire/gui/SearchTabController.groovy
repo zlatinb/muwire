@@ -108,6 +108,11 @@ class SearchTabController {
     }
     
     @ControllerAction
+    void subscribe() {
+        
+    }
+    
+    @ControllerAction
     void chat() {
         def sender = view.selectedSender()
         if (sender == null)
