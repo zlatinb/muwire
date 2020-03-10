@@ -167,15 +167,18 @@ class FeedManager {
         if (feed == null) {
             log.severe("Persisting items for non-existing feed " + publisher.getHumanReadableName())
             return
-        }         
-         
+        }   
+              
+        if (feed.getItemsToKeep() == 0)
+            return
+             
         List<FeedItem> list = new ArrayList<>(set)
         if (list.size() > feed.getItemsToKeep()) {
             log.info("will persist ${feed.getItemsToKeep()}/${list.size()} items")
             list.sort({l, r ->
                 Long.compare(r.getTimestamp(), l.getTimestamp())
             } as Comparator<FeedItem>)
-            list = list[0..feed.getItemsToKeep()]
+            list = list[0..feed.getItemsToKeep() - 1]
         }
         
         
