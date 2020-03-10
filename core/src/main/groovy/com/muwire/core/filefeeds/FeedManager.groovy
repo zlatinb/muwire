@@ -48,7 +48,7 @@ class FeedManager {
     }
     
     public Set<FeedItem> getFeedItems(Persona persona) {
-        feedItems.get(persona)
+        feedItems.getOrDefault(persona, Collections.emptySet())
     }
     
     public List<Feed> getFeedsToUpdate() {
