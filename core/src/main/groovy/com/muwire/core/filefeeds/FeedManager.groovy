@@ -91,21 +91,19 @@ class FeedManager {
     
     private void loadItems() {
         def slurper = new JsonSlurper()
-        feeds.keySet().each {
-            File itemsFile = getItemsFile(feeds[it])
+        feeds.keySet().each { persona ->
+            File itemsFile = getItemsFile(feeds[persona])
             if (!itemsFile.exists())
                 return // no items yet?
             itemsFile.eachLine { line ->
-                def parsed = slurper.parse(line)
-                FeedItem item = FeedItems.objToFeedItem(parsed, it)
-                
-                Set<FeedItem> items = feedItems.get(it)
+                def parsed = slurper.parseText(line)
+                FeedItem item = FeedItems.objToFeedItem(parsed, persona)
+                Set<FeedItem> items = feedItems.get(persona)
                 if (items == null) {
                     items = new ConcurrentHashSet<>()
-                    feedItems.put(it, items)
+                    feedItems.put(persona, items)
                 }
                 items.add(item)
-                
                 eventBus.publish(new FeedItemLoadedEvent(item : item))
             }
         }
