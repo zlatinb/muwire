@@ -193,6 +193,10 @@ class FileManager {
     Set<SharedFile> getSharedFiles(byte []root) {
             return rootToFiles.get(new InfoHash(root))
     }
+    
+    boolean isShared(InfoHash infoHash) {
+        rootToFiles.containsKey(infoHash)
+    }
 
     void onSearchEvent(SearchEvent e) {
         // hash takes precedence
