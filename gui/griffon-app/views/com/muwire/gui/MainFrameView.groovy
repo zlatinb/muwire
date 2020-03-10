@@ -444,7 +444,7 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feeds) {
-                                        closureColumn(header : "Publisher", type : String, read : {it.getPublisher()})
+                                        closureColumn(header : "Publisher", type : String, read : {it.getPublisher().getHumanReadableName()})
                                         closureColumn(header : "Files", type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
                                         closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
                                         closureColumn(header : "Status", type : String, read : {it.getStatus()})

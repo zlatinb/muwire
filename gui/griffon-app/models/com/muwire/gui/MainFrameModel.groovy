@@ -30,6 +30,7 @@ import com.muwire.core.download.Downloader
 import com.muwire.core.filecert.CertificateCreatedEvent
 import com.muwire.core.filefeeds.FeedFetchEvent
 import com.muwire.core.filefeeds.FeedLoadedEvent
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -230,6 +231,7 @@ class MainFrameModel {
             core.eventBus.register(CertificateCreatedEvent.class, this)
             core.eventBus.register(FeedLoadedEvent.class, this)
             core.eventBus.register(FeedFetchEvent.class, this)
+            core.eventBus.register(UIFeedConfigurationEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -678,6 +680,17 @@ class MainFrameModel {
     
     void onFeedFetchEvent(FeedFetchEvent e) {
         runInsideUIAsync {
+            view.refreshFeeds()
+        }
+    }
+    
+    void onUIFeedConfigurationEvent(UIFeedConfigurationEvent e) {
+        if (!e.newFeed)
+            return
+        runInsideUIAsync {
+            if (feeds.contains(e.feed))
+                return
+            feeds << e.feed
             view.refreshFeeds()
         }
     }

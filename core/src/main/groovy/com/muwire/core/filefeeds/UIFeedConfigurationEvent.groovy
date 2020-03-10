@@ -8,4 +8,5 @@ import com.muwire.core.Event
  */
 class UIFeedConfigurationEvent extends Event {
     Feed feed
+    boolean newFeed
 }
