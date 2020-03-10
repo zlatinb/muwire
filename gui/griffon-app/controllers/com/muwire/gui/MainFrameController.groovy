@@ -30,6 +30,9 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.UIFeedDeletedEvent
+import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
@@ -530,12 +533,23 @@ class MainFrameController {
     
     @ControllerAction
     void updateFileFeed() {
-        
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        model.core.eventBus.publish(new UIFeedUpdateEvent(host: feed.getPublisher()))
     }
     
     @ControllerAction
     void unsubscribeFileFeed() {
-        
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        model.core.eventBus.publish(new UIFeedDeletedEvent(host : feed.getPublisher()))
+        runInsideUIAsync {
+            model.feeds.remove(feed)
+            model.feedItems.clear()
+            view.refreshFeeds()
+        }
     }
     
     @ControllerAction

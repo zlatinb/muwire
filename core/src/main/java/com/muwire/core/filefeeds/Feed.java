@@ -14,6 +14,7 @@ public class Feed {
     
     public Feed(Persona publisher) {
         this.publisher = publisher;
+        this.status = FeedFetchStatus.IDLE;
     }
 
     public int getUpdateInterval() {

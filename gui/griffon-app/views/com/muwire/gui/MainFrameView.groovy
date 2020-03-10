@@ -1332,6 +1332,9 @@ class MainFrameView {
         feedsTable.model.fireTableDataChanged()
         if (selectedFeed >= 0)
             feedsTable.selectionModel.setSelectionInterval(selectedFeed, selectedFeed)
+        
+        JTable feedItemsTable = builder.getVariable("feed-items-table")
+        feedItemsTable.model.fireTableDataChanged()
     }
     
     Feed selectedFeed() {
