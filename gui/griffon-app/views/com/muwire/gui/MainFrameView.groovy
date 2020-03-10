@@ -892,6 +892,25 @@ class MainFrameView {
                 model.viewFeedItemCertificatesButtonEnabled = item.getCertificates() > 0
             }
         })
+        feedItemsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                List<FeedItem> selectedItems = selectedFeedItems()
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedItemsPopupMenu(e)
+                else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 &&
+                    selectedItems != null && selectedItems.size() == 1 &&
+                    model.canDownload(selectedItems.get(0).getInfoHash())) {
+                    mvcGroup.controller.downloadFeedItem()
+                }
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    showFeedItemsPopupMenu(e)
+            }
+        })
         
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
@@ -1159,7 +1178,6 @@ class MainFrameView {
         Feed feed = selectedFeed()
         if (feed == null)
             return
-        // TODO: finish
         JPopupMenu menu = new JPopupMenu()
         if (model.updateFileFeedButtonEnabled) {
             JMenuItem update = new JMenuItem("Update")
@@ -1176,6 +1194,30 @@ class MainFrameView {
         menu.add(configure)
         
         showPopupMenu(menu,e)
+    }
+    
+    void showFeedItemsPopupMenu(MouseEvent e) {
+        List<FeedItem> items = selectedFeedItems()
+        if (items == null || items.isEmpty())
+            return
+        // TODO: finish
+        JPopupMenu menu = new JPopupMenu()
+        if (model.downloadFeedItemButtonEnabled) {
+            JMenuItem download = new JMenuItem("Download")
+            download.addActionListener({mvcGroup.controller.downloadFeedItem()})
+            menu.add(download)
+        }
+        if (model.viewFeedItemCommentButtonEnabled) {
+            JMenuItem viewComment = new JMenuItem("View Comment")
+            viewComment.addActionListener({mvcGroup.controller.viewFeedItemComment()})
+            menu.add(viewComment)
+        }
+        if (model.viewFeedItemCertificatesButtonEnabled) {
+            JMenuItem viewCertificates = new JMenuItem("View Certificates")
+            viewCertificates.addActionListener({mvcGroup.controller.viewFeedItemCertificates()})
+            menu.add(viewCertificates)
+        }
+        showPopupMenu(menu, e)
     }
     
     def selectedUploader() {
