@@ -36,7 +36,7 @@ import com.muwire.core.filefeeds.FeedClient
 import com.muwire.core.filefeeds.FeedFetchEvent
 import com.muwire.core.filefeeds.FeedItemFetchedEvent
 import com.muwire.core.filefeeds.FeedManager
-import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.filefeeds.UIFeedDeletedEvent
 import com.muwire.core.filefeeds.UIFeedUpdateEvent
@@ -280,7 +280,7 @@ public class Core {
         eventBus.register(FileHashedEvent.class, persisterFolderService)
         eventBus.register(FileUnsharedEvent.class, persisterFolderService)
         eventBus.register(UICommentEvent.class, persisterFolderService)
-        eventBus.register(UIFIlePublishedEvent.class, persisterFolderService)
+        eventBus.register(UIFilePublishedEvent.class, persisterFolderService)
         eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")

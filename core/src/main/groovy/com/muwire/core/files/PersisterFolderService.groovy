@@ -1,7 +1,7 @@
 package com.muwire.core.files
 
 import com.muwire.core.*
-import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 
 import groovy.json.JsonOutput
@@ -96,7 +96,7 @@ class PersisterFolderService extends BasePersisterService {
         persistFile(e.sharedFile,null)
     }
     
-    void onUIFilePublishedEvent(UIFIlePublishedEvent e) {
+    void onUIFilePublishedEvent(UIFilePublishedEvent e) {
         persistFile(e.sf, null)
     }
     

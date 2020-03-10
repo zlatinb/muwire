@@ -3,6 +3,6 @@ package com.muwire.core.filefeeds
 import com.muwire.core.Event
 import com.muwire.core.SharedFile
 
-class UIFIlePublishedEvent extends Event {
+class UIFilePublishedEvent extends Event {
     SharedFile sf
 }

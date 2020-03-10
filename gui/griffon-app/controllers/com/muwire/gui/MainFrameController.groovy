@@ -30,7 +30,7 @@ import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
 import com.muwire.core.download.UIDownloadResumedEvent
 import com.muwire.core.filecert.UICreateCertificateEvent
-import com.muwire.core.filefeeds.UIFIlePublishedEvent
+import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
@@ -522,7 +522,7 @@ class MainFrameController {
             long now = System.currentTimeMillis()
             selectedFiles.stream().filter({!it.isPublished()}).forEach({
                 it.publish(now)
-                model.core.eventBus.publish(new UIFIlePublishedEvent(sf : it))
+                model.core.eventBus.publish(new UIFilePublishedEvent(sf : it))
             })
         }
         view.refreshSharedFiles()
