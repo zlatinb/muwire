@@ -77,6 +77,8 @@ class FeedManager {
                 feed.setItemsToKeep(parsed.itemsToKeep)
                 feed.setAutoDownload(parsed.autoDownload)
                 
+                feed.setStatus(FeedFetchStatus.IDLE.name())
+                
                 feeds.put(feed.getPublisher(), feed)
                 
                 eventBus.publish(new FeedLoadedEvent(feed : feed))
@@ -115,13 +117,19 @@ class FeedManager {
     }
     
     void onFeedFetchEvent(FeedFetchEvent e) {
-        if (e.status != FeedFetchStatus.FINISHED)
-            return
+        
         Feed feed = feeds.get(e.host)
         if (feed == null) {
             log.severe("Finished fetching non-existent feed " + e.host.getHumanReadableName())
             return
         }
+        
+        feed.setStatus(e.status.name())
+        
+        if (e.status != FeedFetchStatus.FINISHED)
+            return
+        
+        feed.setStatus(FeedFetchStatus.IDLE.name())
         feed.setLastUpdated(e.getTimestamp())
         // save feed items, then save feed
         persister.submit({saveFeedItems(e.host)} as Runnable)

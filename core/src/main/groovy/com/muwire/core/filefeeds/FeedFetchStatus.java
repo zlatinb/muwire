@@ -1,5 +1,5 @@
 package com.muwire.core.filefeeds;
 
 public enum FeedFetchStatus {
-    CONNECTING, FETCHING, FINISHED, FAILED
+    IDLE, CONNECTING, FETCHING, FINISHED, FAILED
 }
