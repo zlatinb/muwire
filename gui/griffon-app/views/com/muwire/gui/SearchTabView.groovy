@@ -345,7 +345,8 @@ class SearchTabView {
                 Persona sender = model.senders[row]
                 model.browseActionEnabled = model.sendersBucket[sender].first().browse
                 model.chatActionEnabled = model.sendersBucket[sender].first().chat
-                model.subscribeActionEnabled = model.sendersBucket[sender].first().feed
+                model.subscribeActionEnabled = model.sendersBucket[sender].first().feed &&
+                    model.core.feedManager.getFeed(sender) == null
                 model.trustButtonsEnabled = true
                 model.results.clear()
                 model.results.addAll(model.sendersBucket[sender])
@@ -406,12 +407,13 @@ class SearchTabView {
                 model.viewCommentActionEnabled = false
                 return
             }
-            model.browseActionEnabled = model.senders2[row].browse
-            model.chatActionEnabled = model.senders2[row].chat
-            model.subscribeActionEnabled = model.senders2[row].feed
+            UIResultEvent e = model.senders2[row]
+            model.browseActionEnabled = e.browse
+            model.chatActionEnabled = e.chat
+            model.subscribeActionEnabled = e.feed && model.core.feedManager.getFeed(e.getSender()) == null 
             model.trustButtonsEnabled = true
-            model.viewCommentActionEnabled = model.senders2[row].comment != null
-            model.viewCertificatesActionEnabled = model.senders2[row].certificates > 0
+            model.viewCommentActionEnabled = e.comment != null
+            model.viewCertificatesActionEnabled = e.certificates > 0
         })
        
         if (settings.groupByFile)
