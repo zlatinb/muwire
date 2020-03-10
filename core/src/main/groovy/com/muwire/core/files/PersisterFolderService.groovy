@@ -59,11 +59,15 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
+        if (core.getMuOptions().getAutoPublishSharedFiles() && hashedEvent.sharedFile != null) 
+            hashedEvent.sharedFile.publish(System.currentTimeMillis())
         persistFile(hashedEvent.sharedFile, hashedEvent.infoHash)
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
         if (core.getMuOptions().getShareDownloadedFiles()) {
+            if (core.getMuOptions().getAutoPublishSharedFiles())
+                downloadedEvent.downloadedFile.publish(System.currentTimeMillis())
             persistFile(downloadedEvent.downloadedFile, downloadedEvent.infoHash)
         }
     }
