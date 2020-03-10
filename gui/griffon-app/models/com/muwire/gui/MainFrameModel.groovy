@@ -109,6 +109,9 @@ class MainFrameModel {
     @Observable boolean addCommentButtonEnabled
     @Observable boolean publishButtonEnabled
     @Observable String publishButtonText
+    @Observable boolean updateFileFeedButtonEnabled
+    @Observable boolean unsubscribeFileFeedButtonEnabled
+    @Observable boolean configureFileFeedButtonEnabled
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled

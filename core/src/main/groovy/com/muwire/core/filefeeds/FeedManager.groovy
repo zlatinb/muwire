@@ -47,6 +47,10 @@ class FeedManager {
         feeds.get(persona)
     }
     
+    public Set<FeedItem> getFeedItems(Persona persona) {
+        feedItems.get(persona)
+    }
+    
     public List<Feed> getFeedsToUpdate() {
         long now = System.currentTimeMillis()
         feeds.values().stream().
@@ -77,7 +81,7 @@ class FeedManager {
                 feed.setItemsToKeep(parsed.itemsToKeep)
                 feed.setAutoDownload(parsed.autoDownload)
                 
-                feed.setStatus(FeedFetchStatus.IDLE.name())
+                feed.setStatus(FeedFetchStatus.IDLE)
                 
                 feeds.put(feed.getPublisher(), feed)
                 
@@ -124,12 +128,12 @@ class FeedManager {
             return
         }
         
-        feed.setStatus(e.status.name())
+        feed.setStatus(e.status)
         
         if (e.status != FeedFetchStatus.FINISHED)
             return
         
-        feed.setStatus(FeedFetchStatus.IDLE.name())
+        feed.setStatus(FeedFetchStatus.IDLE)
         feed.setLastUpdated(e.getTimestamp())
         // save feed items, then save feed
         persister.submit({saveFeedItems(e.host)} as Runnable)

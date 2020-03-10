@@ -10,7 +10,7 @@ public class Feed {
     private long lastUpdated;
     private int itemsToKeep;
     private boolean autoDownload;
-    private String status;
+    private FeedFetchStatus status;
     
     public Feed(Persona publisher) {
         this.publisher = publisher;
@@ -52,11 +52,11 @@ public class Feed {
         return publisher;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FeedFetchStatus status) {
         this.status = status;
     }
     
-    public String getStatus() {
+    public FeedFetchStatus getStatus() {
         return status;
     }
 }

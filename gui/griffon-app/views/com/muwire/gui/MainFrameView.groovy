@@ -39,6 +39,8 @@ import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.download.Downloader
+import com.muwire.core.filefeeds.Feed
+import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
 import java.awt.BorderLayout
@@ -441,9 +443,17 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feeds) {
-                                        
+                                        closureColumn(header : "Publisher", type : String, read : {it.getPublisher()})
+                                        closureColumn(header : "Files", type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
+                                        closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
+                                        closureColumn(header : "Status", type : String, read : {it.getStatus()})
                                     }
                                 }
+                            }
+                            panel (constraints : BorderLayout.SOUTH) {
+                                button(text : "Update", enabled : bind {model.updateFileFeedButtonEnabled}, updateFileFeedAction)
+                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
+                                button(text : "Configure", enabled : bind {model.configureFileFeedButtonEnabled}, configureFileFeedAction)
                             }
                         }
                         panel {
@@ -799,8 +809,23 @@ class MainFrameView {
         // feeds table
         def feedsTable = builder.getVariable("feeds-table")
         feedsTable.rowSorter.addRowSorterListener({evt -> lastFeedsSortEvent = evt})
+        feedsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        feedsTable.setDefaultRenderer(Long.class, new DateRenderer())
         selectionModel = feedsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            Feed selectedFeed = selectedFeed()
+            if (selectedFeed == null) {
+                model.updateFileFeedButtonEnabled = false
+                model.unsubscribeFileFeedButtonEnabled = false
+                model.configureFileFeedButtonEnabled = false
+                return
+            }
+
+            model.unsubscribeFileFeedButtonEnabled = true
+            model.configureFileFeedButtonEnabled = true
+            model.updateFileFeedButtonEnabled = !selectedFeed.getStatus().isActive()
+        })
         // TODO: hook up with feedItems table
         
         // subscription table
@@ -1255,6 +1280,16 @@ class MainFrameView {
         feedsTable.model.fireTableDataChanged()
         if (selectedFeed >= 0)
             feedsTable.selectionModel.setSelectionInterval(selectedFeed, selectedFeed)
+    }
+    
+    Feed selectedFeed() {
+        JTable feedsTable = builder.getVariable("feeds-table")
+        int row = feedsTable.getSelectedRow()
+        if (row < 0)
+            return null
+        if (lastFeedsSortEvent != null)
+            row = table.rowSorter.convertRowIndexToModel(row)
+        model.feeds[row]
     }
     
     private void closeApplication() {

@@ -528,6 +528,21 @@ class MainFrameController {
         view.refreshSharedFiles()
     }
     
+    @ControllerAction
+    void updateFileFeed() {
+        
+    }
+    
+    @ControllerAction
+    void unsubscribeFileFeed() {
+        
+    }
+    
+    @ControllerAction
+    void configureFileFeed() {
+        
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]
