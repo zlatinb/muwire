@@ -846,7 +846,7 @@ class MainFrameView {
             model.feedItems.addAll(items)
             
             def feedItemsTable = builder.getVariable("feed-items-table")
-            int selectedItemRow = feedItemsTable.selectedRow()
+            int selectedItemRow = feedItemsTable.getSelectedRow()
             feedItemsTable.model.fireTableDataChanged()
             if (selectedItemRow >= 0 && selectedItemRow < items.size())
                 feedItemsTable.selectionModel.setSelectionInterval(selectedItemRow, selectedItemRow)
