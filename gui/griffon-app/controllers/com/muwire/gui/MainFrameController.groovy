@@ -574,7 +574,17 @@ class MainFrameController {
     
     @ControllerAction
     void viewFeedItemComment() {
+        List<FeedItem> items = view.selectedFeedItems()
+        if (items == null || items.size() != 1)
+            return
+        FeedItem item = items.get(0)
         
+        String groupId = Base64.encode(item.getInfoHash().getRoot())
+        Map<String, Object> params = new HashMap<>()
+        params['text'] = DataUtil.readi18nString(Base64.decode(item.getComment()))
+        params['name'] = item.getName()
+        
+        mvcGroup.createMVCGroup("show-comment", groupId, params)
     }
     
     @ControllerAction
