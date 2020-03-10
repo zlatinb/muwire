@@ -103,6 +103,8 @@ class MainFrameModel {
     @Observable boolean previewButtonEnabled
     @Observable String resumeButtonText
     @Observable boolean addCommentButtonEnabled
+    @Observable boolean publishButtonEnabled
+    @Observable String publishButtonText
     @Observable boolean subscribeButtonEnabled
     @Observable boolean markNeutralFromTrustedButtonEnabled
     @Observable boolean markDistrustedButtonEnabled
@@ -253,6 +255,7 @@ class MainFrameModel {
                 distrusted.addAll(core.trustService.bad.values())
 
                 resumeButtonText = "Retry"
+                publishButtonText = "Publish"
                 
                 searchesPaneButtonEnabled = false
                 downloadsPaneButtonEnabled = true

@@ -505,6 +505,24 @@ class MainFrameController {
         clipboard.setContents(selection, null)
     }
     
+    @ControllerAction
+    void publish() {
+        def selectedFiles = view.selectedSharedFiles()
+        if (selectedFiles == null || selectedFiles.isEmpty())
+            return
+        
+        if (model.publishButtonText == "Unpublish") {
+            selectedFiles.each { 
+                it.unpublish()
+            }
+        } else {
+            long now = System.currentTimeMillis()
+            selectedFiles.stream().filter({!it.isPublished()}).forEach({it.publish(now)})
+        }
+        // TODO: issue event to core
+        view.refreshSharedFiles()
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]

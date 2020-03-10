@@ -292,6 +292,7 @@ class MainFrameView {
                                                         Core core = application.context.get("core")
                                                         core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
                                                     })
+                                                    closureColumn(header : "Published", preferredWidth : 50, type : Boolean, read : {row -> row.isPublished()})
                                                     closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
                                                     closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
                                                 }
@@ -316,9 +317,11 @@ class MainFrameView {
                                     radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                 }
                                 panel {
-                                    button(text : "Share", actionPerformed : shareFiles)
-                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, addCommentAction)
-                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, issueCertificateAction)
+                                    gridBagLayout()
+                                    button(text : "Share", constraints : gbc(gridx: 0), actionPerformed : shareFiles)
+                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), addCommentAction)
+                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 2), issueCertificateAction)
+                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:3), publishAction)
                                 }
                                 panel {
                                     panel {
@@ -682,14 +685,30 @@ class MainFrameView {
             if (selectedFiles == null || selectedFiles.isEmpty())
                 return
             model.addCommentButtonEnabled = true
+            model.publishButtonEnabled = true
+            boolean unpublish = true
+            selectedFiles.each { 
+                unpublish &= it.isPublished()
+            }
+            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
         })
+        
         def sharedFilesTree = builder.getVariable("shared-files-tree")
         sharedFilesTree.addMouseListener(sharedFilesMouseListener)
 
         sharedFilesTree.addTreeSelectionListener({
             def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
             model.addCommentButtonEnabled = selectedNode != null
-
+            model.publishButtonEnabled = selectedNode != null
+            
+            def selectedFiles = selectedSharedFiles()
+            if (selectedFiles == null || selectedFiles.isEmpty())
+                return
+            boolean unpublish = true
+            selectedFiles.each {
+                unpublish &= it.isPublished()
+            }
+            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
         })
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
