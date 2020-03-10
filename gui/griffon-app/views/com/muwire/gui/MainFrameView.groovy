@@ -151,6 +151,7 @@ class MainFrameView {
                         button(text: "Uploads", enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         if (settings.showMonitor)
                             button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
+                        button(text: "Feeds", enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
                         button(text: "Trust", enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
                         button(text: "Chat", enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
                     }
@@ -427,6 +428,9 @@ class MainFrameView {
                                 }
                             }
                         }
+                    }
+                    panel(constraints : "feeds window") {
+                        label(text : "Feeds go here")
                     }
                     panel(constraints : "trust window") {
                         gridLayout(rows : 2, cols : 1)
@@ -1088,6 +1092,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = false
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1100,6 +1105,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = false
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1112,6 +1118,20 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = false
+        model.feedsPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
+    }
+    
+    def showFeedsWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel,"feeds window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1124,6 +1144,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
@@ -1136,6 +1157,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()

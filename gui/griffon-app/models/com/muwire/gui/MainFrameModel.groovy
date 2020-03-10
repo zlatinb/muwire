@@ -120,6 +120,7 @@ class MainFrameModel {
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
+    @Observable boolean feedsPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
     @Observable boolean chatPaneButtonEnabled
     
@@ -261,6 +262,7 @@ class MainFrameModel {
                 downloadsPaneButtonEnabled = true
                 uploadsPaneButtonEnabled = true
                 monitorPaneButtonEnabled = true
+                feedsPaneButtonEnabled = true
                 trustPaneButtonEnabled = true
                 chatPaneButtonEnabled = true
                 
