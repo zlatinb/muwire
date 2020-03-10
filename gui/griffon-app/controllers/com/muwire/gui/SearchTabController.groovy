@@ -116,8 +116,10 @@ class SearchTabController {
             return
 
         Feed feed = new Feed(sender)
-        // TODO: defaults
-        feed.setUpdateInterval(60 * 1000)
+        feed.setAutoDownload(core.muOptions.defaultFeedAutoDownload)
+        feed.setSequential(core.muOptions.defaultFeedSequential)
+        feed.setItemsToKeep(core.muOptions.defaultFeedItemsToKeep)
+        feed.setUpdateInterval(core.muOptions.defaultFeedUpdateInterval * 60 * 1000)
         
         core.eventBus.publish(new UIFeedConfigurationEvent(feed : feed, newFeed: true))  
         mvcGroup.parentGroup.view.showFeedsWindow.call()          
