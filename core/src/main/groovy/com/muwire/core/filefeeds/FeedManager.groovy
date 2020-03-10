@@ -86,7 +86,7 @@ class FeedManager {
     private void loadItems() {
         def slurper = new JsonSlurper()
         feeds.keySet().each {
-            File itemsFile = new File(itemsFolder, it.destination.toBase32() + ".json")
+            File itemsFile = getItemsFile(feeds[it])
             if (!itemsFile.exists())
                 return // no items yet?
             itemsFile.eachLine { line ->
@@ -133,6 +133,15 @@ class FeedManager {
         persister.submit({saveFeedMetadata(e.feed)} as Runnable)
     }
     
+    void onUIFeedDeletedEvent(UIFeedDeletedEvent e) {
+        Feed f = feeds.get(e.host)
+        if (f == null) {
+            log.severe("Deleting a non-existing feed " + e.host.getHumanReadableName())
+            return
+        }
+        persister.submit({deleteFeed(f)} as Runnable)
+    }
+    
     private void saveFeedItems(Persona publisher) {
         Set<FeedItem> set = feedItems.get(publisher)
         if (set == null)
@@ -154,7 +163,7 @@ class FeedManager {
         }
         
         
-        File itemsFile = new File(itemsFolder, publisher.destination.toBase32() + ".json")
+        File itemsFile = getItemsFile(feed)
         itemsFile.withPrintWriter { writer -> 
             list.each { item -> 
                 def obj = FeedItems.feedItemToObj(item)
@@ -165,7 +174,7 @@ class FeedManager {
     }
     
     private void saveFeedMetadata(Feed feed) {
-        File metadataFile = new File(metadataFolder, feed.publisher.destination.toBase32() + ".json")
+        File metadataFile = getMetadataFile(feed)
         metadataFile.withPrintWriter { writer ->
             def json = [:]
             json.publisher = feed.getPublisher().toBase64()
@@ -176,5 +185,20 @@ class FeedManager {
             json = JsonOutput.toJson(json)
             writer.println(json)
         }
+    }
+    
+    private void deleteFeed(Feed feed) {
+        feeds.remove(feed.getPublisher())
+        feedItems.remove(feed.getPublisher())
+        getItemsFile(feed).delete()
+        getMetadataFile(feed).delete()
+    }
+    
+    private File getItemsFile(Feed feed) {
+        return new File(itemsFolder, feed.getPublisher().destination.toBase32() + ".json")
+    }
+    
+    private File getMetadataFile(Feed feed) {
+        return new File(metadataFolder, feed.getPublisher().destination.toBase32() + ".json")
     }
 }

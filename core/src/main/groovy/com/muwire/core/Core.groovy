@@ -38,6 +38,7 @@ import com.muwire.core.filefeeds.FeedItemFetchedEvent
 import com.muwire.core.filefeeds.FeedManager
 import com.muwire.core.filefeeds.UIFIlePublishedEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
+import com.muwire.core.filefeeds.UIFeedDeletedEvent
 import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
@@ -329,6 +330,7 @@ public class Core {
             register(FeedItemFetchedEvent.class, feedManager)
             register(FeedFetchEvent.class, feedManager)
             register(UIFeedConfigurationEvent.class, feedManager)
+            register(UIFeedDeletedEvent.class, feedManager)
         }
         
         log.info("initializing feed client")
