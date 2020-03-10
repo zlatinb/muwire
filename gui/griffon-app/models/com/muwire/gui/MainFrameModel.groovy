@@ -28,8 +28,11 @@ import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.filecert.CertificateCreatedEvent
+import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedFetchEvent
+import com.muwire.core.filefeeds.FeedItemFetchedEvent
 import com.muwire.core.filefeeds.FeedLoadedEvent
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
@@ -64,6 +67,7 @@ import griffon.transform.FXObservable
 import griffon.transform.Observable
 import net.i2p.data.Base64
 import net.i2p.data.Destination
+import net.i2p.util.ConcurrentHashSet
 import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
@@ -139,7 +143,7 @@ class MainFrameModel {
     
     @Observable Downloader downloader
 
-    private final Set<InfoHash> downloadInfoHashes = new HashSet<>()
+    private final Set<InfoHash> downloadInfoHashes = new ConcurrentHashSet<>()
 
     @Observable volatile Core core
 
@@ -231,6 +235,7 @@ class MainFrameModel {
             core.eventBus.register(CertificateCreatedEvent.class, this)
             core.eventBus.register(FeedLoadedEvent.class, this)
             core.eventBus.register(FeedFetchEvent.class, this)
+            core.eventBus.register(FeedItemFetchedEvent.class, this)
             core.eventBus.register(UIFeedConfigurationEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
@@ -693,5 +698,18 @@ class MainFrameModel {
             feeds << e.feed
             view.refreshFeeds()
         }
+    }
+    
+    void onFeedItemFetchedEvent(FeedItemFetchedEvent e) {
+        Feed feed = core.feedManager.getFeed(e.item.getPublisher())
+        if (feed == null || !feed.isAutoDownload())
+            return
+        if (!canDownload(e.item.getInfoHash()))
+            return
+        if (core.fileManager.isShared(e.item.getInfoHash()))
+            return
+            
+        File target = new File(core.getMuOptions().getDownloadLocation(), e.item.getName())    
+        core.eventBus.publish(new UIDownloadFeedItemEvent(item : e.item, target : target, sequential : feed.isSequential()))
     }
 }
