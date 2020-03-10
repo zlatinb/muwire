@@ -1192,6 +1192,7 @@ class MainFrameView {
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
