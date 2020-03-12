@@ -103,11 +103,14 @@ public class SearchServlet extends HttpServlet {
             
             List<Sender> senders = new ArrayList<>();
             results.getBySender().forEach( (persona, resultsFromSender) -> {
+                UIResultEvent first = resultsFromSender.iterator().next();
                 Sender sender = new Sender(persona,
                         core.getTrustService().getLevel(persona.getDestination()),
-                        resultsFromSender.iterator().next().getBrowse(),
+                        first.getBrowse(),
                         browseManager.isBrowsing(persona),
-                        resultsFromSender.size());
+                        resultsFromSender.size(),
+                        first.getFeed(),
+                        core.getFeedManager().getFeed(persona) != null);
                 senders.add(sender);
             });
             
@@ -234,7 +237,9 @@ public class SearchServlet extends HttpServlet {
                         browseManager.isBrowsing(event.getSender()),
                         event.getComment(),
                         event.getCertificates(),
-                        core.getTrustService().getLevel(event.getSender().getDestination()));
+                        core.getTrustService().getLevel(event.getSender().getDestination()),
+                        event.getFeed(),
+                        core.getFeedManager().getFeed(event.getSender()) != null);
                 sendersForResult.add(senderForResult);
             });
             
@@ -284,13 +289,18 @@ public class SearchServlet extends HttpServlet {
         private final boolean browse;
         private final boolean browsing;
         private final int results;
+        private final boolean feed;
+        private final boolean subscribed;
         
-        Sender(Persona persona, TrustLevel trustLevel, boolean browse, boolean browsing, int results) {
+        Sender(Persona persona, TrustLevel trustLevel, boolean browse, boolean browsing, int results,
+                boolean feed, boolean subscribed) {
             this.persona = persona;
             this.trustLevel = trustLevel;
             this.browse = browse;
             this.browsing = browsing;
             this.results = results;
+            this.feed = feed;
+            this.subscribed = subscribed;
         }
         
         void toXML(StringBuilder sb) {
@@ -301,6 +311,8 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Browse>").append(browse).append("</Browse>");
             sb.append("<Browsing>").append(browsing).append("</Browsing>");
             sb.append("<Results>").append(results).append("</Results>");
+            sb.append("<Feed>").append(feed).append("</Feed>");
+            sb.append("<Subscribed>").append(subscribed).append("</Subscribed>");
             sb.append("</Sender>");
         }
     }
@@ -369,14 +381,19 @@ public class SearchServlet extends HttpServlet {
         private final String comment;
         private final int certificates;
         private final TrustLevel trustLevel;
+        private final boolean feed;
+        private final boolean subscribed;
         
-        SenderForResult(Persona sender, boolean browse, boolean browsing, String comment, int certificates, TrustLevel trustLevel) {
+        SenderForResult(Persona sender, boolean browse, boolean browsing, String comment, int certificates, TrustLevel trustLevel,
+                boolean feed, boolean subscribed) {
             this.sender = sender;
             this.browse = browse;
             this.trustLevel = trustLevel;
             this.browsing = browsing;
             this.comment = comment;
             this.certificates = certificates;
+            this.feed = feed;
+            this.subscribed = subscribed;
         }
         
         void toXML(StringBuilder sb) {
@@ -389,6 +406,8 @@ public class SearchServlet extends HttpServlet {
             if (comment != null)
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             sb.append("<Certificates>").append(certificates).append("</Certificates>");
+            sb.append("<Feed>").append(feed).append("</Feed>");
+            sb.append("<Subscribed>").append(subscribed).append("</Subscribed>");
             sb.append("</Sender>");
         }
         

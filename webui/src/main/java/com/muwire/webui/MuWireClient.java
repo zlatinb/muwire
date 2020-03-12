@@ -24,6 +24,10 @@ import com.muwire.core.connection.DisconnectionEvent;
 import com.muwire.core.download.DownloadStartedEvent;
 import com.muwire.core.filecert.CertificateFetchEvent;
 import com.muwire.core.filecert.CertificateFetchedEvent;
+import com.muwire.core.filefeeds.FeedFetchEvent;
+import com.muwire.core.filefeeds.FeedItemFetchedEvent;
+import com.muwire.core.filefeeds.FeedLoadedEvent;
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.files.AllFilesLoadedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
@@ -163,6 +167,12 @@ public class MuWireClient {
         core.getEventBus().register(UploadEvent.class, uploadManager);
         core.getEventBus().register(UploadFinishedEvent.class, uploadManager);
         
+        FeedManager feedManager = new FeedManager(core);
+        core.getEventBus().register(FeedLoadedEvent.class, feedManager);
+        core.getEventBus().register(UIFeedConfigurationEvent.class, feedManager);
+        core.getEventBus().register(FeedFetchEvent.class, feedManager);
+        core.getEventBus().register(FeedItemFetchedEvent.class, feedManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
@@ -171,6 +181,7 @@ public class MuWireClient {
         servletContext.setAttribute("trustManager", trustManager);
         servletContext.setAttribute("certificateManager", certificateManager);
         servletContext.setAttribute("uploadManager", uploadManager);
+        servletContext.setAttribute("feedManager", feedManager);
     }
     
     public String getHome() {

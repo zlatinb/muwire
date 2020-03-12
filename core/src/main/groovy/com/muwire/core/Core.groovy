@@ -118,7 +118,7 @@ public class Core {
     private final ConnectionAcceptor connectionAcceptor
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
-    private final DownloadManager downloadManager
+    final DownloadManager downloadManager
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
     final UploadManager uploadManager

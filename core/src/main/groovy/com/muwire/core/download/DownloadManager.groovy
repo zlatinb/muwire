@@ -242,4 +242,8 @@ public class DownloadManager {
         downloaders.values().each { it.stop() }
         Downloader.executorService.shutdownNow()
     }
+    
+    public boolean isDownloading(InfoHash infoHash) {
+        downloaders.containsKey(infoHash)
+    }
 }
