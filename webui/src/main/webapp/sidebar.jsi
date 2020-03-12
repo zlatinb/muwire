@@ -43,6 +43,12 @@
                       <%=Util._t("Browse")%>
                   </div>
                 </a>
+                <a class="menuitem shared" href="Feeds">
+                  <div class="menu-icon"></div>
+                  <div class="menu-text">
+                      <%=Util._t("Feeds")%>
+                  </div>
+                </a>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">

@@ -66,6 +66,11 @@
     <servlet-class>com.muwire.webui.UploadServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.FeedServlet</servlet-name>
+    <servlet-class>com.muwire.webui.FeedServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -121,6 +126,10 @@
     <url-pattern>/Upload</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.FeedServlet</servlet-name>
+    <url-pattern>/Feed</url-pattern>
+</servlet-mapping>
 
 __JASPER__
 
@@ -182,6 +191,11 @@ Mappings without the .jsp suffix
 <servlet-mapping>
     <servlet-name>com.muwire.webui.Uploads_jsp</servlet-name>
     <url-pattern>/Uploads</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.Feeds_jsp</servlet-name>
+    <url-pattern>/Feeds</url-pattern>
 </servlet-mapping>
 
 </web-app>

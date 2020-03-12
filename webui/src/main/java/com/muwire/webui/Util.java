@@ -51,6 +51,7 @@ public class Util {
         _x("Downloading"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
+        _x("Feeds"),
         _x("Fetching Certificates"),
         _x("File"),
         _x("Hashing"),

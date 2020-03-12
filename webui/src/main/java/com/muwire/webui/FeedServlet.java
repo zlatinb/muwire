@@ -122,6 +122,7 @@ public class FeedServlet extends HttpServlet {
             }
             feedManager.subscribe(host);
             Util.pause();
+            resp.sendRedirect("/MuWire/Feeds");
         } else if (action.equals("unsubscribe")) {
             String personaB64 = req.getParameter("host");
             if (personaB64 == null) {
@@ -173,7 +174,7 @@ public class FeedServlet extends HttpServlet {
             
             Optional<FeedItem> itemOptional = core.getFeedManager().getFeedItems(host).
                     stream().filter(item -> item.getInfoHash().equals(infoHash)).findFirst();
-            if (itemOptional.isEmpty())
+            if (!itemOptional.isPresent())
                 return;
             FeedItem item = itemOptional.get();
             
