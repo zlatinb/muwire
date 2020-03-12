@@ -1,10 +1,12 @@
 package com.muwire.webui;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletConfig;
@@ -14,9 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.muwire.core.Core;
+import com.muwire.core.InfoHash;
 import com.muwire.core.Persona;
 import com.muwire.core.filefeeds.Feed;
 import com.muwire.core.filefeeds.FeedItem;
+import com.muwire.core.filefeeds.UIDownloadFeedItemEvent;
 import com.muwire.core.util.DataUtil;
 import com.muwire.webui.FeedManager.RemoteFeed;
 
@@ -132,6 +136,54 @@ public class FeedServlet extends HttpServlet {
                 return;
             }
             feedManager.unsubscribe(host);
+            Util.pause();
+        } else if (action.equals("download")) {
+            if (core == null) {
+                resp.sendError(403, "Not initialized");
+                return;
+            }
+            String personaB64 = req.getParameter("host");
+            if (personaB64 == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            Persona host;
+            try {
+                host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
+            } catch (Exception bad) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            String infoHashB64 = req.getParameter("infoHash");
+            if (infoHashB64 == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            final InfoHash infoHash;
+            try {
+                infoHash = new InfoHash(Base64.decode(infoHashB64));
+            } catch (Exception bad) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            
+            Feed feed = core.getFeedManager().getFeed(host);
+            if (feed == null)
+                return;
+            
+            Optional<FeedItem> itemOptional = core.getFeedManager().getFeedItems(host).
+                    stream().filter(item -> item.getInfoHash().equals(infoHash)).findFirst();
+            if (itemOptional.isEmpty())
+                return;
+            FeedItem item = itemOptional.get();
+            
+            File target = new File(core.getMuOptions().getDownloadLocation(), item.getName());
+            
+            UIDownloadFeedItemEvent event = new UIDownloadFeedItemEvent();
+            event.setItem(item);
+            event.setSequential(feed.isSequential());
+            event.setTarget(target);
+            core.getEventBus().publish(event);
             Util.pause();
         }
     }
