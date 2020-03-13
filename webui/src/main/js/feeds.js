@@ -10,7 +10,27 @@ class Feed {
 	}
 	
 	getMapping() {
-		// TODO: implement
+		var mapping = new Map()
+		var publisherLink = new Link(this.publisher, "displayFeed", [this.publisher])
+		var updateHTML = ""
+		if (this.active != "true") {
+			var updateLink = new Link(_t("Update"), "forceUpdate", [this.publisherB64])
+			updateHTML = updateLink.render()
+		}
+		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.publisherB64])
+		var configureLink = new Link(_t("Configure", "configure", [this.publisherB64]))
+		
+		var publisherHTML = publisherLink.render() + "<span class='right'>" + updateHTML + "  " +
+			unsubscribeLink.render() + "   " +
+			configureLink.render() +
+			"</span>"
+		
+		mapping.set("Publisher", publisherHTML)
+		mapping.set("Files", this.files)
+		mapping.set("Last Updated", this.lastUpdated)
+		mapping.set("Status", this.status)
+		
+		return mapping
 	}
 }
 
@@ -26,12 +46,65 @@ class Item {
 		try {
 			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
 		} catch (ignore) {
-			this.comment = ""
+			this.comment = null
 		}
 	}
 	
+	getCommentBlock() {
+		if (this.comment == null)
+			return ""
+		if (expandedComments.get(this.infoHash)) {
+			var hideCommentLink = new Link(_t("Hide Comment"), "hideComment", [this.infoHash])
+			var html = "<div id='comment-link-" + this.infoHash + ">" + hideCommentLink.render() + "</div>"
+			html += "<div id='comment-" + this.infoHash + "'>"
+			html += "<pre class='comment'>" + this.comment + "</pre>"
+			html += "</div>"
+			return html
+		} else {
+			var showCommentLink = new Link(_t("Show Comment"), "showComment", [this.infoHash])
+			var html = "<div id='comment-link-" + this.infoHash + "'>" + showCommentLink.render() + "</div>"
+			html += "<div id='comment-" + this.infoHash + "'></div>"
+			return html		
+		}
+	}
+	
+	getCertificatesBlock() {
+		if (this.certificates == "0")
+			return ""
+			
+		var linkText
+		if (this.certificates == "1")
+			linkText = _t("View 1 Certificate")
+		else
+			linkText = _t("View {0} Certificates", this.certificates)
+		var b64 = feeds.get(currentFeed).publisherB64
+		var link = new Link(linkText, "showCertificates", [b64, this.infoHash])
+		var id = b64 + "_" + this.infoHash
+		
+		return "<div id='certificates-link-" + id +"'>'" + link.render() + "</div>" +
+			"<div id='certificates-" + id + "'></div>"
+		
+	}
+	
+	getDownloadBlock() {
+		if (this.resultStatus == "DOWNLOADING")
+			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+		if (this.resultStatus == "SHARED")
+			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
+		var downloadLink = new Link(_t("Download"), "download", [this.infoHash])
+		return "<span id='download-" + this.infoHash + "'>" + downloadLink.render() + "</span>"
+	}
+	
 	getMapping() {
-		// TODO: implement
+		var mapping = new Map()
+		
+		var nameHtml = this.name
+		nameHtml += this.getCommentBlock()
+		nameHtml += this.getCertificatesBlock()
+		mapping.set("Name", nameHtml)
+		mapping.set("Size", this.size)
+		mapping.set("Download", this.getDownloadBlock())
+		mapping.set("Published", this.timestamp)
 	}
 }
 
@@ -90,18 +163,23 @@ function displayFeed(feed) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			itemsByInfohash.clear()
+			
 			var items = []
 			var itemNodes = this.responseXML.getElementsByTagName("Item")
 			var i
-			for (i = 0; i < itemNodes.length; i++)
-				items.push(new Item(itemNodes[i]))
+			for (i = 0; i < itemNodes.length; i++) {
+				var item = new Item(itemNodes[i])
+				items.push(item)
+				itemsByInfoHash.set(item.infoHash, item)
+			}
 				
 			var newOrder
 			if (itemsSortOrder == "descending")
 				newOrder = "ascending"
 			else if (itemsSortOrder == "ascending")
 				newOrder = "descending"
-			var table = new Table(["Name", "Size", "Status", "Published"], "sortItems", itemsSortKey, newOrder, null)
+			var table = new Table(["Name", "Size", "Download", "Published"], "sortItems", itemsSortKey, newOrder, null)
 			for (i = 0; i < items.length; i++) {
 				table.addRow(items[i].getMapping())
 			}
@@ -130,10 +208,96 @@ function sortItems(key, order) {
 	displayFeed(currentFeed)
 }
 
+function forceUpdate(b64) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshFeeds()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.open("action=update&host=" + b64)
+}
+
+function unsubscribe(b64) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshFeeds()
+		}
+	}
+	xmlhttp.open("POST","/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.open("action=unsubscribe&host=" + b64)
+}
+
+function configure(b64) {
+	// TODO: implement
+}
+
+function showCertificates(hostB64, infoHash) {
+	var fetch = new CertificateFetch(hostB64, infoHash)
+	certificateFetches.set(fetch.divId, fetch)
+	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var hideLink = new Link(_t("Hide Certificates"), "hideCertificates", [hostB64, infoHash])
+			var hideLinkSpan = document.getElementById("certificates-link-" + fetch.divId)
+			hideLinkSpan.innerHTML = hideLink.render()
+			
+			var certSpan = document.getElementById("certificates-" + fetch.divId)
+			certSpan.innerHTML = _t("Fetching Certificates")
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Certificate", true)	
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=fetch&user=" + hostB64 + "&infoHash=" + infoHash)
+}
+
+function hideCertificates(hostB64, infoHash) {
+	var id = hostB64 + "_" + infoHash
+	certificateFetches.delete(id)
+	
+	var certSpan = document.getElementById("certificates-" + id)
+	certSpan.innerHTML = ""
+	
+	var item = itemsByInfoHash.get(infoHash)
+	var showLinkText
+	if (item.certificates == "1")
+		showLinkText = _t("View 1 Certificate")
+	else
+		showLinkText = _t("View {0} Certificates", item.certificates)
+	
+	var showLink = new Link(showLinkText, "showCertificates", [hostB64, infoHash])
+	var linkSpan = document.getElementById("certificates-link-" + id)
+	linkSpan.innerHTML = showLink.render()
+}
+
+function download(infoHash) {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var resultSpan = document.getElementById("download-" + infoHash);
+			resultSpan.innerHTML = "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+		}
+	}
+	
+	var hostB64 = feeds.get(currentFeed).publisherB64
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=download&host=" + hostB64 + "&infoHash=" + infoHash)
+}
+
 var feeds = new Map()
 var currentFeed = null
+
+var itemsByInfoHash = new Map()
 
 var feedsSortKey = "Publisher"
 var feedsSortOrder = "descending"
 var itemsSortKey = "Name"
 var itemsSortOrder = "descending"
+
+var expandedComments = new Map()

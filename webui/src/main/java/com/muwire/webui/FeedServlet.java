@@ -186,6 +186,22 @@ public class FeedServlet extends HttpServlet {
             event.setTarget(target);
             core.getEventBus().publish(event);
             Util.pause();
+        } else if (action.equals("update")) {
+            String personaB64 = req.getParameter("host");
+            if (personaB64 == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            Persona host;
+            try {
+                host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
+            } catch (Exception bad) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            
+            feedManager.update(host);
+            Util.pause();
         }
     }
 
@@ -239,7 +255,7 @@ public class FeedServlet extends HttpServlet {
     static {
         ITEM_COMPARATORS.add("Name", ITEM_BY_NAME);
         ITEM_COMPARATORS.add("Size", ITEM_BY_SIZE);
-        ITEM_COMPARATORS.add("Status", ITEM_BY_STATUS);
+        ITEM_COMPARATORS.add("Download", ITEM_BY_STATUS);
         ITEM_COMPARATORS.add("Published", ITEM_BY_TIMESTAMP);
     }
 

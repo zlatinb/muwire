@@ -14,6 +14,7 @@ import com.muwire.core.filefeeds.FeedLoadedEvent;
 import com.muwire.core.filefeeds.UIDownloadFeedItemEvent;
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.filefeeds.UIFeedDeletedEvent;
+import com.muwire.core.filefeeds.UIFeedUpdateEvent;
 
 public class FeedManager {
     
@@ -79,6 +80,12 @@ public class FeedManager {
     void unsubscribe(Persona publisher) {
         remoteFeeds.remove(publisher);
         UIFeedDeletedEvent event = new UIFeedDeletedEvent();
+        event.setHost(publisher);
+        core.getEventBus().publish(event);
+    }
+    
+    void update(Persona publisher) {
+        UIFeedUpdateEvent event = new UIFeedUpdateEvent();
         event.setHost(publisher);
         core.getEventBus().publish(event);
     }

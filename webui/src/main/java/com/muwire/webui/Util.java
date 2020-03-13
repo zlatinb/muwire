@@ -104,6 +104,7 @@ public class Util {
         _x("Trusted User"),
         _x("Unshare"),
         _x("Unsubscribe"),
+        _x("Update"),
         _x("Upload"),
         _x("Uploads"),
         _x("User"),
