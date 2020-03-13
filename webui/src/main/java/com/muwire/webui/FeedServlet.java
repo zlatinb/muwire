@@ -43,7 +43,7 @@ public class FeedServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         
-        if (section.equals("status")) {
+        if (section.equals("feeds")) {
             List<WrappedFeed> feeds = feedManager.getRemoteFeeds().values().stream().
                     map(rf -> new WrappedFeed(rf, core.getFeedManager().getFeedItems(rf.getFeed().getPublisher()).size())).
                     collect(Collectors.toList());
@@ -213,10 +213,10 @@ public class FeedServlet extends HttpServlet {
     
     private static final ColumnComparators<WrappedFeed> FEED_COMPARATORS = new ColumnComparators<>();
     static {
-        FEED_COMPARATORS.add("publisher", FEED_BY_PUBLISHER);
-        FEED_COMPARATORS.add("files", FEED_BY_FILES);
-        FEED_COMPARATORS.add("status", FEED_BY_STATUS);
-        FEED_COMPARATORS.add("lastUpdated", FEED_BY_LAST_UPDATED);
+        FEED_COMPARATORS.add("Publisher", FEED_BY_PUBLISHER);
+        FEED_COMPARATORS.add("Files", FEED_BY_FILES);
+        FEED_COMPARATORS.add("Status", FEED_BY_STATUS);
+        FEED_COMPARATORS.add("Last Updated", FEED_BY_LAST_UPDATED);
     }
     
     private static final Comparator<WrappedFeedItem> ITEM_BY_NAME = (l, r) -> {
@@ -237,10 +237,10 @@ public class FeedServlet extends HttpServlet {
     
     private static final ColumnComparators<WrappedFeedItem> ITEM_COMPARATORS = new ColumnComparators<>();
     static {
-        ITEM_COMPARATORS.add("name", ITEM_BY_NAME);
-        ITEM_COMPARATORS.add("size", ITEM_BY_SIZE);
-        ITEM_COMPARATORS.add("status", ITEM_BY_STATUS);
-        ITEM_COMPARATORS.add("timestamp", ITEM_BY_TIMESTAMP);
+        ITEM_COMPARATORS.add("Name", ITEM_BY_NAME);
+        ITEM_COMPARATORS.add("Size", ITEM_BY_SIZE);
+        ITEM_COMPARATORS.add("Status", ITEM_BY_STATUS);
+        ITEM_COMPARATORS.add("Published", ITEM_BY_TIMESTAMP);
     }
 
     private static class WrappedFeedItem {

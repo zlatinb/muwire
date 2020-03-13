@@ -54,6 +54,7 @@ public class Util {
         _x("Feeds"),
         _x("Fetching Certificates"),
         _x("File"),
+        _x("Files"),
         _x("Hashing"),
         _x("Hide Certificates"),
         _x("Hide Comment"),
@@ -70,6 +71,8 @@ public class Util {
         _x("Pause"),
         _x("Piece Size"),
         _x("Progress"),
+        _x("Published"),
+        _x("Publisher"),
         _x("Query"),
         // noun
         _x("Reason"),
