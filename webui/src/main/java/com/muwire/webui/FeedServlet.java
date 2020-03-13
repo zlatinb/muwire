@@ -223,6 +223,24 @@ public class FeedServlet extends HttpServlet {
             feedManager.configure(host, autoDownload, sequential, updateInterval, itemsToKeep);
             Util.pause();
             resp.sendRedirect("/MuWire/Feeds");
+        } else if (action.equals("publish")) {
+            String path = req.getParameter("file");
+            if (path == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            File file = Util.getFromPathElements(path);
+            feedManager.publish(file);
+            Util.pause();
+        } else if (action.equals("unpublish")) {
+            String path = req.getParameter("file");
+            if (path == null) {
+                resp.sendError(403, "Bad param");
+                return;
+            }
+            File file = Util.getFromPathElements(path);
+            feedManager.unpublish(file);
+            Util.pause();
         }
     }
 

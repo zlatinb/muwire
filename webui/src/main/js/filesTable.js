@@ -1,11 +1,12 @@
 class SharedFile {
-	constructor(name, infoHash, path, size, comment, certified) {
+	constructor(name, infoHash, path, size, comment, certified, published) {
 		this.name = name
 		this.infoHash = infoHash
 		this.path = path
 		this.size = size
 		this.comment = comment
 		this.certified = certified
+		this.published = published
 	}
 	
 	getMapping() {
@@ -16,13 +17,19 @@ class SharedFile {
 		var certifyHtml = certifyLink.render()
 		if (this.certified == "true")
 			certifyHtml += " " + _t("Certified")
+		var publishLink
+		if (this.published == "true")
+			publishLink = new Link(_t("Unpublish"), "unpublish", [this.path])
+		else
+		    publishLink = new Link(_t("Publish"), "publish", [this.path])
+
 		var showCommentHtml = ""
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
 		var commentDiv = "<div class='centercomment' id='comment-" + this.path + "'></div>"
 		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
 		
-		var html = nameLink + "<div class=\"right\">" + unshareLink.render() + " " + showCommentHtml + "  " + certifyHtml + "</div>"
+		var html = nameLink + "<div class=\"right\">" + unshareLink.render() + " " + showCommentHtml + "  " + certifyHtml + "  " + publishLink.render()+ "</div>"
 		html += "<br/>" + commentDiv
 		
 		mapping.set("File", html)
@@ -90,9 +97,10 @@ function refreshTable() {
 				else
 					comment = null
 				var certified = files[i].getElementsByTagName("Certified")[0].childNodes[0].nodeValue
+				var published = files[i].getElementsByTagName("Published")[0].childNodes[0].nodeValue
 				
 				var path = Base64.encode(fileName)
-				var newSharedFile = new SharedFile(fileName, infoHash, path, size, comment, certified)
+				var newSharedFile = new SharedFile(fileName, infoHash, path, size, comment, certified, published)
 				filesByPath.set(path, newSharedFile)
 				filesList.push(newSharedFile)
 			}
@@ -193,4 +201,28 @@ function certify(path) {
 	xmlhttp.open("POST", "/MuWire/Certificate", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=certify&file=" + path)
+}
+
+function publish(path) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshTable()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=publish&file=" + path)
+}
+
+function unpublish(path) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshTable()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=unpublish&file=" + path)
 }

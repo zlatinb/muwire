@@ -95,7 +95,8 @@ public class FilesServlet extends HttpServlet {
                         sf.getCachedPath(),
                         sf.getCachedLength(),
                         comment,
-                        core.getCertificateManager().hasLocalCertificate(ih));
+                        core.getCertificateManager().hasLocalCertificate(ih),
+                        sf.isPublished());
                 entries.add(entry);
             });
             
@@ -187,14 +188,16 @@ public class FilesServlet extends HttpServlet {
         private final long size;
         private final String comment;
         private final boolean certified;
+        private final boolean published;
         
-        FilesTableEntry(String name, InfoHash infoHash, String path, long size, String comment, boolean certified) {
+        FilesTableEntry(String name, InfoHash infoHash, String path, long size, String comment, boolean certified, boolean published) {
             this.name = name;
             this.infoHash = infoHash;
             this.path = path;
             this.size = size;
             this.comment = comment;
             this.certified = certified;
+            this.published = published;
         }
         
         void toXML(StringBuilder sb) {
@@ -207,6 +210,7 @@ public class FilesServlet extends HttpServlet {
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             }
             sb.append("<Certified>").append(certified).append("</Certified>");
+            sb.append("<Published>").append(published).append("</Published>");
             sb.append("</File>");
         }
     }
@@ -268,6 +272,7 @@ public class FilesServlet extends HttpServlet {
             }
             InfoHash ih = new InfoHash(sf.getRoot());
             sb.append("<Certified>").append(core.getCertificateManager().hasLocalCertificate(ih)).append("</Certified>");
+            sb.append("<Published>").append(sf.isPublished()).append("</Published>");
             // TODO: other stuff
             sb.append("</File>");
         }

@@ -1,6 +1,6 @@
 
 class Node {
-	constructor(nodeId, parent, leaf, infoHash, path, size, comment, certified, shared, revision) {
+	constructor(nodeId, parent, leaf, infoHash, path, size, comment, certified, published, shared, revision) {
 		this.nodeId = nodeId
 		this.parent = parent
 		this.leaf = leaf
@@ -10,6 +10,7 @@ class Node {
 		this.size = size
 		this.comment = comment
 		this.certified = certified
+		this.published = published
 		this.revision = revision
 		this.shared = shared
 	}
@@ -25,14 +26,23 @@ class Node {
 		var certifyLink = "<a href='#' onclick='window.certify(\"" + this.nodeId + "\");return false;'>" + _t("Certify") + "</a>"
 		if (!this.shared)
 			certifyLink = ""
+		var publishLink = "<a href='#' onclick='window.publish(\"" + this.nodeId + "\");return false;'>" + _t("Publish") + "</a>"
+		if (!this.shared)
+			publishLink = ""
 		if (this.leaf) {
 			var certified = ""
 			if (this.certified == "true") 
 				certified = _t("Certified")
+			var publish
+			if (this.published == "true") {
+				publish = new Link(_t("Unpublish"), "unpublish", [this.nodeId])
+			} else {
+				publish = new Link(_t("Publish"), "publish", [this.nodeId])
+			}
 			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
 			var html = "<li>" + nameLink
-			html += "<div class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "</div>"
+			html += "<div class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "   " + publish.render() +"</div>"
 			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
 			
@@ -150,16 +160,17 @@ function expand(nodeId) {
 					else
 						comment = null
 					var certified = element.getElementsByTagName("Certified")[0].childNodes[0].nodeValue
+					var published = element.getElementsByTagName("Published")[0].childNodes[0].nodeValue
 					
 					var nodeId = node.nodeId + "_"+ Base64.encode(fileName)
-					var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, true, revision)
+					var newFileNode = new Node(nodeId, node, true, infoHash, fileName, size, comment, certified, published, true, revision)
 					nodesById.set(nodeId, newFileNode)
 					node.children.push(newFileNode)
 				} else if (element.nodeName == "Directory") {
 					var dirName = element.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 					var shared = parseBoolean(element.getElementsByTagName("Shared")[0].childNodes[0].nodeValue)
 					var nodeId = node.nodeId + "_"+ Base64.encode(dirName)
-					var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, shared, revision)
+					var newDirNode = new Node(nodeId, node, false, null, dirName, -1, null, false, false, shared, revision)
 					nodesById.set(nodeId, newDirNode)
 					node.children.push(newDirNode)
 				}
@@ -257,4 +268,34 @@ function certify(nodeId) {
 	xmlhttp.open("POST", "/MuWire/Certificate", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=certify&file=" + encodedPath)
+}
+
+function publish(nodeId) {
+	var node = nodesById.get(nodeId)
+	var encodedPath = encodedPathToRoot(node)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			collapse(node.parent.nodeId)
+			expand(node.parent.nodeId)
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=publish&file=" + encodedPath)
+}
+
+function unpublish(nodeId) {
+	var node = nodesById.get(nodeId)
+	var encodedPath = encodedPathToRoot(node)
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			collapse(node.parent.nodeId)
+			expand(node.parent.nodeId)
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=unpublish&file=" + encodedPath)
 }

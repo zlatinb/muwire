@@ -136,6 +136,7 @@ public class CertificateServlet extends HttpServlet {
             }
             File file = Util.getFromPathElements(path);
             certificateManager.certify(file);
+            Util.pause();
         }
     }
 

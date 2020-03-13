@@ -167,7 +167,7 @@ public class MuWireClient {
         core.getEventBus().register(UploadEvent.class, uploadManager);
         core.getEventBus().register(UploadFinishedEvent.class, uploadManager);
         
-        FeedManager feedManager = new FeedManager(core);
+        FeedManager feedManager = new FeedManager(core, fileManager);
         core.getEventBus().register(FeedLoadedEvent.class, feedManager);
         core.getEventBus().register(UIFeedConfigurationEvent.class, feedManager);
         core.getEventBus().register(FeedFetchEvent.class, feedManager);

@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.muwire.core.Core;
 import com.muwire.core.Persona;
+import com.muwire.core.SharedFile;
 import com.muwire.core.filefeeds.Feed;
 import com.muwire.core.filefeeds.FeedFetchEvent;
 import com.muwire.core.filefeeds.FeedItem;
@@ -15,14 +16,18 @@ import com.muwire.core.filefeeds.UIDownloadFeedItemEvent;
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.filefeeds.UIFeedDeletedEvent;
 import com.muwire.core.filefeeds.UIFeedUpdateEvent;
+import com.muwire.core.filefeeds.UIFilePublishedEvent;
+import com.muwire.core.filefeeds.UIFileUnpublishedEvent;
 
 public class FeedManager {
     
     private final Core core;
+    private final FileManager fileManager;
     private final Map<Persona, RemoteFeed> remoteFeeds = new ConcurrentHashMap<>();
     
-    public FeedManager(Core core) {
+    public FeedManager(Core core, FileManager fileManager) {
         this.core = core;
+        this.fileManager = fileManager;
     }
     
     public Map<Persona, RemoteFeed> getRemoteFeeds() {
@@ -102,6 +107,39 @@ public class FeedManager {
         feed.setItemsToKeep(itemsToKeep);
         UIFeedConfigurationEvent event = new UIFeedConfigurationEvent();
         event.setFeed(feed);
+        core.getEventBus().publish(event);
+    }
+    
+    void publish(File file) {
+        if (file.isFile()) {
+            SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+            if (sf == null)
+                return;
+            sf.publish(System.currentTimeMillis());
+            UIFilePublishedEvent event = new UIFilePublishedEvent();
+            event.setSf(sf);
+            core.getEventBus().publish(event);
+        } else {
+            long now = System.currentTimeMillis();
+            for (SharedFile sf : fileManager.getAllFiles(file)) {
+                if (!sf.isPublished())
+                    sf.publish(now);
+                UIFilePublishedEvent event = new UIFilePublishedEvent();
+                event.setSf(sf);
+                core.getEventBus().publish(event);
+            }
+        }
+    }
+    
+    void unpublish(File file) {
+        if (!file.isFile())
+            throw new UnsupportedOperationException();
+        SharedFile sf = core.getFileManager().getFileToSharedFile().get(file);
+        if (sf == null)
+            return;
+        sf.unpublish();
+        UIFileUnpublishedEvent event = new UIFileUnpublishedEvent();
+        event.setSf(sf);
         core.getEventBus().publish(event);
     }
     
