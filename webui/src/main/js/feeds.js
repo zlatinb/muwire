@@ -3,7 +3,7 @@ class Feed {
 		this.publisher = xmlNode.getElementsByTagName("Publisher")[0].childNodes[0].nodeValue
 		this.publisherB64 = xmlNode.getElementsByTagName("PublisherB64")[0].childNodes[0].nodeValue
 		this.files = xmlNode.getElementsByTagName("Files")[0].childNodes[0].nodeValue
-		this.revision = xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue
+		this.revision = parseInt(xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 		this.active = xmlNode.getElementsByTagName("Active")[0].childNodes[0].nodeValue
 		this.lastUpdated = xmlNode.getElementsByTagName("LastUpdated")[0].childNodes[0].nodeValue
@@ -18,7 +18,7 @@ class Feed {
 			updateHTML = updateLink.render()
 		}
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.publisherB64])
-		var configureLink = new Link(_t("Configure", "configure", [this.publisherB64]))
+		var configureLink = new Link(_t("Configure"), "configure", [this.publisherB64])
 		
 		var publisherHTML = publisherLink.render() + "<span class='right'>" + updateHTML + "  " +
 			unsubscribeLink.render() + "   " +
@@ -105,6 +105,8 @@ class Item {
 		mapping.set("Size", this.size)
 		mapping.set("Download", this.getDownloadBlock())
 		mapping.set("Published", this.timestamp)
+		
+		return mapping
 	}
 }
 
@@ -115,7 +117,7 @@ function initFeeds() {
 }
 
 
-function refreshActive() {
+function refreshFeeds() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -146,10 +148,16 @@ function refreshActive() {
 			else
 				feedsDiv.innerHTML = ""
 				
-			if (currentFeed != null)
-				displayFeed(currentFeed)
-			else
+			if (currentFeed != null) {
+				var updatedFeed = feeds.get(currentFeed)
+				if (updatedFeed == null) {
+					currentFeed = null
+					document.getElementById("itemsTable").innerHTML = ""
+				} else if (updatedFeed.revision > currentFeed.revision)
+					displayFeed(currentFeed)
+			} else
 				document.getElementById("itemsTable").innerHTML = ""
+			
 		}
 	}
 	var sortParam = "&key=" + feedsSortKey + "&order=" + feedsSortOrder
@@ -163,7 +171,7 @@ function displayFeed(feed) {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
-			itemsByInfohash.clear()
+			itemsByInfoHash.clear()
 			
 			var items = []
 			var itemNodes = this.responseXML.getElementsByTagName("Item")
@@ -199,7 +207,7 @@ function displayFeed(feed) {
 function sortFeeds(key, order) {
 	feedsSortKey = key
 	feedsSortOrder = order
-	refreshActive()
+	refreshFeeds()
 }
 
 function sortItems(key, order) {
@@ -217,7 +225,7 @@ function forceUpdate(b64) {
 	}
 	xmlhttp.open("POST","/MuWire/Feed", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xmlhttp.open("action=update&host=" + b64)
+	xmlhttp.send("action=update&host=" + b64)
 }
 
 function unsubscribe(b64) {
@@ -229,7 +237,7 @@ function unsubscribe(b64) {
 	}
 	xmlhttp.open("POST","/MuWire/Feed", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xmlhttp.open("action=unsubscribe&host=" + b64)
+	xmlhttp.send("action=unsubscribe&host=" + b64)
 }
 
 function configure(b64) {

@@ -33,6 +33,8 @@ class Sender {
 		this.b64 = xmlNode.getElementsByTagName("B64")[0].childNodes[0].nodeValue
 		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue
+		this.feed = xmlNode.getElementsByTagName("Feed")[0].childNodes[0].nodeValue
+		this.subscribed = xmlNode.getElementsByTagName("Subscribed")[0].childNodes[0].nodeValue
 		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue
 		this.results = xmlNode.getElementsByTagName("Results")[0].childNodes[0].nodeValue
 	}
@@ -48,6 +50,7 @@ class Sender {
 		mapping.set("Trust", trustHtml)
 		
 		mapping.set("Browse", this.getBrowseBlock())
+		mapping.set("Feed", this.getFeedBlock())
 		
 		return mapping
 	}
@@ -90,6 +93,15 @@ class Sender {
 		var block = "<span id='browse-link-" + this.b64 + "'>" + link + "</span>"
 		return block
 	}
+	
+	getFeedBlock() {
+		if (this.feed != "true")
+			return ""
+		if (this.subscribed == "true")
+			return "<a href='/MuWire/Feeds'>" + _t("Subscribed") + "</a>"
+		var link = new Link(_t("Subscribe"), "subscribe", [this.b64])
+		return "<span id='subscribe-link-" + this.b64 + "'>" + link.render() + "</span>"
+	}
 }
 
 class Senders {
@@ -111,7 +123,7 @@ class Senders {
 			newOrder = "ascending"
 		else if (sendersSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Sender", "Browse", "Results", "Trust"], "sortSendersTable", sendersSortKey, newOrder, null)
+		var table = new Table(["Sender", "Browse", "Feed", "Results", "Trust"], "sortSendersTable", sendersSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.senders.length; i++) {
 			table.addRow(this.senders[i].getMapping())
@@ -286,6 +298,8 @@ class SenderForResult {
 		this.b64 = xmlNode.getElementsByTagName("B64")[0].childNodes[0].nodeValue
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue
 		this.browsing = xmlNode.getElementsByTagName("Browsing")[0].childNodes[0].nodeValue
+		this.feed = xmlNode.getElementsByTagName("Feed")[0].childNodes[0].nodeValue
+		this.subscribed = xmlNode.getElementsByTagName("Subscribed")[0].childNodes[0].nodeValue
 		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
 		this.comment = null
 		try {
@@ -298,6 +312,7 @@ class SenderForResult {
 		var mapping = new Map()
 		mapping.set("Sender", this.getNameBlock())
 		mapping.set("Browse", this.getBrowseBlock())
+		mapping.set("Feed", this.getFeedBlock())
 		mapping.set("Trust", this.getTrustBlock())
 		return mapping
 	}
@@ -352,6 +367,15 @@ class SenderForResult {
 		return block
 	}
 	
+	getFeedBlock() {
+		if (this.feed != "true")
+			return ""
+		if (this.subscribed == "true")
+			return "<a href='/MuWire/Feeds'>" + _t("Subscribed") + "</a>" 
+		var link = new Link(_t("Subscribe"), "subscribe", [this.b64])
+		return "<span id='subscribe-link-" + this.b64 + "'>" + link.render() + "</span>"
+	}
+	
 	getTrustBlock() {
 		return this.trust +"<span class='right'>" + this.getTrustLinks() + "</span>" +
 			"<div class='centercomment' id='trusted-" + this.b64 + "'></div>" +
@@ -403,7 +427,7 @@ class SendersForResult {
 			newOrder = "ascending"
 		else if (sendersForResultSortOrder == "ascending")
 			newOrder = "descending"
-		var table = new Table(["Sender", "Browse", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, newOrder, null)
+		var table = new Table(["Sender", "Browse", "Feed", "Trust"], "sortSendersForResultTable", sendersForResultSortKey, newOrder, null)
 		var i
 		for (i = 0; i < this.sendersForResult.length; i++) {
 			table.addRow(this.sendersForResult[i].getMapping())
@@ -614,6 +638,19 @@ function browse(host) {
 	xmlhttp.open("POST", "/MuWire/Browse", true)
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=browse&host="+host)
+}
+
+function subscribe(host) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var linkSpan = document.getElementById("subscribe-link-" + host)
+			linkSpan.innerHTML = "<a href='/MuWire/Feeds'>" + _t("Subscribed") + "</a>"
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/Feed", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=subscribe&host=" + host)
 }
 
 function viewCertificatesByFile(fileSenderB64, count) {

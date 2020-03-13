@@ -53,6 +53,7 @@ public class Util {
         _x("ETA"),
         _x("Feeds"),
         _x("Fetching Certificates"),
+        _x("Feed"),
         _x("File"),
         _x("Files"),
         _x("Hashing"),
