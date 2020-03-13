@@ -202,6 +202,27 @@ public class FeedServlet extends HttpServlet {
             
             feedManager.update(host);
             Util.pause();
+        } else if (action.equals("configure")) {
+            String personaB64 = req.getParameter("host");
+            if (personaB64 == null) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            Persona host;
+            try {
+                host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
+            } catch (Exception bad) {
+                resp.sendError(403,"Bad param");
+                return;
+            }
+            boolean autoDownload = Boolean.valueOf(req.getParameter("autoDownload"));
+            boolean sequential = Boolean.valueOf(req.getParameter("sequential"));
+            int updateInterval = Integer.valueOf(req.getParameter("updateInterval")) * 60000;
+            int itemsToKeep = Integer.valueOf(req.getParameter("itemsToKeep"));
+            
+            feedManager.configure(host, autoDownload, sequential, updateInterval, itemsToKeep);
+            Util.pause();
+            resp.sendRedirect("/MuWire/Feeds");
         }
     }
 
@@ -300,6 +321,10 @@ public class FeedServlet extends HttpServlet {
             sb.append("<Status>").append(feed.getStatus().toString()).append("</Status>");
             sb.append("<Active>").append(feed.getStatus().isActive()).append("</Active>");
             sb.append("<LastUpdated>").append(DataHelper.formatTime(feed.getLastUpdated())).append("</LastUpdated>");
+            sb.append("<UpdateInterval>").append(feed.getUpdateInterval() / 60000).append("</UpdateInterval>");
+            sb.append("<ItemsToKeep>").append(feed.getItemsToKeep()).append("</ItemsToKeep>");
+            sb.append("<AutoDownload>").append(feed.isAutoDownload()).append("</AutoDownload>");
+            sb.append("<Sequential>").append(feed.isSequential()).append("</Sequential>");
             sb.append("</Feed>");
         }
     }

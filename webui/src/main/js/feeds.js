@@ -7,6 +7,10 @@ class Feed {
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
 		this.active = xmlNode.getElementsByTagName("Active")[0].childNodes[0].nodeValue
 		this.lastUpdated = xmlNode.getElementsByTagName("LastUpdated")[0].childNodes[0].nodeValue
+		this.autoDownload = xmlNode.getElementsByTagName("AutoDownload")[0].childNodes[0].nodeValue
+		this.sequential = xmlNode.getElementsByTagName("Sequential")[0].childNodes[0].nodeValue
+		this.itemsToKeep = xmlNode.getElementsByTagName("ItemsToKeep")[0].childNodes[0].nodeValue
+		this.updateInterval = xmlNode.getElementsByTagName("UpdateInterval")[0].childNodes[0].nodeValue
 	}
 	
 	getMapping() {
@@ -18,7 +22,7 @@ class Feed {
 			updateHTML = updateLink.render()
 		}
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.publisherB64])
-		var configureLink = new Link(_t("Configure"), "configure", [this.publisherB64])
+		var configureLink = new Link(_t("Configure"), "configure", [this.publisher])
 		
 		var publisherHTML = publisherLink.render() + "<span class='right'>" + updateHTML + "  " +
 			unsubscribeLink.render() + "   " +
@@ -153,6 +157,7 @@ function refreshFeeds() {
 				if (updatedFeed == null) {
 					currentFeed = null
 					document.getElementById("itemsTable").innerHTML = ""
+					cancelConfig()
 				} else if (updatedFeed.revision > currentFeed.revision)
 					displayFeed(currentFeed)
 			} else
@@ -240,8 +245,55 @@ function unsubscribe(b64) {
 	xmlhttp.send("action=unsubscribe&host=" + b64)
 }
 
-function configure(b64) {
-	// TODO: implement
+function configure(publisher) {
+	var feed = feeds.get(publisher)
+	
+	var html = "<form action='/MuWire/Feed' method='post'>"
+	html += "<h3>"+ _t("Feed configuration for {0}", publisher) + "</h3>"
+	html += "<table>"
+	
+	html += "<tr>" 
+	html += "<td>" + _t("Download published files automatically") + "</td>"
+	html += "<td><p align='right'><input type='checkbox' name='autoDownload' value='true'"
+	if (feed.autoDownload == "true")
+		html += " checked "
+	html += "></p></td>"
+	html += "</tr>"
+	
+	html += "<tr>" 
+	html += "<td>" + _t("Download each file sequentially") + "</td>"
+	html += "<td><p align='right'><input type='checkbox' name='sequential' value='true'"
+	if (feed.sequential == "true")
+		html += " checked "
+	html += "></p></td>"
+	html += "</tr>"
+	
+	html += "<tr>" 
+	html += "<td>" + _t("Feed update frequency (minutes)") + "</td>"
+	html += "<td><p align='right'><input type='text' size='2' name='updateInterval' value='" + feed.updateInterval + "'></p></td>"
+	html += "</tr>"
+	
+	html += "<tr>" 
+	html += "<td>" + _t("Number of items to keep on disk (-1 means unlimited)") + "</td>"
+	html += "<td><p align='right'><input type='text' size='3' name='itemsToKeep' value='" + feed.itemsToKeep + "'></p></td>"
+	html += "</tr>" 
+	
+	html += "</table>"
+	
+	html += "<input type='hidden' name='host' value='" + feed.publisherB64 + "'>"
+	html += "<input type='hidden' name='action' value='configure'>"
+	
+	html += "<input type='submit' value='" + _t("Save") + "'>"
+	html += "<a href='#' onclick='window.cancelConfig();return false;'>" + _t("Cancel") + "</a>"
+	html += "</form>"
+	
+	var tableDiv = document.getElementById("feedConfig")
+	tableDiv.innerHTML = html
+}
+
+function cancelConfig() {
+	var tableDiv = document.getElementById("feedConfig")
+	tableDiv.innerHTML = ""
 }
 
 function showComment(infoHash) {

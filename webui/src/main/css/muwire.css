@@ -196,6 +196,20 @@ div#downloadDetails table td {
 	padding-bottom: 5px;
 }
 
+div#feedConfig table * {
+	background: #bcd1e5 !important;
+}
+div#feedConfig table {
+	border-collapse: collapse;
+	width: auto;
+}
+div#feedConfig table td {
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
 div#uploads table thead th:nth-child(2) {
   width: 120px;
 }

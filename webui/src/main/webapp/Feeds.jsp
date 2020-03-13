@@ -42,6 +42,7 @@ String pagetitle=Util._t("Feeds");
 					<div id="feedsTable"></div>
 				</div>
 			</div>
+			<div id="feedConfig"></div>
 			<hr/>
 			<div id="table-wrapper">
 				<div id="table-scroll">

@@ -90,6 +90,21 @@ public class FeedManager {
         core.getEventBus().publish(event);
     }
     
+    void configure(Persona publisher, boolean autoDownload, boolean sequential,
+            int updateInterval, int itemsToKeep) {
+        RemoteFeed rf = remoteFeeds.get(publisher);
+        if (rf == null)
+            return;
+        Feed feed = rf.getFeed();
+        feed.setAutoDownload(autoDownload);
+        feed.setSequential(sequential);
+        feed.setUpdateInterval(updateInterval);
+        feed.setItemsToKeep(itemsToKeep);
+        UIFeedConfigurationEvent event = new UIFeedConfigurationEvent();
+        event.setFeed(feed);
+        core.getEventBus().publish(event);
+    }
+    
     static class RemoteFeed {
         private final Feed feed;
         private volatile long revision;
