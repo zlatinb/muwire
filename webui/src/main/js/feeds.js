@@ -244,6 +244,31 @@ function configure(b64) {
 	// TODO: implement
 }
 
+function showComment(infoHash) {
+	expandedComments.set(infoHash, true)
+	
+	var commentText = itemsByInfoHash.get(infoHash).comment
+	
+	var commentDiv = document.getElementById("comment-" + infoHash);
+	var comment = "<pre class='comment'>"+ commentText + "</pre>";
+	commentDiv.innerHTML = comment
+	
+	var hideLink = new Link(_t("Hide Comment"), "hideComment", [infoHash])
+	var linkSpan = document.getElementById("comment-link-" + infoHash)
+	linkSpan.innerHTML = hideLink.render()
+}
+
+function hideComment(infoHash) {
+	expandedComments.delete(infoHash)
+	
+	var commentDiv = document.getElementById("comment-" + infoHash);
+	commentDiv.innerHTML = ""
+	
+	var showLink = new Link(_t("Show Comment"), "showComment", [infoHash])
+	var linkSpan = document.getElementById("comment-link-" + infoHash);
+	linkSpan.innerHTML = showLink.render();
+}
+
 function showCertificates(hostB64, infoHash) {
 	var fetch = new CertificateFetch(hostB64, infoHash)
 	certificateFetches.set(fetch.divId, fetch)
