@@ -39,6 +39,9 @@ div#topTableSender table thead th:nth-child(3) {
   width: 100px;
 }
 div#topTableSender table thead th:nth-child(4) {
+  width: 100px;
+}
+div#topTableSender table thead th:nth-child(5) {
   width: 340px;
 }
 div#topTableSender table tbody td:nth-child(1) {
@@ -97,6 +100,9 @@ div#bottomTableFile table thead th:nth-child(2) {
   width: 100px;
 }
 div#bottomTableFile table thead th:nth-child(3) {
+  width: 100px;
+}
+div#bottomTableFile table thead th:nth-child(4) {
   width: 340px;
 }
 div#bottomTableFile table tbody td:nth-child(1) {
@@ -208,6 +214,38 @@ div#feedConfig table td {
 	padding-right: 10px;
 	padding-top: 5px;
 	padding-bottom: 5px;
+}
+
+div#feedsTable table thead th:nth-child(2) {
+	width: 70px;
+}
+
+div#feedsTable table thead th:nth-child(3) {
+	width: 170px;
+}
+
+div#feedsTable table thead th:nth-child(4) {
+	width: 100px;
+}
+
+div#feedsTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
+}
+
+div#itemsTable table thead th:nth-child(2) {
+	width: 80px;
+}
+
+div#itemsTable table thead th:nth-child(3) {
+	width: 70px;
+}
+
+div#itemsTable table thead th:nth-child(4) {
+	width: 170px;
+}
+
+div#itemsTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
 }
 
 div#uploads table thead th:nth-child(2) {
