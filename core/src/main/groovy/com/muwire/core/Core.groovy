@@ -5,6 +5,8 @@ import com.muwire.core.files.PersisterFolderService
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Level
+import java.util.zip.ZipException
 
 import com.muwire.core.chat.ChatDisconnectionEvent
 import com.muwire.core.chat.ChatManager
@@ -144,7 +146,11 @@ public class Core {
         // Read defaults
         def defaultI2PFile = getClass()
                 .getClassLoader().getResource("defaults/i2p.properties");
-        defaultI2PFile.withInputStream { i2pOptions.load(it) }
+        try {
+            defaultI2PFile.withInputStream { i2pOptions.load(it) }
+        } catch (ZipException mystery) {
+            log.log(Level.SEVERE, "couldn't load default i2p properties", mystery)
+        }
 
         def i2pOptionsFile = new File(home, "i2p.properties")
         if (i2pOptionsFile.exists()) {
