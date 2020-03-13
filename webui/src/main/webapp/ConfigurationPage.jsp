@@ -95,6 +95,44 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				</table>
 			</div>
 			<div class="configuration-section">
+				<h3><%=Util._t("Publishing")%></h3>
+				<table>
+					<tr>
+						<td><%=Util._t("Enable my feed")%></td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getFileFeed()) out.write("checked"); %> name="fileFeed" value="true"></p></td>
+					</tr>
+					<tr>
+						<td><%=Util._t("Advertise my feed in search results")%></td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAdvertiseFeed()) out.write("checked"); %> name="advertiseFeed" value="true"></p></td>
+					</tr>
+					<tr>
+						<td><%=Util._t("Publish shared files automatically")%></td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAutoPublishSharedFiles()) out.write("checked"); %> name="autoPublishSharedFiles" value="true"></p></td>
+					</tr>
+				</table>
+			</div>
+			<div class="configuration-section">
+				<h3><%=Util._t("Default settings for new feeds")%></h3>
+				<table>
+					<tr>
+						<td><%=Util._t("Download published files automatically")%></td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getDefaultFeedAutoDownload()) out.write("checked"); %> name="defaultFeedAutoDownload" value="true"></p></td>
+					</tr>
+					<tr>
+						<td><%=Util._t("Download each file sequentially")%></td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getDefaultFeedSequential()) out.write("checked"); %> name="defaultFeedAutoDownload" value="true"></p></td>
+					</tr>
+					<tr>
+						<td><%=Util._t("Feed update frequency (minutes)")%></td>
+						<td><p align="right"><input type="text" size="1" name="defaultFeedUpdateInterval" class="right" value="<%= core.getMuOptions().getDefaultFeedUpdateInterval() / 60000 %>"></p></td>
+					</tr>
+					<tr>
+						<td><%=Util._t("Number of items to keep on disk (-1 means unlimited)")%></td>
+						<td><p align="right"><input type="text" size="1" name="defaultFeedItemsToKeep" class="right" value="<%= core.getMuOptions().getDefaultFeedItemsToKeep() %>"></p></td>
+					</tr>
+				</table>
+			</div>
+			<div class="configuration-section">
 				<h3><%=Util._t("Trust")%></h3>
 				<table>
 					<tr>

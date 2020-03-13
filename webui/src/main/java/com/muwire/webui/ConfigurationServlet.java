@@ -49,6 +49,11 @@ public class ConfigurationServlet extends HttpServlet {
         core.getMuOptions().setShareHiddenFiles(false);
         core.getMuOptions().setSearchComments(false);
         core.getMuOptions().setBrowseFiles(false);
+        core.getMuOptions().setFileFeed(true);
+        core.getMuOptions().setAdvertiseFeed(true);
+        core.getMuOptions().setAutoPublishSharedFiles(false);
+        core.getMuOptions().setDefaultFeedAutoDownload(false);
+        core.getMuOptions().setDefaultFeedSequential(false);
     }
     
     private void update(String name, String value) throws Exception {
@@ -71,6 +76,14 @@ public class ConfigurationServlet extends HttpServlet {
         case "inbound.quantity" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Inbound tunnel quantity"))); break;
         case "outbound.length" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Outbound tunnel length"))); break;
         case "outbound.quantity" : core.getI2pOptions().setProperty(name, String.valueOf(getPositiveInteger(value,"Outbound tunnel quantity"))); break;
+        case "fileFeed" : core.getMuOptions().setFileFeed(true); break;
+        case "advertiseFeed" : core.getMuOptions().setAdvertiseFeed(true); break;
+        case "autoPublishSharedFiles" : core.getMuOptions().setAutoPublishSharedFiles(true); break;
+        case "defaultFeedAutoDownload" : core.getMuOptions().setDefaultFeedAutoDownload(true); break;
+        case "defaultFeedSequential" : core.getMuOptions().setDefaultFeedSequential(true); break;
+        case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * getPositiveInteger(value,"Feed update frequency (minutes")); break;
+        case "defaultFeedItemsToKeep" : core.getMuOptions().setDefaultFeedItemsToKeep(getInteger(value, "Number of items to keep on disk (-1 means unlimited)")); break;
+        
         // TODO: ui settings
         }
     }
