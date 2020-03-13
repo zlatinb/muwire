@@ -100,7 +100,7 @@ class MuWireSettings {
         defaultFeedAutoDownload = Boolean.valueOf(props.getProperty("defaultFeedAutoDownload", "false"))
         defaultFeedItemsToKeep = Integer.valueOf(props.getProperty("defaultFeedItemsToKeep", "1000"))
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
-        defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60"))
+        defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60000"))
         
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
