@@ -31,6 +31,7 @@ This helps with scalability
 ### Swing GUI
 * I2P Status panel - display message when connected to external router
 * Search box - left identation
+* Ability to disable switching of tabs on actions
 
 ### Web UI/Plugin
 * HTML 5 media players
