@@ -19,6 +19,7 @@ This helps with scalability
 * Enum i18n
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
+* Advertise file feed and browseability in upload headers
 
 ### Chat
 * echo "unknown/innappropriate command" in the console
@@ -32,7 +33,7 @@ This helps with scalability
 * I2P Status panel - display message when connected to external router
 * Search box - left identation
 * Ability to disable switching of tabs on actions
-* Ability to trust user from uploads tab
+* Ability to trust/browse/subscribe from uploads tab
 
 ### Web UI/Plugin
 * HTML 5 media players
