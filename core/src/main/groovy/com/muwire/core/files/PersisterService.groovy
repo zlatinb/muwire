@@ -62,7 +62,7 @@ class PersisterService extends BasePersisterService {
                         new File(location.absolutePath + ".bak")
                 )
                 listener.publish(new PersisterDoneEvent())
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 log.log(Level.WARNING, "couldn't load files",e)
             }
         } else {

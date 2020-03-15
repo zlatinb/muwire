@@ -116,7 +116,7 @@ class PersisterFolderService extends BasePersisterService {
             try {
                 _load()
             }
-            catch (IllegalArgumentException e) {
+            catch (Exception e) {
                 log.log(Level.WARNING, "couldn't load files", e)
             }
         } else {
