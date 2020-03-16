@@ -6,6 +6,7 @@ class Pieces {
     private final float ratio
     private final Random random = new Random()
     private final Map<Integer,Integer> partials = new HashMap<>()
+    private int cachedDone;
 
     Pieces(int nPieces) {
         this(nPieces, 1.0f)
@@ -78,6 +79,7 @@ class Pieces {
         if (piece >= nPieces)
             throw new IllegalArgumentException("invalid piece marked as downloaded? $piece/$nPieces")
         done.set(piece)
+        cachedDone = done.cardinality();
         claimed.set(piece)
         partials.remove(piece)
     }
@@ -91,11 +93,11 @@ class Pieces {
     }
 
     synchronized boolean isComplete() {
-        done.cardinality() == nPieces
+        cachedDone == nPieces
     }
 
     synchronized int donePieces() {
-        done.cardinality()
+        cachedDone
     }
 
     synchronized boolean isDownloaded(int piece) {
