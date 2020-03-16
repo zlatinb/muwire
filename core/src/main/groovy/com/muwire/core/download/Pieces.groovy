@@ -106,6 +106,7 @@ class Pieces {
 
     synchronized void clearAll() {
         done.clear()
+        cachedDone = 0
         claimed.clear()
         partials.clear()
     }
