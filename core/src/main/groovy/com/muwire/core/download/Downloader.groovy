@@ -160,7 +160,7 @@ public class Downloader {
             long dataRead = dataSinceLastRead.getAndSet(0)
             long now = System.currentTimeMillis()
             if (now > lastSpeedRead)
-                currSpeed = (int) (dataRead * 1000.0 / (now - lastSpeedRead))
+                currSpeed = (int) (dataRead * 1000.0d / (now - lastSpeedRead))
             lastSpeedRead = now
         }
         
