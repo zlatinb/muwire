@@ -447,7 +447,7 @@ class MainFrameView {
                                         closureColumn(header : "Publisher", preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
                                         closureColumn(header : "Files", preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
                                         closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
-                                        closureColumn(header : "Status", preferredWidth: 10, type : String, read : {it.getStatus()})
+                                        closureColumn(header : "Status", preferredWidth: 10, type : String, read : {it.getStatus().toString()})
                                     }
                                 }
                             }
