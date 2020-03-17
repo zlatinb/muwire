@@ -106,7 +106,7 @@ class ContentUploader extends Uploader {
             return done ? 100 : 0
         int position = mapped.position()
         int total = request.getRange().end - request.getRange().start
-        (int)(position * 100.0 / total)
+        (int)(position * 100.0d / total)
     }
 
     @Override

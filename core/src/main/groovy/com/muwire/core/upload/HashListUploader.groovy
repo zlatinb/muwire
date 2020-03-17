@@ -45,7 +45,7 @@ class HashListUploader extends Uploader {
 
     @Override
     public synchronized int getProgress() {
-        (int)(mapped.position() * 100.0 / mapped.capacity())
+        (int)(mapped.position() * 100.0d / mapped.capacity())
     }
 
     @Override

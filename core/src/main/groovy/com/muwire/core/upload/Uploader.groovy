@@ -49,7 +49,7 @@ abstract class Uploader {
         final long now = System.currentTimeMillis()
         long interval = Math.max(1000, now - lastSpeedRead)
         lastSpeedRead = now;
-        int currSpeed = (int) (dataSinceLastRead * 1000.0 / interval)
+        int currSpeed = (int) (dataSinceLastRead * 1000.0d / interval)
         dataSinceLastRead = 0
 
         // normalize to speedArr.size
