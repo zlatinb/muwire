@@ -52,6 +52,7 @@ public class Util {
         _x("Downloaded Pieces"),
         _x("Downloader"),
         _x("Downloading"),
+        _x("Enter a full MuWire id"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
         _x("Feed configuration for {0}"),

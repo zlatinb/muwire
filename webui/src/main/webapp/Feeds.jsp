@@ -23,7 +23,7 @@ String pagetitle=Util._t("Feeds");
 	    <aside>
 		<div class="menubox-divider"></div>
 		<div class="menubox">
-			<h2>Browse</h2>
+			<h2><%=Util._t("Enter a full MuWire id")%></h2>
 			<form action="/MuWire/Feed" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="subscribe">
