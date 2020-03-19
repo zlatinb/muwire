@@ -110,14 +110,14 @@ public class FeedServlet extends HttpServlet {
         if (action.equals("subscribe")) {
             String personaB64 = req.getParameter("host");
             if (personaB64 == null) {
-                resp.sendError(403,"Bad param");
+                resp.sendError(403, Util._t("Please enter a full MuWire id"));
                 return;
             }
             Persona host;
             try {
                 host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
             } catch (Exception bad) {
-                resp.sendError(403,"Bad param");
+                resp.sendError(403, Util._t("Please enter a full MuWire id"));
                 return;
             }
             feedManager.subscribe(host);
