@@ -1,11 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="com.muwire.webui.*" %>
+<%@ page import="com.muwire.core.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="net.i2p.data.Base64" %>
 <%@include file="initcode.jsi"%>
 
 <% 
 
-String pagetitle=Util._t("Browse Host"); 
+String pagetitle=Util._t("Browse Host");
+
+String currentBrowse = null;
+if (request.getParameter("currentHost") != null) {
+	Persona host = new Persona(new ByteArrayInputStream(Base64.decode(request.getParameter("currentHost"))));
+	currentBrowse = host.getHumanReadableName();
+} 
 
 %>
 
@@ -16,6 +25,12 @@ String pagetitle=Util._t("Browse Host");
 <script src="js/certificates.js?<%=version%> type="text/javascript"></script>
 <script src="js/tables.js?<%=version%> type="text/javascript"></script>
 <script src="js/browse.js?<%=version%>" type="text/javascript"></script>
+
+<% if (currentBrowse != null) { %>
+	<script>
+		currentHost="<%=currentBrowse%>"
+	</script>
+<% } %>
 
 	</head>
 	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse(); initCertificates();">

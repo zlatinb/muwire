@@ -176,7 +176,7 @@ function refreshActive() {
 			
 			if (currentBrowse != null) {
 				var newBrowse = browsesByHost.get(currentHost)
-				if (currentBrowse.revision < newBrowse.revision)
+				if (newBrowse == null || currentBrowse.revision < newBrowse.revision)
 					showResults(currentHost, currentBrowse.key, currentBrowse.descending)
 			} else {
 				document.getElementById("resultsTable").innerHTML = ""
