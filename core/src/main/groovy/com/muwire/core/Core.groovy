@@ -113,11 +113,11 @@ public class Core {
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
     private final PersisterFolderService persisterFolderService
-    private final HostCache hostCache
-    private final ConnectionManager connectionManager
+    final HostCache hostCache
+    final ConnectionManager connectionManager
     private final CacheClient cacheClient
     private final UpdateClient updateClient
-    private final ConnectionAcceptor connectionAcceptor
+    final ConnectionAcceptor connectionAcceptor
     private final ConnectionEstablisher connectionEstablisher
     private final HasherService hasherService
     final DownloadManager downloadManager

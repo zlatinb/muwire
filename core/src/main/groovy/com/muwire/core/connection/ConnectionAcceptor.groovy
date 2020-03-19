@@ -60,7 +60,7 @@ class ConnectionAcceptor {
 
     private volatile shutdown
     
-    private volatile int browsed
+    volatile int browsed
 
     ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,

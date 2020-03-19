@@ -81,6 +81,10 @@
                   <div class="menu-icon"></div>
                   <div class="menu-text"><%=Util._t("About Me")%></div>
                 </a>
+                <a class="menuitem settings" href="MuStatus">
+                  <div class="menu-icon"></div>
+                  <div class="menu-text"><%=Util._t("MuWire")%></div>
+                </a>
             </div>
             <!--
             <div class="menubox-divider"></div>
