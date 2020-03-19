@@ -198,4 +198,9 @@ Mappings without the .jsp suffix
     <url-pattern>/Feeds</url-pattern>
 </servlet-mapping>
 
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.AboutMe_jsp</servlet-name>
+    <url-pattern>/AboutMe</url-pattern>
+</servlet-mapping>
+
 </web-app>

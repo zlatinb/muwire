@@ -29,6 +29,8 @@ public class Util {
     // a file, but it's not worth it for just a handful.
     private static final String[] jsStrings = {
         // alphabetical please
+        _x("About"),
+        _x("About Me"),
         _x("Actions"),
         _x("Active Sources"),
         _x("Browse"),
@@ -122,6 +124,8 @@ public class Util {
         _x("User"),
         _x("View 1 Certificate"),
         _x("View {0} Certificates"),
+        _x("Your full MuWire id is"),
+        _x("Your short MuWire id is {0}"),
         _x("Your Trust"),
         _x("{0}% of piece")
     };

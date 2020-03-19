@@ -422,6 +422,10 @@ pre.comment {
 	word-wrap: break-word;
 }
 
+pre.fullId {
+	overflow: auto;
+}
+
 /* File tree CSS */
 
  /* Remove default bullets */
