@@ -44,8 +44,11 @@ public class SearchServlet extends HttpServlet {
         
         if (action.equals("start")) {
             String search = req.getParameter("search");
-            searchManager.newSearch(search);
-            resp.sendRedirect("/MuWire/Home");
+            UUID newUUID = searchManager.newSearch(search);
+            if (newUUID != null)
+                resp.sendRedirect("/MuWire/Home?uuid=" + newUUID.toString());
+            else
+                resp.sendError(403, Util._t("Please enter a search keyword or hash"));
         } else if (action.equals("stop")) {
             String uuidString = req.getParameter("uuid");
             UUID uuid = UUID.fromString(uuidString);

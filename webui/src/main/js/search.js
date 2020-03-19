@@ -845,7 +845,7 @@ function refreshStatus() {
 			
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
-				if (newStatus.revision > currentSearch.revision)
+				if (currentSearch == null || newStatus.revision > currentSearch.revision)
 					refreshFunction(uuid)
 			}
 		}

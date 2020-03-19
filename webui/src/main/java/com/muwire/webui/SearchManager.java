@@ -30,13 +30,11 @@ class SearchManager {
         this.core = core;
     }
     
-    void newSearch(String search) {
+    UUID newSearch(String search) {
         search = search.trim();
         if (search.length() == 0)
-            return;
-        if (search.length() > 128) {
-            // TODO: browse by persona
-        } else {
+            return null;
+        else {
             UUID uuid = UUID.randomUUID();
             
             SearchResults searchResults = new SearchResults(uuid, search);
@@ -84,6 +82,7 @@ class SearchManager {
             queryEvent.setSig2(DataUtil.signUUID(uuid, timestamp, core.getSpk()));
             
             core.getEventBus().publish(queryEvent);
+            return uuid;
         }
     }
     

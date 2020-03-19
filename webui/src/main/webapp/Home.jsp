@@ -31,6 +31,11 @@
 	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
+<% if (request.getParameter("uuid") != null) {%>
+	<script>
+		uuid="<%=request.getParameter("uuid")%>"
+	</script>
+<% } %>
 	</head>
 <% if (groupBy.equals("sender")) { %>
 		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender(); initCertificates();">
