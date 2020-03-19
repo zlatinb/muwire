@@ -105,6 +105,7 @@ public class ConfigurationServlet extends HttpServlet {
     
     private static File getDirectory(String s) throws Exception {
         File f = new File(s);
+        f = f.getCanonicalFile();
         if (!f.exists())
             throw new Exception(Util._t("Bad input") + ":" + Util._t("{0} does not exist",s));
         if (!f.isDirectory())
