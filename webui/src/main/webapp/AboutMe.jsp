@@ -17,6 +17,13 @@ Core core = (Core) application.getAttribute("core");
 <html>
     <head>
 <%@include file="css.jsi"%>
+<script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script>
+function copyFullId() {
+	copyToClipboard("full-id")
+	alert("Full Id Copied To Clipboard")
+}
+</script>
     </head>
     <body onload="initConnectionsCount();">
 <%@include file="header.jsi"%>    	
@@ -27,7 +34,8 @@ Core core = (Core) application.getAttribute("core");
 	<section class="main foldermain">
 		<p><%=Util._t("Your short MuWire id is {0}", core.getMe().getHumanReadableName())%></p>
 		<p><%=Util._t("Your full MuWire id is")%></p>
-		<p><pre class="fullId"><%=core.getMe().toBase64()%></pre></p>
+		<p><textarea class="fullId" id="full-id" readOnly="true"><%=core.getMe().toBase64()%></textarea></p>
+		<p><a href='#' onclick="window.copyFullId();return false;"><%=Util._t("Copy To Clipboard")%></a></p>
 	</section>
     </body>
 </html>

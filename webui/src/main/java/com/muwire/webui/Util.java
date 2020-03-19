@@ -41,6 +41,7 @@ public class Util {
         _x("Certify"),
         _x("Clear Finished"),
         _x("Comment"),
+        _x("Copy To Clipbaord"),
         _x("Default settings for new feeds"),
         _x("Details for {0}"),
         _x("Distrusted"),

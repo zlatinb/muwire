@@ -6,6 +6,13 @@ function rfc3986EncodeURIComponent (str) {
     return encodeURIComponent(str).replace(/[!'()*]/g, escape);  
 }
 
+function copyToClipboard(id) {
+	var copyText = document.getElementById(id)
+	copyText.select()
+	copyText.setSelectionRange(0,99999) // because W3Schools says so
+	document.execCommand("copy")
+}
+
 /**
 *
 *  Base64 encode / decode
