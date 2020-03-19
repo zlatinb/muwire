@@ -81,6 +81,7 @@ public class Util {
         _x("Mark Neutral"),
         _x("Mark Trusted"),
         _x("MuWire Status"),
+        _x("must be greater than zero"),
         _x("Name"),
         _x("Number of items to keep on disk (-1 means unlimited)"),
         _x("Outgoing Connections"),
