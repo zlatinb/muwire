@@ -52,39 +52,45 @@
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2><%=Util._t("Trust")%></h2>
-                <a class="menuitem identities" href="TrustUsers">
-                  <div class="menu-icon"></div>
-                  <div class="menu-text">
-                      <%=Util._t("Users")%>
-                  </div>
-                </a>
-                <a class="menuitem address-book" href="TrustLists">
-                  <div class="menu-icon"></div>
-                  <div class="menu-text">
-                      <%=Util._t("Subscriptions")%>
-                  </div>
-                </a>
+                <h2 class="accordion"><%=Util._t("Trust")%></h2>
+                <div class="panel">
+	                <a class="menuitem identities" href="TrustUsers">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text">
+	                      <%=Util._t("Users")%>
+	                  </div>
+	                </a>
+	                <a class="menuitem address-book" href="TrustLists">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text">
+	                      <%=Util._t("Subscriptions")%>
+	                  </div>
+	                </a>
+                </div>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-                <h2><%=Util._t("Configuration")%></h2>
-                <a class="menuitem settings" href="ConfigurationPage">
-                  <div class="menu-icon"></div>
-                  <div class="menu-text"><%=Util._t("Settings")%></div>
-                </a>
+                <h2 class="accordion"><%=Util._t("Configuration")%></h2>
+                <div class="panel">
+	                <a class="menuitem settings" href="ConfigurationPage">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text"><%=Util._t("Settings")%></div>
+	                </a>
+                </div>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
-            	<h2><%=Util._t("About")%></h2>
-            	<a class="menuitem settings" href="AboutMe">
-                  <div class="menu-icon"></div>
-                  <div class="menu-text"><%=Util._t("About Me")%></div>
-                </a>
-                <a class="menuitem settings" href="MuStatus">
-                  <div class="menu-icon"></div>
-                  <div class="menu-text"><%=Util._t("MuWire")%></div>
-                </a>
+            	<h2 class="accordion"><%=Util._t("About")%></h2>
+            	<div class="panel">
+	            	<a class="menuitem settings" href="AboutMe">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text"><%=Util._t("About Me")%></div>
+	                </a>
+	                <a class="menuitem settings" href="MuStatus">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text"><%=Util._t("MuWire")%></div>
+	                </a>
+                </div>
             </div>
             <!--
             <div class="menubox-divider"></div>
@@ -95,3 +101,20 @@
                 <a class="menuitem" href="about"><%=Util._t("About")%></a>
             </div>
 			-->
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    } 
+  });
+}
+</script>
