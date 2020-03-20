@@ -469,3 +469,11 @@ ul, #sharedTree {
 .active {
   display: block;
 } 
+
+ul.fileTree {
+	margin-left: -1.5%;
+}
+
+li.fileTree {
+	
+}

@@ -41,7 +41,7 @@ class Node {
 			}
 			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
-			var html = "<li>" + nameLink
+			var html = "<li class='fileTree'>" + nameLink
 			html += "<div class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "   " + publish.render() +"</div>"
 			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
@@ -59,10 +59,10 @@ class Node {
 				var commentDiv = "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 				var l = "<li>" + link + "<span class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv
 				
-				l += "<ul>"
+				l += "<ul class='fileTree'>"
 				var i
 				for (i = 0; i < this.children.length; i++) {
-					l += "<li>"
+					l += "<li class='fileTree'>"
 					l += "<div id='" + this.children[i].nodeId+"'></div>"
 					l += "</li>"
 				}
