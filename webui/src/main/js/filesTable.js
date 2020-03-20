@@ -14,14 +14,20 @@ class SharedFile {
 		
 		var unshareLink = new Link(_t("Unshare"), "unshare", [this.path])
 		var certifyLink = new Link(_t("Certify"), "certify", [this.path])
-		var certifyHtml = certifyLink.render()
+		var certified
 		if (this.certified == "true")
-			certifyHtml += " " + _t("Certified")
-		var publishLink
-		if (this.published == "true")
-			publishLink = new Link(_t("Unpublish"), "unpublish", [this.path])
+			certified = " " + _t("Certified")
 		else
+			certified = ""
+		var publishLink
+		var published
+		if (this.published == "true") {
+			publishLink = new Link(_t("Unpublish"), "unpublish", [this.path])
+			published = _t("Published")
+		} else {
 		    publishLink = new Link(_t("Publish"), "publish", [this.path])
+			published = ""
+		}
 
 		var showCommentHtml = ""
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
@@ -29,7 +35,10 @@ class SharedFile {
 		var commentDiv = "<div class='centercomment' id='comment-" + this.path + "'></div>"
 		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
 		
-		var html = nameLink + "<div class=\"right\">" + unshareLink.render() + " " + showCommentHtml + "  " + certifyHtml + "  " + publishLink.render()+ "</div>"
+		var html = nameLink + "<div class=\"right\">" + certified + "  " + published + "  "
+		html += "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>"
+		html += unshareLink.render() + showCommentHtml + certifyLink.render() + publishLink.render()
+		html += "</div></div></div>"
 		html += "<br/>" + commentDiv
 		
 		mapping.set("File", html)
