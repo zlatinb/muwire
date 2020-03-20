@@ -29,6 +29,9 @@ class Node {
 		var publishLink = "<a href='#' onclick='window.publish(\"" + this.nodeId + "\");return false;'>" + _t("Publish") + "</a>"
 		if (!this.shared)
 			publishLink = ""
+		var actionsLink = "<a class='droplink' href='#'>" + _t("Actions") + "</a>"
+		if (!this.shared)
+			actionsLink = ""
 		if (this.leaf) {
 			var certified = ""
 			if (this.certified == "true") 
@@ -45,7 +48,7 @@ class Node {
 			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
 			var html = "<li class='fileTree'>" + nameLink
-			html += "<div class='right'>" + certified + "  " + published + "   <div class='dropdown'><a class='droplink' href='#'>" + _t("Actions")+ "</a><div class='dropdown-content'>"
+			html += "<div class='right'>" + certified + "  " + published + "   <div class='dropdown'>" + actionsLink + "<div class='dropdown-content'>"
 			html += unshareLink + commentLink + certifyLink + publish.render()
 			html += "</div></div></div>"
 			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
@@ -57,12 +60,14 @@ class Node {
 				
 				var link = "<a class='caret' href='#' onclick='window.expand(\"" + this.nodeId + "\");return false'>" + this.path + "</a>"
 				var commentDiv = "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
-				var html = "<li>" + link + "<span class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv + "</li>"
+				var html = "<li>" + link + "<span class='right'><div class='dropdown'>" + actionsLink + "<div class='dropdown-content'>" 
+				html += unshareLink + commentLink + certifyLink + "</div></div></span>" + commentDiv + "</li>"
 				div.innerHTML = html				
 			} else {
 				var link = "<a class='caret caret-down' href='#' onclick='window.collapse(\"" + this.nodeId + "\");return false;'>"+this.path+"</a>"
 				var commentDiv = "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
-				var l = "<li>" + link + "<span class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "</span>" + commentDiv
+				var l = "<li>" + link + "<span class='right'><div class='dropdown'>" + actionsLink + "<div class='dropdown-content'>" 
+				l += unshareLink + commentLink + certifyLink + "</div></div></span>" + commentDiv
 				
 				l += "<ul class='fileTree'>"
 				var i
