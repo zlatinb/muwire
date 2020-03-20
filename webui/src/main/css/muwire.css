@@ -488,3 +488,32 @@ li.fileTree {
 	overflow: hidden;
 	transition: max-height: 0.2s ease-out;
 }
+
+.droplink {
+	cursor : pointer;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	z-index:1;
+	background: white;
+	padding-left: 20px;
+	
+}
+
+.dropdown-content a {
+	color: black;
+	display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}

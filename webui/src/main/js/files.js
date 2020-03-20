@@ -34,15 +34,20 @@ class Node {
 			if (this.certified == "true") 
 				certified = _t("Certified")
 			var publish
+			var published
 			if (this.published == "true") {
 				publish = new Link(_t("Unpublish"), "unpublish", [this.nodeId])
+				published = _t("Published")
 			} else {
 				publish = new Link(_t("Publish"), "publish", [this.nodeId])
+				published = ""
 			}
 			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
 			var html = "<li class='fileTree'>" + nameLink
-			html += "<div class='right'>" + unshareLink + "  " + commentLink + "  " + certifyLink + "  " + certified + "   " + publish.render() +"</div>"
+			html += "<div class='right'>" + certified + "  " + published + "   <div class='dropdown'><a class='droplink' href='#'>" + _t("Actions")+ "</a><div class='dropdown-content'>"
+			html += unshareLink + commentLink + certifyLink + publish.render()
+			html += "</div></div></div>"
 			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"
 			
