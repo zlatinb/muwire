@@ -29,15 +29,18 @@ class SharedFile {
 			published = ""
 		}
 
+		var infoHashTextArea = "<textarea class='copypaste' readOnly='true' id='" + this.infoHash + "'>" + this.infoHash + "</textarea>"
+		var copyInfoHashLink = new Link(_t("Copy hash to clipboard"), "copyAndAlert", [this.infoHash, _t("Hash copied to clipboard")])
+
 		var showCommentHtml = ""
 		var showCommentLink = new Link(_t("Comment"), "showCommentForm", [this.path])
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
 		var commentDiv = "<div class='centercomment' id='comment-" + this.path + "'></div>"
 		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
 		
-		var html = nameLink + "<div class=\"right\">" + certified + "  " + published + "  "
+		var html = nameLink + infoHashTextArea + "<div class=\"right\">" + certified + "  " + published + "  "
 		html += "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>"
-		html += unshareLink.render() + showCommentHtml + certifyLink.render() + publishLink.render()
+		html += copyInfoHashLink.render() + unshareLink.render() + showCommentHtml + certifyLink.render() + publishLink.render()
 		html += "</div></div></div>"
 		html += "<br/>" + commentDiv
 		
