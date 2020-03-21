@@ -46,10 +46,13 @@ class Node {
 				published = ""
 			}
 			
+			var infoHashTextArea = "<textarea class='copypaste' readOnly='true' id='" + this.infoHash + "'>" + this.infoHash + "</textarea>"
+			var copyInfoHashLink = new Link(_t("Copy hash to clipboard"), "copyAndAlert", [this.infoHash, _t("Hash copied to clipboard")])
+			
 			var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.path + "</a>"
-			var html = "<li class='fileTree'>" + nameLink
+			var html = "<li class='fileTree'>" + nameLink + infoHashTextArea
 			html += "<div class='right'>" + certified + "  " + published + "   <div class='dropdown'>" + actionsLink + "<div class='dropdown-content'>"
-			html += unshareLink + commentLink + certifyLink + publish.render()
+			html += copyInfoHashLink.render() + unshareLink + commentLink + certifyLink + publish.render()
 			html += "</div></div></div>"
 			html += "<div class='centercomment' id='comment-" + this.nodeId + "'></div>"
 			html += "</li>"

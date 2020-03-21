@@ -13,6 +13,11 @@ function copyToClipboard(id) {
 	document.execCommand("copy")
 }
 
+function copyAndAlert(id, msg) {
+	copyToClipboard(id)
+	alert(msg)
+}
+
 /**
 *
 *  Base64 encode / decode

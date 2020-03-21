@@ -504,7 +504,7 @@ li.fileTree {
 	z-index:1;
 	background: white;
 	padding-left: 20px;
-	
+	width: max-content;
 }
 
 .dropdown-content a {
@@ -517,3 +517,10 @@ li.fileTree {
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
+
+textarea.copypaste {
+	opacity: 0;
+	position: absolute;
+	z-index: -9999;
+	pointer-events: none;
+}
