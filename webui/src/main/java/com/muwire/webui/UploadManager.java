@@ -49,13 +49,14 @@ public class UploadManager {
         UploaderWrapper wrapper = null;
         synchronized(uploads) {
             for(UploaderWrapper uw : uploads) {
-                if (uw.uploader == e.getUploader()) {
+                if (uw.uploader.equals(e.getUploader())) {
                     wrapper = uw;
                     break;
                 }
             }
         }
-        wrapper.finished = true;
+        if (wrapper != null)
+            wrapper.finished = true;
     }
     
     public void clearFinished() {
