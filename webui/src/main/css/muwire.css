@@ -248,6 +248,34 @@ div#itemsTable table tbody td:nth-child(1) {
 	text-overflow: ellipsis;
 }
 
+div#hitsTable table thead th:nth-child(1) {
+	width: 270px;
+}
+
+div#hitsTable table thead th:nth-child(2) {
+	width: 170px;
+}
+
+div#hitsTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
+}
+
+div#hitsTable table tbody td:nth-child(3) {
+	text-overflow: ellipsis;
+}
+
+div#certificatesTable table thead th:nth-child(2) {
+	width: 170px;
+}
+
+div#certificatesTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
+}
+
+div#certificatesTable table tbody td:nth-child(3) {
+	text-overflow: ellipsis;
+}
+
 div#uploads table thead th:nth-child(2) {
   width: 120px;
 }
