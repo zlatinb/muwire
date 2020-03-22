@@ -1,4 +1,4 @@
-The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and issues there.
+The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and issues at http://git.idk.i2p/zlatinb/muwire
 
 # MuWire - Easy Anonymous File-Sharing
 
