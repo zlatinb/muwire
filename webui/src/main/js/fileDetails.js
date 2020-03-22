@@ -128,7 +128,37 @@ function refreshDownloaders() {
 }
 
 function refreshCertificates() {
-	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var certificates = []
+			var certNodes = this.responseXML.getElementsByTagName("Certificate")
+			var i
+			for (i = 0; i < certNodes.length; i++) {
+				certificates.push(new CertificateEntry(certNodes[i]))
+			}
+			
+			var newOrder
+			if (certificatesSortOrder == "descending")
+				newOrder = "ascending"
+			else if (certificatesSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["Name","Timestamp","Issuer"], "sortCertificates", certificatesSortKey, newOrder, null)
+			
+			for (i = 0; i < certificates.length; i++) {
+				table.addRow(certificates[i].getMapping())
+			}
+			
+			var certsDiv = document.getElementById("certificatesTable")
+			if (certificates.length > 0)
+				certsDiv.innerHTML = table.render()
+			else
+				certsDiv.innerHTML = ""
+		}
+	}
+	var sortParam = "&key=" + certificatesSortKey + "&order=" + certificatesSortOrder
+	xmlhttp.open("GET", encodeURI("/MuWire/FileInfo?path=" + path + "&section=certificates" + sortParam))
+	xmlhttp.send()
 }
 
 function sortSearchers(key, order) {
@@ -141,6 +171,12 @@ function sortDownloaders(key, order) {
 	downloadersSortKey = key
 	downloadersSortOrder = order
 	refreshDownloaders()
+}
+
+function sortCertificates(key, order) {
+	certificatesSortKey = key
+	certificatesSortOrder = order
+	refreshCertificates()
 }
 
 var path = null
