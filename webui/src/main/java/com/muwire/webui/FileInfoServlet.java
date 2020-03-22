@@ -165,6 +165,7 @@ public class FileInfoServlet extends HttpServlet {
             if (certificate.getComment() != null)
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(certificate.getComment().getName())).append("</Comment>");
             sb.append("<Timestamp>").append(DataHelper.formatTime(certificate.getTimestamp())).append("</Timestamp>");
+            sb.append("<TimestampLong>").append(certificate.getTimestamp()).append("</TimestampLong>");
             sb.append("<Issuer>").append(Util.escapeHTMLinXML(certificate.getIssuer().getHumanReadableName())).append("</Issuer>");
             sb.append("</Certificate>");
         }

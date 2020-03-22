@@ -30,7 +30,9 @@ class CertificateEntry {
 	constructor(xmlNode) {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
+		this.timestampLong = xmlNode.getElementsByTagName("TimestampLong")[0].childNodes[0].nodeValue
 		this.issuer = xmlNode.getElementsByTagName("Issuer")[0].childNodes[0].nodeValue
+		this.id = this.issuer + "_" + this.timestampLong
 		try {
 			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
 		} catch (ignored) {
@@ -40,11 +42,28 @@ class CertificateEntry {
 		
 	getMapping() {
 		var mapping = new Map()
-		// TODO: comments
-		mapping.set("Name", this.name)
+		mapping.set("Name", this.name + this.getCommentBlock())
 		mapping.set("Timestamp", this.timestamp)
 		mapping.set("Issuer", this.issuer)
 		return mapping
+	}
+	
+	getCommentBlock() {
+		if (this.comment == null)
+			return ""
+		if (expandedComments.get(this.id)) {
+			var link = new Link(_t("Hide Comment"), "hideComment", [this.id])
+			var html = "<div id='comment-link-" + this.id + "'>" + link.render() + "</div>"
+			html += "<div id='comment-" + this.id + "'>"
+			html += "<pre class='comment'>" + this.comment + "</pre>"
+			html += "</div>"
+			return html
+		} else {
+			var link = new Link(_t("Show Comment"), "showComment", [this.id])
+			var html = "<div id='comment-link-" + this.id + "'>" + link.render() + "</div>"
+			html += "<div id='comment-" + this.id + "'></div>"
+			return html
+		}
 	}
 }
 
@@ -131,11 +150,14 @@ function refreshCertificates() {
 	var xmlhttp = new XMLHttpRequest()
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
+			certificatesById.clear()
 			var certificates = []
 			var certNodes = this.responseXML.getElementsByTagName("Certificate")
 			var i
 			for (i = 0; i < certNodes.length; i++) {
-				certificates.push(new CertificateEntry(certNodes[i]))
+				var cert = new CertificateEntry(certNodes[i])
+				certificates.push(cert)
+				certificatesById.set(cert.id, cert)
 			}
 			
 			var newOrder
@@ -179,9 +201,35 @@ function sortCertificates(key, order) {
 	refreshCertificates()
 }
 
+
+function showComment(id) {
+	var cert = certificatesById.get(id)
+	expandedComments.set(id, true)
+	
+	var commentLinkDiv = document.getElementById("comment-link-" + id)
+	var hideLink = new Link(_t("Hide Comment"), "hideComment", [id])
+	commentLinkDiv.innerHTML = hideLink.render()
+	
+	var commentDiv = document.getElementById("comment-" + id)
+	commentDiv.innerHTML = "<pre class='comment'>" + cert.comment + "</pre>"
+}
+
+function hideComment(id) {
+	var cert = certificatesById.get(id)
+	expandedComments.delete(id)
+	
+	var commentLinkDiv = document.getElementById("comment-link-" + id)
+	var showLink = new Link(_t("Show Comment"), "showComment", [id])
+	commentLinkDiv.innerHTML = showLink.render()
+	
+	var commentDiv = document.getElementById("comment-" + id)
+	commentDiv.innerHTML = ""
+}
+
 var path = null
 
 var expandedComments = new Map()
+var certificatesById = new Map()
 
 var searchersSortKey = "Searcher"
 var searchersSortOrder = "descending"
