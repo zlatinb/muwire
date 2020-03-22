@@ -323,28 +323,40 @@ See also .menu-icon
     font-weight: 300;
     margin: 0 24px 0 48px;
 }
-.menuitem.identities .menu-icon:before {
-    content: url("images/identities.png");
-}
-.menuitem.address-book .menu-icon:before {
-    content: url("images/addressbook.png");
-}
+
 .menuitem.settings .menu-icon:before {
-    content: url("images/settings.png");
+    content: url("images/ConfigurationPage.png");
 }
 .menuitem.downloads .menu-icon:before {
-    content: url("images/inbox.png");
+    content: url("images/Downloads.png");
 }
 .menuitem.uploads .menu-icon:before {
 	content: url("images/uploads.png");
 }
 .menuitem.search .menu-icon:before {
-    content: url("images/delay.png");
+    content: url("images/Search.png");
 }
 .menuitem.shared .menu-icon:before {
-    content: url("images/folder.png");
+    content: url("images/SharedFiles.png");
 }
-
+.menuitem.browse .menu-icon:before {
+	content : url("images/BrowseHost.png")
+}
+.menuitem.feeds .menu-icon:before {
+	content : url("images/Feeds.png")
+}
+.menuitem.trustUsers .menu-icon:before {
+	content : url("images/TrustUsers.png")
+}
+.menuitem.trustList .menu-icon:before {
+	content : url("images/TrustList.png")
+}
+.menuitem.aboutMe .menu-icon:before {
+	content : url("images/AboutMe.png")
+}
+.menuitem.muStatus .menu-icon:before {
+	content : url("images/MuStatus.png")
+}
 
 /* Main content */
 

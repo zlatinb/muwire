@@ -42,7 +42,7 @@ if (request.getParameter("currentHost") != null) {
 			<form action="/MuWire/Browse" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="browse">
-				<div class="menuitem shared">
+				<div class="menuitem browse">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value=<%=Util._t("Browse")%>>
 				</div>

@@ -11,7 +11,7 @@ function refreshConnectionsCount() {
 			var countString = ""+count;
 			connectionCountSpan.innerHTML = countString;
 			if (count > 0)
-			    image = "connected.png";
+			    image = "Connect.png";
 			else
 			    image = "connecting.png";
 			connectionIcon.innerHTML = "<img src=\"images/" + image + "\" alt=\"\">";

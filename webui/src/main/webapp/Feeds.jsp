@@ -27,7 +27,7 @@ String pagetitle=Util._t("Feeds");
 			<form action="/MuWire/Feed" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="subscribe">
-				<div class="menuitem shared">
+				<div class="menuitem feeds">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value=<%=Util._t("Subscribe")%>>
 				</div>
