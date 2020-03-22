@@ -76,6 +76,11 @@
     <servlet-class>com.muwire.webui.StatusServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.FileInfoServlet</servlet-name>
+    <servlet-class>com.muwire.webui.FileInfoServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -139,6 +144,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.StatusServlet</servlet-name>
     <url-pattern>/Status</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.FileInfoServlet</servlet-name>
+    <url-pattern>/FileInfo</url-pattern>
 </servlet-mapping>
 
 __JASPER__
@@ -216,6 +226,11 @@ Mappings without the .jsp suffix
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuStatus_jsp</servlet-name>
     <url-pattern>/MuStatus</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.FileDetails_jsp</servlet-name>
+    <url-pattern>/FileDetails</url-pattern>
 </servlet-mapping>
 
 </web-app>
