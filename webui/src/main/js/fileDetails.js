@@ -94,7 +94,37 @@ function refreshSearchers() {
 }
 
 function refreshDownloaders() {
-	
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var downloaders = []
+			var downloadNodes = this.responseXML.getElementsByTagName("Downloader")
+			var i
+			for (i = 0;i < downloadNodes.length; i++ ) {
+				downloaders.push(new DownloadEntry(downloadNodes[i]))
+			}
+			
+			var newOrder
+			if (downloadersSortOrder == "descending")
+				newOrder = "ascending"
+			else if (downloadersSortOrder == "ascending")
+				newOrder = "descending"
+			var table = new Table(["Downloader"], "sortDownloaders", downloadersSortKey, newOrder, null)
+			
+			for (i = 0; i < downloaders.length; i++) {
+				table.addRow(downloaders[i].getMapping())
+			}
+			
+			var downloadersDiv = document.getElementById("downloadersTable")
+			if (downloaders.length > 0)
+				downloadersDiv.innerHTML = table.render()
+			else
+				downloadersDiv.innerHTML = ""
+		}
+	}
+	var sortParam = "&key=" + downloadersSortKey + "&order=" + downloadersSortOrder
+	xmlhttp.open("GET", encodeURI("/MuWire/FileInfo?path=" + path + "&section=downloaders" + sortParam))
+	xmlhttp.send()
 }
 
 function refreshCertificates() {
@@ -107,13 +137,19 @@ function sortSearchers(key, order) {
 	refreshSearchers()
 }
 
+function sortDownloaders(key, order) {
+	downloadersSortKey = key
+	downloadersSortOrder = order
+	refreshDownloaders()
+}
+
 var path = null
 
 var expandedComments = new Map()
 
-var searchersSortKey = "searcher"
+var searchersSortKey = "Searcher"
 var searchersSortOrder = "descending"
-var downloadersSortKey = "downloader"
+var downloadersSortKey = "Downloader"
 var downloadersSortOrder = "descending"
-var certificatesSortKey = "name"
+var certificatesSortKey = "Name"
 var certificatesSortOrder = "descending"

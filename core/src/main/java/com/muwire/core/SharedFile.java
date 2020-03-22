@@ -159,6 +159,18 @@ public class SharedFile {
             this.query = query;
         }
         
+        public Persona getSearcher() {
+            return searcher;
+        }
+        
+        public long getTimestamp() {
+            return timestamp;
+        }
+        
+        public String getQuery() {
+            return query;
+        }
+        
         public int hashCode() {
             return Objects.hash(searcher) ^ Objects.hash(timestamp) ^ query.hashCode();
         }

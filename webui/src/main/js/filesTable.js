@@ -37,10 +37,11 @@ class SharedFile {
 		showCommentHtml = "<span id='comment-link-" + this.path + "'>" + showCommentLink.render() + "</span>"
 		var commentDiv = "<div class='centercomment' id='comment-" + this.path + "'></div>"
 		var nameLink = "<a href='/MuWire/DownloadedContent/" + this.infoHash + "'>" + this.name + "</a>"
+		var detailsLink = "<a href='/MuWire/FileDetails?path=" + encodeURI(this.path) + "'>" + _t("Show Details") + "</a>"
 		
 		var html = nameLink + infoHashTextArea + "<div class=\"right\">" + certified + "  " + published + "  "
 		html += "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>"
-		html += copyInfoHashLink.render() + unshareLink.render() + showCommentHtml + certifyLink.render() + publishLink.render()
+		html += copyInfoHashLink.render() + unshareLink.render() + showCommentHtml + certifyLink.render() + publishLink.render() + detailsLink
 		html += "</div></div></div>"
 		html += "<br/>" + commentDiv
 		
