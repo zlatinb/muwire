@@ -42,4 +42,6 @@ This helps with scalability
 * Upload files from browser to plugin via drag-and-drop
 * Check permissions, display better errors when sharing local folders
 
- 
+### Gitlab
+
+* Integrate github repository and git.idk.i2p repository 
