@@ -13,7 +13,7 @@ function refreshConnectionsCount() {
 			if (count > 0)
 			    image = "Connect.png";
 			else
-			    image = "connecting.png";
+			    image = "NotStarted.png";
 			connectionIcon.innerHTML = "<img src=\"images/" + image + "\" alt=\"\">";
 		  } else {
 			connectionCountSpan.innerHTML = _t("Down");
