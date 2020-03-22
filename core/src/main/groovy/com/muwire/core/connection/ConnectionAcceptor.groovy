@@ -574,7 +574,9 @@ class ConnectionAcceptor {
 
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
+            final long now = System.currentTimeMillis();
             published.each {
+                it.hit(requestor, now, "Feed Update");
                 int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
                 def obj = FeedItems.sharedFileToObj(it, certificates)
                 def json = jsonOutput.toJson(obj)
