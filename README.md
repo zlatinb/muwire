@@ -1,3 +1,5 @@
+The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and issues there.
+
 # MuWire - Easy Anonymous File-Sharing
 
 MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows,MacOS,Linux.
