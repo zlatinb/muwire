@@ -32,6 +32,9 @@ div#activeSearches table td:nth-child(2) {
   text-align: right;
 }
 
+div#topTableSender table thead th:nth-child(1) {
+  width: 35%;
+}
 div#topTableSender table thead th:nth-child(2) {
   width: 100px;
 }
@@ -42,7 +45,7 @@ div#topTableSender table thead th:nth-child(4) {
   width: 100px;
 }
 div#topTableSender table thead th:nth-child(5) {
-  width: 340px;
+  width: 35%;
 }
 div#topTableSender table tbody td:nth-child(1) {
   text-overflow: ellipsis;

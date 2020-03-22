@@ -475,7 +475,7 @@ table td, th {
     padding-top: 3px;
     background: white;
     white-space: nowrap;
-    overflow-x: hidden;
+    overflow: hidden;
     font-size: 1em;
     font-weight: normal;
 }
