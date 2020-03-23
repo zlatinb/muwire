@@ -34,6 +34,7 @@ import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.files.FileSharedEvent;
+import com.muwire.core.files.FileUnsharedEvent;
 import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
@@ -150,6 +151,7 @@ public class MuWireClient {
         core.getEventBus().register(FileHashedEvent.class, fileManager);
         core.getEventBus().register(FileDownloadedEvent.class, fileManager);
         core.getEventBus().register(FileHashingEvent.class, fileManager);
+        core.getEventBus().register(FileUnsharedEvent.class, fileManager);
         
         BrowseManager browseManager = new BrowseManager(core);
         core.getEventBus().register(BrowseStatusEvent.class, browseManager);
