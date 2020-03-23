@@ -6,6 +6,9 @@
   overflow:auto;
   margin-top:20px;
 }
+.filesTable {
+	padding-bottom: 6%;
+}
 #table-wrapper table {
   width:100%;
 

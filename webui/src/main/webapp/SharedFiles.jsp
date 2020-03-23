@@ -60,7 +60,7 @@ if (viewAs == null)
 			</ul>
 <% } else { %>
 			<div id="table-wrapper">
-				<div id="table-scroll">
+				<div class="filesTable" id="table-scroll">
 					<div id="filesTable"></div>
 				</div>
 			</div>
