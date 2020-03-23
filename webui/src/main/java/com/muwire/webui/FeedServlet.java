@@ -43,7 +43,9 @@ public class FeedServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         
-        if (section.equals("feeds")) {
+        if (section.equals("revision")) {
+            sb.append("<Revision>").append(feedManager.getRevision()).append("</Revision>");
+        } else if (section.equals("feeds")) {
             List<WrappedFeed> feeds = feedManager.getRemoteFeeds().values().stream().
                     map(rf -> new WrappedFeed(rf, core.getFeedManager().getFeedItems(rf.getFeed().getPublisher()).size())).
                     collect(Collectors.toList());

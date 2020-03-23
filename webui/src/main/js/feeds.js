@@ -116,10 +116,24 @@ class Item {
 
 
 function initFeeds() {
-	setTimeout(refreshFeeds, 1)
-	setInterval(refreshFeeds, 3000)
+	setTimeout(fetchRevision, 1)
+	setInterval(fetchRevision, 3000)
 }
 
+function fetchRevision() {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var newRevision = parseInt(this.responseXML.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
+			if (newRevision > revision) {
+				revision = newRevision
+				refreshFeeds()
+			}
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Feed?section=revision", true)
+	xmlhttp.send()
+}
 
 function refreshFeeds() {
 	var xmlhttp = new XMLHttpRequest()
@@ -375,6 +389,7 @@ function download(infoHash) {
 	xmlhttp.send("action=download&host=" + hostB64 + "&infoHash=" + infoHash)
 }
 
+var revision = 0
 var feeds = new Map()
 var currentFeed = null
 
