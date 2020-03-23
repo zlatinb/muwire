@@ -43,6 +43,7 @@ public class MuWireServlet extends HttpServlet {
             throw new ServletException(bad);
         }
         config.getServletContext().setAttribute("mwClient", client);
+        config.getServletContext().setAttribute("buildNumber", config.getInitParameter("buildNumber"));
     }
 
     @Override

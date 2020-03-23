@@ -14,6 +14,10 @@
         <param-name>version</param-name>
         <param-value>__VERSION__</param-value>
     </init-param>
+    <init-param>
+        <param-name>buildNumber</param-name>
+        <param-value>__BUILD_NUMBER__</param-value>
+    </init-param>
 </servlet>
 
 <servlet>
