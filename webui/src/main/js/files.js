@@ -15,6 +15,16 @@ class Node {
 		this.shared = shared
 	}
 	
+	collectCollapsed(map) {
+		if (this.leaf || this.children.length == 0) {
+			map.set(this.nodeId, true)
+			return
+		}
+		var i
+		for (i = 0;i < this.children.length; i++)
+			this.children[i].collectCollapsed(map)
+	}
+	
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
 		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
@@ -114,8 +124,14 @@ function refreshStatus() {
 				
 			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > treeRevision) {
-				// TODO: update expanded nodes
 				treeRevision = newRevision
+				var collapsed = new Map()
+				root.collectCollapsed(collapsed)
+				collapse("root")
+				nodesById.clear()
+				nodesById.set("root", root)
+				root.updateDiv()
+				expandUnless("root", collapsed)
 			}
 		}
 	}
@@ -130,7 +146,7 @@ var nodesById = new Map()
 function initFiles() {
 	root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
 	setInterval(refreshStatus, 3000)
-	setTimeout(refreshStatus, 1)
+	// setTimeout(refreshStatus, 1)
 	
 	nodesById.set("root",root)
 	root.updateDiv()
@@ -152,6 +168,10 @@ function encodedPathToRoot(node) {
 }
 
 function expand(nodeId) {
+	expandUnless(nodeId, new Map())
+}
+
+function expandUnless(nodeId, collapsed) {
 	var node = nodesById.get(nodeId)
 	var encodedPath = encodedPathToRoot(node)	
 	var xmlhttp = new XMLHttpRequest()
@@ -195,8 +215,18 @@ function expand(nodeId) {
 		    for (i = 0; i < node.children.length; i++) {
 				node.children[i].updateDiv()
 			}
-			if (node.children.length == 1 && !node.children[0].leaf)
-				expand(node.children[0].nodeId)
+			
+			// if nothing was collapsed, just expand until there is a fork
+			if (collapsed.size == 0) {
+				if (node.children.length == 1 && !node.children[0].leaf)
+					expandUnless(node.children[0].nodeId, collapsed)
+			} else {
+				for (i = 0; i < node.children.length; i++) {
+					if (collapsed.get(node.children[i].nodeId))
+						continue
+					expandUnless(node.children[i].nodeId, collapsed)
+				}
+			}
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=fileTree&path="+encodedPath, true)
