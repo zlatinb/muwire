@@ -38,7 +38,7 @@ String pagetitle=Util._t("Feeds");
 	    </aside>
 	    <section class="main foldermain">
 		    <div id="table-wrapper">
-				<div id="table-scroll">
+				<div class="paddedTable" id="table-scroll">
 					<div id="feedsTable"></div>
 				</div>
 			</div>

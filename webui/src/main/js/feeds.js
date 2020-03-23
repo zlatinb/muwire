@@ -24,10 +24,10 @@ class Feed {
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.publisherB64])
 		var configureLink = new Link(_t("Configure"), "configure", [this.publisher])
 		
-		var publisherHTML = publisherLink.render() + "<span class='right'>" + updateHTML + "  " +
-			unsubscribeLink.render() + "   " +
-			configureLink.render() +
-			"</span>"
+		var actionsHtml = "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>" +
+			updateHTML + unsubscribeLink.render() + configureLink.render() + "</div></div>"
+		
+		var publisherHTML = publisherLink.render() + "<span class='right'>" + actionsHtml + "</span>"
 		
 		mapping.set("Publisher", publisherHTML)
 		mapping.set("Files", this.files)

@@ -6,7 +6,7 @@
   overflow:auto;
   margin-top:20px;
 }
-.filesTable {
+.paddedTable {
 	padding-bottom: 6%;
 }
 #table-wrapper table {
@@ -237,6 +237,7 @@ div#feedsTable table thead th:nth-child(4) {
 
 div#feedsTable table tbody td:nth-child(1) {
 	text-overflow: ellipsis;
+	overflow: auto;
 }
 
 div#itemsTable table thead th:nth-child(2) {
