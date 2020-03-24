@@ -105,7 +105,7 @@ function fetch(infoHash) {
 	xmlhttp.send()
 }
 
-function refreshStatus() {
+function refreshStatus(noRefresh) {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -125,6 +125,10 @@ function refreshStatus() {
 			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > treeRevision) {
 				treeRevision = newRevision
+			
+				if (noRefresh)
+					return
+						
 				var collapsed = new Map()
 				root.collectCollapsed(collapsed)
 				collapse("root")
@@ -146,11 +150,11 @@ var nodesById = new Map()
 function initFiles() {
 	root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
 	setInterval(refreshStatus, 3000)
-	// setTimeout(refreshStatus, 1)
 	
 	nodesById.set("root",root)
-	root.updateDiv()
-	expand(root.nodeId)
+		root.updateDiv()
+		expand(root.nodeId)	
+	refreshStatus(true)
 }
 
 function encodedPathToRoot(node) {
