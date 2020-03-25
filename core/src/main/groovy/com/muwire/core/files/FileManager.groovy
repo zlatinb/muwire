@@ -28,6 +28,7 @@ class FileManager {
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index = new SearchIndex()
     final FileTree<Void> negativeTree = new FileTree<>()
+    final FileTree<SharedFile> positiveTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
 
     FileManager(EventBus eventBus, MuWireSettings settings) {
@@ -87,6 +88,7 @@ class FileManager {
         }
         existing.add(sf)
         fileToSharedFile.put(sf.file, sf)
+        positiveTree.add(sf.file, sf);
         
         negativeTree.remove(sf.file)
         String parent = sf.getFile().getParent()
@@ -130,6 +132,7 @@ class FileManager {
         }
 
         fileToSharedFile.remove(sf.file)
+        positiveTree.remove(sf.file)
         if (!e.deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
             negativeTree.add(sf.file,null)
             saveNegativeTree()
@@ -246,14 +249,26 @@ class FileManager {
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         negativeTree.remove(e.directory)
         saveNegativeTree()
-        e.directory.listFiles().each {
-            if (it.isDirectory())
-                eventBus.publish(new DirectoryUnsharedEvent(directory : it))
-            else {
-                SharedFile sf = fileToSharedFile.get(it)
-                if (sf != null)
-                    eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+        if (!e.deleted) {
+            e.directory.listFiles().each {
+                if (it.isDirectory())
+                    eventBus.publish(new DirectoryUnsharedEvent(directory : it))
+                else {
+                    SharedFile sf = fileToSharedFile.get(it)
+                    if (sf != null)
+                        eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+                }
             }
+        } else {
+             def cb = new DirDeletionCallback()
+             positiveTree.traverse(e.directory, cb)
+             positiveTree.remove(e.directory)
+             cb.unsharedFiles.each { 
+                 eventBus.publish(new FileUnsharedEvent(unsharedFile : it, deleted: true))
+             }
+             cb.subDirs.each {
+                 eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted : true))
+             }
         }
     }
     
@@ -269,5 +284,26 @@ class FileManager {
                     filter({sf -> sf.getPublishedTimestamp() >= timestamp}).
                     collect(Collectors.toList())
         }
+    }
+    
+    private static class DirDeletionCallback implements FileTreeCallback<SharedFile> {
+        
+        final List<File> subDirs = new ArrayList<>()
+        final List<SharedFile> unsharedFiles = new ArrayList<>()
+
+        @Override
+        public void onDirectoryEnter(File file) {
+            subDirs.add(file)
+        }
+
+        @Override
+        public void onDirectoryLeave() {
+        }
+
+        @Override
+        public void onFile(File file, SharedFile value) {
+            unsharedFiles << value
+        }
+        
     }
 }

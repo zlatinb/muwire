@@ -133,6 +133,10 @@ class DirectoryWatcher {
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFile : sf, deleted : true))
+        else if (muOptions.watchedDirectories.contains(f.toString())) 
+            eventBus.publish(new DirectoryUnsharedEvent(directory : f, deleted : true))
+        else
+            log.fine("Entry was not relevant");
     }
 
     private static File join(Path parent, Path path) {
