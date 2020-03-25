@@ -29,6 +29,7 @@ import com.muwire.core.filefeeds.FeedItemFetchedEvent;
 import com.muwire.core.filefeeds.FeedLoadedEvent;
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.files.AllFilesLoadedEvent;
+import com.muwire.core.files.DirectoryUnsharedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
@@ -152,6 +153,7 @@ public class MuWireClient {
         core.getEventBus().register(FileDownloadedEvent.class, fileManager);
         core.getEventBus().register(FileHashingEvent.class, fileManager);
         core.getEventBus().register(FileUnsharedEvent.class, fileManager);
+        core.getEventBus().register(DirectoryUnsharedEvent.class, fileManager);
         
         BrowseManager browseManager = new BrowseManager(core);
         core.getEventBus().register(BrowseStatusEvent.class, browseManager);

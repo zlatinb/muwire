@@ -68,6 +68,13 @@ public class FileManager {
         revision++;
     }
     
+    public void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        if (!e.getDeleted())
+            return;
+        fileTree.remove(e.getDirectory());
+        revision++;
+    }
+    
     void list(File parent, FileListCallback<SharedFile> callback) {
         fileTree.list(parent, callback);
     }
