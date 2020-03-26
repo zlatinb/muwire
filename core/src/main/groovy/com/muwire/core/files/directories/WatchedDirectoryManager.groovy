@@ -74,8 +74,10 @@ class WatchedDirectoryManager {
                 WatchedDirectory wd = WatchedDirectory.fromJson(parsed)
                 watchedDirs.put(wd.directory, wd)
                 
-                if (wd.autoWatch)
+                if (wd.autoWatch) {
                     eventBus.publish(new DirectoryWatchedEvent(directory : wd.directory))
+                    eventBus.publish(new FileSharedEvent(file : wd.directory))
+                }
             }
         } as Runnable)
     }
@@ -89,7 +91,7 @@ class WatchedDirectoryManager {
     }
     
     void onFileSharedEvent(FileSharedEvent e) {
-        if (e.file.isFile())
+        if (e.file.isFile() || watchedDirs.containsKey(e.file))
             return
         
         def wd = new WatchedDirectory(e.file)
