@@ -193,12 +193,6 @@ public class MuWireClient {
     }
     
     public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
-        core.getMuOptions().getWatchedDirectories().stream().map(File::new).
-            forEach(f -> {
-                FileSharedEvent event = new FileSharedEvent();
-                event.setFile(f);
-                core.getEventBus().publish(event);
-            });
         
         core.getMuOptions().getTrustSubscriptions().forEach( p -> {
             TrustSubscriptionEvent event = new TrustSubscriptionEvent();

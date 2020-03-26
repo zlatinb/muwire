@@ -28,7 +28,6 @@ class FilesModel {
         core.eventBus.register(FileLoadedEvent.class, this)
         core.eventBus.register(FileUnsharedEvent.class, this)
         core.eventBus.register(FileHashedEvent.class, this)
-        core.eventBus.register(AllFilesLoadedEvent.class, this)
         
         Runnable refreshModel = {refreshModel()}
         Timer timer = new Timer(true)
@@ -36,15 +35,6 @@ class FilesModel {
             guiThread.invokeLater(refreshModel)
         } as TimerTask, 1000,1000)
         
-    }
-    
-    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
-        def eventBus = core.eventBus
-        guiThread.invokeLater {
-            core.muOptions.watchedDirectories.each {
-                eventBus.publish(new FileSharedEvent(file: new File(it)))
-            }
-        }
     }
     
     void onFileLoadedEvent(FileLoadedEvent e) {

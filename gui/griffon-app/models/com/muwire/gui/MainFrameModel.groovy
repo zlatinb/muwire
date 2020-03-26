@@ -294,8 +294,6 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
-            core.muOptions.watchedDirectories.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
-
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
