@@ -390,11 +390,6 @@ public class Core {
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer)
 
-        log.info("initializing directory watcher")
-        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
-        eventBus.register(DirectoryWatchedEvent.class, directoryWatcher)
-        eventBus.register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
-        eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
 
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager, props)
@@ -427,6 +422,13 @@ public class Core {
             register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
         }
         
+        log.info("initializing directory watcher")
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, watchedDirectoryManager)
+        eventBus.with {
+            register(DirectoryWatchedEvent.class, directoryWatcher)
+            register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
+            register(DirectoryUnsharedEvent.class, directoryWatcher)
+        }
     }
 
     public void startServices() {

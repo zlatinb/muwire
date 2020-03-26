@@ -16,6 +16,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
+import com.muwire.core.files.directories.WatchedDirectoryManager
 
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
@@ -34,20 +35,20 @@ class DirectoryWatcher {
     }
 
     private final File home
-    private final MuWireSettings muOptions
     private final EventBus eventBus
     private final FileManager fileManager
+    private final WatchedDirectoryManager watchedDirectoryManager
     private final Thread watcherThread, publisherThread
     private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
     private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
 
-    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, MuWireSettings muOptions) {
+    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, WatchedDirectoryManager watchedDirectoryManager) {
         this.home = home
-        this.muOptions = muOptions
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.watchedDirectoryManager = watchedDirectoryManager
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
         watcherThread.setDaemon(true)
         this.publisherThread = new Thread({publish()} as Runnable, "watched-files-publisher")
@@ -72,26 +73,13 @@ class DirectoryWatcher {
         Path path = canonical.toPath()
         WatchKey wk = path.register(watchService, kinds)
         watchedDirectories.put(canonical, wk)
-        
-        if (muOptions.watchedDirectories.add(canonical.toString()))
-            saveMuSettings()
     }
 
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         WatchKey wk = watchedDirectories.remove(e.directory)
         wk?.cancel()
-        
-        if (muOptions.watchedDirectories.remove(e.directory.toString()))
-            saveMuSettings()
     }
     
-    private void saveMuSettings() {
-        File muSettingsFile = new File(home, "MuWire.properties")
-        muSettingsFile.withPrintWriter("UTF-8", {
-            muOptions.write(it)
-        })
-    }
-
     private void watch() {
         try {
             while(!shutdown) {
@@ -134,7 +122,7 @@ class DirectoryWatcher {
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFile : sf, deleted : true))
-        else if (muOptions.watchedDirectories.contains(f.toString())) 
+        else if (watchedDirectoryManager.isWatched(f)) 
             eventBus.publish(new DirectoryUnsharedEvent(directory : f, deleted : true))
         else
             log.fine("Entry was not relevant");
