@@ -73,11 +73,10 @@ class WatchedDirectoryManager {
                 def parsed = slurper.parse(it.toFile())
                 WatchedDirectory wd = WatchedDirectory.fromJson(parsed)
                 watchedDirs.put(wd.directory, wd)
-                
-                if (wd.autoWatch) {
-                    eventBus.publish(new DirectoryWatchedEvent(directory : wd.directory))
-                    eventBus.publish(new FileSharedEvent(file : wd.directory))
-                }
+            }
+            watchedDirs.values().stream().filter({it.autoWatch}).forEach {
+                eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
+                eventBus.publish(new FileSharedEvent(file : it.directory))
             }
         } as Runnable)
     }
