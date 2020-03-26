@@ -61,7 +61,14 @@ class WatchedDirectoryManager {
             newDir.autoWatch = e.autoWatch
             persist(newDir)
         } else {
-            // TODO: update state and stuff
+            def wd = watchedDirs.get(e.directory)
+            if (wd == null) {
+                log.severe("got a configuration event for a non-watched directory ${e.directory}")
+                return
+            }
+            wd.autoWatch = e.autoWatch
+            wd.syncInterval = e.syncInterval
+            persist(wd)
         }
     }
     

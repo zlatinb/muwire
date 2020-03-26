@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
 import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
 import com.muwire.core.files.directories.WatchedDirectoryManager
 
@@ -78,6 +79,19 @@ class DirectoryWatcher {
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         WatchKey wk = watchedDirectories.remove(e.directory)
         wk?.cancel()
+    }
+    
+    void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
+        if (watchService == null)
+            return // still converting
+        if (!e.autoWatch) {
+            WatchKey wk = watchedDirectories.remove(e.directory)
+            wk?.cancel()
+        } else if (!watchedDirectories.containsKey(e.directory)) {
+            Path path = e.directory.toPath()
+            def wk = path.register(watchService, kinds)
+            watchedDirectories.put(e.directory, wk)
+        } // else it was already watched
     }
     
     private void watch() {
