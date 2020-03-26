@@ -420,6 +420,8 @@ public class Core {
         eventBus.with { 
             register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
             register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
+            register(FileSharedEvent.class, watchedDirectoryManager)
+            register(DirectoryUnsharedEvent.class, watchedDirectoryManager)
         }
         
         log.info("initializing directory watcher")

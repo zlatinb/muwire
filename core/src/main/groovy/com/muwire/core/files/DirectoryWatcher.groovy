@@ -104,7 +104,7 @@ class DirectoryWatcher {
         File f= join(parent, path)
         log.fine("created entry $f")
         if (f.isDirectory())
-            f.toPath().register(watchService, kinds)
+            eventBus.publish(new FileSharedEvent(file : f, fromWatch : true))
         else
             waitingFiles.put(f, System.currentTimeMillis())
     }
@@ -142,7 +142,7 @@ class DirectoryWatcher {
                 waitingFiles.each { file, timestamp ->
                     if (now - timestamp > WAIT_TIME) {
                         log.fine("publishing file $file")
-                        eventBus.publish new FileSharedEvent(file : file)
+                        eventBus.publish new FileSharedEvent(file : file, fromWatch: true)
                         published << file
                     }
                 }

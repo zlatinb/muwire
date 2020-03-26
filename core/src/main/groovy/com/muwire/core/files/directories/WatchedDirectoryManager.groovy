@@ -7,12 +7,16 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
 import com.muwire.core.EventBus
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.files.FileSharedEvent
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import groovy.util.logging.Log
 
+@Log
 class WatchedDirectoryManager {
     
     private final File home
@@ -82,5 +86,39 @@ class WatchedDirectoryManager {
             def targetFile = new File(home, dir.getEncodedName() + ".json")
             targetFile.text = json
         } as Runnable)
+    }
+    
+    void onFileSharedEvent(FileSharedEvent e) {
+        if (e.file.isFile())
+            return
+        
+        def wd = new WatchedDirectory(e.file)
+        if (e.fromWatch) {
+            // parent should be already watched, copy settings
+            def parent = watchedDirs.get(e.file.getParentFile())
+            if (parent == null) {
+                log.severe("watching found a directory without a watched parent? ${e.file}")
+                return
+            }
+            wd.autoWatch = parent.autoWatch
+            wd.syncInterval = parent.syncInterval
+        } else
+            wd.autoWatch = true
+        
+        watchedDirs.put(wd.directory, wd)
+        persist(wd)
+        if (wd.autoWatch)
+            eventBus.publish(new DirectoryWatchedEvent(directory: wd.directory))
+    }
+    
+    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        def wd = watchedDirs.remove(e.directory)
+        if (wd == null) {
+            log.warning("unshared a directory that wasn't watched? ${e.directory}")
+            return
+        }
+        
+        File persistFile = new File(home, wd.getEncodedName() + ".json")
+        persistFile.delete()
     }
 }
