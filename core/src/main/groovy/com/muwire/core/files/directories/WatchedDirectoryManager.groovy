@@ -54,6 +54,15 @@ class WatchedDirectoryManager {
         timer.cancel()
     }
     
+    void onUISyncDirectoryEvent(UISyncDirectoryEvent e) {
+        def wd = watchedDirs.get(e.directory)
+        if (wd == null) {
+            log.warning("Got a sync event for non-watched dir ${e.directory}")
+            return
+        }
+        diskIO.submit({sync(wd, System.currentTimeMillis())} as Runnable)
+    }
+    
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
         if (converting) {
             def newDir = new WatchedDirectory(e.directory)
