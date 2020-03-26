@@ -7,10 +7,13 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
 import com.muwire.core.EventBus
+import com.muwire.core.SharedFile
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
+import com.muwire.core.files.FileListCallback
 import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.files.FileUnsharedEvent
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -78,15 +81,18 @@ class WatchedDirectoryManager {
                 eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
                 eventBus.publish(new FileSharedEvent(file : it.directory))
             }
+            timer.schedule({sync()} as TimerTask, 1000, 1000)
         } as Runnable)
     }
     
     private void persist(WatchedDirectory dir) {
-        diskIO.submit({
-            def json = JsonOutput.toJson(dir.toJson())
-            def targetFile = new File(home, dir.getEncodedName() + ".json")
-            targetFile.text = json
-        } as Runnable)
+        diskIO.submit({doPersist(dir)} as Runnable)
+    }
+    
+    private void doPersist(WatchedDirectory dir) {
+        def json = JsonOutput.toJson(dir.toJson())
+        def targetFile = new File(home, dir.getEncodedName() + ".json")
+        targetFile.text = json
     }
     
     void onFileSharedEvent(FileSharedEvent e) {
@@ -121,5 +127,72 @@ class WatchedDirectoryManager {
         
         File persistFile = new File(home, wd.getEncodedName() + ".json")
         persistFile.delete()
+    }
+    
+    private void sync() {
+        long now = System.currentTimeMillis()
+        watchedDirs.values().stream().
+            filter({!it.autoWatch}).
+            filter({it.syncInterval > 0}).
+            filter({it.lastSync + it.syncInterval * 1000 < now}).
+            forEach({wd -> diskIO.submit({sync(wd, now)} as Runnable )})
+    }
+    
+    private void sync(WatchedDirectory wd, long now) {
+        log.fine("syncing ${wd.directory}")
+        wd.lastSync = now
+        doPersist(wd)
+        
+        def cb = new DirSyncCallback()
+        fileManager.positiveTree.list(wd.directory, cb)
+        
+        Set<File> filesOnFS = new HashSet<>()
+        Set<File> dirsOnFS = new HashSet<>()
+        wd.directory.listFiles().each {
+            File canonical = it.getCanonicalFile() 
+            if (canonical.isFile())
+                filesOnFS.add(canonical)
+            else
+                dirsOnFS.add(canonical)
+        }
+        
+        Set<File> addedFiles = new HashSet<>(filesOnFS)
+        addedFiles.removeAll(cb.files)
+        addedFiles.each { 
+            eventBus.publish(new FileSharedEvent(file : it, fromWatch : true))
+        }
+        Set<File> addedDirs = new HashSet<>(dirsOnFS)
+        addedDirs.removeAll(cb.dirs)
+        addedDirs.each { 
+            eventBus.publish(new FileSharedEvent(file : it, fromWatch : true))
+        }
+        
+        Set<File> deletedFiles = new HashSet<>(cb.files)
+        deletedFiles.removeAll(filesOnFS)
+        deletedFiles.each {
+            eventBus.publish(new FileUnsharedEvent(unsharedFile : fileManager.getFileToSharedFile().get(it), deleted : true))
+        }
+        Set<File> deletedDirs = new HashSet<>(cb.dirs)
+        deletedDirs.removeAll(dirsOnFS)
+        deletedDirs.each {
+            eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted: true))
+        }
+    }
+    
+    private static class DirSyncCallback implements FileListCallback<SharedFile> {
+        
+        private final Set<File> files = new HashSet<>()
+        private final Set<File> dirs = new HashSet<>()
+
+        @Override
+        public void onFile(File f, SharedFile value) {
+            files.add(f)
+        }
+
+        @Override
+        public void onDirectory(File f) {
+            dirs.add(f)
+        }
+        
     }
 }
