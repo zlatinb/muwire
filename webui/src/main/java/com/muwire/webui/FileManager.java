@@ -134,14 +134,14 @@ public class FileManager {
             }
             
             for (File directory : cb.directories) {
-                if (core.getMuOptions().getWatchedDirectories().contains(directory.getAbsolutePath())) {
+                if (core.getWatchedDirectoryManager().isWatched(directory)) {
                     DirectoryUnsharedEvent e = new DirectoryUnsharedEvent();
                     e.setDirectory(directory);
                     core.getEventBus().publish(e);
                 }
             }
             
-            if (core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath())) {
+            if (core.getWatchedDirectoryManager().isWatched(file)) {
                 DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
                 event.setDirectory(file);
                 core.getEventBus().publish(event);
