@@ -20,7 +20,7 @@ class AdvancedSharingModel {
     Core core
     
     void mvcGroupInit(Map<String,String> args) {
-        watchedDirectories.addAll(core.muOptions.watchedDirectories)
+        watchedDirectories.addAll(core.watchedDirectoryManager.watchedDirs.values())
         
         treeRoot = new DefaultMutableTreeNode()
         negativeTree = new DefaultTreeModel(treeRoot)

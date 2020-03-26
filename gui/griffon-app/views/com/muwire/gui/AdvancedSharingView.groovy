@@ -43,7 +43,9 @@ class AdvancedSharingView {
             scrollPane( constraints : BorderLayout.CENTER ) {
                 watchedDirsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.watchedDirectories) {
-                        closureColumn(header : "Directory", type : String, read : {it})
+                        closureColumn(header : "Directory", type : String, read : {it.directory.toString()})
+                        closureColumn(header : "Automatic", type : Boolean, read : {it.autoWatch})
+                        closureColumn(header : "Sync Interval", type : Integer, read : {it.syncInterval})
                     }
                 }
             }
