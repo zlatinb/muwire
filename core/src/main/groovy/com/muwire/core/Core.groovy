@@ -55,7 +55,10 @@ import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
-
+import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
+import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
+import com.muwire.core.files.directories.WatchedDirectoryConverter
+import com.muwire.core.files.directories.WatchedDirectoryManager
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -130,6 +133,8 @@ public class Core {
     final ChatManager chatManager
     final FeedManager feedManager
     private final FeedClient feedClient
+    private final WatchedDirectoryConverter watchedDirectoryConverter
+    final WatchedDirectoryManager watchedDirectoryManager
 
     private final Router router
 
@@ -388,7 +393,7 @@ public class Core {
         log.info("initializing directory watcher")
         directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
         eventBus.register(DirectoryWatchedEvent.class, directoryWatcher)
-        eventBus.register(AllFilesLoadedEvent.class, directoryWatcher)
+        eventBus.register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
         eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
 
         log.info("initializing hasher service")
@@ -410,6 +415,17 @@ public class Core {
         log.info("initializing browse manager")
         BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
         eventBus.register(UIBrowseEvent.class, browseManager)
+        
+        log.info("initializing watched directory converter")
+        watchedDirectoryConverter = new WatchedDirectoryConverter(this)
+        eventBus.register(AllFilesLoadedEvent.class, watchedDirectoryConverter)
+        
+        log.info("initializing watched directory manager")
+        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager)
+        eventBus.with { 
+            register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
+            register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
+        }
         
     }
 
@@ -454,6 +470,8 @@ public class Core {
         connectionEstablisher.stop()
         log.info("shutting down directory watcher")
         directoryWatcher.stop()
+        log.info("shutting down watch directory manager")
+        watchedDirectoryManager.shutdown()
         log.info("shutting down cache client")
         cacheClient.stop()
         log.info("shutting down chat server")

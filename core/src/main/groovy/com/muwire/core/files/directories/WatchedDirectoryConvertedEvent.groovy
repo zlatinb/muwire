@@ -7,5 +7,4 @@ import com.muwire.core.Event
  * new format.
  */
 class WatchedDirectoryConvertedEvent extends Event {
-    String directoryPath
 }

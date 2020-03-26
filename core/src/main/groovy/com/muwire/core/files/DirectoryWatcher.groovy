@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
 
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
@@ -53,7 +54,7 @@ class DirectoryWatcher {
         publisherThread.setDaemon(true)
     }
 
-    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+    void onWatchedDirectoryConvertedEvent(WatchedDirectoryConvertedEvent e) {
         watchService = FileSystems.getDefault().newWatchService()
         watcherThread.start()
         publisherThread.start()
