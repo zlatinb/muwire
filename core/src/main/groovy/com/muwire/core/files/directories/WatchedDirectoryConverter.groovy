@@ -18,8 +18,7 @@ class WatchedDirectoryConverter {
         core.getMuOptions().getWatchedDirectories().each {
             File directory = new File(it)
             directory = directory.getCanonicalFile() 
-            WatchedDirectory watched = new WatchedDirectory(directory : directory, autoWatch : true)
-            core.eventBus.publish(new WatchedDirectoryConfigurationEvent(directory : watched))
+            core.eventBus.publish(new WatchedDirectoryConfigurationEvent(directory : directory, autoWatch: true))
         }
         core.getMuOptions().getWatchedDirectories().clear()
         core.saveMuSettings()
