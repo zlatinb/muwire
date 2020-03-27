@@ -50,7 +50,7 @@ class WatchedDirectoryManager {
         watchedDirs.containsKey(f)
     }
     
-    public Stream<WatchedDirectory> getWatchedDirs() {
+    public Stream<WatchedDirectory> getWatchedDirsStream() {
         watchedDirs.values().stream()
     }
     

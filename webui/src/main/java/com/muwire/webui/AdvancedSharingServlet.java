@@ -37,7 +37,7 @@ public class AdvancedSharingServlet extends HttpServlet {
         if (section.equals("revision")) {
             sb.append("<Revision>").append(advancedSharingManager.getRevision()).append("</Revision>");
         } else if (section.equals("dirs")) {
-            List<WrappedDir> dirs = core.getWatchedDirectoryManager().getWatchedDirs().
+            List<WrappedDir> dirs = core.getWatchedDirectoryManager().getWatchedDirsStream().
                     map(WrappedDir::new).
                     collect(Collectors.toList());
             DIR_COMPARATORS.sort(dirs, req);
