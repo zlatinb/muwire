@@ -125,6 +125,7 @@ public class Util {
         _x("Submit"),
         _x("Subscribe"),
         _x("Subscribed"),
+        _x("Sync"),
         _x("Times Browsed"),
         _x("Timestamp"),
         _x("Total Pieces"),

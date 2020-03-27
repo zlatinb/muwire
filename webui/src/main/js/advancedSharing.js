@@ -11,8 +11,12 @@ class Directory {
 		var mapping = new Map()
 		
 		var configLink = new Link(_t("Configure"), "configure", [this.path])
+		var syncLink = new Link(_t("Sync"), "sync", [this.path])
+		var syncHtml = syncLink.render()
+		if (this.autoWatch == "true")
+			syncHtml = ""
 		var divRight = "<span class='right'><div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>" +
-			configLink.render() + "</div></div></span>"
+			syncHtml + configLink.render() + "</div></div></span>"
 			
 		mapping.set("Directory", this.directory + divRight)
 		mapping.set("Auto Watch", this.autoWatch)
@@ -75,7 +79,8 @@ function refreshDirs() {
 				dirsDiv.innerHTML = ""
 		}
 	}
-	xmlhttp.open("GET", "/MuWire/AdvancedShare?section=dirs", true)
+	var sortParam = "&key=" + sortKey + "&order=" + sortOrder
+	xmlhttp.open("GET", "/MuWire/AdvancedShare?section=dirs" + sortParam, true)
 	xmlhttp.send()
 }
 
@@ -122,6 +127,18 @@ function configure(path) {
 function cancelConfig() {
 	var tableDiv = document.getElementById("dirConfig")
 	tableDiv.innerHTML = ""
+}
+
+function sync(path) {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			refreshDirs()
+		}
+	}
+	xmlhttp.open("POST", "/MuWire/AdvancedShare", true)
+	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xmlhttp.send("action=sync&path=" + path)
 }
 
 var revision = -1
