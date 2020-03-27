@@ -256,6 +256,34 @@ div#itemsTable table tbody td:nth-child(1) {
 	text-overflow: ellipsis;
 }
 
+div#dirConfig table * {
+	background: #bcd1e5 !important;
+}
+div#dirConfig table {
+	border-collapse: collapse;
+	width: auto;
+}
+div#dirConfig table td {
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+div#dirsTable table thead th:nth-child(2) {
+	width: 80px;
+}
+div#dirsTable table thead th:nth-child(3) {
+	width: 80px;
+}
+div#dirsTable table thead th:nth-child(4) {
+	width: 170px;
+}
+div#dirsTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
+	overflow: auto;
+}
+
 div#hitsTable table thead th:nth-child(1) {
 	width: 270px;
 }
