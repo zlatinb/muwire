@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.stream.Stream
 
 import com.muwire.core.EventBus
 import com.muwire.core.SharedFile
@@ -47,6 +48,10 @@ class WatchedDirectoryManager {
     
     public boolean isWatched(File f) {
         watchedDirs.containsKey(f)
+    }
+    
+    public Stream<WatchedDirectory> getWatchedDirs() {
+        watchedDirs.values().stream()
     }
     
     public void shutdown() {

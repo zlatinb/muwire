@@ -327,6 +327,9 @@ See also .menu-icon
 .menuitem.settings .menu-icon:before {
     content: url("images/ConfigurationPage.png");
 }
+.menuitem.advancedSharing .menu-icon:before {
+	content: url("images/AdvancedSharing.png");
+}
 .menuitem.downloads .menu-icon:before {
     content: url("images/Downloads.png");
 }

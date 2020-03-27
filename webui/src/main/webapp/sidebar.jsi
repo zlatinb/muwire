@@ -76,6 +76,10 @@
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text"><%=Util._t("Settings")%></div>
 	                </a>
+	                <a class="menuitem advancedSharing" href="AdvancedSharing">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text"><%=Util._t("Advanced Sharing")%></div>
+	                </a>
                 </div>
             </div>
             <div class="menubox-divider"></div>

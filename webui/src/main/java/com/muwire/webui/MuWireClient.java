@@ -30,6 +30,7 @@ import com.muwire.core.filefeeds.FeedLoadedEvent;
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.files.AllFilesLoadedEvent;
 import com.muwire.core.files.DirectoryUnsharedEvent;
+import com.muwire.core.files.DirectoryWatchedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
@@ -177,6 +178,10 @@ public class MuWireClient {
         core.getEventBus().register(FeedFetchEvent.class, feedManager);
         core.getEventBus().register(FeedItemFetchedEvent.class, feedManager);
         
+        AdvancedSharingManager advancedSharingManager = new AdvancedSharingManager(core);
+        core.getEventBus().register(DirectoryWatchedEvent.class, advancedSharingManager);
+        core.getEventBus().register(DirectoryUnsharedEvent.class, advancedSharingManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
@@ -186,6 +191,7 @@ public class MuWireClient {
         servletContext.setAttribute("certificateManager", certificateManager);
         servletContext.setAttribute("uploadManager", uploadManager);
         servletContext.setAttribute("feedManager", feedManager);
+        servletContext.setAttribute("advancedSharingManager", advancedSharingManager);
     }
     
     public String getHome() {
