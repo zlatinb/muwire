@@ -55,6 +55,7 @@ import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
+import com.muwire.core.files.directories.UISyncDirectoryEvent
 import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
 import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
 import com.muwire.core.files.directories.WatchedDirectoryConverter
@@ -422,6 +423,7 @@ public class Core {
             register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
             register(FileSharedEvent.class, watchedDirectoryManager)
             register(DirectoryUnsharedEvent.class, watchedDirectoryManager)
+            register(UISyncDirectoryEvent.class, watchedDirectoryManager)
         }
         
         log.info("initializing directory watcher")
