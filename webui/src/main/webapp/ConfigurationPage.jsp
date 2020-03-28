@@ -42,7 +42,11 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Search")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Search in comments")%></td>
+						<td>
+							<div class="tooltip"><%=Util._t("Search in comments")%>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search only file names or in the comments too?")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchComments()) out.write("checked"); %> name="searchComments" value="true"></p></td>
 					</tr>
 					<tr>

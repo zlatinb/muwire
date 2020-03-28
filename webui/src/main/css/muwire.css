@@ -615,3 +615,16 @@ textarea.copypaste {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.configuration-section table tr td {
+	overflow: auto;
+}
+
+.configuration-section .tooltip {
+	border-bottom: none;
+}
+
+.configuration-section .tooltip .tooltiptext {
+	white-space: pre-wrap;
+	padding : 5x 0 5x 5x;
+}
