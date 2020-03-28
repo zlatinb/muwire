@@ -628,3 +628,12 @@ textarea.copypaste {
 	white-space: pre-wrap;
 	padding : 5px 0 5px 5px;
 }
+
+.title-and-help .pagehelp .tooltip .tooltiptext {
+	white-space: pre-wrap;
+	right : 0;
+	top:20px;
+	width: 400px;
+	font-size: initial;
+	color: initial;
+}

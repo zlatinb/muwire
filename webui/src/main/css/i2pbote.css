@@ -191,10 +191,20 @@ iframe {
     padding: 0 0 22px 28px;
     width: 300px;
 }
+.title-and-help {
+	display: inline-block;
+}
 .pagetitle {
     display: inline-block;
     font-size: 2em;
     padding-left: 28px;
+}
+.pagehelp {
+    font-size: 2em;
+    padding-right: 28px;
+	float: right;
+	position: absolute;
+	right:0;
 }
 .password {
     height: 24px;
