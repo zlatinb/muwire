@@ -163,6 +163,7 @@ class WatchedDirectoryManager {
         log.fine("syncing ${wd.directory}")
         wd.lastSync = now
         doPersist(wd)
+        eventBus.publish(new WatchedDirectorySyncEvent(directory: wd.directory, when: now))
         
         def cb = new DirSyncCallback()
         fileManager.positiveTree.list(wd.directory, cb)

@@ -37,6 +37,7 @@ import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.files.FileSharedEvent;
 import com.muwire.core.files.FileUnsharedEvent;
+import com.muwire.core.files.directories.WatchedDirectorySyncEvent;
 import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
@@ -181,6 +182,7 @@ public class MuWireClient {
         AdvancedSharingManager advancedSharingManager = new AdvancedSharingManager(core);
         core.getEventBus().register(DirectoryWatchedEvent.class, advancedSharingManager);
         core.getEventBus().register(DirectoryUnsharedEvent.class, advancedSharingManager);
+        core.getEventBus().register(WatchedDirectorySyncEvent.class, advancedSharingManager);
         
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);

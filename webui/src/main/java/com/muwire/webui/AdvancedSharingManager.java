@@ -7,6 +7,7 @@ import com.muwire.core.files.DirectoryUnsharedEvent;
 import com.muwire.core.files.DirectoryWatchedEvent;
 import com.muwire.core.files.directories.UISyncDirectoryEvent;
 import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent;
+import com.muwire.core.files.directories.WatchedDirectorySyncEvent;
 
 public class AdvancedSharingManager {
     
@@ -26,6 +27,10 @@ public class AdvancedSharingManager {
     }
     
     public void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
+        revision++;
+    }
+    
+    public void onWatchedDirectorySyncEvent(WatchedDirectorySyncEvent e) {
         revision++;
     }
     
