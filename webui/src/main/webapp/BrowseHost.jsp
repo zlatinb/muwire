@@ -45,6 +45,11 @@ if (request.getParameter("currentHost") != null) {
 				<div class="menuitem browse">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value=<%=Util._t("Browse")%>>
+				  <div class="tooltip"><%=Util._t("Help")%>
+				  	<span class="tooltiptext">
+				  		<%=Util._t("Enter the full id of a MuWire user to see what files they are sharing")%>
+				  	</span>
+				  </div>
 				</div>
 			</form>
 		</div>

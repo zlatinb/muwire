@@ -30,6 +30,11 @@ String pagetitle=Util._t("Feeds");
 				<div class="menuitem feeds">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value=<%=Util._t("Subscribe")%>>
+				  <div class="tooltip"><%=Util._t("Help")%>
+				  	<span class="tooltiptext">
+				  		<%=Util._t("Enter the full id of a MuWire user to see what files they have published to their feed")%>
+				  	</span>
+				  </div>
 				</div>
 			</form>
 		</div>
