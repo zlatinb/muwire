@@ -6,6 +6,10 @@
 <% 
 
 String pagetitle=Util._t("Feeds"); 
+String helptext = Util._t("Every MuWire user can have a file feed to which they can publish shared files of their choosing.  " +
+						"You can subscribe to the feeds of other users.  That is similar to following someone on a social network.");
+helptext +=  "<br/>" + Util._t("On this page you can view the file feeds of users you are subscribed to.  You can configure each feed " +
+						"separately with various options, and you can download the published files.");
 
 %>
 

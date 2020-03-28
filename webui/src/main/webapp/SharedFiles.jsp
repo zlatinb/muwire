@@ -5,6 +5,10 @@
 <% 
 
 String pagetitle= Util._t("Shared Files");
+String helptext = Util._t("Shared files are those files you decide to share with other MuWire users.");
+helptext += "<br/>" + Util._t("To share a file, enter it's path in the box to the left.");
+helptext += "<br/>" + Util._t("You can view your shared files as a tree or as a table.");
+helptext += "<br/>" + Util._t("The \"Actions\" menu lets you perform various actions on the shared file.");
 
 String viewAs = request.getParameter("viewAs");
 if (viewAs == null)

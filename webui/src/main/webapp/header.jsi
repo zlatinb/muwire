@@ -9,12 +9,12 @@
     <br>
   </div>
   <div class="title-and-help">
-	  <div class="pagetitle">
+	  <span class="pagetitle">
 	    <%=pagetitle%>
-	  </div> 
+	  </span> 
 	  <span class="pagehelp">
 	  	<div class="tooltip"><%=Util._t("Help")%>
-	  		<span class="tooltiptext">Help text goes here</span>
+	  		<span class="tooltiptext"><%=helptext%></span>
 	  	</div>
 	  </span>
   </div>

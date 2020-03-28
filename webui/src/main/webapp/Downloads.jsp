@@ -10,7 +10,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="initcode.jsi"%>
 
-<% String pagetitle=Util._t("Downloads"); %>
+<% 
+String pagetitle=Util._t("Downloads");
+String helptext = Util._t("This page shows files which you are currently downloading from other MuWire users."); 
+%>
 
 <html>
     <head>

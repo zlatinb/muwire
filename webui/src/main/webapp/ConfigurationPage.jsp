@@ -12,6 +12,8 @@
 
 <% 
 String pagetitle=Util._t("Configuration");
+String helptext = Util._t("On this page you can change various MuWire options");
+
 Core core = (Core) application.getAttribute("core");
 
 String inboundLength = core.getI2pOptions().getProperty("inbound.length");

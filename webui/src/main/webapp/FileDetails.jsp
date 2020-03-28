@@ -7,6 +7,7 @@
 <% 
 
 String pagetitle=Util._t("File Details"); 
+String helptext = Util._t("Details about the selected shared file.");
 
 String path = request.getParameter("path");
 File file = Util.getFromPathElements(path);

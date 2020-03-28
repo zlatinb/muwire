@@ -9,6 +9,7 @@
 <% 
 
 String pagetitle=Util._t("Browse Host");
+String helptext = Util._t("On this page you can browse the files shared by other MuWire users");
 
 String currentBrowse = null;
 if (request.getParameter("currentHost") != null) {

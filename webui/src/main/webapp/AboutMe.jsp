@@ -10,6 +10,8 @@
 
 <% 
 String pagetitle=Util._t("About Me");
+String helptext = Util._t("This page shows information about your MuWire identity");
+
 Core core = (Core) application.getAttribute("core");
 
 %>
