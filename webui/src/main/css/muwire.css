@@ -592,3 +592,26 @@ textarea.copypaste {
 	z-index: -9999;
 	pointer-events: none;
 }
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 240px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  background : #d8f0ff;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

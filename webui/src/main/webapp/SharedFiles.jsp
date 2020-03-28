@@ -39,6 +39,13 @@ if (viewAs == null)
 				<div class="menuitem shared">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value="<%=Util._t("Share")%>">
+				  <div class="tooltip"><%=Util._t("Help")%>
+				  	<span class="tooltiptext"><%=Util._t("Enter path to file or folder you wish to share.")%>
+				  		<br/>
+				  		<%=Util._t("When sharing files on network drives (like a NAS) please visit")%>
+				  		<a href="/MuWire/AdvancedSharing"><%=Util._t("Advanced Sharing")%></a>
+				  	</span>
+				  </div>
 				</div>
 			</form>
 <% if (viewAs.equals("tree")) { %>
