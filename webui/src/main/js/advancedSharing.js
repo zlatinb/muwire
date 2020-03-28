@@ -104,7 +104,7 @@ function configure(path) {
 	html += "<table>"
 	
 	html += "<tr>"
-	html += "<td>" + _t("Watch directory for changes using operating system") + "</td>"
+	html += "<td>" + _t("Auto-watch directory for changes using operating system") + "</td>"
 	html += "<td><p align='right'><input type='checkbox' name='autoWatch' value='true'"
 	if (dir.autoWatch == "true")
 		html += " checked "

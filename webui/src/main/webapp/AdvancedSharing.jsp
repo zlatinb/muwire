@@ -24,6 +24,7 @@ String pagetitle=Util._t("Advanced Sharing");
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
+	    	<p><%=Util._t("Shared directories can be watched automatically or periodically.  Automatic watching is recommended, but may not work on some NAS devices.")%></p>
 		    <div id="table-wrapper">
 				<div class="paddedTable" id="table-scroll">
 					<div id="dirsTable"></div>
