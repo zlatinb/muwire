@@ -5,6 +5,7 @@ class Directory {
 		this.autoWatch = xmlNode.getElementsByTagName("AutoWatch")[0].childNodes[0].nodeValue
 		this.syncInterval = xmlNode.getElementsByTagName("SyncInterval")[0].childNodes[0].nodeValue
 		this.lastSync = xmlNode.getElementsByTagName("LastSync")[0].childNodes[0].nodeValue
+		this.lastSyncTS = parseInt(xmlNode.getElementsByTagName("LastSyncTS")[0].childNodes[0].nodeValue)
 	}
 	
 	getMapping() {
@@ -20,7 +21,11 @@ class Directory {
 			
 		mapping.set("Directory", this.directory + divRight)
 		mapping.set("Auto Watch", this.autoWatch)
-		mapping.set("Last Sync", this.lastSync)
+		
+		if (this.lastSyncTS == 0)
+			mapping.set("Last Sync", _t("Never"))
+		else
+			mapping.set("Last Sync", this.lastSync)
 		mapping.set("Sync Interval", this.syncInterval)
 		
 		return mapping

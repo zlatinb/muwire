@@ -111,6 +111,7 @@ public class AdvancedSharingServlet extends HttpServlet {
             sb.append("<Directory>").append(Util.escapeHTMLinXML(directory)).append("</Directory>");
             sb.append("<AutoWatch>").append(autoWatch).append("</AutoWatch>");
             sb.append("<LastSync>").append(DataHelper.formatTime(lastSync)).append("</LastSync>");
+            sb.append("<LastSyncTS>").append(lastSync).append("</LastSyncTS>");
             sb.append("<SyncInterval>").append(syncInterval).append("</SyncInterval>");
             sb.append("</WatchedDir>");
         }
