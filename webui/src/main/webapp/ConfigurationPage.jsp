@@ -50,7 +50,11 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchComments()) out.write("checked"); %> name="searchComments" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Allow browsing")%></td>
+						<td>
+							<div class="tooltip"><%=Util._t("Allow browsing")%>
+								<span class="tooltiptext"><%=Util._t("Allow other MuWire users to browse your shared files?")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getBrowseFiles()) out.write("checked"); %> name="browseFiles" value="true"></p></td>
 					</tr>
 				</table>
@@ -59,15 +63,24 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Downloads")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Download retry frequency (seconds)")%></td>
+						<td><div class="tooltip"><%=Util._t("Download retry frequency (seconds)")%>
+							<span class="tooltiptext"><%=Util._t("MuWire retries failed downloads automatically.  This value controls how often to retry.")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="downloadRetryInterval" class="right" value="<%= core.getMuOptions().getDownloadRetryInterval()%>"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Directory for downloaded files")%></td>
+						<td><div class="tooltip"><%=Util._t("Directory for downloaded files")%>
+							<span class="tooltiptext"><%=Util._t("Where to save downloaded files.  MuWire must be able to write to this location")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="text" size="30" name="downloadLocation" value="<%= core.getMuOptions().getDownloadLocation().getAbsoluteFile()%>"></p></td>
 					</tr>
 					<tr> 
-						<td><%=Util._t("Directory for incomplete files")%></td>
+						<td><div class="tooltip"><%=Util._t("Directory for incomplete files")%>
+							<span class="tooltiptext"><%=Util._t("Where to store partial data of files which are currently being downloaded.")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="text" size="30" name="incompleteLocation" value="<%= core.getMuOptions().getIncompleteLocation().getAbsoluteFile()%>"></p></td>
 					</tr>
 				</table>
@@ -76,11 +89,17 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Upload")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Total upload slots (-1 means unlimited)")%></td>
+						<td><div class="tooltip"><%=Util._t("Total upload slots (-1 means unlimited)")%>
+							<span class="tooltiptext"><%=Util._t("How many files at most should MuWire upload at the same time")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="totalUploadSlots" class="right" value="<%= core.getMuOptions().getTotalUploadSlots() %>"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Upload slots per user (-1 means unlimited)")%></td>
+						<td><div class="tooltip"><%=Util._t("Upload slots per user (-1 means unlimited)")%>
+							<span class="tooltiptext"><%=Util._t("How many files should MuWire upload to any given user at the same time")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="uploadSlotsPerUser" class="right" value="<%= core.getMuOptions().getUploadSlotsPerUser() %>"></p></td>
 					</tr>
 				</table>
@@ -89,11 +108,17 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Sharing")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Share downloaded files")%></td>
+						<td><div class="tooltip"><%=Util._t("Share downloaded files")%>
+							<span class="tooltiptext"><%=Util._t("Whether to automatically share files which you have downloaded with MuWire")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getShareDownloadedFiles()) out.write("checked"); %> name="shareDownloadedFiles" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Share hidden files")%></td>
+						<td><div class="tooltip"><%=Util._t("Share hidden files")%>
+							<span class="tooltiptext"><%=Util._t("Should MuWire share files marked as Hidden by the operating system?")%></span>
+							</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getShareHiddenFiles()) out.write("checked"); %> name="shareHiddenFiles" value="true"></p></td>
 					</tr>
 				</table>
@@ -102,15 +127,23 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Publishing")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Enable my feed")%></td>
+						<td><div class="tooltip"><%=Util._t("Enable my feed")%>
+							<span class="tooltiptext"><%=Util._t("Enable your personal file feed?")%></span></div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getFileFeed()) out.write("checked"); %> name="fileFeed" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Advertise my feed in search results")%></td>
+						<td><div class="tooltip"><%=Util._t("Advertise my feed in search results")%>
+							<span class="tooltiptext"><%=Util._t("If this is enabled MuWire will let other users know about your personal file feed")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAdvertiseFeed()) out.write("checked"); %> name="advertiseFeed" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Publish shared files automatically")%></td>
+						<td><div class="tooltip"><%=Util._t("Publish shared files automatically")%>
+							<span class="tooltiptext"><%=Util._t("If enabled, all files you share in the future will be published to your feed automatically.")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAutoPublishSharedFiles()) out.write("checked"); %> name="autoPublishSharedFiles" value="true"></p></td>
 					</tr>
 				</table>
@@ -119,19 +152,32 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Default settings for new feeds")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Download published files automatically")%></td>
+						<td><div class="tooltip"><%=Util._t("Download published files automatically")%>
+							<span class="tooltiptext"><%=Util._t("If enabled, MuWire will download every file published to the given feed")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getDefaultFeedAutoDownload()) out.write("checked"); %> name="defaultFeedAutoDownload" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Download each file sequentially")%></td>
+						<td><div class="tooltip"><%=Util._t("Download each file sequentially")%>
+							<span class="tooltiptext"><%=Util._t("Whether to download files from this feed sequentially.  This helps with previewing media files, but may reduce availability of the file for others.")%></span>
+						</div>
+						</td>
+						
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getDefaultFeedSequential()) out.write("checked"); %> name="defaultFeedAutoDownload" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Feed update frequency (minutes)")%></td>
+						<td><div class="tooltip"><%=Util._t("Feed update frequency (minutes)")%>
+							<span class="tooltiptext"><%=Util._t("How often to check for updates to this feed")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="defaultFeedUpdateInterval" class="right" value="<%= core.getMuOptions().getDefaultFeedUpdateInterval() / 60000 %>"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Number of items to keep on disk (-1 means unlimited)")%></td>
+						<td><div class="tooltip"><%=Util._t("Number of items to keep on disk (-1 means unlimited)")%>
+							<span class="tooltiptext"><%=Util._t("MuWire will only remember this many published items across restarts, unless you set the value to -1")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="defaultFeedItemsToKeep" class="right" value="<%= core.getMuOptions().getDefaultFeedItemsToKeep() %>"></p></td>
 					</tr>
 				</table>
@@ -140,19 +186,31 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Trust")%></h3>
 				<table>
 					<tr>
-						<td><%=Util._t("Allow only trusted connections")%></td>
+						<td><div class="tooltip"><%=Util._t("Allow only trusted connections")%>
+							<span class="tooltiptext"><%=Util._t("If enabled, MuWire will only connect to users you have marked as Trusted")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (!core.getMuOptions().getAllowUntrusted()) out.write("checked"); %> name="allowUntrusted" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Search extra hop")%></td>
+						<td><div class="tooltip"><%=Util._t("Search extra hop")%>
+							<span class="tooltiptext"><%=Util._t("If only trusted connections are allowed, MuWire will search only users that are directly connected to you.  Use this setting to search further out.  It has no effect if untrusted connections are allowed")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchExtraHop()) out.write("checked"); %> name="searchExtraHop" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Allow others to view my trust list")%></td>
+						<td><div class="tooltip"><%=Util._t("Allow others to view my trust list")%>
+							<span class="tooltiptext"><%=Util._t("Whether to allow other MuWire users to see who you have marked as Trusted and Distrusted")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAllowTrustLists()) out.write("checked"); %> name="allowTrustLists" value="true"></p></td>
 					</tr>
 					<tr>
-						<td><%=Util._t("Trust list update frequency (hours)")%></td>
+						<td><div class="tooltip"><%=Util._t("Trust list update frequency (hours)")%>
+							<span class="tooltiptext"><%=Util._t("How often to check for updates to the trust lists you are subscribed to.")%></span>
+						</div>
+						</td>
 						<td><p align="right"><input type="text" size="1" name="trustListInterval" class="right" value="<%= core.getMuOptions().getTrustListInterval() %>"></p></td>
 					</tr>
 				</table>
