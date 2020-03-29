@@ -383,6 +383,7 @@ div#trustedUsers table tbody td:nth-child(3) {
 }
 div#trustedUsers table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trustedUsers table tbody td:nth-child(3) {
   text-align: center;
@@ -390,6 +391,7 @@ div#trustedUsers table tbody td:nth-child(3) {
 
 div#distrustedUsers table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#distrustedUsers table thead th:nth-child(2) {
   width: 300px;

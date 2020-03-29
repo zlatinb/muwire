@@ -12,19 +12,18 @@ class Persona {
 	getMapping(trusted) {
 		var mapping = new Map()
 		var nameHtml = this.user
+		nameHtml += "<div class='right'><div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>"
 		if (trusted) {
-			nameHtml += "<div class='right'>"
 			nameHtml += this.getNeutralLink()
-			nameHtml += "  "
 			nameHtml += this.getDistrustedLink()
-			nameHtml += "</div>"
+		} else {
+			nameHtml += this.getTrustedLink()
+			nameHtml += this.getNeutralLink()
+		}
+		nameHtml += "</div></div></div>"
+		if (trusted) {
 			nameHtml += "<div class='centercomment' id='distrusted-" + this.userB64 + "'></div>"
 		} else {
-			nameHtml += "<div class='right'>"
-			nameHtml += this.getTrustedLink()
-			nameHtml += "  "
-			nameHtml += this.getNeutralLink()
-			nameHtml += "</div>"
 			nameHtml += "<div class='centercomment' id='trusted-" + this.userB64 + "'></div>"
 		}
 		

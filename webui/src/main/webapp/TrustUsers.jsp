@@ -25,7 +25,7 @@ helptext += "<br/>" + Util._t("You can subscribe to the trust lists of the users
 	    <section class="main foldermain">
 	    	<h3><%=Util._t("Trusted Users")%></h3>
 		    <div id="table-wrapper">
-				<div id="table-scroll">
+				<div id="table-scroll" class="paddedTable">
 					<div id="trustedUsers"></div>
 				</div>
 			</div>
@@ -33,7 +33,7 @@ helptext += "<br/>" + Util._t("You can subscribe to the trust lists of the users
 			<h3><%=Util._t("Distrusted Users")%></h3>
 			<div id="refresh-link"></div>
 			<div id="table-wrapper">
-				<div id="table-scroll">
+				<div id="table-scroll" class="paddedTable">
 					<div id="distrustedUsers"></div>
 				</div>
 			</div>
