@@ -1,3 +1,10 @@
+:root {
+	--hover-menu-bg : #c8e0ff;
+	--hover-menu-link-bg : #d8f0ff;
+	
+	--table-bg : #ceeee8;
+}
+
 #table-wrapper {
   position:relative;
 }
@@ -9,14 +16,28 @@
 .paddedTable {
 	padding-bottom: 6%;
 }
+.paddedTable table tbody tr td .dropdown .dropdown-content {
+	background: var(--hover-menu-bg);
+}
+
+.paddedTable table tbody tr td .dropdown .dropdown-content a:hover {
+	background: var(--hover-menu-link-bg);
+}
+
 #table-wrapper table {
   width:100%;
 
 }
-#table-wrapper table * {
-  background: #ceeee8;
+#table-wrapper table tbody tr td {
+  background: var(--table-bg);
   color:black;
 }
+
+#table-wrapper table thead tr th {
+  background: var(--table-bg);
+  color:black;
+}
+
 #table-wrapper table td, th {
     padding-right: 10px;
     padding-bottom: 1px;
@@ -566,8 +587,8 @@ li.fileTree {
 	display: none;
 	position: absolute;
 	z-index:1;
-	background: #c8e0ff;
-	background-color: #c8e0ff;
+	background: var(--hover-menu-bg);
+	background-color: var(--hover-menu-bg);
 	padding: 3px 14px 3px 14px;
 	width: max-content;
 }
@@ -579,8 +600,8 @@ li.fileTree {
 
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
-	background: #d8f0ff;
-	background-color: #d8f0ff;
+	background: var(--hover-menu-link-bg);
+	background-color: var(--hover-menu-link-bg);
 }
 
 /* Show the dropdown menu on hover */
