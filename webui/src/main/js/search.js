@@ -44,7 +44,10 @@ class Sender {
 		mapping.set("Sender", this.getSenderLink())
 		mapping.set("Results", this.results)
 		
-		var trustHtml = this.trust + "<span class='right'>" + this.getTrustLinks() + "</span>"
+		var trustActionHtml = "<span class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content-right'>" +
+			this.getTrustLinks() +
+			"</div></span>"
+		var trustHtml = "<span class='center'>" + this.trust + "   " + trustActionHtml + "</span>" 
 		trustHtml += "<div class='centercomment' id='trusted-" + this.b64 + "'></div>"
 		trustHtml += "<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 		mapping.set("Trust", trustHtml)
@@ -61,11 +64,11 @@ class Sender {
 	
 	getTrustLinks() {
 		if (this.trust == "NEUTRAL")
-			return "  " + this.getTrustLink() + "  " + this.getDistrustLink()
+			return  this.getTrustLink() + this.getDistrustLink()
 		else if (this.trust == "TRUSTED")
-			return "  " + this.getNeutralLink() + "  " + this.getDistrustLink()
+			return this.getNeutralLink() + this.getDistrustLink()
 		else
-			return "  " + this.getTrustLink() + "  " + this.getNeutralLink()
+			return this.getTrustLink() + this.getNeutralLink()
 	}
 	
 	getTrustLink() {
@@ -377,7 +380,11 @@ class SenderForResult {
 	}
 	
 	getTrustBlock() {
-		return this.trust +"<span class='right'>" + this.getTrustLinks() + "</span>" +
+		var dropdownBlock = "<span class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content-right'>" +
+			this.getTrustLinks() +
+			"</div></span>"
+		
+		return "<span class='center'>"+ this.trust + "   "+ dropdownBlock + "</span>" +
 			"<div class='centercomment' id='trusted-" + this.b64 + "'></div>" +
 			"<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 	}

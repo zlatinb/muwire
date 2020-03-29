@@ -57,7 +57,7 @@ div#activeSearches table td:nth-child(2) {
 }
 
 div#topTableSender table thead th:nth-child(1) {
-  width: 35%;
+  width: 45%;
 }
 div#topTableSender table thead th:nth-child(2) {
   width: 100px;
@@ -69,7 +69,7 @@ div#topTableSender table thead th:nth-child(4) {
   width: 100px;
 }
 div#topTableSender table thead th:nth-child(5) {
-  width: 35%;
+  width: 20%;
 }
 div#topTableSender table tbody td:nth-child(1) {
   text-overflow: ellipsis;
@@ -80,6 +80,11 @@ div#topTableSender table tbody td:nth-child(2) {
 div#topTableSender table tbody td:nth-child(3) {
   padding-right: 40px;
   text-align: right;
+}
+div#topTableSender table tbody td:nth-child(5) {
+	text-overflow: ellipsis;
+	overflow: auto;
+	text-align: center;
 }
 
 div#bottomTableSender table thead th:nth-child(2) {
@@ -130,13 +135,17 @@ div#bottomTableFile table thead th:nth-child(3) {
   width: 100px;
 }
 div#bottomTableFile table thead th:nth-child(4) {
-  width: 340px;
+  width: 20%;
 }
 div#bottomTableFile table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#bottomTableFile table tbody td:nth-child(2) {
   text-align: center;
+}
+div#bottomTableFile table tbody td:nth-child(4) {
+	text-overflow:ellipsis;
+	overflow:auto;
 }
 
 div#activeBrowses table thead th:nth-child(2) {
@@ -492,6 +501,11 @@ span.right {
   float: right;
 }
 
+span.center {
+	display : inline-block;
+	text-align : center;
+}
+
 input.right {
   text-align: right;
 }
@@ -593,7 +607,23 @@ li.fileTree {
 	width: max-content;
 }
 
+.dropdown-content-right {
+	display: none;
+	position: absolute;
+	z-index:1;
+	background: var(--hover-menu-bg);
+	background-color: var(--hover-menu-bg);
+	padding: 3px 14px 3px 14px;
+	width: max-content;
+	right: 0;
+}
+
 .dropdown-content a {
+	color: black;
+	display: block;
+}
+
+.dropdown-content-right a {
 	color: black;
 	display: block;
 }
@@ -604,8 +634,14 @@ li.fileTree {
 	background-color: var(--hover-menu-link-bg);
 }
 
+.dropdown-content-right a:hover {
+	background: var(--hover-menu-link-bg);
+	background-color: var(--hover-menu-link-bg);
+}
+
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content-right {display: block;}
 
 textarea.copypaste {
 	opacity: 0;

@@ -69,13 +69,13 @@
 		<section class="main foldermain">
 			<h3><span id="currentSearch"><%=Util._t("Results")%></span></h3>
 									<div id="table-wrapper">
-										<div id="table-scroll">
+										<div id="table-scroll" class="paddedTable">
 											<div id="<%=topTableId%>"></div>
 										</div>
 									</div>
 			<h3><span id="resultsFrom"></span></h3>
 													<div id="table-wrapper">
-														<div id="table-scroll">
+														<div id="table-scroll" class="paddedTable">
 															<div id="<%=bottomTableId%>">
 															</div>
 														</div>
