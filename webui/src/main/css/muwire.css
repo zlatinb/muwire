@@ -411,6 +411,7 @@ div#trustLists table thead th:nth-child(5) {
 }
 div#trustLists table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trustLists table tbody td:nth-child(2) {
   padding-right: 40px;
@@ -432,6 +433,7 @@ div#trusted table thead th:nth-child(3) {
 }
 div#trusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trusted table tbody td:nth-child(3) {
   text-align: center;
@@ -444,6 +446,7 @@ div#distrusted table thead th:nth-child(3) {
 }
 div#distrusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#distrusted table tbody td:nth-child(3) {
   text-align: center;

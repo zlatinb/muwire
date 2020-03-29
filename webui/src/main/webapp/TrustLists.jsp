@@ -23,14 +23,14 @@ String helptext = Util._t("This page shows the trust lists of users whom you hav
 	    </aside>
 	    <section class="main foldermain">
 		    <div id="table-wrapper">
-				<div id="table-scroll">
+				<div id="table-scroll" class="paddedTable">
 					<div id="trustLists"></div>
 				</div>
 			</div>
 			<hr/>
 				<center><div id="currentList"></div></center>
-						<div id="table-wrapper"><div id="table-scroll"><div id="trusted"></div></div></div>
-						<div id="table-wrapper"><div id="table-scroll"><div id="distrusted"></div></div></div>
+						<div id="table-wrapper"><div id="table-scroll" class="paddedTable"><div id="trusted"></div></div></div>
+						<div id="table-wrapper"><div id="table-scroll" class="paddedTable"><div id="distrusted"></div></div></div>
 	    </section>
 	</body>
 </html>
