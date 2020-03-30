@@ -21,17 +21,8 @@ public class MuWireServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        RouterContext ctx = (RouterContext) I2PAppContext.getGlobalContext();
-        
-        
-        while(!ctx.clientManager().isAlive()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new ServletException(e);
-            }
-        }
-            
+
+        RouterContext ctx = (RouterContext) I2PAppContext.getGlobalContext();   
         
         String home = ctx.getConfigDir()+File.separator+"plugins"+File.separator+"MuWire";
         version = config.getInitParameter("version");

@@ -92,7 +92,9 @@ public class MuWireClient {
         reader.close();
         
         MuWireSettings settings = new MuWireSettings(props);
-        MWStarter starter = new MWStarter(settings, new File(home), version, this);
+        Core core = new Core(settings, new File(home), version);
+        setCore(core);
+        MWStarter starter = new MWStarter(core);
         starter.start();
     }
     

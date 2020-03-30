@@ -1,29 +1,31 @@
 package com.muwire.webui;
 
-import java.io.File;
-
 import com.muwire.core.Core;
-import com.muwire.core.MuWireSettings;
 import com.muwire.core.UILoadedEvent;
 
+import net.i2p.I2PAppContext;
+import net.i2p.router.RouterContext;
+
 class MWStarter extends Thread {
-    private final MuWireSettings settings;
-    private final File home;
-    private final String version;
-    private final MuWireClient client;
+    private final Core core;
     
-    MWStarter(MuWireSettings settings, File home, String version, MuWireClient client) {
-        this.settings = settings;
-        this.home = home;
-        this.version = version;
-        this.client = client;
+    MWStarter(Core core) {
+        this.core = core;
         setName("MW starter");
         setDaemon(true);
     }
     
     public void run() {
-        Core core = new Core(settings, home, version);
-        client.setCore(core);
+        RouterContext ctx = (RouterContext) I2PAppContext.getGlobalContext();
+        
+        while(!ctx.clientManager().isAlive()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
         core.startServices();
         core.getEventBus().publish(new UILoadedEvent());
     }
