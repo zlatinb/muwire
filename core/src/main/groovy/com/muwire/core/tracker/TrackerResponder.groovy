@@ -108,6 +108,8 @@ class TrackerResponder {
                 }
                 
                 def response = [:]
+                response.me = me.toBase64()
+                
                 if (!muSettings.allowTracking) {
                     response.code = 403
                     respond(sender, response)
