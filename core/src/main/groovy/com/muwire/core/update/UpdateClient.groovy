@@ -2,6 +2,7 @@ package com.muwire.core.update
 
 import java.util.logging.Level
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
@@ -63,7 +64,7 @@ class UpdateClient {
     }
 
     void start() {
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 2)
+        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
         timer.schedule({checkUpdate()} as TimerTask, 60000, 60 * 60 * 1000)
     }
 
@@ -108,7 +109,7 @@ class UpdateClient {
         ping = maker.makeI2PDatagram(ping.bytes)
         def options = new SendMessageOptions()
         options.setSendLeaseSet(true)
-        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 2, 0, options)
+        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT, 0, options)
     }
 
     class Listener implements I2PSessionMuxedListener {

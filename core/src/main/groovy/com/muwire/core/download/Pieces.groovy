@@ -2,7 +2,7 @@ package com.muwire.core.download
 
 class Pieces {
     private final BitSet done, claimed
-    private final int nPieces
+    final int nPieces
     private final float ratio
     private final Random random = new Random()
     private final Map<Integer,Integer> partials = new HashMap<>()
