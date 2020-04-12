@@ -82,6 +82,7 @@ public class ConfigurationServlet extends HttpServlet {
         core.getMuOptions().setAutoPublishSharedFiles(false);
         core.getMuOptions().setDefaultFeedAutoDownload(false);
         core.getMuOptions().setDefaultFeedSequential(false);
+        core.getMuOptions().setAllowTracking(false);
     }
     
     private void update(String name, String value) throws Exception {
@@ -99,6 +100,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "shareHiddenFiles" : core.getMuOptions().setShareHiddenFiles(true); break;
         case "searchComments" : core.getMuOptions().setSearchComments(true); break;
         case "browseFiles" : core.getMuOptions().setBrowseFiles(true); break;
+        case "allowTracking" : core.getMuOptions().setAllowTracking(true); break;
         case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(Integer.parseInt(value)); break;
         case "inbound.length" : core.getI2pOptions().setProperty(name, value); break;
         case "inbound.quantity" : core.getI2pOptions().setProperty(name, value); break;
