@@ -18,6 +18,7 @@ class OptionsModel {
     @Observable String incompleteLocation
     @Observable boolean searchComments
     @Observable boolean browseFiles
+    @Observable boolean allowTracking
     @Observable int speedSmoothSeconds
     @Observable int totalUploadSlots
     @Observable int uploadSlotsPerUser
@@ -83,6 +84,7 @@ class OptionsModel {
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
         browseFiles = settings.browseFiles
+        allowTracking = settings.allowTracking
         speedSmoothSeconds = settings.speedSmoothSeconds
         totalUploadSlots = settings.totalUploadSlots
         uploadSlotsPerUser = settings.uploadSlotsPerUser

@@ -104,6 +104,10 @@ class OptionsController {
         model.browseFiles = browseFiles
         settings.browseFiles = browseFiles
         
+        boolean allowTracking = view.allowTrackingCheckbox.model.isSelected()
+        model.allowTracking = allowTracking
+        settings.allowTracking = allowTracking
+        
         text = view.speedSmoothSecondsField.text
         model.speedSmoothSeconds = Integer.valueOf(text)
         settings.speedSmoothSeconds = Integer.valueOf(text)

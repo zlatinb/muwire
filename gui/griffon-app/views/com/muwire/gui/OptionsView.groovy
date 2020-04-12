@@ -43,6 +43,7 @@ class OptionsView {
     def shareHiddenCheckbox
     def searchCommentsCheckbox
     def browseFilesCheckbox
+    def allowTrackingCheckbox
     def speedSmoothSecondsField
     def totalUploadSlotsField
     def uploadSlotsPerUserField
@@ -107,6 +108,10 @@ class OptionsView {
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 1,
                 anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
+                label(text : "Allow tracking", constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START,
+                    fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+                allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 2,
+                    anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
             }
             
             panel (border : titledBorder(title : "Download Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
