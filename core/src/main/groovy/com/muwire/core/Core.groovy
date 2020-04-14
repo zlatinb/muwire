@@ -145,7 +145,7 @@ public class Core {
     
     final SigningPrivateKey spk
 
-    public Core(MuWireSettings props, File home, String myVersion) {
+    public Core(MuWireSettings props, File home, String myVersion, String tunnelName = "MuWire") {
         this.home = home
         this.version = myVersion
         this.muOptions = props
@@ -165,9 +165,9 @@ public class Core {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
 
             if (!i2pOptions.containsKey("inbound.nickname"))
-                i2pOptions["inbound.nickname"] = "MuWire"
+                i2pOptions["inbound.nickname"] = tunnelName
             if (!i2pOptions.containsKey("outbound.nickname"))
-                i2pOptions["outbound.nickname"] = "MuWire"
+                i2pOptions["outbound.nickname"] = tunnelName
         }
         if (!(i2pOptions.hasProperty("i2np.ntcp.port")
                 && i2pOptions.hasProperty("i2np.udp.port")
