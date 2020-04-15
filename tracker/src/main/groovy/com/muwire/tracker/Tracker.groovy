@@ -1,6 +1,12 @@
 package com.muwire.tracker
 
+import java.nio.charset.StandardCharsets
+
+import com.github.arteam.simplejsonrpc.server.JsonRpcServer
+import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.core.UILoadedEvent
+import com.muwire.core.files.AllFilesLoadedEvent
 
 class Tracker {
     
@@ -53,5 +59,54 @@ class Tracker {
             
             trackerProps.withPrintWriter { jsonProps.store(it, "") }
         }
+        
+        Properties p = new Properties()
+        mwProps.withReader("UTF-8", { p.load(it) } )
+        MuWireSettings muSettings = new MuWireSettings(p)
+        p = new Properties()
+        trackerProps.withInputStream { p.load(it) }
+        
+        InetAddress toBind = InetAddress.getByName(p['jsonrpc.iface'])
+        int port = Integer.parseInt(p['jsonrpc.port'])
+        ServerSocket ss = new ServerSocket(port, Integer.MAX_VALUE, toBind)
+        
+        Core core = new Core(muSettings, home, VERSION, "MuWire Tracker")
+        
+
+        // init json service object
+        TrackerService trackerService = new TrackerService()
+        JsonRpcServer rpcServer = new JsonRpcServer()
+                
+        Thread coreStarter = new Thread({ 
+            core.startServices()
+            core.eventBus.publish(new UILoadedEvent()) 
+        } as Runnable)
+        coreStarter.start()
+        
+        println "json rpc listening on $toBind:$port"
+        
+        try {
+            while(true) {
+                Socket s = ss.accept()
+                try {
+                    println "accepted connection from " + s.getInetAddress()
+                    def reader = new BufferedReader(new InputStreamReader(s.getInputStream()))
+                    String request;
+                    while((request = reader.readLine()) != null) {
+                        println "got request \"$request\""
+                        String response = rpcServer.handle(request, trackerService)
+                        println "sending response \"$response\""
+                        s.getOutputStream().newWriter("UTF-8").write(response)
+                        s.getOutputStream().write("\n".getBytes(StandardCharsets.US_ASCII))
+                        s.getOutputStream().flush()
+                    }
+                } finally {
+                    s.close()
+                }
+            }
+        } catch (Exception bad) {
+            bad.printStackTrace()
+        }
+        
     }
 }
