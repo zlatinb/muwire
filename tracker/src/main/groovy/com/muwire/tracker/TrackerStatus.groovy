@@ -1,7 +1,7 @@
 package com.muwire.tracker
 
 class TrackerStatus {
-    String status
+    volatile String status
     int connections
     int swarms
 }
