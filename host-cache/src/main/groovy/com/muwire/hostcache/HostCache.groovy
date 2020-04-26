@@ -64,8 +64,10 @@ public class HostCache {
         Timer timer = new Timer("timer", true)
         timer.schedule({hostPool.age()} as TimerTask, 1000,1000)
         timer.schedule({crawler.startCrawl()} as TimerTask, 10000, 10000)
-        File verified = new File("verified.json")
-        File unverified = new File("unverified.json")
+        File verified = new File("verified")
+        File unverified = new File("unverified")
+        verified.mkdir()
+        unverified.mkdir()
         timer.schedule({hostPool.serialize(verified, unverified)} as TimerTask, 10000, 60 * 60 * 1000)
 
         session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler),
