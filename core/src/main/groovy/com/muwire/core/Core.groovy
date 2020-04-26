@@ -145,7 +145,7 @@ public class Core {
     
     final SigningPrivateKey spk
 
-    public Core(MuWireSettings props, File home, String myVersion, String tunnelName = "MuWire") {
+    public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home
         this.version = myVersion
         this.muOptions = props
