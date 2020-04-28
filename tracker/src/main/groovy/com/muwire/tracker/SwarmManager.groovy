@@ -46,6 +46,10 @@ class SwarmManager {
         swarm.add(e.results[0].sender)            
     }
     
+    int countSwarms() {
+        swarms.size()
+    }
+    
     void track(InfoHash infoHash) {
         Swarm swarm = swarms.computeIfAbsent(infoHash, {new Swarm(it)} as Function)
         if (swarm.needsQuery()) {
@@ -60,5 +64,10 @@ class SwarmManager {
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : DataUtil.signUUID(uuid, timestamp, core.spk)))
         }
+    }
+    
+    boolean forget(InfoHash infoHash) {
+        Swarm swarm = swarms.remove(infoHash)
+        swarm != null
     }
 }

@@ -25,6 +25,7 @@ class TrackerServiceImpl implements TrackerService {
     
     public TrackerStatus status() {
         status.connections = core.getConnectionManager().getConnections().size()
+        status.swarms = swarmManager.countSwarms()
         status
     }
     
@@ -37,5 +38,11 @@ class TrackerServiceImpl implements TrackerService {
     public void track(String infoHash) {
         InfoHash ih = new InfoHash(Base64.decode(infoHash))
         swarmManager.track(ih)
+    }
+    
+    @Override
+    public boolean forget(String infoHash) {
+        InfoHash ih = new InfoHash(Base64.decode(infoHash))
+        swarmManager.forget(ih)
     }
 }
