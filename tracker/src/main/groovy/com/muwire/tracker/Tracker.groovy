@@ -123,6 +123,11 @@ class Tracker {
     }
     
     @Bean
+    Core core() {
+        core
+    }
+    
+    @Bean
     WebServerFactoryCustomizer<ConfigurableWebServerFactory> wsCustomizer() {
         wsCustomizer
     }
