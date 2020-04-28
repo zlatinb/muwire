@@ -3,12 +3,12 @@ package com.muwire.tracker
 import com.muwire.core.Core
 import com.muwire.core.UILoadedEvent
 
-class TrackerService {
+class TrackerServiceImpl implements TrackerService {
     
     private final TrackerStatus status = new TrackerStatus()
     private final Core core
     
-    TrackerService(Core core) {
+    TrackerServiceImpl(Core core) {
         this.core = core
         status.status = "Starting"
     }

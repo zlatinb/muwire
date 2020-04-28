@@ -4,16 +4,23 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.annotation.Bean
+
+import com.googlecode.jsonrpc4j.spring.JsonServiceExporter
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 
+@SpringBootApplication
 class Tracker {
     
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool()
-    
     private static final String VERSION = System.getProperty("build.version")
+    
+    private static Core core
+    private static TrackerService trackerService
     
     public static void main(String [] args) {
         println "Launching MuWire Tracker version $VERSION"
@@ -74,11 +81,11 @@ class Tracker {
         InetAddress toBind = InetAddress.getByName(p['jsonrpc.iface'])
         int port = Integer.parseInt(p['jsonrpc.port'])
         
-        Core core = new Core(muSettings, home, VERSION)
+        core = new Core(muSettings, home, VERSION)
         
 
         // init json service object
-        TrackerService trackerService = new TrackerService()
+        trackerService = new TrackerServiceImpl(core)
         core.eventBus.with { 
             register(UILoadedEvent.class, trackerService)
         }
@@ -89,6 +96,19 @@ class Tracker {
         } as Runnable)
         coreStarter.start()
               
-        // TODO: rewrite as Spring app
+        SpringApplication.run(Tracker.class, args)
+    }
+    
+    @Bean
+    public TrackerService trackerService() {
+        trackerService
+    }
+    
+    @Bean(name = '/tracker')
+    public JsonServiceExporter jsonServiceExporter() {
+        def exporter = new JsonServiceExporter()
+        exporter.setService(trackerService())
+        exporter.setServiceInterface(TrackerService.class)
+        exporter
     }
 }
