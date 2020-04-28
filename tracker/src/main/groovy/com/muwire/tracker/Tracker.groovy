@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-import com.github.arteam.simplejsonrpc.server.JsonRpcServer
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
@@ -12,9 +11,9 @@ import com.muwire.core.files.AllFilesLoadedEvent
 
 class Tracker {
     
-    private static final String VERSION = "0.6.12"
-    
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool()
+    
+    private static final String VERSION = System.getProperty("build.version")
     
     public static void main(String [] args) {
         println "Launching MuWire Tracker version $VERSION"
@@ -74,9 +73,6 @@ class Tracker {
         
         InetAddress toBind = InetAddress.getByName(p['jsonrpc.iface'])
         int port = Integer.parseInt(p['jsonrpc.port'])
-        ServerSocket ss = new ServerSocket(port, Integer.MAX_VALUE, toBind)
-        println "json rpc listening on $toBind:$port"
-        JsonRpcServer rpcServer = new JsonRpcServer()
         
         Core core = new Core(muSettings, home, VERSION)
         
@@ -92,34 +88,7 @@ class Tracker {
             core.eventBus.publish(new UILoadedEvent()) 
         } as Runnable)
         coreStarter.start()
-        
-        
-        try {
-            while(true) {
-                Socket s = ss.accept()
-                println "accepted connection from " + s.getInetAddress()
-                EXECUTOR_SERVICE.submit {
-                    try {
-                        def reader = new BufferedReader(new InputStreamReader(s.getInputStream()))
-                        String request;
-                        while((request = reader.readLine()) != null) {
-                            println "got request \"$request\""
-                            String response = rpcServer.handle(request, trackerService)
-                            println "sending response \"$response\""
-                            s.getOutputStream().newWriter("UTF-8").write(response)
-                            s.getOutputStream().write("\n".getBytes(StandardCharsets.US_ASCII))
-                            s.getOutputStream().flush()
-                        }
-                    } catch (Exception bad) {
-                        bad.printStackTrace()
-                    } finally {
-                        s.close()
-                    }
-                } as Runnable
-            }
-        } catch (Exception bad) {
-            bad.printStackTrace()
-        }
-        
+              
+        // TODO: rewrite as Spring app
     }
 }

@@ -10,18 +10,32 @@ buildscript {
     }
 }
 
+plugins {
+	id 'org.springframework.boot' version '2.2.6.RELEASE'
+}
+
 apply plugin : 'application'
+apply plugin : 'io.spring.dependency-management'
+
 application {
     mainClassName = 'com.muwire.tracker.Tracker'
-    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M',"-Dbuild.version=${project.version}"]
     applicationName = 'mwtrackerd'
 }
 
 apply plugin : 'com.github.johnrengelman.shadow'
 
+springBoot {
+    buildInfo {
+        properties {
+            version = "${project.version}"
+            name = "mwtrackerd"
+        }
+    }
+}
 
 dependencies {
     compile project(":core")
-    compile 'com.github.arteam:simple-json-rpc-server:1.0'
+    compile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.3'
 }
 
