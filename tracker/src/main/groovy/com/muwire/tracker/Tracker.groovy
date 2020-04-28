@@ -6,6 +6,8 @@ import java.util.concurrent.Executors
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.web.server.ConfigurableWebServerFactory
+import org.springframework.boot.web.server.WebServerFactoryCustomizer
 import org.springframework.context.annotation.Bean
 
 import com.googlecode.jsonrpc4j.spring.JsonServiceExporter
@@ -21,6 +23,7 @@ class Tracker {
     
     private static Core core
     private static TrackerService trackerService
+    private static WebServerCustomizer wsCustomizer
     
     public static void main(String [] args) {
         println "Launching MuWire Tracker version $VERSION"
@@ -81,6 +84,8 @@ class Tracker {
         InetAddress toBind = InetAddress.getByName(p['jsonrpc.iface'])
         int port = Integer.parseInt(p['jsonrpc.port'])
         
+        wsCustomizer = new WebServerCustomizer(toBind, port)
+        
         core = new Core(muSettings, home, VERSION)
         
 
@@ -97,6 +102,29 @@ class Tracker {
         coreStarter.start()
               
         SpringApplication.run(Tracker.class, args)
+    }
+    
+    private static class WebServerCustomizer implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
+        
+        private final InetAddress toBind
+        private final int port
+        
+        WebServerCustomizer(InetAddress toBind, int port) {
+            this.toBind = toBind
+            this.port = port
+        }
+
+        @Override
+        public void customize(ConfigurableWebServerFactory factory) {
+            factory.setPort(port)
+            factory.setAddress(toBind)
+        }
+        
+    }
+    
+    @Bean
+    WebServerFactoryCustomizer<ConfigurableWebServerFactory> wsCustomizer() {
+        wsCustomizer
     }
     
     @Bean
