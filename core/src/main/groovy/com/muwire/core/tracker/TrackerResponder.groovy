@@ -1,5 +1,6 @@
 package com.muwire.core.tracker
 
+import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 import java.util.stream.Collectors
 
@@ -36,6 +37,11 @@ class TrackerResponder {
     private final TrustService trustService
     private final Persona me
     
+    private final Map<UUID,Long> uuids = new HashMap<>()
+    private final Timer expireTimer = new Timer("tracker-responder-timer", true)
+    
+    private static final long UUID_LIFETIME = 10 * 60 * 1000
+    
     TrackerResponder(I2PSession i2pSession, MuWireSettings muSettings,
         FileManager fileManager, DownloadManager downloadManager,
         MeshManager meshManager, TrustService trustService,
@@ -51,10 +57,23 @@ class TrackerResponder {
     
     void start() {
         i2pSession.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.TRACKER_PORT)
+        expireTimer.schedule({expireUUIDs()} as TimerTask, UUID_LIFETIME, UUID_LIFETIME)
     }
     
     void stop() {
-        // ???
+        expireTimer.cancel()
+    }
+    
+    private void expireUUIDs() {
+        final long now = System.currentTimeMillis()
+        synchronized(uuids) {
+            for (Iterator<UUID> iter = uuids.keySet().iterator(); iter.hasNext();) {
+                UUID uuid = iter.next();
+                Long time = uuids.get(uuid)
+                if (now - time > UUID_LIFETIME)
+                    iter.remove()
+            }
+        }
     }
     
     private void respond(host, json) {
@@ -129,10 +148,26 @@ class TrackerResponder {
                     log.warning("infoHash missing")
                     return
                 }
-                response.infoHash = json.infoHash
+                
+                if (json.uuid == null) {
+                    log.warning("uuid missing")
+                    return
+                }
+                
+                UUID uuid = UUID.fromString(json.uuid)
+                synchronized(uuids) {
+                    if (uuids.containsKey(uuid)) {
+                        log.warning("duplicate uuid $uuid")
+                        return
+                    }
+                    uuids.put(uuid, System.currentTimeMillis())
+                }
+                response.uuid = json.uuid
                 
                 byte[] infoHashBytes = Base64.decode(json.infoHash)
                 InfoHash infoHash = new InfoHash(infoHashBytes)
+                
+                log.info("servicing request for infoHash ${json.infoHash} with uuid ${json.uuid}")
                 
                 if (!(fileManager.isShared(infoHash) || downloadManager.isDownloading(infoHash))) {
                     response.code = 404
