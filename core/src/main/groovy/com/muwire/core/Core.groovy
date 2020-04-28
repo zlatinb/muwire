@@ -113,7 +113,7 @@ public class Core {
     final Properties i2pOptions
     final MuWireSettings muOptions
 
-    private final I2PSession i2pSession;
+    final I2PSession i2pSession;
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
