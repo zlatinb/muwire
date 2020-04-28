@@ -108,6 +108,7 @@ class TrackerResponder {
                 }
                 
                 def response = [:]
+                response.type = "TrackerPong"
                 response.me = me.toBase64()
                 
                 if (!muSettings.allowTracking) {
@@ -128,6 +129,7 @@ class TrackerResponder {
                     log.warning("infoHash missing")
                     return
                 }
+                response.infoHash = json.infoHash
                 
                 byte[] infoHashBytes = Base64.decode(json.infoHash)
                 InfoHash infoHash = new InfoHash(infoHashBytes)
