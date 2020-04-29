@@ -73,6 +73,23 @@ class SwarmManager {
             if (it.shouldQuery(queryCutoff, now))
                 query(it)
         }
+        
+        List<Swarm> swarmList = new ArrayList<>(swarms.values())
+        Collections.sort(swarmList,{Swarm x, Swarm y ->
+            Long.compare(x.getLastPingTime(), y.getLastPingTime())
+        } as Comparator<Swarm>)
+        
+        List<HostAndIH> toPing = new ArrayList<>()
+        final int amount = trackerProperties.getSwarmParameters().getPingParallel()
+        final int pingCutoff = now - trackerProperties.getSwarmParameters().getPingInterval() * 60 * 1000L
+        
+        for(int i = 0; i < swarmList.size() && toPing.size() < amount; i++) {
+            Swarm s = swarmList.get(i)
+            List<Host> hostsFromSwarm = s.getBatchToPing(amount - toPing.size(), now, pingCutoff)
+            hostsFromSwarm.collect(toPing, { host -> new HostAndIH(host, s.getInfoHash())})
+        }
+        
+        log.info("will ping $toPing")
     }
     
     private void query(Swarm swarm) {
@@ -114,4 +131,18 @@ class SwarmManager {
     Swarm.Info info(InfoHash infoHash) {
         swarms.get(infoHash)?.info()
     }
+    
+    private static class HostAndIH {
+        private final Host host
+        private final InfoHash infoHash
+        HostAndIH(Host host, InfoHash infoHash) {
+            this.host = host
+            this.infoHash = infoHash
+        }
+        
+        @Override
+        public String toString() {
+            "$host:$infoHash"
+        }
+    } 
 }

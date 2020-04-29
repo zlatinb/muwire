@@ -34,6 +34,11 @@ class Swarm {
      */
     private long lastQueryTime
     
+    /**
+     * Last time a batch of hosts was pinged
+     */
+    private long lastPingTime
+    
     Swarm(InfoHash infoHash) {
         this.infoHash = infoHash
     }
@@ -119,12 +124,20 @@ class Swarm {
         negative.add(h.persona)
     }
     
-    synchronized List<Host> getBatchToPing(int max) {
+    /**
+     * @param max number of hosts to give back
+     * @param now what time is it now
+     * @param cutoff only consider hosts which have been pinged before this time
+     * @return hosts to be pinged
+     */
+    synchronized List<Host> getBatchToPing(int max, long now, long cutOff) {        
         List<Host> rv = new ArrayList<>()
         rv.addAll(unknown.values())
         rv.addAll(seeds.values())
         rv.addAll(leeches.values())
         rv.removeAll(inFlight.values())
+        
+        rv.removeAll { it.lastPinged >= cutOff }
         
         Collections.sort(rv, {l, r ->
             Long.compare(l.lastPinged, r.lastPinged)
@@ -133,13 +146,18 @@ class Swarm {
         if (rv.size() > max)
             rv = rv[0..(max-1)]
         
-        final long now = System.currentTimeMillis()
         rv.each {
             it.lastPinged = now
             inFlight.put(it.persona, it)
         }
         
+        if (!rv.isEmpty())
+            lastPingTime = now
         rv
+    }
+    
+    synchronized long getLastPingTime() {
+        lastPingTime
     }
     
     public Info info() {
