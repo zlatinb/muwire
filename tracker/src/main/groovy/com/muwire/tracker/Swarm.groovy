@@ -130,4 +130,21 @@ class Swarm {
         
         rv
     }
+    
+    public Info info() {
+        List<String> seeders = seeds.keySet().collect { it.getHumanReadableName() }
+        List<String> leechers = leeches.keySet().collect { it.getHumanReadableName() }
+        return new Info(seeders, leechers, unknown.size())
+    }
+    
+    public static class Info {
+        final List<String> seeders, leechers
+        final int unknown
+        
+        Info(List<String> seeders, List<String> leechers, int unknown) {
+            this.seeders = seeders
+            this.leechers = leechers
+            this.unknown = unknown
+        }
+    }
 }

@@ -70,4 +70,8 @@ class SwarmManager {
         Swarm swarm = swarms.remove(infoHash)
         swarm != null
     }
+    
+    Swarm.Info info(InfoHash infoHash) {
+        swarms.get(infoHash)?.info()
+    }
 }

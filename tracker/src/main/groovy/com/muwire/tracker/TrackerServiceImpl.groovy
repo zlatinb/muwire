@@ -45,4 +45,10 @@ class TrackerServiceImpl implements TrackerService {
         InfoHash ih = new InfoHash(Base64.decode(infoHash))
         swarmManager.forget(ih)
     }
+    
+    @Override
+    public Swarm.Info info(String infoHash) {
+        InfoHash ih = new InfoHash(Base64.decode(infoHash))
+        swarmManager.info(ih)
+    }
 }
