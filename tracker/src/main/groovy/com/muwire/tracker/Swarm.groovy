@@ -12,7 +12,7 @@ import groovy.util.logging.Log
  */
 @Log
 class Swarm {
-    private final InfoHash infoHash
+    final InfoHash infoHash
     
     /** 
      * Invariant: these four collections are mutually exclusive.
@@ -28,6 +28,11 @@ class Swarm {
      * and in the collections above, except for negative.
      */
     private final Map<Persona, Host> inFlight = new HashMap<>()
+    
+    /**
+     * Last time a query was made to the MW network for this hash
+     */
+    private long lastQueryTime
     
     Swarm(InfoHash infoHash) {
         this.infoHash = infoHash
@@ -51,11 +56,17 @@ class Swarm {
         }
     }
     
-    synchronized boolean needsQuery() {
-        seeds.isEmpty() &&
+    synchronized boolean shouldQuery(long queryCutoff, long now) {
+        if (!(seeds.isEmpty() &&
             leeches.isEmpty() &&
             inFlight.isEmpty() &&
-            unknown.isEmpty()
+            unknown.isEmpty()))
+        return false 
+        if (lastQueryTime <= queryCutoff) {
+            lastQueryTime = now
+            return true
+        }
+        false
     }
     
     synchronized boolean isHealthy() {
