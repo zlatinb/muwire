@@ -51,6 +51,9 @@ MuWire is available as a Docker image.  For more information see the [Docker] pa
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
 
+## MuWire Tracker Daemon
+The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent trackig to MuWire.  For more info see the [Tracker] page.
+
 ## GPG Fingerprint
 
 ```
@@ -69,3 +72,4 @@ You can find the full key at https://keybase.io/zlatinb
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
 [Docker]: https://github.com/zlatinb/muwire/wiki/Docker
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
+[Tracker]: https://github.com/zlatinb/muwire/wiki/Tracker-Daemon
