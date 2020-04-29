@@ -52,7 +52,7 @@ MuWire is available as a Docker image.  For more information see the [Docker] pa
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
 
 ## MuWire Tracker Daemon
-The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent trackig to MuWire.  For more info see the [Tracker] page.
+The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent tracking to MuWire.  For more info see the [Tracker] page.
 
 ## GPG Fingerprint
 
