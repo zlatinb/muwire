@@ -90,6 +90,8 @@ class SwarmManager {
         }
         
         log.info("will ping $toPing")
+        
+        toPing.each { pinger.ping(it, now) }
     }
     
     private void query(Swarm swarm) {
@@ -132,9 +134,13 @@ class SwarmManager {
         swarms.get(infoHash)?.info()
     }
     
-    private static class HostAndIH {
-        private final Host host
-        private final InfoHash infoHash
+    void fail(HostAndIH target) {
+        swarms.get(target.infoHash)?.fail(target.host)
+    }
+    
+    public static class HostAndIH {
+        final Host host
+        final InfoHash infoHash
         HostAndIH(Host host, InfoHash infoHash) {
             this.host = host
             this.infoHash = infoHash

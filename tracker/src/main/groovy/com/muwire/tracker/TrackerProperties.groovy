@@ -25,5 +25,7 @@ class TrackerProperties {
         int pingInterval = 15
         /** how long to wait before declaring a host is dead, in minutes */
         int expiry = 60
+        /** how long to wait for a host to respond to a ping, in seconds */
+        int pingTimeout = 20
     }
 }
