@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -81,7 +82,7 @@ class SwarmManager {
         
         List<HostAndIH> toPing = new ArrayList<>()
         final int amount = trackerProperties.getSwarmParameters().getPingParallel()
-        final int pingCutoff = now - trackerProperties.getSwarmParameters().getPingInterval() * 60 * 1000L
+        final long pingCutoff = now - trackerProperties.getSwarmParameters().getPingInterval() * 60 * 1000L
         
         for(int i = 0; i < swarmList.size() && toPing.size() < amount; i++) {
             Swarm s = swarmList.get(i)
@@ -136,6 +137,14 @@ class SwarmManager {
     
     void fail(HostAndIH target) {
         swarms.get(target.infoHash)?.fail(target.host)
+    }
+    
+    void handleResponse(HostAndIH target, int code, Set<Persona> altlocs) {
+        Swarm swarm = swarms.get(target.infoHash)
+        swarm?.handleResponse(target.host, code)
+        altlocs.each { 
+            swarm?.add(it)
+        }
     }
     
     public static class HostAndIH {

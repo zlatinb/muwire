@@ -10,12 +10,15 @@ import org.springframework.stereotype.Component
 
 import com.muwire.core.Constants
 import com.muwire.core.Core
+import com.muwire.core.Persona
 
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 import net.i2p.client.I2PSession
 import net.i2p.client.I2PSessionMuxedListener
 import net.i2p.client.SendMessageOptions
+import net.i2p.client.datagram.I2PDatagramDissector
 import net.i2p.client.datagram.I2PDatagramMaker
 import net.i2p.data.Base64
 
@@ -89,7 +92,73 @@ class Pinger {
 
         @Override
         public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromport, int toport) {
-            // TODO Auto-generated method stub
+            if (proto != I2PSession.PROTO_DATAGRAM) {
+                log.warning("received unexpected protocol $proto")
+                return
+            }
+            
+            byte [] payload = session.receiveMessage(msgId)
+            def dissector = new I2PDatagramDissector()
+            try {
+                dissector.loadI2PDatagram(payload)
+                def sender = dissector.getSender()
+                
+                log.info("got a response from ${sender.toBase32()}")
+                
+                payload = dissector.getPayload()
+                def slurper = new JsonSlurper()
+                def json = slurper.parse(payload)
+                
+                if (json.type != "TrackerPong") {
+                    log.warning("unknown type ${json.type}")
+                    return
+                }
+                
+                if (json.me == null) {
+                    log.warning("sender persona missing")
+                    return
+                }
+                
+                Persona senderPersona = new Persona(new ByteArrayInputStream(Base64.decode(json.me)))
+                if (sender != senderPersona.getDestination()) {
+                    log.warning("persona in payload does not match sender ${senderPersona.getHumanReadableName()}")
+                    return
+                }
+                
+                if (json.uuid == null) {
+                    log.warning("uuid missing")
+                    return
+                }
+                
+                UUID uuid = UUID.fromString(json.uuid)
+                def ping = inFlight.remove(uuid)
+                
+                if (ping == null) {
+                    log.warning("no ping in progress for $uuid")
+                    return
+                }
+                
+                if (json.code == null) {
+                    log.warning("no code")
+                    return
+                }
+                
+                int code = json.code
+                
+                if (json.xHave != null)
+                    ping.target.host.xHave = json.xHave
+                
+                
+                Set<Persona> altlocs = new HashSet<>()
+                json.altlocs?.collect(altlocs,{ new Persona(new ByteArrayInputStream(Base64.decode(it))) })
+                    
+                log.info("For ${ping.target.infoHash} received code $code and altlocs ${altlocs.size()}")
+                
+                swarmManager.handleResponse(ping.target, code, altlocs)
+                
+            } catch (Exception e) {
+                log.log(Level.WARNING,"invalid datagram",e)
+            }
             
         }
 
