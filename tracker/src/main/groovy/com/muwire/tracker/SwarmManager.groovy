@@ -68,7 +68,8 @@ class SwarmManager {
     private void trackSwarms() {
         final long now = System.currentTimeMillis()
         final long expiryCutoff = now - trackerProperties.getSwarmParameters().getExpiry() * 60 * 1000L
-        swarms.values().each { it.expire(expiryCutoff) }
+        final int maxFailures = trackerProperties.getSwarmParameters().getMaxFailures()
+        swarms.values().each { it.expire(expiryCutoff, maxFailures) }
         final long queryCutoff = now - trackerProperties.getSwarmParameters().getQueryInterval() * 60 * 60 * 1000L
         swarms.values().each { 
             if (it.shouldQuery(queryCutoff, now))
@@ -136,6 +137,7 @@ class SwarmManager {
     }
     
     void fail(HostAndIH target) {
+        log.info("failing $target")
         swarms.get(target.infoHash)?.fail(target.host)
     }
     

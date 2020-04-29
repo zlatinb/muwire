@@ -27,5 +27,7 @@ class TrackerProperties {
         int expiry = 60
         /** how long to wait for a host to respond to a ping, in seconds */
         int pingTimeout = 20
+        /** Do not expire a host until it has failed this many times */
+        int maxFailures = 3
     }
 }

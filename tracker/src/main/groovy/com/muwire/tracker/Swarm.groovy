@@ -46,17 +46,17 @@ class Swarm {
     /**
      * @param cutoff expire hosts older than this
      */
-    synchronized void expire(long cutoff) {
-        doExpire(cutoff, seeds)
-        doExpire(cutoff, leeches)
-        doExpire(cutoff, unknown)
+    synchronized void expire(long cutoff, int maxFailures) {
+        doExpire(cutoff, maxFailures, seeds)
+        doExpire(cutoff, maxFailures, leeches)
+        doExpire(cutoff, maxFailures, unknown)
     }
     
-    private static void doExpire(long cutoff, Map<Persona,Host> map) {
+    private static void doExpire(long cutoff, int maxFailures, Map<Persona,Host> map) {
         for (Iterator<Persona> iter = map.keySet().iterator(); iter.hasNext();) {
             Persona p = iter.next()
             Host h = map.get(p)
-            if (h.isExpired(cutoff))
+            if (h.isExpired(cutoff, maxFailures))
                 iter.remove()
         }
     }
@@ -90,7 +90,8 @@ class Swarm {
         if (responder != h)
             log.warning("received a response mismatch from host $responder vs $h")
             
-        responder.lastResponded = System.currentTimeMillis()    
+        responder.lastResponded = System.currentTimeMillis()
+        responder.failures = 0    
         switch(code) {
             case 200: addSeed(responder); break
             case 206 : addLeech(responder); break;
@@ -103,6 +104,7 @@ class Swarm {
         Host h = inFlight.remove(failed.persona)
         if (h != failed)
             log.warning("failed a host that wasn't in flight $failed vs $h")
+        h.failures++
     }
     
     private void addSeed(Host h) {
@@ -163,17 +165,18 @@ class Swarm {
     public Info info() {
         List<String> seeders = seeds.keySet().collect { it.getHumanReadableName() }
         List<String> leechers = leeches.keySet().collect { it.getHumanReadableName() }
-        return new Info(seeders, leechers, unknown.size())
+        return new Info(seeders, leechers, unknown.size(), negative.size())
     }
     
     public static class Info {
         final List<String> seeders, leechers
-        final int unknown
+        final int unknown, negative
         
-        Info(List<String> seeders, List<String> leechers, int unknown) {
+        Info(List<String> seeders, List<String> leechers, int unknown, int negative) {
             this.seeders = seeders
             this.leechers = leechers
             this.unknown = unknown
+            this.negative = negative
         }
     }
 }

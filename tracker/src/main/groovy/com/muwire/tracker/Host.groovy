@@ -10,18 +10,19 @@ class Host {
     final Persona persona
     long lastPinged
     long lastResponded
+    int failures
     volatile String xHave
     
     Host(Persona persona) {
         this.persona = persona
     }
     
-    boolean isExpired(long cutoff) {
-        lastPinged > lastResponded && lastResponded <= cutoff 
+    boolean isExpired(long cutoff, int maxFailures) {
+        lastPinged > lastResponded && lastResponded <= cutoff && failures >= maxFailures 
     }
 
     @Override    
     public String toString() {
-        "Host:[${persona.getHumanReadableName()} lastPinged:$lastPinged lastResponded:$lastResponded xHave:$xHave]"
+        "Host:[${persona.getHumanReadableName()} lastPinged:$lastPinged lastResponded:$lastResponded failures:$failures xHave:$xHave]"
     }
 }
