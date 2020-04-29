@@ -129,21 +129,7 @@ class TrackerResponder {
                 def response = [:]
                 response.type = "TrackerPong"
                 response.me = me.toBase64()
-                
-                if (!muSettings.allowTracking) {
-                    response.code = 403
-                    respond(sender, response)
-                    return
-                }
-                
-                if (json.version != 1) {
-                    log.warning("unknown version $json.version")
-                    response.code = 400
-                    response.message = "I only support version 1"
-                    respond(sender,response)
-                    return
-                }
-                
+
                 if (json.infoHash == null) {
                     log.warning("infoHash missing")
                     return
@@ -163,6 +149,20 @@ class TrackerResponder {
                     uuids.put(uuid, System.currentTimeMillis())
                 }
                 response.uuid = json.uuid
+                                
+                if (!muSettings.allowTracking) {
+                    response.code = 403
+                    respond(sender, response)
+                    return
+                }
+                
+                if (json.version != 1) {
+                    log.warning("unknown version $json.version")
+                    response.code = 400
+                    response.message = "I only support version 1"
+                    respond(sender,response)
+                    return
+                }
                 
                 byte[] infoHashBytes = Base64.decode(json.infoHash)
                 InfoHash infoHash = new InfoHash(infoHashBytes)
