@@ -41,5 +41,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-web'
+
+    runtime 'javax.jws:jsr181-api:1.0-MR1'
 }
 
