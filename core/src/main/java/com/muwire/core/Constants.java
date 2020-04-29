@@ -17,5 +17,8 @@ public class Constants {
     
     public static final int MAX_COMMENT_LENGTH = 0x1 << 15;
     
-    public static final long MAX_QUERY_AGE = 5 * 60 * 1000L; 
+    public static final long MAX_QUERY_AGE = 5 * 60 * 1000L;
+    
+    public static final int UPDATE_PORT = 2;
+    public static final int TRACKER_PORT = 3;
 }

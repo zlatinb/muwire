@@ -10,7 +10,7 @@ import net.i2p.util.ConcurrentHashSet
 class Mesh {
     private final InfoHash infoHash
     private final Set<Persona> sources = new ConcurrentHashSet<>()
-    private final Pieces pieces
+    final Pieces pieces
 
     Mesh(InfoHash infoHash, Pieces pieces) {
         this.infoHash = infoHash

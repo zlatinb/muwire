@@ -59,6 +59,14 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getBrowseFiles()) out.write("checked"); %> name="browseFiles" value="true"></p></td>
 					</tr>
+					<tr>
+						<td>
+							<div class="tooltip"><%=Util._t("Allow tracking")%>
+								<span class="tooltiptext"><%=Util._t("Allow trackers to track your shared files?")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAllowTracking()) out.write("checked"); %> name="allowTracking" value="true"></p></td>
+					</tr>
 				</table>
 			</div>
 			<div class="configuration-section">

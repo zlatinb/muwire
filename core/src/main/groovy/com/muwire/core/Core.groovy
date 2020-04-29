@@ -85,6 +85,7 @@ import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
 import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.content.ContentManager
+import com.muwire.core.tracker.TrackerResponder
 
 import groovy.util.logging.Log
 import net.i2p.I2PAppContext
@@ -112,7 +113,7 @@ public class Core {
     final Properties i2pOptions
     final MuWireSettings muOptions
 
-    private final I2PSession i2pSession;
+    final I2PSession i2pSession;
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
@@ -136,6 +137,7 @@ public class Core {
     private final FeedClient feedClient
     private final WatchedDirectoryConverter watchedDirectoryConverter
     final WatchedDirectoryManager watchedDirectoryManager
+    private final TrackerResponder trackerResponder
 
     private final Router router
 
@@ -163,9 +165,9 @@ public class Core {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
 
             if (!i2pOptions.containsKey("inbound.nickname"))
-                i2pOptions["inbound.nickname"] = "MuWire"
+                i2pOptions["inbound.nickname"] = tunnelName
             if (!i2pOptions.containsKey("outbound.nickname"))
-                i2pOptions["outbound.nickname"] = "MuWire"
+                i2pOptions["outbound.nickname"] = tunnelName
         }
         if (!(i2pOptions.hasProperty("i2np.ntcp.port")
                 && i2pOptions.hasProperty("i2np.udp.port")
@@ -371,6 +373,9 @@ public class Core {
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)
+        
+        log.info("initializing tracker responder")
+        trackerResponder = new TrackerResponder(i2pSession, props, fileManager, downloadManager, meshManager, trustService, me)
 
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
@@ -450,6 +455,7 @@ public class Core {
         updateClient?.start()
         feedManager.start()
         feedClient.start()
+        trackerResponder.start()
     }
 
     public void shutdown() {
@@ -489,6 +495,8 @@ public class Core {
         feedManager.stop()
         log.info("shutting down feed client")
         feedClient.stop()
+        log.info("shutting down tracker responder")
+        trackerResponder.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
         log.info("killing i2p session")

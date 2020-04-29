@@ -1,0 +1,47 @@
+buildscript {
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.2.6.RELEASE'
+}
+
+apply plugin : 'application'
+apply plugin : 'io.spring.dependency-management'
+
+application {
+    mainClassName = 'com.muwire.tracker.Tracker'
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M',"-Dbuild.version=${project.version}"]
+    applicationName = 'mwtrackerd'
+}
+
+apply plugin : 'com.github.johnrengelman.shadow'
+
+springBoot {
+    buildInfo {
+        properties {
+            version = "${project.version}"
+            name = "mwtrackerd"
+        }
+    }
+}
+
+dependencies {
+    compile project(":core")
+    compile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.3'
+
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+
+    runtime 'javax.jws:jsr181-api:1.0-MR1'
+}
+
