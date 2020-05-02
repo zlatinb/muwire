@@ -58,9 +58,9 @@ public class DataUtil {
         if (header.length != 3)
             throw new IllegalArgumentException("header length $header.length");
 
-        return (((int)(header[0] & 0x7F)) << 16) |
-                (((int)(header[1] & 0xFF) << 8)) |
-                ((int)header[2] & 0xFF);
+        return ((header[0] & 0x7F) << 16) |
+                ((header[1] & 0xFF) << 8) |
+                (header[2] & 0xFF);
     }
 
     public static String readi18nString(byte [] encoded) {
@@ -174,7 +174,7 @@ public class DataUtil {
                 clean.setAccessible(true);
                 clean.invoke(cleaner.invoke(cb));
             } else {
-                Class unsafeClass;
+                Class<?> unsafeClass;
                 try {
                     unsafeClass = Class.forName("sun.misc.Unsafe");
                 } catch(Exception ex) {
