@@ -9,7 +9,7 @@
 <% 
 
 String pagetitle=Util._t("Browse Host");
-String helptext = Util._t("On this page you can browse the files shared by other MuWire users");
+String helptext = Util._t("Use this page to browse the files shared by other MuWire users.");
 
 String currentBrowse = null;
 if (request.getParameter("currentHost") != null) {
@@ -39,7 +39,7 @@ if (request.getParameter("currentHost") != null) {
 	    <aside>
 		<div class="menubox-divider"></div>
 		<div class="menubox">
-			<h2><%=Util._t("Enter a full MuWire id")%></h2>
+			<h2><%=Util._t("Enter a full MuWire ID")%></h2>
 			<form action="/MuWire/Browse" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="browse">
@@ -48,7 +48,7 @@ if (request.getParameter("currentHost") != null) {
 				  <input type="submit" value=<%=Util._t("Browse")%>>
 				  <div class="tooltip"><%=Util._t("Help")%>
 				  	<span class="tooltiptext">
-				  		<%=Util._t("Enter the full id of a MuWire user to see what files they are sharing")%>
+				  		<%=Util._t("Enter the full ID of a MuWire user to see what files they are sharing")%>
 				  	</span>
 				  </div>
 				</div>

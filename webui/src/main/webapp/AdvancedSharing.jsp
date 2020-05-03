@@ -6,7 +6,7 @@
 <% 
 
 String pagetitle=Util._t("Advanced Sharing"); 
-String helptext = Util._t("On this page you can configure advanced settings for each shared directory.");
+String helptext = Util._t("Use this page to configure advanced settings for each shared directory.");
 
 %>
 

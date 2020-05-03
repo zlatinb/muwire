@@ -5,8 +5,8 @@
 <% 
 
 String pagetitle=Util._t("Users"); 
-String helptext = Util._t("This page shows the users you have marked as Trusted or Distrusted.");
-helptext += "<br/>" + Util._t("You can subscribe to the trust lists of the users you trust and see who they trust or distrust in turn.");
+String helptext = Util._t("This page shows the users you have marked as Trusted or Distrusted.") +
+        "<br/>" + Util._t("You can subscribe to the trust lists of your Trusted users and see who they trust or distrust.");
 %>
 
 <html>

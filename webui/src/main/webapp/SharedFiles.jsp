@@ -5,10 +5,10 @@
 <% 
 
 String pagetitle= Util._t("Shared Files");
-String helptext = Util._t("Shared files are those files you decide to share with other MuWire users.");
-helptext += "<br/>" + Util._t("To share a file, enter it's path in the box to the left.");
-helptext += "<br/>" + Util._t("You can view your shared files as a tree or as a table.");
-helptext += "<br/>" + Util._t("The \"Actions\" menu lets you perform various actions on the shared file.");
+String helptext = Util._t("Shared files are those files you decide to share with other MuWire users.") +
+        "<br/>" + Util._t("To share a file, enter its path in the box to the left.") +
+        "<br/>" + Util._t("You can view your shared files as a tree or as a table.") +
+        "<br/>" + Util._t("The \"Actions\" menu lets you perform various actions on the shared file.");
 
 String viewAs = request.getParameter("viewAs");
 if (viewAs == null)
@@ -44,10 +44,9 @@ if (viewAs == null)
 				  <div class="menu-icon"></div>
 				  <input type="submit" value="<%=Util._t("Share")%>">
 				  <div class="tooltip"><%=Util._t("Help")%>
-				  	<span class="tooltiptext"><%=Util._t("Enter path to file or folder you wish to share.")%>
+				  	<span class="tooltiptext"><%=Util._t("Enter the full path for the file or folder to be shared.")%>
 				  		<br/>
-				  		<%=Util._t("When sharing files on network drives (like a NAS) please visit")%>
-				  		<a href="/MuWire/AdvancedSharing"><%=Util._t("Advanced Sharing")%></a>
+				  		<%=Util._t("When sharing files on network drives (like a NAS) please visit {0}Advanced Sharing{1}", "<a href=\"/MuWire/AdvancedSharing\">", "</a>")%>
 				  	</span>
 				  </div>
 				</div>

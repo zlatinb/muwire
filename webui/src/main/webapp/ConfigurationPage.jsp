@@ -12,7 +12,7 @@
 
 <% 
 String pagetitle=Util._t("Configuration");
-String helptext = Util._t("On this page you can change various MuWire options");
+String helptext = Util._t("Use this page to change MuWire options.");
 
 Core core = (Core) application.getAttribute("core");
 

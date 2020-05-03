@@ -7,7 +7,7 @@
 <% 
 
 String pagetitle=Util._t("MuWire Status");
-String helptext = Util._t("This page shows various internal MuWire metrics");
+String helptext = Util._t("This page shows internal MuWire metrics.");
  
 Core core = (Core) application.getAttribute("core");
 String buildNumber = (String)application.getAttribute("buildNumber");
