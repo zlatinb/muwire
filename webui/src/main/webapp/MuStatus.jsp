@@ -18,7 +18,9 @@ String buildNumber = (String)application.getAttribute("buildNumber");
 	<head>
 <%@ include file="css.jsi"%>
 <script src="js/status.js?<%=version%>" type="text/javascript"></script>
-
+<script>
+    openAccordion = 3;
+</script>
 	</head>
 	<body onload="initConnectionsCount(); initStatus();">
 <%@ include file="header.jsi"%>

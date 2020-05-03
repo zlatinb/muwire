@@ -16,7 +16,9 @@ String helptext = Util._t("Use this page to configure advanced settings for each
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
 <script src="js/tables.js?<%=version%> type="text/javascript"></script>
 <script src="js/advancedSharing.js?<%=version%>" type="text/javascript"></script>
-
+<script type="text/javascript">
+  openAccordion = 2;
+</script>
 	</head>
 	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initAdvancedSharing();">
 <%@ include file="header.jsi"%>
