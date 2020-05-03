@@ -14,7 +14,9 @@ String helptext = Util._t("This page shows the trust lists of the users you have
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
 <script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <script src="js/trustLists.js?<%=version%>" type="text/javascript"></script>
-
+<script type="text/javascript">
+  openAccordion = 1;
+</script>
 	</head>
 	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initTrustLists();">
 <%@ include file="header.jsi"%>

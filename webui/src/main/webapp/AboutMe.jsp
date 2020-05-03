@@ -25,6 +25,7 @@ function copyFullId() {
 	copyToClipboard("full-id")
 	alert("Full ID copied to clipboard")
 }
+openAccordion = 3;
 </script>
     </head>
     <body onload="initConnectionsCount();">

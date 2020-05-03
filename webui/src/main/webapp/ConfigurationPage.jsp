@@ -27,6 +27,9 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 <html>
     <head>
 <%@include file="css.jsi"%>
+<script type="text/javascript">
+  openAccordion = 2;
+</script>
     </head>
     <body onload="initConnectionsCount();">
 <%@include file="header.jsi"%>    	
