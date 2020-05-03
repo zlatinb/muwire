@@ -10,8 +10,8 @@
 <%
         String pagetitle=Util._t("Home");
         
-        String helptext = Util._t("On this page you can search for files shared by other MuWire users");
-        helptext += "<br/>" + Util._t("You can group the results by sender or by file");
+        String helptext = Util._t("Search for files shared by other MuWire users.") +
+                "<br/>" + Util._t("You can group the results by sender or by file.");
         
 	session.setAttribute("persona", persona);
 	session.setAttribute("version", version);

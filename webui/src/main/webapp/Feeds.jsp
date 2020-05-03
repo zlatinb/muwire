@@ -6,10 +6,10 @@
 <% 
 
 String pagetitle=Util._t("Feeds"); 
-String helptext = Util._t("Every MuWire user can have a file feed to which they can publish shared files of their choosing.  " +
-						"You can subscribe to the feeds of other users.  That is similar to following someone on a social network.");
-helptext +=  "<br/>" + Util._t("On this page you can view the file feeds of users you are subscribed to.  You can configure each feed " +
-						"separately with various options, and you can download the published files.");
+String helptext = Util._t("Every MuWire user can have a file feed to publish shared files of their choosing. " +
+                          "You can subscribe to the feeds of other users. This is similar to following someone on a social network.") +
+        "<br/>" + Util._t("On this page you can view the file feeds of users you are subscribed to. You can configure each feed " +
+			  "separately with various options, and you can download the published files.");
 
 %>
 
@@ -36,7 +36,7 @@ helptext +=  "<br/>" + Util._t("On this page you can view the file feeds of user
 				  <input type="submit" value=<%=Util._t("Subscribe")%>>
 				  <div class="tooltip"><%=Util._t("Help")%>
 				  	<span class="tooltiptext">
-				  		<%=Util._t("Enter the full id of a MuWire user to see what files they have published to their feed")%>
+				  		<%=Util._t("Enter the full ID of a MuWire user to see what files they have published to their feed")%>
 				  	</span>
 				  </div>
 				</div>

@@ -10,7 +10,7 @@
 
 <% 
 String pagetitle=Util._t("About Me");
-String helptext = Util._t("This page shows information about your MuWire identity");
+String helptext = Util._t("This page shows information about your MuWire identity.");
 
 Core core = (Core) application.getAttribute("core");
 
@@ -23,7 +23,7 @@ Core core = (Core) application.getAttribute("core");
 <script>
 function copyFullId() {
 	copyToClipboard("full-id")
-	alert("Full Id Copied To Clipboard")
+	alert("Full ID copied to clipboard")
 }
 </script>
     </head>
@@ -34,10 +34,10 @@ function copyFullId() {
 <%@include file="sidebar.jsi"%>    	
 	</aside>
 	<section class="main foldermain">
-		<p><%=Util._t("Your short MuWire id is {0}", core.getMe().getHumanReadableName())%></p>
-		<p><%=Util._t("Your full MuWire id is")%></p>
+		<p><%=Util._t("Your short MuWire ID: {0}", core.getMe().getHumanReadableName())%></p>
+		<p><%=Util._t("Your full MuWire ID:")%></p>
 		<p><textarea class="fullId" id="full-id" readOnly="true"><%=core.getMe().toBase64()%></textarea></p>
-		<p><a href='#' onclick="window.copyFullId();return false;"><%=Util._t("Copy To Clipboard")%></a></p>
+		<p><a href='#' onclick="window.copyFullId();return false;"><%=Util._t("Copy to clipboard")%></a></p>
 	</section>
     </body>
 </html>

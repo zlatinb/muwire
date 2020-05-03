@@ -5,7 +5,7 @@
 <% 
 
 String pagetitle=Util._t("Subscriptions"); 
-String helptext = Util._t("This page shows the trust lists of users whom you have subscribed to.");
+String helptext = Util._t("This page shows the trust lists of the users you have subscribed to.");
 %>
 
 <html>
