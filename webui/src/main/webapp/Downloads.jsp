@@ -12,7 +12,7 @@
 
 <% 
 String pagetitle=Util._t("Downloads");
-String helptext = Util._t("This page shows files which you are currently downloading from other MuWire users."); 
+String helptext = Util._t("This page shows the files you are currently downloading from other MuWire users."); 
 %>
 
 <html>
