@@ -7,6 +7,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
 import com.muwire.core.Core
+import com.muwire.core.files.directories.UISyncDirectoryEvent
 
 @ArtifactProviderFor(GriffonController)
 class AdvancedSharingController {
@@ -14,4 +15,25 @@ class AdvancedSharingController {
     AdvancedSharingModel model
     @MVCMember @Nonnull
     AdvancedSharingView view
+    
+    @ControllerAction
+    void configure() {
+        def wd = view.selectedWatchedDirectory()
+        if (wd == null)
+            return
+            
+        def params = [:]
+        params['core'] = model.core
+        params['directory'] = wd
+        mvcGroup.createMVCGroup("watched-directory",params)
+    }
+    
+    @ControllerAction
+    void sync() {
+        def wd = view.selectedWatchedDirectory()
+        if (wd == null)
+            return
+        def event = new UISyncDirectoryEvent(directory : wd.directory)
+        model.core.eventBus.publish(event)
+    }
 }
