@@ -144,6 +144,11 @@ class MainFrameView {
                                 mvcGroup.createMVCGroup("chat-monitor","chat-monitor",env)
                             }
                         })
+                        menuItem("Sign Tool", actionPerformed : {
+                            def env = [:]
+                            env['core'] = model.core
+                            mvcGroup.createMVCGroup("sign",env)
+                        })
                     }
                 }
                 borderLayout()

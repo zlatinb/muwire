@@ -136,4 +136,9 @@ mvcGroups {
         view = 'com.muwire.gui.WatchedDirectoryView'
         controller = 'com.muwire.gui.WatchedDirectoryController'
     }
+    'sign' {
+        model = 'com.muwire.gui.SignModel'
+        view = 'com.muwire.gui.SignView'
+        controller = 'com.muwire.gui.SignController'
+    }
 }
