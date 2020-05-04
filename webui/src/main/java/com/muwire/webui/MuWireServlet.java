@@ -42,7 +42,7 @@ public class MuWireServlet extends HttpServlet {
         if (client.needsMWInit()) {
             resp.sendRedirect("/MuWire/MuWire");
         } else {
-            if (client.getCore() == null) {
+            if (!client.isCoreLoaded()) {
                 resp.setContentType("text/html");
                 resp.setCharacterEncoding("UTF-8");
                 resp.getWriter().println("<html><head>\n" +

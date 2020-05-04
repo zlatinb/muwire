@@ -62,6 +62,7 @@ public class MuWireClient {
     private final File mwProps;
     
     private volatile Core core;
+    private volatile boolean coreLoaded;
     
     public MuWireClient(RouterContext ctx, String home, String version, ServletContext servletContext) {
         this.ctx = ctx;
@@ -94,7 +95,7 @@ public class MuWireClient {
         MuWireSettings settings = new MuWireSettings(props);
         Core core = new Core(settings, new File(home), version);
         setCore(core);
-        MWStarter starter = new MWStarter(core);
+        MWStarter starter = new MWStarter(core, this);
         starter.start();
     }
     
@@ -105,6 +106,8 @@ public class MuWireClient {
         core.shutdown();
         this.core = null;
     }
+    
+    
     
     public boolean needsMWInit() {
         return !mwProps.exists();
@@ -200,6 +203,14 @@ public class MuWireClient {
     
     public String getHome() {
         return home;
+    }
+    
+    void setCoreLoaded() {
+        coreLoaded = true;
+    }
+    
+    public boolean isCoreLoaded() {
+        return coreLoaded;
     }
     
     public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {

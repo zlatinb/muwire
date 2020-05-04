@@ -8,9 +8,11 @@ import net.i2p.router.RouterContext;
 
 class MWStarter extends Thread {
     private final Core core;
+    private final MuWireClient client;
     
-    MWStarter(Core core) {
+    MWStarter(Core core, MuWireClient client) {
         this.core = core;
+        this.client = client;
         setName("MW starter");
         setDaemon(true);
     }
@@ -27,6 +29,7 @@ class MWStarter extends Thread {
         }
         
         core.startServices();
+        client.setCoreLoaded();
         core.getEventBus().publish(new UILoadedEvent());
     }
 }
