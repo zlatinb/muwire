@@ -46,7 +46,7 @@ class Crawler {
         }
 
         if (!uuid.equals(currentUUID)) {
-            log.warn("uuid mismatch $uuid expected $currentUUID")
+            log.warning("uuid mismatch $uuid expected $currentUUID")
             hostPool.fail(host)
             return
         }
