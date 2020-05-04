@@ -9,4 +9,5 @@ dependencies {
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
     testCompile 'junit:junit:4.12'
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.15'
 }

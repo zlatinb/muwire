@@ -45,7 +45,7 @@ class HasherServiceTest {
         def hashed = listener.poll()
         assert hashed instanceof FileHashedEvent
         assert hashed.sharedFile.file == f.getCanonicalFile()
-        assert hashed.sharedFile.infoHash != null
+        assert hashed.sharedFile.root != null
         assert listener.isEmpty()
     }
 

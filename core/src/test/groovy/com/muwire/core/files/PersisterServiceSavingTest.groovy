@@ -2,6 +2,7 @@ package com.muwire.core.files
 
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import com.muwire.core.Destinations
@@ -16,6 +17,7 @@ import groovy.json.JsonSlurper
 import net.i2p.data.Base32
 import net.i2p.data.Base64
 
+@Ignore
 class PersisterServiceSavingTest {
 
     File f
