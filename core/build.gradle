@@ -1,4 +1,9 @@
-apply plugin : 'java-library'
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
 dependencies {
     api "net.i2p:i2p:${i2pVersion}"
     api "net.i2p:router:${i2pVersion}"
@@ -17,5 +22,17 @@ configurations {
         classes {
             artifact file: compileGroovy.destinationDir, builtBy: compileGroovy
         }
+    }
+}
+
+// publish core to local maven repo for sister projects
+publishing {
+    publications {
+        muCore(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
     }
 }
