@@ -1,13 +1,21 @@
-apply plugin : 'application'
-mainClassName = 'com.muwire.core.Core'
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+apply plugin : 'java-library'
 dependencies {
-    compile "net.i2p:i2p:${i2pVersion}"
-    compile "net.i2p:router:${i2pVersion}"
-    compile "net.i2p.client:mstreaming:${i2pVersion}"
-    compile "net.i2p.client:streaming:${i2pVersion}"
+    api "net.i2p:i2p:${i2pVersion}"
+    api "net.i2p:router:${i2pVersion}"
+    implementation "net.i2p.client:mstreaming:${i2pVersion}"
+    implementation "net.i2p.client:streaming:${i2pVersion}"
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.codehaus.groovy:groovy-all:2.4.15'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.codehaus.groovy:groovy-all:2.4.15'
+}
+
+
+// this is necessary because applying both groovy and java-library doesn't work well
+configurations {
+    apiElements.outgoing.variants {
+        classes {
+            artifact file: compileGroovy.destinationDir, builtBy: compileGroovy
+        }
+    }
 }
