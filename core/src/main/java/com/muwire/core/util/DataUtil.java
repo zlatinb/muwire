@@ -216,4 +216,11 @@ public class DataUtil {
         Signature sig = DSAEngine.getInstance().sign(payload, spk);
         return sig.getData();
     }
+    
+    public static boolean isValidName(String name) {
+        for (int i = 0; i < Constants.INVALID_NICKNAME_CHARS.length(); i++)
+            if (name.indexOf(Constants.INVALID_NICKNAME_CHARS.charAt(i)) >= 0)
+                return false;
+        return true;
+    }
 }

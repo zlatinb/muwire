@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.muwire.core.util.DataUtil;
+
 import net.i2p.crypto.DSAEngine;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -25,12 +27,15 @@ public class Persona {
     private volatile String base64;
     private volatile byte[] payload;
 
-    public Persona(InputStream personaStream) throws IOException, DataFormatException, InvalidSignatureException {
+    public Persona(InputStream personaStream) throws IOException, DataFormatException, InvalidSignatureException, InvalidNicknameException {
         version = (byte) (personaStream.read() & 0xFF);
         if (version != Constants.PERSONA_VERSION)
             throw new IOException("Unknown version "+version);
 
         name = new Name(personaStream);
+        if (!DataUtil.isValidName(name.name))
+            throw new InvalidNicknameException(name.name + " is not a valid nickname");
+        
         destination = Destination.create(personaStream);
         sig = new byte[SIG_LEN];
         DataInputStream dis = new DataInputStream(personaStream);
@@ -38,7 +43,7 @@ public class Persona {
         if (!verify(version, name, destination, sig))
             throw new InvalidSignatureException(getHumanReadableName() + " didn't verify");
     }
-
+    
     private static boolean verify(byte version, Name name, Destination destination, byte [] sig) 
     throws IOException, DataFormatException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

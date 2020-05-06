@@ -6,10 +6,12 @@ import net.i2p.util.SystemVersion
 
 import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
+import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.util.DataUtil
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -116,8 +118,8 @@ class Ready extends AbstractLifecycleHandler {
                         JOptionPane.WARNING_MESSAGE)
                 continue
             }
-            if (nickname.contains("@")) {
-                JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another",
+            if (!DataUtil.isValidName(nickname)) {
+                JOptionPane.showMessageDialog(null, "Nickname cannot contain any of ${Constants.INVALID_NICKNAME_CHARS} choose another",
                         "Select another nickname", JOptionPane.WARNING_MESSAGE)
                 continue
             }
