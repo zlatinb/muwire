@@ -9,6 +9,7 @@ import net.i2p.data.Base64
 
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.nio.charset.StandardCharsets
 
 import javax.annotation.Nonnull
 import javax.swing.JOptionPane
@@ -28,13 +29,7 @@ class SignController {
     @ControllerAction
     void sign() {
         String plain = view.plainTextArea.getText()
-        if (plain.length() > Constants.MAX_COMMENT_LENGTH) {
-            JOptionPane.showMessageDialog(null, "Text to sign is too long - ${plain.length()} bytes.  The maximum size is $Constants.MAX_COMMENT_LENGTH bytes",
-                "Text Too Long", JOptionPane.WARNING_MESSAGE)
-            return
-        }
-        
-        byte[] payload = DataUtil.encodei18nString(plain)
+        byte[] payload = plain.getBytes(StandardCharsets.UTF_8)
         def sig = DSAEngine.getInstance().sign(payload, core.spk)
         view.signedTextArea.setText(Base64.encode(sig.data))
     }
