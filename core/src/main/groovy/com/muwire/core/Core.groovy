@@ -169,8 +169,8 @@ public class Core {
             if (!i2pOptions.containsKey("outbound.nickname"))
                 i2pOptions["outbound.nickname"] = tunnelName
         }
-        if (!(i2pOptions.hasProperty("i2np.ntcp.port")
-                && i2pOptions.hasProperty("i2np.udp.port")
+        if (!(i2pOptions.containsKey("i2np.ntcp.port")
+                && i2pOptions.containsKey("i2np.udp.port")
         )) {
             Random r = new Random()
             int port = r.nextInt(60000) + 4000
