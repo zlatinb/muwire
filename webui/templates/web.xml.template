@@ -90,6 +90,11 @@
     <servlet-class>com.muwire.webui.AdvancedSharingServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.SignServlet</servlet-name>
+    <servlet-class>com.muwire.webui.SignServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -163,6 +168,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.AdvancedSharingServlet</servlet-name>
     <url-pattern>/AdvancedShare</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.SignServlet</servlet-name>
+    <url-pattern>/Sign</url-pattern>
 </servlet-mapping>
 
 __JASPER__

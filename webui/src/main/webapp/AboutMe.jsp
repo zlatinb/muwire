@@ -20,6 +20,7 @@ Core core = (Core) application.getAttribute("core");
     <head>
 <%@include file="css.jsi"%>
 <script src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script src="js/sign.js?<%=version%>" type ="text/javascript"></script>
 <script>
 function copyFullId() {
 	copyToClipboard("full-id")
@@ -35,10 +36,18 @@ openAccordion = 3;
 <%@include file="sidebar.jsi"%>    	
 	</aside>
 	<section class="main foldermain">
+		<h3><%=Util._t("MuWire ID")%></h3>
 		<p><%=Util._t("Your short MuWire ID: {0}", core.getMe().getHumanReadableName())%></p>
 		<p><%=Util._t("Your full MuWire ID:")%></p>
-		<p><textarea class="fullId" id="full-id" readOnly="true"><%=core.getMe().toBase64()%></textarea></p>
+		<p><textarea class="fullId" id="full-id" readonly><%=core.getMe().toBase64()%></textarea></p>
 		<p><a href='#' onclick="window.copyFullId();return false;"><%=Util._t("Copy to clipboard")%></a></p>
+		
+		<hr/>
+		<h3><%=Util._t("Sign Tool")%></h3>
+		<p><%=Util._t("Enter text to sign with your MuWire ID")%></p>
+		<p><textarea class="sign" id="sign"></textarea></p>
+		<p><a href='#' onclick="window.sign();return false;"><%=Util._t("Sign")%></a></p>
+		<div id="signed"></div>
 	</section>
     </body>
 </html>
