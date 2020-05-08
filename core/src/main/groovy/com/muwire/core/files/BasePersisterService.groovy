@@ -121,8 +121,13 @@ abstract class BasePersisterService extends Service{
         if (json.searchers != null) {
             json.searchers.each {
                 Persona searcher = null
-                if (it.searcher != null)
-                    searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
+                if (it.searcher != null) {
+                    try {
+                        searcher = new Persona(new ByteArrayInputStream(Base64.decode(it.searcher)))
+                    } catch (Exception ignore) {
+                        return 
+                    }
+                }
                 long timestamp = it.timestamp
                 String query = it.query
                 sf.hit(searcher, timestamp, query)
