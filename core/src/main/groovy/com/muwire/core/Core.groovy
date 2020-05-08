@@ -173,7 +173,7 @@ public class Core {
                 && i2pOptions.containsKey("i2np.udp.port")
         )) {
             Random r = new Random()
-            int port = r.nextInt(60000) + 4000
+            int port = 9151 + r.nextInt(1 + 30777 - 9151)  // this range matches what the i2p router would choose
             i2pOptions["i2np.ntcp.port"] = String.valueOf(port)
             i2pOptions["i2np.udp.port"] = String.valueOf(port)
             i2pOptionsFile.withOutputStream { i2pOptions.store(it, "") }
