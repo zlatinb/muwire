@@ -233,7 +233,7 @@ class ChatConnection implements ChatLink {
         daos.close()
         byte [] signed = baos.toByteArray()
         def spk = sender.destination.getSigningPublicKey()
-        def signature = new Signature(Constants.SIG_TYPE, sig)
+        def signature = new Signature(spk.getType(), sig)
         DSAEngine.getInstance().verifySignature(signature, signed, spk)
     }
     
