@@ -52,7 +52,7 @@ public class Persona {
         destination.writeBytes(baos);
         byte[] payload = baos.toByteArray();
         SigningPublicKey spk = destination.getSigningPublicKey();
-        Signature signature = new Signature(Constants.SIG_TYPE, sig);
+        Signature signature = new Signature(spk.getType(), sig);
         return DSAEngine.getInstance().verifySignature(signature, payload, spk);
     }
 

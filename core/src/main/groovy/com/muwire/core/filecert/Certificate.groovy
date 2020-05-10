@@ -105,7 +105,7 @@ class Certificate {
         
         byte [] payload = baos.toByteArray()
         SigningPublicKey spk = issuer.destination.getSigningPublicKey()
-        Signature signature = new Signature(Constants.SIG_TYPE, sig)
+        Signature signature = new Signature(spk.getType(), sig)
         DSAEngine.getInstance().verifySignature(signature, payload, spk)
     }
     
