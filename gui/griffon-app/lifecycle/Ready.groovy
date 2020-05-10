@@ -119,7 +119,8 @@ class Ready extends AbstractLifecycleHandler {
                 continue
             }
             if (!DataUtil.isValidName(nickname)) {
-                JOptionPane.showMessageDialog(null, "Nickname cannot contain any of ${Constants.INVALID_NICKNAME_CHARS} choose another",
+                JOptionPane.showMessageDialog(null, 
+                    "Nickname cannot contain any of ${Constants.INVALID_NICKNAME_CHARS} and must be no longer than ${Constants.MAX_NICKNAME_LENGTH} characters.  Choose another.",
                         "Select another nickname", JOptionPane.WARNING_MESSAGE)
                 continue
             }

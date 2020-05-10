@@ -21,7 +21,8 @@ public class InitServlet extends HttpServlet {
                 throw new Exception("Nickname cannot be blank");
             
             if (!DataUtil.isValidName(nickname))
-                throw new Exception("Nickname cannot contain any of " + Constants.INVALID_NICKNAME_CHARS);
+                throw new Exception("Nickname cannot contain any of " + Constants.INVALID_NICKNAME_CHARS +
+                        " and must be no longer than " + Constants.MAX_NICKNAME_LENGTH + " characters.");
             
             String downloadLocation = req.getParameter("download_location");
             if (downloadLocation == null)

@@ -218,6 +218,8 @@ public class DataUtil {
     }
     
     public static boolean isValidName(String name) {
+        if (name.length() > Constants.MAX_NICKNAME_LENGTH)
+            return false;
         for (int i = 0; i < Constants.INVALID_NICKNAME_CHARS.length(); i++)
             if (name.indexOf(Constants.INVALID_NICKNAME_CHARS.charAt(i)) >= 0)
                 return false;
