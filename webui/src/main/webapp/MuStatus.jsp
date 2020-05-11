@@ -17,7 +17,7 @@ String buildNumber = (String)application.getAttribute("buildNumber");
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script nonce="<%=cspNonce%>" src="js/status.js?<%=version%>" type="text/javascript"></script>
+<script src="js/status.js?<%=version%>" type="text/javascript"></script>
 <script nonce="<%=cspNonce%>" type="text/javascript">
     openAccordion = 3;
 </script>

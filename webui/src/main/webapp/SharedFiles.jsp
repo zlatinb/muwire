@@ -19,12 +19,10 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
-	<script nonce="<%=cspNonce%>" src="js/files.js?<%=version%>" type="text/javascript"></script>
+	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>
-	<script nonce="<%=cspNonce%>" src="js/filesTable.js?<%=version%>" type="text/javascript"></script>
+	<script src="js/filesTable.js?<%=version%>" type="text/javascript"></script>
 <% } %>
 
 	</head>

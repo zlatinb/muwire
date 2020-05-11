@@ -16,10 +16,8 @@ String helptext = Util._t("Every MuWire user can have a file feed to publish sha
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/certificates.js?<%=version%> type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%> type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/feeds.js?<%=version%>" type="text/javascript"></script>
+<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
+<script src="js/feeds.js?<%=version%>" type="text/javascript"></script>
 
 	</head>
 	<body>
