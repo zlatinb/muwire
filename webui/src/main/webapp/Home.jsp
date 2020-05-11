@@ -32,20 +32,23 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
-	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
-	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
-	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" src="js/certificates.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
+<% if (groupBy.equals("sender")) { %>
+		var bySender = true;
+<% } else { %>
+		var bySender = false;
+<% } %>
+	</script>
+	<script nonce="<%=cspNonce%>" src="js/search.js?<%=version%>" type="text/javascript"></script>
 <% if (request.getParameter("uuid") != null) {%>
-	<script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
 		uuid="<%=request.getParameter("uuid")%>"
 	</script>
 <% } %>
 	</head>
-<% if (groupBy.equals("sender")) { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender(); initCertificates();">
-<% } else { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupByFile(); initCertificates();">
-<% } %>
+		<body>
 <%@include file="header.jsi"%>
 		<aside>
 <%@include file="searchbox.jsi"%>    	

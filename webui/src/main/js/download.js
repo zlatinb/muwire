@@ -219,3 +219,7 @@ function initDownloads() {
 	setInterval(refreshDownloader, 3000)
 	setTimeout(refreshDownloader,1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initDownloads();
+}, true);

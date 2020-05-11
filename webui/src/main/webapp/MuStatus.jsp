@@ -17,12 +17,12 @@ String buildNumber = (String)application.getAttribute("buildNumber");
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/status.js?<%=version%>" type="text/javascript"></script>
-<script>
+<script nonce="<%=cspNonce%>" src="js/status.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
     openAccordion = 3;
 </script>
 	</head>
-	<body onload="initConnectionsCount(); initStatus();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

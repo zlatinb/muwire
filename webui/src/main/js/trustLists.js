@@ -371,3 +371,7 @@ function initTrustLists() {
 	setTimeout(fetchRevision, 1)
 	setInterval(fetchRevision, 3000)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initTrustLists();
+}, true);

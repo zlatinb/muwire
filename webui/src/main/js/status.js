@@ -25,3 +25,7 @@ function initStatus() {
 	setInterval(refreshStatus, 3000);
 	setTimeout(refreshStatus, 1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initStatus();
+}, true);

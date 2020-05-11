@@ -29,3 +29,7 @@ function initConnectionsCount() {
 	setInterval(refreshConnectionsCount, 3000);
 	setTimeout(refreshConnectionsCount, 1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initConnectionsCount();
+}, true);

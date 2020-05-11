@@ -141,7 +141,7 @@ function refreshTable() {
 	xmlhttp.send()
 }
 
-function initFiles() {
+function initFilesTable() {
 	setInterval(refreshStatus, 3000)
 	setTimeout(refreshStatus, 1)
 
@@ -239,3 +239,7 @@ function unpublish(path) {
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=unpublish&file=" + path)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFilesTable();
+}, true);

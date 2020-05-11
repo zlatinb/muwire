@@ -401,3 +401,7 @@ var itemsSortKey = "Name"
 var itemsSortOrder = "descending"
 
 var expandedComments = new Map()
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFeeds();
+}, true);

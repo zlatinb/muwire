@@ -31,7 +31,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
   openAccordion = 2;
 </script>
     </head>
-    <body onload="initConnectionsCount();">
+    <body>
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

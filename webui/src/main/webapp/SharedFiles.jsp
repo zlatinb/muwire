@@ -19,16 +19,16 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
-	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>
-	<script src="js/filesTable.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" src="js/filesTable.js?<%=version%>" type="text/javascript"></script>
 <% } %>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initFiles();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

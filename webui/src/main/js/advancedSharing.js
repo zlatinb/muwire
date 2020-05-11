@@ -151,3 +151,7 @@ var pathToDir = new Map()
 
 var sortKey = "Directory"
 var sortOrder = "descending"
+
+document.addEventListener("DOMContentLoaded", function() {
+   initAdvancedSharing();
+}, true);

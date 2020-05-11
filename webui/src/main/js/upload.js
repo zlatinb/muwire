@@ -85,3 +85,7 @@ function initUploads() {
 	setInterval(refreshUploads, 3000)
 	setTimeout(refreshUploads,1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initUploads();
+}, true);

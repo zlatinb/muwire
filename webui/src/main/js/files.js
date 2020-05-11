@@ -348,3 +348,7 @@ function unpublish(nodeId) {
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=unpublish&file=" + encodedPath)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFiles();
+}, true);
