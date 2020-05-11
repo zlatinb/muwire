@@ -537,7 +537,7 @@ function hideComment(id) {
 	expandedComments.delete(id)
 	
 	var commentDiv = document.getElementById("comment-" + id);
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var showLink = "<a href='#' onclick='window.showCommentBy" + refreshType + "(\"" + id + "\"); return false;'>" + _t("Show Comment") + "</a>";
 	var linkSpan = document.getElementById("comment-link-"+id);
@@ -559,7 +559,7 @@ function download(resultInfoHash) {
 
 function markTrusted(host) {
 	var linkSpan = document.getElementById("trusted-link-"+host)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("trusted-"+host)
 	
@@ -578,7 +578,7 @@ function markNeutral(host) {
 
 function markDistrusted(host) {
 	var linkSpan = document.getElementById("distrusted-link-"+host)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("distrusted-"+host)
 	
@@ -603,7 +603,7 @@ function submitDistrust(host) {
 
 function cancelTrust(host) {
 	var textAreaSpan = document.getElementById("trusted-" + host)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("trusted-link-"+host)
 	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
@@ -612,7 +612,7 @@ function cancelTrust(host) {
 
 function cancelDistrust(host) {
 	var textAreaSpan = document.getElementById("distrusted-" + host)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-"+host)
 	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
@@ -672,7 +672,7 @@ function viewCertificatesByFile(fileSenderB64, count) {
 			linkSpan.innerHTML = hideLink
 			
 			var fetchSpan = document.getElementById("certificates-" + fetch.divId)
-			fetchSpan.innerHTML = _t("Fetching Certificates")
+			fetchSpan.textContent = _t("Fetching Certificates")
 		}	
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
@@ -685,7 +685,7 @@ function hideCertificatesByFile(fileSenderB64, count) {
 	certificateFetches.delete(id)  // TODO: propagate cancel to core
 	
 	var fetchSpan = document.getElementById("certificates-" + id)
-	fetchSpan.innerHTML = ""
+	fetchSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("certificates-link-" + id)
 	var linkText
@@ -711,7 +711,7 @@ function viewCertificatesBySender(fileInfoHash, count) {
 			linkSpan.innerHTML = hideLink
 			
 			var fetchSpan = document.getElementById("certificates-" + fetch.divId)
-			fetchSpan.innerHTML = _t("Fetching Certificates")
+			fetchSpan.textContent = _t("Fetching Certificates")
 			
 		}
 	}
@@ -726,7 +726,7 @@ function hideCertificatesBySender(fileInfoHash, count) {
 	certificateFetches.delete(id) // TODO: propagate cancel to core
 	
 	var fetchSpan = document.getElementById("certificates-" + id)
-	fetchSpan.innerHTML = ""
+	fetchSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("certificates-link-" + id)
 	var linkText = _t("View {0} Certificates", count)
@@ -848,7 +848,7 @@ function refreshStatus() {
 			if (statuses.length > 0)
 				activeDiv.innerHTML = table.render()
 			else
-				activeDiv.innerHTML = ""
+				activeDiv.textContent = ""
 			
 			if (uuid != null) {
 				var newStatus = statusByUUID.get(uuid)
@@ -875,9 +875,9 @@ function stopSearch(searchUUID) {
 			if (searchUUID == uuid) {
 				uuid = null
 				var element = document.getElementById("topTable" + refreshType)
-				element.innerHTML = ""
+				element.textContent = ""
 				element = document.getElementById("bottomTable" + refreshType)
-				element.innerHTML = ""
+				element.textContent = ""
 			}
 			refreshStatus()
 		}

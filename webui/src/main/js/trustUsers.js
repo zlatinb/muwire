@@ -87,7 +87,7 @@ function subscribe(host) {
 
 function markTrusted(host) {
 	var linkSpan = document.getElementById("trusted-link-"+host)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("trusted-"+host)
 	
@@ -106,7 +106,7 @@ function markNeutral(host) {
 
 function markDistrusted(host) {
 	var linkSpan = document.getElementById("distrusted-link-"+host)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("distrusted-"+host)
 	
@@ -144,7 +144,7 @@ function publishTrust(host, reason, trust) {
 
 function cancelTrust(host) {
 	var textAreaSpan = document.getElementById("trusted-" + host)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("trusted-link-"+host)
 	var html = "<a href='#' onclick='markTrusted(\"" + host + "\"); return false;'>" + _t("Mark Trusted") + "</a>"
@@ -153,7 +153,7 @@ function cancelTrust(host) {
 
 function cancelDistrust(host) {
 	var textAreaSpan = document.getElementById("distrusted-" + host)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-"+host)
 	var html = "<a href='#' onclick='markDistrusted(\"" + host + "\"); return false;'>" + _t("Mark Distrusted") + "</a>"
@@ -202,7 +202,7 @@ function refreshDistrustedUsers() {
 			if (distrustedList.length > 0)
 				tableDiv.innerHTML = table.render()
 			else
-				tableDiv.innerHTML = ""
+				tableDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + distrustedUsersSortKey + "&order=" + distrustedUsersSortOrder
@@ -240,7 +240,7 @@ function refreshTrustedUsers() {
 			if (trustedList.length > 0)
 				tableDiv.innerHTML = table.render()
 			else
-				tableDiv.innerHTML = ""
+				tableDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + trustedUsersSortKey + "&order=" + trustedUsersSortOrder
