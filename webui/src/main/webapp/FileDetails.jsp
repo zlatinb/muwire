@@ -17,16 +17,16 @@ File file = Util.getFromPathElements(path);
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/tables.js?<%=version%> type="text/javascript"></script>
-<script src="js/fileDetails.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%> type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/fileDetails.js?<%=version%>" type="text/javascript"></script>
 
-<script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
 	path="<%=path%>"
 </script>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initFileDetails();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

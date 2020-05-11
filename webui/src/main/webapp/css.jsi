@@ -1,10 +1,22 @@
+<%
+
+   String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
+
+   response.setHeader("X-Frame-Options", "SAMEORIGIN");
+   // TODO after removing innterHTML: script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'
+   response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'");
+   response.setHeader("X-XSS-Protection", "1; mode=block");
+   response.setHeader("X-Content-Type-Options", "nosniff");
+   response.setHeader("Accept-Ranges", "none");
+   response.setHeader("Referrer-Policy", "no-referrer");
+%>
 <title>MuWire ${version}</title>
 <link href="i2pbote.css?${version}" rel="stylesheet" type="text/css">
 <link href="muwire.css?${version}" rel="stylesheet" type="text/css">
 <link rel="icon" type="image/png" href="images/muwire.png" />
-<script src="js/conncount.js?${version}" type="text/javascript"></script>
-<script src="js/translate.js?${version}" type="text/javascript"></script>
-<script src="js/accordion.js?${version}" type="text/javascript"></script>
-<script type="text/javascript">
+<script src="js/conncount.js?${version}" nonce="<%=cspNonce%>" type="text/javascript"></script>
+<script src="js/translate.js?${version}" nonce="<%=cspNonce%>" type="text/javascript"></script>
+<script src="js/accordion.js?${version}" nonce="<%=cspNonce%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
   var jsTranslations = '<%=Util.getJSTranslations()%>';
 </script>

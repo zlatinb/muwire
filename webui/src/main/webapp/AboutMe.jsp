@@ -19,9 +19,9 @@ Core core = (Core) application.getAttribute("core");
 <html>
     <head>
 <%@include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/sign.js?<%=version%>" type ="text/javascript"></script>
-<script>
+<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/sign.js?<%=version%>" type ="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
 function copyFullId() {
 	copyToClipboard("full-id")
 	alert("Full ID copied to clipboard")
@@ -29,7 +29,7 @@ function copyFullId() {
 openAccordion = 3;
 </script>
     </head>
-    <body onload="initConnectionsCount();">
+    <body>
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

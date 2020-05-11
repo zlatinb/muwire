@@ -208,3 +208,7 @@ function initCertificates() {
 	setInterval(refreshCertificates, 3000)
 	setTimeout(refreshCertificates, 1)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initCertificates();
+}, true);

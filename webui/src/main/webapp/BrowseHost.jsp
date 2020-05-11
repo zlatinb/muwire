@@ -22,19 +22,19 @@ if (request.getParameter("currentHost") != null) {
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/certificates.js?<%=version%> type="text/javascript"></script>
-<script src="js/tables.js?<%=version%> type="text/javascript"></script>
-<script src="js/browse.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/certificates.js?<%=version%> type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%> type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 <% if (currentBrowse != null) { %>
-	<script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
 		currentHost="<%=currentBrowse%>"
 	</script>
 <% } %>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse(); initCertificates();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

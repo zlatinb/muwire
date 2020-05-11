@@ -273,3 +273,7 @@ function initTrustUsers() {
 	setTimeout(fetchRevision, 1)
 	setInterval(fetchRevision, 3000)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initTrustUsers();
+}, true);

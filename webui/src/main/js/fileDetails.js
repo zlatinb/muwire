@@ -237,3 +237,7 @@ var downloadersSortKey = "Downloader"
 var downloadersSortOrder = "descending"
 var certificatesSortKey = "Name"
 var certificatesSortOrder = "descending"
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFileDetails();
+}, true);

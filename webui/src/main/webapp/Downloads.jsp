@@ -18,10 +18,10 @@ String helptext = Util._t("This page shows the files you are currently downloadi
 <html>
     <head>
 <%@include file="css.jsi"%>
-	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
-    <script src="js/download.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
+    <script nonce="<%=cspNonce%>" src="js/download.js?<%=version%>" type="text/javascript"></script>
     </head>
-    <body onload="initTranslate(jsTranslations); initConnectionsCount(); initDownloads();">
+    <body>
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

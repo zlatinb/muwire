@@ -318,3 +318,7 @@ function hideComment(infoHash) {
 	var commentSpan = document.getElementById("comment-"+infoHash)
 	commentSpan.innerHTML = ""
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initBrowse();
+}, true);

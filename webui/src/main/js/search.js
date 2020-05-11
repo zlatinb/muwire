@@ -908,3 +908,11 @@ function initGroupByFile() {
 	setInterval ( refreshStatus, 3000);
 	setTimeout ( refreshStatus, 1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (bySender) {
+       initGroupBySender();
+    } else {
+       initGroupByFile();
+    }
+}, true);
