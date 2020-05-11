@@ -113,14 +113,14 @@ function refreshStatus(noRefresh) {
 			
 			var count = xmlDoc.getElementsByTagName("Count")[0].childNodes[0].nodeValue
 			var countSpan = document.getElementById("count")
-			countSpan.innerHTML = count
+			countSpan.textContent = count
 			
 			var hashingSpan = document.getElementById("hashing")
 			var hashing = xmlDoc.getElementsByTagName("Hashing")
 			if (hashing != null && hashing.length == 1) {
-				hashingSpan.innerHTML = "Hashing "+hashing[0].childNodes[0].nodeValue
+				hashingSpan.textContent = "Hashing "+hashing[0].childNodes[0].nodeValue
 			} else
-				hashingSpan.innerHTML = "";
+				hashingSpan.textContent = "";
 				
 			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > treeRevision) {
@@ -264,7 +264,7 @@ function unshare(nodeId) {
 
 function showCommentForm(nodeId) {
 	var linkSpan = document.getElementById("comment-link-"+nodeId)
-	linkSpan.innerHTML=""
+	linkSpan.textContent=""
 	var commentDiv = document.getElementById("comment-"+nodeId)
 	
 	var node = nodesById.get(nodeId)
@@ -281,7 +281,7 @@ function showCommentForm(nodeId) {
 
 function cancelComment(nodeId) {
 	var commentDiv = document.getElementById("comment-"+nodeId)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var node = nodesById.get(nodeId)
 	node.updateDiv()

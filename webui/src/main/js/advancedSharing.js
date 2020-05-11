@@ -81,7 +81,7 @@ function refreshDirs() {
 			if (listOfDirs.length > 0)
 				dirsDiv.innerHTML = table.render()
 			else
-				dirsDiv.innerHTML = ""
+				dirsDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + sortKey + "&order=" + sortOrder
@@ -131,7 +131,7 @@ function configure(path) {
 
 function cancelConfig() {
 	var tableDiv = document.getElementById("dirConfig")
-	tableDiv.innerHTML = ""
+	tableDiv.textContent = ""
 }
 
 function sync(path) {

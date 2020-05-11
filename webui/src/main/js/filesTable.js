@@ -60,14 +60,14 @@ function refreshStatus() {
 			
 			var count = xmlDoc.getElementsByTagName("Count")[0].childNodes[0].nodeValue
 			var countSpan = document.getElementById("count")
-			countSpan.innerHTML = count
+			countSpan.textContent = count
 			
 			var hashingSpan = document.getElementById("hashing")
 			var hashing = xmlDoc.getElementsByTagName("Hashing")
 			if (hashing != null && hashing.length == 1) {
-				hashingSpan.innerHTML = _t("Hashing") + " " +hashing[0].childNodes[0].nodeValue
+				hashingSpan.textContent = _t("Hashing") + " " +hashing[0].childNodes[0].nodeValue
 			} else
-				hashingSpan.innerHTML = "";
+				hashingSpan.textContent = "";
 				
 			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > tableRevision) {
@@ -133,7 +133,7 @@ function refreshTable() {
 			if (filesList.length > 0 )
 				tableDiv.innerHTML = table.render()
 			else
-				tableDiv.innerHTML = ""
+				tableDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + sortKey + "&order=" + sortOrder
@@ -164,7 +164,7 @@ function unshare(fileId) {
 
 function showCommentForm(nodeId) {
 	var linkSpan = document.getElementById("comment-link-"+nodeId)
-	linkSpan.innerHTML=""
+	linkSpan.textContent=""
 	var commentDiv = document.getElementById("comment-"+nodeId)
 	
 	var node = filesByPath.get(nodeId)
@@ -181,7 +181,7 @@ function showCommentForm(nodeId) {
 
 function cancelComment(nodeId) {
 	var commentDiv = document.getElementById("comment-"+nodeId)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var commentLink = new Link(_t("Comment"), "showCommentForm", [nodeId])
 	

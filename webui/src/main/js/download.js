@@ -89,7 +89,7 @@ function cancelDownload(infoHash) {
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var downloadSpan = document.getElementById("download-"+infoHash);
-			downloadSpan.innerHTML = "";
+			downloadSpan.textContent = "";
 			refreshDownloader();
 		}
 	}
@@ -179,11 +179,11 @@ function refreshDownloader() {
 				var clearLink = new Link(_t("Clear Finished"), "clear", ["ignored"])
 				clearDiv.innerHTML = clearLink.render()
 			} else {
-				downloadsDiv.innerHTML = ""
-				clearDiv.innerHTML = ""
+				downloadsDiv.textContent = ""
+				clearDiv.textContent = ""
 				downloader = null
 				var downloadDetailsDiv = document.getElementById("downloadDetails");
-				downloadDetailsDiv.innerHTML = ""
+				downloadDetailsDiv.textContent = ""
 			}
 			if (downloader != null)
 				updateDownloader(downloader);

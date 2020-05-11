@@ -195,7 +195,7 @@ function hideCertificateComment(divId, base64) {
 	linkDiv.innerHTML = link
 	
 	var commentDiv = document.getElementById("certificate-comment-" + divId + "_" + base64)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 }
 
 function refreshCertificates() {

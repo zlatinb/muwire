@@ -164,18 +164,18 @@ function refreshFeeds() {
 			if (listOfFeeds.length > 0)
 				feedsDiv.innerHTML = table.render()
 			else
-				feedsDiv.innerHTML = ""
+				feedsDiv.textContent = ""
 				
 			if (currentFeed != null) {
 				var updatedFeed = feeds.get(currentFeed)
 				if (updatedFeed == null) {
 					currentFeed = null
-					document.getElementById("itemsTable").innerHTML = ""
+					document.getElementById("itemsTable").textContent = ""
 					cancelConfig()
 				} else if (updatedFeed.revision > currentFeed.revision)
 					displayFeed(currentFeed)
 			} else
-				document.getElementById("itemsTable").innerHTML = ""
+				document.getElementById("itemsTable").textContent = ""
 			
 		}
 	}
@@ -215,7 +215,7 @@ function displayFeed(feed) {
 			if (items.length > 0)
 				itemsDiv.innerHTML = table.render()
 			else
-				itemsDiv.innerHTML = ""
+				itemsDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + itemsSortKey + "&order=" + itemsSortOrder
@@ -307,7 +307,7 @@ function configure(publisher) {
 
 function cancelConfig() {
 	var tableDiv = document.getElementById("feedConfig")
-	tableDiv.innerHTML = ""
+	tableDiv.textContent = ""
 }
 
 function showComment(infoHash) {
@@ -328,7 +328,7 @@ function hideComment(infoHash) {
 	expandedComments.delete(infoHash)
 	
 	var commentDiv = document.getElementById("comment-" + infoHash);
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var showLink = new Link(_t("Show Comment"), "showComment", [infoHash])
 	var linkSpan = document.getElementById("comment-link-" + infoHash);
@@ -347,7 +347,7 @@ function showCertificates(hostB64, infoHash) {
 			hideLinkSpan.innerHTML = hideLink.render()
 			
 			var certSpan = document.getElementById("certificates-" + fetch.divId)
-			certSpan.innerHTML = _t("Fetching Certificates")
+			certSpan.textContent = _t("Fetching Certificates")
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
@@ -360,7 +360,7 @@ function hideCertificates(hostB64, infoHash) {
 	certificateFetches.delete(id)
 	
 	var certSpan = document.getElementById("certificates-" + id)
-	certSpan.innerHTML = ""
+	certSpan.textContent = ""
 	
 	var item = itemsByInfoHash.get(infoHash)
 	var showLinkText

@@ -16,8 +16,8 @@ function refreshConnectionsCount() {
 			    image = "NotStarted.png";
 			connectionIcon.innerHTML = "<img src=\"images/" + image + "\" alt=\"\">";
 		  } else {
-			connectionCountSpan.innerHTML = _t("Down");
-			connectionIcon.innerHTML = "";
+			connectionCountSpan.textContent = _t("Down");
+			connectionIcon.textContent = "";
 		  }
 		}
 	}
