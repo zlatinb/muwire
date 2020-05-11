@@ -32,8 +32,7 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
-	<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
-	<script nonce="<%=cspNonce%>" src="js/certificates.js?<%=version%>" type="text/javascript"></script>
+	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
 	<script nonce="<%=cspNonce%>" type="text/javascript">
 <% if (groupBy.equals("sender")) { %>
 		var bySender = true;
@@ -41,7 +40,7 @@
 		var bySender = false;
 <% } %>
 	</script>
-	<script nonce="<%=cspNonce%>" src="js/search.js?<%=version%>" type="text/javascript"></script>
+	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 <% if (request.getParameter("uuid") != null) {%>
 	<script nonce="<%=cspNonce%>" type="text/javascript">
 		uuid="<%=request.getParameter("uuid")%>"

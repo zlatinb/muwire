@@ -12,10 +12,8 @@ String helptext = Util._t("This page shows the users you have marked as Trusted 
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%>" type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/trustUsers.js?<%=version%>" type="text/javascript"></script>
-<script type="text/javascript">
+<script src="js/trustUsers.js?<%=version%>" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
   openAccordion = 1;
 </script>
 	</head>

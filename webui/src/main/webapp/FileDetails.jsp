@@ -17,9 +17,7 @@ File file = Util.getFromPathElements(path);
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script nonce="<%=cspNonce%>" src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/tables.js?<%=version%> type="text/javascript"></script>
-<script nonce="<%=cspNonce%>" src="js/fileDetails.js?<%=version%>" type="text/javascript"></script>
+<script src="js/fileDetails.js?<%=version%>" type="text/javascript"></script>
 
 <script nonce="<%=cspNonce%>" type="text/javascript">
 	path="<%=path%>"
