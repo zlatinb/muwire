@@ -33,7 +33,6 @@ public class Util {
         _x("About Me"),
         _x("Actions"),
         _x("Active Sources"),
-        _x("Auto-watch directory for changes using operating system"),
         _x("Browse"),
         _x("Browsing"),
         _x("Cancel"),
@@ -59,7 +58,6 @@ public class Util {
         _x("Downloaded Pieces"),
         _x("Downloader"),
         _x("Downloading"),
-        _x("Enter a full MuWire id"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
         _x("Failing Hosts"),
@@ -85,6 +83,7 @@ public class Util {
         _x("Mark Distrusted"),
         _x("Mark Neutral"),
         _x("Mark Trusted"),
+        _x("Monitor directory for changes"),
         _x("MuWire Status"),
         _x("must be greater than zero"),
         _x("Name"),
@@ -143,8 +142,6 @@ public class Util {
         _x("User"),
         _x("View 1 Certificate"),
         _x("View {0} Certificates"),
-        _x("Your full MuWire id is"),
-        _x("Your short MuWire id is {0}"),
         _x("Your Trust"),
         _x("{0}% of piece")
     };
