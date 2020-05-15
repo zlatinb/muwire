@@ -29,7 +29,7 @@ class SignController {
     @ControllerAction
     void sign() {
         String plain = view.plainTextArea.getText()
-        byte[] payload = plain.getBytes(StandardCharsets.UTF_8)
+        byte[] payload = plain.trim().getBytes(StandardCharsets.UTF_8)
         def sig = DSAEngine.getInstance().sign(payload, core.spk)
         view.signedTextArea.setText(Base64.encode(sig.data))
     }

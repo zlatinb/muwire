@@ -32,7 +32,7 @@ public class SignServlet extends HttpServlet {
             return;
         }
         
-        byte [] payload = text.getBytes(StandardCharsets.UTF_8);
+        byte [] payload = text.trim().getBytes(StandardCharsets.UTF_8);
         Signature sig = DSAEngine.getInstance().sign(payload, core.getSpk());
         
         String response = Base64.encode(sig.getData());
