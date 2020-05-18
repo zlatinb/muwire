@@ -32,22 +32,14 @@ class OptionsController {
 
         def i2pProps = core.i2pOptions
 
-        text = view.inboundLengthField.text
-        model.inboundLength = text
-        i2pProps["inbound.length"] = text
-
-        text = view.inboundQuantityField.text
-        model.inboundQuantity = text
-        i2pProps["inbound.quantity"] = text
-
-        text = view.outboundQuantityField.text
-        model.outboundQuantity = text
-        i2pProps["outbound.quantity"] = text
-
-        text = view.outboundLengthField.text
-        model.outboundLength = text
-        i2pProps["outbound.length"] = text
-
+        int tunnelLength = view.tunnelLengthSlider.value
+        i2pProps["inbound.length"] = String.valueOf(tunnelLength)
+        i2pProps["outbound.length"] = String.valueOf(tunnelLength)
+        
+        int tunnelQuantity = view.tunnelQuantitySlider.value
+        i2pProps["inbound.quantity"] = String.valueOf(tunnelQuantity)
+        i2pProps["outbound.quantity"] = String.valueOf(tunnelQuantity)
+        
         if (settings.embeddedRouter) {
             text = view.i2pNTCPPortField.text
             model.i2pNTCPPort = text

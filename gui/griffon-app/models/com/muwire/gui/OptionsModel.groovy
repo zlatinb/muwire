@@ -25,10 +25,8 @@ class OptionsModel {
     @Observable boolean storeSearchHistory
 
     // i2p options
-    @Observable String inboundLength
-    @Observable String inboundQuantity
-    @Observable String outboundLength
-    @Observable String outboundQuantity
+    @Observable int tunnelLength
+    @Observable int tunnelQuantity
     @Observable String i2pUDPPort
     @Observable String i2pNTCPPort
 
@@ -90,10 +88,8 @@ class OptionsModel {
         uploadSlotsPerUser = settings.uploadSlotsPerUser
 
         Core core = application.context.get("core")
-        inboundLength = core.i2pOptions["inbound.length"]
-        inboundQuantity = core.i2pOptions["inbound.quantity"]
-        outboundLength = core.i2pOptions["outbound.length"]
-        outboundQuantity = core.i2pOptions["outbound.quantity"]
+        tunnelLength = Math.max(Integer.parseInt(core.i2pOptions["inbound.length"]), Integer.parseInt(core.i2pOptions['outbound.length']))
+        tunnelQuantity = Math.max(Integer.parseInt(core.i2pOptions["inbound.quantity"]), Integer.parseInt(core.i2pOptions['outbound.quantity']))
         i2pUDPPort = core.i2pOptions["i2np.udp.port"]
         i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
 
