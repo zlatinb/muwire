@@ -165,9 +165,9 @@ public class Core {
             i2pOptionsFile.withInputStream { i2pOptions.load(it) }
 
             if (!i2pOptions.containsKey("inbound.nickname"))
-                i2pOptions["inbound.nickname"] = tunnelName
+                i2pOptions["inbound.nickname"] = "MuWire"
             if (!i2pOptions.containsKey("outbound.nickname"))
-                i2pOptions["outbound.nickname"] = tunnelName
+                i2pOptions["outbound.nickname"] = "MuWire"
         }
         if (!(i2pOptions.containsKey("i2np.ntcp.port")
                 && i2pOptions.containsKey("i2np.udp.port")
