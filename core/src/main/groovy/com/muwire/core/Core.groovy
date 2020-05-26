@@ -178,6 +178,8 @@ public class Core {
             i2pOptions["i2np.udp.port"] = String.valueOf(port)
             i2pOptionsFile.withOutputStream { i2pOptions.store(it, "") }
         }
+        
+        i2pOptions['i2cp.leaseSetEncType']='4,0'
 
         if (!props.embeddedRouter) {
             if (!(I2PAppContext.getGlobalContext() instanceof RouterContext)) {
