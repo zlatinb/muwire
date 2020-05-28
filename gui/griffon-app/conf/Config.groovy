@@ -141,4 +141,9 @@ mvcGroups {
         view = 'com.muwire.gui.SignView'
         controller = 'com.muwire.gui.SignController'
     }
+    'wizard' {
+        model = 'com.muwire.gui.wizard.WizardModel'
+        view = 'com.muwire.gui.wizard.WizardView'
+        controller = 'com.muwire.gui.wizard.WizardController'
+    }
 }

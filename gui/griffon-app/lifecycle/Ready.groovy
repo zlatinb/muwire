@@ -54,27 +54,41 @@ class Ready extends AbstractLifecycleHandler {
         } else {
             log.info("creating new properties")
             props = new MuWireSettings()
-            props.incompleteLocation = new File(home, "incompletes")
-            props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
-            props.updateType = System.getProperty("updateType","jar")
-            props.setNickname(selectNickname())
-
-
-            def portableDownloads = System.getProperty("portable.downloads")
-            if (portableDownloads != null) {
-                props.downloadLocation = new File(portableDownloads)
-            } else {
-                def chooser = new JFileChooser()
-                chooser.setFileHidingEnabled(false)
-                chooser.setDialogTitle("Select a directory where downloads will be saved")
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-                int rv = chooser.showOpenDialog(null)
-                if (rv != JFileChooser.APPROVE_OPTION) {
-                    JOptionPane.showMessageDialog(null, "MuWire will now exit")
-                    System.exit(0)
-                }
-                props.downloadLocation = chooser.getSelectedFile()
-            }
+            boolean embeddedRouterAvailable = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
+            
+            def parent = application.windowManager.findWindow("event-list")
+            Properties i2pProps = new Properties()
+            
+            def params = [:]
+            params['parent'] = parent
+            params['embeddedRouterAvailable'] = embeddedRouterAvailable
+            params['muSettings'] = props
+            params['i2pProps'] = i2pProps
+            
+            application.mvcGroupManager.createMVCGroup("wizard", params)
+                        
+            
+//            props.incompleteLocation = new File(home, "incompletes")
+//            props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
+//            props.updateType = System.getProperty("updateType","jar")
+//            props.setNickname(selectNickname())
+//
+//
+//            def portableDownloads = System.getProperty("portable.downloads")
+//            if (portableDownloads != null) {
+//                props.downloadLocation = new File(portableDownloads)
+//            } else {
+//                def chooser = new JFileChooser()
+//                chooser.setFileHidingEnabled(false)
+//                chooser.setDialogTitle("Select a directory where downloads will be saved")
+//                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+//                int rv = chooser.showOpenDialog(null)
+//                if (rv != JFileChooser.APPROVE_OPTION) {
+//                    JOptionPane.showMessageDialog(null, "MuWire will now exit")
+//                    System.exit(0)
+//                }
+//                props.downloadLocation = chooser.getSelectedFile()
+//            }
 
             propsFile.withPrintWriter("UTF-8", {
                 props.write(it)
