@@ -31,6 +31,7 @@ class WizardModel {
             steps << new EmbeddedRouterStep()
         else
             steps << new ExternalRouterStep()
+        steps << new TunnelStep()
         steps << new LastStep(embeddedRouterAvailable)
         
         currentStep = 0
