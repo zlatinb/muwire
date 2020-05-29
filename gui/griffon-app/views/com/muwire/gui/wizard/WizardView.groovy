@@ -49,6 +49,10 @@ class WizardView {
     }
     
     void updateLayout() {
+        model.previousButtonEnabled = model.currentStep > 0
+        model.nextButtonEnabled = model.steps.size() > (model.currentStep + 1)
+        model.finishButtonEnabled = model.steps.size() == (model.currentStep + 1)
+        
         String constraints = model.steps[model.currentStep].getConstraint()
         def cardsPanel = builder.getVariable("cards-panel")
         cardsPanel.getLayout().show(cardsPanel, constraints)

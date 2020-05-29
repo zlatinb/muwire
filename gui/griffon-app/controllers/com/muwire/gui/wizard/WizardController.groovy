@@ -17,19 +17,17 @@ class WizardController {
     @ControllerAction
     void previous() {
         model.currentStep--
-        recalcButtons()
         view.updateLayout()
     }
     
     @ControllerAction
     void next() {
         def errors = model.steps[model.currentStep].validate()
-        if (errors) {
+        if (errors != null && !errors.isEmpty()) {
             String errorMessage = String.join("\n", errors)
             JOptionPane.showMessageDialog(model.parent, errorMessage, "Invalid Input", JOptionPane.ERROR_MESSAGE)
         } else {
             model.currentStep++
-            recalcButtons()
             view.updateLayout()
         }
     }
@@ -47,11 +45,5 @@ class WizardController {
     void cancel() {
         model.finished['applied'] = false
         view.hide()
-    }
-    
-    private void recalcButtons() {
-        model.previousButtonEnabled = model.currentStep > 0
-        model.nextButtonEnabled = model.steps.size() > (model.currentStep + 1)
-        model.finishButtonEnabled = model.steps.size() == (model.currentStep + 1)
     }
 }
