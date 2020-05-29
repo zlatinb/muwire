@@ -14,6 +14,7 @@ class WizardModel {
     boolean embeddedRouterAvailable
     MuWireSettings muSettings
     Properties i2pProps
+    def finished
     
     final List<WizardStep> steps = [new NicknameStep(),
                                     new DirectoriesStep()]

@@ -35,9 +35,15 @@ class WizardView {
                 }
             }   
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Previous", enabled : bind {model.previousButtonEnabled}, previousAction)
-                button(text : "Next", enabled : bind {model.nextButtonEnabled}, nextAction)
-                button(text : "Finish", enabled : bind {model.finishButtonEnabled}, finishAction)
+                gridLayout(rows:1, cols:2)
+                panel {
+                    button(text : "Cancel", cancelAction)
+                }
+                panel {
+                    button(text : "Previous", enabled : bind {model.previousButtonEnabled}, previousAction)
+                    button(text : "Next", enabled : bind {model.nextButtonEnabled}, nextAction)
+                    button(text : "Finish", enabled : bind {model.finishButtonEnabled}, finishAction)
+                }
             } 
         }
     }
@@ -59,5 +65,10 @@ class WizardView {
             }
         })
         dialog.show()
+    }
+    
+    void hide() {
+        dialog.setVisible(false)
+        mvcGroup.destroy()
     }
 }

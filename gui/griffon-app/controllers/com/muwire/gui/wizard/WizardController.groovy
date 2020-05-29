@@ -36,7 +36,17 @@ class WizardController {
     
     @ControllerAction
     void finish() {
-        
+        model.steps.each { 
+            it.apply(model.muSettings, model.i2pProps)
+        }
+        model.finished['applied'] = true
+        view.hide()
+    }
+    
+    @ControllerAction
+    void cancel() {
+        model.finished['applied'] = false
+        view.hide()
     }
     
     private void recalcButtons() {

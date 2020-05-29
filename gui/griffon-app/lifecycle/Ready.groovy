@@ -64,8 +64,15 @@ class Ready extends AbstractLifecycleHandler {
             params['embeddedRouterAvailable'] = embeddedRouterAvailable
             params['muSettings'] = props
             params['i2pProps'] = i2pProps
+            def finished = [:]
+            params['finished'] = finished
             
             application.mvcGroupManager.createMVCGroup("wizard", params)
+            
+            if (!finished['applied']) {
+                JOptionPane.showMessageDialog(parent, "MuWire will now exit")
+                System.exit(0)
+            }
                         
             
 //            props.incompleteLocation = new File(home, "incompletes")
