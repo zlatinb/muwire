@@ -46,8 +46,6 @@ class Ready extends AbstractLifecycleHandler {
             propsFile.withReader("UTF-8", {
                 props.load(it)
             })
-            if (!props.containsKey("nickname"))
-                props.setProperty("nickname", selectNickname())
             props = new MuWireSettings(props)
             if (props.incompleteLocation == null)
                 props.incompleteLocation = new File(home, "incompletes")
@@ -106,33 +104,6 @@ class Ready extends AbstractLifecycleHandler {
                     "Can't connect to I2P router", JOptionPane.WARNING_MESSAGE)
             System.exit(0)
         }
-    }
-    
-    private String selectNickname() {
-        String nickname
-        while (true) {
-            nickname = JOptionPane.showInputDialog(null,
-                    "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
-                    "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
-                    if (nickname == null) {
-                        JOptionPane.showMessageDialog(null, "MuWire cannot start without a nickname and will now exit", JOptionPane.PLAIN_MESSAGE)
-                        System.exit(0)
-                    }
-            if (nickname.trim().length() == 0) {
-                JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
-                        JOptionPane.WARNING_MESSAGE)
-                continue
-            }
-            if (!DataUtil.isValidName(nickname)) {
-                JOptionPane.showMessageDialog(null, 
-                    "Nickname cannot contain any of ${Constants.INVALID_NICKNAME_CHARS} and must be no longer than ${Constants.MAX_NICKNAME_LENGTH} characters.  Choose another.",
-                        "Select another nickname", JOptionPane.WARNING_MESSAGE)
-                continue
-            }
-            nickname = nickname.trim()
-            break
-        }
-        nickname
     }
 }
 
