@@ -36,14 +36,28 @@ class DirectoriesStep extends WizardStep {
 
     @Override
     protected List<String> validate() {
-        // TODO Auto-generated method stub
-        return null
+        def rv = []
+        if (!canWrite(downloadLocationField.text))
+            rv << "Download location not writeable"
+        if (!canWrite(incompleteLocationField.text))
+            rv << "Incomplete location not writeable"
+        rv
+    }
+    
+    private static boolean canWrite(String location) {
+        File f = new File(location)
+        if (f.exists())
+            return f.isDirectory() && f.canWrite()
+        canWrite(f.getParentFile().getAbsolutePath())
     }
 
     @Override
     protected void apply(MuWireSettings muSettings, Properties i2pSettings) {
-        // TODO Auto-generated method stub
-
+        muSettings.downloadLocation = new File(downloadLocationField.text)
+        muSettings.incompleteLocation = new File(incompleteLocationField.text)
+        
+        muSettings.downloadLocation.mkdirs()
+        muSettings.incompleteLocation.mkdirs()
     }
     
     def showDownloadChooser = {
