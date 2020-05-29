@@ -17,7 +17,8 @@ class WizardModel {
     def finished
     
     final List<WizardStep> steps = [new NicknameStep(),
-                                    new DirectoriesStep()]
+                                    new DirectoriesStep(),
+                                    new LastStep(embeddedRouterAvailable)]
     int currentStep
     
     @Observable boolean finishButtonEnabled
