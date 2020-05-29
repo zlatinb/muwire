@@ -14,9 +14,10 @@ class LastStep extends WizardStep {
     @Override
     protected void buildUI(FactoryBuilderSupport builder) {
         builder.panel(constraints: getConstraint()) {
-            label("The wizard is complete.  Press \"Finish\" to launch MuWire.")
+            gridBagLayout()
+            label(text: "The wizard is complete.  Press \"Finish\" to launch MuWire.", constraints : gbc(gridx: 0, gridy: 0))
             if (embeddedRouterAvailable)
-                label("MuWire will launch an embedded I2P router.  This can take a few minutes.")
+                label(text : "MuWire will launch an embedded I2P router.  This can take a few minutes.", constraints: gbc(gridx:0, gridy:1))
         }
     }
 

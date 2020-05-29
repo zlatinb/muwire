@@ -1,5 +1,7 @@
 package com.muwire.gui.wizard
 
+import java.awt.GridBagConstraints
+
 import javax.swing.JFileChooser
 
 import com.muwire.core.MuWireSettings
@@ -22,15 +24,19 @@ class DirectoriesStep extends WizardStep {
         
         builder.panel(constraints : getConstraint()) {
             gridBagLayout()
-            label(text : "Select directories for saving downloaded and incomplete files.  They will be created if they do not already exist",
-            constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2))
+            label(text : "Select directories for saving downloaded and incomplete files.",
+                constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2, insets: [10,0,0,0]))
+            label(text : "They will be created if they do not already exist.",
+                constraints : gbc(gridx:0, gridy: 1, gridwidth: 2, insets: [0,0,10,0]))
 
-            label(text : "Directory for saving downloaded files", constraints : gbc(gridx:0, gridy: 1))
-            downloadLocationField = textField(text : defaultDownloadLocation.getAbsolutePath(), constraints : gbc(gridx : 0, gridy : 2))
-            downloadLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 2), actionPerformed : showDownloadChooser)
-            label(text : "Directory for storing incomplete files", constraints : gbc(gridx:0, gridy: 3))
-            incompleteLocationField = textField(text : defaultIncompleteLocation.getAbsolutePath(), constraints : gbc(gridx:0, gridy:4))
-            incompleteLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 4), actionPerformed : showIncompleteChooser)
+            label(text : "Directory for saving downloaded files", constraints : gbc(gridx:0, gridy: 2))
+            downloadLocationField = textField(text : defaultDownloadLocation.getAbsolutePath(), 
+                constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+            downloadLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 3), actionPerformed : showDownloadChooser)
+            label(text : "Directory for storing incomplete files", constraints : gbc(gridx:0, gridy: 4))
+            incompleteLocationField = textField(text : defaultIncompleteLocation.getAbsolutePath(), 
+                constraints : gbc(gridx:0, gridy:5, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+            incompleteLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 5), actionPerformed : showIncompleteChooser)
         }
     }        
 

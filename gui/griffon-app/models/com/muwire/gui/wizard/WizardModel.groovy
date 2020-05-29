@@ -16,9 +16,7 @@ class WizardModel {
     Properties i2pProps
     def finished
     
-    final List<WizardStep> steps = [new NicknameStep(),
-                                    new DirectoriesStep(),
-                                    new LastStep(embeddedRouterAvailable)]
+    final List<WizardStep> steps = []
     int currentStep
     
     @Observable boolean finishButtonEnabled
@@ -26,6 +24,15 @@ class WizardModel {
     @Observable boolean nextButtonEnabled
     
     void mvcGroupInit(Map<String,String> args) {
+        
+        steps << new NicknameStep()
+        steps << new DirectoriesStep()
+        if (embeddedRouterAvailable)
+            steps << new EmbeddedRouterStep()
+        else
+            steps << new ExternalRouterStep()
+        steps << new LastStep(embeddedRouterAvailable)
+        
         currentStep = 0
         previousButtonEnabled = false
         nextButtonEnabled = steps.size() > (currentStep + 1)

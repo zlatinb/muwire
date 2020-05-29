@@ -73,30 +73,14 @@ class Ready extends AbstractLifecycleHandler {
                 JOptionPane.showMessageDialog(parent, "MuWire will now exit")
                 System.exit(0)
             }
-                        
             
-//            props.incompleteLocation = new File(home, "incompletes")
-//            props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
-//            props.updateType = System.getProperty("updateType","jar")
-//            props.setNickname(selectNickname())
-//
-//
-//            def portableDownloads = System.getProperty("portable.downloads")
-//            if (portableDownloads != null) {
-//                props.downloadLocation = new File(portableDownloads)
-//            } else {
-//                def chooser = new JFileChooser()
-//                chooser.setFileHidingEnabled(false)
-//                chooser.setDialogTitle("Select a directory where downloads will be saved")
-//                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-//                int rv = chooser.showOpenDialog(null)
-//                if (rv != JFileChooser.APPROVE_OPTION) {
-//                    JOptionPane.showMessageDialog(null, "MuWire will now exit")
-//                    System.exit(0)
-//                }
-//                props.downloadLocation = chooser.getSelectedFile()
-//            }
-
+            File i2pPropsFile = new File(home, "i2p.properties")
+            i2pPropsFile.withPrintWriter { i2pProps.store(it, "") }     
+            
+            props.embeddedRouter = embeddedRouterAvailable
+            props.updateType = System.getProperty("updateType","jar")
+                   
+            
             propsFile.withPrintWriter("UTF-8", {
                 props.write(it)
             })
