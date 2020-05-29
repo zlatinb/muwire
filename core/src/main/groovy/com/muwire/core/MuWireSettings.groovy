@@ -104,7 +104,7 @@ class MuWireSettings {
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
         defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60000"))
         
-        speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
+        speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
         startChatServer = Boolean.valueOf(props.getProperty("startChatServer","false"))
