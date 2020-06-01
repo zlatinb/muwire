@@ -12,7 +12,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.codehaus.groovy:groovy-all:2.4.15'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.4'
 }
 
 
