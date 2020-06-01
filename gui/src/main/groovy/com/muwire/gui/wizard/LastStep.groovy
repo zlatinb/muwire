@@ -7,7 +7,7 @@ class LastStep extends WizardStep {
     private final boolean embeddedRouterAvailable
 
     public LastStep(boolean embeddedRouterAvailable) {
-        super("last")
+        super("last", null)
         this.embeddedRouterAvailable = embeddedRouterAvailable
     }
 

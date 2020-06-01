@@ -11,6 +11,7 @@ import griffon.metadata.ArtifactProviderFor
 @ArtifactProviderFor(GriffonModel)
 class WizardModel {
     Component parent
+    WizardDefaults defaults
     boolean embeddedRouterAvailable
     MuWireSettings muSettings
     Properties i2pProps
@@ -26,12 +27,12 @@ class WizardModel {
     void mvcGroupInit(Map<String,String> args) {
         
         steps << new NicknameStep()
-        steps << new DirectoriesStep()
+        steps << new DirectoriesStep(defaults)
         if (embeddedRouterAvailable)
-            steps << new EmbeddedRouterStep()
+            steps << new EmbeddedRouterStep(defaults)
         else
-            steps << new ExternalRouterStep()
-        steps << new TunnelStep()
+            steps << new ExternalRouterStep(defaults)
+        steps << new TunnelStep(defaults)
         steps << new LastStep(embeddedRouterAvailable)
         
         currentStep = 0

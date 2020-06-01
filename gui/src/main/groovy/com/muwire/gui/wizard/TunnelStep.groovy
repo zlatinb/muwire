@@ -13,8 +13,8 @@ class TunnelStep extends WizardStep {
     def tunnelLengthSlider
     def tunnelQuantitySlider
     
-    public TunnelStep() {
-        super("tunnels")
+    public TunnelStep(WizardDefaults defaults) {
+        super("tunnels", defaults)
     }
 
     @Override
@@ -26,7 +26,7 @@ class TunnelStep extends WizardStep {
                 def lengthTable = new Hashtable()
                 lengthTable.put(1, new JLabel("Max Speed"))
                 lengthTable.put(3, new JLabel("Max Anonymity"))
-                tunnelLengthSlider = slider(minimum : 1, maximum : 3, value : 3,
+                tunnelLengthSlider = slider(minimum : 1, maximum : 3, value : defaults.tunnelLength,
                     majorTickSpacing : 1, snapToTicks: true, paintTicks: true, labelTable : lengthTable,
                     paintLabels : true)
             }
@@ -35,7 +35,7 @@ class TunnelStep extends WizardStep {
                 def quantityTable = new Hashtable()
                 quantityTable.put(1, new JLabel("Min Resources"))
                 quantityTable.put(6, new JLabel("Max Reliability"))
-                tunnelQuantitySlider = slider(minimum : 1, maximum : 6, value : 4,
+                tunnelQuantitySlider = slider(minimum : 1, maximum : 6, value : defaults.tunnelQuantity,
                     majorTickSpacing : 1, snapToTicks : true, paintTicks: true, labelTable : quantityTable,
                     paintLabels : true)
             }

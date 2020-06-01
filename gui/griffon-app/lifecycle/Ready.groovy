@@ -12,6 +12,7 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.util.DataUtil
+import com.muwire.gui.wizard.WizardDefaults
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -54,11 +55,21 @@ class Ready extends AbstractLifecycleHandler {
             props = new MuWireSettings()
             boolean embeddedRouterAvailable = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
             
+            def defaults
+            if (System.getProperties().containsKey("wizard.defaults")) {
+                File defaultsFile = new File(System.getProperty("wizard.defaults"))
+                Properties defaultsProps = new Properties()
+                defaultsFile.withInputStream { defaultsProps.load(it) }
+                defaults = new WizardDefaults(defaultsProps)
+            } else
+                defaults = new WizardDefaults()
+            
             def parent = application.windowManager.findWindow("event-list")
             Properties i2pProps = new Properties()
             
             def params = [:]
             params['parent'] = parent
+            params['defaults'] = defaults
             params['embeddedRouterAvailable'] = embeddedRouterAvailable
             params['muSettings'] = props
             params['i2pProps'] = i2pProps

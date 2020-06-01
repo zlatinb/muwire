@@ -5,9 +5,11 @@ import com.muwire.core.MuWireSettings
 abstract class WizardStep {
 
     final String constraint
+    final WizardDefaults defaults
     
-    protected WizardStep(String constraint) {
+    protected WizardStep(String constraint, WizardDefaults defaults) {
         this.constraint = constraint
+        this.defaults = defaults
     }
     
     

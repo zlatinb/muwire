@@ -13,14 +13,12 @@ class DirectoriesStep extends WizardStep {
     def downloadLocationButton
     def incompleteLocationButton
 
-    public DirectoriesStep(String constraint) {
-        super("directories")
+    public DirectoriesStep(WizardDefaults defaults) {
+        super("directories", defaults)
     }
 
     @Override
     protected void buildUI(FactoryBuilderSupport builder) {
-        File defaultDownloadLocation = new File(System.getProperty("user.home"), "MuWire Downloads")
-        File defaultIncompleteLocation = new File(System.getProperty("user.home"), "MuWire Incompletes")
         
         builder.panel(constraints : getConstraint()) {
             gridBagLayout()
@@ -30,11 +28,11 @@ class DirectoriesStep extends WizardStep {
                 constraints : gbc(gridx:0, gridy: 1, gridwidth: 2, insets: [0,0,10,0]))
 
             label(text : "Directory for saving downloaded files", constraints : gbc(gridx:0, gridy: 2))
-            downloadLocationField = textField(text : defaultDownloadLocation.getAbsolutePath(), 
+            downloadLocationField = textField(text : defaults.downloadLocation, 
                 constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
             downloadLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 3), actionPerformed : showDownloadChooser)
             label(text : "Directory for storing incomplete files", constraints : gbc(gridx:0, gridy: 4))
-            incompleteLocationField = textField(text : defaultIncompleteLocation.getAbsolutePath(), 
+            incompleteLocationField = textField(text : defaults.incompleteLocation, 
                 constraints : gbc(gridx:0, gridy:5, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
             incompleteLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 5), actionPerformed : showIncompleteChooser)
         }

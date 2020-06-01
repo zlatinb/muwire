@@ -9,7 +9,7 @@ class NicknameStep extends WizardStep {
     volatile def nickField
     
     public NicknameStep() {
-        super("nickname")
+        super("nickname", null)
     }
 
     @Override

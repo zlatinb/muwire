@@ -11,8 +11,8 @@ class ExternalRouterStep extends WizardStep {
     def addressField
     def portField
     
-    public ExternalRouterStep() {
-        super("router")
+    public ExternalRouterStep(WizardDefaults defaults) {
+        super("router", defaults)
     }
 
     @Override
@@ -24,10 +24,10 @@ class ExternalRouterStep extends WizardStep {
                 gridBagLayout()
             
                 label(text : "Host", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                addressField = textField(text : "127.0.0.1", constraints : gbc(gridx:1, gridy:0, anchor: GridBagConstraints.LINE_END))
+                addressField = textField(text : defaults.i2cpHost, constraints : gbc(gridx:1, gridy:0, anchor: GridBagConstraints.LINE_END))
                 
                 label(text : "Port", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                portField = textField(text : "7654", constraints : gbc(gridx:1, gridy:1, anchor: GridBagConstraints.LINE_END))
+                portField = textField(text : String.valueOf(defaults.i2cpPort), constraints : gbc(gridx:1, gridy:1, anchor: GridBagConstraints.LINE_END))
             }
             panel(constraints : gbc(gridx:0, gridy:1, weighty: 100))
         }
