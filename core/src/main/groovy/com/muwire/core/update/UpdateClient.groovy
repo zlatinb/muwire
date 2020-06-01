@@ -49,6 +49,7 @@ class UpdateClient {
     private volatile boolean updateDownloading
     
     private volatile String text
+    private volatile boolean shutdown
 
     UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, 
         FileManager fileManager, Persona me, SigningPrivateKey spk) {
@@ -69,6 +70,7 @@ class UpdateClient {
     }
 
     void stop() {
+        shutdown = true
         timer.cancel()
     }
 
@@ -199,7 +201,8 @@ class UpdateClient {
 
         @Override
         public void disconnected(I2PSession session) {
-            log.severe("I2P session disconnected")
+            if (!shutdown)
+                log.severe("I2P session disconnected")
         }
 
         @Override

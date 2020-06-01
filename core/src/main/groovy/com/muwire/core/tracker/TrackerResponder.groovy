@@ -42,6 +42,8 @@ class TrackerResponder {
     
     private static final long UUID_LIFETIME = 10 * 60 * 1000
     
+    private volatile boolean shutdown
+    
     TrackerResponder(I2PSession i2pSession, MuWireSettings muSettings,
         FileManager fileManager, DownloadManager downloadManager,
         MeshManager meshManager, TrustService trustService,
@@ -61,6 +63,7 @@ class TrackerResponder {
     }
     
     void stop() {
+        shutdown = true
         expireTimer.cancel()
     }
     
@@ -200,7 +203,8 @@ class TrackerResponder {
 
         @Override
         public void disconnected(I2PSession session) {
-            log.severe("session disconnected")
+            if (!shutdown)
+                log.severe("Tracker Responder session disconnected")
         }
 
         @Override

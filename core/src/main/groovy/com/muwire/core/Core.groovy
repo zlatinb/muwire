@@ -114,6 +114,7 @@ public class Core {
     final MuWireSettings muOptions
 
     final I2PSession i2pSession;
+    private I2PSocketManager i2pSocketManager
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
@@ -220,14 +221,13 @@ public class Core {
 
 
         // options like tunnel length and quantity
-        I2PSocketManager socketManager
         keyDat.withInputStream {
-            socketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
+            i2pSocketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
         }
-        socketManager.getDefaultOptions().setReadTimeout(60000)
-        socketManager.getDefaultOptions().setConnectTimeout(30000)
-        socketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
-        i2pSession = socketManager.getSession()
+        i2pSocketManager.getDefaultOptions().setReadTimeout(60000)
+        i2pSocketManager.getDefaultOptions().setConnectTimeout(30000)
+        i2pSocketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
+        i2pSession = i2pSocketManager.getSession()
 
         def destination = new Destination()
         spk = new SigningPrivateKey(Constants.SIG_TYPE)
@@ -327,7 +327,7 @@ public class Core {
             log.info("running as plugin, not initializing update client")
 
         log.info("initializing connector")
-        I2PConnector i2pConnector = new I2PConnector(socketManager)
+        I2PConnector i2pConnector = new I2PConnector(i2pSocketManager)
 
         log.info("initializing certificate client")
         CertificateClient certificateClient = new CertificateClient(eventBus, i2pConnector)
@@ -393,7 +393,7 @@ public class Core {
         }
         
         log.info("initializing acceptor")
-        I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
+        I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer)
@@ -501,8 +501,12 @@ public class Core {
         trackerResponder.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
-        log.info("killing i2p session")
-        i2pSession.destroySession()
+        if (updateClient != null) {
+            log.info("shutting down update client")
+            updateClient.stop()
+        }
+        log.info("killing socket manager")
+        i2pSocketManager.destroySocketManager()
         if (router != null) {
             log.info("shutting down embedded router")
             router.shutdown(0)

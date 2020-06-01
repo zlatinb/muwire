@@ -40,15 +40,6 @@ class Initialize extends AbstractLifecycleHandler {
     @Override
     void execute() {
         
-        if (System.getProperty("java.util.logging.config.file") == null) {
-            log.info("No config file specified, so turning off most logging")
-            def names = LogManager.getLogManager().getLoggerNames()
-            while(names.hasMoreElements()) {
-                def name = names.nextElement()
-                LogManager.getLogManager().getLogger(name).setLevel(Level.SEVERE)
-            }
-        }
-        
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
         
         if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {

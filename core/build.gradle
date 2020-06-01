@@ -7,7 +7,7 @@ plugins {
 dependencies {
     api "net.i2p:i2p:${i2pVersion}"
     api "net.i2p:router:${i2pVersion}"
-    implementation "net.i2p.client:mstreaming:${i2pVersion}"
+    api "net.i2p.client:mstreaming:${i2pVersion}"
     implementation "net.i2p.client:streaming:${i2pVersion}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    

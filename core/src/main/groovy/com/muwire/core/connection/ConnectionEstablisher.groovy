@@ -34,6 +34,8 @@ class ConnectionEstablisher {
     final ExecutorService executor, closer
 
     final Set inProgress = new ConcurrentHashSet()
+    
+    private volatile boolean shutdown
 
     ConnectionEstablisher(){}
 
@@ -60,12 +62,15 @@ class ConnectionEstablisher {
     }
 
     void stop() {
+        shutdown = true
         timer.cancel()
         executor.shutdownNow()
         closer.shutdownNow()
     }
 
     private void connectIfNeeded() {
+        if (shutdown)
+            return
         if (!connectionManager.needsConnections())
             return
         if (inProgress.size() >= CONCURRENT)
@@ -89,6 +94,8 @@ class ConnectionEstablisher {
     }
 
     private void connect(Destination toTry) {
+        if (shutdown)
+            return
         log.info("starting connect to ${toTry.toBase32()}")
         try {
             def endpoint = i2pConnector.connect(toTry)
@@ -123,6 +130,8 @@ class ConnectionEstablisher {
     }
 
     private void fail(Endpoint endpoint) {
+        if (shutdown)
+            return
         if (!closer.isShutdown()) {
             closer.execute {
                 endpoint.close()
