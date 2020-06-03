@@ -124,7 +124,7 @@ class Initialize extends AbstractLifecycleHandler {
                 uiSettings.lnf = lnf.getID()
             }
 
-            if (uiSettings.font != null || uiSettings.autoFontSize || uiSettings.fontSize > 0) {
+            if (uiSettings.font != null || uiSettings.autoFontSize || uiSettings.fontSize > 0 ) {
 
                 FontUIResource defaultFont = lnf.getDefaults().getFont("Label.font")
                 
@@ -142,7 +142,7 @@ class Initialize extends AbstractLifecycleHandler {
                     fontSize = uiSettings.fontSize
                 }
                 rowHeight = fontSize + 3
-                FontUIResource font = new FontUIResource(fontName, Font.PLAIN, fontSize)
+                FontUIResource font = new FontUIResource(fontName, uiSettings.fontStyle, fontSize)
                 
                 def keys = lnf.getDefaults().keys()
                 while(keys.hasMoreElements()) {
@@ -158,21 +158,23 @@ class Initialize extends AbstractLifecycleHandler {
             Properties props = new Properties()
             uiSettings = new UISettings(props)
             log.info "will try default lnfs"
+            LookAndFeel chosen
             if (isMacOSX()) {
-                if (SystemVersion.isJava9()) {
                     uiSettings.lnf = "metal"
-                    lookAndFeel("metal")
-                } else {
-                    uiSettings.lnf = "nimbus"
-                    lookAndFeel('nimbus') // otherwise the file chooser doesn't open???
-                }
+                    chosen = lookAndFeel("metal")
             } else {
-                LookAndFeel chosen = lookAndFeel('system', 'gtk')
+                chosen = lookAndFeel('system', 'gtk')
                 if (chosen == null)
                     chosen = lookAndFeel('metal')
                 uiSettings.lnf = chosen.getID()
                 log.info("ended up applying $chosen.name")
             }
+            
+            FontUIResource defaultFont = chosen.getDefaults().getFont("Label.font")
+            uiSettings.font = defaultFont.getName()
+            uiSettings.fontSize = defaultFont.getSize()
+            uiSettings.fontStyle = defaultFont.getStyle()
+            rowHeight = uiSettings.fontSize + 3
         }
 
         application.context.put("row-height", rowHeight)
