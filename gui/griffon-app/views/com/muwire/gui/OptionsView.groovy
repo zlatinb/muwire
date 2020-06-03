@@ -59,6 +59,8 @@ class OptionsView {
     def monitorCheckbox
     def fontField
     def fontSizeField
+    def fontStyleBoldCheckbox
+    def fontStyleItalicCheckbox
     def clearCancelledDownloadsCheckbox
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
@@ -220,6 +222,14 @@ class OptionsView {
                 constraints : gbc(gridx : 2, gridy: 2, anchor : GridBagConstraints.LINE_START), customFontAction)
                 fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, 
                     constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                
+                label(text : "Font style", constraints: gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                panel(constraints : gbc(gridx: 2, gridy: 3, gridwidth: 2, anchor:GridBagConstraints.LINE_END)) {
+                    fontStyleBoldCheckbox = checkBox(selected : bind {model.fontStyleBold})
+                    label(text: "Bold")
+                    fontStyleItalicCheckbox = checkBox(selected : bind {model.fontStyleItalic})
+                    label(text: "Italic")
+                }
 
             }
             panel (border : titledBorder(title : "Search Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),

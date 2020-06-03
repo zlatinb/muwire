@@ -11,6 +11,7 @@ import java.util.logging.Level
 import javax.annotation.Nonnull
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
+import java.awt.Font
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
@@ -200,6 +201,12 @@ class OptionsController {
         
         uiSettings.autoFontSize = model.automaticFontSize
         uiSettings.fontSize = Integer.parseInt(view.fontSizeField.text)
+        
+        uiSettings.fontStyle = Font.PLAIN
+        if (view.fontStyleBoldCheckbox.model.isSelected())
+            uiSettings.fontStyle |= Font.BOLD
+        if (view.fontStyleItalicCheckbox.model.isSelected())
+            uiSettings.fontStyle |= Font.ITALIC
 
         uiSettings.groupByFile = model.groupByFile
         

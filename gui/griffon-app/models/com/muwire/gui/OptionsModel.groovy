@@ -7,6 +7,8 @@ import griffon.core.artifact.GriffonModel
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
+import java.awt.Font
+
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
     @Observable String downloadRetryInterval
@@ -36,6 +38,8 @@ class OptionsModel {
     @Observable String font
     @Observable boolean automaticFontSize
     @Observable int customFontSize
+    @Observable boolean fontStyleBold
+    @Observable boolean fontStyleItalic
     @Observable boolean clearCancelledDownloads
     @Observable boolean clearFinishedDownloads
     @Observable boolean excludeLocalResult
@@ -99,6 +103,8 @@ class OptionsModel {
         font = uiSettings.font
         automaticFontSize = uiSettings.autoFontSize
         customFontSize = uiSettings.fontSize
+        fontStyleBold = (uiSettings.fontStyle & Font.BOLD) == Font.BOLD
+        fontStyleItalic = (uiSettings.fontStyle & Font.ITALIC) == Font.ITALIC
         clearCancelledDownloads = uiSettings.clearCancelledDownloads
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult
