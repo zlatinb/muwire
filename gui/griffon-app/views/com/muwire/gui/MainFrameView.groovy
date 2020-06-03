@@ -329,16 +329,16 @@ class MainFrameView {
                                 }
                                 panel {
                                     gridBagLayout()
-                                    button(text : "Share", constraints : gbc(gridx: 0), actionPerformed : shareFiles)
-                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), addCommentAction)
-                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 2), issueCertificateAction)
-                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:3), publishAction)
+                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
+                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
+                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     panel {
                                         label("Shared:")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
+                                    button(text : "Share", actionPerformed : shareFiles)
                                 }
                             }
                         }
