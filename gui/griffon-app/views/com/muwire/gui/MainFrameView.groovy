@@ -91,7 +91,7 @@ class MainFrameView {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         builder.with {
-            application(size : [1024,768], id: 'main-frame',
+            application(size : [settings.mainFrameX,settings.mainFrameY], id: 'main-frame',
             locationRelativeTo : null,
             defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
@@ -1456,10 +1456,10 @@ class MainFrameView {
         for (int i = 0; i < count; i++)
             settings.openTabs.add(tabbedPane.getTitleAt(i))
         
-        File uiPropsFile = new File(core.home, "gui.properties")
-        uiPropsFile.withOutputStream { settings.write(it) }    
             
-        def mainFrame = builder.getVariable("main-frame")
+        JFrame mainFrame = builder.getVariable("main-frame")
+        settings.mainFrameX = mainFrame.getSize().width
+        settings.mainFrameY = mainFrame.getSize().height
         mainFrame.setVisible(false)
         application.getWindowManager().findWindow("shutdown-window").setVisible(true)
         if (core != null) {
@@ -1469,6 +1469,9 @@ class MainFrameView {
             }as Runnable)
             t.start()
         }
+        
+        File uiPropsFile = new File(core.home, "gui.properties")
+        uiPropsFile.withOutputStream { settings.write(it) }
     }
 
     private static class TreeExpansions implements TreeExpansionListener {

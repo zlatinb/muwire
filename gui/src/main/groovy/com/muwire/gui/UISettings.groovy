@@ -11,6 +11,7 @@ class UISettings {
     String font
     boolean autoFontSize
     int fontSize, fontStyle
+    int mainFrameX, mainFrameY
     boolean clearCancelledDownloads
     boolean clearFinishedDownloads
     boolean excludeLocalResult
@@ -44,6 +45,9 @@ class UISettings {
         groupByFile = Boolean.parseBoolean(props.getProperty("groupByFile","false"))
         maxChatLines = Integer.parseInt(props.getProperty("maxChatLines","-1"))
         
+        mainFrameX = Integer.parseInt(props.getProperty("mainFrameX","1024"))
+        mainFrameY = Integer.parseInt(props.getProperty("mainFrameY","768"))
+        
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
         openTabs = DataUtil.readEncodedSet(props, "openTabs")
     }
@@ -68,6 +72,9 @@ class UISettings {
         props.setProperty("fontStyle", String.valueOf(fontStyle))
         if (font != null)
             props.setProperty("font", font)
+            
+        props.setProperty("mainFrameX", String.valueOf(mainFrameX))
+        props.setProperty("mainFrameY", String.valueOf(mainFrameY))
 
         DataUtil.writeEncodedSet(searchHistory, "searchHistory", props)
         DataUtil.writeEncodedSet(openTabs, "openTabs", props)
