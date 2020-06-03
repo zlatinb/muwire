@@ -565,9 +565,10 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        label(text : bind {model.me})
-                        button(text : "Copy Short", copyShortAction)
-                        button(text : "Copy Full", copyFullAction)
+                        gridBagLayout()
+                        label(text : bind {model.me}, constraints : gbc(gridx:0, gridy:0))
+                        button(text : "Copy Short", constraints : gbc(gridx:1, gridy:0), copyShortAction)
+                        button(text : "Copy Full", constraints : gbc(gridx:2, gridy:0), copyFullAction)
                     }
                     panel (constraints : BorderLayout.EAST) {
                         label("Connections:")
