@@ -199,7 +199,11 @@ public class Util {
             if (!s.equals(tx))
                 map.put(s, tx);
         }
-        return JSONObject.toJSONString(map);
+        try {
+            return JSONObject.toJSONString(map);
+        } catch (NoClassDefFoundError json2) {
+            return "{}"; // TODO: upgrade to json-simple 2.x
+        }
     }
 
 
