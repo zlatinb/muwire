@@ -42,7 +42,13 @@ griffon {
 
 application {
     mainClassName = 'com.muwire.gui.Launcher'
-    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties',
+                                    '-Xmx256M',
+                                    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                                    "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED"]
     applicationName = 'MuWire'
 }
 
