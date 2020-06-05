@@ -8,7 +8,7 @@ subprojects {
     }
 
     compileGroovy {
-        groovyOptions.optimizationOptions.indy = true
+        groovyOptions.optimizationOptions.indy = false
         sourceCompatibility = project.sourceCompatibility
         targetCompatibility = project.targetCompatibility
         options.compilerArgs += project.compilerArgs
