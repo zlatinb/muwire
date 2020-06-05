@@ -4,8 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
-
+import groovy.json.JsonOutput;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -199,11 +198,7 @@ public class Util {
             if (!s.equals(tx))
                 map.put(s, tx);
         }
-        try {
-            return JSONObject.toJSONString(map);
-        } catch (NoClassDefFoundError json2) {
-            return "{}"; // TODO: upgrade to json-simple 2.x
-        }
+        return JsonOutput.toJson(map);
     }
 
 
