@@ -2,9 +2,9 @@ subprojects {
     apply plugin: 'groovy'
 
     dependencies {
-        compile 'org.codehaus.groovy:groovy:3.0.4'
-        compile 'org.codehaus.groovy:groovy-jsr223:3.0.4'
-        compile 'org.codehaus.groovy:groovy-json:3.0.4'
+        compile "org.codehaus.groovy:groovy:${groovyVersion}"
+        compile "org.codehaus.groovy:groovy-jsr223:${groovyVersion}"
+        compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
     }
 
     compileGroovy {
