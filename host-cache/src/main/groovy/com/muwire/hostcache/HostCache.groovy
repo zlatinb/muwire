@@ -51,8 +51,13 @@ public class HostCache {
             println myDest.toBase64()
         }
 
-        def props = System.getProperties().clone()
-        props.putAt("inbound.nickname", "MuWire HostCache")
+        Properties props = System.getProperties().clone()
+        props["inbound.nickname"] = "MuWire HostCache"
+        
+        def i2pPropsFile = new File(home,"i2p.properties")
+        if (i2pPropsFile.exists()) {
+            i2pPropsFile.withInputStream { props.load(it) }
+        }
         session = i2pClient.createSession(new FileInputStream(keyfile), props)
         myDest = session.getMyDestination()
 

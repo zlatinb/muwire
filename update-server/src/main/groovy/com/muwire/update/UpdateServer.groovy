@@ -42,8 +42,12 @@ class UpdateServer {
             System.exit(1)
         }
 
-        def props = System.getProperties().clone()
-        props.putAt("inbound.nickname", "MuWire UpdateServer")
+        Properties props = System.getProperties().clone()
+        props["inbound.nickname"] = "MuWire UpdateServer"
+        def i2pPropsFile = new File(home, "i2p.properties")
+        if (i2pPropsFile.exists()) {
+            i2pPropsFile.withInputStream { props.load(it) }
+        }
         session = i2pClient.createSession(new FileInputStream(keyFile), props)
         myDest = session.getMyDestination()
 
