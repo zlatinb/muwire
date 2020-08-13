@@ -52,7 +52,7 @@ public class MuWireServlet extends HttpServlet {
                                          "</head><body>\n" +
                                          "<header class=\"titlebar\">" +
                                          "<div class=\"title\">" +
-                                         "<img src=\"images/muwire.png\" alt=\"\"><br>" +
+                                         "<img src=\"images/muwire_logo.png\" alt=\"\"><br>" +
                                          _t("Welcome to MuWire") +
                                          "</div>" +
                                          "<div class=\"subtitle\"><br><br><br><br></div>" +
