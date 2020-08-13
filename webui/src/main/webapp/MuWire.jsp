@@ -7,6 +7,7 @@
 
 <%
 	String pagetitle = Util._t("Initial Setup");
+	String helptext = Util._t("Set up your MuWire nickname and download locations now.");
 %>
 
 <html>

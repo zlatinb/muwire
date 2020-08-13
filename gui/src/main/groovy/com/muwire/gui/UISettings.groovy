@@ -2,13 +2,16 @@ package com.muwire.gui
 
 import com.muwire.core.util.DataUtil
 
+import java.awt.Font
+
 class UISettings {
 
     String lnf
     boolean showMonitor
     String font
     boolean autoFontSize
-    int fontSize
+    int fontSize, fontStyle
+    int mainFrameX, mainFrameY
     boolean clearCancelledDownloads
     boolean clearFinishedDownloads
     boolean excludeLocalResult
@@ -33,6 +36,7 @@ class UISettings {
         showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","true"))
         autoFontSize = Boolean.parseBoolean(props.getProperty("autoFontSize","false"))
         fontSize = Integer.parseInt(props.getProperty("fontSize","12"))
+        fontStyle = Integer.parseInt(props.getProperty("fontStyle", String.valueOf(Font.PLAIN)))
         closeWarning = Boolean.parseBoolean(props.getProperty("closeWarning","true"))
         certificateWarning = Boolean.parseBoolean(props.getProperty("certificateWarning","true"))
         exitOnClose = Boolean.parseBoolean(props.getProperty("exitOnClose","false"))
@@ -40,6 +44,9 @@ class UISettings {
         storeSearchHistory = Boolean.parseBoolean(props.getProperty("storeSearchHistory","true"))
         groupByFile = Boolean.parseBoolean(props.getProperty("groupByFile","false"))
         maxChatLines = Integer.parseInt(props.getProperty("maxChatLines","-1"))
+        
+        mainFrameX = Integer.parseInt(props.getProperty("mainFrameX","1024"))
+        mainFrameY = Integer.parseInt(props.getProperty("mainFrameY","768"))
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
         openTabs = DataUtil.readEncodedSet(props, "openTabs")
@@ -62,8 +69,12 @@ class UISettings {
         props.setProperty("storeSearchHistory", String.valueOf(storeSearchHistory))
         props.setProperty("groupByFile", String.valueOf(groupByFile))
         props.setProperty("maxChatLines", String.valueOf(maxChatLines))
+        props.setProperty("fontStyle", String.valueOf(fontStyle))
         if (font != null)
             props.setProperty("font", font)
+            
+        props.setProperty("mainFrameX", String.valueOf(mainFrameX))
+        props.setProperty("mainFrameY", String.valueOf(mainFrameY))
 
         DataUtil.writeEncodedSet(searchHistory, "searchHistory", props)
         DataUtil.writeEncodedSet(openTabs, "openTabs", props)

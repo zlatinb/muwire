@@ -42,8 +42,23 @@ griffon {
 
 application {
     mainClassName = 'com.muwire.gui.Launcher'
-    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
     applicationName = 'MuWire'
+}
+
+run {
+    applicationDefaultJvmArgs=[]
+}
+
+startScripts.doFirst {
+    application.applicationDefaultJvmArgs = ["-Djava.util.logging.config.file=logging.properties",
+                                    "-Xmx256M",
+                                    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                                    "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
+                                    "--add-opens", "java.base/java.nio=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED"]
+                                   
 }
 
 apply from: 'gradle/publishing.gradle'
@@ -57,9 +72,27 @@ apply plugin: 'org.kordamp.gradle.stats'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.github.kt3k.coveralls'
 
+
+configurations.all {
+        exclude group:'org.codehaus.groovy', module:'groovy-test'
+        exclude group:'org.codehaus.groovy', module:'groovy-testng'
+        exclude group:'org.codehaus.groovy', module:'groovy-test-junit5'
+        exclude group:'org.codehaus.groovy', module:'groovy-ant'
+        exclude group:'org.codehaus.groovy', module:'groovy-sql'
+        exclude group:'org.codehaus.groovy', module:'groovy-nio'
+        exclude group:'org.codehaus.groovy', module:'groovy-servlet'
+        exclude group:'org.codehaus.groovy', module:'groovy-jmx'
+        exclude group:'org.codehaus.groovy', module:'groovy-groovydoc'
+        exclude group:'org.codehaus.groovy', module:'groovy-groovysh'
+        exclude group:'org.codehaus.groovy', module:'groovy-xml'
+        exclude group:'org.codehaus.groovy', module:'groovy-docgenerator'
+        // TODO: add more as discovered
+}
+
 dependencies {
     compile project(":core")
     compile "org.codehaus.griffon:griffon-guice:${griffon.version}"
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}" 
 
     // runtime "org.slf4j:slf4j-simple:${slf4jVersion}"
 

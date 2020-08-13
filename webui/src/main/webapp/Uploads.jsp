@@ -10,15 +10,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="initcode.jsi"%>
 
-<% String pagetitle=Util._t("Uploads"); %>
+<% 
+String pagetitle=Util._t("Uploads");
+String helptext = Util._t("This page shows the files you are currently uploading to other MuWire users."); 
+%>
 
 <html>
     <head>
 <%@include file="css.jsi"%>
-	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
     <script src="js/upload.js?<%=version%>" type="text/javascript"></script>
     </head>
-    <body onload="initTranslate(jsTranslations); initConnectionsCount(); initUploads();">
+    <body>
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

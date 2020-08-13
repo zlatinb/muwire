@@ -4,8 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
-
+import groovy.json.JsonOutput;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -45,6 +44,8 @@ public class Util {
         _x("Copy To Clipbaord"),
         _x("Default settings for new feeds"),
         _x("Details for {0}"),
+        _x("Directory configuration for {0}"),
+        _x("Directory sync frequency (seconds, 0 means never)"),
         _x("Distrusted"),
         _x("Distrusted User"),
         _x("Down"),
@@ -56,7 +57,6 @@ public class Util {
         _x("Downloaded Pieces"),
         _x("Downloader"),
         _x("Downloading"),
-        _x("Enter a full MuWire id"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
         _x("Failing Hosts"),
@@ -82,9 +82,11 @@ public class Util {
         _x("Mark Distrusted"),
         _x("Mark Neutral"),
         _x("Mark Trusted"),
+        _x("Monitor directory for changes"),
         _x("MuWire Status"),
         _x("must be greater than zero"),
         _x("Name"),
+        _x("Never"),
         _x("Number of items to keep on disk (-1 means unlimited)"),
         _x("Outgoing Connections"),
         // verb
@@ -123,6 +125,7 @@ public class Util {
         _x("Submit"),
         _x("Subscribe"),
         _x("Subscribed"),
+        _x("Sync"),
         _x("Times Browsed"),
         _x("Timestamp"),
         _x("Total Pieces"),
@@ -138,8 +141,6 @@ public class Util {
         _x("User"),
         _x("View 1 Certificate"),
         _x("View {0} Certificates"),
-        _x("Your full MuWire id is"),
-        _x("Your short MuWire id is {0}"),
         _x("Your Trust"),
         _x("{0}% of piece")
     };
@@ -197,7 +198,7 @@ public class Util {
             if (!s.equals(tx))
                 map.put(s, tx);
         }
-        return JSONObject.toJSONString(map);
+        return JsonOutput.toJson(map);
     }
 
 

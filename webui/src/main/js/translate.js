@@ -27,3 +27,7 @@ function _t(s, p) {
     rv = rv.replace("{0}", p);
     return rv;
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initTranslate(jsTranslations);
+}, true);

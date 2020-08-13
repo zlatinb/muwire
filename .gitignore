@@ -2,7 +2,7 @@
 **/.settings
 **/build
 .gradle
-.project
-.classpath
+**/.project
+**/.classpath
 **/*.rej
 **/*.orig

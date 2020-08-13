@@ -10,15 +10,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="initcode.jsi"%>
 
-<% String pagetitle=Util._t("Downloads"); %>
+<% 
+String pagetitle=Util._t("Downloads");
+String helptext = Util._t("This page shows the files you are currently downloading from other MuWire users."); 
+%>
 
 <html>
     <head>
 <%@include file="css.jsi"%>
-	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
     <script src="js/download.js?<%=version%>" type="text/javascript"></script>
     </head>
-    <body onload="initTranslate(jsTranslations); initConnectionsCount(); initDownloads();">
+    <body>
 <%@include file="header.jsi"%>    	
 	<aside>
 <%@include file="searchbox.jsi"%>    	

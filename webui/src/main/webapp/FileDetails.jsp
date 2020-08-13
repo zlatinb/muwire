@@ -7,6 +7,7 @@
 <% 
 
 String pagetitle=Util._t("File Details"); 
+String helptext = Util._t("View details about the selected shared file here.");
 
 String path = request.getParameter("path");
 File file = Util.getFromPathElements(path);
@@ -16,16 +17,14 @@ File file = Util.getFromPathElements(path);
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/tables.js?<%=version%> type="text/javascript"></script>
 <script src="js/fileDetails.js?<%=version%>" type="text/javascript"></script>
 
-<script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
 	path="<%=path%>"
 </script>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initFileDetails();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>

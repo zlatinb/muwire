@@ -133,14 +133,14 @@ public class BrowseServlet extends HttpServlet {
         if (action.equals("browse")) {
             String personaB64 = req.getParameter("host");
             if (personaB64 == null) {
-                resp.sendError(403,Util._t("Please enter a full MuWire id"));
+                resp.sendError(403,Util._t("Please enter a full MuWire ID"));
                 return;
             }
             Persona host;
             try {
                 host = new Persona(new ByteArrayInputStream(Base64.decode(personaB64)));
             } catch (Exception bad) {
-                resp.sendError(403,Util._t("Please enter a full MuWire id"));
+                resp.sendError(403,Util._t("Please enter a full MuWire ID"));
                 return;
             }
             browseManager.browse(host);

@@ -1,3 +1,10 @@
+:root {
+	--hover-menu-bg : #c8e0ff;
+	--hover-menu-link-bg : #d8f0ff;
+	
+	--table-bg : #ceeee8;
+}
+
 #table-wrapper {
   position:relative;
 }
@@ -6,14 +13,31 @@
   overflow:auto;
   margin-top:20px;
 }
+.paddedTable {
+	padding-bottom: 6%;
+}
+.paddedTable table tbody tr td .dropdown .dropdown-content {
+	background: var(--hover-menu-bg);
+}
+
+.paddedTable table tbody tr td .dropdown .dropdown-content a:hover {
+	background: var(--hover-menu-link-bg);
+}
+
 #table-wrapper table {
   width:100%;
 
 }
-#table-wrapper table * {
-  background: #ceeee8;
+#table-wrapper table tbody tr td {
+  background: var(--table-bg);
   color:black;
 }
+
+#table-wrapper table thead tr th {
+  background: var(--table-bg);
+  color:black;
+}
+
 #table-wrapper table td, th {
     padding-right: 10px;
     padding-bottom: 1px;
@@ -32,6 +56,9 @@ div#activeSearches table td:nth-child(2) {
   text-align: right;
 }
 
+div#topTableSender table thead th:nth-child(1) {
+  width: 45%;
+}
 div#topTableSender table thead th:nth-child(2) {
   width: 100px;
 }
@@ -42,7 +69,7 @@ div#topTableSender table thead th:nth-child(4) {
   width: 100px;
 }
 div#topTableSender table thead th:nth-child(5) {
-  width: 340px;
+  width: 20%;
 }
 div#topTableSender table tbody td:nth-child(1) {
   text-overflow: ellipsis;
@@ -53,6 +80,11 @@ div#topTableSender table tbody td:nth-child(2) {
 div#topTableSender table tbody td:nth-child(3) {
   padding-right: 40px;
   text-align: right;
+}
+div#topTableSender table tbody td:nth-child(5) {
+	text-overflow: ellipsis;
+	overflow: auto;
+	text-align: center;
 }
 
 div#bottomTableSender table thead th:nth-child(2) {
@@ -103,13 +135,17 @@ div#bottomTableFile table thead th:nth-child(3) {
   width: 100px;
 }
 div#bottomTableFile table thead th:nth-child(4) {
-  width: 340px;
+  width: 20%;
 }
 div#bottomTableFile table tbody td:nth-child(1) {
   text-overflow: ellipsis;
 }
 div#bottomTableFile table tbody td:nth-child(2) {
   text-align: center;
+}
+div#bottomTableFile table tbody td:nth-child(4) {
+	text-overflow:ellipsis;
+	overflow:auto;
 }
 
 div#activeBrowses table thead th:nth-child(2) {
@@ -134,6 +170,7 @@ div#filesTable table thead th:nth-child(2) {
 }
 div#filesTable table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#filesTable table tbody td:nth-child(2) {
   padding-right: 25px;
@@ -230,6 +267,7 @@ div#feedsTable table thead th:nth-child(4) {
 
 div#feedsTable table tbody td:nth-child(1) {
 	text-overflow: ellipsis;
+	overflow: auto;
 }
 
 div#itemsTable table thead th:nth-child(2) {
@@ -246,6 +284,34 @@ div#itemsTable table thead th:nth-child(4) {
 
 div#itemsTable table tbody td:nth-child(1) {
 	text-overflow: ellipsis;
+}
+
+div#dirConfig table * {
+	background: #bcd1e5 !important;
+}
+div#dirConfig table {
+	border-collapse: collapse;
+	width: auto;
+}
+div#dirConfig table td {
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+div#dirsTable table thead th:nth-child(2) {
+	width: 80px;
+}
+div#dirsTable table thead th:nth-child(3) {
+	width: 90px;
+}
+div#dirsTable table thead th:nth-child(4) {
+	width: 170px;
+}
+div#dirsTable table tbody td:nth-child(1) {
+	text-overflow: ellipsis;
+	overflow: auto;
 }
 
 div#hitsTable table thead th:nth-child(1) {
@@ -317,6 +383,7 @@ div#trustedUsers table tbody td:nth-child(3) {
 }
 div#trustedUsers table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trustedUsers table tbody td:nth-child(3) {
   text-align: center;
@@ -324,6 +391,7 @@ div#trustedUsers table tbody td:nth-child(3) {
 
 div#distrustedUsers table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#distrustedUsers table thead th:nth-child(2) {
   width: 300px;
@@ -343,6 +411,7 @@ div#trustLists table thead th:nth-child(5) {
 }
 div#trustLists table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trustLists table tbody td:nth-child(2) {
   padding-right: 40px;
@@ -364,6 +433,7 @@ div#trusted table thead th:nth-child(3) {
 }
 div#trusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#trusted table tbody td:nth-child(3) {
   text-align: center;
@@ -376,6 +446,7 @@ div#distrusted table thead th:nth-child(3) {
 }
 div#distrusted table tbody td:nth-child(1) {
   text-overflow: ellipsis;
+  overflow: auto;
 }
 div#distrusted table tbody td:nth-child(3) {
   text-align: center;
@@ -433,6 +504,11 @@ div.centercomment textarea {
 span.right {
   display: inline-block;
   float: right;
+}
+
+span.center {
+	display : inline-block;
+	text-align : center;
 }
 
 input.right {
@@ -530,9 +606,21 @@ li.fileTree {
 	display: none;
 	position: absolute;
 	z-index:1;
-	background: white;
-	padding-left: 20px;
+	background: var(--hover-menu-bg);
+	background-color: var(--hover-menu-bg);
+	padding: 3px 14px 3px 14px;
 	width: max-content;
+}
+
+.dropdown-content-right {
+	display: none;
+	position: absolute;
+	z-index:1;
+	background: var(--hover-menu-bg);
+	background-color: var(--hover-menu-bg);
+	padding: 3px 14px 3px 14px;
+	width: max-content;
+	right: 0;
 }
 
 .dropdown-content a {
@@ -540,15 +628,74 @@ li.fileTree {
 	display: block;
 }
 
+.dropdown-content-right a {
+	color: black;
+	display: block;
+}
+
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-content a:hover {
+	background: var(--hover-menu-link-bg);
+	background-color: var(--hover-menu-link-bg);
+}
+
+.dropdown-content-right a:hover {
+	background: var(--hover-menu-link-bg);
+	background-color: var(--hover-menu-link-bg);
+}
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content-right {display: block;}
 
 textarea.copypaste {
 	opacity: 0;
 	position: absolute;
 	z-index: -9999;
 	pointer-events: none;
+}
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 240px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  background : #d8f0ff;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.configuration-section table tr td {
+	overflow: auto;
+}
+
+.configuration-section .tooltip {
+	border-bottom: none;
+}
+
+.configuration-section .tooltip .tooltiptext {
+	white-space: pre-wrap;
+	padding : 5px 0 5px 5px;
+}
+
+.title-and-help .pagehelp .tooltip .tooltiptext {
+	white-space: pre-wrap;
+	right : 0;
+	top:20px;
+	width: 400px;
+	font-size: initial;
+	color: initial;
 }

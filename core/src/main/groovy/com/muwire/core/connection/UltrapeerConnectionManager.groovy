@@ -105,8 +105,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
     @Override
     void shutdown() {
         super.shutdown()
-        peerConnections.values().stream().parallel().forEach({v -> v.close()})
-        leafConnections.values().stream().parallel().forEach({v -> v.close()})
+        peerConnections.values().stream().forEach({v -> v.close()})
+        leafConnections.values().stream().forEach({v -> v.close()})
         peerConnections.clear()
         leafConnections.clear()
     }

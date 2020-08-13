@@ -8,8 +8,15 @@
     ${persona}
     <br>
   </div>
-  <div class="pagetitle">
-    <%=pagetitle%>
+  <div class="title-and-help">
+	  <span class="pagetitle">
+	    <%=pagetitle%>
+	  </span> 
+	  <span class="pagehelp">
+	  	<div class="tooltip"><%=Util._t("Help")%>
+	  		<span class="tooltiptext"><%=helptext%></span>
+	  	</div>
+	  </span>
   </div>
 </header>
 <noscript>

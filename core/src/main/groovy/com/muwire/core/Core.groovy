@@ -55,7 +55,11 @@ import com.muwire.core.files.HasherService
 import com.muwire.core.files.PersisterService
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.files.UICommentEvent
-
+import com.muwire.core.files.directories.UISyncDirectoryEvent
+import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
+import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
+import com.muwire.core.files.directories.WatchedDirectoryConverter
+import com.muwire.core.files.directories.WatchedDirectoryManager
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
@@ -81,6 +85,7 @@ import com.muwire.core.upload.UploadManager
 import com.muwire.core.util.MuWireLogManager
 import com.muwire.core.content.ContentControlEvent
 import com.muwire.core.content.ContentManager
+import com.muwire.core.tracker.TrackerResponder
 
 import groovy.util.logging.Log
 import net.i2p.I2PAppContext
@@ -108,7 +113,8 @@ public class Core {
     final Properties i2pOptions
     final MuWireSettings muOptions
 
-    private final I2PSession i2pSession;
+    final I2PSession i2pSession;
+    private I2PSocketManager i2pSocketManager
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
@@ -130,6 +136,9 @@ public class Core {
     final ChatManager chatManager
     final FeedManager feedManager
     private final FeedClient feedClient
+    private final WatchedDirectoryConverter watchedDirectoryConverter
+    final WatchedDirectoryManager watchedDirectoryManager
+    private final TrackerResponder trackerResponder
 
     private final Router router
 
@@ -161,15 +170,17 @@ public class Core {
             if (!i2pOptions.containsKey("outbound.nickname"))
                 i2pOptions["outbound.nickname"] = "MuWire"
         }
-        if (!(i2pOptions.hasProperty("i2np.ntcp.port")
-                && i2pOptions.hasProperty("i2np.udp.port")
+        if (!(i2pOptions.containsKey("i2np.ntcp.port")
+                && i2pOptions.containsKey("i2np.udp.port")
         )) {
             Random r = new Random()
-            int port = r.nextInt(60000) + 4000
+            int port = 9151 + r.nextInt(1 + 30777 - 9151)  // this range matches what the i2p router would choose
             i2pOptions["i2np.ntcp.port"] = String.valueOf(port)
             i2pOptions["i2np.udp.port"] = String.valueOf(port)
             i2pOptionsFile.withOutputStream { i2pOptions.store(it, "") }
         }
+        
+        i2pOptions['i2cp.leaseSetEncType']='4,0'
 
         if (!props.embeddedRouter) {
             if (!(I2PAppContext.getGlobalContext() instanceof RouterContext)) {
@@ -210,14 +221,13 @@ public class Core {
 
 
         // options like tunnel length and quantity
-        I2PSocketManager socketManager
         keyDat.withInputStream {
-            socketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
+            i2pSocketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
         }
-        socketManager.getDefaultOptions().setReadTimeout(60000)
-        socketManager.getDefaultOptions().setConnectTimeout(30000)
-        socketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
-        i2pSession = socketManager.getSession()
+        i2pSocketManager.getDefaultOptions().setReadTimeout(60000)
+        i2pSocketManager.getDefaultOptions().setConnectTimeout(30000)
+        i2pSocketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
+        i2pSession = i2pSocketManager.getSession()
 
         def destination = new Destination()
         spk = new SigningPrivateKey(Constants.SIG_TYPE)
@@ -317,7 +327,7 @@ public class Core {
             log.info("running as plugin, not initializing update client")
 
         log.info("initializing connector")
-        I2PConnector i2pConnector = new I2PConnector(socketManager)
+        I2PConnector i2pConnector = new I2PConnector(i2pSocketManager)
 
         log.info("initializing certificate client")
         CertificateClient certificateClient = new CertificateClient(eventBus, i2pConnector)
@@ -365,6 +375,9 @@ public class Core {
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)
+        
+        log.info("initializing tracker responder")
+        trackerResponder = new TrackerResponder(i2pSession, props, fileManager, downloadManager, meshManager, trustService, me)
 
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
@@ -380,16 +393,11 @@ public class Core {
         }
         
         log.info("initializing acceptor")
-        I2PAcceptor i2pAcceptor = new I2PAcceptor(socketManager)
+        I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer)
 
-        log.info("initializing directory watcher")
-        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, props)
-        eventBus.register(DirectoryWatchedEvent.class, directoryWatcher)
-        eventBus.register(AllFilesLoadedEvent.class, directoryWatcher)
-        eventBus.register(DirectoryUnsharedEvent.class, directoryWatcher)
 
         log.info("initializing hasher service")
         hasherService = new HasherService(new FileHasher(), eventBus, fileManager, props)
@@ -411,6 +419,28 @@ public class Core {
         BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
         eventBus.register(UIBrowseEvent.class, browseManager)
         
+        log.info("initializing watched directory converter")
+        watchedDirectoryConverter = new WatchedDirectoryConverter(this)
+        eventBus.register(AllFilesLoadedEvent.class, watchedDirectoryConverter)
+        
+        log.info("initializing watched directory manager")
+        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager)
+        eventBus.with { 
+            register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
+            register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
+            register(FileSharedEvent.class, watchedDirectoryManager)
+            register(DirectoryUnsharedEvent.class, watchedDirectoryManager)
+            register(UISyncDirectoryEvent.class, watchedDirectoryManager)
+        }
+        
+        log.info("initializing directory watcher")
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, watchedDirectoryManager)
+        eventBus.with {
+            register(DirectoryWatchedEvent.class, directoryWatcher)
+            register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
+            register(DirectoryUnsharedEvent.class, directoryWatcher)
+            register(WatchedDirectoryConfigurationEvent.class, directoryWatcher)
+        }
     }
 
     public void startServices() {
@@ -427,6 +457,7 @@ public class Core {
         updateClient?.start()
         feedManager.start()
         feedClient.start()
+        trackerResponder.start()
     }
 
     public void shutdown() {
@@ -454,6 +485,8 @@ public class Core {
         connectionEstablisher.stop()
         log.info("shutting down directory watcher")
         directoryWatcher.stop()
+        log.info("shutting down watch directory manager")
+        watchedDirectoryManager.shutdown()
         log.info("shutting down cache client")
         cacheClient.stop()
         log.info("shutting down chat server")
@@ -464,10 +497,16 @@ public class Core {
         feedManager.stop()
         log.info("shutting down feed client")
         feedClient.stop()
+        log.info("shutting down tracker responder")
+        trackerResponder.stop()
         log.info("shutting down connection manager")
         connectionManager.shutdown()
-        log.info("killing i2p session")
-        i2pSession.destroySession()
+        if (updateClient != null) {
+            log.info("shutting down update client")
+            updateClient.stop()
+        }
+        log.info("killing socket manager")
+        i2pSocketManager.destroySocketManager()
         if (router != null) {
             log.info("shutting down embedded router")
             router.shutdown(0)
@@ -511,7 +550,7 @@ public class Core {
             }
         }
 
-        Core core = new Core(props, home, "0.6.11")
+        Core core = new Core(props, home, "0.7.1")
         core.startServices()
 
         // ... at the end, sleep or execute script

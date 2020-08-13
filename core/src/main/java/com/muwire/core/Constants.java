@@ -4,6 +4,8 @@ import net.i2p.crypto.SigType;
 
 public class Constants {
     public static final byte PERSONA_VERSION = (byte)1;
+    public static final String INVALID_NICKNAME_CHARS = "'\"();<>=@$%";
+    public static final int MAX_NICKNAME_LENGTH = 30;
     public static final byte FILE_CERT_VERSION = (byte)2;
     public static final int CHAT_VERSION = 1;
     
@@ -17,5 +19,8 @@ public class Constants {
     
     public static final int MAX_COMMENT_LENGTH = 0x1 << 15;
     
-    public static final long MAX_QUERY_AGE = 5 * 60 * 1000L; 
+    public static final long MAX_QUERY_AGE = 5 * 60 * 1000L;
+    
+    public static final int UPDATE_PORT = 2;
+    public static final int TRACKER_PORT = 3;
 }

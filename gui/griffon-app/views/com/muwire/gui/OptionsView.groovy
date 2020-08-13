@@ -6,7 +6,9 @@ import griffon.metadata.ArtifactProviderFor
 import groovy.swing.factory.TitledBorderFactory
 
 import javax.swing.JDialog
+import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JSlider
 import javax.swing.JTabbedPane
 import javax.swing.SwingConstants
 import javax.swing.border.TitledBorder
@@ -43,14 +45,13 @@ class OptionsView {
     def shareHiddenCheckbox
     def searchCommentsCheckbox
     def browseFilesCheckbox
+    def allowTrackingCheckbox
     def speedSmoothSecondsField
     def totalUploadSlotsField
     def uploadSlotsPerUserField
 
-    def inboundLengthField
-    def inboundQuantityField
-    def outboundLengthField
-    def outboundQuantityField
+    def tunnelLengthSlider
+    def tunnelQuantitySlider
     def i2pUDPPortField
     def i2pNTCPPortField
 
@@ -58,6 +59,8 @@ class OptionsView {
     def monitorCheckbox
     def fontField
     def fontSizeField
+    def fontStyleBoldCheckbox
+    def fontStyleItalicCheckbox
     def clearCancelledDownloadsCheckbox
     def clearFinishedDownloadsCheckbox
     def excludeLocalResultCheckbox
@@ -107,6 +110,10 @@ class OptionsView {
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 1,
                 anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
+                label(text : "Allow tracking", constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START,
+                    fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+                allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 2,
+                    anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
             }
             
             panel (border : titledBorder(title : "Download Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
@@ -163,19 +170,24 @@ class OptionsView {
             label(text : "Changing any I2P settings requires a restart", constraints : gbc(gridx:0, gridy : 0))
             panel (border : titledBorder(title : "Tunnel Settings", border : etchedBorder(), titlePosition: TitledBorder.TOP,
             constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
-                gridBagLayout()
-                label(text : "Inbound length", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                inboundLengthField = textField(text : bind {model.inboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:0, 
-                    anchor : GridBagConstraints.LINE_END))
-                label(text : "Inbound quantity", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                inboundQuantityField = textField(text : bind {model.inboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:1,
-                    anchor : GridBagConstraints.LINE_END))
-                label(text : "Outbound length", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                outboundLengthField = textField(text : bind {model.outboundLength}, columns : 2, constraints : gbc(gridx:1, gridy:2,
-                    anchor : GridBagConstraints.LINE_END))
-                label(text : "Outbound quantity", constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                outboundQuantityField = textField(text : bind {model.outboundQuantity}, columns : 2, constraints : gbc(gridx:1, gridy:3,
-                    anchor : GridBagConstraints.LINE_END))
+                gridLayout(rows:4, cols:1)
+                
+                label(text : "Speed vs Anonymity")
+                def lengthTable = new Hashtable()
+                lengthTable.put(1, new JLabel("Max Speed"))
+                lengthTable.put(3, new JLabel("Max Anonymity"))
+                tunnelLengthSlider = slider(minimum : 1, maximum : 3, value : bind {model.tunnelLength}, 
+                    majorTickSpacing : 1, snapToTicks: true, paintTicks: true, labelTable : lengthTable,
+                    paintLabels : true)
+                
+                
+                label(text: "Reliability vs Resource Usage")
+                def quantityTable = new Hashtable()
+                quantityTable.put(1, new JLabel("Min Resources"))
+                quantityTable.put(6, new JLabel("Max Reliability"))
+                tunnelQuantitySlider = slider(minimum : 1, maximum : 6, value : bind {model.tunnelQuantity}, 
+                    majorTickSpacing : 1, snapToTicks : true, paintTicks: true, labelTable : quantityTable,
+                    paintLabels : true)
             }
 
             Core core = application.context.get("core")
@@ -210,6 +222,14 @@ class OptionsView {
                 constraints : gbc(gridx : 2, gridy: 2, anchor : GridBagConstraints.LINE_START), customFontAction)
                 fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, 
                     constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                
+                label(text : "Font style", constraints: gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                panel(constraints : gbc(gridx: 2, gridy: 3, gridwidth: 2, anchor:GridBagConstraints.LINE_END)) {
+                    fontStyleBoldCheckbox = checkBox(selected : bind {model.fontStyleBold})
+                    label(text: "Bold")
+                    fontStyleItalicCheckbox = checkBox(selected : bind {model.fontStyleItalic})
+                    label(text: "Italic")
+                }
 
             }
             panel (border : titledBorder(title : "Search Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP),

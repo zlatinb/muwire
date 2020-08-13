@@ -15,6 +15,16 @@ class Node {
 		this.shared = shared
 	}
 	
+	collectCollapsed(map) {
+		if (this.leaf || this.children.length == 0) {
+			map.set(this.nodeId, true)
+			return
+		}
+		var i
+		for (i = 0;i < this.children.length; i++)
+			this.children[i].collectCollapsed(map)
+	}
+	
 	updateDiv() {
 		var div = document.getElementById(this.nodeId)
 		var unshareLink = "<a href='#' onclick='window.unshare(\"" + this.nodeId +"\");return false;'>" + _t("Unshare") + "</a>"
@@ -95,7 +105,7 @@ function fetch(infoHash) {
 	xmlhttp.send()
 }
 
-function refreshStatus() {
+function refreshStatus(noRefresh) {
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -103,19 +113,29 @@ function refreshStatus() {
 			
 			var count = xmlDoc.getElementsByTagName("Count")[0].childNodes[0].nodeValue
 			var countSpan = document.getElementById("count")
-			countSpan.innerHTML = count
+			countSpan.textContent = count
 			
 			var hashingSpan = document.getElementById("hashing")
 			var hashing = xmlDoc.getElementsByTagName("Hashing")
 			if (hashing != null && hashing.length == 1) {
-				hashingSpan.innerHTML = "Hashing "+hashing[0].childNodes[0].nodeValue
+				hashingSpan.textContent = "Hashing "+hashing[0].childNodes[0].nodeValue
 			} else
-				hashingSpan.innerHTML = "";
+				hashingSpan.textContent = "";
 				
 			var newRevision = parseInt(xmlDoc.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 			if (newRevision > treeRevision) {
-				// TODO: update expanded nodes
 				treeRevision = newRevision
+			
+				if (noRefresh)
+					return
+						
+				var collapsed = new Map()
+				root.collectCollapsed(collapsed)
+				collapse("root")
+				nodesById.clear()
+				nodesById.set("root", root)
+				root.updateDiv()
+				expandUnless("root", collapsed)
 			}
 		}
 	}
@@ -130,11 +150,11 @@ var nodesById = new Map()
 function initFiles() {
 	root = new Node("root",null,false, null, _t("Shared Files"), -1, null, false, false, -1)
 	setInterval(refreshStatus, 3000)
-	setTimeout(refreshStatus, 1)
 	
 	nodesById.set("root",root)
-	root.updateDiv()
-	expand(root.nodeId)
+		root.updateDiv()
+		expand(root.nodeId)	
+	refreshStatus(true)
 }
 
 function encodedPathToRoot(node) {
@@ -152,6 +172,10 @@ function encodedPathToRoot(node) {
 }
 
 function expand(nodeId) {
+	expandUnless(nodeId, new Map())
+}
+
+function expandUnless(nodeId, collapsed) {
 	var node = nodesById.get(nodeId)
 	var encodedPath = encodedPathToRoot(node)	
 	var xmlhttp = new XMLHttpRequest()
@@ -195,8 +219,18 @@ function expand(nodeId) {
 		    for (i = 0; i < node.children.length; i++) {
 				node.children[i].updateDiv()
 			}
-			if (node.children.length == 1 && !node.children[0].leaf)
-				expand(node.children[0].nodeId)
+			
+			// if nothing was collapsed, just expand until there is a fork
+			if (collapsed.size == 0) {
+				if (node.children.length == 1 && !node.children[0].leaf)
+					expandUnless(node.children[0].nodeId, collapsed)
+			} else {
+				for (i = 0; i < node.children.length; i++) {
+					if (collapsed.get(node.children[i].nodeId))
+						continue
+					expandUnless(node.children[i].nodeId, collapsed)
+				}
+			}
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Files?section=fileTree&path="+encodedPath, true)
@@ -230,7 +264,7 @@ function unshare(nodeId) {
 
 function showCommentForm(nodeId) {
 	var linkSpan = document.getElementById("comment-link-"+nodeId)
-	linkSpan.innerHTML=""
+	linkSpan.textContent=""
 	var commentDiv = document.getElementById("comment-"+nodeId)
 	
 	var node = nodesById.get(nodeId)
@@ -247,7 +281,7 @@ function showCommentForm(nodeId) {
 
 function cancelComment(nodeId) {
 	var commentDiv = document.getElementById("comment-"+nodeId)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var node = nodesById.get(nodeId)
 	node.updateDiv()
@@ -314,3 +348,7 @@ function unpublish(nodeId) {
 	xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xmlhttp.send("action=unpublish&file=" + encodedPath)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFiles();
+}, true);

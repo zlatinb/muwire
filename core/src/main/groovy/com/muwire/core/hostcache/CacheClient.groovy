@@ -127,7 +127,8 @@ class CacheClient {
 
         @Override
         public void disconnected(I2PSession session) {
-            log.severe "I2P session disconnected"
+            if (!stopped.get())
+                log.severe "Cache client I2P session disconnected"
         }
 
         @Override

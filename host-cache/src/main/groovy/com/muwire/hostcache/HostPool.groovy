@@ -1,11 +1,14 @@
 package com.muwire.hostcache
 
+import java.text.SimpleDateFormat
 import java.util.stream.Collectors
 
 import groovy.json.JsonOutput
 
 class HostPool {
 
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd-HH")
+    
     final def maxFailures
     final def maxAge
 
@@ -77,9 +80,11 @@ class HostPool {
         }
     }
 
-    synchronized void serialize(File verifiedFile, File unverifiedFile) {
-        write(verifiedFile, verified.values())
-        write(unverifiedFile, unverified.values())
+    synchronized void serialize(File verifiedPath, File unverifiedPath) {
+        def now = new Date()
+        now = SDF.format(now)
+        write(new File(verifiedPath, now), verified.values())
+        write(new File(unverifiedPath, now), unverified.values())
     }
 
     private void write(File target, Collection hosts) {

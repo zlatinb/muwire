@@ -15,4 +15,9 @@ class Host {
     public boolean equals(other) {
         return destination.equals(other.destination)
     }
+    
+    @Override
+    public String toString() {
+        "Host[b32:${destination.toBase32()} verifyTime:$verifyTime verificationFailures:$verificationFailures]"
+    }
 }

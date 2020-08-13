@@ -11,13 +11,13 @@ function refreshConnectionsCount() {
 			var countString = ""+count;
 			connectionCountSpan.innerHTML = countString;
 			if (count > 0)
-			    image = "connected.png";
+			    image = "Connect.png";
 			else
-			    image = "connecting.png";
+			    image = "NotStarted.png";
 			connectionIcon.innerHTML = "<img src=\"images/" + image + "\" alt=\"\">";
 		  } else {
-			connectionCountSpan.innerHTML = _t("Down");
-			connectionIcon.innerHTML = "";
+			connectionCountSpan.textContent = _t("Down");
+			connectionIcon.textContent = "";
 		  }
 		}
 	}
@@ -29,3 +29,7 @@ function initConnectionsCount() {
 	setInterval(refreshConnectionsCount, 3000);
 	setTimeout(refreshConnectionsCount, 1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initConnectionsCount();
+}, true);

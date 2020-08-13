@@ -6,10 +6,13 @@ import net.i2p.util.SystemVersion
 
 import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
+import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.util.DataUtil
+import com.muwire.gui.wizard.WizardDefaults
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -44,36 +47,49 @@ class Ready extends AbstractLifecycleHandler {
             propsFile.withReader("UTF-8", {
                 props.load(it)
             })
-            if (!props.containsKey("nickname"))
-                props.setProperty("nickname", selectNickname())
             props = new MuWireSettings(props)
             if (props.incompleteLocation == null)
                 props.incompleteLocation = new File(home, "incompletes")
         } else {
             log.info("creating new properties")
             props = new MuWireSettings()
-            props.incompleteLocation = new File(home, "incompletes")
-            props.embeddedRouter = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
-            props.updateType = System.getProperty("updateType","jar")
-            props.setNickname(selectNickname())
-
-
-            def portableDownloads = System.getProperty("portable.downloads")
-            if (portableDownloads != null) {
-                props.downloadLocation = new File(portableDownloads)
-            } else {
-                def chooser = new JFileChooser()
-                chooser.setFileHidingEnabled(false)
-                chooser.setDialogTitle("Select a directory where downloads will be saved")
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-                int rv = chooser.showOpenDialog(null)
-                if (rv != JFileChooser.APPROVE_OPTION) {
-                    JOptionPane.showMessageDialog(null, "MuWire will now exit")
-                    System.exit(0)
-                }
-                props.downloadLocation = chooser.getSelectedFile()
+            boolean embeddedRouterAvailable = Boolean.parseBoolean(System.getProperties().getProperty("embeddedRouter"))
+            
+            def defaults
+            if (System.getProperties().containsKey("wizard.defaults")) {
+                File defaultsFile = new File(System.getProperty("wizard.defaults"))
+                Properties defaultsProps = new Properties()
+                defaultsFile.withInputStream { defaultsProps.load(it) }
+                defaults = new WizardDefaults(defaultsProps)
+            } else
+                defaults = new WizardDefaults()
+            
+            def parent = application.windowManager.findWindow("event-list")
+            Properties i2pProps = new Properties()
+            
+            def params = [:]
+            params['parent'] = parent
+            params['defaults'] = defaults
+            params['embeddedRouterAvailable'] = embeddedRouterAvailable
+            params['muSettings'] = props
+            params['i2pProps'] = i2pProps
+            def finished = [:]
+            params['finished'] = finished
+            
+            application.mvcGroupManager.createMVCGroup("wizard", params)
+            
+            if (!finished['applied']) {
+                JOptionPane.showMessageDialog(parent, "MuWire will now exit")
+                System.exit(0)
             }
-
+            
+            File i2pPropsFile = new File(home, "i2p.properties")
+            i2pPropsFile.withPrintWriter { i2pProps.store(it, "") }     
+            
+            props.embeddedRouter = embeddedRouterAvailable
+            props.updateType = System.getProperty("updateType","jar")
+                   
+            
             propsFile.withPrintWriter("UTF-8", {
                 props.write(it)
             })
@@ -99,32 +115,6 @@ class Ready extends AbstractLifecycleHandler {
                     "Can't connect to I2P router", JOptionPane.WARNING_MESSAGE)
             System.exit(0)
         }
-    }
-    
-    private String selectNickname() {
-        String nickname
-        while (true) {
-            nickname = JOptionPane.showInputDialog(null,
-                    "Your nickname is displayed when you send search results so other MuWire users can choose to trust you",
-                    "Please choose a nickname", JOptionPane.PLAIN_MESSAGE)
-                    if (nickname == null) {
-                        JOptionPane.showMessageDialog(null, "MuWire cannot start without a nickname and will now exit", JOptionPane.PLAIN_MESSAGE)
-                        System.exit(0)
-                    }
-            if (nickname.trim().length() == 0) {
-                JOptionPane.showMessageDialog(null, "Nickname cannot be empty", "Select another nickname",
-                        JOptionPane.WARNING_MESSAGE)
-                continue
-            }
-            if (nickname.contains("@")) {
-                JOptionPane.showMessageDialog(null, "Nickname cannot contain @, choose another",
-                        "Select another nickname", JOptionPane.WARNING_MESSAGE)
-                continue
-            }
-            nickname = nickname.trim()
-            break
-        }
-        nickname
     }
 }
 

@@ -50,8 +50,8 @@ function refreshUploads() {
 				var clearLink = new Link(_t("Clear Finished"), "clear", ["ignored"])
 				clearDiv.innerHTML = clearLink.render()
 			} else {
-				uploadsDiv.innerHTML = ""
-				clearDiv.innerHTML = ""
+				uploadsDiv.textContent = ""
+				clearDiv.textContent = ""
 			}
 		}
 	}
@@ -85,3 +85,7 @@ function initUploads() {
 	setInterval(refreshUploads, 3000)
 	setTimeout(refreshUploads,1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initUploads();
+}, true);

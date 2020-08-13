@@ -24,6 +24,7 @@ public class FeedManager {
     private final Core core;
     private final FileManager fileManager;
     private final Map<Persona, RemoteFeed> remoteFeeds = new ConcurrentHashMap<>();
+    private volatile long revision;
     
     public FeedManager(Core core, FileManager fileManager) {
         this.core = core;
@@ -34,14 +35,20 @@ public class FeedManager {
         return remoteFeeds;
     }
     
+    long getRevision() {
+        return revision;
+    }
+    
     public void onFeedLoadedEvent(FeedLoadedEvent e) {
        remoteFeeds.put(e.getFeed().getPublisher(), new RemoteFeed(e.getFeed()));
+       revision++;
     }
     
     public void onUIFeedConfigurationEvent(UIFeedConfigurationEvent e) {
         if (!e.isNewFeed()) 
             return;
         remoteFeeds.put(e.getFeed().getPublisher(), new RemoteFeed(e.getFeed()));
+        revision++;
     }
     
     public void onFeedFetchEvent(FeedFetchEvent e) {
@@ -50,6 +57,7 @@ public class FeedManager {
             return; // hmm
         feed.getFeed().setStatus(e.getStatus());
         feed.revision++;
+        revision++;
     }
     
     public void onFeedItemFetchedEvent(FeedItemFetchedEvent e) {

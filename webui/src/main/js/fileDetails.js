@@ -104,7 +104,7 @@ function refreshSearchers() {
 			if (searchNodes.length > 0)
 				hitsDiv.innerHTML = table.render()
 			else
-				hitsDiv.innerHTML = ""
+				hitsDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + searchersSortKey + "&order=" + searchersSortOrder
@@ -138,7 +138,7 @@ function refreshDownloaders() {
 			if (downloaders.length > 0)
 				downloadersDiv.innerHTML = table.render()
 			else
-				downloadersDiv.innerHTML = ""
+				downloadersDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + downloadersSortKey + "&order=" + downloadersSortOrder
@@ -175,7 +175,7 @@ function refreshCertificates() {
 			if (certificates.length > 0)
 				certsDiv.innerHTML = table.render()
 			else
-				certsDiv.innerHTML = ""
+				certsDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + certificatesSortKey + "&order=" + certificatesSortOrder
@@ -223,7 +223,7 @@ function hideComment(id) {
 	commentLinkDiv.innerHTML = showLink.render()
 	
 	var commentDiv = document.getElementById("comment-" + id)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 }
 
 var path = null
@@ -237,3 +237,7 @@ var downloadersSortKey = "Downloader"
 var downloadersSortOrder = "descending"
 var certificatesSortKey = "Name"
 var certificatesSortOrder = "descending"
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFileDetails();
+}, true);

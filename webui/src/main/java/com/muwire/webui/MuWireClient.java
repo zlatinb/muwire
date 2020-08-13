@@ -29,11 +29,15 @@ import com.muwire.core.filefeeds.FeedItemFetchedEvent;
 import com.muwire.core.filefeeds.FeedLoadedEvent;
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent;
 import com.muwire.core.files.AllFilesLoadedEvent;
+import com.muwire.core.files.DirectoryUnsharedEvent;
+import com.muwire.core.files.DirectoryWatchedEvent;
 import com.muwire.core.files.FileDownloadedEvent;
 import com.muwire.core.files.FileHashedEvent;
 import com.muwire.core.files.FileHashingEvent;
 import com.muwire.core.files.FileLoadedEvent;
 import com.muwire.core.files.FileSharedEvent;
+import com.muwire.core.files.FileUnsharedEvent;
+import com.muwire.core.files.directories.WatchedDirectorySyncEvent;
 import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
@@ -58,6 +62,7 @@ public class MuWireClient {
     private final File mwProps;
     
     private volatile Core core;
+    private volatile boolean coreLoaded;
     
     public MuWireClient(RouterContext ctx, String home, String version, ServletContext servletContext) {
         this.ctx = ctx;
@@ -88,7 +93,9 @@ public class MuWireClient {
         reader.close();
         
         MuWireSettings settings = new MuWireSettings(props);
-        MWStarter starter = new MWStarter(settings, new File(home), version, this);
+        Core core = new Core(settings, new File(home), version);
+        setCore(core);
+        MWStarter starter = new MWStarter(core, this);
         starter.start();
     }
     
@@ -99,6 +106,8 @@ public class MuWireClient {
         core.shutdown();
         this.core = null;
     }
+    
+    
     
     public boolean needsMWInit() {
         return !mwProps.exists();
@@ -150,6 +159,8 @@ public class MuWireClient {
         core.getEventBus().register(FileHashedEvent.class, fileManager);
         core.getEventBus().register(FileDownloadedEvent.class, fileManager);
         core.getEventBus().register(FileHashingEvent.class, fileManager);
+        core.getEventBus().register(FileUnsharedEvent.class, fileManager);
+        core.getEventBus().register(DirectoryUnsharedEvent.class, fileManager);
         
         BrowseManager browseManager = new BrowseManager(core);
         core.getEventBus().register(BrowseStatusEvent.class, browseManager);
@@ -173,6 +184,11 @@ public class MuWireClient {
         core.getEventBus().register(FeedFetchEvent.class, feedManager);
         core.getEventBus().register(FeedItemFetchedEvent.class, feedManager);
         
+        AdvancedSharingManager advancedSharingManager = new AdvancedSharingManager(core);
+        core.getEventBus().register(DirectoryWatchedEvent.class, advancedSharingManager);
+        core.getEventBus().register(DirectoryUnsharedEvent.class, advancedSharingManager);
+        core.getEventBus().register(WatchedDirectorySyncEvent.class, advancedSharingManager);
+        
         servletContext.setAttribute("searchManager", searchManager);
         servletContext.setAttribute("downloadManager", downloadManager);
         servletContext.setAttribute("connectionCounter", connectionCounter);
@@ -182,19 +198,22 @@ public class MuWireClient {
         servletContext.setAttribute("certificateManager", certificateManager);
         servletContext.setAttribute("uploadManager", uploadManager);
         servletContext.setAttribute("feedManager", feedManager);
+        servletContext.setAttribute("advancedSharingManager", advancedSharingManager);
     }
     
     public String getHome() {
         return home;
     }
     
+    void setCoreLoaded() {
+        coreLoaded = true;
+    }
+    
+    public boolean isCoreLoaded() {
+        return coreLoaded;
+    }
+    
     public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
-        core.getMuOptions().getWatchedDirectories().stream().map(File::new).
-            forEach(f -> {
-                FileSharedEvent event = new FileSharedEvent();
-                event.setFile(f);
-                core.getEventBus().publish(event);
-            });
         
         core.getMuOptions().getTrustSubscriptions().forEach( p -> {
             TrustSubscriptionEvent event = new TrustSubscriptionEvent();

@@ -245,7 +245,7 @@ public class FilesServlet extends HttpServlet {
         
         void toXML(StringBuilder sb) {
             String name = file.getName().isEmpty() ? file.toString() : file.getName();
-            boolean shared = core.getMuOptions().getWatchedDirectories().contains(file.getAbsolutePath());
+            boolean shared = core.getWatchedDirectoryManager().isWatched(file);
             sb.append("<Directory>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<Shared>").append(shared).append("</Shared>");

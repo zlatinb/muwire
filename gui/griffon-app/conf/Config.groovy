@@ -131,4 +131,19 @@ mvcGroups {
         view = 'com.muwire.gui.FeedConfigurationView'
         controller = 'com.muwire.gui.FeedConfigurationController'
     }
+    'watched-directory' {
+        model = 'com.muwire.gui.WatchedDirectoryModel'
+        view = 'com.muwire.gui.WatchedDirectoryView'
+        controller = 'com.muwire.gui.WatchedDirectoryController'
+    }
+    'sign' {
+        model = 'com.muwire.gui.SignModel'
+        view = 'com.muwire.gui.SignView'
+        controller = 'com.muwire.gui.SignController'
+    }
+    'wizard' {
+        model = 'com.muwire.gui.wizard.WizardModel'
+        view = 'com.muwire.gui.wizard.WizardView'
+        controller = 'com.muwire.gui.wizard.WizardController'
+    }
 }

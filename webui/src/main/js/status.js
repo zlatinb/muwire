@@ -9,12 +9,12 @@ function refreshStatus() {
 			var hopelessHosts = this.responseXML.getElementsByTagName("HopelessHosts")[0].childNodes[0].nodeValue
 			var timesBrowsed = this.responseXML.getElementsByTagName("TimesBrowsed")[0].childNodes[0].nodeValue
 			
-			document.getElementById("incoming-connections").innerHTML = incomingConnections
-			document.getElementById("outgoing-connections").innerHTML = outgoingConnections
-			document.getElementById("known-hosts").innerHTML = knownHosts
-			document.getElementById("failing-hosts").innerHTML = failingHosts
-			document.getElementById("hopeless-hosts").innerHTML = hopelessHosts
-			document.getElementById("times-browsed").innerHTML = timesBrowsed
+			document.getElementById("incoming-connections").textContent = incomingConnections
+			document.getElementById("outgoing-connections").textContent = outgoingConnections
+			document.getElementById("known-hosts").textContent = knownHosts
+			document.getElementById("failing-hosts").textContent = failingHosts
+			document.getElementById("hopeless-hosts").textContent = hopelessHosts
+			document.getElementById("times-browsed").textContent = timesBrowsed
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Status", true);
@@ -25,3 +25,7 @@ function initStatus() {
 	setInterval(refreshStatus, 3000);
 	setTimeout(refreshStatus, 1);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initStatus();
+}, true);

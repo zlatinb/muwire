@@ -2,6 +2,7 @@ package com.muwire.core.update
 
 import java.util.logging.Level
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
@@ -48,6 +49,7 @@ class UpdateClient {
     private volatile boolean updateDownloading
     
     private volatile String text
+    private volatile boolean shutdown
 
     UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, 
         FileManager fileManager, Persona me, SigningPrivateKey spk) {
@@ -63,11 +65,12 @@ class UpdateClient {
     }
 
     void start() {
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 2)
+        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
         timer.schedule({checkUpdate()} as TimerTask, 60000, 60 * 60 * 1000)
     }
 
     void stop() {
+        shutdown = true
         timer.cancel()
     }
 
@@ -108,7 +111,7 @@ class UpdateClient {
         ping = maker.makeI2PDatagram(ping.bytes)
         def options = new SendMessageOptions()
         options.setSendLeaseSet(true)
-        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, 2, 0, options)
+        session.sendMessage(UpdateServers.UPDATE_SERVER, ping, 0, ping.length, I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT, 0, options)
     }
 
     class Listener implements I2PSessionMuxedListener {
@@ -198,7 +201,8 @@ class UpdateClient {
 
         @Override
         public void disconnected(I2PSession session) {
-            log.severe("I2P session disconnected")
+            if (!shutdown)
+                log.severe("I2P session disconnected")
         }
 
         @Override

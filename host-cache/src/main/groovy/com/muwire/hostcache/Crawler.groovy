@@ -40,12 +40,13 @@ class Crawler {
         try {
             uuid = UUID.fromString(pong.uuid)
         } catch (IllegalArgumentException bad) {
+            log.log(Level.WARNING,"couldn't parse uuid",bad)
             hostPool.fail(host)
             return
         }
 
         if (!uuid.equals(currentUUID)) {
-            log.info("uuid mismatch")
+            log.warning("uuid mismatch $uuid expected $currentUUID")
             hostPool.fail(host)
             return
         }
@@ -75,11 +76,12 @@ class Crawler {
     }
 
     synchronized def startCrawl() {
+        currentUUID = UUID.randomUUID()
+        log.info("starting new crawl with uuid $currentUUID inFlight ${inFlight.size()}")
         if (!inFlight.isEmpty()) {
             inFlight.values().each { hostPool.fail(it) }
             inFlight.clear()
         }
-        currentUUID = UUID.randomUUID()
         hostPool.getUnverified(parallel).each {
             inFlight.put(it.destination, it)
             pinger.ping(it, currentUUID)

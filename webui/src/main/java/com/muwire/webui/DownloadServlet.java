@@ -213,7 +213,7 @@ public class DownloadServlet extends HttpServlet {
         void toXML(StringBuilder sb) {
             sb.append("<Download>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
-            sb.append("<Name>").append(name).append("</Name>");
+            sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<State>").append(state.toString()).append("</State>");
             sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed, false)).append("B/sec").append("</Speed>");
             String ETAString;

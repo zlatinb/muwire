@@ -244,7 +244,7 @@ abstract class Connection implements Closeable {
             else 
                 payload =  String.join(" ",search.keywords).getBytes(StandardCharsets.UTF_8)
             def spk = originator.destination.getSigningPublicKey()
-            def signature = new Signature(Constants.SIG_TYPE, sig)
+            def signature = new Signature(spk.getType(), sig)
             if (!DSAEngine.getInstance().verifySignature(signature, payload, spk)) {
                 log.info("signature didn't match keywords")
                 return
@@ -266,7 +266,7 @@ abstract class Connection implements Closeable {
             queryTime = search.queryTime
             byte [] payload = (search.uuid + String.valueOf(queryTime)).getBytes(StandardCharsets.US_ASCII)
             def spk = originator.destination.getSigningPublicKey()
-            def signature = new Signature(Constants.SIG_TYPE, sig2)
+            def signature = new Signature(spk.getType(), sig2)
             if (!DSAEngine.getInstance().verifySignature(signature, payload, spk)) {
                 log.info("extended signature didn't match uuid and timestamp")
                 return

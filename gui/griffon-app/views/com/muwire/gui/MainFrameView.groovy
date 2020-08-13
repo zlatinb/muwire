@@ -91,7 +91,7 @@ class MainFrameView {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         builder.with {
-            application(size : [1024,768], id: 'main-frame',
+            application(size : [settings.mainFrameX,settings.mainFrameY], id: 'main-frame',
             locationRelativeTo : null,
             defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
@@ -144,6 +144,11 @@ class MainFrameView {
                                 mvcGroup.createMVCGroup("chat-monitor","chat-monitor",env)
                             }
                         })
+                        menuItem("Sign Tool", actionPerformed : {
+                            def env = [:]
+                            env['core'] = model.core
+                            mvcGroup.createMVCGroup("sign",env)
+                        })
                     }
                 }
                 borderLayout()
@@ -163,7 +168,7 @@ class MainFrameView {
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
                         label(constraints : "top-connect-panel",
-                        text : "        MuWire is connecting, please wait.  You will be able to search soon.") // TODO: real padding
+                        text : "        MuWire is connecting, please wait.") // TODO: real padding
                         panel(constraints : "top-search-panel") {
                             borderLayout()
                             panel(constraints: BorderLayout.CENTER) {
@@ -324,16 +329,16 @@ class MainFrameView {
                                 }
                                 panel {
                                     gridBagLayout()
-                                    button(text : "Share", constraints : gbc(gridx: 0), actionPerformed : shareFiles)
-                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), addCommentAction)
-                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 2), issueCertificateAction)
-                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:3), publishAction)
+                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
+                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
+                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     panel {
                                         label("Shared:")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
+                                    button(text : "Share", actionPerformed : shareFiles)
                                 }
                             }
                         }
@@ -560,9 +565,10 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        label(text : bind {model.me})
-                        button(text : "Copy Short", copyShortAction)
-                        button(text : "Copy Full", copyFullAction)
+                        gridBagLayout()
+                        label(text : bind {model.me}, constraints : gbc(gridx:0, gridy:0))
+                        button(text : "Copy Short", constraints : gbc(gridx:1, gridy:0), copyShortAction)
+                        button(text : "Copy Full", constraints : gbc(gridx:2, gridy:0), copyFullAction)
                     }
                     panel (constraints : BorderLayout.EAST) {
                         label("Connections:")
@@ -1451,10 +1457,10 @@ class MainFrameView {
         for (int i = 0; i < count; i++)
             settings.openTabs.add(tabbedPane.getTitleAt(i))
         
-        File uiPropsFile = new File(core.home, "gui.properties")
-        uiPropsFile.withOutputStream { settings.write(it) }    
             
-        def mainFrame = builder.getVariable("main-frame")
+        JFrame mainFrame = builder.getVariable("main-frame")
+        settings.mainFrameX = mainFrame.getSize().width
+        settings.mainFrameY = mainFrame.getSize().height
         mainFrame.setVisible(false)
         application.getWindowManager().findWindow("shutdown-window").setVisible(true)
         if (core != null) {
@@ -1464,6 +1470,9 @@ class MainFrameView {
             }as Runnable)
             t.start()
         }
+        
+        File uiPropsFile = new File(core.home, "gui.properties")
+        uiPropsFile.withOutputStream { settings.write(it) }
     }
 
     private static class TreeExpansions implements TreeExpansionListener {

@@ -14,6 +14,10 @@
         <param-name>version</param-name>
         <param-value>__VERSION__</param-value>
     </init-param>
+    <init-param>
+        <param-name>buildNumber</param-name>
+        <param-value>__BUILD_NUMBER__</param-value>
+    </init-param>
 </servlet>
 
 <servlet>
@@ -79,6 +83,16 @@
 <servlet>
     <servlet-name>com.muwire.webui.FileInfoServlet</servlet-name>
     <servlet-class>com.muwire.webui.FileInfoServlet</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>com.muwire.webui.AdvancedSharingServlet</servlet-name>
+    <servlet-class>com.muwire.webui.AdvancedSharingServlet</servlet-class>
+</servlet>
+
+<servlet>
+    <servlet-name>com.muwire.webui.SignServlet</servlet-name>
+    <servlet-class>com.muwire.webui.SignServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
@@ -149,6 +163,16 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.FileInfoServlet</servlet-name>
     <url-pattern>/FileInfo</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.AdvancedSharingServlet</servlet-name>
+    <url-pattern>/AdvancedShare</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.SignServlet</servlet-name>
+    <url-pattern>/Sign</url-pattern>
 </servlet-mapping>
 
 __JASPER__
@@ -231,6 +255,11 @@ Mappings without the .jsp suffix
 <servlet-mapping>
     <servlet-name>com.muwire.webui.FileDetails_jsp</servlet-name>
     <url-pattern>/FileDetails</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.AdvancedSharing_jsp</servlet-name>
+    <url-pattern>/AdvancedSharing</url-pattern>
 </servlet-mapping>
 
 </web-app>

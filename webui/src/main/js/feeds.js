@@ -24,10 +24,10 @@ class Feed {
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.publisherB64])
 		var configureLink = new Link(_t("Configure"), "configure", [this.publisher])
 		
-		var publisherHTML = publisherLink.render() + "<span class='right'>" + updateHTML + "  " +
-			unsubscribeLink.render() + "   " +
-			configureLink.render() +
-			"</span>"
+		var actionsHtml = "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>" +
+			updateHTML + unsubscribeLink.render() + configureLink.render() + "</div></div>"
+		
+		var publisherHTML = publisherLink.render() + "<span class='right'>" + actionsHtml + "</span>"
 		
 		mapping.set("Publisher", publisherHTML)
 		mapping.set("Files", this.files)
@@ -116,10 +116,24 @@ class Item {
 
 
 function initFeeds() {
-	setTimeout(refreshFeeds, 1)
-	setInterval(refreshFeeds, 3000)
+	setTimeout(fetchRevision, 1)
+	setInterval(fetchRevision, 3000)
 }
 
+function fetchRevision() {
+	var xmlhttp = new XMLHttpRequest()
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			var newRevision = parseInt(this.responseXML.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
+			if (newRevision > revision) {
+				revision = newRevision
+				refreshFeeds()
+			}
+		}
+	}
+	xmlhttp.open("GET", "/MuWire/Feed?section=revision", true)
+	xmlhttp.send()
+}
 
 function refreshFeeds() {
 	var xmlhttp = new XMLHttpRequest()
@@ -150,18 +164,18 @@ function refreshFeeds() {
 			if (listOfFeeds.length > 0)
 				feedsDiv.innerHTML = table.render()
 			else
-				feedsDiv.innerHTML = ""
+				feedsDiv.textContent = ""
 				
 			if (currentFeed != null) {
 				var updatedFeed = feeds.get(currentFeed)
 				if (updatedFeed == null) {
 					currentFeed = null
-					document.getElementById("itemsTable").innerHTML = ""
+					document.getElementById("itemsTable").textContent = ""
 					cancelConfig()
 				} else if (updatedFeed.revision > currentFeed.revision)
 					displayFeed(currentFeed)
 			} else
-				document.getElementById("itemsTable").innerHTML = ""
+				document.getElementById("itemsTable").textContent = ""
 			
 		}
 	}
@@ -201,7 +215,7 @@ function displayFeed(feed) {
 			if (items.length > 0)
 				itemsDiv.innerHTML = table.render()
 			else
-				itemsDiv.innerHTML = ""
+				itemsDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + itemsSortKey + "&order=" + itemsSortOrder
@@ -293,7 +307,7 @@ function configure(publisher) {
 
 function cancelConfig() {
 	var tableDiv = document.getElementById("feedConfig")
-	tableDiv.innerHTML = ""
+	tableDiv.textContent = ""
 }
 
 function showComment(infoHash) {
@@ -314,7 +328,7 @@ function hideComment(infoHash) {
 	expandedComments.delete(infoHash)
 	
 	var commentDiv = document.getElementById("comment-" + infoHash);
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 	
 	var showLink = new Link(_t("Show Comment"), "showComment", [infoHash])
 	var linkSpan = document.getElementById("comment-link-" + infoHash);
@@ -333,7 +347,7 @@ function showCertificates(hostB64, infoHash) {
 			hideLinkSpan.innerHTML = hideLink.render()
 			
 			var certSpan = document.getElementById("certificates-" + fetch.divId)
-			certSpan.innerHTML = _t("Fetching Certificates")
+			certSpan.textContent = _t("Fetching Certificates")
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
@@ -346,7 +360,7 @@ function hideCertificates(hostB64, infoHash) {
 	certificateFetches.delete(id)
 	
 	var certSpan = document.getElementById("certificates-" + id)
-	certSpan.innerHTML = ""
+	certSpan.textContent = ""
 	
 	var item = itemsByInfoHash.get(infoHash)
 	var showLinkText
@@ -375,6 +389,7 @@ function download(infoHash) {
 	xmlhttp.send("action=download&host=" + hostB64 + "&infoHash=" + infoHash)
 }
 
+var revision = 0
 var feeds = new Map()
 var currentFeed = null
 
@@ -386,3 +401,7 @@ var itemsSortKey = "Name"
 var itemsSortOrder = "descending"
 
 var expandedComments = new Map()
+
+document.addEventListener("DOMContentLoaded", function() {
+   initFeeds();
+}, true);

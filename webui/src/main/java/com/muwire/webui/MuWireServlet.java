@@ -21,17 +21,8 @@ public class MuWireServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        RouterContext ctx = (RouterContext) I2PAppContext.getGlobalContext();
-        
-        
-        while(!ctx.clientManager().isAlive()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new ServletException(e);
-            }
-        }
-            
+
+        RouterContext ctx = (RouterContext) I2PAppContext.getGlobalContext();   
         
         String home = ctx.getConfigDir()+File.separator+"plugins"+File.separator+"MuWire";
         version = config.getInitParameter("version");
@@ -43,6 +34,7 @@ public class MuWireServlet extends HttpServlet {
             throw new ServletException(bad);
         }
         config.getServletContext().setAttribute("mwClient", client);
+        config.getServletContext().setAttribute("buildNumber", config.getInitParameter("buildNumber"));
     }
 
     @Override
@@ -50,7 +42,7 @@ public class MuWireServlet extends HttpServlet {
         if (client.needsMWInit()) {
             resp.sendRedirect("/MuWire/MuWire");
         } else {
-            if (client.getCore() == null) {
+            if (!client.isCoreLoaded()) {
                 resp.setContentType("text/html");
                 resp.setCharacterEncoding("UTF-8");
                 resp.getWriter().println("<html><head>\n" +
@@ -60,7 +52,7 @@ public class MuWireServlet extends HttpServlet {
                                          "</head><body>\n" +
                                          "<header class=\"titlebar\">" +
                                          "<div class=\"title\">" +
-                                         "<img src=\"images/muwire.png\" alt=\"\"><br>" +
+                                         "<img src=\"images/muwire_logo.png\" alt=\"\"><br>" +
                                          _t("Welcome to MuWire") +
                                          "</div>" +
                                          "<div class=\"subtitle\"><br><br><br><br></div>" +

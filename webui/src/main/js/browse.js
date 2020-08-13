@@ -91,7 +91,7 @@ function showCertificates(hostB64, infoHash) {
 			hideLinkSpan.innerHTML = hideLink
 			
 			var certSpan = document.getElementById("certificates-" + fetch.divId)
-			certSpan.innerHTML = _t("Fetching Certificates")
+			certSpan.textContent = _t("Fetching Certificates")
 		}
 	}
 	xmlhttp.open("POST", "/MuWire/Certificate", true)	
@@ -104,7 +104,7 @@ function hideCertificates(hostB64, infoHash) {
 	certificateFetches.delete(id)
 	
 	var certSpan = document.getElementById("certificates-" + id)
-	certSpan.innerHTML = ""
+	certSpan.textContent = ""
 	
 	var result = resultsByInfoHash.get(infoHash)
 	var showLinkText
@@ -172,14 +172,14 @@ function refreshActive() {
 			if (activeBrowses.length > 0)
 				tableDiv.innerHTML = table.render()
 			else 
-				tableDiv.innerHTML = ""
+				tableDiv.textContent = ""
 			
 			if (currentBrowse != null) {
 				var newBrowse = browsesByHost.get(currentHost)
 				if (newBrowse == null || currentBrowse.revision < newBrowse.revision)
 					showResults(currentHost, currentBrowse.key, currentBrowse.descending)
 			} else {
-				document.getElementById("resultsTable").innerHTML = ""
+				document.getElementById("resultsTable").textContent = ""
 			}
 		}
 	}
@@ -255,7 +255,7 @@ function showResults(host, key, descending) {
 			if (resultsByInfoHash.size > 0)
 				tableDiv.innerHTML = table.render()
 			else
-				tableDiv.innerHTML = ""
+				tableDiv.textContent = ""
 		}
 	}
 	var paramString = "/MuWire/Browse?section=results&host=" + browse.hostB64
@@ -316,5 +316,9 @@ function hideComment(infoHash) {
 	linkSpan.innerHTML = getShowCommentLink(infoHash)
 	
 	var commentSpan = document.getElementById("comment-"+infoHash)
-	commentSpan.innerHTML = ""
+	commentSpan.textContent = ""
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initBrowse();
+}, true);

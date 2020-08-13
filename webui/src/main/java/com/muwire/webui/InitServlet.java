@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.muwire.core.Constants;
+import com.muwire.core.util.DataUtil;
+
 public class InitServlet extends HttpServlet {
 
     @Override
@@ -16,6 +19,10 @@ public class InitServlet extends HttpServlet {
             String nickname = req.getParameter("nickname");
             if (nickname == null || nickname.trim().length() == 0)
                 throw new Exception("Nickname cannot be blank");
+            
+            if (!DataUtil.isValidName(nickname))
+                throw new Exception("Nickname cannot contain any of " + Constants.INVALID_NICKNAME_CHARS +
+                        " and must be no longer than " + Constants.MAX_NICKNAME_LENGTH + " characters.");
             
             String downloadLocation = req.getParameter("download_location");
             if (downloadLocation == null)

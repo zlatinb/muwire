@@ -5,6 +5,10 @@
 <% 
 
 String pagetitle= Util._t("Shared Files");
+String helptext = Util._t("Shared files are those files you decide to share with other MuWire users.") +
+        "<br/>" + Util._t("To share a file, enter its path in the box to the left.") +
+        "<br/>" + Util._t("You can view your shared files as a tree or as a table.") +
+        "<br/>" + Util._t("The \"Actions\" menu lets you perform various actions on the shared file.");
 
 String viewAs = request.getParameter("viewAs");
 if (viewAs == null)
@@ -15,8 +19,6 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
 	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>
@@ -24,7 +26,7 @@ if (viewAs == null)
 <% } %>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initFiles();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>
@@ -39,6 +41,12 @@ if (viewAs == null)
 				<div class="menuitem shared">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value="<%=Util._t("Share")%>">
+				  <div class="tooltip"><%=Util._t("Help")%>
+				  	<span class="tooltiptext"><%=Util._t("Enter the full path for the file or folder to be shared.")%>
+				  		<br/>
+				  		<%=Util._t("When sharing files on network drives (like a NAS) please visit {0}Advanced Sharing{1}", "<a href=\"/MuWire/AdvancedSharing\">", "</a>")%>
+				  	</span>
+				  </div>
 				</div>
 			</form>
 <% if (viewAs.equals("tree")) { %>
@@ -60,7 +68,7 @@ if (viewAs == null)
 			</ul>
 <% } else { %>
 			<div id="table-wrapper">
-				<div id="table-scroll">
+				<div class="paddedTable" id="table-scroll">
 					<div id="filesTable"></div>
 				</div>
 			</div>

@@ -31,6 +31,7 @@ class MuWireSettings {
     boolean shareHiddenFiles
     boolean searchComments
     boolean browseFiles
+    boolean allowTracking
     
     boolean fileFeed
     boolean advertiseFeed
@@ -92,6 +93,7 @@ class MuWireSettings {
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
+        allowTracking = Boolean.valueOf(props.getProperty("allowTracking","true"))
         
         // feed settings
         fileFeed = Boolean.valueOf(props.getProperty("fileFeed","true"))
@@ -102,7 +104,7 @@ class MuWireSettings {
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
         defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60000"))
         
-        speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","60"))
+        speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
         startChatServer = Boolean.valueOf(props.getProperty("startChatServer","false"))
@@ -157,6 +159,7 @@ class MuWireSettings {
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
+        props.setProperty("allowTracking", String.valueOf(allowTracking))
         
         // feed settings
         props.setProperty("fileFeed", String.valueOf(fileFeed))

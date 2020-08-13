@@ -3,7 +3,7 @@
                 <h2><%=Util._t("Status")%></h2>
                 <div class="menuitem">
                     <div class="menu-icon" id="connectionsIcon">
-                         <img src="images/not_started.png" alt="">
+                         <img src="images/NotStarted.png" alt="">
                     </div>
                     <div class="menu-text">
                         <%=Util._t("Connections")%>: <span id="connectionsCount">0</span>
@@ -37,13 +37,13 @@
                       <%=Util._t("Shared Files")%>
                   </div>
                 </a>
-                <a class="menuitem shared" href="BrowseHost">
+                <a class="menuitem browse" href="BrowseHost">
                   <div class="menu-icon"></div>
                   <div class="menu-text">
                       <%=Util._t("Browse")%>
                   </div>
                 </a>
-                <a class="menuitem shared" href="Feeds">
+                <a class="menuitem feeds" href="Feeds">
                   <div class="menu-icon"></div>
                   <div class="menu-text">
                       <%=Util._t("Feeds")%>
@@ -54,13 +54,13 @@
             <div class="menubox">
                 <h2 class="accordion"><%=Util._t("Trust")%></h2>
                 <div class="panel">
-	                <a class="menuitem identities" href="TrustUsers">
+	                <a class="menuitem trustUsers" href="TrustUsers">
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text">
 	                      <%=Util._t("Users")%>
 	                  </div>
 	                </a>
-	                <a class="menuitem address-book" href="TrustLists">
+	                <a class="menuitem trustList" href="TrustLists">
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text">
 	                      <%=Util._t("Subscriptions")%>
@@ -76,17 +76,21 @@
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text"><%=Util._t("Settings")%></div>
 	                </a>
+	                <a class="menuitem advancedSharing" href="AdvancedSharing">
+	                  <div class="menu-icon"></div>
+	                  <div class="menu-text"><%=Util._t("Advanced Sharing")%></div>
+	                </a>
                 </div>
             </div>
             <div class="menubox-divider"></div>
             <div class="menubox">
             	<h2 class="accordion"><%=Util._t("About")%></h2>
             	<div class="panel">
-	            	<a class="menuitem settings" href="AboutMe">
+	            	<a class="menuitem aboutMe" href="AboutMe">
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text"><%=Util._t("About Me")%></div>
 	                </a>
-	                <a class="menuitem settings" href="MuStatus">
+	                <a class="menuitem muStatus" href="MuStatus">
 	                  <div class="menu-icon"></div>
 	                  <div class="menu-text"><%=Util._t("MuWire")%></div>
 	                </a>
@@ -101,20 +105,3 @@
                 <a class="menuitem" href="about"><%=Util._t("About")%></a>
             </div>
 			-->
-
-<script>
-var acc = document.getElementsByClassName("accordion");
-var i;
-
-for (i = 0; i < acc.length; i++) {
-  acc[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var panel = this.nextElementSibling;
-    if (panel.style.maxHeight) {
-      panel.style.maxHeight = null;
-    } else {
-      panel.style.maxHeight = panel.scrollHeight + "px";
-    } 
-  });
-}
-</script>

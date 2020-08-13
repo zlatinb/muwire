@@ -23,6 +23,7 @@ class FileTree<T> {
             if (existing == null) {
                 existing = new TreeNode()
                 existing.file = element
+                existing.isFile = element.isFile()
                 existing.parent = current
                 fileToNode.put(element, existing)
                 current.children.add(existing)
@@ -64,7 +65,7 @@ class FileTree<T> {
     private void doTraverse(TreeNode<T> node, FileTreeCallback<T> callback) {
         boolean leave = false
         if (node.file != null) {
-            if (node.file.isFile())
+            if (node.isFile)
                 callback.onFile(node.file, node.value)
             else {
                 leave = true
@@ -88,7 +89,7 @@ class FileTree<T> {
             node = fileToNode.get(parent)
             
         node.children.each { 
-            if (it.file.isFile())
+            if (it.isFile)
                 callback.onFile(it.file, it.value)
             else
                 callback.onDirectory(it.file)
@@ -98,6 +99,7 @@ class FileTree<T> {
     public static class TreeNode<T> {
         TreeNode parent
         File file
+        boolean isFile
         T value;
         final Set<TreeNode> children = new HashSet<>()
         

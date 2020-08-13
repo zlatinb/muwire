@@ -8,6 +8,10 @@
                      <div class="menuitem search">
                        <div class="menu-icon"></div>
                        <input type="submit" value="<%=Util._t("Search")%>" />
+                       <div class="tooltip">
+                       		<%=Util._t("Help")%>
+                       		<span class="tooltiptext"><%=Util._t("Enter keywords or file hash.")%></span>
+                       	</div>
                      </div>
                   </form>
               </div>

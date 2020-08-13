@@ -195,7 +195,7 @@ function hideCertificateComment(divId, base64) {
 	linkDiv.innerHTML = link
 	
 	var commentDiv = document.getElementById("certificate-comment-" + divId + "_" + base64)
-	commentDiv.innerHTML = ""
+	commentDiv.textContent = ""
 }
 
 function refreshCertificates() {
@@ -208,3 +208,7 @@ function initCertificates() {
 	setInterval(refreshCertificates, 3000)
 	setTimeout(refreshCertificates, 1)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initCertificates();
+}, true);

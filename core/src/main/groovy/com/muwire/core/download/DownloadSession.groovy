@@ -183,15 +183,14 @@ class DownloadSession {
                 mapped.position(position)
 
                 byte[] tmp = new byte[0x1 << 13]
+                DataInputStream dis = new DataInputStream(is)
                 while(mapped.hasRemaining()) {
                     if (mapped.remaining() < tmp.length)
                         tmp = new byte[mapped.remaining()]
-                    int read = is.read(tmp)
-                    if (read == -1)
-                        throw new IOException()
+                    dis.readFully(tmp)
                     synchronized(this) {
-                        mapped.put(tmp, 0, read)
-                        dataSinceLastRead.addAndGet(read)
+                        mapped.put(tmp)
+                        dataSinceLastRead.addAndGet(tmp.length)
                         pieces.markPartial(piece, mapped.position())
                     }
                 }

@@ -1,11 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="com.muwire.webui.*" %>
+<%@ page import="com.muwire.core.*" %>
 <%@include file="initcode.jsi"%>
 
 <% 
 
-String pagetitle=Util._t("MuWire Status"); 
+String pagetitle=Util._t("MuWire Status");
+String helptext = Util._t("This page shows internal MuWire metrics.");
+ 
+Core core = (Core) application.getAttribute("core");
+String buildNumber = (String)application.getAttribute("buildNumber");
 
 %>
 
@@ -13,15 +18,18 @@ String pagetitle=Util._t("MuWire Status");
 	<head>
 <%@ include file="css.jsi"%>
 <script src="js/status.js?<%=version%>" type="text/javascript"></script>
-
+<script nonce="<%=cspNonce%>" type="text/javascript">
+    openAccordion = 3;
+</script>
 	</head>
-	<body onload="initConnectionsCount(); initStatus();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
+	    <h3>MuWire <%=core.getVersion() + "-b" + buildNumber%></h3>
 	    <table>
 	    	<tr>
 	    		<td><%=Util._t("Incoming Connections")%></td>

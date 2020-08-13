@@ -1,12 +1,38 @@
-apply plugin : 'application'
-mainClassName = 'com.muwire.core.Core'
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
-dependencies {
-    compile "net.i2p:i2p:${i2pVersion}"
-    compile "net.i2p:router:${i2pVersion}"
-    compile "net.i2p.client:mstreaming:${i2pVersion}"
-    compile "net.i2p.client:streaming:${i2pVersion}"
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
-    testCompile 'junit:junit:4.12'
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+dependencies {
+    api "net.i2p:i2p:${i2pVersion}"
+    api "net.i2p:router:${i2pVersion}"
+    api "net.i2p.client:mstreaming:${i2pVersion}"
+    implementation "net.i2p.client:streaming:${i2pVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.4'
+}
+
+
+// this is necessary because applying both groovy and java-library doesn't work well
+configurations {
+    apiElements.outgoing.variants {
+        classes {
+            artifact file: compileGroovy.destinationDir, builtBy: compileGroovy
+        }
+    }
+}
+
+// publish core to local maven repo for sister projects
+publishing {
+    publications {
+        muCore(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }

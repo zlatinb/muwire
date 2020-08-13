@@ -85,7 +85,7 @@ class PersisterServiceLoadingTest {
         def loadedFile = listener.publishedFiles[0]
         assert loadedFile != null
         assert loadedFile.file == sharedFile1.getCanonicalFile()
-        assert loadedFile.infoHash == ih1
+        assert loadedFile.root == ih1.getRoot()
     }
 
     private static String getSharedFileJsonName(File sharedFile) {
@@ -128,7 +128,7 @@ class PersisterServiceLoadingTest {
         def loadedFile = listener.publishedFiles[0]
         assert loadedFile != null
         assert loadedFile.file == sharedFile1.getCanonicalFile()
-        assert loadedFile.infoHash == ih1
+        assert loadedFile.root == ih1.getRoot()
     }
 
     @Test
@@ -169,10 +169,10 @@ class PersisterServiceLoadingTest {
         assert listener.publishedFiles.size() == 2
         def loadedFile1 = listener.publishedFiles[0]
         assert loadedFile1.file == sharedFile1.getCanonicalFile()
-        assert loadedFile1.infoHash == ih1
+        assert loadedFile1.root == ih1.getRoot()
         def loadedFile2 = listener.publishedFiles[1]
         assert loadedFile2.file == sharedFile2.getCanonicalFile()
-        assert loadedFile2.infoHash == ih2
+        assert loadedFile2.root == ih2.getRoot()
     }
 
     @Test

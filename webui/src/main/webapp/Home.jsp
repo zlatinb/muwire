@@ -9,6 +9,10 @@
 <%@include file="initcode.jsi"%>
 <%
         String pagetitle=Util._t("Home");
+        
+        String helptext = Util._t("Search for files shared by other MuWire users.") +
+                "<br/>" + Util._t("You can group the results by sender or by file.");
+        
 	session.setAttribute("persona", persona);
 	session.setAttribute("version", version);
 	
@@ -28,20 +32,22 @@
 <html>
 	<head>
 <%@include file="css.jsi"%>
-	<script src="js/tables.js?<%=version%>" type="text/javascript"></script>
 	<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
+<% if (groupBy.equals("sender")) { %>
+		var bySender = true;
+<% } else { %>
+		var bySender = false;
+<% } %>
+	</script>
 	<script src="js/search.js?<%=version%>" type="text/javascript"></script>
 <% if (request.getParameter("uuid") != null) {%>
-	<script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
 		uuid="<%=request.getParameter("uuid")%>"
 	</script>
 <% } %>
 	</head>
-<% if (groupBy.equals("sender")) { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupBySender(); initCertificates();">
-<% } else { %>
-		<body onload="initTranslate(jsTranslations); initConnectionsCount(); initGroupByFile(); initCertificates();">
-<% } %>
+		<body>
 <%@include file="header.jsi"%>
 		<aside>
 <%@include file="searchbox.jsi"%>    	
@@ -65,13 +71,13 @@
 		<section class="main foldermain">
 			<h3><span id="currentSearch"><%=Util._t("Results")%></span></h3>
 									<div id="table-wrapper">
-										<div id="table-scroll">
+										<div id="table-scroll" class="paddedTable">
 											<div id="<%=topTableId%>"></div>
 										</div>
 									</div>
 			<h3><span id="resultsFrom"></span></h3>
 													<div id="table-wrapper">
-														<div id="table-scroll">
+														<div id="table-scroll" class="paddedTable">
 															<div id="<%=bottomTableId%>">
 															</div>
 														</div>

@@ -294,8 +294,6 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
-            core.muOptions.watchedDirectories.each { core.eventBus.publish(new FileSharedEvent(file : new File(it))) }
-
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
@@ -415,7 +413,7 @@ class MainFrameModel {
                         break
                     if (parent.getChildCount() == 0) {
                         File file = parent.getUserObject().file
-                        if (core.muOptions.watchedDirectories.contains(file.toString()))
+                        if (core.watchedDirectoryManager.isWatched(file))
                             unshared.add(file)
                         dmtn = parent
                         continue

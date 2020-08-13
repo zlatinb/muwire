@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
+import com.muwire.core.files.directories.WatchedDirectoryConvertedEvent
+import com.muwire.core.files.directories.WatchedDirectoryManager
 
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
@@ -33,27 +36,27 @@ class DirectoryWatcher {
     }
 
     private final File home
-    private final MuWireSettings muOptions
     private final EventBus eventBus
     private final FileManager fileManager
+    private final WatchedDirectoryManager watchedDirectoryManager
     private final Thread watcherThread, publisherThread
     private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
     private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
 
-    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, MuWireSettings muOptions) {
+    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, WatchedDirectoryManager watchedDirectoryManager) {
         this.home = home
-        this.muOptions = muOptions
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.watchedDirectoryManager = watchedDirectoryManager
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
         watcherThread.setDaemon(true)
         this.publisherThread = new Thread({publish()} as Runnable, "watched-files-publisher")
         publisherThread.setDaemon(true)
     }
 
-    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+    void onWatchedDirectoryConvertedEvent(WatchedDirectoryConvertedEvent e) {
         watchService = FileSystems.getDefault().newWatchService()
         watcherThread.start()
         publisherThread.start()
@@ -71,26 +74,26 @@ class DirectoryWatcher {
         Path path = canonical.toPath()
         WatchKey wk = path.register(watchService, kinds)
         watchedDirectories.put(canonical, wk)
-        
-        if (muOptions.watchedDirectories.add(canonical.toString()))
-            saveMuSettings()
     }
 
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         WatchKey wk = watchedDirectories.remove(e.directory)
         wk?.cancel()
-        
-        if (muOptions.watchedDirectories.remove(e.directory.toString()))
-            saveMuSettings()
     }
     
-    private void saveMuSettings() {
-        File muSettingsFile = new File(home, "MuWire.properties")
-        muSettingsFile.withPrintWriter("UTF-8", {
-            muOptions.write(it)
-        })
+    void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
+        if (watchService == null)
+            return // still converting
+        if (!e.autoWatch) {
+            WatchKey wk = watchedDirectories.remove(e.directory)
+            wk?.cancel()
+        } else if (!watchedDirectories.containsKey(e.directory)) {
+            Path path = e.directory.toPath()
+            def wk = path.register(watchService, kinds)
+            watchedDirectories.put(e.directory, wk)
+        } // else it was already watched
     }
-
+    
     private void watch() {
         try {
             while(!shutdown) {
@@ -115,7 +118,7 @@ class DirectoryWatcher {
         File f= join(parent, path)
         log.fine("created entry $f")
         if (f.isDirectory())
-            f.toPath().register(watchService, kinds)
+            eventBus.publish(new FileSharedEvent(file : f, fromWatch : true))
         else
             waitingFiles.put(f, System.currentTimeMillis())
     }
@@ -133,6 +136,10 @@ class DirectoryWatcher {
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFile : sf, deleted : true))
+        else if (watchedDirectoryManager.isWatched(f)) 
+            eventBus.publish(new DirectoryUnsharedEvent(directory : f, deleted : true))
+        else
+            log.fine("Entry was not relevant");
     }
 
     private static File join(Path parent, Path path) {
@@ -149,7 +156,7 @@ class DirectoryWatcher {
                 waitingFiles.each { file, timestamp ->
                     if (now - timestamp > WAIT_TIME) {
                         log.fine("publishing file $file")
-                        eventBus.publish new FileSharedEvent(file : file)
+                        eventBus.publish new FileSharedEvent(file : file, fromWatch: true)
                         published << file
                     }
                 }

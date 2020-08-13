@@ -7,6 +7,8 @@ import griffon.core.artifact.GriffonModel
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
+import java.awt.Font
+
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
     @Observable String downloadRetryInterval
@@ -18,16 +20,15 @@ class OptionsModel {
     @Observable String incompleteLocation
     @Observable boolean searchComments
     @Observable boolean browseFiles
+    @Observable boolean allowTracking
     @Observable int speedSmoothSeconds
     @Observable int totalUploadSlots
     @Observable int uploadSlotsPerUser
     @Observable boolean storeSearchHistory
 
     // i2p options
-    @Observable String inboundLength
-    @Observable String inboundQuantity
-    @Observable String outboundLength
-    @Observable String outboundQuantity
+    @Observable int tunnelLength
+    @Observable int tunnelQuantity
     @Observable String i2pUDPPort
     @Observable String i2pNTCPPort
 
@@ -37,6 +38,8 @@ class OptionsModel {
     @Observable String font
     @Observable boolean automaticFontSize
     @Observable int customFontSize
+    @Observable boolean fontStyleBold
+    @Observable boolean fontStyleItalic
     @Observable boolean clearCancelledDownloads
     @Observable boolean clearFinishedDownloads
     @Observable boolean excludeLocalResult
@@ -83,15 +86,14 @@ class OptionsModel {
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
         browseFiles = settings.browseFiles
+        allowTracking = settings.allowTracking
         speedSmoothSeconds = settings.speedSmoothSeconds
         totalUploadSlots = settings.totalUploadSlots
         uploadSlotsPerUser = settings.uploadSlotsPerUser
 
         Core core = application.context.get("core")
-        inboundLength = core.i2pOptions["inbound.length"]
-        inboundQuantity = core.i2pOptions["inbound.quantity"]
-        outboundLength = core.i2pOptions["outbound.length"]
-        outboundQuantity = core.i2pOptions["outbound.quantity"]
+        tunnelLength = Math.max(Integer.parseInt(core.i2pOptions["inbound.length"]), Integer.parseInt(core.i2pOptions['outbound.length']))
+        tunnelQuantity = Math.max(Integer.parseInt(core.i2pOptions["inbound.quantity"]), Integer.parseInt(core.i2pOptions['outbound.quantity']))
         i2pUDPPort = core.i2pOptions["i2np.udp.port"]
         i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
 
@@ -101,6 +103,8 @@ class OptionsModel {
         font = uiSettings.font
         automaticFontSize = uiSettings.autoFontSize
         customFontSize = uiSettings.fontSize
+        fontStyleBold = (uiSettings.fontStyle & Font.BOLD) == Font.BOLD
+        fontStyleItalic = (uiSettings.fontStyle & Font.ITALIC) == Font.ITALIC
         clearCancelledDownloads = uiSettings.clearCancelledDownloads
         clearFinishedDownloads = uiSettings.clearFinishedDownloads
         excludeLocalResult = uiSettings.excludeLocalResult

@@ -53,7 +53,6 @@ class HasherService {
 
     private void process(File f) {
         if (f.isDirectory()) {
-            eventBus.publish(new DirectoryWatchedEvent(directory : f))
             f.listFiles().each {
                 eventBus.publish new FileSharedEvent(file: it)
             }

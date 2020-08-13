@@ -14,8 +14,13 @@ class TrustList {
 		var userLink = new Link(this.user, "displayList", [this.user])
 		var unsubscribeLink = new Link(_t("Unsubscribe"), "unsubscribe", [this.userB64])
 		var refreshLink = new Link(_t("Refresh"), "forceUpdate", [this.userB64])
-		
-		var nameHtml = userLink.render() + "<span class='right'>" + unsubscribeLink.render() + "  " + refreshLink.render() + "</span>"
+
+		var actionsHtml = "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>" +
+			unsubscribeLink.render() +
+			refreshLink.render() +
+			"</div></div>"
+				
+		var nameHtml = userLink.render() + "<span class='right'>" + actionsHtml + "</span>"
 		
 		mapping.set("Name", nameHtml)
 		mapping.set("Status", this.status)
@@ -42,7 +47,11 @@ class Persona {
 	getMapping() {
 		var mapping = new Map()
 		
-		var userHtml = this.user + "<div class='right'>" + this.getTrustActions().join("  ") + "</div>"
+		var actionsHtml = "<div class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content'>" +
+			this.getTrustActions().join("") +
+			"</div></div>"
+		
+		var userHtml = this.user + "<div class='right'>" + actionsHtml + "</div>"
 		userHtml += "<div class='centercomment' id='trusted-" + this.userB64 + "'></div>"
 		userHtml += "<div class='centercomment' id='distrusted-" + this.userB64 + "'></div>"
 		mapping.set("Trusted User", userHtml)
@@ -101,7 +110,7 @@ var distrustedSortOrder = "descending"
 
 function markTrusted(user) {
 	var linkSpan = document.getElementById("trusted-link-" + user)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("trusted-" + user)
 	
@@ -121,7 +130,7 @@ function submitTrust(user) {
 
 function cancelTrust(user) {
 	var textAreaSpan = document.getElementById("trusted-" + user)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("trusted-link-" + user)
 	var html = "<a href='#' onclick='markTrusted(\"" + user + "\");return false;'>" + _t("Mark Trusted") + "</a>"
@@ -134,7 +143,7 @@ function markNeutral(user) {
 
 function markDistrusted(user) {
 	var linkSpan = document.getElementById("distrusted-link-" + user)
-	linkSpan.innerHTML = ""
+	linkSpan.textContent = ""
 	
 	var textAreaSpan = document.getElementById("distrusted-" + user)
 	
@@ -154,7 +163,7 @@ function submitDistrust(user) {
 
 function cancelDistrust(user) {
 	var textAreaSpan = document.getElementById("distrusted-" + user)
-	textAreaSpan.innerHTML = ""
+	textAreaSpan.textContent = ""
 	
 	var linkSpan = document.getElementById("distrusted-link-" + user)
 	var html = "<a href='#' onclick='markDistrusted(\"" + user + "\");return false;'>" + _t("Mark Distrusted") + "</a>"
@@ -245,7 +254,7 @@ function displayTrustedList(user) {
 			if (trusted.length > 0)
 				trustedDiv.innerHTML = table.render()
 			else
-				trustedDiv.innerHTML = ""
+				trustedDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + trustedSortKey + "&order=" + trustedSortOrder
@@ -277,7 +286,7 @@ function displayDistrustedList(user) {
 			if (distrusted.length > 0)
 				distrustedDiv.innerHTML = table.render()
 			else
-				distrustedDiv.innerHTML = ""
+				distrustedDiv.textContent = ""
 		}
 	}
 	var sortParam = "&key=" + distrustedSortKey + "&order=" + distrustedSortOrder
@@ -327,13 +336,13 @@ function refreshLists() {
 			if (listOfLists.length > 0)
 				trustListsDiv.innerHTML = table.render()
 			else
-				trustListsDiv.innerHTML = ""
+				trustListsDiv.textContent = ""
 			
 			if (currentUser != null)
 				displayList(currentUser)
 			else {
-				document.getElementById("trusted").innerHTML = ""
-				document.getElementById("distrusted").innerHTML = ""
+				document.getElementById("trusted").textContent = ""
+				document.getElementById("distrusted").textContent = ""
 			}
 		}
 	}
@@ -362,3 +371,7 @@ function initTrustLists() {
 	setTimeout(fetchRevision, 1)
 	setInterval(fetchRevision, 3000)
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+   initTrustLists();
+}, true);

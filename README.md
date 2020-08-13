@@ -1,8 +1,10 @@
+The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and issues at http://git.idk.i2p/zlatinb/muwire
+
 # MuWire - Easy Anonymous File-Sharing
 
 MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows,MacOS,Linux.
 
-The current stable release - 0.6.8 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+The current stable release - 0.7.1 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -28,9 +30,7 @@ Type
 ./gradlew gui:run
 ```
 
-If you have an I2P router running on the same machine that is all you need to do.  If you use a custom I2CP host and port, create a file `i2p.properties` and put `i2cp.tcp.host=<host>` and `i2cp.tcp.port=<port>` in there.  On Windows that file should go into `%HOME%\AppData\Roaming\MuWire`, on Mac into `$HOME/Library/Application Support/MuWire` and on Linux `$HOME/.MuWire`
-
-[Default I2CP port]\: `7654`
+The setup wizard will ask you for the host and port of an I2P or I2Pd router.
 
 ## Running the CLI
 
@@ -48,6 +48,12 @@ MuWire is available as a Docker image.  For more information see the [Docker] pa
 
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
+
+## Related Projects
+### MuWire Tracker Daemon
+The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent tracking to MuWire.  For more info see the [Tracker] page.
+### MuCats
+MuCats is a project to create a website for hosting hashes of files shared on the MuWire network.  For more info see the [MuCats] project.
 
 ## GPG Fingerprint
 
@@ -67,3 +73,5 @@ You can find the full key at https://keybase.io/zlatinb
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
 [Docker]: https://github.com/zlatinb/muwire/wiki/Docker
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
+[Tracker]: https://github.com/zlatinb/muwire/wiki/Tracker-Daemon
+[MuCats]: https://github.com/zlatinb/mucats

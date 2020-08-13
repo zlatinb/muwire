@@ -9,6 +9,7 @@
 <% 
 
 String pagetitle=Util._t("Browse Host");
+String helptext = Util._t("Use this page to browse the files shared by other MuWire users.");
 
 String currentBrowse = null;
 if (request.getParameter("currentHost") != null) {
@@ -21,30 +22,33 @@ if (request.getParameter("currentHost") != null) {
 <html>
 	<head>
 <%@ include file="css.jsi"%>
-<script src="js/util.js?<%=version%>" type="text/javascript"></script>
-<script src="js/certificates.js?<%=version%> type="text/javascript"></script>
-<script src="js/tables.js?<%=version%> type="text/javascript"></script>
+<script src="js/certificates.js?<%=version%>" type="text/javascript"></script>
 <script src="js/browse.js?<%=version%>" type="text/javascript"></script>
 
 <% if (currentBrowse != null) { %>
-	<script>
+	<script nonce="<%=cspNonce%>" type="text/javascript">
 		currentHost="<%=currentBrowse%>"
 	</script>
 <% } %>
 
 	</head>
-	<body onload="initTranslate(jsTranslations); initConnectionsCount(); initBrowse(); initCertificates();">
+	<body>
 <%@ include file="header.jsi"%>
 	    <aside>
 		<div class="menubox-divider"></div>
 		<div class="menubox">
-			<h2><%=Util._t("Enter a full MuWire id")%></h2>
+			<h2><%=Util._t("Enter a full MuWire ID")%></h2>
 			<form action="/MuWire/Browse" method="post">
 				<input type="text" name="host">
 				<input type="hidden" name="action" value="browse">
-				<div class="menuitem shared">
+				<div class="menuitem browse">
 				  <div class="menu-icon"></div>
 				  <input type="submit" value=<%=Util._t("Browse")%>>
+				  <div class="tooltip"><%=Util._t("Help")%>
+				  	<span class="tooltiptext">
+				  		<%=Util._t("Enter the full ID of a MuWire user to see what files they are sharing")%>
+				  	</span>
+				  </div>
 				</div>
 			</form>
 		</div>

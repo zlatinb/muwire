@@ -2,13 +2,26 @@ subprojects {
     apply plugin: 'groovy'
 
     dependencies {
-        compile 'org.codehaus.groovy:groovy:2.4.15'
-        compile 'org.codehaus.groovy:groovy-jsr223:2.4.15'
-        compile 'org.codehaus.groovy:groovy-json:2.4.15'
+        compile "org.codehaus.groovy:groovy:${groovyVersion}"
+        compile "org.codehaus.groovy:groovy-jsr223:${groovyVersion}"
+        compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
     }
 
     compileGroovy {
-        groovyOptions.optimizationOptions.indy = true
+        groovyOptions.optimizationOptions.indy = false
+        sourceCompatibility = project.sourceCompatibility
+        targetCompatibility = project.targetCompatibility
+        options.compilerArgs += project.compilerArgs
+        options.deprecation = true
+        options.encoding = 'UTF-8'
+    }
+
+    compileJava {
+        sourceCompatibility = project.sourceCompatibility
+        targetCompatibility = project.targetCompatibility
+        options.compilerArgs += project.compilerArgs
+        options.deprecation = true
+        options.encoding = 'UTF-8'
     }
 
     repositories {
