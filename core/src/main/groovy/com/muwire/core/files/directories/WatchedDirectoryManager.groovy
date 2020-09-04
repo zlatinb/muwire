@@ -96,8 +96,12 @@ class WatchedDirectoryManager {
             forEach {
                 def parsed = slurper.parse(it.toFile())
                 WatchedDirectory wd = WatchedDirectory.fromJson(parsed)
-                watchedDirs.put(wd.directory, wd)
+                if (wd.directory.exists() && wd.directory.isDirectory()) // check if directory disappeared
+                    watchedDirs.put(wd.directory, wd)
+                else
+                    it.toFile().delete()
             }
+            
             watchedDirs.values().stream().filter({it.autoWatch}).forEach {
                 eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
                 eventBus.publish(new FileSharedEvent(file : it.directory))
