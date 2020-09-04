@@ -20,7 +20,7 @@ This helps with scalability
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
 * Advertise file feed and browseability in upload headers
-* Manual polling / shared folder re-scan (because polling NAS doesn't work)
+* Download queue with priorities 
 
 ### Chat
 * echo "unknown/innappropriate command" in the console
