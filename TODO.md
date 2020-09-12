@@ -15,12 +15,12 @@ This helps with scalability
 * Metadata parsing and search
 * Automatic adjustment of number of I2P tunnels
 * Persist trust immediately
-* Check if user-selected download and incomplete locations exist and are writeable
 * Enum i18n
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
 * Advertise file feed and browseability in upload headers
 * Download queue with priorities 
+* Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
 
 ### Chat
 * echo "unknown/innappropriate command" in the console
