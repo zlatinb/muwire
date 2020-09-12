@@ -43,4 +43,7 @@ This helps with scalability
 * Upload files from browser to plugin via drag-and-drop
 * Check permissions, display better errors when sharing local folders
 
- 
+### mwtrackerd
+* `save` and `load` JSON-RPC commands that save and load swarm state respectively
+* load-test with many many hashes (1M?)
+* evaluate other usage scenarios besides website backend 
