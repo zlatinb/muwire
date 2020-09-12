@@ -9,9 +9,11 @@ import com.muwire.core.Persona
 import com.muwire.core.files.FileHasher
 import com.muwire.core.util.DataUtil
 
+import groovy.util.logging.Log
 import net.i2p.data.Base64
 import net.i2p.data.Destination
 
+@Log
 class ResultsParser {
     public static UIResultEvent parse(Persona p, UUID uuid, def json) throws InvalidSearchResultException {
         if (json.type != "Result")
@@ -103,6 +105,8 @@ class ResultsParser {
             int certificates = 0
             if (json.certificates != null)
                 certificates = json.certificates
+                
+            log.fine("Received result from ${p.getHumanReadableName()} name \"$name\" infoHash:\"${json.infohash}\"")
 
             return new UIResultEvent( sender : p,
                 name : name,
