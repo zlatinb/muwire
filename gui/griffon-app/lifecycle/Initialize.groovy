@@ -158,18 +158,11 @@ class Initialize extends AbstractLifecycleHandler {
             Properties props = new Properties()
             uiSettings = new UISettings(props)
             log.info "will try default lnfs"
-            LookAndFeel chosen
-            if (isMacOSX()) {
-                    uiSettings.lnf = "metal"
-                    chosen = lookAndFeel("metal")
-            } else {
-                chosen = lookAndFeel('system', 'gtk')
-                if (chosen == null)
-                    chosen = lookAndFeel('metal')
-                uiSettings.lnf = chosen.getID()
-                log.info("ended up applying $chosen.name")
-            }
             
+            LookAndFeel chosen = lookAndFeel('system', 'gtk', 'metal')
+            uiSettings.lnf = chosen.getID()
+            log.info("ended up applying $chosen.name")
+
             FontUIResource defaultFont = chosen.getDefaults().getFont("Label.font")
             uiSettings.font = defaultFont.getName()
             uiSettings.fontSize = defaultFont.getSize()
