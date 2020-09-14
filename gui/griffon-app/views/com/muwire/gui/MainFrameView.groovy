@@ -1407,8 +1407,12 @@ class MainFrameView {
         
         expanded.each { tree.expandPath(it) }
         tree.setSelectionPaths(selectedPaths)
-        
-        builder.getVariable("shared-files-table").model.fireTableDataChanged()
+
+        def table = builder.getVariable("shared-files-table")
+        int [] selectedRows = table.getSelectedRows()
+        table.model.fireTableDataChanged()
+        for (int row : selectedRows)
+            table.selectionModel.addSelectionInterval(row, row)
     }
     
     public void refreshFeeds() {
