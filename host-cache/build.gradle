@@ -8,3 +8,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile "org.codehaus.groovy:groovy-all:${groovyVersion}"
 }
+
+configurations.testImplementation {
+        exclude group:'org.codehaus.groovy', module:'groovy-testng'
+}

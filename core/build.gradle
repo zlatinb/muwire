@@ -25,6 +25,10 @@ configurations {
     }
 }
 
+configurations.testImplementation {
+        exclude group:'org.codehaus.groovy', module:'groovy-testng'
+}
+
 // publish core to local maven repo for sister projects
 publishing {
     publications {
