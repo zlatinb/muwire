@@ -501,6 +501,9 @@ class MainFrameModel {
     }
 
     void onQueryEvent(QueryEvent e) {
+        if (!uiSettings.showMonitor)
+            return
+            
         if (e.replyTo == core.me.destination)
             return
 
