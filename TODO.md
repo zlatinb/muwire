@@ -35,7 +35,6 @@ This helps with scalability
 * Search box - left identation
 * Ability to disable switching of tabs on actions
 * Ability to trust/browse/subscribe from uploads tab
-* Fix JRE 14 on MacOS (may require switching LnF)
 
 ### Web UI/Plugin
 * HTML 5 media players
