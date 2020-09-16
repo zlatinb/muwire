@@ -15,6 +15,7 @@ import java.util.logging.Level
 
 import javax.annotation.Nonnull
 import javax.swing.JOptionPane
+import javax.swing.text.StyledDocument
 
 import com.muwire.core.Persona
 import com.muwire.core.chat.ChatCommand
@@ -54,10 +55,13 @@ class ChatRoomController {
         long now = System.currentTimeMillis()
         
         if (command.action == ChatAction.SAY && command.payload.length() > 0) {
-            String toShow = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + "> "+command.payload
+            String header = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + ">"
+            StyledDocument sd = view.roomTextArea.getStyledDocument()
+            sd.insertString(sd.getEndPosition().getOffset() - 1, header, sd.getStyle("italic"))
+            sd.insertString(sd.getEndPosition().getOffset() - 1, " ", sd.getStyle("regular"))
+            sd.insertString(sd.getEndPosition().getOffset() - 1, command.payload, sd.getStyle("regular"))
+            sd.insertString(sd.getEndPosition().getOffset() - 1, "\n", sd.getStyle("regular"))
 
-            view.roomTextArea.append(toShow)
-            view.roomTextArea.append('\n')
             trimLines()
         }
         
@@ -190,9 +194,8 @@ class ChatRoomController {
     }
     
     private void processSay(ChatMessageEvent e, String text) {
-        String toDisplay = DataHelper.formatTime(e.timestamp) + " <"+e.sender.getHumanReadableName()+"> " + text + "\n"
         runInsideUIAsync {
-            view.roomTextArea.append(toDisplay)
+            view.appendSay(text, e.sender, e.timestamp)
             trimLines()
             if (!model.console)
                 view.chatNotificator.onMessage(mvcGroup.mvcId)
@@ -203,7 +206,7 @@ class ChatRoomController {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " joined the room\n"
         runInsideUIAsync {
             model.members.add(p)
-            view.roomTextArea.append(toDisplay)
+            view.appendGray(toDisplay)
             trimLines()
             view.membersTable?.model?.fireTableDataChanged()
         }
@@ -223,7 +226,7 @@ class ChatRoomController {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " left the room\n"
         runInsideUIAsync {
             model.members.remove(p)
-            view.roomTextArea.append(toDisplay)
+            view.appendGray(toDisplay)
             trimLines()
             view.membersTable?.model?.fireTableDataChanged()
         }
@@ -233,7 +236,7 @@ class ChatRoomController {
         String toDisplay = DataHelper.formatTime(System.currentTimeMillis()) + " " + p.getHumanReadableName() + " disconnected\n"
         runInsideUIAsync {
             if (model.members.remove(p)) {
-                view.roomTextArea.append(toDisplay)
+                view.appendGray(toDisplay)
                 trimLines()
                 view.membersTable?.model?.fireTableDataChanged()
             }
@@ -243,11 +246,12 @@ class ChatRoomController {
     private void trimLines() {
         if (model.settings.maxChatLines < 0)
             return
-        while(view.roomTextArea.getLineCount() > model.settings.maxChatLines) {
-            int line0Start = view.roomTextArea.getLineStartOffset(0)
-            int line0End = view.roomTextArea.getLineEndOffset(0)
-            view.roomTextArea.replaceRange(null, line0Start, line0End)
-        }
+        // TODO: update to JTextPane api
+//        while(view.roomTextArea.getLineCount() > model.settings.maxChatLines) {
+//            int line0Start = view.roomTextArea.getLineStartOffset(0)
+//            int line0End = view.roomTextArea.getLineEndOffset(0)
+//            view.roomTextArea.replaceRange(null, line0Start, line0End)
+//        }
     }
     
     void rejoinRoom() {

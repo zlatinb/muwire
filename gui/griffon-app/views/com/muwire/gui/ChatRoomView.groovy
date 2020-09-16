@@ -3,18 +3,25 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.DataHelper
 
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
+import javax.swing.JTextPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.text.Style
+import javax.swing.text.StyleConstants
+import javax.swing.text.StyleContext
+import javax.swing.text.StyledDocument
 import javax.swing.SpringLayout.Constraints
 
 import com.muwire.core.Persona
 import com.muwire.core.chat.ChatConnectionAttemptStatus
 
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
@@ -34,7 +41,7 @@ class ChatRoomView {
     def pane
     def parent
     def sayField
-    def roomTextArea
+    JTextPane roomTextArea
     def textScrollPane
     def membersTable
     def lastMembersTableSortEvent
@@ -48,7 +55,7 @@ class ChatRoomView {
                 panel(constraints : BorderLayout.CENTER) {
                     gridLayout(rows : 1, cols : 1)
                     textScrollPane = scrollPane {
-                        roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                        roomTextArea = textPane(editable : false)
                     }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
@@ -78,7 +85,7 @@ class ChatRoomView {
                         panel {
                             gridLayout(rows : 1, cols : 1)
                             textScrollPane = scrollPane {
-                                roomTextArea = textArea(editable : false, lineWrap : true, wrapStyleWord : true)
+                                roomTextArea = textPane(editable : false)
                             }
                         }
                     }
@@ -135,6 +142,15 @@ class ChatRoomView {
                         }
                     })
         }
+        
+        // styles
+        StyledDocument document = roomTextArea.getStyledDocument()
+        Style regular = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE)
+        Style italic = document.addStyle("italic", regular)
+        StyleConstants.setItalic(italic, true)
+        Style gray = document.addStyle("gray", regular)
+        StyleConstants.setForeground(gray, Color.GRAY)
+          
     }
     
     private void showPopupMenu(MouseEvent e) {
@@ -178,5 +194,18 @@ class ChatRoomView {
         controller.leaveRoom()
         chatNotificator.roomClosed(mvcGroup.mvcId)
         mvcGroup.destroy()
+    }
+    
+    void appendGray(String gray) {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        doc.insertString(doc.getEndPosition().getOffset() - 1, gray, doc.getStyle("gray"))
+    }
+    
+    void appendSay(String text, Persona sender, long timestamp) {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        String header = DataHelper.formatTime(timestamp) + " <" + sender.getHumanReadableName() + "> "
+        doc.insertString(doc.getEndPosition().getOffset() - 1, header, doc.getStyle("italic"))
+        doc.insertString(doc.getEndPosition().getOffset() - 1, text, doc.getStyle("regular"))
+        doc.insertString(doc.getEndPosition().getOffset() - 1, "\n", doc.getStyle("regular"))
     }
 }
