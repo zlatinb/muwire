@@ -41,6 +41,8 @@ class MuWireSettings {
     int defaultFeedItemsToKeep
     boolean defaultFeedSequential
     
+    int peerConnections
+    int leafConnections
     
     boolean startChatServer
     int maxChatConnections
@@ -103,6 +105,10 @@ class MuWireSettings {
         defaultFeedItemsToKeep = Integer.valueOf(props.getProperty("defaultFeedItemsToKeep", "1000"))
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
         defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60000"))
+        
+        // ultrapeer connection settings
+        leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
+        peerConnections = Integer.valueOf(props.getProperty("peerConnections","512"))
         
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
@@ -169,6 +175,10 @@ class MuWireSettings {
         props.setProperty("defaultFeedItemsToKeep", String.valueOf(defaultFeedItemsToKeep))
         props.setProperty("defaultFeedSequential", String.valueOf(defaultFeedSequential))
         props.setProperty("defaultFeedUpdateInterval", String.valueOf(defaultFeedUpdateInterval))
+        
+        // ultrapeer connection settings
+        props.setProperty("peerConnections", String.valueOf(peerConnections))
+        props.setProperty("leafConnections", String.valueOf(leafConnections))
         
         props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
