@@ -125,7 +125,7 @@ class OptionsModel {
         defaultFeedAutoDownload = settings.defaultFeedAutoDownload
         defaultFeedItemsToKeep = String.valueOf(settings.defaultFeedItemsToKeep)
         defaultFeedSequential = settings.defaultFeedSequential
-        defaultFeedUpdateInterval = String.valueOf(Math.max(1, settings.defaultFeedUpdateInterval / 60000))
+        defaultFeedUpdateInterval = String.valueOf(Math.max(1L, (long)(settings.defaultFeedUpdateInterval / 60000L)))
 
         onlyTrusted = !settings.allowUntrusted()
         searchExtraHop = settings.searchExtraHop
