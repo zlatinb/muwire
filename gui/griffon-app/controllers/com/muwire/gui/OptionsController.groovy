@@ -148,7 +148,7 @@ class OptionsController {
         
         String defaultFeedUpdateInterval = view.defaultFeedUpdateIntervalField.text
         model.defaultFeedUpdateInterval = defaultFeedUpdateInterval
-        settings.defaultFeedUpdateInterval = Integer.parseInt(defaultFeedUpdateInterval)
+        settings.defaultFeedUpdateInterval = Integer.parseInt(defaultFeedUpdateInterval) * 60000L
 
         // trust saving
 

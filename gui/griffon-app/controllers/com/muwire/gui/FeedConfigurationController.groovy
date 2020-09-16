@@ -21,7 +21,7 @@ class FeedConfigurationController {
         model.feed.setAutoDownload(view.autoDownloadCheckbox.model.isSelected())
         model.feed.setSequential(view.sequentialCheckbox.model.isSelected())
         model.feed.setItemsToKeep(Integer.parseInt(view.itemsToKeepField.text))
-        model.feed.setUpdateInterval(Integer.parseInt(view.updateIntervalField.text) * 60000)
+        model.feed.setUpdateInterval(Long.parseLong(view.updateIntervalField.text) * 60000)
         
         model.core.eventBus.publish(new UIFeedConfigurationEvent(feed : model.feed))
         

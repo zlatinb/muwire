@@ -111,7 +111,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "autoPublishSharedFiles" : core.getMuOptions().setAutoPublishSharedFiles(true); break;
         case "defaultFeedAutoDownload" : core.getMuOptions().setDefaultFeedAutoDownload(true); break;
         case "defaultFeedSequential" : core.getMuOptions().setDefaultFeedSequential(true); break;
-        case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * Integer.parseInt(value)); break;
+        case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * Long.parseLong(value)); break;
         case "defaultFeedItemsToKeep" : core.getMuOptions().setDefaultFeedItemsToKeep(Integer.parseInt(value)); break;
         
         // TODO: ui settings

@@ -219,7 +219,7 @@ public class FeedServlet extends HttpServlet {
             }
             boolean autoDownload = Boolean.valueOf(req.getParameter("autoDownload"));
             boolean sequential = Boolean.valueOf(req.getParameter("sequential"));
-            int updateInterval = Integer.valueOf(req.getParameter("updateInterval")) * 60000;
+            long updateInterval = Long.valueOf(req.getParameter("updateInterval")) * 60000;
             int itemsToKeep = Integer.valueOf(req.getParameter("itemsToKeep"));
             
             feedManager.configure(host, autoDownload, sequential, updateInterval, itemsToKeep);

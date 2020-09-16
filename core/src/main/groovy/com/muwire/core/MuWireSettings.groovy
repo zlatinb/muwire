@@ -37,7 +37,7 @@ class MuWireSettings {
     boolean advertiseFeed
     boolean autoPublishSharedFiles
     boolean defaultFeedAutoDownload
-    int defaultFeedUpdateInterval
+    long defaultFeedUpdateInterval
     int defaultFeedItemsToKeep
     boolean defaultFeedSequential
     
@@ -104,7 +104,7 @@ class MuWireSettings {
         defaultFeedAutoDownload = Boolean.valueOf(props.getProperty("defaultFeedAutoDownload", "false"))
         defaultFeedItemsToKeep = Integer.valueOf(props.getProperty("defaultFeedItemsToKeep", "1000"))
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
-        defaultFeedUpdateInterval = Integer.valueOf(props.getProperty("defaultFeedUpdateInterval", "60000"))
+        defaultFeedUpdateInterval = Long.valueOf(props.getProperty("defaultFeedUpdateInterval", "3600000"))
         
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))

@@ -6,7 +6,7 @@ public class Feed {
     
     private final Persona publisher;
     
-    private int updateInterval;
+    private long updateInterval;
     private long lastUpdated;
     private volatile long lastUpdateAttempt;
     private int itemsToKeep;
@@ -19,11 +19,11 @@ public class Feed {
         this.status = FeedFetchStatus.IDLE;
     }
 
-    public int getUpdateInterval() {
+    public long getUpdateInterval() {
         return updateInterval;
     }
 
-    public void setUpdateInterval(int updateInterval) {
+    public void setUpdateInterval(long updateInterval) {
         this.updateInterval = updateInterval;
     }
 

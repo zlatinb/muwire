@@ -104,7 +104,7 @@ public class FeedManager {
     }
     
     void configure(Persona publisher, boolean autoDownload, boolean sequential,
-            int updateInterval, int itemsToKeep) {
+            long updateInterval, int itemsToKeep) {
         RemoteFeed rf = remoteFeeds.get(publisher);
         if (rf == null)
             return;
