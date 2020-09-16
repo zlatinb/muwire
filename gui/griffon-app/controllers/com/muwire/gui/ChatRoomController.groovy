@@ -246,12 +246,8 @@ class ChatRoomController {
     private void trimLines() {
         if (model.settings.maxChatLines < 0)
             return
-        // TODO: update to JTextPane api
-//        while(view.roomTextArea.getLineCount() > model.settings.maxChatLines) {
-//            int line0Start = view.roomTextArea.getLineStartOffset(0)
-//            int line0End = view.roomTextArea.getLineEndOffset(0)
-//            view.roomTextArea.replaceRange(null, line0Start, line0End)
-//        }
+        while(view.getLineCount() > model.settings.maxChatLines) 
+            view.removeFirstLine()
     }
     
     void rejoinRoom() {

@@ -25,7 +25,6 @@ This helps with scalability
 ### Chat
 * echo "unknown/innappropriate command" in the console
 * break up lines on CR/LF, send multiple messages
-* Style timestamps and persona names
 * enforce # in room names or ignore it
 * auto-create/join channel on server start
 * jump from notification window to room with message

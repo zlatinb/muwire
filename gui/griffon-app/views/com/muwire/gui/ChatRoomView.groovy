@@ -11,6 +11,7 @@ import javax.swing.JSplitPane
 import javax.swing.JTextPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
+import javax.swing.text.Element
 import javax.swing.text.Style
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyleContext
@@ -207,5 +208,16 @@ class ChatRoomView {
         doc.insertString(doc.getEndPosition().getOffset() - 1, header, doc.getStyle("italic"))
         doc.insertString(doc.getEndPosition().getOffset() - 1, text, doc.getStyle("regular"))
         doc.insertString(doc.getEndPosition().getOffset() - 1, "\n", doc.getStyle("regular"))
+    }
+    
+    int getLineCount() {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        doc.getDefaultRootElement().getElementCount() - 1
+    }
+    
+    void removeFirstLine() {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        Element element = doc.getParagraphElement(0)
+        doc.remove(0, element.getEndOffset())
     }
 }
