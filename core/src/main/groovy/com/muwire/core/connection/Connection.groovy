@@ -132,6 +132,7 @@ abstract class Connection implements Closeable {
         def ping = [:]
         ping.type = "Ping"
         ping.version = 1
+        ping.uuid = UUID.randomUUID().toString()
         messages.put(ping)
         lastPingSentTime = System.currentTimeMillis()
     }
@@ -160,11 +161,13 @@ abstract class Connection implements Closeable {
         messages.put(query)
     }
 
-    protected void handlePing() {
+    protected void handlePing(def ping) {
         log.fine("$name received ping")
         def pong = [:]
         pong.type = "Pong"
         pong.version = 1
+        if (ping.uuid != null)
+            pong.uuid = ping.uuid
         pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
         messages.put(pong)
     }

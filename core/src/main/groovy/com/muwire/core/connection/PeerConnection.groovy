@@ -53,7 +53,7 @@ class PeerConnection extends Connection {
             if (json.type == null)
                 throw new Exception("missing json type")
             switch(json.type) {
-                case "Ping" : handlePing(); break;
+                case "Ping" : handlePing(json); break;
                 case "Pong" : handlePong(json); break;
                 case "Search": handleSearch(json); break
                 default :
