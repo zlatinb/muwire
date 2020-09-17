@@ -177,7 +177,7 @@ abstract class Connection implements Closeable {
         lastPongReceivedTime = System.currentTimeMillis()
         if (pong.pongs == null)
             throw new Exception("Pong doesn't have pongs")
-        pong.pongs.each {
+        pong.pongs.stream().limit(10).forEach {
             def dest = new Destination(it)
             eventBus.publish(new HostDiscoveredEvent(destination: dest))
         }
