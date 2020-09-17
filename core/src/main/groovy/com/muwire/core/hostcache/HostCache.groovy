@@ -86,7 +86,7 @@ class HostCache extends Service {
         rv.retainAll {allowHost(hosts[it])}
         rv.removeAll {
             def h = hosts[it]; 
-            (h.isFailed() && !h.canTryAgain()) || h.isRecentlyRejected()
+            (h.isFailed() && !h.canTryAgain()) || h.isRecentlyRejected() || h.isHopeless()
         }
         if (rv.size() <= n)
             return rv
