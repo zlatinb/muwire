@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 
 abstract class Uploader {
@@ -31,6 +32,7 @@ abstract class Uploader {
     }
 
     abstract String getName();
+    
 
     /**
      * @return an integer between 0 and 100
@@ -38,6 +40,7 @@ abstract class Uploader {
     abstract int getProgress();
 
     abstract String getDownloader();
+    abstract Persona getDownloaderPersona();
 
     abstract int getDonePieces();
 

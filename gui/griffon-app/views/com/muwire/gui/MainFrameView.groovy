@@ -44,6 +44,8 @@ import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.trust.RemoteTrustList
+import com.muwire.core.upload.Uploader
+
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.FlowLayout
@@ -782,18 +784,14 @@ class MainFrameView {
         
         selectionModel = uploadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        JPopupMenu uploadsTableMenu = new JPopupMenu()
-        JMenuItem showInLibrary = new JMenuItem("Show in library")
-        showInLibrary.addActionListener({mvcGroup.controller.showInLibrary()})
-        uploadsTableMenu.add(showInLibrary)
         uploadsTable.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(uploadsTableMenu, e)
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showUploadsMenu(e)
             }
             public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showPopupMenu(uploadsTableMenu, e)
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showUploadsMenu()
             }
         })
         
@@ -1205,7 +1203,6 @@ class MainFrameView {
         List<FeedItem> items = selectedFeedItems()
         if (items == null || items.isEmpty())
             return
-        // TODO: finish
         JPopupMenu menu = new JPopupMenu()
         if (model.downloadFeedItemButtonEnabled) {
             JMenuItem download = new JMenuItem("Download")
@@ -1253,6 +1250,37 @@ class MainFrameView {
             
             table.scrollRectToVisible(new Rectangle(table.getCellRect(row, 0, true)))
         }
+    }
+    
+    void showUploadsMenu(MouseEvent e) {
+        Uploader uploader = selectedUploader()
+        if (uploader == null)
+            return
+            
+        JPopupMenu uploadsTableMenu = new JPopupMenu()
+        JMenuItem showInLibrary = new JMenuItem("Show in library")
+        showInLibrary.addActionListener({mvcGroup.controller.showInLibrary()})
+        uploadsTableMenu.add(showInLibrary)
+        
+        if (uploader.isBrowseEnabled()) {
+            JMenuItem browseItem = new JMenuItem("Browse Host")
+            browseItem.addActionListener({mvcGroup.controller.browseFromUpload()})
+            uploadsTableMenu.add(browseItem)
+        }
+        
+        if (uploader.isFeedEnabled() && mvcGroup.controller.core.feedManager.getFeed(uploader.getDownloaderPersona()) == null) {
+            JMenuItem feedItem = new JMenuItem("Subscribe")
+            feedItem.addActionListener({mvcGroup.controller.subscribeFromUpload()})
+            uploadsTableMenu.add(feedItem)
+        }
+        
+        if (uploader.isChatEnabled() && !mvcGroup.controller.core.chatManager.isConnected(uploader.getDownloaderPersona())) {
+            JMenuItem chatItem = new JMenuItem("Chat")
+            chatItem.addActionListener({mvcGroup.controller.chatFromUpload()})
+            uploadsTableMenu.add(chatItem)
+        }
+        
+        showPopupMenu(uploadsTableMenu, e)
     }
     
     void showRestoreOrEmpty() {

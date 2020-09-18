@@ -29,6 +29,10 @@ class ChatManager {
         timer.schedule({connect()} as TimerTask, 1000, 1000)
     }
     
+    boolean isConnected(Persona p) {
+        clients.containsKey(p)
+    }
+    
     void onUIConnectChatEvent(UIConnectChatEvent e) {
         if (e.host == me) { 
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, 

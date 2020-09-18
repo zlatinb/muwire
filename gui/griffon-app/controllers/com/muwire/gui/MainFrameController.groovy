@@ -33,6 +33,7 @@ import com.muwire.core.filecert.UICreateCertificateEvent
 import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
+import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.filefeeds.UIFeedDeletedEvent
 import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
@@ -353,6 +354,47 @@ class MainFrameController {
             return
         Persona p = model.trusted[row].persona
         
+        startChat(p)
+        view.showChatWindow.call()
+    }
+    
+    @ControllerAction
+    void browseFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+
+        String groupId = p.getHumanReadableName() + "-browse"
+        def params = [:]
+        params['host'] = p
+        params['core'] = model.core
+        mvcGroup.createMVCGroup("browse",groupId,params)
+    }
+    
+    @ControllerAction
+    void subscribeFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+        
+        Feed feed = new Feed(p)
+        feed.setAutoDownload(core.muOptions.defaultFeedAutoDownload)
+        feed.setSequential(core.muOptions.defaultFeedSequential)
+        feed.setItemsToKeep(core.muOptions.defaultFeedItemsToKeep)
+        feed.setUpdateInterval(core.muOptions.defaultFeedUpdateInterval)
+        
+        core.eventBus.publish(new UIFeedConfigurationEvent(feed : feed, newFeed : true))
+        view.showFeedsWindow.call()
+    }
+    
+    @ControllerAction
+    void chatFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
         startChat(p)
         view.showChatWindow.call()
     }

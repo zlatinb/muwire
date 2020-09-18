@@ -152,4 +152,9 @@ class ContentUploader extends Uploader {
     public boolean isChatEnabled() {
         request.chat
     }
+
+    @Override
+    public Persona getDownloaderPersona() {
+        request.downloader
+    }
 }

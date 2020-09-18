@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 
 import net.i2p.data.Base64
@@ -89,5 +90,10 @@ class HashListUploader extends Uploader {
     @Override
     public boolean isChatEnabled() {
         return false;
+    }
+
+    @Override
+    public Persona getDownloaderPersona() {
+        request.downloader
     }
 }

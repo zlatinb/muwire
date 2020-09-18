@@ -32,7 +32,6 @@ This helps with scalability
 * I2P Status panel - display message when connected to external router
 * Search box - left identation
 * Ability to disable switching of tabs on actions
-* Ability to trust/browse/subscribe from uploads tab
 
 ### Web UI/Plugin
 * HTML 5 media players
