@@ -349,9 +349,15 @@ div#uploads table thead th:nth-child(3) {
   width: 120px;
 }
 div#uploads table thead th:nth-child(4) {
-  width: 120px;
+  width: 70px;
 }
 div#uploads table thead th:nth-child(5) {
+  width: 70px;
+}
+div#uploads table thead th:nth-child(6) {
+  width: 120px;
+}
+div#uploads table thead th:nth-child(7) {
   width: 120px;
 }
 div#uploads table tbody td:nth-child(1) {
@@ -363,11 +369,11 @@ div#uploads table tbody td:nth-child(2) {
 div#uploads table tbody td:nth-child(3) {
   text-overflow: ellipsis;
 }
-div#uploads table tbody td:nth-child(4) {
+div#uploads table tbody td:nth-child(6) {
   padding-right: 40px;
   text-align: right;
 }
-div#uploads table tbody td:nth-child(5) {
+div#uploads table tbody td:nth-child(7) {
   padding-right: 25px;
   text-align: right;
 }
