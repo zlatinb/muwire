@@ -64,7 +64,7 @@ class AdvancedSharingView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Configure", configureAction)
+                button(text : "Configure", enabled : bind{model.configureActionEnabled}, configureAction)
                 button(text : "Sync", enabled : bind{model.syncActionEnabled}, syncAction)
             }
         }
@@ -91,6 +91,7 @@ class AdvancedSharingView {
         selectionModel.addListSelectionListener({
             def directory = selectedWatchedDirectory()
             model.syncActionEnabled = !(directory == null || directory.autoWatch)
+            model.configureActionEnabled = directory != null
         })
         
         watchedDirsTable.addMouseListener(new MouseAdapter() {
