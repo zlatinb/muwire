@@ -791,7 +791,7 @@ class MainFrameView {
             }
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showUploadsMenu()
+                    showUploadsMenu(e)
             }
         })
         
