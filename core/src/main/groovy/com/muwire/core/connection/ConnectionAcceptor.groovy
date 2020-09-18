@@ -380,7 +380,7 @@ class ConnectionAcceptor {
 
             os.write("Count: ${sharedFiles.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
             
-            boolean chat = chatServer.running.get() && settings.advertiseChat
+            boolean chat = chatServer.isRunning() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
             
             boolean feed = settings.fileFeed && settings.advertiseFeed
