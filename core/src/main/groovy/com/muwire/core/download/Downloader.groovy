@@ -2,6 +2,8 @@ package com.muwire.core.download
 
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
+import com.muwire.core.chat.ChatManager
+import com.muwire.core.chat.ChatServer
 import com.muwire.core.connection.Endpoint
 
 import java.nio.file.AtomicMoveNotSupportedException
@@ -41,6 +43,7 @@ public class Downloader {
 
     private final EventBus eventBus
     private final DownloadManager downloadManager
+    private final ChatServer chatServer
     private final Persona me
     private final File file
     private final Pieces pieces
@@ -68,13 +71,14 @@ public class Downloader {
     private int speedPos = 0
     private int speedAvg = 0
 
-    public Downloader(EventBus eventBus, DownloadManager downloadManager,
+    public Downloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
         Persona me, File file, long length, InfoHash infoHash,
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
         File incompletes, Pieces pieces) {
         this.eventBus = eventBus
         this.me = me
         this.downloadManager = downloadManager
+        this.chatServer = chatServer
         this.file = file
         this.infoHash = infoHash
         this.length = length
@@ -373,10 +377,16 @@ public class Downloader {
                     setInfoHash(received)
                 }
                 currentState = WorkerState.DOWNLOADING
+                
+                boolean browse = downloadManager.muSettings.browseFiles
+                boolean feed = downloadManager.muSettings.fileFeed && downloadManager.muSettings.advertiseFeed
+                boolean chat = chatServer.isRunning() && downloadManager.muSettings.advertiseChat
+                
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
                     currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
-                        endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead)
+                        endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
+                        browse, feed, chat)
                     requestPerformed = currentSession.request()
                     if (!requestPerformed)
                         break

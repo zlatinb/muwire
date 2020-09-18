@@ -60,6 +60,10 @@ class ChatServer {
         echo(getWelcome(),me.destination)
     }
     
+    public boolean isRunning() {
+        running.get()
+    }
+    
     private String getWelcome() {
         String welcome = DEFAULT_WELCOME
         if (settings.chatWelcomeFile != null)

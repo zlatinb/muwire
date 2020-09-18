@@ -37,13 +37,15 @@ class DownloadSession {
     private final long fileLength
     private final Set<Integer> available
     private final MessageDigest digest
+    private final boolean browse, feed, chat
 
     private final AtomicLong dataSinceLastRead
 
     private MappedByteBuffer mapped
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
-        int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead) {
+        int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
+        boolean browse, boolean feed, boolean chat) {
         this.eventBus = eventBus
         this.meB64 = meB64
         this.pieces = pieces
@@ -54,6 +56,9 @@ class DownloadSession {
         this.fileLength = fileLength
         this.available = available
         this.dataSinceLastRead = dataSinceLastRead
+        this.browse = browse
+        this.feed = feed
+        this.chat = chat
         try {
             digest = MessageDigest.getInstance("SHA-256")
         } catch (NoSuchAlgorithmException impossible) {
@@ -94,6 +99,12 @@ class DownloadSession {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (browse)
+                os.write("Browse: true\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (feed)
+                os.write("Feed: true\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (chat)
+                os.write("Chat: true\r\n".getBytes(StandardCharsets.US_ASCII))
             String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
             os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()

@@ -23,6 +23,8 @@ import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
+import com.muwire.core.chat.ChatManager
+import com.muwire.core.chat.ChatServer
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
@@ -35,16 +37,17 @@ public class DownloadManager {
     private final EventBus eventBus
     private final TrustService trustService
     private final MeshManager meshManager
-    private final MuWireSettings muSettings
+    final MuWireSettings muSettings
     private final I2PConnector connector
     private final Executor executor
     private final File home
     private final Persona me
+    private final ChatServer chatServer
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
 
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
-        I2PConnector connector, File home, Persona me) {
+        I2PConnector connector, File home, Persona me, ChatServer chatServer) {
         this.eventBus = eventBus
         this.trustService = trustService
         this.meshManager = meshManager
@@ -52,6 +55,7 @@ public class DownloadManager {
         this.connector = connector
         this.home = home
         this.me = me
+        this.chatServer = chatServer
 
         this.executor = Executors.newCachedThreadPool({ r ->
             Thread rv = new Thread(r)
@@ -94,7 +98,7 @@ public class DownloadManager {
         incompletes.mkdirs()
         
         Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
-        def downloader = new Downloader(eventBus, this, me, target, size,
+        def downloader = new Downloader(eventBus, this, chatServer, me, target, size,
                 infoHash, pieceSize, connector, destinations,
                 incompletes, pieces)
         downloaders.put(infoHash, downloader)
@@ -158,7 +162,7 @@ public class DownloadManager {
                 
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
-            def downloader = new Downloader(eventBus, this, me, file, (long)json.length,
+            def downloader = new Downloader(eventBus, this, chatServer, me, file, (long)json.length,
                 infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
             if (json.paused != null)
                 downloader.paused = json.paused

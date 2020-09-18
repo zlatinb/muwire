@@ -245,7 +245,7 @@ class MainFrameModel {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: true, add: true))
             }
             
-            chatServerRunning = core.chatServer.running.get()
+            chatServerRunning = core.chatServer.isRunning()
             
             timer.schedule({
                 if (core.shutdown.get())

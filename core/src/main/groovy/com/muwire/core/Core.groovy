@@ -362,8 +362,17 @@ public class Core {
         eventBus.register(QueryEvent.class, searchManager)
         eventBus.register(ResultsEvent.class, searchManager)
 
+        log.info("initializing chat manager")
+        chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
+        eventBus.with { 
+            register(UIConnectChatEvent.class, chatManager)
+            register(UIDisconnectChatEvent.class, chatManager)
+            register(ChatMessageEvent.class, chatManager)
+            register(ChatDisconnectionEvent.class, chatManager)
+        }
+        
         log.info("initializing download manager")
-        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me)
+        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me, chatServer)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UIDownloadFeedItemEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)
@@ -382,16 +391,6 @@ public class Core {
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
-        
-        log.info("initializing chat manager")
-        chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
-        eventBus.with { 
-            register(UIConnectChatEvent.class, chatManager)
-            register(UIDisconnectChatEvent.class, chatManager)
-            register(ChatMessageEvent.class, chatManager)
-            register(ChatDisconnectionEvent.class, chatManager)
-        }
-        
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,

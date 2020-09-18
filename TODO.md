@@ -18,7 +18,6 @@ This helps with scalability
 * Enum i18n
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
-* Advertise file feed and browseability in upload headers
 * Download queue with priorities 
 * Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
 
