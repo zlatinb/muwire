@@ -65,7 +65,7 @@ class ChatRoomController {
             trimLines()
         }
         
-        if (command.action == ChatAction.JOIN) {
+        if (command.action == ChatAction.JOIN && model.console) {
             String newRoom = command.payload
             String groupId = model.host.getHumanReadableName()+"-"+newRoom
             if (!mvcGroup.parentGroup.childrenGroups.containsKey(groupId)) {

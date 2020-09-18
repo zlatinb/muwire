@@ -22,7 +22,6 @@ This helps with scalability
 * Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
 
 ### Chat
-* echo "unknown/innappropriate command" in the console
 * break up lines on CR/LF, send multiple messages
 * enforce # in room names or ignore it
 * auto-create/join channel on server start

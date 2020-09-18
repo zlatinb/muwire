@@ -201,9 +201,19 @@ class ChatServer {
             return
         }
 
-        if ((command.action.console && e.room != CONSOLE) ||
-            (!command.action.console && e.room == CONSOLE) ||
-            !command.action.user)
+        if (command.action.console && e.room != CONSOLE) {
+            echo("/SAY ERROR: You can only execute that command in the chat console, not in a chat room.",
+                    e.sender.destination, e.room)
+            return
+        }
+        
+        if (!command.action.console && e.room == CONSOLE) {
+            echo("/SAY ERROR: You need to be in a chat room.  Type /LIST for list of rooms or /JOIN to join or create a room.",
+                    e.sender.destination)
+            return
+        }
+        
+        if (!command.action.user)
             return
         
         if (command.action.local && e.sender != me)
@@ -300,17 +310,17 @@ class ChatServer {
         echo(help, d)
     }
     
-    private void echo(String payload, Destination d) {
+    private void echo(String payload, Destination d, String room = CONSOLE) {
         log.info "echoing $payload"
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
-        byte [] sig = ChatConnection.sign(uuid, now, CONSOLE, payload, me, me, spk)
+        byte [] sig = ChatConnection.sign(uuid, now, room, payload, me, me, spk)
         ChatMessageEvent echo = new ChatMessageEvent(
             uuid : uuid,
             payload : payload,
             sender : me,
             host : me,
-            room : CONSOLE,
+            room : room,
             chatTime : now,
             sig : sig
             )
