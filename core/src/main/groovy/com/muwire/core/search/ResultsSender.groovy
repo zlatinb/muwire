@@ -88,7 +88,7 @@ class ResultsSender {
                     sources : suggested,
                     comment : comment,
                     certificates : certificates,
-                    chat : chatServer.running.get() && settings.advertiseChat,
+                    chat : chatServer.isRunning() && settings.advertiseChat,
                     feed : settings.fileFeed && settings.advertiseFeed
                     )
                 uiResultEvents << uiResultEvent
@@ -137,7 +137,7 @@ class ResultsSender {
                         os.write("RESULTS $uuid\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Sender: ${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("Count: $results.length\r\n".getBytes(StandardCharsets.US_ASCII))
-                        boolean chat = chatServer.running.get() && settings.advertiseChat
+                        boolean chat = chatServer.isRunning() && settings.advertiseChat
                         os.write("Chat: $chat\r\n".getBytes(StandardCharsets.US_ASCII))
                         boolean feed = settings.fileFeed && settings.advertiseFeed
                         os.write("Feed: $feed\r\n".getBytes(StandardCharsets.US_ASCII))
