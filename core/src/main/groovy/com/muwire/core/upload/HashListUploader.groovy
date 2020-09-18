@@ -75,4 +75,19 @@ class HashListUploader extends Uploader {
         HashListUploader other = (HashListUploader)o
         infoHash == other.infoHash && request.downloader == other.request.downloader
     }
+
+    @Override
+    public boolean isBrowseEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isFeedEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isChatEnabled() {
+        return false;
+    }
 }

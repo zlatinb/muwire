@@ -137,4 +137,19 @@ class ContentUploader extends Uploader {
         request.infoHash == other.request.infoHash &&
             request.getDownloader() == other.request.getDownloader()
     }
+
+    @Override
+    public boolean isBrowseEnabled() {
+        request.browse
+    }
+
+    @Override
+    public boolean isFeedEnabled() {
+        request.feed
+    }
+
+    @Override
+    public boolean isChatEnabled() {
+        request.chat
+    }
 }

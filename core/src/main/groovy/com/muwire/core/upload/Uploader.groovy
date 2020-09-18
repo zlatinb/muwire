@@ -45,6 +45,10 @@ abstract class Uploader {
 
     abstract long getTotalSize();
     
+    abstract boolean isBrowseEnabled();
+    abstract boolean isFeedEnabled();
+    abstract boolean isChatEnabled();
+    
     synchronized int speed() {
         final long now = System.currentTimeMillis()
         long interval = Math.max(1000, now - lastSpeedRead)

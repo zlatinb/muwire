@@ -55,8 +55,14 @@ class Request {
             def encoded = headers["X-Have"].trim()
             have = DataUtil.decodeXHave(encoded).size()
         }
+        
+        boolean browse = headers.containsKey("Browse") && Boolean.parseBoolean(headers['Browse'])
+        boolean feed = headers.containsKey("Feed") && Boolean.parseBoolean(headers['Feed'])
+        boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
+        
         new ContentRequest( infoHash : infoHash, range : new Range(start, end),
-            headers : headers, downloader : downloader, have : have)
+            headers : headers, downloader : downloader, have : have,
+            browse : browse, feed : feed, chat : chat)
     }
 
     static Request parseHashListRequest(InfoHash infoHash, InputStream is) throws IOException {
