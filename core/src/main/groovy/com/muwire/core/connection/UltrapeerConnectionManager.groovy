@@ -21,6 +21,8 @@ class UltrapeerConnectionManager extends ConnectionManager {
 
     final Map<Destination, PeerConnection> peerConnections = new ConcurrentHashMap()
     final Map<Destination, LeafConnection> leafConnections = new ConcurrentHashMap()
+    
+    private final Random random = new Random()
 
     UltrapeerConnectionManager() {}
 
@@ -44,8 +46,16 @@ class UltrapeerConnectionManager extends ConnectionManager {
         if (e.replyTo != me.destination && e.receivedOn != me.destination &&
             !leafConnections.containsKey(e.receivedOn))
             e.firstHop = false
+        final int connCount = peerConnections.size()
+        if (connCount == 0)
+            return
+        final int treshold = (int)(Math.sqrt(connCount)) + 1
         peerConnections.values().each {
-            if (e.getReceivedOn() != it.getEndpoint().getDestination())
+            // 1. do not send query back to originator
+            // 2. if firstHop forward to everyone
+            // 3. otherwise to randomized sqrt of neighbors
+            if (e.getReceivedOn() != it.getEndpoint().getDestination() &&
+                (e.firstHop || random.nextInt(connCount) < treshold))
                 it.sendQuery(e)
         }
     }
