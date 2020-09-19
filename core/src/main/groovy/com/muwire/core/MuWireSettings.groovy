@@ -108,7 +108,7 @@ class MuWireSettings {
         
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
-        peerConnections = Integer.valueOf(props.getProperty("peerConnections","512"))
+        peerConnections = Integer.valueOf(props.getProperty("peerConnections","128"))
         
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
