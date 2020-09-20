@@ -50,7 +50,7 @@ class MuWireSettings {
     File chatWelcomeFile
     Set<String> watchedDirectories
     float downloadSequentialRatio
-    int hostClearInterval, hostHopelessInterval, hostRejectInterval
+    int hostClearInterval, hostHopelessInterval, hostRejectInterval, hostHopelessPurgeInterval
     int meshExpiration
     int speedSmoothSeconds
     boolean embeddedRouter
@@ -88,6 +88,7 @@ class MuWireSettings {
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","15"))
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "1440"))
         hostRejectInterval = Integer.valueOf(props.getProperty("hostRejectInterval", "1"))
+        hostHopelessPurgeInterval = Integer.valueOf(props.getProperty("hostHopelessPurgeInterval","2880"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
         plugin = Boolean.valueOf(props.getProperty("plugin","false"))
@@ -158,6 +159,7 @@ class MuWireSettings {
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("hostHopelessInterval", String.valueOf(hostHopelessInterval))
         props.setProperty("hostRejectInterval", String.valueOf(hostRejectInterval))
+        props.setProperty("hostHopelessPurgeInterval", String.valueOf(hostHopelessPurgeInterval))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
         props.setProperty("embeddedRouter", String.valueOf(embeddedRouter))
         props.setProperty("plugin", String.valueOf(plugin))

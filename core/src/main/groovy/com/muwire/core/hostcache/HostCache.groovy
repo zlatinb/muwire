@@ -52,7 +52,8 @@ class HostCache extends Service {
             hosts.get(e.destination).clearFailures()
             return
         }
-        Host host = new Host(e.destination, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
+        Host host = new Host(e.destination, settings.hostClearInterval, settings.hostHopelessInterval, 
+            settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
         if (allowHost(host)) {
             hosts.put(e.destination, host)
         }
@@ -64,7 +65,8 @@ class HostCache extends Service {
         Destination dest = e.endpoint.destination
         Host host = hosts.get(dest)
         if (host == null) {
-            host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
+            host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, 
+                settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
             hosts.put(dest, host)
         }
 
@@ -130,7 +132,8 @@ class HostCache extends Service {
             storage.eachLine {
                 def entry = slurper.parseText(it)
                 Destination dest = new Destination(entry.destination)
-                Host host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, settings.hostRejectInterval)
+                Host host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, 
+                    settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
                 host.failures = Integer.valueOf(String.valueOf(entry.failures))
                 host.successes = Integer.valueOf(String.valueOf(entry.successes))
                 if (entry.lastAttempt != null)
@@ -163,8 +166,9 @@ class HostCache extends Service {
     }
 
     private void save() {
-        storage.delete()
         final long now = System.currentTimeMillis()
+        hosts.keySet().removeAll { hosts[it].shouldBeForgotten(now) }
+        storage.delete()
         storage.withPrintWriter { writer ->
             hosts.each { dest, host ->
                 if (allowHost(host) && !host.isHopeless(now)) {

@@ -75,6 +75,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
 
         initMocks()
 
@@ -97,6 +98,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
 
@@ -114,6 +116,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
 
         initMocks()
 
@@ -136,6 +139,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
 
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -160,6 +164,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 100 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -182,6 +187,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -211,6 +217,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -246,6 +253,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -266,6 +274,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         cache.onHostDiscoveredEvent(new HostDiscoveredEvent(destination: destinations.dest1))
@@ -301,6 +310,7 @@ class HostCacheTest {
         settingsMock.ignore.getHostClearInterval { 0 }
         settingsMock.ignore.getHostHopelessInterval { 0 }
         settingsMock.ignore.getHostRejectInterval { 0 }
+        settingsMock.ignore.getHostHopelessPurgeInterval { 0 }
         
         initMocks()
         def rv = cache.getHosts(5)

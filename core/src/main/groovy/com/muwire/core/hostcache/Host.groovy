@@ -7,17 +7,19 @@ class Host {
     private static final int MAX_FAILURES = 3
 
     final Destination destination
-    private final int clearInterval, hopelessInterval, rejectionInterval
+    private final int clearInterval, hopelessInterval, rejectionInterval, purgeInterval
     int failures,successes
     long lastAttempt
     long lastSuccessfulAttempt
     long lastRejection
 
-    public Host(Destination destination, int clearInterval, int hopelessInterval, int rejectionInterval) {
+    public Host(Destination destination, int clearInterval, int hopelessInterval, int rejectionInterval,
+        int purgeInterval) {
         this.destination = destination
         this.clearInterval = clearInterval
         this.hopelessInterval = hopelessInterval
         this.rejectionInterval = rejectionInterval
+        this.purgeInterval = purgeInterval
     }
     
     private void connectSuccessful() {
@@ -66,5 +68,10 @@ class Host {
     
     synchronized boolean isRecentlyRejected(final long now) {
         now - lastRejection < (rejectionInterval * 60 * 1000)
+    }
+    
+    synchronized boolean shouldBeForgotten(final long now) {
+        isHopeless(now) &&
+            now - lastAttempt > (purgeInterval * 60 * 1000)
     }
 }
