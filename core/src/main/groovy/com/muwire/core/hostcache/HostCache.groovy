@@ -84,9 +84,10 @@ class HostCache extends Service {
     List<Destination> getHosts(int n) {
         List<Destination> rv = new ArrayList<>(hosts.keySet())
         rv.retainAll {allowHost(hosts[it])}
+        final long now = System.currentTimeMillis()
         rv.removeAll {
             def h = hosts[it]; 
-            (h.isFailed() && !h.canTryAgain()) || h.isRecentlyRejected() || h.isHopeless()
+            (h.isFailed() && !h.canTryAgain(now)) || h.isRecentlyRejected(now) || h.isHopeless(now)
         }
         if (rv.size() <= n)
             return rv
@@ -116,8 +117,9 @@ class HostCache extends Service {
     
     int countHopelessHosts() {
         List<Destination> rv = new ArrayList<>(hosts.keySet())
+        final long now = System.currentTimeMillis()
         rv.retainAll {
-            hosts[it].isHopeless()
+            hosts[it].isHopeless(now)
         }
         rv.size()
     }
@@ -162,9 +164,10 @@ class HostCache extends Service {
 
     private void save() {
         storage.delete()
+        final long now = System.currentTimeMillis()
         storage.withPrintWriter { writer ->
             hosts.each { dest, host ->
-                if (allowHost(host) && !host.isHopeless()) {
+                if (allowHost(host) && !host.isHopeless(now)) {
                     def map = [:]
                     map.destination = dest.toBase64()
                     map.failures = host.failures

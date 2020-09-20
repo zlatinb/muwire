@@ -54,17 +54,17 @@ class Host {
         failures = 0
     }
 
-    synchronized boolean canTryAgain() {
+    synchronized boolean canTryAgain(final long now) {
         lastSuccessfulAttempt > 0 && 
-            System.currentTimeMillis() - lastAttempt > (clearInterval * 60 * 1000)
+            now - lastAttempt > (clearInterval * 60 * 1000)
     }
     
-    synchronized boolean isHopeless() {
+    synchronized boolean isHopeless(final long now) {
         isFailed() && 
-            System.currentTimeMillis() - lastSuccessfulAttempt > (hopelessInterval * 60 * 1000)
+            now - lastSuccessfulAttempt > (hopelessInterval * 60 * 1000)
     }
     
-    synchronized boolean isRecentlyRejected() {
-        System.currentTimeMillis() - lastRejection < (rejectionInterval * 60 * 1000)
+    synchronized boolean isRecentlyRejected(final long now) {
+        now - lastRejection < (rejectionInterval * 60 * 1000)
     }
 }
