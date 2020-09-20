@@ -168,7 +168,7 @@ abstract class Connection implements Closeable {
         pong.version = 1
         if (ping.uuid != null)
             pong.uuid = ping.uuid
-        pong.pongs = hostCache.getGoodHosts(10).collect { d -> d.toBase64() }
+        pong.pongs = hostCache.getGoodHosts(2).collect { d -> d.toBase64() }
         messages.put(pong)
     }
 
@@ -177,7 +177,7 @@ abstract class Connection implements Closeable {
         lastPongReceivedTime = System.currentTimeMillis()
         if (pong.pongs == null)
             throw new Exception("Pong doesn't have pongs")
-        pong.pongs.stream().limit(10).forEach {
+        pong.pongs.stream().limit(2).forEach {
             def dest = new Destination(it)
             eventBus.publish(new HostDiscoveredEvent(destination: dest))
         }
