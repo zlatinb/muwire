@@ -70,6 +70,7 @@ import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
+import com.muwire.core.search.ResponderCache
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.ResultsSender
 import com.muwire.core.search.SearchEvent
@@ -306,10 +307,16 @@ public class Core {
         eventBus.register(HostDiscoveredEvent.class, hostCache)
         eventBus.register(ConnectionEvent.class, hostCache)
 
+        
+        log.info("initializing responder cache")
+        ResponderCache responderCache = new ResponderCache((int)(Math.sqrt(props.peerConnections)) + 1)
+        eventBus.register(UIResultBatchEvent.class, responderCache)
+        
+        
         log.info("initializing connection manager")
         connectionManager = props.isLeaf() ?
             new LeafConnectionManager(eventBus, me, 3, hostCache, props) :
-            new UltrapeerConnectionManager(eventBus, me, props.peerConnections, props.leafConnections, hostCache, trustService, props)
+            new UltrapeerConnectionManager(eventBus, me, props.peerConnections, props.leafConnections, hostCache, responderCache, trustService, props)
         eventBus.register(TrustEvent.class, connectionManager)
         eventBus.register(ConnectionEvent.class, connectionManager)
         eventBus.register(DisconnectionEvent.class, connectionManager)
