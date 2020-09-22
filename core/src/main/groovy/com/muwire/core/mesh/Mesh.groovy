@@ -35,6 +35,7 @@ class Mesh {
         List<Destination> tmp = new ArrayList<>(verified)
         if (exclude != null)
             tmp.remove(exclude.destination)
+        tmp.retainAll(sources.keySet()) // verified may contain nodes not in sources
         Collections.shuffle(tmp)
         if (tmp.size() > n)
             tmp = tmp[0..n-1]
