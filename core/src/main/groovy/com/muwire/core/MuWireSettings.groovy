@@ -44,6 +44,8 @@ class MuWireSettings {
     int peerConnections
     int leafConnections
     
+    int responderCacheSize
+    
     boolean startChatServer
     int maxChatConnections
     boolean advertiseChat
@@ -110,6 +112,9 @@ class MuWireSettings {
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
         peerConnections = Integer.valueOf(props.getProperty("peerConnections","128"))
+        
+        // responder cache settings
+        responderCacheSize = Integer.valueOf(props.getProperty("responderCacheSize","32"))
         
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
@@ -181,6 +186,9 @@ class MuWireSettings {
         // ultrapeer connection settings
         props.setProperty("peerConnections", String.valueOf(peerConnections))
         props.setProperty("leafConnections", String.valueOf(leafConnections))
+        
+        // responder cache settings
+        props.setProperty("responderCacheSize", String.valueOf(responderCacheSize))
         
         props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))

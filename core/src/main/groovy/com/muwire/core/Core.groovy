@@ -309,7 +309,7 @@ public class Core {
 
         
         log.info("initializing responder cache")
-        ResponderCache responderCache = new ResponderCache((int)(Math.sqrt(props.peerConnections)) + 1)
+        ResponderCache responderCache = new ResponderCache(props.responderCacheSize)
         eventBus.register(UIResultBatchEvent.class, responderCache)
         
         
