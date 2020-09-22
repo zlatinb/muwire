@@ -11,6 +11,7 @@ import com.muwire.core.connection.Endpoint
 import com.muwire.core.download.DownloadManager
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.SourceDiscoveredEvent
+import com.muwire.core.download.SourceVerifiedEvent
 import com.muwire.core.files.FileManager
 import com.muwire.core.files.PersisterFolderService
 import com.muwire.core.mesh.Mesh
@@ -123,6 +124,7 @@ public class UploadManager {
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
+                eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
             } finally {
                 decrementUploads(request.downloader)
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
@@ -259,6 +261,7 @@ public class UploadManager {
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
+                eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
             } finally {
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
             }

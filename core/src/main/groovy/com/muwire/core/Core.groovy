@@ -25,6 +25,7 @@ import com.muwire.core.connection.LeafConnectionManager
 import com.muwire.core.connection.UltrapeerConnectionManager
 import com.muwire.core.download.DownloadManager
 import com.muwire.core.download.SourceDiscoveredEvent
+import com.muwire.core.download.SourceVerifiedEvent
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.download.UIDownloadPausedEvent
@@ -285,6 +286,7 @@ public class Core {
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)
         eventBus.register(SourceDiscoveredEvent.class, meshManager)
+        eventBus.register(SourceVerifiedEvent.class, meshManager)
 
         log.info "initializing persistence service"
         persisterService = new PersisterService(new File(home, "files.json"), eventBus, 60000, fileManager)

@@ -215,6 +215,8 @@ class DownloadSession {
                     pieces.markPartial(piece, 0)
                     throw new BadHashException("bad hash on piece $piece")
                 }
+                
+                eventBus.publish(new SourceVerifiedEvent(infoHash : infoHash, source : endpoint.destination))
             } finally {
                 try { channel?.close() } catch (IOException ignore) {}
                 DataUtil.tryUnmap(mapped)

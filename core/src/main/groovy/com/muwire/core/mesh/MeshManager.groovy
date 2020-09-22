@@ -9,6 +9,7 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.download.Pieces
 import com.muwire.core.download.SourceDiscoveredEvent
+import com.muwire.core.download.SourceVerifiedEvent
 import com.muwire.core.files.FileManager
 import com.muwire.core.util.DataUtil
 
@@ -56,25 +57,25 @@ class MeshManager {
         Mesh mesh = meshes.get(e.infoHash)
         if (mesh == null)
             return
-       mesh.sources.add(e.source)
-       save()
+       mesh.add(e.source)
     }
 
+    void onSourceVerifiedEvent(SourceVerifiedEvent e) {
+        Mesh mesh = meshes.get(e.infoHash)
+        if (mesh == null)
+            return
+       mesh.verify(e.source)
+       save()
+    }
+    
     private void save() {
         File meshFile = new File(home, "mesh.json")
         synchronized(meshes) {
             meshFile.withPrintWriter { writer ->
                 meshes.values().each { mesh ->
-                    def json = [:]
-                    json.timestamp = System.currentTimeMillis()
-                    json.infoHash = Base64.encode(mesh.infoHash.getRoot())
-                    json.sources = mesh.sources.stream().map({it.toBase64()}).collect(Collectors.toList())
-                    json.nPieces = mesh.pieces.nPieces
-                    List<Integer> downloaded = mesh.pieces.getDownloaded()
-                    if( downloaded.size() > mesh.pieces.nPieces)
-                        return
-                    json.xHave = DataUtil.encodeXHave(downloaded, mesh.pieces.nPieces)
-                    writer.println(JsonOutput.toJson(json))
+                    def json = mesh.toJson()
+                    if (json != null)
+                        writer.println(JsonOutput.toJson(json))
                 }
             }
         }
@@ -99,7 +100,8 @@ class MeshManager {
             Mesh mesh = new Mesh(infoHash, pieces)
             json.sources.each { source ->
                 Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(source)))
-                mesh.sources.add(persona)
+                mesh.add(persona)
+                mesh.verify(persona.destination) // assume if persisted it was verified
             }
 
             if (json.xHave != null) {
