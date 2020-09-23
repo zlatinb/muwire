@@ -313,6 +313,7 @@ public class Core {
         log.info("initializing responder cache")
         ResponderCache responderCache = new ResponderCache(props.responderCacheSize)
         eventBus.register(UIResultBatchEvent.class, responderCache)
+        eventBus.register(SourceVerifiedEvent.class, responderCache)
         
         
         log.info("initializing connection manager")

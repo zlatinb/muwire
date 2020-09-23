@@ -56,7 +56,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
         peerConnections.values().each {
             // 1. do not send query back to originator
             // 2. if firstHop forward to everyone
-            // 3. otherwise to everyone who has recently responded to us + randomized sqrt of neighbors
+            // 3. otherwise to everyone who has recently responded/transferred to us + randomized sqrt of neighbors
             if (e.getReceivedOn() != it.getEndpoint().getDestination() &&
                 (e.firstHop || 
                     responderCache.hasResponded(it.endpoint.destination) ||
