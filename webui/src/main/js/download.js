@@ -105,8 +105,10 @@ function updateDownloader(infoHash) {
 		if (this.readyState == 4 && this.status == 200) {
 			var path = this.responseXML.getElementsByTagName("Path")[0].childNodes[0].nodeValue
 			var pieceSize = this.responseXML.getElementsByTagName("PieceSize")[0].childNodes[0].nodeValue
+			var sequential = this.responseXML.getElementsByTagName("Sequential")[0].childNodes[0].nodeValue
 			var knownSources = this.responseXML.getElementsByTagName("KnownSources")[0].childNodes[0].nodeValue
 			var activeSources = this.responseXML.getElementsByTagName("ActiveSources")[0].childNodes[0].nodeValue
+			var hopelessSources = this.responseXML.getElementsByTagName("HopelessSources")[0].childNodes[0].nodeValue
 			var totalPieces = this.responseXML.getElementsByTagName("TotalPieces")[0].childNodes[0].nodeValue
 			var donePieces = this.responseXML.getElementsByTagName("DonePieces")[0].childNodes[0].nodeValue
 			
@@ -116,12 +118,20 @@ function updateDownloader(infoHash) {
 			html += "<td>" + "<p align='right'>" + path + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
+			html += "<td>" + _t("Sequential") + "</td>"
+			html += "<td>" + "<p align='right'>" + sequential + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
 			html += "<td>" + _t("Known Sources") + "</td>"
 			html += "<td>" + "<p align='right'>" + knownSources + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
 			html += "<td>" + _t("Active Sources") + "</td>"
 			html += "<td>" + "<p align='right'>" + activeSources + "</p>" + "</td>"
+			html += "</tr>"
+			html += "<tr>"
+			html += "<td>" + _t("Hopeless Sources") + "</td>"
+			html += "<td>" + "<p align='right'>" + hopelessSources + "</p>" + "</td>"
 			html += "</tr>"
 			html += "<tr>"
 			html += "<td>" + _t("Piece Size") + "</td>"

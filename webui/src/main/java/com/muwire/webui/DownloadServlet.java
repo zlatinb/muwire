@@ -104,8 +104,10 @@ public class DownloadServlet extends HttpServlet {
                 sb.append("<Details>");
                 sb.append("<Path>").append(Util.escapeHTMLinXML(downloader.getFile().getAbsolutePath())).append("</Path>");
                 sb.append("<PieceSize>").append(downloader.getPieceSize()).append("</PieceSize>");
+                sb.append("<Sequential>").append(downloader.isSequential()).append("</Sequential>");
                 sb.append("<KnownSources>").append(downloader.getTotalWorkers()).append("</KnownSources>");
                 sb.append("<ActiveSources>").append(downloader.activeWorkers()).append("</ActiveSources>");
+                sb.append("<HopelessSources>").append(downloader.countHopelessSources()).append("</HopelessSources>");
                 sb.append("<TotalPieces>").append(downloader.getNPieces()).append("</TotalPieces>");
                 sb.append("<DonePieces>").append(downloader.donePieces()).append("</DonePieces>");
                 sb.append("</Details>");
