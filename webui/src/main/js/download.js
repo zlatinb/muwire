@@ -42,7 +42,7 @@ class Downloader {
 	}
 	
 	getPauseResumeRetryBlock() {
-		if (this.state == "FINISHED" || this.state == "CANCELLED")
+		if (this.state == "FINISHED" || this.state == "CANCELLED" || this.state == "HOPELESS")
 			return ""
 		if (this.state == "FAILED") {
 			var retryLink = new Link(_t("Retry"), "resumeDownload", [this.infoHash])

@@ -31,7 +31,7 @@ import net.i2p.util.ConcurrentHashSet
 @Log
 public class Downloader {
     
-    public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, CANCELLED, PAUSED, FINISHED }
+    public enum DownloadState { CONNECTING, HASHLIST, DOWNLOADING, FAILED, HOPELESS, CANCELLED, PAUSED, FINISHED }
     private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
@@ -214,6 +214,8 @@ public class Downloader {
         if (allFinished) {
             if (pieces.isComplete())
                 return DownloadState.FINISHED
+            if (!hasLiveSources())
+                return DownloadState.HOPELESS
             return DownloadState.FAILED
         }
 
@@ -284,7 +286,7 @@ public class Downloader {
         }
     }
     
-    public boolean hasLiveSources() {
+    private boolean hasLiveSources() {
         destinations.size() > countHopelessSources()
     }
 
