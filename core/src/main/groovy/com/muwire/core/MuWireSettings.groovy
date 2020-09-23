@@ -16,7 +16,7 @@ class MuWireSettings {
     boolean allowTrustLists
     int trustListInterval
     Set<Persona> trustSubscriptions
-    int downloadRetryInterval
+    int downloadRetryInterval, downloadMaxFailures
     int totalUploadSlots
     int uploadSlotsPerUser
     int updateCheckInterval
@@ -80,6 +80,7 @@ class MuWireSettings {
         if (incompleteLocationProp != null)
             incompleteLocation = new File(incompleteLocationProp)
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","60"))
+        downloadMaxFailures = Integer.parseInt(props.getProperty("downloadMaxFailures","10"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
         lastUpdateCheck = Long.parseLong(props.getProperty("lastUpdateChec","0"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
@@ -154,6 +155,7 @@ class MuWireSettings {
         if (incompleteLocation != null)
             props.setProperty("incompleteLocation", incompleteLocation.getAbsolutePath())
         props.setProperty("downloadRetryInterval", String.valueOf(downloadRetryInterval))
+        props.setProperty("downloadMaxFailures", String.valueOf(downloadMaxFailures))
         props.setProperty("updateCheckInterval", String.valueOf(updateCheckInterval))
         props.setProperty("lastUpdateCheck", String.valueOf(lastUpdateCheck))
         props.setProperty("autoDownloadUpdate", String.valueOf(autoDownloadUpdate))

@@ -100,7 +100,7 @@ public class DownloadManager {
         Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
         def downloader = new Downloader(eventBus, this, chatServer, me, target, size,
                 infoHash, pieceSize, connector, destinations,
-                incompletes, pieces)
+                incompletes, pieces, muSettings.downloadMaxFailures)
         downloaders.put(infoHash, downloader)
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
@@ -163,7 +163,7 @@ public class DownloadManager {
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
             def downloader = new Downloader(eventBus, this, chatServer, me, file, (long)json.length,
-                infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces)
+                infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
             if (json.paused != null)
                 downloader.paused = json.paused
                 

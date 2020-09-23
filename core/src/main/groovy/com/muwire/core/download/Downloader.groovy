@@ -59,6 +59,9 @@ public class Downloader {
     final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     private final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
+    /** LOCKING: itself */
+    private final Map<Destination, Integer> failingDestinations = new HashMap<>()
+    private final int maxFailures
 
 
     private volatile boolean cancelled, paused
@@ -74,7 +77,7 @@ public class Downloader {
     public Downloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
         Persona me, File file, long length, InfoHash infoHash,
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
-        File incompletes, Pieces pieces) {
+        File incompletes, Pieces pieces, int maxFailures) {
         this.eventBus = eventBus
         this.me = me
         this.downloadManager = downloadManager
@@ -91,6 +94,7 @@ public class Downloader {
         this.pieceSize = 1 << pieceSizePow2
         this.pieces = pieces
         this.nPieces = pieces.nPieces
+        this.maxFailures = maxFailures
     }
 
     public synchronized InfoHash getInfoHash() {
@@ -120,7 +124,7 @@ public class Downloader {
     void download() {
         readPieces()
         destinations.each {
-            if (it != me.destination) {
+            if (it != me.destination && !isHopeless(it)) {
                 def worker = new DownloadWorker(it)
                 activeWorkers.put(it, worker)
                 executorService.submit(worker)
@@ -273,11 +277,22 @@ public class Downloader {
     public int getTotalWorkers() {
         return activeWorkers.size();
     }
+    
+    public int countHopelessSources() {
+        synchronized(failingDestinations) {
+            return destinations.count { isHopeless(it)}
+        }
+    }
+    
+    public boolean hasLiveSources() {
+        destinations.size() > countHopelessSources()
+    }
 
     public void resume() {
         paused = false
         readPieces()
-        destinations.each { destination ->
+        destinations.stream().filter({!isHopeless(it)}).forEach { destination ->
+            log.fine("resuming source ${destination.toBase32()}")
             def worker = activeWorkers.get(destination)
             if (worker != null) {
                 if (worker.currentState == WorkerState.FINISHED) {
@@ -294,8 +309,9 @@ public class Downloader {
     }
 
     void addSource(Destination d) {
-        if (activeWorkers.containsKey(d))
+        if (activeWorkers.containsKey(d) || isHopeless(d))
             return
+        destinations.add(d)
         DownloadWorker newWorker = new DownloadWorker(d)
         activeWorkers.put(d, newWorker)
         executorService.submit(newWorker)
@@ -351,6 +367,28 @@ public class Downloader {
             try {os?.close() } catch (IOException ignore) {}
         }
     }
+    
+    private boolean isHopeless(Destination d) {
+        if (maxFailures < 0)
+            return false
+        synchronized(failingDestinations) {
+            return !successfulDestinations.contains(d) &&
+                    failingDestinations.containsKey(d) &&
+                    failingDestinations[d] >= maxFailures
+        }
+    }
+    
+    private void markFailed(Destination d) {
+        log.fine("marking failed ${d.toBase32()}")
+        synchronized(failingDestinations) {
+            Integer count = failingDestinations.get(d)
+            if (count == null) {
+                failingDestinations.put(d, 1)
+            } else {
+                failingDestinations.put(d, count + 1)
+            }
+        }
+    }
 
     class DownloadWorker implements Runnable {
         private final Destination destination
@@ -395,6 +433,7 @@ public class Downloader {
                 }
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Exception while downloading",DataUtil.findRoot(bad))
+                markFailed(destination)
             } finally {
                 writePieces()
                 currentState = WorkerState.FINISHED
