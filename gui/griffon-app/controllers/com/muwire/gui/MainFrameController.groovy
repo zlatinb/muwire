@@ -222,17 +222,13 @@ class MainFrameController {
 
     @ControllerAction
     void clear() {
-        def toRemove = []
-        model.downloads.each {
-             if (it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED) {
-                 toRemove << it
-             } else if (it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED) {
-                 toRemove << it
-             }
-         }
-         toRemove.each {
-             model.downloads.remove(it)
-         }
+        model.downloads.removeAll { 
+            def state = it.downloader.getCurrentState()
+            state == Downloader.DownloadState.CANCELLED ||
+                state == Downloader.DownloadState.FINISHED ||
+                state == Downloader.DownloadState.HOPELESS
+        }
+        
          model.clearButtonEnabled = false
 
     }

@@ -177,22 +177,25 @@ class MainFrameModel {
                 if (!mvcGroup.alive)
                     return
 
-                // remove cancelled or finished downloads
+                // remove cancelled or finished or hopeless downloads
                 if (!clearButtonEnabled || uiSettings.clearCancelledDownloads || uiSettings.clearFinishedDownloads) {
                     def toRemove = []
                     downloads.each {
-                        if (it.downloader.getCurrentState() == Downloader.DownloadState.CANCELLED) {
+                        def state = it.downloader.getCurrentState()
+                        if (state == Downloader.DownloadState.CANCELLED) {
                             if (uiSettings.clearCancelledDownloads) {
                                 toRemove << it
                             } else {
                                 clearButtonEnabled = true
                             }
-                        } else if (it.downloader.getCurrentState() == Downloader.DownloadState.FINISHED) {
+                        } else if (state == Downloader.DownloadState.FINISHED) {
                             if (uiSettings.clearFinishedDownloads) {
                                 toRemove << it
                             } else {
                                 clearButtonEnabled = true
                             }
+                        } else if (state == Downloader.DownloadState.HOPELESS) {
+                            clearButtonEnabled = true
                         }
                     }
                     toRemove.each {
