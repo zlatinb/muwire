@@ -12,6 +12,7 @@ import java.awt.Font
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
     @Observable String downloadRetryInterval
+    @Observable String downloadMaxFailures
     @Observable String updateCheckInterval
     @Observable boolean autoDownloadUpdate
     @Observable boolean shareDownloadedFiles
@@ -78,6 +79,7 @@ class OptionsModel {
     void mvcGroupInit(Map<String, String> args) {
         MuWireSettings settings = application.context.get("muwire-settings")
         downloadRetryInterval = settings.downloadRetryInterval
+        downloadMaxFailures = settings.downloadMaxFailures
         updateCheckInterval = settings.updateCheckInterval
         autoDownloadUpdate = settings.autoDownloadUpdate
         shareDownloadedFiles = settings.shareDownloadedFiles

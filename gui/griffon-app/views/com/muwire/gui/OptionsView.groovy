@@ -39,6 +39,7 @@ class OptionsView {
     def chat
 
     def retryField
+    def downloadMaxFailuresField
     def updateField
     def autoDownloadUpdateCheckbox
     def shareDownloadedCheckbox
@@ -123,13 +124,17 @@ class OptionsView {
                 retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, 
                     constraints : gbc(gridx: 2, gridy: 0, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
-                label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START))
-                label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_START))
-                button(text : "Choose", constraints : gbc(gridx : 2, gridy:1), downloadLocationAction)
+                label(text : "Give up on sources after this many failures (-1 means never)", constraints: gbc(gridx: 0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : 2, 
+                    constraints : gbc(gridx: 2, gridy: 1, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
-                label(text : "Store incomplete files in:", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
-                label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
-                button(text : "Choose", constraints : gbc(gridx : 2, gridy:2), incompleteLocationAction)
+                label(text : "Save downloaded files to:", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
+                label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
+                button(text : "Choose", constraints : gbc(gridx : 2, gridy:2), downloadLocationAction)
+                
+                label(text : "Store incomplete files in:", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
+                label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_START))
+                button(text : "Choose", constraints : gbc(gridx : 2, gridy:3), incompleteLocationAction)
             }
             
             panel (border : titledBorder(title : "Upload Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,

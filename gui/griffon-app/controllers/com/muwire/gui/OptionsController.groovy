@@ -59,8 +59,11 @@ class OptionsController {
 
         text = view.retryField.text
         model.downloadRetryInterval = text
-
         settings.downloadRetryInterval = Integer.valueOf(text)
+        
+        text = view.downloadMaxFailuresField.text
+        model.downloadMaxFailures = text
+        settings.downloadMaxFailures = Integer.valueOf(text)
 
         text = view.updateField.text
         model.updateCheckInterval = text
