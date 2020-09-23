@@ -63,7 +63,8 @@ public class DownloadManager {
             Map.Entry<InfoHash, Downloader> entry = iter.next();
             Downloader.DownloadState state = entry.getValue().getCurrentState();
             if (state == Downloader.DownloadState.CANCELLED ||
-                    state == Downloader.DownloadState.FINISHED)
+                    state == Downloader.DownloadState.FINISHED ||
+                    state == Downloader.DownloadState.HOPELESS)
                 iter.remove();
         }
     }
