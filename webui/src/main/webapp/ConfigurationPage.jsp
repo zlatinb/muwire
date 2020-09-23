@@ -83,6 +83,13 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 						<td><p align="right"><input type="text" size="1" name="downloadRetryInterval" class="right" value="<%= core.getMuOptions().getDownloadRetryInterval()%>"></p></td>
 					</tr>
 					<tr>
+						<td><div class="tooltip"><%=Util._t("Give up on sources after this many failures (-1 means never)")%>
+							<span class="tooltiptext"><%=Util._t("After how many download attempts MuWire should give up on the download source.")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="text" size="1" name="downloadMaxFailures" class="right" value="<%= core.getMuOptions().getDownloadMaxFailures()%>"></p></td>
+					</tr>
+					<tr>
 						<td><div class="tooltip"><%=Util._t("Directory for downloaded files")%>
 							<span class="tooltiptext"><%=Util._t("Where to save downloaded files. MuWire must be able to write to this location.")%></span>
 							</div>

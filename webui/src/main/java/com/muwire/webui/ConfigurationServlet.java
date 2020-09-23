@@ -23,6 +23,7 @@ public class ConfigurationServlet extends HttpServlet {
     static {
         INPUT_VALIDATORS.put("trustListInterval", new PositiveIntegerValidator("Trust list update frequency (hours)"));
         INPUT_VALIDATORS.put("downloadRetryInterval", new PositiveIntegerValidator("Download retry frequency (seconds)"));
+        INPUT_VALIDATORS.put("downloadMaxFailures", new IntegerValidator("Give up on sources after this many failures (-1 means never)"));
         INPUT_VALIDATORS.put("totalUploadSlots", new IntegerValidator("Total upload slots (-1 means unlimited)"));
         INPUT_VALIDATORS.put("uploadSlotsPerUser", new IntegerValidator("Upload slots per user (-1 means unlimited)"));
         INPUT_VALIDATORS.put("downloadLocation", new DirectoryValidator());
@@ -92,6 +93,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "allowTrustLists": core.getMuOptions().setAllowTrustLists(true); break;
         case "trustListInterval" : core.getMuOptions().setTrustListInterval(Integer.parseInt(value)); break;
         case "downloadRetryInterval" : core.getMuOptions().setDownloadRetryInterval(Integer.parseInt(value)); break;
+        case "downloadMaxFailures" : core.getMuOptions().setDownloadMaxFailures(Integer.parseInt(value)); break;
         case "totalUploadSlots" : core.getMuOptions().setTotalUploadSlots(Integer.parseInt(value)); break;
         case "uploadSlotsPerUser" : core.getMuOptions().setUploadSlotsPerUser(Integer.parseInt(value)); break;
         case "downloadLocation" : core.getMuOptions().setDownloadLocation(getDirectory(value)); break;
