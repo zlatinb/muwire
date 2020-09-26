@@ -50,6 +50,9 @@ class Ready extends AbstractLifecycleHandler {
             props = new MuWireSettings(props)
             if (props.incompleteLocation == null)
                 props.incompleteLocation = new File(home, "incompletes")
+                
+            if (System.getProperties().containsKey("disableUpdates"))
+                props.disableUpdates = Boolean.valueOf(System.getProperty("disableUpdates"))
         } else {
             log.info("creating new properties")
             props = new MuWireSettings()
@@ -88,6 +91,7 @@ class Ready extends AbstractLifecycleHandler {
             
             props.embeddedRouter = embeddedRouterAvailable
             props.updateType = System.getProperty("updateType","jar")
+            props.disableUpdates = Boolean.parseBoolean(System.getProperty("disableUpdates", "false"))
                    
             
             propsFile.withPrintWriter("UTF-8", {

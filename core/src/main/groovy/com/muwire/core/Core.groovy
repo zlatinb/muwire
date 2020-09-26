@@ -329,13 +329,13 @@ public class Core {
         log.info("initializing cache client")
         cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
 
-        if (!props.plugin) {
+        if (!(props.plugin || props.disableUpdates)) {
         log.info("initializing update client")
             updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me, spk)
             eventBus.register(FileDownloadedEvent.class, updateClient)
             eventBus.register(UIResultBatchEvent.class, updateClient)
         } else
-            log.info("running as plugin, not initializing update client")
+            log.info("running as plugin or updates disabled, not initializing update client")
 
         log.info("initializing connector")
         I2PConnector i2pConnector = new I2PConnector(i2pSocketManager)

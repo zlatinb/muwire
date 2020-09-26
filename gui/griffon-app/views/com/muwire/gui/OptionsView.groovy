@@ -158,16 +158,18 @@ class OptionsView {
                 shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0))
             }
             
-            panel (border : titledBorder(title : "Update Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
+            if (!model.disableUpdates) {
+                panel (border : titledBorder(title : "Update Settings", border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL))) {
-                gridBagLayout()
-                label(text : "Check for updates every (hours)", constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
+                    gridBagLayout()
+                    label(text : "Check for updates every (hours)", constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
 
-                label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate}, 
+                    label(text : "Download updates automatically", constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate},
                     constraints : gbc(gridx:1, gridy : 1, anchor : GridBagConstraints.LINE_END))
 
+                }
             }
         }
         i = builder.panel {
