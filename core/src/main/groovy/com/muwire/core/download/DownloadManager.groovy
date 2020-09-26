@@ -112,6 +112,11 @@ public class DownloadManager {
         persistDownloaders()
     }
 
+    public void onDownloadHopelessEvent(DownloadHopelessEvent e) {
+        downloaders.remove(e.downloader.infoHash)
+        persistDownloaders()
+    }
+    
     public void onUIDownloadPausedEvent(UIDownloadPausedEvent e) {
         persistDownloaders()
     }

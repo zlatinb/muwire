@@ -66,6 +66,7 @@ public class Downloader {
 
     private volatile boolean cancelled, paused
     private final AtomicBoolean eventFired = new AtomicBoolean()
+    private final AtomicBoolean hopelessEventFired = new AtomicBoolean()
     private boolean piecesFileClosed
 
     private final AtomicLong dataSinceLastRead = new AtomicLong(0)
@@ -436,6 +437,8 @@ public class Downloader {
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Exception while downloading",DataUtil.findRoot(bad))
                 markFailed(destination)
+                if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true)) 
+                    eventBus.publish(new DownloadHopelessEvent(downloader : Downloader.this))
             } finally {
                 writePieces()
                 currentState = WorkerState.FINISHED
