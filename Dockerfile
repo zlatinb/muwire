@@ -39,7 +39,7 @@ RUN \
 
 # Generate and install favicons.
 RUN \
-    APP_ICON_URL=https://github.com/zlatinb/muwire/raw/master/gui/griffon-app/resources/MuWire-128x128.png && \
+    APP_ICON_URL=https://github.com/zlatinb/muwire/raw/master/gui/griffon-app/resources/MuWire-48x48.png && \
     install_app_icon.sh "$APP_ICON_URL"
 
 # Add files.
