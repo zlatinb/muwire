@@ -4,7 +4,7 @@ The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and is
 
 MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows,MacOS,Linux.
 
-The current stable release - 0.7.1 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+The current stable release - 0.7.4 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -21,7 +21,7 @@ If you want to run the unit tests, type
 ./gradlew clean build
 ```
 
-If you want to build binary bundles that do not depend on Java or I2P, see the [muwire-pkg] project
+If you want to build binary bundles that do not depend on Java or I2P, see the [muwire-pkg] project.  If you want to package MuWire for a Linux distribution, see the [Packaging] wiki page.
 
 ## Running the GUI
 
@@ -68,6 +68,7 @@ You can find the full key at https://keybase.io/zlatinb
 [Wiki]: https://github.com/zlatinb/muwire/wiki
 [doc]: https://github.com/zlatinb/muwire/tree/master/doc
 [muwire-pkg]: https://github.com/zlatinb/muwire-pkg 
+[Packaging]: https://github.com/zlatinb/muwire/wiki/Packaging
 [cli options]: https://github.com/zlatinb/muwire/wiki/CLI-Configuration-Options
 [I2P Github]: https://github.com/i2p/i2p.i2p
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
