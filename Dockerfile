@@ -39,7 +39,7 @@ RUN \
 
 # Generate and install favicons.
 RUN \
-    APP_ICON_URL=https://github.com/zlatinb/muwire/raw/master/gui/griffon-app/resources/MuWire-128x128.png && \
+    APP_ICON_URL=https://github.com/zlatinb/muwire/raw/master/gui/griffon-app/resources/MuWire-48x48.png && \
     install_app_icon.sh "$APP_ICON_URL"
 
 # Add files.
@@ -47,7 +47,8 @@ COPY docker/rootfs/ /
 
 # Set environment variables.
 ENV APP_NAME="MuWire" \
-    S6_KILL_GRACETIME=8000
+    S6_KILL_GRACETIME=8000 \
+    MU_WIRE_OPTS='"-Dwizard.defaults=/etc/muwire/MuWire.default.properties"'
 
 # Define mountable directories.
 VOLUME ["$APP_HOME/.MuWire"]
