@@ -47,7 +47,8 @@ COPY docker/rootfs/ /
 
 # Set environment variables.
 ENV APP_NAME="MuWire" \
-    S6_KILL_GRACETIME=8000
+    S6_KILL_GRACETIME=8000 \
+    MU_WIRE_OPTS='"-Dwizard.defaults=/etc/muwire/MuWire.default.properties"'
 
 # Define mountable directories.
 VOLUME ["$APP_HOME/.MuWire"]
