@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -71,12 +72,12 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : "Sender", preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
-                                            closureColumn(header : "Results", preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
-                                            closureColumn(header : "Browse", preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
-                                            closureColumn(header : "Feed", preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
-                                            closureColumn(header : "Chat", preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
-                                            closureColumn(header : "Trust", preferredWidth : 50, type: String, read : { row ->
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
+                                            closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
+                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
+                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
+                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
+                                            closureColumn(header : trans("TRUST"), preferredWidth : 50, type: String, read : { row ->
                                                 model.core.trustService.getLevel(row.destination).toString()
                                             })
                                         }
@@ -85,14 +86,14 @@ class SearchTabView {
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows: 1, cols : 2)
                                     panel (border : etchedBorder()){
-                                        button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
-                                        button(text : "Subscribe", enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : "Chat", enabled : bind{model.chatActionEnabled}, chatAction)
+                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
                                     }
                                     panel (border : etchedBorder()){
-                                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
-                                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                        button(text : trans("TRUST"), enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
                                 }
                             }
@@ -101,22 +102,22 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.results) {
-                                            closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                                            closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                                            closureColumn(header: "Direct Sources", preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                                            closureColumn(header: "Possible Sources", preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                                            closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
-                                            closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                                            closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
+                                            closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
+                                            closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
+                                            closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
+                                            closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
                                         }
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
                                     label(text : "", constraints : gbc(gridx : 0, gridy: 0, weightx : 100))
-                                    button(text : "Download", enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
-                                    button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
-                                    button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
-                                    label(text : "Download sequentially", constraints : gbc(gridx: 4, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
+                                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
+                                    button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
+                                    button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
+                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 4, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
                                     sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 5, gridy: 0, anchor : GridBagConstraints.LINE_END),
                                     selected : false, enabled : bind {model.downloadActionEnabled})
                                 }
@@ -131,19 +132,19 @@ class SearchTabView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.results2) {
-                                            closureColumn(header : "Name", preferredWidth : 350, type : String, read : {
+                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : String, read : {
                                                 model.hashBucket[it].first().name.replace('<', '_')
                                             })
-                                            closureColumn(header : "Size", preferredWidth : 20, type : Long, read : {
+                                            closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
                                                 model.hashBucket[it].first().size
                                             })
-                                            closureColumn(header : "Direct Sources", preferredWidth : 20, type : Integer, read : {
+                                            closureColumn(header : trans("DIRECT_SOURCES"), preferredWidth : 20, type : Integer, read : {
                                                 model.hashBucket[it].size()
                                             })
-                                            closureColumn(header : "Possible Sources", preferredWidth : 20, type : Integer , read : {
+                                            closureColumn(header : trans("POSSIBLE_SOURCES"), preferredWidth : 20, type : Integer , read : {
                                                 model.sourcesBucket[it].size()
                                             })
-                                            closureColumn(header : "Comments", preferredWidth : 20, type : Integer, read : {
+                                            closureColumn(header : trans("COMMENTS"), preferredWidth : 20, type : Integer, read : {
                                                 int count = 0
                                                 model.hashBucket[it].each { 
                                                     if (it.comment != null)
@@ -151,14 +152,14 @@ class SearchTabView {
                                                 }
                                                 count
                                             })
-                                            closureColumn(header : "Certificates", preferredWidth : 20, type : Integer, read : {
+                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type : Integer, read : {
                                                 int count = 0
                                                 model.hashBucket[it].each { 
                                                     count += it.certificates
                                                 }
                                                 count
                                             })
-                                            closureColumn(header : "Feeds", preferredWidth : 20, type : Integer, read : {
+                                            closureColumn(header : trans("FEEDS"), preferredWidth : 20, type : Integer, read : {
                                                 int count = 0
                                                 model.hashBucket[it].each { 
                                                     if (it.feed)
@@ -166,7 +167,7 @@ class SearchTabView {
                                                 }
                                                 count
                                             })
-                                            closureColumn(header : "Chat Hosts", preferredWidth : 20, type : Integer, read : {
+                                            closureColumn(header : trans("CHAT_HOSTS"), preferredWidth : 20, type : Integer, read : {
                                                 int count = 0
                                                 model.hashBucket[it].each { 
                                                     if (it.chat)
@@ -181,11 +182,11 @@ class SearchTabView {
                                     gridLayout(rows :1, cols : 3)
                                     panel {}
                                     panel {
-                                        button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
                                     }
                                     panel {
                                         gridBagLayout()
-                                        label(text : "Download sequentially", constraints : gbc(gridx : 0, gridy : 0, weightx : 100, anchor : GridBagConstraints.LINE_END))
+                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx : 0, gridy : 0, weightx : 100, anchor : GridBagConstraints.LINE_END))
                                         sequentialDownloadCheckbox2 = checkBox( constraints : gbc(gridx: 1, gridy:0, weightx: 0, anchor : GridBagConstraints.LINE_END))
                                     }
                                 }
@@ -195,13 +196,13 @@ class SearchTabView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     sendersTable2 = table(id : "senders-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders2) {
-                                            closureColumn(header : "Sender", preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
-                                            closureColumn(header : "Browse", preferredWidth : 20, type : Boolean, read : {it.browse})
-                                            closureColumn(header : "Feed", preferredWidth : 20, type: Boolean, read : {it.feed})
-                                            closureColumn(header : "Chat", preferredWidth : 20, type : Boolean, read : {it.chat})
-                                            closureColumn(header : "Comment", preferredWidth : 20, type : Boolean, read : {it.comment != null})
-                                            closureColumn(header : "Certificates", preferredWidth : 20, type: Integer, read : {it.certificates})
-                                            closureColumn(header : "Trust", preferredWidth : 50, type : String, read : {
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
+                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type : Boolean, read : {it.browse})
+                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type: Boolean, read : {it.feed})
+                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {it.chat})
+                                            closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
+                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
+                                            closureColumn(header : trans("TRUST"), preferredWidth : 50, type : String, read : {
                                                 model.core.trustService.getLevel(it.sender.destination).toString()
                                             })
                                         }
@@ -210,16 +211,16 @@ class SearchTabView {
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows : 1, cols : 2)
                                     panel (border : etchedBorder()) {
-                                        button(text : "Browse Host", enabled : bind {model.browseActionEnabled}, browseAction)
-                                        button(text : "Subscribe", enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : "Chat", enabled : bind{model.chatActionEnabled}, chatAction)
-                                        button(text : "View Comment", enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
-                                        button(text : "View Certificates", enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
+                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
+                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
                                     }
                                     panel (border : etchedBorder()) {
-                                        button(text : "Trust", enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : "Neutral", enabled: bind {model.trustButtonsEnabled}, neutralAction)
-                                        button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                        button(text : trans("TRUST"), enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
                                 }
                             }
@@ -227,7 +228,7 @@ class SearchTabView {
                     }
                 }
                 panel (constraints : BorderLayout.SOUTH) {
-                    label(text : "Group by")
+                    label(text : trans("GROUP_BY"))
                     buttonGroup(id : "groupBy")
                     radioButton(text : "Sender", selected : bind  {!model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
                     radioButton(text : "File", selected : bind {model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showFileGrouping)
@@ -434,30 +435,30 @@ class SearchTabView {
         JPopupMenu menu = new JPopupMenu()
         boolean showMenu = false
         if (model.downloadActionEnabled) {
-            JMenuItem download = new JMenuItem("Download")
+            JMenuItem download = new JMenuItem(trans("DOWNLOAD"))
             download.addActionListener({mvcGroup.controller.download()})
             menu.add(download)
             showMenu = true
         }
         if (resultsTable.getSelectedRows().length == 1) {
-            JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+            JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
             copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
             menu.add(copyHashToClipboard)
-            JMenuItem copyNameToClipboard = new JMenuItem("Copy name to clipboard")
+            JMenuItem copyNameToClipboard = new JMenuItem(trans("COPY_NAME_TO_CLIPBOARD"))
             copyNameToClipboard.addActionListener({mvcGroup.view.copyNameToClipboard()})
             menu.add(copyNameToClipboard)
             showMenu = true
             
             // show comment if any
             if (model.viewCommentActionEnabled) {
-                JMenuItem showComment = new JMenuItem("View Comment")
+                JMenuItem showComment = new JMenuItem(trans("VIEW_COMMENT"))
                 showComment.addActionListener({mvcGroup.controller.showComment()})
                 menu.add(showComment)
             }
             
             // view certificates if any
             if (model.viewCertificatesActionEnabled) {
-                JMenuItem viewCerts = new JMenuItem("View Certificates")
+                JMenuItem viewCerts = new JMenuItem(trans("VIEW_CERTIFICATES"))
                 viewCerts.addActionListener({mvcGroup.controller.viewCertificates()})
                 menu.add(viewCerts)
             }
