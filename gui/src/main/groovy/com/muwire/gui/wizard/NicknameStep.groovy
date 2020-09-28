@@ -1,6 +1,7 @@
 package com.muwire.gui.wizard
 
 import com.muwire.core.Constants
+import static com.muwire.gui.Translator.trans
 import com.muwire.core.MuWireSettings
 import com.muwire.core.util.DataUtil
 
@@ -15,7 +16,7 @@ class NicknameStep extends WizardStep {
     @Override
     protected void buildUI(FactoryBuilderSupport builder) {
         builder.panel(constraints : getConstraint()) {
-            label(text: "Select a nickname")
+            label(text: trans("SELECT_A_NICKNAME"))
             nickField = textField(columns: 30)
         }
     }
@@ -24,12 +25,12 @@ class NicknameStep extends WizardStep {
     protected List<String> validate() {
         String nickname = nickField.text
         if (nickname == null)
-            return ['Please select a nickname']
+            return [trans('PLEASE_SELECT_A_NICKNAME')]
         nickname = nickname.trim()
         if (nickname.length() == 0)
-            return ['Nickname cannot be blank']
+            return [trans('NICKNAME_CANNOT_BE_BLANK')]
         if (!DataUtil.isValidName(nickname))
-            return ["Nickname cannot contain any of ${Constants.INVALID_NICKNAME_CHARS} and must be no longer than ${Constants.MAX_NICKNAME_LENGTH} characters.  Choose another."]
+            return [trans('NICKNAME_CANNOT_CONTAIN', Constants.INVALID_NICKNAME_CHARS, Constants.MAX_NICKNAME_LENGTH)]
         null
     }
 

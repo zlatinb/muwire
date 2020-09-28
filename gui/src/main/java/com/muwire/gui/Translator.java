@@ -1,5 +1,7 @@
 package com.muwire.gui;
 
+import java.text.ChoiceFormat;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,7 +35,7 @@ public class Translator {
         localeBundle = ResourceBundle.getBundle("messages", locale);
     }
     
-    public synchronized static String getString(String key) {
+    public synchronized static String trans(String key) {
         if (localeBundle == null)
             throw new IllegalStateException("locale not initialized");
         try {
@@ -41,6 +43,18 @@ public class Translator {
         } catch (MissingResourceException notTranslated) {
             return usBundle.getString(key);
         }
+    }
+    
+    public synchronized static String trans(String key, Object... values) {
+        if (localeBundle == null)
+            throw new IllegalStateException("locale not initialized");
+        String pattern;
+        try {
+            pattern = localeBundle.getString(key);
+        } catch (MissingResourceException notTranslated) {
+            pattern = usBundle.getString(key);
+        }
+        return MessageFormat.format(pattern, values);
     }
     
     public static class LocaleWrapper {

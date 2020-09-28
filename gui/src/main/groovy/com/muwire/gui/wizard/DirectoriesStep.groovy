@@ -1,6 +1,7 @@
 package com.muwire.gui.wizard
 
 import java.awt.GridBagConstraints
+import static com.muwire.gui.Translator.trans
 
 import javax.swing.JFileChooser
 
@@ -22,19 +23,19 @@ class DirectoriesStep extends WizardStep {
         
         builder.panel(constraints : getConstraint()) {
             gridBagLayout()
-            label(text : "Select directories for saving downloaded and incomplete files.",
+            label(text : trans("SELECT_DOWNLOAD_AND_INCOMPLETE_DIRECTORIES"),
                 constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2, insets: [10,0,0,0]))
-            label(text : "They will be created if they do not already exist.",
+            label(text : trans("DIRECTORIES_WILL_BE_CREATED"),
                 constraints : gbc(gridx:0, gridy: 1, gridwidth: 2, insets: [0,0,10,0]))
 
-            label(text : "Directory for saving downloaded files", constraints : gbc(gridx:0, gridy: 2))
+            label(text : trans("DIRECTORY_FOR_DOWNLOADED_FILES"), constraints : gbc(gridx:0, gridy: 2))
             downloadLocationField = textField(text : defaults.downloadLocation, 
                 constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
-            downloadLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 3), actionPerformed : showDownloadChooser)
-            label(text : "Directory for storing incomplete files", constraints : gbc(gridx:0, gridy: 4))
+            downloadLocationButton = button(text : trans("CHOOSE"), constraints : gbc(gridx: 1, gridy: 3), actionPerformed : showDownloadChooser)
+            label(text : trans("DIRECTORY_FOR_INCOMPLETE_FILES"), constraints : gbc(gridx:0, gridy: 4))
             incompleteLocationField = textField(text : defaults.incompleteLocation, 
                 constraints : gbc(gridx:0, gridy:5, fill : GridBagConstraints.HORIZONTAL, weightx: 100))
-            incompleteLocationButton = button(text : "Choose", constraints : gbc(gridx: 1, gridy: 5), actionPerformed : showIncompleteChooser)
+            incompleteLocationButton = button(text : trans("CHOOSE"), constraints : gbc(gridx: 1, gridy: 5), actionPerformed : showIncompleteChooser)
         }
     }        
 
@@ -42,9 +43,9 @@ class DirectoriesStep extends WizardStep {
     protected List<String> validate() {
         def rv = []
         if (!canWrite(downloadLocationField.text))
-            rv << "Download location not writeable"
+            rv << trans("DOWNLOAD_LOCATION_NOT_WRITEABLE")
         if (!canWrite(incompleteLocationField.text))
-            rv << "Incomplete location not writeable"
+            rv << trans("INCOMPLETE_LOCATION_NOT_WRITEABLE")
         rv
     }
     
@@ -65,13 +66,13 @@ class DirectoriesStep extends WizardStep {
     }
     
     def showDownloadChooser = {
-        String text = chooseFile("Select directory for downloaded files")
+        String text = chooseFile("SELECT_DIRECTORY_DOWNLOAD_FILES")
         if (text != null)
             downloadLocationField.text = text
     }
     
     def showIncompleteChooser = {
-        String text = chooseFile("Select directory for incomplete files")
+        String text = chooseFile("SELECT_DIRECTORY_INCOMPLETE_FILES")
         if (text != null)
             incompleteLocationField.text = text
     }
@@ -79,7 +80,7 @@ class DirectoriesStep extends WizardStep {
     private String chooseFile(String title) {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(false)
-        chooser.setDialogTitle(title)
+        chooser.setDialogTitle(trans(title))
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)

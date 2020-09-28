@@ -1,6 +1,7 @@
 package com.muwire.gui.wizard
 
 import java.awt.GridBagConstraints
+import static com.muwire.gui.Translator.trans
 
 import javax.swing.JLabel
 import javax.swing.border.TitledBorder
@@ -21,20 +22,20 @@ class TunnelStep extends WizardStep {
     protected void buildUI(FactoryBuilderSupport builder) {
         builder.panel (constraints : getConstraint()) {
             gridBagLayout()
-            panel (border : titledBorder(title : "Speed vs. Anonymity", border : etchedBorder(), titlePosition: TitledBorder.TOP,
+            panel (border : titledBorder(title : trans("SPEED_VS_ANONYMITY"), border : etchedBorder(), titlePosition: TitledBorder.TOP,
                 constraints : gbc(gridx: 0, gridy: 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 def lengthTable = new Hashtable()
-                lengthTable.put(1, new JLabel("Max Speed"))
-                lengthTable.put(3, new JLabel("Max Anonymity"))
+                lengthTable.put(1, new JLabel(trans("MAX_SPEED")))
+                lengthTable.put(3, new JLabel(trans("MAX_ANONYMITY")))
                 tunnelLengthSlider = slider(minimum : 1, maximum : 3, value : defaults.tunnelLength,
                     majorTickSpacing : 1, snapToTicks: true, paintTicks: true, labelTable : lengthTable,
                     paintLabels : true)
             }
-            panel (border : titledBorder(title : "Reliability vs. Resource Usage", border : etchedBorder(), titlePosition: TitledBorder.TOP,
+            panel (border : titledBorder(title : trans("RELIABILITY_VS_RESOURCES"), border : etchedBorder(), titlePosition: TitledBorder.TOP,
                 constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 def quantityTable = new Hashtable()
-                quantityTable.put(1, new JLabel("Min Resources"))
-                quantityTable.put(6, new JLabel("Max Reliability"))
+                quantityTable.put(1, new JLabel(trans("MIN_RESOURCES")))
+                quantityTable.put(6, new JLabel(trans("MAX_RELIABILITY")))
                 tunnelQuantitySlider = slider(minimum : 1, maximum : 6, value : defaults.tunnelQuantity,
                     majorTickSpacing : 1, snapToTicks : true, paintTicks: true, labelTable : quantityTable,
                     paintLabels : true)

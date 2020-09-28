@@ -1,6 +1,7 @@
 package com.muwire.gui.wizard
 
 import com.muwire.core.MuWireSettings
+import static com.muwire.gui.Translator.trans
 
 class LastStep extends WizardStep {
     
@@ -15,9 +16,9 @@ class LastStep extends WizardStep {
     protected void buildUI(FactoryBuilderSupport builder) {
         builder.panel(constraints: getConstraint()) {
             gridBagLayout()
-            label(text: "The wizard is complete.  Press \"Finish\" to launch MuWire.", constraints : gbc(gridx: 0, gridy: 0))
+            label(text: trans("WIZARD_COMPLETE"), constraints : gbc(gridx: 0, gridy: 0))
             if (embeddedRouterAvailable)
-                label(text : "MuWire will launch an embedded I2P router.  This can take a few minutes.", constraints: gbc(gridx:0, gridy:1))
+                label(text : trans("LAUNCH_EMBEDDED_ROUTER"), constraints: gbc(gridx:0, gridy:1))
         }
     }
 

@@ -1,6 +1,7 @@
 package com.muwire.gui.wizard
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -37,12 +38,12 @@ class WizardView {
             panel (constraints : BorderLayout.SOUTH) {
                 gridLayout(rows:1, cols:2)
                 panel {
-                    button(text : "Cancel", cancelAction)
+                    button(text : trans("CANCEL"), cancelAction)
                 }
                 panel {
-                    button(text : "Previous", enabled : bind {model.previousButtonEnabled}, previousAction)
-                    button(text : "Next", enabled : bind {model.nextButtonEnabled}, nextAction)
-                    button(text : "Finish", enabled : bind {model.finishButtonEnabled}, finishAction)
+                    button(text : trans("PREVIOUS"), enabled : bind {model.previousButtonEnabled}, previousAction)
+                    button(text : trans("NEXT"), enabled : bind {model.nextButtonEnabled}, nextAction)
+                    button(text : trans("FINISH"), enabled : bind {model.finishButtonEnabled}, finishAction)
                 }
             } 
         }

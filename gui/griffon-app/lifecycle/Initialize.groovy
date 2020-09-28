@@ -144,7 +144,7 @@ class Initialize extends AbstractLifecycleHandler {
                 def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
 
 
-                def exit = new MenuItem(Translator.getString("EXIT"))
+                def exit = new MenuItem(Translator.trans("EXIT"))
                 exit.addActionListener({
                     application.getWindowManager().findWindow("main-frame").setVisible(false)
                     application.getWindowManager().findWindow("shutdown-window").setVisible(true)
@@ -169,7 +169,7 @@ class Initialize extends AbstractLifecycleHandler {
                     }
                 }
 
-                def show = new MenuItem(Translator.getString("OPEN_MUWIRE"))
+                def show = new MenuItem(Translator.trans("OPEN_MUWIRE"))
                 show.addActionListener(showMW)
                 popupMenu.add(show)
                 popupMenu.add(exit)
