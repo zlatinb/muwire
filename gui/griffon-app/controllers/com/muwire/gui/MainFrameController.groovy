@@ -550,7 +550,7 @@ class MainFrameController {
         if (selectedFiles == null || selectedFiles.isEmpty())
             return
         
-        if (model.publishButtonText == "Unpublish") {
+        if (model.publishButtonText == "UNPUBLISH") {
             selectedFiles.each { 
                 it.unpublish()
                 model.core.eventBus.publish(new UIFileUnpublishedEvent(sf : it))

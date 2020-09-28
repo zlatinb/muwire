@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.GriffonApplication
+import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
 import griffon.core.env.Metadata
 import griffon.inject.MVCMember
@@ -105,11 +106,11 @@ class MainFrameView {
             pack : false,
             visible : bind { model.coreInitialized }) {
                 menuBar {
-                    menu (text : "File") {
-                        menuItem("Exit", actionPerformed : {closeApplication()})
+                    menu (text : trans("FILE")) {
+                        menuItem(trans("EXIT"), actionPerformed : {closeApplication()})
                     }
-                    menu (text : "Options") {
-                        menuItem("Configuration", actionPerformed : {
+                    menu (text : trans("OPTIONS")) {
+                        menuItem(trans("CONFIGURATION"), actionPerformed : {
                             def params = [:]
                             params['core'] = application.context.get("core")
                             params['settings'] = params['core'].muOptions
@@ -117,36 +118,36 @@ class MainFrameView {
                             mvcGroup.createMVCGroup("Options", params)
                         })
                     }
-                    menu (text : "Status") {
+                    menu (text : trans("STATUS")) {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
                         MuWireSettings muSettings = application.context.get("muwire-settings")
                         menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status")})
-                        menuItem("System", actionPerformed : {mvcGroup.createMVCGroup("system-status")})
+                        menuItem(trans("SYSTEM"), actionPerformed : {mvcGroup.createMVCGroup("system-status")})
                     }
-                    menu (text : "Tools") {
-                        menuItem("Content Control", actionPerformed : {
+                    menu (text : trans("TOOLS")) {
+                        menuItem(trans("CONTENT_CONTROL"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core
                             mvcGroup.createMVCGroup("content-panel", env)
                         })
-                        menuItem("Advanced Sharing", actionPerformed : {
+                        menuItem(trans("ADVANCED_SHARING"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core
                             mvcGroup.createMVCGroup("advanced-sharing",env)  
                         })
-                        menuItem("Certificates", actionPerformed : {
+                        menuItem(trans("CERTIFICATES"), actionPerformed : {
                             def env = [:]
                             env['core'] = model.core
                             mvcGroup.createMVCGroup("certificate-control",env)
                         })
-                        menuItem("Chat Room Monitor", actionPerformed : {
+                        menuItem(trans("CHAT_ROOM_MONITOR"), actionPerformed : {
                             if (!mvcGroup.getChildrenGroups().containsKey("chat-monitor")) {
                                 def env = [:]
                                 env['chatNotificator'] = chatNotificator
                                 mvcGroup.createMVCGroup("chat-monitor","chat-monitor",env)
                             }
                         })
-                        menuItem("Sign Tool", actionPerformed : {
+                        menuItem(trans("SIGN_TOOL"), actionPerformed : {
                             def env = [:]
                             env['core'] = model.core
                             mvcGroup.createMVCGroup("sign",env)
@@ -158,24 +159,24 @@ class MainFrameView {
                     borderLayout()
                     panel (constraints: BorderLayout.WEST) {
                         gridLayout(rows:1, cols: 2)
-                        button(text: "Searches", enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
-                        button(text: "Downloads", enabled : bind{model.downloadsPaneButtonEnabled}, actionPerformed : showDownloadsWindow)
-                        button(text: "Uploads", enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
+                        button(text: trans("SEARCHES"), enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
+                        button(text: trans("DOWNLOADS"), enabled : bind{model.downloadsPaneButtonEnabled}, actionPerformed : showDownloadsWindow)
+                        button(text: trans("UPLOADS"), enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         if (settings.showMonitor)
-                            button(text: "Monitor", enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
-                        button(text: "Feeds", enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
-                        button(text: "Trust", enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
-                        button(text: "Chat", enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
+                            button(text: trans("MONITOR"), enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
+                        button(text: trans("FEEDS"), enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
+                        button(text: trans("TRUST"), enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
+                        button(text: trans("CHAT"), enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
                         label(constraints : "top-connect-panel",
-                        text : "        MuWire is connecting, please wait.") // TODO: real padding
+                        text : "        " + trans("MUWIRE_IS_CONNECTING")) // TODO: real padding
                         panel(constraints : "top-search-panel") {
                             borderLayout()
                             panel(constraints: BorderLayout.CENTER) {
                                 borderLayout()
-                                label("        Enter search ", constraints: BorderLayout.WEST) // TODO: fix this
+                                label("        " + trans("ENTER_SEARCH")+ " ", constraints: BorderLayout.WEST) // TODO: fix this
                                 
                                 def searchFieldModel = new SearchFieldModel(settings, new File(application.context.get("muwire-home")))
                                 JComboBox myComboBox = new SearchField(searchFieldModel)
@@ -184,7 +185,7 @@ class MainFrameView {
 
                             }
                             panel( constraints: BorderLayout.EAST) {
-                                button(text: "Search", searchAction)
+                                button(text: trans("SEARCH"), searchAction)
                             }
                         }
                     }
@@ -201,11 +202,11 @@ class MainFrameView {
                             borderLayout()
                             panel (constraints : BorderLayout.CENTER) {
                                 gridBagLayout()
-                                label(text :  "Saved Tabs:", constraints : gbc(gridx : 0, gridy : 0))
+                                label(text :  trans("SAVED_TABS") + ":", constraints : gbc(gridx : 0, gridy : 0))
                                 scrollPane (constraints : gbc(gridx : 0, gridy : 1)) {
                                     list(items : new ArrayList(settings.openTabs))
                                 }
-                                button(text : "Restore Session", constraints : gbc(gridx :0, gridy : 2), restoreSessionAction)
+                                button(text : trans("RESTORE_SESSION"), constraints : gbc(gridx :0, gridy : 2), restoreSessionAction)
                             }
                         } 
                     }
@@ -217,16 +218,16 @@ class MainFrameView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.downloads) {
-                                            closureColumn(header: "Name", preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
-                                            closureColumn(header: "Status", preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
-                                            closureColumn(header: "Progress", preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
-                                            closureColumn(header: "Speed", preferredWidth: 50, type:String, read :{row ->
-                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + "B/sec"
+                                            closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
+                                            closureColumn(header: trans("PROGRESS"), preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
+                                            closureColumn(header: trans("SPEED"), preferredWidth: 50, type:String, read :{row ->
+                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + trans("B_SEC")
                                             })
-                                            closureColumn(header : "ETA", preferredWidth : 50, type:String, read :{ row ->
+                                            closureColumn(header : trans("ETA"), preferredWidth : 50, type:String, read :{ row ->
                                                 def speed = row.downloader.speed()
                                                 if (speed == 0)
-                                                    return "Unknown"
+                                                    return trans("UNKNOWN")
                                                 else {
                                                     def remaining = (row.downloader.nPieces - row.downloader.donePieces()) * row.downloader.pieceSize / speed
                                                     return DataHelper.formatDuration(remaining.toLong() * 1000)
@@ -236,42 +237,42 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    button(text: "Pause", enabled : bind {model.pauseButtonEnabled}, pauseAction)
-                                    button(text: bind { model.resumeButtonText }, enabled : bind {model.retryButtonEnabled}, resumeAction)
-                                    button(text: "Cancel", enabled : bind {model.cancelButtonEnabled }, cancelAction)
-                                    button(text: "Preview", enabled : bind {model.previewButtonEnabled}, previewAction)
-                                    button(text: "Clear Done", enabled : bind {model.clearButtonEnabled}, clearAction)
+                                    button(text: trans("PAUSE"), enabled : bind {model.pauseButtonEnabled}, pauseAction)
+                                    button(text: bind { trans(model.resumeButtonText) }, enabled : bind {model.retryButtonEnabled}, resumeAction)
+                                    button(text: trans("CANCEL"), enabled : bind {model.cancelButtonEnabled }, cancelAction)
+                                    button(text: trans("PREVIEW"), enabled : bind {model.previewButtonEnabled}, previewAction)
+                                    button(text: trans("CLEAR_DONE"), enabled : bind {model.clearButtonEnabled}, clearAction)
                                 }
                             }
                             panel {
                                 borderLayout()
                                 panel(constraints : BorderLayout.NORTH) {
-                                    label(text : "Download Details")
+                                    label(text : trans("DOWNLOAD_DETAILS"))
                                 }
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     panel (id : "download-details-panel") {
                                         cardLayout()
                                         panel (constraints : "select-download") {
-                                            label(text : "Select a download to view details")
+                                            label(text : trans("SELECT_DOWNLOAD_VIEW_DETAILS"))
                                         }
                                         panel(constraints : "download-selected") {
                                             gridBagLayout()
-                                            label(text : "Download Location:", constraints : gbc(gridx:0, gridy:0))
+                                            label(text : trans("DOWNLOAD_LOCATION") + ":", constraints : gbc(gridx:0, gridy:0))
                                             label(text : bind {model.downloader?.file?.getAbsolutePath()},
                                             constraints: gbc(gridx:1, gridy:0, gridwidth: 2, insets : [0,0,0,20]))
-                                            label(text : "Piece Size", constraints : gbc(gridx: 0, gridy:1))
+                                            label(text : trans("PIECE_SIZE") + ":", constraints : gbc(gridx: 0, gridy:1))
                                             label(text : bind {model.downloader?.pieceSize}, constraints : gbc(gridx:1, gridy:1))
-                                            label(text : "Sequential", constraints : gbc(gridx: 0, gridy: 2))
+                                            label(text : trans("SEQUENTIAL") + ":", constraints : gbc(gridx: 0, gridy: 2))
                                             label(text : bind {model.downloader?.isSequential()}, constraints : gbc(gridx:1, gridy:2, insets : [0,0,0,20]))
-                                            label(text : "Known Sources:", constraints : gbc(gridx:3, gridy: 0))
+                                            label(text : trans("KNOWN_SOURCES") + ":", constraints : gbc(gridx:3, gridy: 0))
                                             label(text : bind {model.downloader?.activeWorkers?.size()}, constraints : gbc(gridx:4, gridy:0, insets : [0,0,0,20]))
-                                            label(text : "Active Sources:", constraints : gbc(gridx:3, gridy:1))
+                                            label(text : trans("ACTIVE_SOURCES") + ":", constraints : gbc(gridx:3, gridy:1))
                                             label(text : bind {model.downloader?.activeWorkers()}, constraints : gbc(gridx:4, gridy:1, insets : [0,0,0,20]))
-                                            label(text : "Hopeless Sources:", constraints : gbc(gridx:3, gridy:2))
+                                            label(text : trans("HOPELESS_SOURCES") + ":", constraints : gbc(gridx:3, gridy:2))
                                             label(text : bind {model.downloader?.countHopelessSources()}, constraints : gbc(gridx:4, gridy:2, insets : [0,0,0,20]))
-                                            label(text : "Total Pieces:", constraints : gbc(gridx:5, gridy: 0))
+                                            label(text : trans("TOTAL_PIECES") + ":", constraints : gbc(gridx:5, gridy: 0))
                                             label(text : bind {model.downloader?.nPieces}, constraints : gbc(gridx:6, gridy:0, insets : [0,0,0,20]))
-                                            label(text : "Done Pieces:", constraints: gbc(gridx:5, gridy: 1))
+                                            label(text : trans("DONE_PIECES") + ":", constraints: gbc(gridx:5, gridy: 1))
                                             label(text : bind {model.downloader?.donePieces()}, constraints : gbc(gridx:6, gridy:1, insets : [0,0,0,20]))
                                         }
                                     }
@@ -286,9 +287,11 @@ class MainFrameView {
                             panel (constraints : BorderLayout.NORTH) {
                                 label(text : bind {
                                     if (model.hashingFile == null) {
-                                        "You can drag-and-drop files and directories here"
+                                        trans("YOU_CAN_DRAG_AND_DROP")
                                     } else {
-                                        "hashing: " + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + "B)"
+                                        trans("HASHING") + ": "
+                                            + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + 
+                                            trans("BYTES_SHORT") + ")"
                                     }
                                 })
                             }
@@ -301,16 +304,16 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                                 tableModel(list : model.shared) {
-                                                    closureColumn(header : "Name", preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
-                                                    closureColumn(header : "Size", preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
-                                                    closureColumn(header : "Comments", preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
-                                                    closureColumn(header : "Certified", preferredWidth : 50, type : Boolean, read : {
+                                                    closureColumn(header : trans("NAME"), preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
+                                                    closureColumn(header : trans("SIZE"), preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
+                                                    closureColumn(header : trans("COMMENTS"), preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
+                                                    closureColumn(header : trans("CERTIFIED"), preferredWidth : 50, type : Boolean, read : {
                                                         Core core = application.context.get("core")
                                                         core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
                                                     })
-                                                    closureColumn(header : "Published", preferredWidth : 50, type : Boolean, read : {row -> row.isPublished()})
-                                                    closureColumn(header : "Search Hits", preferredWidth: 50, type : Integer, read : {it.getHits()})
-                                                    closureColumn(header : "Downloaders", preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
+                                                    closureColumn(header : trans("PUBLISHED"), preferredWidth : 50, type : Boolean, read : {row -> row.isPublished()})
+                                                    closureColumn(header : trans("SEARCH_HITS"), preferredWidth: 50, type : Integer, read : {it.getHits()})
+                                                    closureColumn(header : trans("DOWNLOADERS"), preferredWidth: 50, type : Integer, read : {it.getDownloaders().size()})
                                                 }
                                             }
                                         }
@@ -329,41 +332,41 @@ class MainFrameView {
                                 gridLayout(rows:1, cols:3)
                                 panel {
                                     buttonGroup(id : "sharedViewType")
-                                    radioButton(text : "Tree", selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
-                                    radioButton(text : "Table", selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
+                                    radioButton(text : trans("TREE"), selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
+                                    radioButton(text : trans("TABLE"), selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                 }
                                 panel {
                                     gridBagLayout()
-                                    button(text : "Add Comment", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
-                                    button(text : "Certify", enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
-                                    button(text : bind {model.publishButtonText}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
+                                    button(text : trans("ADD_COMMENT"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
+                                    button(text : trans("CERTIFY"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
+                                    button(text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     panel {
-                                        label("Shared:")
+                                        label(trans("SHARED") + ":")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
-                                    button(text : "Share", actionPerformed : shareFiles)
+                                    button(text : trans("SHARE"), actionPerformed : shareFiles)
                                 }
                             }
                         }
                         panel (border : etchedBorder()) {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
-                                label("Uploads")
+                                label(trans("UPLOADS"))
                             }
                             scrollPane (constraints : BorderLayout.CENTER) {
                                 table(id : "uploads-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                     tableModel(list : model.uploads) {
-                                        closureColumn(header : "Name", type : String, read : {row -> row.uploader.getName() })
-                                        closureColumn(header : "Progress", type : String, read : { row ->
+                                        closureColumn(header : trans("NAME"), type : String, read : {row -> row.uploader.getName() })
+                                        closureColumn(header : trans("PROGRESS"), type : String, read : { row ->
                                             int percent = row.uploader.getProgress()
-                                            "$percent% of piece".toString()
+                                            trans("PERCENT_OF_PIECE", percent)
                                         })
-                                        closureColumn(header : "Downloader", type : String, read : { row ->
+                                        closureColumn(header : trans("DOWNLOADER"), type : String, read : { row ->
                                             row.uploader.getDownloader()
                                         })
-                                        closureColumn(header : "Remote Pieces", type : String, read : { row ->
+                                        closureColumn(header : trans("REMOTE_PIECES"), type : String, read : { row ->
                                             int pieces = row.uploader.getTotalPieces()
                                             int done = row.uploader.getDonePieces()
                                             if (row.uploader.getProgress() == 100)
@@ -375,19 +378,21 @@ class MainFrameView {
                                             long size = row.uploader.getTotalSize()
                                             String totalSize = ""
                                             if (size >= 0 ) {
-                                                totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
+                                                totalSize = trans("PERCENT_OF",
+                                                        String.format("%02d", percent),
+                                                        DataHelper.formatSize2Decimal(size, false)) + trans("BYTES_SHORT")
                                             }
-                                            String.format("%02d", percent) + "% ${totalSize} ($done/$pieces pcs)".toString()
+                                            "${totalSize} ($done/$pieces".toString() + trans("PIECES_SHORT")+ ")"
                                         })
-                                        closureColumn(header : "Speed", type : String, read : { row ->
+                                        closureColumn(header : trans("SPEED"), type : String, read : { row ->
                                             int speed = row.uploader.speed()
-                                            DataHelper.formatSize2Decimal(speed, false) + "B/sec"
+                                            DataHelper.formatSize2Decimal(speed, false) + trans("B_SEC")
                                         })
                                     }
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                button(text : "Clear Finished Uploads", clearUploadsAction)
+                                button(text : trans("CLEAR_FINISHED_UPLOADS"), clearUploadsAction)
                             }
                         }
                     }
@@ -396,17 +401,17 @@ class MainFrameView {
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
-                                label("Connections")
+                                label(trans("CONNECTIONS"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "connections-table", rowHeight : rowHeight) {
                                     tableModel(list : model.connectionList) {
-                                        closureColumn(header : "Destination", preferredWidth: 250, type: String, read : { row -> row.destination.toBase32() })
-                                        closureColumn(header : "Direction", preferredWidth: 20, type: String, read : { row ->
+                                        closureColumn(header : trans("DESTINATION"), preferredWidth: 250, type: String, read : { row -> row.destination.toBase32() })
+                                        closureColumn(header : trans("DIRECTION"), preferredWidth: 20, type: String, read : { row ->
                                             if (row.incoming)
-                                                return "In"
+                                                return trans("IN")
                                             else
-                                                return "Out"
+                                                return trans("OUT")
                                         })
                                     }
                                 }
@@ -415,26 +420,26 @@ class MainFrameView {
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
-                                label("Incoming searches")
+                                label(trans("INCOMING_SEARCHES"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "searches-table", rowHeight : rowHeight) {
                                     tableModel(list : model.searches) {
-                                        closureColumn(header : "Keywords", type : String, read : {
+                                        closureColumn(header : trans("KEYWORDS"), type : String, read : {
                                             sanitized = it.search.replace('<', ' ')
                                             sanitized
                                         })
-                                        closureColumn(header : "From", type : String, read : {
+                                        closureColumn(header : trans("FROM"), type : String, read : {
                                             if (it.originator != null) {
                                                 return it.originator.getHumanReadableName()
                                             } else {
                                                 return it.replyTo.toBase32()
                                             }
                                         })
-                                        closureColumn(header : "Count", type : String, read : {
+                                        closureColumn(header : trans("COUNT"), type : String, read : {
                                             it.count.toString()
                                         })
-                                        closureColumn(header : "Timestamp", type : String, read : {
+                                        closureColumn(header : trans("TIMESTAMP"), type : String, read : {
                                             String.format("%02d", it.timestamp.get(Calendar.HOUR_OF_DAY)) + ":" +
                                                     String.format("%02d", it.timestamp.get(Calendar.MINUTE)) + ":" +
                                                     String.format("%02d", it.timestamp.get(Calendar.SECOND))
@@ -449,48 +454,48 @@ class MainFrameView {
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
-                                label(text: "Subscriptions")
+                                label(text: trans("SUBSCRIPTIONS"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feeds) {
-                                        closureColumn(header : "Publisher", preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
-                                        closureColumn(header : "Files", preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
-                                        closureColumn(header : "Last Updated", type : Long, read : {it.getLastUpdated()})
-                                        closureColumn(header : "Status", preferredWidth: 10, type : String, read : {it.getStatus().toString()})
+                                        closureColumn(header : trans("PUBLISHER"), preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
+                                        closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
+                                        closureColumn(header : trans("LAST_UPDATED"), type : Long, read : {it.getLastUpdated()})
+                                        closureColumn(header : trans("STATUS"), preferredWidth: 10, type : String, read : {it.getStatus().toString()})
                                     }
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                button(text : "Update", enabled : bind {model.updateFileFeedButtonEnabled}, updateFileFeedAction)
-                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
-                                button(text : "Configure", enabled : bind {model.configureFileFeedButtonEnabled}, configureFileFeedAction)
+                                button(text : trans("UPDATE"), enabled : bind {model.updateFileFeedButtonEnabled}, updateFileFeedAction)
+                                button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
+                                button(text : trans("CONFIGURE"), enabled : bind {model.configureFileFeedButtonEnabled}, configureFileFeedAction)
                             }
                         }
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
-                                label(text : "Published Files")
+                                label(text : trans("PUBLISHED_FILES"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feedItems) {
-                                        closureColumn(header : "Name", preferredWidth: 350, type : String, read : {it.getName()})
-                                        closureColumn(header : "Size", preferredWidth: 10, type : Long, read : {it.getSize()})
-                                        closureColumn(header : "Comment", preferredWidth: 10, type : Boolean, read : {it.getComment() != null})
-                                        closureColumn(header : "Certificates", preferredWidth: 10, type : Integer, read : {it.getCertificates()})
-                                        closureColumn(header : "Downloaded", preferredWidth: 10, type : Boolean, read : {
+                                        closureColumn(header : trans("NAME"), preferredWidth: 350, type : String, read : {it.getName()})
+                                        closureColumn(header : trans("SIZE"), preferredWidth: 10, type : Long, read : {it.getSize()})
+                                        closureColumn(header : trans("COMMENT"), preferredWidth: 10, type : Boolean, read : {it.getComment() != null})
+                                        closureColumn(header : trans("CERTIFICATES"), preferredWidth: 10, type : Integer, read : {it.getCertificates()})
+                                        closureColumn(header : trans("DOWNLOADED"), preferredWidth: 10, type : Boolean, read : {
                                             InfoHash ih = it.getInfoHash()
                                             model.core.fileManager.isShared(ih)
                                         })
-                                        closureColumn(header: "Date", type : Long, read : {it.getTimestamp()})
+                                        closureColumn(header: trans("DATE"), type : Long, read : {it.getTimestamp()})
                                     }
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : "Download", enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
-                                button(text : "View Comment", enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
-                                button(text : "View Certificates", enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
+                                button(text : trans("DOWNLOAD"), enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
+                                button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
+                                button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
                             }
                         }
                     }
@@ -503,18 +508,18 @@ class MainFrameView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.trusted) {
-                                            closureColumn(header : "Trusted Users", type : String, read : { it.persona.getHumanReadableName() } )
-                                            closureColumn(header : "Reason", type : String, read : {it.reason})
+                                            closureColumn(header : trans("TRUSTED_USERS"), type : String, read : { it.persona.getHumanReadableName() } )
+                                            closureColumn(header : trans("REASON"), type : String, read : {it.reason})
                                         }
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text : "Subscribe", enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
-                                    button(text : "Mark Neutral", enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
-                                    button(text : "Mark Distrusted", enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
-                                    button(text : "Browse", enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
-                                    button(text : "Chat", enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
+                                    button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
+                                    button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
+                                    button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
+                                    button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
+                                    button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -522,38 +527,38 @@ class MainFrameView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.distrusted) {
-                                            closureColumn(header: "Distrusted Users", type : String, read : { it.persona.getHumanReadableName() } )
-                                            closureColumn(header: "Reason", type : String, read : {it.reason})
+                                            closureColumn(header: trans("DISTRUSTED_USERS"), type : String, read : { it.persona.getHumanReadableName() } )
+                                            closureColumn(header: trans("REASON"), type : String, read : {it.reason})
                                         }
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text: "Mark Neutral", enabled : bind {model.markNeutralFromDistrustedButtonEnabled}, constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
-                                    button(text: "Mark Trusted", enabled : bind {model.markTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
+                                    button(text: trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromDistrustedButtonEnabled}, constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                    button(text: trans("MARK_TRUSTED"), enabled : bind {model.markTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
                                 }
                             }
                         }
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
-                                label(text : "Trust List Subscriptions")
+                                label(text : trans("TRUST_LIST_SUBSCRIPTIONS"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "subscription-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.subscriptions) {
-                                        closureColumn(header : "Name", preferredWidth: 200, type: String, read : {it.persona.getHumanReadableName()})
-                                        closureColumn(header : "Trusted", preferredWidth : 20, type: Integer, read : {it.good.size()})
-                                        closureColumn(header : "Distrusted", preferredWidth: 20, type: Integer, read : {it.bad.size()})
-                                        closureColumn(header : "Status", preferredWidth: 30, type: String, read : {it.status.toString()})
-                                        closureColumn(header : "Last Updated", preferredWidth: 200, type : Long, read : { it.timestamp })
+                                        closureColumn(header : trans("NAME"), preferredWidth: 200, type: String, read : {it.persona.getHumanReadableName()})
+                                        closureColumn(header : trans("TRUSTED"), preferredWidth : 20, type: Integer, read : {it.good.size()})
+                                        closureColumn(header : trans("DISTRUSTED"), preferredWidth: 20, type: Integer, read : {it.bad.size()})
+                                        closureColumn(header : trans("STATUS"), preferredWidth: 30, type: String, read : {it.status.toString()})
+                                        closureColumn(header : trans("LAST_UPDATED"), preferredWidth: 200, type : Long, read : { it.timestamp })
                                     }
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : "Review", enabled : bind {model.reviewButtonEnabled}, reviewAction)
-                                button(text : "Update", enabled : bind {model.updateButtonEnabled}, updateAction)
-                                button(text : "Unsubscribe", enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
+                                button(text : trans("REVIEW"), enabled : bind {model.reviewButtonEnabled}, reviewAction)
+                                button(text : trans("UPDATE"), enabled : bind {model.updateButtonEnabled}, updateAction)
+                                button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
                             }
                         }
                     }
@@ -561,9 +566,9 @@ class MainFrameView {
                         borderLayout()
                         tabbedPane(id : "chat-tabs", constraints : BorderLayout.CENTER)
                         panel(constraints : BorderLayout.SOUTH) {
-                            button(text : "Start Chat Server", enabled : bind {!model.chatServerRunning}, startChatServerAction)
-                            button(text : "Stop Chat Server", enabled : bind {model.chatServerRunning}, stopChatServerAction)
-                            button(text : "Connect To Remote Server", connectChatServerAction)
+                            button(text : trans("START_CHAT_SERVER"), enabled : bind {!model.chatServerRunning}, startChatServerAction)
+                            button(text : trans("STOP_CHAT_SERVER"), enabled : bind {model.chatServerRunning}, stopChatServerAction)
+                            button(text : trans("CONNECT_TO_REMOTE_SERVER"), connectChatServerAction)
                         }
                     }
                 }
@@ -572,11 +577,11 @@ class MainFrameView {
                     panel (constraints : BorderLayout.WEST) {
                         gridBagLayout()
                         label(text : bind {model.me}, constraints : gbc(gridx:0, gridy:0))
-                        button(text : "Copy Short", constraints : gbc(gridx:1, gridy:0), copyShortAction)
-                        button(text : "Copy Full", constraints : gbc(gridx:2, gridy:0), copyFullAction)
+                        button(text : trans("COPY_SHORT"), constraints : gbc(gridx:1, gridy:0), copyShortAction)
+                        button(text : trans("COPY_FULL"), constraints : gbc(gridx:2, gridy:0), copyFullAction)
                     }
                     panel (constraints : BorderLayout.EAST) {
-                        label("Connections:")
+                        label(trans("CONNECTIONS") + ":")
                         label(text : bind {model.connections})
                     }
                 }
@@ -665,13 +670,13 @@ class MainFrameView {
                 case Downloader.DownloadState.FAILED:
                     model.cancelButtonEnabled = true
                     model.retryButtonEnabled = true
-                    model.resumeButtonText = "Retry"
+                    model.resumeButtonText = "RETRY"
                     model.pauseButtonEnabled = false
                     break
                 case Downloader.DownloadState.PAUSED:
                     model.cancelButtonEnabled = true
                     model.retryButtonEnabled = true
-                    model.resumeButtonText = "Resume"
+                    model.resumeButtonText = "RESUME"
                     model.pauseButtonEnabled = false
                     break
                 default:
@@ -705,22 +710,22 @@ class MainFrameView {
 
         // shared files menu
         JPopupMenu sharedFilesMenu = new JPopupMenu()
-        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
         sharedFilesMenu.add(copyHashToClipboard)
-        JMenuItem unshareSelectedFiles = new JMenuItem("Unshare selected files")
+        JMenuItem unshareSelectedFiles = new JMenuItem(trans("UNSHARE_SELECTED_FILES"))
         unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
         sharedFilesMenu.add(unshareSelectedFiles)
-        JMenuItem commentSelectedFiles = new JMenuItem("Comment selected files")
+        JMenuItem commentSelectedFiles = new JMenuItem(trans("COMMENT_SELECTED_FILES"))
         commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
         sharedFilesMenu.add(commentSelectedFiles)
-        JMenuItem certifySelectedFiles = new JMenuItem("Certify selected files")
+        JMenuItem certifySelectedFiles = new JMenuItem(trans("CERTIFY_SELECTED_FILES"))
         certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
         sharedFilesMenu.add(certifySelectedFiles)
-        JMenuItem openContainingFolder = new JMenuItem("Open containing folder")
+        JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
         openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
         sharedFilesMenu.add(openContainingFolder)
-        JMenuItem showFileDetails = new JMenuItem("Show file details")
+        JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
         showFileDetails.addActionListener({mvcGroup.controller.showFileDetails()})
         sharedFilesMenu.add(showFileDetails)
         
@@ -757,7 +762,7 @@ class MainFrameView {
             selectedFiles.each { 
                 unpublish &= it.isPublished()
             }
-            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
+            model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
         
         def sharedFilesTree = builder.getVariable("shared-files-tree")
@@ -775,7 +780,7 @@ class MainFrameView {
             selectedFiles.each {
                 unpublish &= it.isPublished()
             }
-            model.publishButtonText = unpublish ? "Unpublish" : "Publish"
+            model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
@@ -803,11 +808,11 @@ class MainFrameView {
         def searchesTable = builder.getVariable("searches-table")
         JPopupMenu searchTableMenu = new JPopupMenu()
 
-        JMenuItem copySearchToClipboard = new JMenuItem("Copy search to clipboard")
+        JMenuItem copySearchToClipboard = new JMenuItem(trans("COPY_SEARCH_TO_CLIPBOARD"))
         copySearchToClipboard.addActionListener({mvcGroup.view.copySearchToClipboard(searchesTable)})
-        JMenuItem trustSearcher = new JMenuItem("Trust searcher")
+        JMenuItem trustSearcher = new JMenuItem(trans("TRUST_SEARCHER"))
         trustSearcher.addActionListener({mvcGroup.controller.trustPersonaFromSearch()})
-        JMenuItem distrustSearcher = new JMenuItem("Distrust searcher")
+        JMenuItem distrustSearcher = new JMenuItem(trans("DISTRUST_SEARCHER"))
         distrustSearcher.addActionListener({mvcGroup.controller.distrustPersonaFromSearch()})
 
         searchTableMenu.add(copySearchToClipboard)
@@ -983,19 +988,19 @@ class MainFrameView {
         })
         
         JPopupMenu trustMenu = new JPopupMenu()
-        JMenuItem subscribeItem = new JMenuItem("Subscribe")
+        JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
         subscribeItem.addActionListener({mvcGroup.controller.subscribe()})
         trustMenu.add(subscribeItem)
-        JMenuItem markNeutralItem = new JMenuItem("Mark Neutral")
+        JMenuItem markNeutralItem = new JMenuItem(trans("MARK_NEUTRAL"))
         markNeutralItem.addActionListener({mvcGroup.controller.markNeutralFromTrusted()})
         trustMenu.add(markNeutralItem)
-        JMenuItem markDistrustedItem = new JMenuItem("Mark Distrusted")
+        JMenuItem markDistrustedItem = new JMenuItem(trans("MARK_DISTRUSTED"))
         markDistrustedItem.addActionListener({mvcGroup.controller.markDistrusted()})
         trustMenu.add(markDistrustedItem)
-        JMenuItem browseItem = new JMenuItem("Browse")
+        JMenuItem browseItem = new JMenuItem(trans("BROWSE"))
         browseItem.addActionListener({mvcGroup.controller.browseFromTrusted()})
         trustMenu.add(browseItem)
-        JMenuItem chatItem = new JMenuItem("Chat")
+        JMenuItem chatItem = new JMenuItem(trans("CHAT"))
         chatItem.addActionListener({mvcGroup.controller.chatFromTrusted()})
         trustMenu.add(chatItem)
         
@@ -1123,7 +1128,7 @@ class MainFrameView {
         boolean pauseEnabled = false
         boolean cancelEnabled = false
         boolean retryEnabled = false
-        String resumeText = "Retry"
+        String resumeText = "RETRY"
         Downloader downloader = model.downloads[selected].downloader
         switch(downloader.currentState) {
             case Downloader.DownloadState.DOWNLOADING:
@@ -1142,7 +1147,7 @@ class MainFrameView {
                 pauseEnabled = false
                 cancelEnabled = true
                 retryEnabled = true
-                resumeText = "Resume"
+                resumeText = "RESUME"
                 break
             default :
                 pauseEnabled = false
@@ -1151,7 +1156,7 @@ class MainFrameView {
         }
 
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem copyHashToClipboard = new JMenuItem("Copy hash to clipboard")
+        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHashToClipboard.addActionListener({
             String hash = Base64.encode(downloader.infoHash.getRoot())
             StringSelection selection = new StringSelection(hash)
@@ -1161,13 +1166,13 @@ class MainFrameView {
         menu.add(copyHashToClipboard)
 
         if (pauseEnabled) {
-            JMenuItem pause = new JMenuItem("Pause")
+            JMenuItem pause = new JMenuItem(trans("PAUSE"))
             pause.addActionListener({mvcGroup.controller.pause()})
             menu.add(pause)
         }
 
         if (cancelEnabled) {
-            JMenuItem cancel = new JMenuItem("Cancel")
+            JMenuItem cancel = new JMenuItem(trans("CANCEL"))
             cancel.addActionListener({mvcGroup.controller.cancel()})
             menu.add(cancel)
         }
@@ -1187,16 +1192,16 @@ class MainFrameView {
             return
         JPopupMenu menu = new JPopupMenu()
         if (model.updateFileFeedButtonEnabled) {
-            JMenuItem update = new JMenuItem("Update")
+            JMenuItem update = new JMenuItem(trans("UPDATE"))
             update.addActionListener({mvcGroup.controller.updateFileFeed()})
             menu.add(update)
         }
         
-        JMenuItem unsubscribe = new JMenuItem("Unsubscribe")
+        JMenuItem unsubscribe = new JMenuItem(trans("UNSUBSCRIBE"))
         unsubscribe.addActionListener({mvcGroup.controller.unsubscribeFileFeed()})
         menu.add(unsubscribe)
         
-        JMenuItem configure = new JMenuItem("Configure")
+        JMenuItem configure = new JMenuItem(trans("CONFIGURE"))
         configure.addActionListener({mvcGroup.controller.configureFileFeed()})
         menu.add(configure)
         
@@ -1209,17 +1214,17 @@ class MainFrameView {
             return
         JPopupMenu menu = new JPopupMenu()
         if (model.downloadFeedItemButtonEnabled) {
-            JMenuItem download = new JMenuItem("Download")
+            JMenuItem download = new JMenuItem(trans("DOWNLOAD"))
             download.addActionListener({mvcGroup.controller.downloadFeedItem()})
             menu.add(download)
         }
         if (model.viewFeedItemCommentButtonEnabled) {
-            JMenuItem viewComment = new JMenuItem("View Comment")
+            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
             viewComment.addActionListener({mvcGroup.controller.viewFeedItemComment()})
             menu.add(viewComment)
         }
         if (model.viewFeedItemCertificatesButtonEnabled) {
-            JMenuItem viewCertificates = new JMenuItem("View Certificates")
+            JMenuItem viewCertificates = new JMenuItem(trans("VIEW_CERTIFICATES"))
             viewCertificates.addActionListener({mvcGroup.controller.viewFeedItemCertificates()})
             menu.add(viewCertificates)
         }
@@ -1262,24 +1267,24 @@ class MainFrameView {
             return
             
         JPopupMenu uploadsTableMenu = new JPopupMenu()
-        JMenuItem showInLibrary = new JMenuItem("Show in library")
+        JMenuItem showInLibrary = new JMenuItem(trans("SHOW_IN_LIBRARY"))
         showInLibrary.addActionListener({mvcGroup.controller.showInLibrary()})
         uploadsTableMenu.add(showInLibrary)
         
         if (uploader.isBrowseEnabled()) {
-            JMenuItem browseItem = new JMenuItem("Browse Host")
+            JMenuItem browseItem = new JMenuItem(trans("BROWSE_HOST"))
             browseItem.addActionListener({mvcGroup.controller.browseFromUpload()})
             uploadsTableMenu.add(browseItem)
         }
         
         if (uploader.isFeedEnabled() && mvcGroup.controller.core.feedManager.getFeed(uploader.getDownloaderPersona()) == null) {
-            JMenuItem feedItem = new JMenuItem("Subscribe")
+            JMenuItem feedItem = new JMenuItem(trans("SUBSCRIBE"))
             feedItem.addActionListener({mvcGroup.controller.subscribeFromUpload()})
             uploadsTableMenu.add(feedItem)
         }
         
         if (uploader.isChatEnabled() && !mvcGroup.controller.core.chatManager.isConnected(uploader.getDownloaderPersona())) {
-            JMenuItem chatItem = new JMenuItem("Chat")
+            JMenuItem chatItem = new JMenuItem(trans("CHAT"))
             chatItem.addActionListener({mvcGroup.controller.chatFromUpload()})
             uploadsTableMenu.add(chatItem)
         }
@@ -1406,7 +1411,7 @@ class MainFrameView {
     def shareFiles = {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(!model.core.muOptions.shareHiddenFiles)
-        chooser.setDialogTitle("Select files or directories to share")
+        chooser.setDialogTitle(trans("SELECT_FILES_OR_DIRECTORIES_TO_SHARE"))
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES)
         chooser.setMultiSelectionEnabled(true)
         int rv = chooser.showOpenDialog(null)

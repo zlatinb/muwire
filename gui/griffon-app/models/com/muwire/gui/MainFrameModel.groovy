@@ -277,8 +277,8 @@ class MainFrameModel {
                 trusted.addAll(core.trustService.good.values())
                 distrusted.addAll(core.trustService.bad.values())
 
-                resumeButtonText = "Retry"
-                publishButtonText = "Publish"
+                resumeButtonText = "RETRY"
+                publishButtonText = "PUBLISH"
                 
                 searchesPaneButtonEnabled = false
                 downloadsPaneButtonEnabled = true
