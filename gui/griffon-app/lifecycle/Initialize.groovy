@@ -1,4 +1,5 @@
 import griffon.core.GriffonApplication
+import groovy.swing.SwingBuilder
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
 
@@ -12,22 +13,26 @@ import com.muwire.gui.UISettings
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.ImageIcon
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.LookAndFeel
+import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.FontUIResource
 
 import static griffon.util.GriffonApplicationUtils.isMacOSX
 import static groovy.swing.SwingBuilder.lookAndFeel
 
+import java.awt.BorderLayout
 import java.awt.Font
 import java.awt.MenuItem
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.Toolkit
 import java.awt.TrayIcon
+import java.util.concurrent.CountDownLatch
 import java.util.logging.Level
 import java.util.logging.LogManager
 
@@ -119,6 +124,8 @@ class Initialize extends AbstractLifecycleHandler {
             uiSettings.fontSize = defaultFont.getSize()
             uiSettings.fontStyle = defaultFont.getStyle()
             rowHeight = uiSettings.fontSize + 3
+            
+            uiSettings.locale = showLanguageDialog()
         }
 
         application.context.put("row-height", rowHeight)
@@ -195,6 +202,38 @@ class Initialize extends AbstractLifecycleHandler {
             return muwire.getAbsolutePath()
         }
         defaultHome.getAbsolutePath()
+    }
+
+    private String showLanguageDialog() {
+        def builder = new SwingBuilder()
+        def languageComboBox
+        def chooseButton
+        def frame = builder.frame (visible : true, locationRelativeTo: null,
+        defaultCloseOperation : JFrame.EXIT_ON_CLOSE,
+        iconImage : builder.imageIcon("/MuWire-48x48.png").image) {
+            borderLayout()
+            panel(constraints : BorderLayout.NORTH) {
+                label("Select Language")
+            }
+            
+            languageComboBox = comboBox (editable: false, items : Translator.LOCALE_WRAPPERS, constraints : BorderLayout.CENTER)
+            
+            panel (constraints : BorderLayout.SOUTH) {
+                chooseButton = button(text : "Choose")
+            }
+        }
+        
+        CountDownLatch latch = new CountDownLatch(1)
+        chooseButton.addActionListener({
+            frame.setVisible(false)
+            latch.countDown()
+        })
+        SwingUtilities.invokeAndWait({
+            frame.pack()
+            frame.setVisible(true)
+        })
+        latch.await()
+        languageComboBox.getSelectedItem().locale.toLanguageTag()
     }
 }
 
