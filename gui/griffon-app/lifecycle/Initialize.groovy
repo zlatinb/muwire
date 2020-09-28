@@ -6,6 +6,7 @@ import org.codehaus.griffon.runtime.core.AbstractLifecycleHandler
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
+import com.muwire.gui.Translator
 import com.muwire.gui.UISettings
 
 import javax.annotation.Nonnull
@@ -39,56 +40,6 @@ class Initialize extends AbstractLifecycleHandler {
 
     @Override
     void execute() {
-        
-        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
-        
-        if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
-            try {
-                def tray = SystemTray.getSystemTray()
-                def url = Initialize.class.getResource("/MuWire-16x16.png")
-                def image = new ImageIcon(url, "tray icon").getImage()
-                def popupMenu = new PopupMenu()
-                def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
-
-
-                def exit = new MenuItem("Exit")
-                exit.addActionListener({
-                    application.getWindowManager().findWindow("main-frame").setVisible(false)
-                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
-                    Core core = application.getContext().get("core")
-                    if (core != null) {
-                        Thread t = new Thread({
-                            core.shutdown()
-                            application.shutdown()
-                        }as Runnable)
-                        t.start()
-                    } else
-                        application.shutdown()
-                    tray.remove(trayIcon)
-                })
-                
-                def showMW = {e ->
-                    def mainFrame = application.getWindowManager().findWindow("main-frame")
-                    if (mainFrame != null) {
-                        Core core = application.getContext().get("core")
-                        if (core != null)
-                            mainFrame.setVisible(true)
-                    }
-                }
-
-                def show = new MenuItem("Open MuWire")
-                show.addActionListener(showMW)
-                popupMenu.add(show)
-                popupMenu.add(exit)
-                tray.add(trayIcon)
-                
-                
-                trayIcon.addActionListener(showMW)
-                application.getContext().put("tray-icon", true)
-            } catch (Exception bad) {
-                log.log(Level.WARNING,"couldn't set tray icon",bad)
-            }
-        }
         
         log.info "Loading home dir"
         def portableHome = System.getProperty("portable.home")
@@ -172,6 +123,58 @@ class Initialize extends AbstractLifecycleHandler {
 
         application.context.put("row-height", rowHeight)
         application.context.put("ui-settings", uiSettings)
+        
+        Translator.setLocale(uiSettings.locale);
+        
+        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+        
+        if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
+            try {
+                def tray = SystemTray.getSystemTray()
+                def url = Initialize.class.getResource("/MuWire-16x16.png")
+                def image = new ImageIcon(url, "tray icon").getImage()
+                def popupMenu = new PopupMenu()
+                def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
+
+
+                def exit = new MenuItem(Translator.getString("EXIT"))
+                exit.addActionListener({
+                    application.getWindowManager().findWindow("main-frame").setVisible(false)
+                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
+                    Core core = application.getContext().get("core")
+                    if (core != null) {
+                        Thread t = new Thread({
+                            core.shutdown()
+                            application.shutdown()
+                        }as Runnable)
+                        t.start()
+                    } else
+                        application.shutdown()
+                    tray.remove(trayIcon)
+                })
+                
+                def showMW = {e ->
+                    def mainFrame = application.getWindowManager().findWindow("main-frame")
+                    if (mainFrame != null) {
+                        Core core = application.getContext().get("core")
+                        if (core != null)
+                            mainFrame.setVisible(true)
+                    }
+                }
+
+                def show = new MenuItem(Translator.getString("OPEN_MUWIRE"))
+                show.addActionListener(showMW)
+                popupMenu.add(show)
+                popupMenu.add(exit)
+                tray.add(trayIcon)
+                
+                
+                trayIcon.addActionListener(showMW)
+                application.getContext().put("tray-icon", true)
+            } catch (Exception bad) {
+                log.log(Level.WARNING,"couldn't set tray icon",bad)
+            }
+        }
     }
 
     private static String selectHome() {
