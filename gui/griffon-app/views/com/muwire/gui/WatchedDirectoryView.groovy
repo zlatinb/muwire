@@ -2,6 +2,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -32,25 +33,25 @@ class WatchedDirectoryView {
 
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, "Watched Directory Configuration", true)
+        dialog = new JDialog(mainFrame, trans("WATCHED_DIRECTORY_CONFIGURATION"), true)
         dialog.setResizable(false)
         
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label("Configuration for directory " + model.directory.directory.toString())
+                label(trans("WATCHED_DIRECTORY_CONFIGURATION_FOR",model.directory.directory.toString()))
             }
             panel (constraints : BorderLayout.CENTER) {
                 gridBagLayout()
-                label(text : "Auto-watch directory using operating system", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("WATCHED_DIRECTORY_AUTO"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 autoWatchCheckbox = checkBox(selected : bind {model.autoWatch}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Directory sync frequency (seconds, 0 means never)", enabled : bind {!model.autoWatch}, constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("WATCHED_DIRECTORY_INTERVAL"), enabled : bind {!model.autoWatch}, constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 syncIntervalField = textField(text : bind {model.syncInterval}, columns: 4, enabled : bind {!model.autoWatch}, 
                     constraints: gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END, insets : [0,10,0,0]))
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Save", saveAction)
-                button(text : "Cancel", cancelAction)
+                button(text : trans("SAVE"), saveAction)
+                button(text : trans("CANCEL"), cancelAction)
             }
         }
     }
