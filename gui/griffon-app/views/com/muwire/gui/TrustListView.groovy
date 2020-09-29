@@ -3,7 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-
+import static com.muwire.gui.Translator.trans
 import javax.swing.JDialog
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -36,10 +36,10 @@ class TrustListView {
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
                 panel (constraints : BorderLayout.NORTH) {
-                    label(text: "Trust List of "+model.trustList.persona.getHumanReadableName())
+                    label(text: trans("TRUST_LIST_OF",model.trustList.persona.getHumanReadableName()))
                 }
                 panel (constraints: BorderLayout.SOUTH) {
-                    label(text : "Last updated "+ new Date(model.trustList.timestamp))
+                    label(text : trans("LAST_UPDATED") + " "+ new Date(model.trustList.timestamp))
                 }
             }
             panel(constraints : BorderLayout.CENTER) {
@@ -49,16 +49,16 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER){
                         table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
-                                closureColumn(header: "Trusted Users", type : String, read : {it.persona.getHumanReadableName()})
-                                closureColumn(header: "Reason", type : String, read : {it.reason})
-                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
+                                closureColumn(header: trans("TRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: trans("REASON"), type : String, read : {it.reason})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
                             }
                         }
                     }
                     panel (constraints : BorderLayout.SOUTH) {
                         gridBagLayout()
-                        button(text : "Trust", constraints : gbc(gridx : 0, gridy : 0), trustFromTrustedAction)
-                        button(text : "Distrust", constraints : gbc(gridx : 1, gridy : 0), distrustFromTrustedAction)
+                        button(text : trans("TRUST"), constraints : gbc(gridx : 0, gridy : 0), trustFromTrustedAction)
+                        button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromTrustedAction)
                     }
                 }
                 panel {
@@ -66,16 +66,16 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER ){
                         table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
-                                closureColumn(header: "Distrusted Users", type : String, read : {it.persona.getHumanReadableName()})
-                                closureColumn(header: "Reason", type:String, read : {it.reason})
-                                closureColumn(header: "Your Trust", type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
+                                closureColumn(header: trans("DISTRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: trans("REASON"), type:String, read : {it.reason})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
                             }
                         }
                     }
                     panel(constraints : BorderLayout.SOUTH) {
                         gridBagLayout()
-                        button(text : "Trust", constraints : gbc(gridx : 0, gridy : 0), trustFromDistrustedAction)
-                        button(text : "Distrust", constraints : gbc(gridx : 1, gridy : 0), distrustFromDistrustedAction)
+                        button(text : trans("TRUST"), constraints : gbc(gridx : 0, gridy : 0), trustFromDistrustedAction)
+                        button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromDistrustedAction)
                     }
                 }
             }
