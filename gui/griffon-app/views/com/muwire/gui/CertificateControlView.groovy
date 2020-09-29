@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
@@ -42,36 +43,36 @@ class CertificateControlView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
-        dialog = new JDialog(mainFrame,"Certificates",true)
+        dialog = new JDialog(mainFrame,trans("CERTIFICATES"),true)
         dialog.setResizable(true)
         
         panel = builder.panel {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
-                label("Certificates in your repository")
+                label(trans("CERTIFICATES_IN_REPOSITORY"))
             }
             panel (constraints : BorderLayout.CENTER) {
                 gridLayout(rows : 1, cols : 2)
                 scrollPane {
                     usersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.users) {
-                            closureColumn(header : "Issuer", type : String, read : {it.getHumanReadableName()})
+                            closureColumn(header : trans("ISSUER"), type : String, read : {it.getHumanReadableName()})
                         }
                     }
                 }
                 scrollPane {
                     certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.certificates) {
-                            closureColumn(header : "File Name", type : String, read : {it.name.name})
-                            closureColumn(header : "Hash", type : String, read : {Base64.encode(it.infoHash.getRoot())})
-                            closureColumn(header : "Comment", preferredWidth : 20, type : Boolean, read : {it.comment != null})
-                            closureColumn(header : "Timestamp", type : Long, read : { it.timestamp })
+                            closureColumn(header : trans("FILE_NAME"), type : String, read : {it.name.name})
+                            closureColumn(header : trans("HASH"), type : String, read : {Base64.encode(it.infoHash.getRoot())})
+                            closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
+                            closureColumn(header : trans("TIMESTAMP"), type : Long, read : { it.timestamp })
                         }
                     }
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Show Comment", enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
             }
         }
     }
@@ -146,7 +147,7 @@ class CertificateControlView {
         if (!model.showCommentActionEnabled)
             return
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem showComment = new JMenuItem("Show Comment")
+        JMenuItem showComment = new JMenuItem(trans("SHOW_COMMENT"))
         showComment.addActionListener({controller.showComment()})
         menu.add(showComment)
         menu.show(e.getComponent(), e.getX(), e.getY())
