@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -44,28 +45,28 @@ class FetchCertificatesView {
         p = builder.panel {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
-                label(text : "Status:")
+                label(text : trans("STATUS") + ":")
                 label(text : bind {model.status.toString()})
                 label(text : bind {model.certificateCount == 0 ? "" : Math.round(model.certificateCount * 100 / model.totalCertificates)+"%"})
             }
             scrollPane(constraints : BorderLayout.CENTER) {
                 certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
-                        closureColumn(header : "Issuer", preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
-                        closureColumn(header : "Trust Status", preferredWidth: 50, type : String, read : {controller.core.trustService.getLevel(it.issuer.destination)})
-                        closureColumn(header : "Name", preferredWidth : 200, type: String, read : {it.name.name.toString()})
-                        closureColumn(header : "Issued", preferredWidth : 100, type : String, read : {
+                        closureColumn(header : trans("ISSUER"), preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
+                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 50, type : String, read : {controller.core.trustService.getLevel(it.issuer.destination)})
+                        closureColumn(header : trans("NAME"), preferredWidth : 200, type: String, read : {it.name.name.toString()})
+                        closureColumn(header : trans("ISSUED"), preferredWidth : 100, type : String, read : {
                             def date = new Date(it.timestamp)
                             date.toString()
                         })
-                        closureColumn(header : "Comments", preferredWidth: 20, type : Boolean, read :{it.comment != null})
+                        closureColumn(header : trans("COMMENTS"), preferredWidth: 20, type : Boolean, read :{it.comment != null})
                     }
                 }
             }
             panel(constraints : BorderLayout.SOUTH) {
-                button(text : "Import", enabled : bind {model.importActionEnabled}, importCertificatesAction)
-                button(text : "Show Comment", enabled : bind {model.showCommentActionEnabled}, showCommentAction)
-                button(text : "Dismiss", dismissAction)
+                button(text : trans("IMPORT"), enabled : bind {model.importActionEnabled}, importCertificatesAction)
+                button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("DISMISS"), dismissAction)
             }
         }
         
@@ -102,11 +103,11 @@ class FetchCertificatesView {
     
     private void showMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem importItem = new JMenuItem("Import")
+        JMenuItem importItem = new JMenuItem(trans("IMPORT"))
         importItem.addActionListener({controller.importCertificates()})
         menu.add(importItem)
         if (model.showCommentActionEnabled) {
-            JMenuItem showComment = new JMenuItem("Show Comment")
+            JMenuItem showComment = new JMenuItem(trans("SHOW_COMMENt"))
             showComment.addActionListener({controller.showComment()})
             menu.add(showComment)
         }
