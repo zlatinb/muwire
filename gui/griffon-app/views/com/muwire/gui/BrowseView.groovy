@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
@@ -50,27 +51,27 @@ class BrowseView {
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label(text: "Status:")
+                label(text: trans("STATUS") + ":")
                 label(text: bind {model.status.toString()})
                 label(text : bind {model.totalResults == 0 ? "" : Math.round(model.resultCount * 100 / model.totalResults)+ "%"})
             }
             scrollPane (constraints : BorderLayout.CENTER){
                 resultsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.results) {
-                        closureColumn(header: "Name", preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
-                        closureColumn(header: "Size", preferredWidth: 20, type: Long, read : {row -> row.size})
-                        closureColumn(header: "Comments", preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
-                        closureColumn(header: "Certificates", preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                        closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                        closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
+                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
+                        closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
                     }
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Download", enabled : bind {model.downloadActionEnabled}, downloadAction)
-                button(text : "View Comment", enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
-                button(text : "View Certificates", enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
-                button(text : "Chat", enabled : bind {model.chatActionEnabled}, chatAction)
-                button(text : "Dismiss", dismissAction)
-                label(text : "Download sequentially")
+                button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
+                button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
+                button(text : trans("VIEW_CERTIFICATES"), enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                button(text : trans("CHAT"), enabled : bind {model.chatActionEnabled}, chatAction)
+                button(text : trans("DISMISS"), dismissAction)
+                label(text : trans("DOWNLOAD_SEQUENTIALLY"))
                 sequentialDownloadCheckbox = checkBox()
             }
         }
@@ -133,22 +134,22 @@ class BrowseView {
     private void showMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
         if (model.downloadActionEnabled) {
-            JMenuItem download = new JMenuItem("Download")
+            JMenuItem download = new JMenuItem(trans("DOWNLOAD"))
             download.addActionListener({controller.download()})
             menu.add(download)
         }
         if (model.viewCommentActionEnabled) {
-            JMenuItem viewComment = new JMenuItem("View Comment")
+            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
             viewComment.addActionListener({controller.viewComment()})
             menu.add(viewComment)
         }
         if (model.viewCertificatesActionEnabled) {
-            JMenuItem viewCertificates = new JMenuItem("View Certificates")
+            JMenuItem viewCertificates = new JMenuItem(trans("VIEW_CERTIFICATES"))
             viewCertificates.addActionListener({controller.viewCertificates()})
             menu.add(viewCertificates)
         }
         
-        JMenuItem copyHash = new JMenuItem("Copy Hash To Clipboard")
+        JMenuItem copyHash = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHash.addActionListener({
             List<UIResultEvent> results = selectedResults()
             def hash = ""
@@ -162,7 +163,7 @@ class BrowseView {
         })
         menu.add(copyHash)
         
-        JMenuItem copyName = new JMenuItem("Copy Name To Clipboard")
+        JMenuItem copyName = new JMenuItem(trans("COPY_NAME_TO_CLIPBOARD"))
         copyName.addActionListener({
             List<UIResultEvent> results = selectedResults()
             def name = ""
