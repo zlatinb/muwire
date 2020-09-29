@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -28,7 +29,7 @@ class EventListView {
                  visible: bind { !model.coreInitialized} ) {
                 panel {
                     vbox {
-                        label("MuWire is loading, please wait...")
+                        label(trans("MUWIRE_IS_LOADING"))
                         Box.createVerticalGlue()
                         progressBar(indeterminate : true)
                     }
