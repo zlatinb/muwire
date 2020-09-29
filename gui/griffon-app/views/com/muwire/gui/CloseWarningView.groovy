@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -28,16 +29,16 @@ class CloseWarningView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        dialog = new JDialog(mainFrame, "Close MuWire?", true)
+        dialog = new JDialog(mainFrame, trans("CLOSE_MUWIRE_QUESTION"), true)
         panel = builder.panel {
             gridBagLayout()
-            label(text : "Would you like to minimize to system tray or exit immediately?", constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2))
+            label(text : trans("MINIMIZE_OR_EXIT"), constraints : gbc(gridx: 0, gridy: 0, gridwidth : 2))
             label(text : "\n", constraints : gbc(gridx : 0, gridy : 1)) // TODO: real padding
-            label(text : "Remember my decision", constraints : gbc(gridx: 0, gridy : 2, weightx: 100, anchor : GridBagConstraints.LINE_END))
+            label(text : trans("REMEMBER_DECISION"), constraints : gbc(gridx: 0, gridy : 2, weightx: 100, anchor : GridBagConstraints.LINE_END))
             checkbox = checkBox(selected : bind {model.closeWarning}, constraints : gbc(gridx: 1, gridy :2))
             panel (constraints : gbc(gridx: 0, gridy : 3, gridwidth : 2)) {
-                button(text : "Minimize To Tray", closeAction)
-                button(text : "Exit MuWire", exitAction)
+                button(text : trans("OPTIONS_MINIMIZE_TO_TRAY"), closeAction)
+                button(text : trans("EXIT_MUWIRE"), exitAction)
             }
         }
         dialog.getContentPane().add(panel)
