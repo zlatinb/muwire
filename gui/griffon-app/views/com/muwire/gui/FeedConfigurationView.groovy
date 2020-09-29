@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -32,28 +33,28 @@ class FeedConfigurationView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, "Feed Configuration", true)
+        dialog = new JDialog(mainFrame, trans("FEED_CONFIGURATION"), true)
         dialog.setResizable(false)
         
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label("Configuration for feed " + model.feed.getPublisher().getHumanReadableName())
+                label(trans("FEED_CONFIGURATION_FOR",model.feed.getPublisher().getHumanReadableName()))
             }
             panel (constraints : BorderLayout.CENTER) {
                 gridBagLayout()
-                label(text : "Automatically download files from feed", constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_FEED_AUTO_DOWNLOAD"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 autoDownloadCheckbox = checkBox(selected : bind {model.autoDownload}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Download files from feed sequentially", constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_FEED_DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 sequentialCheckbox = checkBox(selected : bind {model.sequential}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Feed items to store on disk (-1 means unlimited)", constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_FEED_ITEMS_ON_DISK"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 itemsToKeepField = textField(text : bind {model.itemsToKeep}, constraints:gbc(gridx :1, gridy:2, anchor : GridBagConstraints.LINE_END))
-                label(text : "Feed refresh frequency in minutes", constraints : gbc(gridx: 0, gridy : 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_FEED_REFRESH_FREQUENCY"), constraints : gbc(gridx: 0, gridy : 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 updateIntervalField = textField(text : bind {model.updateInterval}, constraints:gbc(gridx :1, gridy:3, anchor : GridBagConstraints.LINE_END))
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Save", saveAction)
-                button(text : "Cancel", cancelAction)
+                button(text : trans("SAVE"), saveAction)
+                button(text : trans("CANCEL"), cancelAction)
             } 
         }
     }
