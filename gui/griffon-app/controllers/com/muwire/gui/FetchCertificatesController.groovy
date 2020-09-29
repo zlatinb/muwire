@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonController
+import static com.muwire.gui.Translator.trans
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -61,7 +62,7 @@ class FetchCertificatesController {
         selectedCerts.each { 
             core.eventBus.publish(new UIImportCertificateEvent(certificate : it))
         }
-        JOptionPane.showMessageDialog(null, "Certificates imported.")
+        JOptionPane.showMessageDialog(null, trans("CERTIFICATES_IMPORTED"))
     }
     
     @ControllerAction
@@ -73,7 +74,7 @@ class FetchCertificatesController {
         String comment = selectedCerts[0].comment.name
         def params = [:]
         params['text'] = comment
-        params['name'] = "Certificate Comment"
+        params['name'] = trans("CERTIFICATE_COMMENT")
         mvcGroup.createMVCGroup("show-comment", params)
     }
     
