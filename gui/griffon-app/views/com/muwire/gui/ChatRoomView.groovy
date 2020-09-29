@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
@@ -61,9 +62,9 @@ class ChatRoomView {
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
-                    label(text : "Say something here: ", constraints : BorderLayout.WEST)
+                    label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
                     sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(enabled : bind {parentModel.sayActionEnabled},text : "Say", constraints : BorderLayout.EAST, sayAction)
+                    button(enabled : bind {parentModel.sayActionEnabled},text : trans("SAY"), constraints : BorderLayout.EAST, sayAction)
                 }
             }
         } else {
@@ -77,8 +78,8 @@ class ChatRoomView {
                             scrollPane {
                                 membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
-                                        closureColumn(header : "Name", preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
-                                        closureColumn(header : "Trust Status", preferredWidth: 30, type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
+                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
                                     }
                                 }
                             }
@@ -93,9 +94,9 @@ class ChatRoomView {
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
-                    label(text : "Say something here: ", constraints : BorderLayout.WEST)
+                    label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
                     sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(enabled : bind {parentModel.sayActionEnabled}, text : "Say", constraints : BorderLayout.EAST, sayAction)
+                    button(enabled : bind {parentModel.sayActionEnabled}, text : trans("SAY"), constraints : BorderLayout.EAST, sayAction)
                 }
 
             }
@@ -156,19 +157,19 @@ class ChatRoomView {
     
     private void showPopupMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem privateChat = new JMenuItem("Start Private Chat")
+        JMenuItem privateChat = new JMenuItem(trans("START_PRIVATE_CHAT"))
         privateChat.addActionListener({controller.privateMessage()})
         menu.add(privateChat)
-        JMenuItem browse = new JMenuItem("Browse")
+        JMenuItem browse = new JMenuItem(trans("BROWSE"))
         browse.addActionListener({controller.browse()})
         menu.add(browse)
-        JMenuItem markTrusted = new JMenuItem("Mark Trusted")
+        JMenuItem markTrusted = new JMenuItem(trans("MARK_TRUSTED"))
         markTrusted.addActionListener({controller.markTrusted()})
         menu.add(markTrusted)
-        JMenuItem markNeutral = new JMenuItem("Mark Neutral")
+        JMenuItem markNeutral = new JMenuItem(trans("MARK_NEUTRAL"))
         markNeutral.addActionListener({controller.markNeutral()})
         menu.add(markNeutral)
-        JMenuItem markDistrusted = new JMenuItem("Mark Distrusted")
+        JMenuItem markDistrusted = new JMenuItem(trans("MARK_DISTRUSTED"))
         markDistrusted.addActionListener({controller.markDistrusted()})
         menu.add(markDistrusted)
         menu.show(e.getComponent(), e.getX(), e.getY())
