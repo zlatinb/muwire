@@ -219,7 +219,7 @@ class MainFrameView {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
-                                            closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> row.downloader.getCurrentState().toString()})
+                                            closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> trans(row.downloader.getCurrentState().name())})
                                             closureColumn(header: trans("PROGRESS"), preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
                                             closureColumn(header: trans("SPEED"), preferredWidth: 50, type:String, read :{row ->
                                                 DataHelper.formatSize2Decimal(row.downloader.speed(), false) + trans("B_SEC")
@@ -462,7 +462,7 @@ class MainFrameView {
                                         closureColumn(header : trans("PUBLISHER"), preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
                                         closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
                                         closureColumn(header : trans("LAST_UPDATED"), type : Long, read : {it.getLastUpdated()})
-                                        closureColumn(header : trans("STATUS"), preferredWidth: 10, type : String, read : {it.getStatus().toString()})
+                                        closureColumn(header : trans("STATUS"), preferredWidth: 10, type : String, read : {trans(it.getStatus().name())})
                                     }
                                 }
                             }

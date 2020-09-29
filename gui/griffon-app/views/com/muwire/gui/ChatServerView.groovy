@@ -39,7 +39,7 @@ class ChatServerView {
                 }
                 panel {
                     label(text : trans("CONNECTION_STATUS") + " ")
-                    label(text : bind {model.status.toString()})
+                    label(text : bind {trans(model.status.name())})
                 }
             }
         }

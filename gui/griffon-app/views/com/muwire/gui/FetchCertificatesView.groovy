@@ -46,7 +46,7 @@ class FetchCertificatesView {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 label(text : trans("STATUS") + ":")
-                label(text : bind {model.status.toString()})
+                label(text : bind {trans(model.status.name())})
                 label(text : bind {model.certificateCount == 0 ? "" : Math.round(model.certificateCount * 100 / model.totalCertificates)+"%"})
             }
             scrollPane(constraints : BorderLayout.CENTER) {

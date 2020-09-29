@@ -52,7 +52,7 @@ class BrowseView {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
                 label(text: trans("STATUS") + ":")
-                label(text: bind {model.status.toString()})
+                label(text: bind {trans(model.status.name())})
                 label(text : bind {model.totalResults == 0 ? "" : Math.round(model.resultCount * 100 / model.totalResults)+ "%"})
             }
             scrollPane (constraints : BorderLayout.CENTER){
