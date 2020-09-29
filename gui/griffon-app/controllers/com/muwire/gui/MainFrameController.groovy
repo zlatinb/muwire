@@ -1,5 +1,5 @@
 package com.muwire.gui
-
+import static com.muwire.gui.Translator.trans
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -175,7 +175,7 @@ class MainFrameController {
         int selected = builder.getVariable("searches-table").getSelectedRow()
         if (selected < 0)
             return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
         Persona p = model.searches[selected].originator
         core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason) )
     }
@@ -185,7 +185,7 @@ class MainFrameController {
         int selected = builder.getVariable("searches-table").getSelectedRow()
         if (selected < 0)
             return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
         Persona p = model.searches[selected].originator
         core.eventBus.publish( new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason) )
     }
@@ -239,7 +239,7 @@ class MainFrameController {
             return
         String reason = null
         if (level != TrustLevel.NEUTRAL)
-            reason = JOptionPane.showInputDialog("Enter reason (optional)")
+            reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
         builder.getVariable(tableName).model.fireTableDataChanged()
         core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level, reason : reason))
     }
@@ -462,7 +462,7 @@ class MainFrameController {
             view.selectedSharedFiles().each {
                 core.eventBus.publish(new UICreateCertificateEvent(sharedFile : it))
             }
-            JOptionPane.showMessageDialog(null, "Certificate(s) have been issued")
+            JOptionPane.showMessageDialog(null, trans("CERTIFICATES_ISSUED"))
         }
     }
     
@@ -470,7 +470,7 @@ class MainFrameController {
     void showFileDetails() {
         def selected = view.selectedSharedFiles()
         if (selected == null || selected.size() != 1) {
-            JOptionPane.showMessageDialog(null, "Please select only one file to view it's details")
+            JOptionPane.showMessageDialog(null, trans("PLEASE_SELECT_ONE_FILE_DETAILS"))
             return
         }
         def params = [:]
@@ -483,7 +483,7 @@ class MainFrameController {
     void openContainingFolder() {
         def selected = view.selectedSharedFiles()
         if (selected == null || selected.size() != 1) {
-            JOptionPane.showMessageDialog(null, "Please select only one file to open it's containing folder")
+            JOptionPane.showMessageDialog(null, trans("PLEASE_SELECT_ONE_FILE_FOLDER"))
             return
         }
         
@@ -514,14 +514,14 @@ class MainFrameController {
 
     @ControllerAction
     void connectChatServer() {
-        String address = JOptionPane.showInputDialog("Copy/paste the address of the server here")
+        String address = JOptionPane.showInputDialog(trans("COPY_PASTE_SERVER_ADDRESS"))
         if (address == null)
             return
         Persona p
         try {
             p = new Persona(new ByteArrayInputStream(Base64.decode(address)))
         } catch (Exception bad) {
-            JOptionPane.showMessageDialog(null, "Invalid server address", "Invalid server address", JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(null, trans("INVALID_SERVER_ADDRESS"), trans("INVALID_SERVER_ADDRESS"), JOptionPane.ERROR_MESSAGE)
             return
         }
      
