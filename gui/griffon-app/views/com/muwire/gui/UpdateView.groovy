@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -26,7 +27,7 @@ class UpdateView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        String title = model.downloaded != null ? "Update Downloaded" : "Update Available"
+        String title = model.downloaded != null ? trans("UPDATE_DOWNLOADED") : trans("UPDATE_AVAILABLE")
         dialog = new JDialog(mainFrame, title, true)
         dialog.setResizable(true)
         
@@ -40,8 +41,8 @@ class UpdateView {
             }
             panel (constraints : BorderLayout.SOUTH) {
                 if (model.available != null)
-                    button(text : "Find", searchAction)
-                button(text : "Close", closeAction)
+                    button(text : trans("FIND"), searchAction)
+                button(text : trans("CLOSE"), closeAction)
             }
         }
     }
