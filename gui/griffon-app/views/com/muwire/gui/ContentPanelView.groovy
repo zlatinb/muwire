@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -39,21 +40,21 @@ class ContentPanelView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
-        dialog = new JDialog(mainFrame, "Content Control Panel", true)
+        dialog = new JDialog(mainFrame, trans("CONTENT_CONTROL_PANEL"), true)
         
         mainPanel = builder.panel {
             gridLayout(rows:1, cols:2)
             panel {
                 borderLayout()
                 panel (constraints : BorderLayout.NORTH) {
-                    label(text : "Rules")
+                    label(text : trans("RULES"))
                 }
                 scrollPane (constraints : BorderLayout.CENTER) {
                     rulesTable = table(id : "rules-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.rules) {
-                            closureColumn(header: "Term", type:String, read: {row -> row.getTerm()})
-                            closureColumn(header: "Regex?", type:Boolean, read: {row -> row instanceof RegexMatcher})
-                            closureColumn(header: "Hits", type:Integer, read : {row -> row.matches.size()})
+                            closureColumn(header: trans("TERM"), type:String, read: {row -> row.getTerm()})
+                            closureColumn(header: trans("REGEX") + "?", type:Boolean, read: {row -> row instanceof RegexMatcher})
+                            closureColumn(header: trans("HITS"), type:Integer, read : {row -> row.matches.size()})
                         }
                     }
                 }
@@ -62,32 +63,32 @@ class ContentPanelView {
                     ruleTextField = textField(constraints: BorderLayout.CENTER, action: addRuleAction)
                     panel (constraints: BorderLayout.EAST) {
                         buttonGroup(id : "ruleType")
-                        radioButton(text: "Keyword", selected : true, buttonGroup: ruleType, keywordAction)
-                        radioButton(text: "Regex", selected : false, buttonGroup: ruleType, regexAction)
-                        button(text : "Add Rule", addRuleAction)
-                        button(text : "Delete Rule", enabled : bind {model.deleteButtonEnabled}, deleteRuleAction)
+                        radioButton(text: trans("KEYWORD"), selected : true, buttonGroup: ruleType, keywordAction)
+                        radioButton(text: trans("REGEX"), selected : false, buttonGroup: ruleType, regexAction)
+                        button(text : trans("ADD_RULE"), addRuleAction)
+                        button(text : trans("DELETE_RULE"), enabled : bind {model.deleteButtonEnabled}, deleteRuleAction)
                     }
                 }
             }
             panel (border : etchedBorder()){
                 borderLayout()
                 panel (constraints : BorderLayout.NORTH) {
-                    label(text : "Hits")
+                    label(text : trans("HITS"))
                 }
                 scrollPane(constraints : BorderLayout.CENTER) {
                      hitsTable = table(id : "hits-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                          tableModel(list : model.hits) {
-                             closureColumn(header : "Searcher", type : String, read : {row -> row.persona.getHumanReadableName()})
-                             closureColumn(header : "Keywords", type : String, read : {row -> row.keywords.join(" ")})
-                             closureColumn(header : "Date", type : String, read : {row -> String.valueOf(new Date(row.timestamp))})
+                             closureColumn(header : trans("SEARCHER"), type : String, read : {row -> row.persona.getHumanReadableName()})
+                             closureColumn(header : trans("KEYWORDS"), type : String, read : {row -> row.keywords.join(" ")})
+                             closureColumn(header : trans("DATE"), type : String, read : {row -> String.valueOf(new Date(row.timestamp))})
                          }
                      }   
                 }
                 panel (constraints : BorderLayout.SOUTH) {
-                    button(text : "Refresh", refreshAction)
-                    button(text : "Clear Hits", clearHitsAction)
-                    button(text : "Trust", enabled : bind {model.trustButtonsEnabled}, trustAction)
-                    button(text : "Distrust", enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                    button(text : trans("REFRESH"), refreshAction)
+                    button(text : trans("CLEAR_HITS"), clearHitsAction)
+                    button(text : trans("TRUST"), enabled : bind {model.trustButtonsEnabled}, trustAction)
+                    button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                 }
             }
         }
