@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -43,7 +44,7 @@ class SharedFileView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
-        dialog = new JDialog(mainFrame,"Details for "+model.sf.getFile().getName(),true)
+        dialog = new JDialog(mainFrame,trans("DETAILS_FOR",model.sf.getFile().getName()),true)
         dialog.setResizable(true)
         
         searchersPanel = builder.panel {
@@ -51,9 +52,9 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 searchersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.searchers) {
-                        closureColumn(header : "Searcher", type : String, read : {it.searcher?.getHumanReadableName()})
-                        closureColumn(header : "Query", type : String, read : {it.query})
-                        closureColumn(header : "Timestamp", type : Long, read : {it.timestamp})
+                        closureColumn(header : trans("SEARCHER"), type : String, read : {it.searcher?.getHumanReadableName()})
+                        closureColumn(header : trans("QUERY"), type : String, read : {it.query})
+                        closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
                     }
                 }
             }
@@ -64,7 +65,7 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.downloaders) {
-                        closureColumn(header : "Downloader", type : String, read : {it})
+                        closureColumn(header : trans("DOWNLOADER"), type : String, read : {it})
                     }
                 }
             }
@@ -75,15 +76,15 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 certificatesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
-                        closureColumn(header : "Issuer", type:String, read : {it.issuer.getHumanReadableName()})
-                        closureColumn(header : "File Name", type : String, read : {it.name.name})
-                        closureColumn(header : "Comment", type : Boolean, read : {it.comment != null})
-                        closureColumn(header :  "Timestamp", type : Long, read : {it.timestamp})
+                        closureColumn(header : trans("ISSUER"), type:String, read : {it.issuer.getHumanReadableName()})
+                        closureColumn(header : trans("FILE_NAME"), type : String, read : {it.name.name})
+                        closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.comment != null})
+                        closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
                     }
                 }
             }
             panel(constraints : BorderLayout.SOUTH) {
-                button(text : "Show Comment", enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
             }
         }
     }
@@ -115,9 +116,9 @@ class SharedFileView {
         searchersTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         def tabbedPane = new JTabbedPane()
-        tabbedPane.addTab("Search Hits", searchersPanel)
-        tabbedPane.addTab("Downloaders", downloadersPanel)
-        tabbedPane.addTab("Certificates", certificatesPanel)
+        tabbedPane.addTab(trans("SEARCH_HITS"), searchersPanel)
+        tabbedPane.addTab(trans("DOWNLOADERS"), downloadersPanel)
+        tabbedPane.addTab(trans("CERTIFICATES"), certificatesPanel)
         
         dialog.with { 
             getContentPane().add(tabbedPane)
@@ -146,7 +147,7 @@ class SharedFileView {
         if (!model.showCommentActionEnabled)
             return
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem showComment = new JMenuItem("Show Comment")
+        JMenuItem showComment = new JMenuItem(trans("SHOW_COMMENT"))
         showComment.addActionListener({controller.showComment()})
         menu.add(showComment)
         menu.show(e.getComponent(), e.getX(), e.getY())
