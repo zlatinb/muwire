@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
@@ -45,34 +46,34 @@ class AdvancedSharingView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
-        dialog = new JDialog(mainFrame,"Advanced Sharing",true)
+        dialog = new JDialog(mainFrame,trans("ADVANCED_SHARING"),true)
         dialog.setResizable(true)
         
         watchedDirsPanel = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label(text : "Directories watched for file changes")
+                label(text : trans("DIRECTORIES_WATCHED_FOR_CHANGES"))
             }
             scrollPane( constraints : BorderLayout.CENTER ) {
                 watchedDirsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.watchedDirectories) {
-                        closureColumn(header : "Directory", preferredWidth: 350, type : String, read : {it.directory.toString()})
-                        closureColumn(header : "Auto", preferredWidth: 100, type : Boolean, read : {it.autoWatch})
-                        closureColumn(header : "Interval", preferredWidth : 100, type : Integer, read : {it.syncInterval})
-                        closureColumn(header : "Last Sync", preferredWidth: 250, type : Long, read : {it.lastSync})
+                        closureColumn(header : trans("DIRECTORY"), preferredWidth: 350, type : String, read : {it.directory.toString()})
+                        closureColumn(header : trans("AUTO"), preferredWidth: 100, type : Boolean, read : {it.autoWatch})
+                        closureColumn(header : trans("INTERVAL"), preferredWidth : 100, type : Integer, read : {it.syncInterval})
+                        closureColumn(header : trans("LAST_SYNC"), preferredWidth: 250, type : Long, read : {it.lastSync})
                     }
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Configure", enabled : bind{model.configureActionEnabled}, configureAction)
-                button(text : "Sync", enabled : bind{model.syncActionEnabled}, syncAction)
+                button(text : trans("CONFIGURE"), enabled : bind{model.configureActionEnabled}, configureAction)
+                button(text : trans("SYNC"), enabled : bind{model.syncActionEnabled}, syncAction)
             }
         }
         
         negativeTreePanel = builder.panel {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
-                label(text : "Files which are explicitly not shared")
+                label(text : trans("FILES_NOT_SHARED"))
             }
             scrollPane( constraints : BorderLayout.CENTER ) {
                 def jtree = new JTree(model.negativeTree)
@@ -108,12 +109,12 @@ class AdvancedSharingView {
     
     private void showMenu(MouseEvent e) {
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem configure = new JMenuItem("Configure")
+        JMenuItem configure = new JMenuItem(trans("CONFIGURE"))
         configure.addActionListener({controller.configure()})
         menu.add(configure)
         
         if (model.syncActionEnabled) {
-            JMenuItem sync = new JMenuItem("Sync")
+            JMenuItem sync = new JMenuItem(trans("SYNC"))
             sync.addActionListener({controller.sync()})
             menu.add(sync)
         }
@@ -132,8 +133,8 @@ class AdvancedSharingView {
     
     void mvcGroupInit(Map<String,String> args) {
         def tabbedPane = new JTabbedPane()
-        tabbedPane.addTab("Watched Directories", watchedDirsPanel)
-        tabbedPane.addTab("Negative Tree", negativeTreePanel)
+        tabbedPane.addTab(trans("WATCHED_DIRECTORIES"), watchedDirsPanel)
+        tabbedPane.addTab(trans("NEGATIVE_TREE"), negativeTreePanel)
         
         dialog.with {
             getContentPane().add(tabbedPane)
