@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -32,14 +33,14 @@ class ChatMonitorView {
             iconImage : builder.imageIcon("/MuWire-48x48.png").image){
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
-                label("Chat rooms with unread messages")
+                label(trans("CHAT_ROOMS_WITH_MESSAGES"))
             }
             scrollPane(constraints : BorderLayout.CENTER) {
                 roomsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.rooms) {
-                        closureColumn(header : "Server", type: String, read : {it.server})
-                        closureColumn(header : "Room", type : String, read : {it.room})
-                        closureColumn(header : "Messages", type : Integer, read : {it.count})
+                        closureColumn(header : trans("SERVER"), type: String, read : {it.server})
+                        closureColumn(header : trans("ROOM"), type : String, read : {it.room})
+                        closureColumn(header : trans("MESSAGES"), type : Integer, read : {it.count})
                     }
                 }
             }
