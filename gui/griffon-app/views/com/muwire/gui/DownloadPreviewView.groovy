@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -28,11 +29,11 @@ class DownloadPreviewView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        dialog = new JDialog(mainFrame, "Generating Preview", true)
+        dialog = new JDialog(mainFrame, trans("GENERATING_PREVIEW"), true)
         
         panel = builder.panel {
             vbox {
-                label(text : "Generating preview for "+model.downloader.file.getName())
+                label(text : trans("GENERATING_PREVIEW_FOR",model.downloader.file.getName()))
                 Box.createVerticalGlue()
                 progressBar(indeterminate : true)
             }
@@ -53,7 +54,7 @@ class DownloadPreviewView {
     
     void mvcGroupInit(Map<String, String> args) {
         if (!model.downloader.isSequential())
-            JOptionPane.showMessageDialog(mainFrame, "This download is not sequential, there may not be much to preview")
+            JOptionPane.showMessageDialog(mainFrame, trans("PREVIEW_SEQUENTIAL_NOTICE"))
         DownloadPreviewer previewer = new DownloadPreviewer(model.downloader, this)
         previewer.execute()
         dialog.show()
