@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
@@ -32,32 +33,32 @@ class SystemStatusView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        dialog = new JDialog(mainFrame, "System Status", true)
+        dialog = new JDialog(mainFrame, trans("SYSTEM_STATUS"), true)
         
         panel = builder.panel {
             gridBagLayout()
             panel(border : titledBorder(title : "Java", border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy: 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Vendor   ", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("VENDOR") + "   ", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.javaVendor}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Version", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("VERSION"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.javaVersion}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Memory", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("MEMORY"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Used", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("USED"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {DataHelper.formatSize2Decimal(model.usedRam,false)+"B"}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Total", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("TOTAL"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {DataHelper.formatSize2Decimal(model.totalRam,false)+"B"}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Max", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("MAX"), constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {DataHelper.formatSize2Decimal(model.maxRam,false)+"B"}, constraints : gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_END))
             }
             buttonsPanel = builder.panel {
                 gridBagLayout()
-                button(text : "Refresh", constraints: gbc(gridx: 0, gridy: 0), refreshAction)
-                button(text : "Close", constraints : gbc(gridx : 1, gridy :0), closeAction)
+                button(text : trans("REFRESH"), constraints: gbc(gridx: 0, gridy: 0), refreshAction)
+                button(text : trans("CLOSE"), constraints : gbc(gridx : 1, gridy :0), closeAction)
             }
         }
     }

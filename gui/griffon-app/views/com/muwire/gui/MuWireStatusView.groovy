@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -33,43 +34,43 @@ class MuWireStatusView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
 
-        dialog = new JDialog(mainFrame, "MuWire Status", true)
+        dialog = new JDialog(mainFrame, trans("MUWIRE_STATUS"), true)
 
         panel = builder.panel {
             gridBagLayout()
-            panel(border : titledBorder(title : "Connections", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("CONNECTIONS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy: 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Incoming", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("INCOMING"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.incomingConnections}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Outgoing", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OUTGOING"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.outgoingConnections}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Hosts", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("HOSTS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Known", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("KNOWN"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.knownHosts}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Failing", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("FAILING"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.failingHosts}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Hopeless", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("HOPELESS"), constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.hopelessHosts}, constraints : gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Files", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("FILES"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Shared", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("SHARED"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.sharedFiles}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Downloading", constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("DOWNLOADING"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.downloads}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Times Browsed", constraints : gbc(gridx:0, gridy:2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("TIMES_BROWSED"), constraints : gbc(gridx:0, gridy:2, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.browsed}, constraints : gbc(gridx: 1, gridy: 2, anchor : GridBagConstraints.LINE_END))
             }
         }
         buttonsPanel = builder.panel {
             gridBagLayout()
-            button(text : "Refresh", constraints: gbc(gridx: 0, gridy: 0), refreshAction)
-            button(text : "Close", constraints : gbc(gridx : 1, gridy :0), closeAction)
+            button(text : trans("REFRESH"), constraints: gbc(gridx: 0, gridy: 0), refreshAction)
+            button(text : trans("CLOSE"), constraints : gbc(gridx : 1, gridy :0), closeAction)
         }
     }
 

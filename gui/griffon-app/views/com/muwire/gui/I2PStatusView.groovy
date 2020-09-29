@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
@@ -32,25 +33,25 @@ class I2PStatusView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
 
-        dialog = new JDialog(mainFrame, "I2P Status", true)
+        dialog = new JDialog(mainFrame, trans("I2P_STATUS"), true)
 
         panel = builder.panel {
             gridBagLayout()
-            panel(border : titledBorder(title : "General", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("GENERAL"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Network status", constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("NETWORK_STATUS"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.networkStatus}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text: "Floodfill", constraints : gbc(gridx: 0, gridy : 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text: trans("FLOODFILL"), constraints : gbc(gridx: 0, gridy : 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.floodfill}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
-                label(text : "Active Peers", constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("ACTIVE_PEERS"), constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.activePeers}, constraints : gbc(gridx: 1, gridy:2, anchor : GridBagConstraints.LINE_END))
-                label(text : "Our Country", constraints : gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OUR_COUNTRY"), constraints : gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.myCountry}, constraints : gbc(gridx : 1, gridy: 3, anchor :  GridBagConstraints.LINE_END))
-                label(text : "Strict Country", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("STRICT_COUNTRY"), constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 label(text : bind {model.strictCountry}, constraints : gbc(gridx : 1, gridy : 4, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Connections", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("CONNECTIONS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
                 label(text : "NTCP", constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
@@ -58,28 +59,28 @@ class I2PStatusView {
                 label(text : "SSU", constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.ssuConnections}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Participation", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("PARTICIPATION"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy: 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Tunnels", constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("TUNNELS"), constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.participatingTunnels}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Bandwidth", constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("BANDWIDTH"), constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {model.participatingBW}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
-            panel(border : titledBorder(title : "Bandwidth", border : etchedBorder(), titlePosition : TitledBorder.TOP),
+            panel(border : titledBorder(title : trans("BANDWIDTH"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy: 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : "Receive (15 seconds)", constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("RECEIVE_15"), constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {DataHelper.formatSize2Decimal(model.receiveBps,false)+"B"}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                label(text : "Send (15 seconds)", constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("SEND_15"), constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 label(text : bind {DataHelper.formatSize2Decimal(model.sendBps, false)+"B"}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
         }
 
         buttonsPanel = builder.panel {
             gridBagLayout()
-            button(text : "Refresh", constraints: gbc(gridx: 0, gridy: 0), refreshAction)
-            button(text : "Close", constraints : gbc(gridx : 1, gridy :0), closeAction)
+            button(text : trans("REFRESH"), constraints: gbc(gridx: 0, gridy: 0), refreshAction)
+            button(text : trans("CLOSE"), constraints : gbc(gridx : 1, gridy :0), closeAction)
         }
     }
 
