@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
@@ -41,7 +42,7 @@ class ShowCommentView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Dismiss", dismissAction)
+                button(text : trans("DISMISS"), dismissAction)
             }
         }
     }

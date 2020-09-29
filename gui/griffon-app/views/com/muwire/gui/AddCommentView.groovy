@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
@@ -30,10 +31,10 @@ class AddCommentView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        String title = "Add comment to multiple files"
+        String title = trans("ADD_COMMENT_MULTIPLE")
         String comment = ""
         if (model.selectedFiles.size() == 1) {
-            title = "Add comments to " + model.selectedFiles[0].getFile().getName()
+            title = trans("ADD_COMMENT_SINGLE",model.selectedFiles[0].getFile().getName())
             if (model.selectedFiles[0].comment != null)
                 comment = DataUtil.readi18nString(Base64.decode(model.selectedFiles[0].comment))
         }
@@ -47,8 +48,8 @@ class AddCommentView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Save", saveAction)
-                button(text : "Cancel", cancelAction)
+                button(text : trans("SAVE"), saveAction)
+                button(text : trans("CANCEL"), cancelAction)
             }
         }
     }
