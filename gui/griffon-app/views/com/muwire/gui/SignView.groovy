@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -27,12 +28,12 @@ class SignView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        dialog = new JDialog(mainFrame, "Sign Text", true)
+        dialog = new JDialog(mainFrame, trans("SIGN_TEXT"), true)
         
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label("Enter text to be signed")
+                label(trans("ENTER_TEXT_TO_SIGN"))
             }
             panel (constraints : BorderLayout.CENTER) {
                 gridLayout(rows : 2, cols: 1)
@@ -44,9 +45,9 @@ class SignView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : "Sign", signAction)
-                button(text : "Copy To Clipboard", copyAction)
-                button(text : "Dismiss", closeAction)
+                button(text : trans("SIGN"), signAction)
+                button(text : trans("COPY_TO_CLIPBOARD"), copyAction)
+                button(text : trans("DISMISS"), closeAction)
             }
         }
     }
