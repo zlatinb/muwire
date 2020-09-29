@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -25,18 +26,18 @@ class CertificateWarningView {
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, "Certificate Warning", true)
+        dialog = new JDialog(mainFrame, trans("CERTIFICATE_WARNING"), true)
         
         panel = builder.panel {
             gridBagLayout()
-            label(text : "When you certify a file, you create a proof that you shared this file.", constraints :gbc(gridx: 0, gridy : 0, gridwidth : 2))
-            label(text : "Even if you delete the certificate from your disk, others may already have it.", constraints : gbc(gridx:0, gridy : 1, gridwidth: 2))
-            label(text : "If you are sure you want to do this, check the checkbox below, then click \"Certify\" again.", constraints : gbc(gridx:0, gridy: 2, gridwidth:2))
+            label(text : trans("CERTIFICATE_WARNING_TEXT1"), constraints :gbc(gridx: 0, gridy : 0, gridwidth : 2))
+            label(text : trans("CERTIFICATE_WARNING_TEXT2"), constraints : gbc(gridx:0, gridy : 1, gridwidth: 2))
+            label(text : trans("CERTIFICATE_WARNING_TEXT3"), constraints : gbc(gridx:0, gridy: 2, gridwidth:2))
             label(text : "\n", constraints : gbc(gridx:0, gridy:3)) // TODO: real padding
-            label(text : "   I understand, do not show this warning again", constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_END))
+            label(text : "   " + trans("CERTIFICATE_UNDERSTAND"), constraints : gbc(gridx:0, gridy:4, anchor : GridBagConstraints.LINE_END))
             checkbox = checkBox(constraints : gbc(gridx:1, gridy:4, anchor : GridBagConstraints.LINE_START))
             panel (constraints : gbc(gridx :0, gridy : 5, gridwidth : 2)) {
-                button(text : "Ok", dismissAction)
+                button(text : trans("OK"), dismissAction)
             }
         }
         
