@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.swing.SwingConstants
@@ -34,10 +35,10 @@ class ChatServerView {
                 gridLayout(rows : 1, cols : 3)
                 panel {}
                 panel {
-                    button(text : bind {model.buttonText}, enabled : bind {model.disconnectActionEnabled}, disconnectAction)
+                    button(text : bind {trans(model.buttonText)}, enabled : bind {model.disconnectActionEnabled}, disconnectAction)
                 }
                 panel {
-                    label(text : "Connection Status ")
+                    label(text : trans("CONNECTION_STATUS") + " ")
                     label(text : bind {model.status.toString()})
                 }
             }
@@ -59,7 +60,7 @@ class ChatServerView {
             tabPanel = panel {
                 borderLayout()
                 panel (constraints : BorderLayout.CENTER) {
-                    String text = model.host == model.core.me ? "Local Server" : model.host.getHumanReadableName()
+                    String text = model.host == model.core.me ? trans("LOCAL_SERVER") : model.host.getHumanReadableName()
                     label(text : text)
                 }
                 button(icon : imageIcon("/close_tab.png"), preferredSize: [20, 20], constraints : BorderLayout.EAST,
@@ -83,7 +84,7 @@ class ChatServerView {
         if (model.host == model.core.me) {
             mvcGroup.parentGroup.controller.stopChatServer()
         }
-        else if (model.buttonText == "Disconnect")
+        else if (model.buttonText == "DISCONNECT")
             controller.disconnect()
         int index = parent.indexOfComponent(pane)
         parent.removeTabAt(index)

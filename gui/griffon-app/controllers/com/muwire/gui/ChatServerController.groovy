@@ -16,14 +16,14 @@ class ChatServerController {
     @ControllerAction
     void disconnect() {
         switch(model.buttonText) {
-            case "Disconnect" :
-                model.buttonText = "Connect"
+            case "DISCONNECT" :
+                model.buttonText = "CONNECT"
                 mvcGroup.getChildrenGroups().each { k,v ->
                     v.controller.serverDisconnected()
                 }
                 model.core.eventBus.publish(new UIDisconnectChatEvent(host : model.host))
                 break
-            case "Connect" :
+            case "CONNECT" :
                  model.connect()
                  break
         }

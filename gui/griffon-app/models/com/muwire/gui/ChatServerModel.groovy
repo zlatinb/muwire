@@ -30,7 +30,7 @@ class ChatServerModel {
     Core core
     
     @Observable boolean disconnectActionEnabled
-    @Observable String buttonText = "Disconnect"
+    @Observable String buttonText = "DISCONNECT"
     @Observable ChatConnectionAttemptStatus status
     @Observable boolean sayActionEnabled
 
@@ -47,7 +47,7 @@ class ChatServerModel {
     
     void connect() {
         runInsideUIAsync {
-            buttonText = "Disconnect"
+            buttonText = "DISCONNECT"
         }
         core.eventBus.publish(new UIConnectChatEvent(host : host))
     }
