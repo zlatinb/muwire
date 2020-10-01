@@ -66,7 +66,7 @@ class FetchCertificatesView {
             panel(constraints : BorderLayout.SOUTH) {
                 button(text : trans("IMPORT"), enabled : bind {model.importActionEnabled}, importCertificatesAction)
                 button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
-                button(text : trans("DISMISS"), dismissAction)
+                button(text : trans("CLOSE"), dismissAction)
             }
         }
         

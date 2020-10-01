@@ -42,7 +42,7 @@ class ShowCommentView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : trans("DISMISS"), dismissAction)
+                button(text : trans("CLOSE"), dismissAction)
             }
         }
     }

@@ -47,7 +47,7 @@ class SignView {
             panel (constraints : BorderLayout.SOUTH) {
                 button(text : trans("SIGN"), signAction)
                 button(text : trans("COPY_TO_CLIPBOARD"), copyAction)
-                button(text : trans("DISMISS"), closeAction)
+                button(text : trans("CLOSE"), closeAction)
             }
         }
     }
