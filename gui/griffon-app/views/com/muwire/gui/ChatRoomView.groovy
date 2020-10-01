@@ -64,7 +64,6 @@ class ChatRoomView {
                     borderLayout()
                     label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
                     sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(enabled : bind {parentModel.sayActionEnabled},text : trans("SAY"), constraints : BorderLayout.EAST, sayAction)
                 }
             }
         } else {
@@ -96,7 +95,6 @@ class ChatRoomView {
                     borderLayout()
                     label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
                     sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
-                    button(enabled : bind {parentModel.sayActionEnabled}, text : trans("SAY"), constraints : BorderLayout.EAST, sayAction)
                 }
 
             }
