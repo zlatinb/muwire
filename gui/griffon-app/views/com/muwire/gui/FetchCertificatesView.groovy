@@ -65,7 +65,7 @@ class FetchCertificatesView {
             }
             panel(constraints : BorderLayout.SOUTH) {
                 button(text : trans("IMPORT"), enabled : bind {model.importActionEnabled}, importCertificatesAction)
-                button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("VIEW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
                 button(text : trans("CLOSE"), dismissAction)
             }
         }
@@ -107,7 +107,7 @@ class FetchCertificatesView {
         importItem.addActionListener({controller.importCertificates()})
         menu.add(importItem)
         if (model.showCommentActionEnabled) {
-            JMenuItem showComment = new JMenuItem(trans("SHOW_COMMENt"))
+            JMenuItem showComment = new JMenuItem(trans("VIEW_COMMENT"))
             showComment.addActionListener({controller.showComment()})
             menu.add(showComment)
         }

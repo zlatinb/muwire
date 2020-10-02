@@ -72,7 +72,7 @@ class CertificateControlView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : trans("SHOW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("VIEW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
             }
         }
     }
@@ -147,7 +147,7 @@ class CertificateControlView {
         if (!model.showCommentActionEnabled)
             return
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem showComment = new JMenuItem(trans("SHOW_COMMENT"))
+        JMenuItem showComment = new JMenuItem(trans("VIEW_COMMENT"))
         showComment.addActionListener({controller.showComment()})
         menu.add(showComment)
         menu.show(e.getComponent(), e.getX(), e.getY())
