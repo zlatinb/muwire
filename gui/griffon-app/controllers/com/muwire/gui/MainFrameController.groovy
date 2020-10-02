@@ -459,10 +459,15 @@ class MainFrameController {
             params['home'] = core.home
             mvcGroup.createMVCGroup("certificate-warning", params)
         } else {
+            int count = 0
             view.selectedSharedFiles().each {
+                count++
                 core.eventBus.publish(new UICreateCertificateEvent(sharedFile : it))
             }
-            JOptionPane.showMessageDialog(null, trans("CERTIFICATES_ISSUED"))
+            if (count > 1)
+                JOptionPane.showMessageDialog(null, trans("CERTIFICATES_ISSUED"))
+            else if (count == 1)
+                JOptionPane.showMessageDialog(null, trans("CERTIFICATE_ISSUED"))
         }
     }
     
