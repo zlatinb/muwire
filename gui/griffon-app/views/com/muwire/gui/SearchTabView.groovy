@@ -77,7 +77,7 @@ class SearchTabView {
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
                                             closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
-                                            closureColumn(header : trans("TRUST"), preferredWidth : 50, type: String, read : { row ->
+                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { row ->
                                                 model.core.trustService.getLevel(row.destination).toString()
                                             })
                                         }
@@ -91,7 +91,7 @@ class SearchTabView {
                                         button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
                                     }
                                     panel (border : etchedBorder()){
-                                        button(text : trans("TRUST"), enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
                                         button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
                                         button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
@@ -202,7 +202,7 @@ class SearchTabView {
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {it.chat})
                                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
-                                            closureColumn(header : trans("TRUST"), preferredWidth : 50, type : String, read : {
+                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type : String, read : {
                                                 model.core.trustService.getLevel(it.sender.destination).toString()
                                             })
                                         }
@@ -218,7 +218,7 @@ class SearchTabView {
                                         button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
                                     }
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("TRUST"), enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
                                         button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
                                         button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }

@@ -375,7 +375,7 @@ class OptionsView {
             tabbedPane.addTab(trans("BANDWIDTH"), bandwidth)
         }
         tabbedPane.addTab(trans("FEED"), feed)
-        tabbedPane.addTab(trans("TRUST"), trust)
+        tabbedPane.addTab(trans("TRUST_NOUN"), trust)
         tabbedPane.addTab(trans("CHAT"), chat)
 
         JPanel panel = new JPanel()

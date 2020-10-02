@@ -57,7 +57,7 @@ class TrustListView {
                     }
                     panel (constraints : BorderLayout.SOUTH) {
                         gridBagLayout()
-                        button(text : trans("TRUST"), constraints : gbc(gridx : 0, gridy : 0), trustFromTrustedAction)
+                        button(text : trans("TRUST_VERB"), constraints : gbc(gridx : 0, gridy : 0), trustFromTrustedAction)
                         button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromTrustedAction)
                     }
                 }
@@ -74,7 +74,7 @@ class TrustListView {
                     }
                     panel(constraints : BorderLayout.SOUTH) {
                         gridBagLayout()
-                        button(text : trans("TRUST"), constraints : gbc(gridx : 0, gridy : 0), trustFromDistrustedAction)
+                        button(text : trans("TRUST_VERB"), constraints : gbc(gridx : 0, gridy : 0), trustFromDistrustedAction)
                         button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromDistrustedAction)
                     }
                 }

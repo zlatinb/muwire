@@ -87,7 +87,7 @@ class ContentPanelView {
                 panel (constraints : BorderLayout.SOUTH) {
                     button(text : trans("REFRESH"), refreshAction)
                     button(text : trans("CLEAR_HITS"), clearHitsAction)
-                    button(text : trans("TRUST"), enabled : bind {model.trustButtonsEnabled}, trustAction)
+                    button(text : trans("TRUST_VERB"), enabled : bind {model.trustButtonsEnabled}, trustAction)
                     button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                 }
             }
