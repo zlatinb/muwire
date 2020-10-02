@@ -99,7 +99,7 @@ class UpdateServer {
 
         @Override
         public void disconnected(I2PSession session) {
-            Log.severe("Disconnected from I2P router")
+            log.severe("Disconnected from I2P router")
             System.exit(1)
         }
 
