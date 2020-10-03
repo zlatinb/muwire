@@ -79,7 +79,8 @@ public class HostCache {
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         log.info("connected, going to sleep")
-        Thread.sleep(Integer.MAX_VALUE)
+        while(true)
+            Thread.sleep(Integer.MAX_VALUE)
 
     }
 
