@@ -87,8 +87,10 @@ class DownloadSessionTest {
 
     private void perform() {
         try {
-            performed = session.request()
+            performed = session.sendRequest()
+            performed &= session.consumeResponse()
         } catch (IOException e) {
+            performed = false
             thrown = e
         }
     }
