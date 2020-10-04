@@ -41,7 +41,7 @@ public class Util {
         _x("Clear Finished"),
         _x("Comment"),
         _x("Copy hash to clipboard"),
-        _x("Copy To Clipbaord"),
+        _x("Copy To Clipboard"),
         _x("Default settings for new feeds"),
         _x("Details for {0}"),
         _x("Directory configuration for {0}"),
