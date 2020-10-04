@@ -12,7 +12,7 @@ import net.i2p.data.Destination
 
 abstract class ConnectionManager {
 
-    private static final int PING_TIME = 20000
+    private static final int PING_TIME = 40000
 
     final EventBus eventBus
 
