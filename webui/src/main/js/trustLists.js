@@ -3,6 +3,7 @@ class TrustList {
 		this.user = xmlNode.getElementsByTagName("User")[0].childNodes[0].nodeValue
 		this.userB64 = xmlNode.getElementsByTagName("UserB64")[0].childNodes[0].nodeValue
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
+		this.statusString = xmlNode.getElementsByTagName("StatusString")[0].childNodes[0].nodeValue
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
 		this.trusted = xmlNode.getElementsByTagName("Trusted")[0].childNodes[0].nodeValue
 		this.distrusted = xmlNode.getElementsByTagName("Distrusted")[0].childNodes[0].nodeValue
@@ -23,7 +24,7 @@ class TrustList {
 		var nameHtml = userLink.render() + "<span class='right'>" + actionsHtml + "</span>"
 		
 		mapping.set("Name", nameHtml)
-		mapping.set("Status", this.status)
+		mapping.set("Status", this.statusString)
 		mapping.set("Last Updated", this.timestamp)
 		mapping.set("Trusted", this.trusted)
 		mapping.set("Distrusted", this.distrusted)
@@ -42,6 +43,7 @@ class Persona {
 			this.reason = ""
 		}
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
+		this.statusString = xmlNode.getElementsByTagName("StatusString")[0].childNodes[0].nodeValue
 	}
 	
 	getMapping() {
@@ -60,7 +62,7 @@ class Persona {
 		if (this.reason != "")
 			reason = "<pre class='comment'>" + this.reason + "</pre>"
 		mapping.set("Reason", reason)
-		mapping.set("Your Trust", this.status)
+		mapping.set("Your Trust", this.statusString)
 		
 		return mapping
 	}

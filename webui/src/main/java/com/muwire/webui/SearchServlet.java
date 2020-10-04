@@ -311,6 +311,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</Name>");
             sb.append("<B64>").append(persona.toBase64()).append("</B64>");
             sb.append("<Trust>").append(trustLevel.toString()).append("</Trust>");
+            sb.append("<TrustString>").append(Util._t(EnumStrings.TRUST_LEVELS.get(trustLevel))).append("</TrustString>");
             sb.append("<Browse>").append(browse).append("</Browse>");
             sb.append("<Browsing>").append(browsing).append("</Browsing>");
             sb.append("<Results>").append(results).append("</Results>");
@@ -343,6 +344,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
+            sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultStatus))).append("</ResultStatusString>");
             if (comment != null)
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             sb.append("<Certificates>").append(certificates).append("</Certificates>");
@@ -371,6 +373,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
+            sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultStatus))).append("</ResultStatusString>");
             sb.append("<Sources>").append(sources).append("</Sources>");
             sb.append("</Result>");
         }
@@ -405,6 +408,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("<B64>").append(sender.toBase64()).append("</B64>");
             sb.append("<Browse>").append(browse).append("</Browse>");
             sb.append("<Trust>").append(trustLevel.toString()).append("</Trust>");
+            sb.append("<TrustString>").append(Util._t(EnumStrings.TRUST_LEVELS.get(trustLevel))).append("</TrustString>");
             sb.append("<Browsing>").append(browsing).append("</Browsing>");
             if (comment != null)
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");

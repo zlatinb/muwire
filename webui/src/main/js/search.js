@@ -32,6 +32,7 @@ class Sender {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.b64 = xmlNode.getElementsByTagName("B64")[0].childNodes[0].nodeValue
 		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
+		this.trustString = xmlNode.getElementsByTagName("TrustString")[0].childNodes[0].nodeValue
 		this.browse = xmlNode.getElementsByTagName("Browse")[0].childNodes[0].nodeValue
 		this.feed = xmlNode.getElementsByTagName("Feed")[0].childNodes[0].nodeValue
 		this.subscribed = xmlNode.getElementsByTagName("Subscribed")[0].childNodes[0].nodeValue
@@ -47,7 +48,7 @@ class Sender {
 		var trustActionHtml = "<span class='dropdown'><a class='droplink'>" + _t("Actions") + "</a><div class='dropdown-content-right'>" +
 			this.getTrustLinks() +
 			"</div></span>"
-		var trustHtml = "<span class='center'>" + this.trust + "   " + trustActionHtml + "</span>" 
+		var trustHtml = "<span class='center'>" + this.trustString + "   " + trustActionHtml + "</span>" 
 		trustHtml += "<div class='centercomment' id='trusted-" + this.b64 + "'></div>"
 		trustHtml += "<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 		mapping.set("Trust", trustHtml)
@@ -141,6 +142,7 @@ class ResultFromSender {
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 		this.resultStatus = xmlNode.getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
+		this.resultStatusString = xmlNode.getElementsByTagName("ResultStatusString")[0].childNodes[0].nodeValue
 		this.comment = null
 		try {
 			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
@@ -198,9 +200,9 @@ class ResultFromSender {
 	
 	getDownloadBlock() {
 		if (this.resultStatus == "DOWNLOADING")
-			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+			return "<a href='/MuWire/Downloads'>" + this.resultStatusString + "</a>"
 		if (this.resultStatus == "SHARED")
-			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
+			return "<a href='/MuWire/SharedFiles'>" + this.resultStatusString + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
@@ -241,6 +243,7 @@ class Result {
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 		this.resultStatus = xmlNode.getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
+		this.resultStatusString = xmlNode.getElementsByTagName("ResultStatusString")[0].childNodes[0].nodeValue
 		this.sources = xmlNode.getElementsByTagName("Sources")[0].childNodes[0].nodeValue
 	}
 	
@@ -258,9 +261,9 @@ class Result {
 	}
 	getDownloadBlock() {
 		if (this.resultStatus == "DOWNLOADING")
-			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+			return "<a href='/MuWire/Downloads'>" + this.resultStatusString + "</a>"
 		if (this.resultStatus == "SHARED")
-			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
+			return "<a href='/MuWire/SharedFiles'>" + this.resultStatusString + "</a>"
 		var link = "<a href='#' onclick='window.download(\"" + this.infoHash + "\");return false;'>" + _t("Download") + "</a>"
 		var block = "<span id='download-" + this.infoHash + "'>" + link + "</span>"
 		return block
@@ -304,6 +307,7 @@ class SenderForResult {
 		this.feed = xmlNode.getElementsByTagName("Feed")[0].childNodes[0].nodeValue
 		this.subscribed = xmlNode.getElementsByTagName("Subscribed")[0].childNodes[0].nodeValue
 		this.trust = xmlNode.getElementsByTagName("Trust")[0].childNodes[0].nodeValue
+		this.trustString = xmlNode.getElementsByTagName("TrustString")[0].childNodes[0].nodeValue
 		this.comment = null
 		try {
 			this.comment = xmlNode.getElementsByTagName("Comment")[0].childNodes[0].nodeValue
@@ -384,7 +388,7 @@ class SenderForResult {
 			this.getTrustLinks() +
 			"</div></span>"
 		
-		return "<span class='center'>"+ this.trust + "   "+ dropdownBlock + "</span>" +
+		return "<span class='center'>"+ this.trustString + "   "+ dropdownBlock + "</span>" +
 			"<div class='centercomment' id='trusted-" + this.b64 + "'></div>" +
 			"<div class='centercomment' id='distrusted-" + this.b64 + "'></div>"
 	}

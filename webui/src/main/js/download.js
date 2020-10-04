@@ -2,6 +2,7 @@ class Downloader {
 	constructor(xmlNode) {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue;
 		this.state = xmlNode.getElementsByTagName("State")[0].childNodes[0].nodeValue;
+		this.stateString = xmlNode.getElementsByTagName("StateString")[0].childNodes[0].nodeValue;
 		this.speed = xmlNode.getElementsByTagName("Speed")[0].childNodes[0].nodeValue;
 		this.ETA = xmlNode.getElementsByTagName("ETA")[0].childNodes[0].nodeValue;
 		this.progress = xmlNode.getElementsByTagName("Progress")[0].childNodes[0].nodeValue;
@@ -18,7 +19,7 @@ class Downloader {
 			ETA = ""
 		}
 		mapping.set("Name", this.getNameBlock())
-		mapping.set("State", this.state)
+		mapping.set("State", this.stateString)
 		
 		mapping.set("Speed", speed)
 		mapping.set("ETA", ETA)

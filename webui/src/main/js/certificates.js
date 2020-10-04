@@ -67,6 +67,7 @@ class Certificate {
 class CertificateResponse {
 	constructor(xmlNode, divId) {
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
+		this.statusString = xmlNode.getElementsByTagName("StatusString")[0].childNodes[0].nodeValue
 		this.total = xmlNode.getElementsByTagName("Total")[0].childNodes[0].nodeValue
 		this.divId = divId
 		
@@ -82,7 +83,7 @@ class CertificateResponse {
 	}
 	
 	renderTable() {
-		var html = _t("Status") + "  " + this.status
+		var html = _t("Status") + "  " + this.statusString
 		if (this.certificates.length == 0)
 			return html
 		

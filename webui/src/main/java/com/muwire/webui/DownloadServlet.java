@@ -217,6 +217,7 @@ public class DownloadServlet extends HttpServlet {
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<State>").append(state.toString()).append("</State>");
+            sb.append("<StateString>").append(Util._t(EnumStrings.DOWNLOAD_STATES.get(state))).append("</StateString>");
             sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed, false)).append("B/sec").append("</Speed>");
             String ETAString;
             if (ETA == Long.MAX_VALUE)

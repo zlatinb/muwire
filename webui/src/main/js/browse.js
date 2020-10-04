@@ -1,10 +1,11 @@
 class Result {
-	constructor(name, size, comment, infoHash, resultStatus, certificates, hostB64) {
+	constructor(name, size, comment, infoHash, resultStatus, resultStatusString, certificates, hostB64) {
 		this.name = name
 		this.size = size
 		this.infoHash = infoHash
 		this.comment = comment
 		this.resultStatus = resultStatus
+		this.resultStatusString = resultStatusString
 		this.certificates = certificates
 		this.hostB64 = hostB64
 	}
@@ -26,12 +27,13 @@ class Result {
 }
 
 class Browse {
-	constructor(host, hostB64, status, totalResults, receivedResults, revision) {
+	constructor(host, hostB64, status, statusString, totalResults, receivedResults, revision) {
 		this.host = host
 		this.hostB64 = hostB64
 		this.totalResults = totalResults
 		this.receivedResults = receivedResults
 		this.status = status
+		this.statusString = statusString
 		this.revision = revision
 		this.key = "Name"
 		this.descending = "descending"
@@ -137,11 +139,12 @@ function refreshActive() {
 				var host = browses[i].getElementsByTagName("Host")[0].childNodes[0].nodeValue;
 				var hostB64 = browses[i].getElementsByTagName("HostB64")[0].childNodes[0].nodeValue;
 				var status = browses[i].getElementsByTagName("BrowseStatus")[0].childNodes[0].nodeValue;
+				var statusString = browses[i].getElementsByTagName("BrowseStatusString")[0].childNodes[0].nodeValue;
 				var totalResults = browses[i].getElementsByTagName("TotalResults")[0].childNodes[0].nodeValue;
 				var count = browses[i].getElementsByTagName("ResultsCount")[0].childNodes[0].nodeValue;
 				var revision = parseInt(browses[i].getElementsByTagName("Revision")[0].childNodes[0].nodeValue);
 				
-				var browse = new Browse(host, hostB64, status, totalResults, count, revision)
+				var browse = new Browse(host, hostB64, status, statusString, totalResults, count, revision)
 				browsesByHost.set(host, browse)
 				activeBrowses.push(browse)
 			}
@@ -160,7 +163,7 @@ function refreshActive() {
 				
 				var mapping = new Map()
 				mapping.set("Host", nameHtml)
-				mapping.set("Status", browse.status)
+				mapping.set("Status", browse.statusString)
 				
 				var percent = browse.receivedResults + "/" + browse.totalResults
 				mapping.set("Results", percent)
@@ -205,6 +208,7 @@ function showResults(host, key, descending) {
 				var name = results[i].getElementsByTagName("Name")[0].childNodes[0].nodeValue
 				var size = results[i].getElementsByTagName("Size")[0].childNodes[0].nodeValue
 				var resultStatus = results[i].getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
+				var resultStatusString = results[i].getElementsByTagName("ResultStatusString")[0].childNodes[0].nodeValue
 				var infoHash = results[i].getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
 				var comment = results[i].getElementsByTagName("Comment")
 				if (comment != null && comment.length == 1)
@@ -213,7 +217,7 @@ function showResults(host, key, descending) {
 					comment = null
 				var certificates = results[i].getElementsByTagName("Certificates")[0].childNodes[0].nodeValue
 					
-				var result = new Result(name, size, comment, infoHash, resultStatus, certificates, browse.hostB64)
+				var result = new Result(name, size, comment, infoHash, resultStatus, resultStatusString, certificates, browse.hostB64)
 				resultsByInfoHash.set(infoHash, result)
 			}
 			
@@ -237,9 +241,9 @@ function showResults(host, key, descending) {
 				var downloadCell = null
 				
 				if (result.resultStatus == "DOWNLOADING")
-					downloadCell = "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+					downloadCell = "<a href='/MuWire/Downloads'>" + result.resultStatusString + "</a>"
 				else if (result.resultStatus == "SHARED")
-					downloadCell = "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
+					downloadCell = "<a href='/MuWire/SharedFiles'>" + result.resultStatusString + "</a>"
 				else
 					downloadCell = getDownloadLink(host, infoHash)
 					

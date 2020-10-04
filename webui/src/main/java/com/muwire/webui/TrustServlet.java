@@ -282,6 +282,7 @@ public class TrustServlet extends HttpServlet {
             sb.append("<User>").append(Util.escapeHTMLinXML(persona.getHumanReadableName())).append("</User>");
             sb.append("<UserB64>").append(persona.toBase64()).append("</UserB64>");
             sb.append("<Status>").append(status).append("</Status>");
+            sb.append("<StatusString>").append(Util._t(EnumStrings.TRUST_LIST_STATES.get(status))).append("</StatusString>");
             String timestampString = Util._t("Never");
             if (timestamp > 0)
                 timestampString = DataHelper.formatTime(timestamp);
@@ -338,6 +339,7 @@ public class TrustServlet extends HttpServlet {
             sb.append("<UserB64>").append(persona.toBase64()).append("</UserB64>");
             sb.append("<Reason>").append(Util.escapeHTMLinXML(reason)).append("</Reason>");
             sb.append("<Status>").append(status).append("</Status>");
+            sb.append("<StatusString>").append(Util._t(EnumStrings.TRUST_LEVELS.get(status))).append("</StatusString>");
             sb.append("</Persona>");
         }
     }

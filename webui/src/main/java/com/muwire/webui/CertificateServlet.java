@@ -74,6 +74,7 @@ public class CertificateServlet extends HttpServlet {
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         sb.append("<CertificateRequest>");
         sb.append("<Status>").append(request.getStatus().toString()).append("</Status>");
+        sb.append("<StatusString>").append(Util._t(EnumStrings.CERTIFICATE_STATES.get(request.getStatus()))).append("</StatusString>");
         sb.append("<Total>").append(request.totalCertificates()).append("</Total>");
         sb.append("<Certificates>");
         entries.forEach(entry -> entry.toXML(sb));

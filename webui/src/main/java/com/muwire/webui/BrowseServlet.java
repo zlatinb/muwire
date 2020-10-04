@@ -58,6 +58,7 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("<Host>").append(Util.escapeHTMLinXML(browse.getHost().getHumanReadableName())).append("</Host>");
                 sb.append("<HostB64>").append(browse.getHost().toBase64()).append("</HostB64>");
                 sb.append("<BrowseStatus>").append(browse.getStatus()).append("</BrowseStatus>");
+                sb.append("<BrowseStatusString>").append(Util._t(EnumStrings.BROWSE_STATES.get(browse.getStatus()))).append("</BrowseStatusString>");
                 sb.append("<TotalResults>").append(browse.getTotalResults()).append("</TotalResults>");
                 sb.append("<ResultsCount>").append(browse.getResults().size()).append("</ResultsCount>");
                 sb.append("<Revision>").append(browse.getRevision()).append("</Revision>");
@@ -99,6 +100,7 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("<Result>");
                 sb.append("<Name>").append(Util.escapeHTMLinXML(result.getName())).append("</Name>");
                 sb.append("<ResultStatus>").append(resultWrapper.resultStatus).append("</ResultStatus>");
+                sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultWrapper.resultStatus))).append("</ResultStatusString>");
                 sb.append("<Size>").append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B").append("</Size>");
                 sb.append("<InfoHash>").append(Base64.encode(result.getInfohash().getRoot())).append("</InfoHash>");
                 if (result.getComment() != null) {

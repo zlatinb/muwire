@@ -5,6 +5,7 @@ class Feed {
 		this.files = xmlNode.getElementsByTagName("Files")[0].childNodes[0].nodeValue
 		this.revision = parseInt(xmlNode.getElementsByTagName("Revision")[0].childNodes[0].nodeValue)
 		this.status = xmlNode.getElementsByTagName("Status")[0].childNodes[0].nodeValue
+		this.statusString = xmlNode.getElementsByTagName("StatusString")[0].childNodes[0].nodeValue
 		this.active = xmlNode.getElementsByTagName("Active")[0].childNodes[0].nodeValue
 		this.lastUpdated = xmlNode.getElementsByTagName("LastUpdated")[0].childNodes[0].nodeValue
 		this.autoDownload = xmlNode.getElementsByTagName("AutoDownload")[0].childNodes[0].nodeValue
@@ -32,7 +33,7 @@ class Feed {
 		mapping.set("Publisher", publisherHTML)
 		mapping.set("Files", this.files)
 		mapping.set("Last Updated", this.lastUpdated)
-		mapping.set("Status", this.status)
+		mapping.set("Status", this.statusString)
 		
 		return mapping
 	}
@@ -43,6 +44,7 @@ class Item {
 	constructor(xmlNode) {
 		this.name = xmlNode.getElementsByTagName("Name")[0].childNodes[0].nodeValue
 		this.resultStatus = xmlNode.getElementsByTagName("ResultStatus")[0].childNodes[0].nodeValue
+		this.resultStatusString = xmlNode.getElementsByTagName("ResultStatusString")[0].childNodes[0].nodeValue
 		this.size = xmlNode.getElementsByTagName("Size")[0].childNodes[0].nodeValue
 		this.timestamp = xmlNode.getElementsByTagName("Timestamp")[0].childNodes[0].nodeValue
 		this.infoHash = xmlNode.getElementsByTagName("InfoHash")[0].childNodes[0].nodeValue
@@ -92,9 +94,9 @@ class Item {
 	
 	getDownloadBlock() {
 		if (this.resultStatus == "DOWNLOADING")
-			return "<a href='/MuWire/Downloads'>" + _t("Downloading") + "</a>"
+			return "<a href='/MuWire/Downloads'>" + this.resultStatusString + "</a>"
 		if (this.resultStatus == "SHARED")
-			return "<a href='/MuWire/SharedFiles'>" + _t("Downloaded") + "</a>"
+			return "<a href='/MuWire/SharedFiles'>" + this.resultStatusString + "</a>"
 		var downloadLink = new Link(_t("Download"), "download", [this.infoHash])
 		return "<span id='download-" + this.infoHash + "'>" + downloadLink.render() + "</span>"
 	}
