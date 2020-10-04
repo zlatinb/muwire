@@ -78,7 +78,7 @@ class ChatRoomView {
                                 membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
                                         closureColumn(header : trans("NAME"), preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
-                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, read : {String.valueOf(model.core.trustService.getLevel(it.destination))})
+                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, read : {trans(model.core.trustService.getLevel(it.destination).name())})
                                     }
                                 }
                             }
