@@ -61,7 +61,7 @@ public class EnumStrings {
         CERTIFICATE_STATES.put(CertificateFetchStatus.CONNECTING, _x("Connecting"));
         CERTIFICATE_STATES.put(CertificateFetchStatus.DONE, _x("Done"));
         CERTIFICATE_STATES.put(CertificateFetchStatus.FAILED, _x("Failed"));
-        CERTIFICATE_STATES.put(CertificateFetchStatus.FETCHING, _x("FETCHING"));
+        CERTIFICATE_STATES.put(CertificateFetchStatus.FETCHING, _x("Fetching"));
     }
     
     public static final Map<RemoteTrustList.Status, String> TRUST_LIST_STATES = 
