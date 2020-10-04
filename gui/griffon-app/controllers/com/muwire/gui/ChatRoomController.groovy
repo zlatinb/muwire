@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import static com.muwire.gui.Translator.trans
+
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -26,7 +28,6 @@ import com.muwire.core.chat.ChatServer
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
-@Log
 @ArtifactProviderFor(GriffonController)
 class ChatRoomController {
     @MVCMember @Nonnull
@@ -49,7 +50,7 @@ class ChatRoomController {
         }
         
         if (!command.action.user) {
-            JOptionPane.showMessageDialog(null, "$words is not a user command","Invalid Command", JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(null, trans("NOT_USER_COMMAND",words),trans("INVALID_COMMAND"), JOptionPane.ERROR_MESSAGE)
             return
         }
         long now = System.currentTimeMillis()
@@ -126,7 +127,7 @@ class ChatRoomController {
         Persona p = view.getSelectedPersona()
         if (p == null)
             return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
         model.core.eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
         view.refreshMembersTable()    
     }
@@ -135,7 +136,7 @@ class ChatRoomController {
         Persona p = view.getSelectedPersona()
         if (p == null)
             return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
+        String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
         model.core.eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
         view.refreshMembersTable()
     }
@@ -181,7 +182,6 @@ class ChatRoomController {
         try {
             command = new ChatCommand(e.payload)
         } catch (Exception bad) {
-            log.log(Level.WARNING,"bad chat command",bad)
             return
         }
         log.info("$model.room processing $command.action")
@@ -203,7 +203,7 @@ class ChatRoomController {
     }
     
     private void processJoin(long timestamp, Persona p) {
-        String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " joined the room\n"
+        String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("JOINED_ROOM", p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
             model.members.add(p)
             view.appendGray(toDisplay)
@@ -223,7 +223,7 @@ class ChatRoomController {
     }
     
     private void processLeave(long timestamp, Persona p) {
-        String toDisplay = DataHelper.formatTime(timestamp) + " " + p.getHumanReadableName() + " left the room\n"
+        String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("LEFT_ROOM",p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
             model.members.remove(p)
             view.appendGray(toDisplay)
@@ -233,7 +233,7 @@ class ChatRoomController {
     }
     
     void handleLeave(Persona p) {
-        String toDisplay = DataHelper.formatTime(System.currentTimeMillis()) + " " + p.getHumanReadableName() + " disconnected\n"
+        String toDisplay = DataHelper.formatTime(System.currentTimeMillis()) + " " + trans("USER_DISCONNECTED",p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
             if (model.members.remove(p)) {
                 view.appendGray(toDisplay)
