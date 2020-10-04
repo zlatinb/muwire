@@ -15,7 +15,6 @@ This helps with scalability
 * Metadata parsing and search
 * Automatic adjustment of number of I2P tunnels
 * Persist trust immediately
-* Enum i18n
 * Ability to share trust list only with trusted users
 * Confidential files visible only to certain users
 * Download queue with priorities 
