@@ -42,6 +42,10 @@ class DownloadSession {
     private final AtomicLong dataSinceLastRead
 
     private MappedByteBuffer mapped
+    private boolean unclaim = true
+    private boolean steal
+    private int piece, position
+    private long pieceStart, start, end
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
@@ -66,13 +70,13 @@ class DownloadSession {
             System.exit(1)
         }
     }
-
+    
     /**
      * @return if the request will proceed.  The only time it may not
      * is if all the pieces have been claimed by other sessions.
      * @throws IOException
      */
-    public boolean request() throws IOException {
+    public boolean sendRequest() throws IOException {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
 
@@ -83,18 +87,20 @@ class DownloadSession {
             pieceAndPosition = pieces.claim(new HashSet<>(available))
         if (pieceAndPosition == null)
             return false
-        int piece = pieceAndPosition[0]
-        int position = pieceAndPosition[1]
-        boolean steal = pieceAndPosition[2] == 1
-        boolean unclaim = true
+            
+        piece = pieceAndPosition[0]
+        position = pieceAndPosition[1]
+        steal = pieceAndPosition[2] == 1
+        
+        log.info("will request piece $piece from position $position steal $steal")
+        
+        pieceStart = piece * ((long)pieceSize)
+        end = Math.min(fileLength, pieceStart + pieceSize) - 1
+        start = pieceStart + position
 
-        log.info("will download piece $piece from position $position steal $steal")
-
-        long pieceStart = piece * ((long)pieceSize)
-        long end = Math.min(fileLength, pieceStart + pieceSize) - 1
-        long start = pieceStart + position
         String root = Base64.encode(infoHash.getRoot())
-
+        
+        boolean headersSent = false
         try {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -108,6 +114,23 @@ class DownloadSession {
             String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
             os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             os.flush()
+            headersSent = true
+            return true
+        } finally {
+            if (!headersSent && !steal) 
+                pieces.unclaim(piece)
+        }
+    }
+
+    /**
+     * @return true if the response was consumed, false if it cannot be satisfied.
+     * @throws IOException
+     */
+    public boolean consumeResponse() throws IOException {
+        OutputStream os = endpoint.getOutputStream()
+        InputStream is = endpoint.getInputStream()
+
+        try {
             String codeString = readTillRN(is)
             int space = codeString.indexOf(' ')
             if (space > 0)

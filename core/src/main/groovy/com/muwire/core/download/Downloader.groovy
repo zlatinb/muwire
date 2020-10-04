@@ -398,7 +398,7 @@ public class Downloader {
         private volatile WorkerState currentState
         private volatile Thread downloadThread
         private Endpoint endpoint
-        private volatile DownloadSession currentSession
+        private volatile DownloadSession currentSession, nextSession
         private final Set<Integer> available = new HashSet<>()
 
         DownloadWorker(Destination destination) {
@@ -425,12 +425,24 @@ public class Downloader {
                 
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
-                    currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
-                        endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
-                        browse, feed, chat)
-                    requestPerformed = currentSession.request()
+                    if (currentSession == null) {
+                        currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
+                                endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
+                                browse, feed, chat)
+                        if (!currentSession.sendRequest())
+                            break;
+                    }
+                    nextSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
+                                endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
+                                browse, feed, chat)
+                    if (!nextSession.sendRequest())
+                        nextSession = null
+                        
+                    requestPerformed = currentSession.consumeResponse()
                     if (!requestPerformed)
                         break
+                    if (nextSession != null)
+                        currentSession = nextSession
                     successfulDestinations.add(endpoint.destination)
                     writePieces()
                 }
