@@ -78,7 +78,7 @@ class SearchTabView {
                                             closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
                                             closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { row ->
-                                                model.core.trustService.getLevel(row.destination).toString()
+                                                trans(model.core.trustService.getLevel(row.destination).name())
                                             })
                                         }
                                     }
@@ -203,7 +203,7 @@ class SearchTabView {
                                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
                                             closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type : String, read : {
-                                                model.core.trustService.getLevel(it.sender.destination).toString()
+                                                trans(model.core.trustService.getLevel(it.sender.destination).name())
                                             })
                                         }
                                     }

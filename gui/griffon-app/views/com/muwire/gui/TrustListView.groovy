@@ -51,7 +51,7 @@ class TrustListView {
                             tableModel(list : model.trusted) {
                                 closureColumn(header: trans("TRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
                                 closureColumn(header: trans("REASON"), type : String, read : {it.reason})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
                         }
                     }
@@ -68,7 +68,7 @@ class TrustListView {
                             tableModel(list : model.distrusted) {
                                 closureColumn(header: trans("DISTRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
                                 closureColumn(header: trans("REASON"), type:String, read : {it.reason})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {model.trustService.getLevel(it.persona.destination).toString()})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
                         }
                     }
