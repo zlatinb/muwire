@@ -15,6 +15,7 @@ public class Translator {
     public static final Set<Locale> SUPPORTED_LOCALES = new LinkedHashSet<>();
     static {
         SUPPORTED_LOCALES.add(Locale.US);
+        SUPPORTED_LOCALES.add(Locale.forLanguageTag("fr"));
         // add more as they get translated
     }
     
