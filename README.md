@@ -4,7 +4,7 @@ The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and is
 
 MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows,MacOS,Linux.
 
-The current stable release - 0.7.4 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+The current stable release - 0.7.5 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -47,7 +47,7 @@ There is a Web-based UI under development.  It is intended to be run as a plugin
 MuWire is available as a Docker image.  For more information see the [Docker] page.
 
 ## Translations
-If you want to help translate MuWire, instructions are on the wiki https://github.com/zlatinb/muwire/wiki/Translate
+If you want to help translate MuWire, instructions are on the wiki [Translate] page.
 
 ## Related Projects
 ### MuWire Tracker Daemon
@@ -73,6 +73,7 @@ You can find the full key at https://keybase.io/zlatinb
 [I2P Github]: https://github.com/i2p/i2p.i2p
 [Plugin]: https://github.com/zlatinb/muwire/wiki/Plugin
 [Docker]: https://github.com/zlatinb/muwire/wiki/Docker
+[Translate]: https://github.com/zlatinb/muwire/wiki/Translate
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
 [Tracker]: https://github.com/zlatinb/muwire/wiki/Tracker-Daemon
 [MuCats]: https://github.com/zlatinb/mucats
