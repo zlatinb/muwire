@@ -1,6 +1,5 @@
 package com.muwire.gui;
 
-import java.text.ChoiceFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,7 +15,6 @@ public class Translator {
     public static final Set<Locale> SUPPORTED_LOCALES = new LinkedHashSet<>();
     static {
         SUPPORTED_LOCALES.add(Locale.US);
-        SUPPORTED_LOCALES.add(Locale.forLanguageTag("bg"));
         // add more as they get translated
     }
     

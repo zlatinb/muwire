@@ -205,6 +205,8 @@ class Initialize extends AbstractLifecycleHandler {
     }
 
     private String showLanguageDialog() {
+        if (Translator.SUPPORTED_LOCALES.size() == 1)
+            return Locale.US.toLanguageTag()
         def builder = new SwingBuilder()
         def languageComboBox
         def chooseButton
