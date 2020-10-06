@@ -289,8 +289,8 @@ class MainFrameView {
                                     if (model.hashingFile == null) {
                                         trans("YOU_CAN_DRAG_AND_DROP")
                                     } else {
-                                        trans("HASHING") + ": "
-                                            + model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false).toString() + 
+                                        trans("HASHING") + ": " +
+                                            model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false) + 
                                             trans("BYTES_SHORT") + ")"
                                     }
                                 })
