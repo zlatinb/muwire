@@ -13,6 +13,8 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import net.i2p.data.Destination
 
+import java.util.Collections
+
 class HostCache extends Service {
 
     final TrustService trustService
@@ -21,8 +23,8 @@ class HostCache extends Service {
     final Timer timer
     final MuWireSettings settings
     final Destination myself
-    final Map<Destination, Host> hosts = new ConcurrentHashMap<>()
-
+    final Map<Destination, Host> hosts = Collections.synchronizedMap(new HashMap<>())
+    
     HostCache(){}
 
     public HostCache(TrustService trustService, File storage, int interval,
@@ -46,11 +48,13 @@ class HostCache extends Service {
     void onHostDiscoveredEvent(HostDiscoveredEvent e) {
         if (myself == e.destination)
             return
-        if (hosts.containsKey(e.destination)) {
-            if (!e.fromHostcache)
+        synchronized(hosts) {
+            if (hosts.containsKey(e.destination)) {
+                if (!e.fromHostcache)
+                    return
+                hosts.get(e.destination).clearFailures()
                 return
-            hosts.get(e.destination).clearFailures()
-            return
+            }
         }
         Host host = new Host(e.destination, settings.hostClearInterval, settings.hostHopelessInterval, 
             settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
@@ -63,11 +67,14 @@ class HostCache extends Service {
         if (e.leaf)
             return
         Destination dest = e.endpoint.destination
-        Host host = hosts.get(dest)
-        if (host == null) {
-            host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval, 
-                settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
-            hosts.put(dest, host)
+        Host host
+        synchronized(hosts) {
+            host = hosts.get(dest)
+            if (host == null) {
+                host = new Host(dest, settings.hostClearInterval, settings.hostHopelessInterval,
+                        settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
+                hosts.put(dest, host)
+            }
         }
 
         switch(e.status) {
@@ -84,12 +91,16 @@ class HostCache extends Service {
     }
 
     List<Destination> getHosts(int n) {
-        List<Destination> rv = new ArrayList<>(hosts.keySet())
-        rv.retainAll {allowHost(hosts[it])}
-        final long now = System.currentTimeMillis()
-        rv.removeAll {
-            def h = hosts[it]; 
-            (h.isFailed() && !h.canTryAgain(now)) || h.isRecentlyRejected(now) || h.isHopeless(now)
+        List<Destination> rv
+        
+        synchronized(hosts) {
+            rv = new ArrayList<>(hosts.keySet())
+            rv.retainAll {allowHost(hosts[it])}
+            final long now = System.currentTimeMillis()
+            rv.removeAll {
+                def h = hosts[it];
+                (h.isFailed() && !h.canTryAgain(now)) || h.isRecentlyRejected(now) || h.isHopeless(now)
+            }
         }
         if (rv.size() <= n)
             return rv
@@ -98,10 +109,13 @@ class HostCache extends Service {
     }
 
     List<Destination> getGoodHosts(int n) {
-        List<Destination> rv = new ArrayList<>(hosts.keySet())
-        rv.retainAll {
-            Host host = hosts[it]
-            allowHost(host) && host.hasSucceeded()
+        List<Destination> rv
+        synchronized(hosts) {
+            rv = new ArrayList<>(hosts.keySet())
+            rv.retainAll {
+                Host host = hosts[it]
+                allowHost(host) && host.hasSucceeded()
+            }
         }
         if (rv.size() <= n)
             return rv
@@ -110,18 +124,24 @@ class HostCache extends Service {
     }
     
     int countFailingHosts() {
-        List<Destination> rv = new ArrayList<>(hosts.keySet())
-        rv.retainAll { 
-            hosts[it].isFailed()
+        List<Destination> rv
+        synchronized(hosts) {
+            rv = new ArrayList<>(hosts.keySet())
+            rv.retainAll {
+                hosts[it].isFailed()
+            }
         }
         rv.size()
     }
     
     int countHopelessHosts() {
-        List<Destination> rv = new ArrayList<>(hosts.keySet())
-        final long now = System.currentTimeMillis()
-        rv.retainAll {
-            hosts[it].isHopeless(now)
+        List<Destination> rv
+        synchronized(hosts) {
+            rv = new ArrayList<>(hosts.keySet())
+            final long now = System.currentTimeMillis()
+            rv.retainAll {
+                hosts[it].isHopeless(now)
+            }
         }
         rv.size()
     }
@@ -167,10 +187,14 @@ class HostCache extends Service {
 
     private void save() {
         final long now = System.currentTimeMillis()
-        hosts.keySet().removeAll { hosts[it].shouldBeForgotten(now) }
+        Map<Destination, Host> copy
+        synchronized(hosts) {
+            hosts.keySet().removeAll { hosts[it].shouldBeForgotten(now) }
+            copy = new HashMap<>(hosts)
+        }
         storage.delete()
         storage.withPrintWriter { writer ->
-            hosts.each { dest, host ->
+            copy.each { dest, host ->
                 if (allowHost(host) && !host.isHopeless(now)) {
                     def map = [:]
                     map.destination = dest.toBase64()
