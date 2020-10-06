@@ -418,6 +418,7 @@ public class Downloader {
                                 browse, feed, chat)
                         if (!currentSession.sendRequest())
                             break;
+                        endpoint.getOutputStream().flush()
                     }
                     nextSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                                 endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,

@@ -113,7 +113,6 @@ class DownloadSession {
                 os.write("Chat: true\r\n".getBytes(StandardCharsets.US_ASCII))
             String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
             os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-            os.flush()
             headersSent = true
             return true
         } finally {
