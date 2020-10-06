@@ -59,21 +59,23 @@ class ChatConsoleModel {
     
     private void eventLoop() {
         Thread.sleep(1000)
-        while(running) {
-            ChatLink link = this.link
-            if (link == null || !link.isUp()) {
-                Thread.sleep(100)
-                continue
+        try {
+            while(running) {
+                ChatLink link = this.link
+                if (link == null || !link.isUp()) {
+                    Thread.sleep(100)
+                    continue
+                }
+
+                Object event = link.nextEvent()
+                if (event instanceof ChatMessageEvent)
+                    handleChatMessage(event)
+                else if (event instanceof Persona)
+                    handleLeave(event)
+                else
+                    throw new IllegalArgumentException("unknown event type $event")
             }
-                
-            Object event = link.nextEvent()
-            if (event instanceof ChatMessageEvent)
-                handleChatMessage(event)
-            else if (event instanceof Persona)
-                handleLeave(event)
-            else
-                throw new IllegalArgumentException("unknown event type $event")
-        }
+        } catch (InterruptedException ignore) {}
     }
     
     private void handleChatMessage(ChatMessageEvent e) {

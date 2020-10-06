@@ -274,7 +274,7 @@ class ChatConnection implements ChatLink {
         messages.put(leave)
     }
     
-    public Object nextEvent() {
+    public Object nextEvent() throws InterruptedException {
         incomingEvents.take()
     }
 }
