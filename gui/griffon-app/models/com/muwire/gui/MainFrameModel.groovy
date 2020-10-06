@@ -441,11 +441,9 @@ class MainFrameModel {
                     return
                 }
             }
-            if (wrapper != null) {
-                wrapper.uploader = e.uploader
-                wrapper.requests++
-                wrapper.finished = false
-            } else
+            if (wrapper != null) 
+                wrapper.updateUploader(e.uploader)
+            else
                 uploads << new UploaderWrapper(uploader : e.uploader)
             updateTablePreservingSelection("uploads-table")
             view.refreshSharedFiles()
@@ -678,6 +676,37 @@ class MainFrameModel {
         Uploader uploader
         int requests
         boolean finished
+        
+        private int[] speedArray = []
+        private long lastSpeedRead = System.currentTimeMillis()
+        private int speedPos
+        
+        public int speed() {
+            
+            if (speedArray.length != core.muOptions.speedSmoothSeconds) {
+                speedArray = new int[core.muOptions.speedSmoothSeconds]
+                speedPos = 0
+            }
+
+            final long now = System.currentTimeMillis()
+            if (now < lastSpeedRead + 50)
+                return speedArray.average()            
+            
+            int read = uploader.dataSinceLastRead()
+            int speed = (int) (1000.0d * read / (now - lastSpeedRead))
+            lastSpeedRead = now
+            
+            speedArray[speedPos++] = speed
+            if (speedPos == speedArray.length)
+                speedPos = 0
+            speedArray.average()
+        }
+        
+        void updateUploader(Uploader uploader) {
+            this.uploader = uploader
+            requests++
+            finished = false
+        }
     }
     
     void onFeedLoadedEvent(FeedLoadedEvent e) {

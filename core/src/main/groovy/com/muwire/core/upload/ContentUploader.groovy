@@ -69,9 +69,9 @@ class ContentUploader extends Uploader {
                     int start = mapped.position()
                     mapped.get(tmp, 0, Math.min(tmp.length, mapped.remaining()))
                     read = mapped.position() - start
-                    dataSinceLastRead += read
                 }
                 endpoint.getOutputStream().write(tmp, 0, read)
+                dataSinceLastRead.addAndGet(read)
             }
             done = true
         } finally {

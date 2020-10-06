@@ -385,7 +385,7 @@ class MainFrameView {
                                             "${totalSize} ($done/$pieces".toString() + trans("PIECES_SHORT")+ ")"
                                         })
                                         closureColumn(header : trans("SPEED"), type : String, read : { row ->
-                                            int speed = row.uploader.speed()
+                                            int speed = row.speed()
                                             DataHelper.formatSize2Decimal(speed, false) + trans("B_SEC")
                                         })
                                     }

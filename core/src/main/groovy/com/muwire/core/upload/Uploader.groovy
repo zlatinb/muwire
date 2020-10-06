@@ -5,6 +5,7 @@ import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
+import java.util.concurrent.atomic.AtomicInteger
 
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
@@ -13,12 +14,8 @@ abstract class Uploader {
     protected final Endpoint endpoint
     protected ByteBuffer mapped
     
-    private long lastSpeedRead
-    protected int dataSinceLastRead
+    protected final AtomicInteger dataSinceLastRead = new AtomicInteger()
 
-    private final ArrayList<Integer> speedArr = [0,0,0,0,0]
-    private int speedPos, speedAvg
-    
     Uploader(Endpoint endpoint) {
         this.endpoint = endpoint
     }
@@ -52,33 +49,7 @@ abstract class Uploader {
     abstract boolean isFeedEnabled();
     abstract boolean isChatEnabled();
     
-    synchronized int speed() {
-        final long now = System.currentTimeMillis()
-        long interval = Math.max(1000, now - lastSpeedRead)
-        lastSpeedRead = now;
-        int currSpeed = (int) (dataSinceLastRead * 1000.0d / interval)
-        dataSinceLastRead = 0
-
-        // normalize to speedArr.size
-        currSpeed /= speedArr.size()
-
-        // compute new speedAvg and update speedArr
-        if ( speedArr[speedPos] > speedAvg ) {
-            speedAvg = 0
-        } else {
-            speedAvg -= speedArr[speedPos]
-        }
-        speedAvg += currSpeed
-        speedArr[speedPos] = currSpeed
-        // this might be necessary due to rounding errors
-        if (speedAvg < 0)
-            speedAvg = 0
-
-        // rolling index over the speedArr
-        speedPos++
-        if (speedPos >= speedArr.size())
-            speedPos=0
-
-        speedAvg
+    int dataSinceLastRead() {
+        dataSinceLastRead.getAndSet(0)
     }
 }
