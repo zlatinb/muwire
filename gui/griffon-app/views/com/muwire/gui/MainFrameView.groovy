@@ -760,7 +760,7 @@ class MainFrameView {
             model.publishButtonEnabled = true
             boolean unpublish = true
             selectedFiles.each { 
-                unpublish &= it.isPublished()
+                unpublish &= it?.isPublished()
             }
             model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
@@ -778,7 +778,7 @@ class MainFrameView {
                 return
             boolean unpublish = true
             selectedFiles.each {
-                unpublish &= it.isPublished()
+                unpublish &= it?.isPublished()
             }
             model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
