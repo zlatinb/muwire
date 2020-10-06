@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.muwire.core.Core;
 import com.muwire.core.upload.UploadEvent;
@@ -69,10 +68,14 @@ public class UploadManager {
         }
     }
     
-    public static class UploaderWrapper {
+    public class UploaderWrapper {
         private volatile Uploader uploader;
         private volatile int requests;
         private volatile boolean finished;
+        
+        private volatile int[] speedArray = new int[0];
+        private volatile int speedPos;
+        private volatile long lastSpeedRead = System.currentTimeMillis();
         
         public Uploader getUploader() {
             return uploader;
@@ -84,6 +87,34 @@ public class UploadManager {
         
         public boolean isFinished() {
             return finished;
+        }
+        
+        public int speed() {
+            
+            if (speedArray.length != core.getMuOptions().getSpeedSmoothSeconds()) {
+                speedArray = new int[core.getMuOptions().getSpeedSmoothSeconds()];
+                speedPos = 0;
+            }
+            
+            final long now = System.currentTimeMillis();
+            if (now < lastSpeedRead + 50)
+                return speedAverage();
+            
+            int read = uploader.dataSinceLastRead();
+            int speed = (int) (1000.0d * read / (now - lastSpeedRead));
+            lastSpeedRead = now;
+            
+            speedArray[speedPos++] = speed;
+            if (speedPos == speedArray.length)
+                speedPos = 0;
+            return speedAverage();
+        }
+        
+        private int speedAverage() {
+            int total = 0;
+            for (int reading : speedArray)
+                total += reading;
+            return total / speedArray.length;
         }
     }
 }

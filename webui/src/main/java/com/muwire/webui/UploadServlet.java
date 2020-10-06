@@ -36,7 +36,7 @@ public class UploadServlet extends HttpServlet {
                         wrapper.getUploader().getDownloaderPersona().toBase64(),
                         wrapper.getUploader().getDonePieces(),
                         wrapper.getUploader().getTotalPieces(),
-                        wrapper.getUploader().speed(),
+                        wrapper.speed(),
                         wrapper.getUploader().isBrowseEnabled(),
                         wrapper.getUploader().isFeedEnabled(),
                         browseManager.isBrowsing(downloader),
