@@ -73,7 +73,6 @@ public class Downloader {
     private volatile long lastSpeedRead = System.currentTimeMillis()
     private ArrayList speedArr = new ArrayList<Integer>()
     private int speedPos = 0
-    private int speedAvg = 0
 
     public Downloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
         Persona me, File file, long length, InfoHash infoHash,
@@ -173,33 +172,21 @@ public class Downloader {
             lastSpeedRead = now
         }
         
+        // this is not very accurate since each slot may hold more than a second
         if (speedArr.size() != downloadManager.muSettings.speedSmoothSeconds) {
             speedArr.clear()
             downloadManager.muSettings.speedSmoothSeconds.times { speedArr.add(0) }
             speedPos = 0
         }
 
-        // normalize to speedArr.size
-        currSpeed /= speedArr.size()
-
-        // compute new speedAvg and update speedArr
-        if ( speedArr[speedPos] > speedAvg ) {
-            speedAvg = 0
-        } else {
-            speedAvg -= speedArr[speedPos]
-        }
-        speedAvg += currSpeed
-        speedArr[speedPos] = currSpeed
-        // this might be necessary due to rounding errors
-        if (speedAvg < 0)
-            speedAvg = 0
-
+        speedArr[speedPos++] = currSpeed
+        
         // rolling index over the speedArr
-        speedPos++
         if (speedPos >= speedArr.size())
             speedPos=0
+        
+        speedArr.average()
 
-        speedAvg
     }
 
     public DownloadState getCurrentState() {
