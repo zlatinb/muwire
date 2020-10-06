@@ -88,20 +88,44 @@ class UploadsModel {
                 totalSize = " of " + DataHelper.formatSize2Decimal(size, false) + "B"
             String remotePieces = String.format("%02d", percentTotal) + "% ${totalSize} ($done/$pieces) pcs".toString()
             
-            String speed = DataHelper.formatSize2Decimal(it.uploader.speed(), false) + "B/sec"
+            String speed = DataHelper.formatSize2Decimal(it.speed(), false) + "B/sec"
             
             
             model.addRow([name, percentString, downloader, remotePieces, speed])
         }
     }
     
-    private static class UploaderWrapper {
+    private class UploaderWrapper {
         Uploader uploader
         boolean finished
+        
+        private int [] speedArray = []
+        private long lastSpeedRead = System.currentTimeMillis()
+        private int speedPos
         
         @Override
         public String toString() {
             uploader.getName()
+        }
+        
+        public int speed() {
+            if (speedArray.length != core.muOptions.speedSmoothSeconds) {
+                speedArray = new int[core.muOptions.speedSmoothSeconds]
+                speedPos = 0
+            }
+            
+            final long now = System.currentTimeMillis()
+            if (now < lastSpeedRead + 50)
+                return speedArray.average()
+            
+            int read = uploader.dataSinceLastRead()
+            int speed = (int) (1000.0d * read / (now - lastSpeedRead))
+            lastSpeedRead = now
+            
+            speedArray[speedPos++] = speed
+            if (speedPos == speedArray.length)
+                speedPos = 0
+            speedArray.average()
         }
     }
 }
