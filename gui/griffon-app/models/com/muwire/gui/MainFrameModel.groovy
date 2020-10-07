@@ -683,6 +683,9 @@ class MainFrameModel {
         
         public int speed() {
             
+            if (finished)
+                return 0
+            
             if (speedArray.length != core.muOptions.speedSmoothSeconds) {
                 speedArray = new int[core.muOptions.speedSmoothSeconds]
                 speedPos = 0
