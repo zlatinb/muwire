@@ -23,6 +23,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.util.DataUtil
+import com.muwire.core.util.BandwidthCounter
 
 import groovy.util.logging.Log
 import net.i2p.data.Destination
@@ -71,10 +72,8 @@ public class Downloader {
     private final AtomicBoolean hopelessEventFired = new AtomicBoolean()
     private boolean piecesFileClosed
 
-    private final AtomicLong dataSinceLastRead = new AtomicLong(0)
-    private volatile long lastSpeedRead = System.currentTimeMillis()
-    private ArrayList speedArr = new ArrayList<Integer>()
-    private int speedPos = 0
+    private final AtomicLong dataSinceLastRead = new AtomicLong()
+    private volatile BandwidthCounter bwCounter = new BandwidthCounter(0)
 
     public Downloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
         Persona me, File file, long length, InfoHash infoHash,
@@ -176,28 +175,13 @@ public class Downloader {
         int currSpeed = 0
         if (getCurrentState() != DownloadState.DOWNLOADING)
             return currSpeed
-        long now = System.currentTimeMillis()
-        if (now < lastSpeedRead + 50)
-            return speedArr.average()
-        long dataRead = dataSinceLastRead.getAndSet(0)
-        currSpeed = (int) (dataRead * 1000.0d / (now - lastSpeedRead))
-        lastSpeedRead = now
 
         // this is not very accurate since each slot may hold more than a second
-        if (speedArr.size() != downloadManager.muSettings.speedSmoothSeconds) {
-            speedArr.clear()
-            downloadManager.muSettings.speedSmoothSeconds.times { speedArr.add(0) }
-            speedPos = 0
-        }
+        if (bwCounter.getMemory() != downloadManager.muSettings.speedSmoothSeconds) 
+            bwCounter = new BandwidthCounter(downloadManager.muSettings.speedSmoothSeconds)
 
-        speedArr[speedPos++] = currSpeed
-        
-        // rolling index over the speedArr
-        if (speedPos >= speedArr.size())
-            speedPos=0
-        
-        speedArr.average()
-
+        bwCounter.read((int)dataSinceLastRead.getAndSet(0))
+        bwCounter.average()
     }
 
     public DownloadState getCurrentState() {
