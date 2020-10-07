@@ -90,18 +90,22 @@ public class UploadManager {
             if (finished)
                 return 0;
             
-            if (bwCounter.getMemory() != core.getMuOptions().getSpeedSmoothSeconds())
-                bwCounter = new BandwidthCounter(core.getMuOptions().getSpeedSmoothSeconds());
-            
+            initIfNeeded();
             bwCounter.read(uploader.dataSinceLastRead());
             return bwCounter.average();
         }
         
         void updateUploader(Uploader uploader) {
+            initIfNeeded();
             bwCounter.read(this.uploader.dataSinceLastRead());
             this.uploader = uploader;
             requests++;
             finished = false;
+        }
+        
+        private void initIfNeeded() {
+            if (bwCounter.getMemory() != core.getMuOptions().getSpeedSmoothSeconds())
+                bwCounter = new BandwidthCounter(core.getMuOptions().getSpeedSmoothSeconds());
         }
     }
 }

@@ -685,18 +685,22 @@ class MainFrameModel {
             if (finished)
                 return 0
 
-            if (bwCounter.getMemory() != core.muOptions.speedSmoothSeconds)
-                bwCounter = new BandwidthCounter(core.muOptions.speedSmoothSeconds)            
-
+            initIfNeeded()
             bwCounter.read(uploader.dataSinceLastRead())
             bwCounter.average()
         }
         
         void updateUploader(Uploader uploader) {
+            initIfNeeded()
             bwCounter.read(this.uploader.dataSinceLastRead())
             this.uploader = uploader
             requests++
             finished = false
+        }
+        
+        private void initIfNeeded() {
+            if (bwCounter.getMemory() != core.muOptions.speedSmoothSeconds)
+                bwCounter = new BandwidthCounter(core.muOptions.speedSmoothSeconds)
         }
     }
     
