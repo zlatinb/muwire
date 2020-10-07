@@ -9,6 +9,7 @@ import com.muwire.core.Core;
 import com.muwire.core.upload.UploadEvent;
 import com.muwire.core.upload.UploadFinishedEvent;
 import com.muwire.core.upload.Uploader;
+import com.muwire.core.util.BandwidthCounter;
 
 public class UploadManager {
     
@@ -34,9 +35,7 @@ public class UploadManager {
             }
         }
         if (wrapper != null) {
-            wrapper.uploader = e.getUploader();
-            wrapper.requests++;
-            wrapper.finished = false;
+            wrapper.updateUploader(e.getUploader());
         } else {
             wrapper = new UploaderWrapper();
             wrapper.uploader = e.getUploader();
@@ -73,9 +72,7 @@ public class UploadManager {
         private volatile int requests;
         private volatile boolean finished;
         
-        private volatile int[] speedArray = new int[0];
-        private volatile int speedPos;
-        private volatile long lastSpeedRead = System.currentTimeMillis();
+        private volatile BandwidthCounter bwCounter = new BandwidthCounter(0);
         
         public Uploader getUploader() {
             return uploader;
@@ -90,31 +87,21 @@ public class UploadManager {
         }
         
         public int speed() {
+            if (finished)
+                return 0;
             
-            if (speedArray.length != core.getMuOptions().getSpeedSmoothSeconds()) {
-                speedArray = new int[core.getMuOptions().getSpeedSmoothSeconds()];
-                speedPos = 0;
-            }
+            if (bwCounter.getMemory() != core.getMuOptions().getSpeedSmoothSeconds())
+                bwCounter = new BandwidthCounter(core.getMuOptions().getSpeedSmoothSeconds());
             
-            final long now = System.currentTimeMillis();
-            if (now < lastSpeedRead + 50)
-                return speedAverage();
-            
-            int read = uploader.dataSinceLastRead();
-            int speed = (int) (1000.0d * read / (now - lastSpeedRead));
-            lastSpeedRead = now;
-            
-            speedArray[speedPos++] = speed;
-            if (speedPos == speedArray.length)
-                speedPos = 0;
-            return speedAverage();
+            bwCounter.read(uploader.dataSinceLastRead());
+            return bwCounter.average();
         }
         
-        private int speedAverage() {
-            int total = 0;
-            for (int reading : speedArray)
-                total += reading;
-            return total / speedArray.length;
+        void updateUploader(Uploader uploader) {
+            bwCounter.read(this.uploader.dataSinceLastRead());
+            this.uploader = uploader;
+            requests++;
+            finished = false;
         }
     }
 }

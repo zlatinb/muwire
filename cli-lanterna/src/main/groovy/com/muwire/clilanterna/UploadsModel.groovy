@@ -7,6 +7,7 @@ import com.muwire.core.Core
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 import com.muwire.core.upload.Uploader
+import com.muwire.core.util.BandwidthCounter
 
 import net.i2p.data.DataHelper
 
@@ -43,8 +44,7 @@ class UploadsModel {
                 }
             }
             if (found != null) {
-                found.uploader = e.uploader
-                found.finished = false
+                found.updateUploader(e.uploader)
             } else
                 uploaders << new UploaderWrapper(uploader : e.uploader)
         }
@@ -99,9 +99,7 @@ class UploadsModel {
         Uploader uploader
         boolean finished
         
-        private int [] speedArray = []
-        private long lastSpeedRead = System.currentTimeMillis()
-        private int speedPos
+        private BandwidthCounter bwCounter = new BandwidthCounter(0);
         
         @Override
         public String toString() {
@@ -112,23 +110,17 @@ class UploadsModel {
             if (finished)
                 return 0
             
-            if (speedArray.length != core.muOptions.speedSmoothSeconds) {
-                speedArray = new int[core.muOptions.speedSmoothSeconds]
-                speedPos = 0
-            }
+            if (bwCounter.getMemory() != core.muOptions.speedSmoothSeconds) 
+                bwCounter = new BandwidthCounter(core.muOptions.speedSmoothSeconds)
             
-            final long now = System.currentTimeMillis()
-            if (now < lastSpeedRead + 50)
-                return speedArray.average()
-            
-            int read = uploader.dataSinceLastRead()
-            int speed = (int) (1000.0d * read / (now - lastSpeedRead))
-            lastSpeedRead = now
-            
-            speedArray[speedPos++] = speed
-            if (speedPos == speedArray.length)
-                speedPos = 0
-            speedArray.average()
+            bwCounter.read(uploader.dataSinceLastRead())
+            bwCounter.average()
+        }
+        
+        void updateUploader(Uploader e) {
+            bwCounter.read(uploader.dataSinceLastRead())
+            this.uploader = uploader
+            finished = false
         }
     }
 }

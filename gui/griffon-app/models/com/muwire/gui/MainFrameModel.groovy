@@ -57,6 +57,7 @@ import com.muwire.core.update.UpdateDownloadedEvent
 import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 import com.muwire.core.upload.Uploader
+import com.muwire.core.util.BandwidthCounter
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -677,35 +678,22 @@ class MainFrameModel {
         int requests
         boolean finished
         
-        private int[] speedArray = []
-        private long lastSpeedRead = System.currentTimeMillis()
-        private int speedPos
+        private BandwidthCounter bwCounter = new BandwidthCounter(0)
         
         public int speed() {
             
             if (finished)
                 return 0
-            
-            if (speedArray.length != core.muOptions.speedSmoothSeconds) {
-                speedArray = new int[core.muOptions.speedSmoothSeconds]
-                speedPos = 0
-            }
 
-            final long now = System.currentTimeMillis()
-            if (now < lastSpeedRead + 50)
-                return speedArray.average()            
-            
-            int read = uploader.dataSinceLastRead()
-            int speed = (int) (1000.0d * read / (now - lastSpeedRead))
-            lastSpeedRead = now
-            
-            speedArray[speedPos++] = speed
-            if (speedPos == speedArray.length)
-                speedPos = 0
-            speedArray.average()
+            if (bwCounter.getMemory() != core.muOptions.speedSmoothSeconds)
+                bwCounter = new BandwidthCounter(core.muOptions.speedSmoothSeconds)            
+
+            bwCounter.read(uploader.dataSinceLastRead())
+            bwCounter.average()
         }
         
         void updateUploader(Uploader uploader) {
+            bwCounter.read(this.uploader.dataSinceLastRead())
             this.uploader = uploader
             requests++
             finished = false
