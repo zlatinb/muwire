@@ -30,11 +30,11 @@ import net.i2p.data.DataHelper;
 
 public class SearchServlet extends HttpServlet {
     
-    private Core core;
-    private SearchManager searchManager;
-    private ConnectionCounter connectionCounter;
-    private DownloadManager downloadManager;
-    private BrowseManager browseManager;
+    private volatile Core core;
+    private volatile SearchManager searchManager;
+    private volatile ConnectionCounter connectionCounter;
+    private volatile DownloadManager downloadManager;
+    private volatile BrowseManager browseManager;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
