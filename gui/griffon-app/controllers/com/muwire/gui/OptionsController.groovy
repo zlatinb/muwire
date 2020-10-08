@@ -65,10 +65,16 @@ class OptionsController {
         model.downloadMaxFailures = text
         settings.downloadMaxFailures = Integer.valueOf(text)
 
-        text = view.updateField.text
-        model.updateCheckInterval = text
-        settings.updateCheckInterval = Integer.valueOf(text)
-        
+        if (!settings.disableUpdates) {
+            text = view.updateField.text
+            model.updateCheckInterval = text
+            settings.updateCheckInterval = Integer.valueOf(text)
+
+            boolean autoDownloadUpdate = view.autoDownloadUpdateCheckbox.model.isSelected()
+            model.autoDownloadUpdate = autoDownloadUpdate
+            settings.autoDownloadUpdate = autoDownloadUpdate
+        }
+                
         text = view.totalUploadSlotsField.text
         int totalUploadSlots = Integer.valueOf(text)
         model.totalUploadSlots = totalUploadSlots
@@ -82,11 +88,6 @@ class OptionsController {
         boolean searchComments = view.searchCommentsCheckbox.model.isSelected()
         model.searchComments = searchComments
         settings.searchComments = searchComments
-        
-        boolean autoDownloadUpdate = view.autoDownloadUpdateCheckbox.model.isSelected()
-        model.autoDownloadUpdate = autoDownloadUpdate
-        settings.autoDownloadUpdate = autoDownloadUpdate
-
 
         boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
         model.shareDownloadedFiles = shareDownloaded
