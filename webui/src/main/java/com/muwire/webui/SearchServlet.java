@@ -23,6 +23,8 @@ import com.muwire.core.Persona;
 import com.muwire.core.search.UIResultEvent;
 import com.muwire.core.trust.TrustLevel;
 
+import static com.muwire.webui.Util._t;
+
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 
@@ -37,7 +39,7 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (searchManager == null) {
-            resp.sendError(403, "Not initialized");
+            resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
             return;
         }
         String action = req.getParameter("action");
@@ -48,7 +50,7 @@ public class SearchServlet extends HttpServlet {
             if (newUUID != null)
                 resp.sendRedirect("/MuWire/Home?uuid=" + newUUID.toString());
             else
-                resp.sendError(403, Util._t("Please enter a search keyword or file hash"));
+                resp.sendError(403, _t("Please enter a search keyword or file hash"));
         } else if (action.equals("stop")) {
             String uuidString = req.getParameter("uuid");
             UUID uuid = UUID.fromString(uuidString);
@@ -69,7 +71,7 @@ public class SearchServlet extends HttpServlet {
         sb.append("<?xml version='1.0' encoding='UTF-8'?>");
         if (section.equals("status")) {
             if (searchManager == null || downloadManager == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             
@@ -88,7 +90,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("</Searches>");
         } else if (section.equals("senders")) {
             if (searchManager == null || downloadManager == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             
@@ -124,7 +126,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("</Senders>");
         } else if (section.equals("resultsFromSender")) {
             if (searchManager == null || downloadManager == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             
@@ -166,7 +168,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("</ResultsFromSender>");
         } else if (section.equals("results")) {
             if (searchManager == null || downloadManager == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             
@@ -205,7 +207,7 @@ public class SearchServlet extends HttpServlet {
             sb.append("</Results>");
         } else if (section.equals("sendersForResult")) {
             if (searchManager == null || downloadManager == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             
@@ -254,7 +256,7 @@ public class SearchServlet extends HttpServlet {
             
         } else if (section.equals("connectionsCount")) {
             if (connectionCounter == null) {
-                resp.sendError(403, "Not initialized");
+                resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
             sb.append("<Connections>");
