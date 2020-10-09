@@ -20,7 +20,7 @@ class ShutdownWindowView {
     
     void initUI() {
         builder.with {
-            app = application(size: [320, 80], id: 'shutdown-window',
+            application(size: [320, 80], id: 'shutdown-window',
                     locationRelativeTo : null,
                     pack: true,
                     title: application.configuration['application.title'],
