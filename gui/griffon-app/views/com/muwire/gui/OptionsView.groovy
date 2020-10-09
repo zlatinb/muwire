@@ -354,9 +354,11 @@ class OptionsView {
                 advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 4, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 4))
-                button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
+                if (model.lnf != "Aqua") {
+                    label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 4, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 4))
+                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
+                }
             }
             panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }
