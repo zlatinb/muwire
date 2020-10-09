@@ -102,7 +102,7 @@ class OptionsView {
         p = builder.panel {
             gridBagLayout()
             panel (border : titledBorder(title : trans("OPTIONS_SEARCH_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
-            constraints : gbc(gridx: 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL)) {
+            constraints : gbc(gridx: 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_SEARCH_IN_COMMENTS"), constraints:gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, 
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
@@ -119,7 +119,7 @@ class OptionsView {
             }
             
             panel (border : titledBorder(title : trans("OPTIONS_DOWNLOAD_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_RETRY_FAILED_DOWNLOADS"), constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, 
@@ -129,17 +129,20 @@ class OptionsView {
                 downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : 2, 
                     constraints : gbc(gridx: 2, gridy: 1, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
-                label(text : trans("OPTIONS_SAVE_DOWNLOADED_FILES") + ":", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
-                label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
-                button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:2), downloadLocationAction)
-                
-                label(text : trans("OPTIONS_STORE_INCOMPLETE_FILES") + ":", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
-                label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_START))
-                button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:3), incompleteLocationAction)
+                // this is a Java bug.  File choosers don't appear on Aqua L&F.
+                if (model.lnf != "Aqua") {
+                    label(text : trans("OPTIONS_SAVE_DOWNLOADED_FILES") + ":", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
+                    label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
+                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:2), downloadLocationAction)
+
+                    label(text : trans("OPTIONS_STORE_INCOMPLETE_FILES") + ":", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
+                    label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_START))
+                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:3), incompleteLocationAction)
+                }
             }
             
             panel (border : titledBorder(title : trans("OPTIONS_UPLOAD_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy:2, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy:2, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_TOTAL_UPLOAD_SLOTS"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 totalUploadSlotsField = textField(text : bind {model.totalUploadSlots}, columns: 2,
@@ -150,7 +153,7 @@ class OptionsView {
             }
             
             panel (border : titledBorder(title : trans("OPTIONS_SHARING_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_SHARE_DOWNLOADED_FILES"), constraints : gbc(gridx : 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:0, weightx : 0))
@@ -161,7 +164,7 @@ class OptionsView {
             
             if (!model.disableUpdates) {
                 panel (border : titledBorder(title : trans("OPTIONS_UPDATE_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL))) {
+                constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                     gridBagLayout()
                     label(text : trans("OPTIONS_CHECK_FOR_UPDATES"), constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
@@ -172,6 +175,7 @@ class OptionsView {
 
                 }
             }
+            panel(constraints : gbc(gridx: 0, gridy: 5, weighty: 100))
         }
         i = builder.panel {
             gridBagLayout()

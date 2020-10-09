@@ -111,11 +111,13 @@ class OptionsController {
         model.speedSmoothSeconds = Integer.valueOf(text)
         settings.speedSmoothSeconds = Integer.valueOf(text)
         
-        String downloadLocation = model.downloadLocation
-        settings.downloadLocation = new File(downloadLocation)
-        
-        String incompleteLocation = model.incompleteLocation
-        settings.incompleteLocation = new File(incompleteLocation)
+        if (model.lnf != "Aqua") {
+            String downloadLocation = model.downloadLocation
+            settings.downloadLocation = new File(downloadLocation)
+
+            String incompleteLocation = model.incompleteLocation
+            settings.incompleteLocation = new File(incompleteLocation)
+        }
 
         if (settings.embeddedRouter) {
             text = view.inBwField.text
