@@ -103,7 +103,7 @@ class MainFrameView {
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
                 imageIcon('/MuWire-16x16.png').image],
-            pack : false,
+            pack : true,
             visible : bind { model.coreInitialized }) {
                 menuBar {
                     menu (text : trans("FILE")) {

@@ -22,6 +22,7 @@ class ShutdownWindowView {
         builder.with {
             app = application(size: [320, 80], id: 'shutdown-window',
                     locationRelativeTo : null,
+                    pack: true,
                     title: application.configuration['application.title'],
                     iconImage:   imageIcon('/MuWire-48x48.png').image,
                     iconImages: [imageIcon('/MuWire-48x48.png').image,
