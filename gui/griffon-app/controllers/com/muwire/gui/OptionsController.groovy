@@ -16,6 +16,8 @@ import java.awt.Font
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
 
+import static com.muwire.gui.Translator.trans
+
 @ArtifactProviderFor(GriffonController)
 class OptionsController {
     @MVCMember @Nonnull
@@ -260,7 +262,7 @@ class OptionsController {
     void downloadLocation() {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(false)
-        chooser.setDialogTitle("Select location for downloaded files")
+        chooser.setDialogTitle(trans("OPTIONS_SELECT_LOCATION_DOWNLOADED_FILES"))
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
@@ -271,7 +273,7 @@ class OptionsController {
     void incompleteLocation() {
         def chooser = new JFileChooser()
         chooser.setFileHidingEnabled(false)
-        chooser.setDialogTitle("Select location for downloaded files")
+        chooser.setDialogTitle(trans("OPTIONS_SELECT_LOCATION_INCOMPLETE_FILES"))
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
@@ -283,12 +285,12 @@ class OptionsController {
         def chooser = new JFileChooser()
         chooser.with { 
             setFileHidingEnabled(false)
-            setDialogTitle("Select location of chat server welcome file")
+            setDialogTitle(trans("OPTIONS_SELECT_CHAT_SERVER_FILE"))
             setFileSelectionMode(JFileChooser.FILES_ONLY)
-            int rv = chooser.showOpenDialog(null)
-            if (rv == JFileChooser.APPROVE_OPTION)
-                model.chatWelcomeFile = getSelectedFile().getAbsolutePath()
         }
+        int rv = chooser.showOpenDialog(null)
+        if (rv == JFileChooser.APPROVE_OPTION)
+            model.chatWelcomeFile = getSelectedFile().getAbsolutePath()
     }
     
     @ControllerAction
@@ -328,6 +330,6 @@ class OptionsController {
     void clearHistory() {
         uiSettings.searchHistory.clear()
         saveUISettings()
-        JOptionPane.showMessageDialog(null, "Search history has been cleared")
+        JOptionPane.showMessageDialog(null, trans("OPTIONS_SEARCH_HISTORY_CLEARED"))
     }
 }
