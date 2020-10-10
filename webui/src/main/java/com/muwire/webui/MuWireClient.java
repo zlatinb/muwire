@@ -164,7 +164,7 @@ public class MuWireClient {
         
         BrowseManager browseManager = new BrowseManager(core);
         core.getEventBus().register(BrowseStatusEvent.class, browseManager);
-        core.getEventBus().register(UIResultEvent.class, browseManager);
+        core.getEventBus().register(UIResultBatchEvent.class, browseManager);
         
         TrustManager trustManager = new TrustManager();
         core.getEventBus().register(TrustEvent.class, trustManager);

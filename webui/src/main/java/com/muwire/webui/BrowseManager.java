@@ -1,16 +1,19 @@
 package com.muwire.webui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
 import com.muwire.core.Core;
 import com.muwire.core.Persona;
 import com.muwire.core.search.BrowseStatus;
 import com.muwire.core.search.BrowseStatusEvent;
 import com.muwire.core.search.UIBrowseEvent;
+import com.muwire.core.search.UIResultBatchEvent;
 import com.muwire.core.search.UIResultEvent;
 
 public class BrowseManager {
@@ -28,15 +31,19 @@ public class BrowseManager {
             return; // hmm
         browse.status = e.getStatus();
         browse.revision++;
-        if (browse.status == BrowseStatus.FETCHING)
+        if (browse.status == BrowseStatus.FETCHING) {
             browse.totalResults = e.getTotalResults();
+            browse.uuid = e.getUuid();
+        }
     }
     
-    public void onUIResultEvent(UIResultEvent e) {
-        Browse browse = browses.get(e.getSender());
+    public void onUIResultBatchEvent(UIResultBatchEvent e) {
+        Browse browse = browses.get(e.getResults()[0].getSender());
         if (browse == null)
             return;
-        browse.results.add(e);
+        if (!browse.uuid.equals(e.getUuid()))
+            return;
+        browse.results.addAll(Arrays.asList(e.getResults()));
         browse.revision++;
     }
     
@@ -65,6 +72,7 @@ public class BrowseManager {
         private volatile BrowseStatus status;
         private volatile int totalResults;
         private volatile long revision;
+        private volatile UUID uuid;
         private final List<UIResultEvent> results = Collections.synchronizedList(new ArrayList<>());
         
         Browse(Persona persona) {
