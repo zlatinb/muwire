@@ -12,6 +12,7 @@ import javax.annotation.Nonnull
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import java.awt.Font
+import java.awt.SystemTray
 
 import com.muwire.core.Core
 import com.muwire.core.MuWireSettings
@@ -238,9 +239,11 @@ class OptionsController {
         model.storeSearchHistory = storeSearchHistory
         uiSettings.storeSearchHistory = storeSearchHistory
         
-        uiSettings.exitOnClose = model.exitOnClose
-        if (model.closeDecisionMade)
-            uiSettings.closeWarning = false
+        if (SystemTray.isSupported()) {
+            uiSettings.exitOnClose = model.exitOnClose
+            if (model.closeDecisionMade)
+                uiSettings.closeWarning = false
+        }
             
         saveUISettings()
 

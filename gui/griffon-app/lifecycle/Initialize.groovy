@@ -135,7 +135,7 @@ class Initialize extends AbstractLifecycleHandler {
         
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
         
-        if (SystemTray.isSupported() && (SystemVersion.isMac() || SystemVersion.isWindows())) {
+        if (SystemTray.isSupported()) {
             try {
                 def tray = SystemTray.getSystemTray()
                 def url = Initialize.class.getResource("/MuWire-16x16.png")

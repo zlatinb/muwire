@@ -18,6 +18,7 @@ import com.muwire.core.Core
 
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
+import java.awt.SystemTray
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -277,11 +278,14 @@ class OptionsView {
                 label(text : trans("OPTIONS_CLEAR_FINISHED_UPLOADS"), constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 clearUploadsCheckbox = checkBox(selected : bind {model.clearUploads},
                 constraints : gbc(gridx:1, gridy: 4, anchor:GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_WHEN_CLOSING_MUWIRE"), constraints : gbc(gridx: 0, gridy : 5, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                panel (constraints : gbc(gridx:1, gridy: 5, anchor : GridBagConstraints.LINE_END)) {
-                    buttonGroup(id : "closeBehaviorGroup")
-                    radioButton(text : trans("OPTIONS_MINIMIZE_TO_TRAY"), selected : bind {!model.exitOnClose}, buttonGroup: closeBehaviorGroup, minimizeOnCloseAction)
-                    radioButton(text : trans("EXIT"), selected : bind {model.exitOnClose}, buttonGroup : closeBehaviorGroup, exitOnCloseAction)
+
+                if (SystemTray.isSupported()) {
+                    label(text : trans("OPTIONS_WHEN_CLOSING_MUWIRE"), constraints : gbc(gridx: 0, gridy : 5, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    panel (constraints : gbc(gridx:1, gridy: 5, anchor : GridBagConstraints.LINE_END)) {
+                        buttonGroup(id : "closeBehaviorGroup")
+                        radioButton(text : trans("OPTIONS_MINIMIZE_TO_TRAY"), selected : bind {!model.exitOnClose}, buttonGroup: closeBehaviorGroup, minimizeOnCloseAction)
+                        radioButton(text : trans("EXIT"), selected : bind {model.exitOnClose}, buttonGroup : closeBehaviorGroup, exitOnCloseAction)
+                    }
                 }
             }
             panel (constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
