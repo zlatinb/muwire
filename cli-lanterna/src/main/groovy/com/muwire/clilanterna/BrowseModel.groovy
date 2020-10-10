@@ -8,6 +8,7 @@ import com.muwire.core.Persona
 import com.muwire.core.search.BrowseStatus
 import com.muwire.core.search.BrowseStatusEvent
 import com.muwire.core.search.UIBrowseEvent
+import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 
 import net.i2p.data.Base64
@@ -21,6 +22,7 @@ class BrowseModel {
     private Map<String, UIResultEvent> rootToResult = new HashMap<>()
     
     private int totalResults
+    private UUID uuid
     
     private Label status
     private Label percentage
@@ -31,37 +33,43 @@ class BrowseModel {
         this.guiThread = guiThread
         
         core.eventBus.register(BrowseStatusEvent.class, this)
-        core.eventBus.register(UIResultEvent.class, this)
+        core.eventBus.register(UIResultBatchEvent.class, this)
         core.eventBus.publish(new UIBrowseEvent(host : persona))
     }
     
     void unregister() {
         core.eventBus.unregister(BrowseStatusEvent.class, this)
-        core.eventBus.unregister(UIResultEvent.class, this)
+        core.eventBus.unregister(UIResultBatchEvent.class, this)
     }
     
     void onBrowseStatusEvent(BrowseStatusEvent e) {
         guiThread.invokeLater {
             status.setText(e.status.toString())
-            if (e.status == BrowseStatus.FETCHING)
+            if (e.status == BrowseStatus.FETCHING) {
                 totalResults = e.totalResults
+                uuid = e.uuid
+            }
         }
     }
     
-    void onUIResultEvent(UIResultEvent e) {
+    void onUIResultBatchEvent(UIResultBatchEvent eBatch) {
+        if (uuid != eBatch.uuid)
+            return
         guiThread.invokeLater {
-            String size = DataHelper.formatSize2Decimal(e.size, false) + "B"
-            String infoHash = Base64.encode(e.infohash.getRoot())
-            String comment = String.valueOf(e.comment != null)
-            model.addRow(e.name, size, infoHash, comment, e.certificates)
-            rootToResult.put(infoHash, e)
-            
-            String percentageString = ""
-            if (totalResults != 0) {
-                double percentage = Math.round( (model.getRowCount() * 100 / totalResults).toDouble() )
-                percentageString = String.valueOf(percentage)+"%"
+            for (UIResultEvent e : eBatch.results) {
+                String size = DataHelper.formatSize2Decimal(e.size, false) + "B"
+                String infoHash = Base64.encode(e.infohash.getRoot())
+                String comment = String.valueOf(e.comment != null)
+                model.addRow(e.name, size, infoHash, comment, e.certificates)
+                rootToResult.put(infoHash, e)
+
+                String percentageString = ""
+                if (totalResults != 0) {
+                    double percentage = Math.round( (model.getRowCount() * 100 / totalResults).toDouble() )
+                    percentageString = String.valueOf(percentage)+"%"
+                }
+                percentage.setText(percentageString)
             }
-            percentage.setText(percentageString)
         }
     }
     
