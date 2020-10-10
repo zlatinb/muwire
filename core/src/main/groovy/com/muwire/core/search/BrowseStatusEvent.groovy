@@ -7,4 +7,5 @@ class BrowseStatusEvent extends Event {
     Persona host
     BrowseStatus status
     int totalResults
+    UUID uuid
 }

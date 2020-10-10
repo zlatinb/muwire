@@ -14,6 +14,7 @@ import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.BrowseStatus
 import com.muwire.core.search.BrowseStatusEvent
 import com.muwire.core.search.UIBrowseEvent
+import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 
 @ArtifactProviderFor(GriffonController)
@@ -28,27 +29,31 @@ class BrowseController {
     
     void register() {
         core.eventBus.register(BrowseStatusEvent.class, this)
-        core.eventBus.register(UIResultEvent.class, this)
+        core.eventBus.register(UIResultBatchEvent.class, this)
         core.eventBus.publish(new UIBrowseEvent(host : model.host))
     }
     
     void mvcGroupDestroy() {
         core.eventBus.unregister(BrowseStatusEvent.class, this)
-        core.eventBus.unregister(UIResultEvent.class, this)
+        core.eventBus.unregister(UIResultBatchEvent.class, this)
     }
     
     void onBrowseStatusEvent(BrowseStatusEvent e) {
         runInsideUIAsync {
             model.status = e.status
-            if (e.status == BrowseStatus.FETCHING)
+            if (e.status == BrowseStatus.FETCHING) {
                 model.totalResults = e.totalResults
+                model.uuid = e.uuid
+            }
         }
     }
     
-    void onUIResultEvent(UIResultEvent e) {
+    void onUIResultBatchEvent(UIResultBatchEvent e) {
         runInsideUIAsync {
-            model.chatActionEnabled = e.chat
-            model.results << e
+            if (e.uuid != model.uuid)
+                return
+            model.chatActionEnabled = e.results[0].chat
+            model.results.addAll(e.results.toList())
             model.resultCount = model.results.size()
             view.resultsTable.model.fireTableDataChanged()
         }

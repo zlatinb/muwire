@@ -18,6 +18,7 @@ class BrowseModel {
     @Observable boolean chatActionEnabled
     @Observable int totalResults
     @Observable int resultCount
+    UUID uuid
     
     def results = []
 }

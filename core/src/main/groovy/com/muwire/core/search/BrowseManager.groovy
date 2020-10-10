@@ -19,6 +19,8 @@ import java.util.zip.GZIPInputStream
 @Log
 class BrowseManager {
     
+    private static final int BATCH_SIZE = 32
+    
     private final I2PConnector connector
     private final EventBus eventBus
     private final Persona me
@@ -58,19 +60,34 @@ class BrowseManager {
                 boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
                 
                 // at this stage, start pulling the results
-                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FETCHING, totalResults : results))
+                UUID uuid = UUID.randomUUID()
+                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FETCHING, 
+                    totalResults : results, uuid : uuid))
+                log.info("Starting to fetch $results results with uuid $uuid")
                 
                 JsonSlurper slurper = new JsonSlurper()
                 DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
-                UUID uuid = UUID.randomUUID()
+                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, results)]
+                int j = 0
                 for (int i = 0; i < results; i++) {
+                    log.fine("parsing result $i at batch position $j")
+                    
                     int size = dis.readUnsignedShort()
                     byte [] tmp = new byte[size]
                     dis.readFully(tmp)
                     def json = slurper.parse(tmp)
                     UIResultEvent result = ResultsParser.parse(e.host, uuid, json)
                     result.chat = chat
-                    eventBus.publish(result)
+                    batch[j++] = result
+                    
+                    
+                    // publish piecemally
+                    if (j == batch.length) {
+                        eventBus.publish(new UIResultBatchEvent(results : batch, uuid : uuid))
+                        j = 0
+                        batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
+                        log.fine("publishing batch, next batch size ${batch.length}")
+                    }
                 }
                 
                 eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FINISHED))
