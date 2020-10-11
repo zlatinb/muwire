@@ -172,6 +172,8 @@ public class Core {
                 i2pOptions["inbound.nickname"] = "MuWire"
             if (!i2pOptions.containsKey("outbound.nickname"))
                 i2pOptions["outbound.nickname"] = "MuWire"
+            if (!i2pOptions.containsKey("router.excludePeerCaps"))
+                i2pOptions["router.excludePeerCaps"] = "KLMNO"
         }
         if (!(i2pOptions.containsKey("i2np.ntcp.port")
                 && i2pOptions.containsKey("i2np.udp.port")
@@ -198,7 +200,7 @@ public class Core {
             routerProps.setProperty("i2p.dir.base", home.getAbsolutePath())
             routerProps.setProperty("i2p.dir.config", home.getAbsolutePath())
             routerProps.setProperty("geoip.dir", home.getAbsolutePath() + File.separator + "geoip")
-            routerProps.setProperty("router.excludePeerCaps", "KLM")
+            routerProps.setProperty("router.excludePeerCaps", i2pOptions["router.excludePeerCaps"])
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
             routerProps.setProperty("i2cp.disableInterface", "true")
