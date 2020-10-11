@@ -150,16 +150,7 @@ class DownloadSession {
             }
 
             // parse all headers
-            Map<String,String> headers = new HashMap<>()
-            String header
-            while((header = readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS) {
-                int colon = header.indexOf(':')
-                if (colon == -1 || colon == header.length() - 1)
-                    throw new IOException("invalid header $header")
-                String key = header.substring(0, colon)
-                String value = header.substring(colon + 1)
-                headers[key] = value.trim()
-            }
+            Map<String,String> headers = DataUtil.readAllHeaders(is)
 
             // prase X-Alt if present
             if (headers.containsKey("X-Alt")) {
