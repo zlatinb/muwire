@@ -63,7 +63,7 @@ public class Translator {
         }
         
         public String toString() {
-            return locale.getDisplayLanguage(locale);
+            return locale.getDisplayLanguage(locale).toUpperCase(locale);
         }
     }
 
