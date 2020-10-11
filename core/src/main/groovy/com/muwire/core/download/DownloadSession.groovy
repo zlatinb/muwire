@@ -44,7 +44,7 @@ class DownloadSession {
     private MappedByteBuffer mapped
     private boolean unclaim = true
     private boolean steal
-    private int piece, position
+    int piece, position
     private long pieceStart, start, end
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,

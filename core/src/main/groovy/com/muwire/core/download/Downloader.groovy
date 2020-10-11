@@ -405,15 +405,18 @@ public class Downloader {
                 boolean feed = downloadManager.muSettings.fileFeed && downloadManager.muSettings.advertiseFeed
                 boolean chat = chatServer.isRunning() && downloadManager.muSettings.advertiseChat
                 
+                Set<Integer> queuedPieces = new HashSet<>()
                 boolean requestPerformed
                 while(!pieces.isComplete()) {
                     if (sessionQueue.isEmpty()) {
                         boolean sentAnyRequests = false
                         queueSize.times {
+                            available.removeAll(queuedPieces)
                             def currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                                     endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
                                     browse, feed, chat)
                             if (currentSession.sendRequest()) {
+                                queuedPieces.add(currentSession.piece)
                                 sessionQueue.addLast(currentSession)
                                 sentAnyRequests = true
                             }
@@ -422,13 +425,18 @@ public class Downloader {
                             break;
                         endpoint.getOutputStream().flush()
                     }
+                    available.removeAll(queuedPieces)
                     def nextSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                                 endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
                                 browse, feed, chat)
-                    if (nextSession.sendRequest())
+                    if (nextSession.sendRequest()) {
                         sessionQueue.addLast(nextSession)
-                        
-                    requestPerformed = sessionQueue.removeFirst().consumeResponse()
+                        queuedPieces.add(nextSession.piece)
+                    }
+                   
+                    def currentSession = sessionQueue.removeFirst()
+                    requestPerformed = currentSession.consumeResponse()
+                    queuedPieces.remove(currentSession.piece)
                     if (!requestPerformed)
                         break
                     successfulDestinations.add(endpoint.destination)
