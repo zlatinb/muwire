@@ -47,8 +47,8 @@ class UISettings {
         groupByFile = Boolean.parseBoolean(props.getProperty("groupByFile","false"))
         maxChatLines = Integer.parseInt(props.getProperty("maxChatLines","-1"))
         
-        mainFrameX = Integer.parseInt(props.getProperty("mainFrameX","1024"))
-        mainFrameY = Integer.parseInt(props.getProperty("mainFrameY","768"))
+        mainFrameX = Integer.parseInt(props.getProperty("mainFrameX","-1"))
+        mainFrameY = Integer.parseInt(props.getProperty("mainFrameY","-1"))
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
         openTabs = DataUtil.readEncodedSet(props, "openTabs")

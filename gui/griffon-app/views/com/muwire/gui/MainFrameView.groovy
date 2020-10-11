@@ -96,8 +96,18 @@ class MainFrameView {
         String revision = ""
         if (metadata["build.revision"] != null)
             revision = " revision " + metadata["build.revision"].substring(0,10)
+        
+        int mainFrameX = 1
+        int mainFrameY = 1
+        boolean pack = true
+        if (settings.mainFrameX > 0 && settings.mainFrameY > 0) {
+            pack = false
+            mainFrameX = settings.mainFrameX
+            mainFrameY = settings.mainFrameY
+        }
+            
         builder.with {
-            application(size : [settings.mainFrameX,settings.mainFrameY], id: 'main-frame',
+            application(size : [mainFrameX,mainFrameY], id: 'main-frame',
             locationRelativeTo : null,
             defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
@@ -106,7 +116,7 @@ class MainFrameView {
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
                 imageIcon('/MuWire-16x16.png').image],
-            pack : true,
+            pack : pack,
             visible : bind { model.coreInitialized }) {
                 menuBar {
                     menu (text : trans("FILE")) {
