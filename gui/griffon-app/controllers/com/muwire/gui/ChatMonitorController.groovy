@@ -9,5 +9,11 @@ import javax.annotation.Nonnull
 @ArtifactProviderFor(GriffonController)
 class ChatMonitorController {
     @MVCMember @Nonnull
-    ChatMonitorModel model
+    ChatMonitorView view
+    
+    @ControllerAction
+    void close() {
+        view.window.setVisible(false)
+        mvcGroup.destroy()
+    }
 }

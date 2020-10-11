@@ -67,6 +67,7 @@ class AdvancedSharingView {
             panel (constraints : BorderLayout.SOUTH) {
                 button(text : trans("CONFIGURE"), enabled : bind{model.configureActionEnabled}, configureAction)
                 button(text : trans("SYNC"), enabled : bind{model.syncActionEnabled}, syncAction)
+                button(text : trans("CLOSE"), closeAction)
             }
         }
         

@@ -44,6 +44,9 @@ class ChatMonitorView {
                     }
                 }
             }
+            panel(constraints : BorderLayout.SOUTH) {
+                button(text : trans("CLOSE"), closeAction)
+            }
         }
     }
     

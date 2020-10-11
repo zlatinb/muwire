@@ -73,6 +73,7 @@ class CertificateControlView {
             }
             panel (constraints : BorderLayout.SOUTH) {
                 button(text : trans("VIEW_COMMENT"), enabled : bind {model.showCommentActionEnabled}, showCommentAction)
+                button(text : trans("CLOSE"), closeAction)
             }
         }
     }

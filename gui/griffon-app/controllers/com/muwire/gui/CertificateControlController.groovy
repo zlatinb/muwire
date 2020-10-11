@@ -25,4 +25,10 @@ class CertificateControlController {
         params['text'] = cert.comment.name
         mvcGroup.createMVCGroup("show-comment", params)
     }
+    
+    @ControllerAction
+    void close() {
+        view.dialog.setVisible(false)
+        mvcGroup.destroy()
+    }
 }

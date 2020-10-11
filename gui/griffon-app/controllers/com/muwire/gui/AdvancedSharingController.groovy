@@ -36,4 +36,10 @@ class AdvancedSharingController {
         def event = new UISyncDirectoryEvent(directory : wd.directory)
         model.core.eventBus.publish(event)
     }
+    
+    @ControllerAction
+    void close() {
+        view.dialog.setVisible(false)
+        mvcGroup.destroy()
+    }
 }

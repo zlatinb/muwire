@@ -99,6 +99,12 @@ class ContentPanelController {
         core.eventBus.publish(new TrustEvent(persona : m.persona, level : TrustLevel.DISTRUSTED, reason : reason))
     }
     
+    @ControllerAction
+    void close() {
+        view.dialog.setVisible(false)
+        mvcGroup.destroy()
+    }
+    
     void saveMuWireSettings() {
         core.saveMuSettings()
     }
