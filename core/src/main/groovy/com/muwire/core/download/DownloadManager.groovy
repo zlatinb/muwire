@@ -255,4 +255,10 @@ public class DownloadManager {
     public boolean isDownloading(InfoHash infoHash) {
         downloaders.containsKey(infoHash)
     }
+    
+    public int totalDownloadSpeed() {
+        int total = 0
+        downloaders.values().each { total += it.speed() }
+        total
+    }
 }

@@ -143,6 +143,9 @@ class MainFrameModel {
     @Observable boolean chatServerRunning
     
     @Observable Downloader downloader
+    
+    @Observable int downSpeed
+    @Observable int upSpeed
 
     private final Set<InfoHash> downloadInfoHashes = new ConcurrentHashSet<>()
 
@@ -208,6 +211,14 @@ class MainFrameModel {
                 updateTablePreservingSelection("downloads-table")
                 updateTablePreservingSelection("trusted-table")
                 updateTablePreservingSelection("distrusted-table")
+                
+                int totalUpload = 0
+                uploads.each { 
+                    totalUpload += it.speed()
+                }
+                upSpeed = totalUpload
+                if (core != null) 
+                    downSpeed = core.downloadManager.totalDownloadSpeed()
             }
         }, 1000, 1000)
 
@@ -682,7 +693,7 @@ class MainFrameModel {
         
         public int speed() {
             
-            if (finished)
+            if (finished) 
                 return 0
 
             initIfNeeded()

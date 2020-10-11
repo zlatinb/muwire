@@ -593,8 +593,21 @@ class MainFrameView {
                         button(text : trans("COPY_SHORT"), constraints : gbc(gridx:1, gridy:0), copyShortAction)
                         button(text : trans("COPY_FULL"), constraints : gbc(gridx:2, gridy:0), copyFullAction)
                     }
+                    panel (constraints : BorderLayout.CENTER) {
+                        gridBagLayout()
+                        panel (constraints : gbc(gridx : 0, gridy : 0)){
+                            borderLayout()
+                            label(icon : imageIcon('/down_arrow.png'), constraints : BorderLayout.CENTER)
+                            label(text : bind { DataHelper.formatSize2Decimal(model.downSpeed, false) + trans("B_SEC") }, constraints : BorderLayout.EAST)
+                        }
+                        panel (constraints : gbc(gridx: 1, gridy : 0)){
+                            borderLayout()
+                            label(icon : imageIcon('/up_arrow.png'), constraints : BorderLayout.CENTER)
+                            label(text : bind { DataHelper.formatSize2Decimal(model.upSpeed, false) + trans("B_SEC") }, constraints : BorderLayout.EAST)
+                        }
+                    }
                     panel (constraints : BorderLayout.EAST) {
-                        label(trans("CONNECTIONS") + ":")
+                        label("   " + trans("CONNECTIONS") + ":")
                         label(text : bind {model.connections})
                     }
                 }
