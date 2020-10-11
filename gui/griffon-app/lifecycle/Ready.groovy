@@ -13,6 +13,7 @@ import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.util.DataUtil
 import com.muwire.gui.wizard.WizardDefaults
+import static com.muwire.gui.Translator.trans
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class Ready extends AbstractLifecycleHandler {
             application.mvcGroupManager.createMVCGroup("wizard", params)
             
             if (!finished['applied']) {
-                JOptionPane.showMessageDialog(parent, "MuWire will now exit")
+                JOptionPane.showMessageDialog(parent, trans("MUWIRE_WILL_EXIT"))
                 System.exit(0)
             }
             
@@ -115,8 +116,11 @@ class Ready extends AbstractLifecycleHandler {
             core.eventBus.publish(new UILoadedEvent())
         } catch (Exception bad) {
             log.log(Level.SEVERE,"couldn't initialize core",bad)
-            JOptionPane.showMessageDialog(null, "Couldn't connect to I2P router.  Make sure I2P is running and restart MuWire",
-                    "Can't connect to I2P router", JOptionPane.WARNING_MESSAGE)
+            
+            String key = props.embeddedRouter ? "CORE_INIT_ERROR_BODY_EMBEDDED" : "CORE_INIT_ERROR_BODY_EXTERNAL"
+            
+            JOptionPane.showMessageDialog(null, trans(key),
+                    trans("CORE_INIT_ERROR_HEADER"), JOptionPane.WARNING_MESSAGE)
             System.exit(0)
         }
     }

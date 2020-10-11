@@ -4,6 +4,7 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import static com.muwire.gui.Translator.trans
 import javax.annotation.Nonnull
 import javax.swing.JOptionPane
 
@@ -25,7 +26,7 @@ class WizardController {
         def errors = model.steps[model.currentStep].validate()
         if (errors != null && !errors.isEmpty()) {
             String errorMessage = String.join("\n", errors)
-            JOptionPane.showMessageDialog(model.parent, errorMessage, "Invalid Input", JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(model.parent, errorMessage, trans("INVALID_INPUT"), JOptionPane.ERROR_MESSAGE)
         } else {
             model.currentStep++
             view.updateLayout()
