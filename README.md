@@ -4,7 +4,7 @@ The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and is
 
 MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows,MacOS,Linux.
 
-The current stable release - 0.7.5 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+The current stable release - 0.7.6 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -32,15 +32,15 @@ Type
 
 The setup wizard will ask you for the host and port of an I2P or I2Pd router.
 
-## Running the CLI
-
-Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z-all.jar` in a terminal.  The CLI will ask you about the router host and port on startup, no need to edit any files.  However, the CLI does not have an options window yet, so if you need to change any options you will need to edit the configuration files.  The CLI options are documented here [cli options]
-
-The CLI is under active development and doesn't have all the features of the GUI.
-
 ## Running the Web UI / Plugin
 
 There is a Web-based UI under development.  It is intended to be run as a plugin to the Java I2P router.  Instructions how to build it are available at the wiki [Plugin] page.
+
+## Running the CLI
+
+Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z-all.jar` in a terminal.  The CLI options are documented here [cli options]
+
+The CLI is in maintenance mode and will not be getting any new features.
 
 ## Docker
 
