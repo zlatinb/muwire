@@ -59,7 +59,7 @@ public class Downloader {
     private final File incompleteFile
     final int pieceSizePow2
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
-    private final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
+    final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
     /** LOCKING: itself */
     private final Map<Destination, Integer> failingDestinations = new HashMap<>()
     private final int maxFailures

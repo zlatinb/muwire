@@ -172,6 +172,8 @@ public class DownloadManager {
             if (json.paused != null)
                 downloader.paused = json.paused
                 
+            downloader.successfulDestinations.addAll(destinations) // if it was persisted, it was successful
+                
             try {
                 downloader.readPieces()
                 if (!downloader.paused)
