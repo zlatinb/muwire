@@ -24,6 +24,13 @@ public class UploadManager {
         return uploads;
     }
     
+    public int totalUploadSpeed() {
+        int total = 0;
+        for (UploaderWrapper uw : uploads)
+            total += uw.speed();
+        return total;
+    }
+    
     public void onUploadEvent(UploadEvent e) {
         UploaderWrapper wrapper = null;
         synchronized(uploads) {
@@ -86,7 +93,7 @@ public class UploadManager {
             return finished;
         }
         
-        public int speed() {
+        public synchronized int speed() {
             if (finished)
                 return 0;
             
@@ -95,7 +102,7 @@ public class UploadManager {
             return bwCounter.average();
         }
         
-        void updateUploader(Uploader uploader) {
+        synchronized void updateUploader(Uploader uploader) {
             initIfNeeded();
             bwCounter.read(this.uploader.dataSinceLastRead());
             this.uploader = uploader;

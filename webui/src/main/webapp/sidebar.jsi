@@ -6,7 +6,23 @@
                          <img src="images/NotStarted.png" alt="">
                     </div>
                     <div class="menu-text">
-                        <%=Util._t("Connections")%>: <span id="connectionsCount">0</span>
+                    	<%=Util._t("Connections")%>: <span id="connectionsCount">0</span>
+                   	</div>
+                </div>
+                <div class="menuitem">
+                   	<div class="menu-icon">
+                    	<img src="images/down_arrow.png" alt="">
+                    </div>
+                    <div class="menu-text">
+                    	<span id="downBw">0<%=Util._t("B/sec")%></span>
+					</div>
+                </div>
+				<div class="menuitem">
+					<div class="menu-icon">
+                    	<img src="images/up_arrow.png" alt="">
+                    </div>
+                    <div class="menu-text">
+                    	<span id="upBw">0<%=Util._t("B/sec")%></span>
                     </div>
                 </div>
             </div>

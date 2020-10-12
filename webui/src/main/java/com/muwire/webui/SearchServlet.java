@@ -34,6 +34,7 @@ public class SearchServlet extends HttpServlet {
     private volatile SearchManager searchManager;
     private volatile ConnectionCounter connectionCounter;
     private volatile DownloadManager downloadManager;
+    private volatile UploadManager uploadManager;
     private volatile BrowseManager browseManager;
 
     @Override
@@ -259,9 +260,11 @@ public class SearchServlet extends HttpServlet {
                 resp.sendError(403, _t("MuWire failed to initialize.  Please close the browser window and restart the plugin"));
                 return;
             }
-            sb.append("<Connections>");
-            sb.append(connectionCounter.getConnections());
-            sb.append("</Connections>");
+            sb.append("<NetworkStatus>");
+            sb.append("<Connections>").append(connectionCounter.getConnections()).append("</Connections>");
+            sb.append("<DownBW>").append(DataHelper.formatSize2Decimal(core.getDownloadManager().totalDownloadSpeed(), false) + Util._t("B/sec")).append("</DownBW>");
+            sb.append("<UpBW>").append(DataHelper.formatSize2Decimal(uploadManager.totalUploadSpeed(), false) + Util._t("B/sec")).append("</UpBW>");
+            sb.append("</NetworkStatus>");
         } else {
             resp.sendError(403, "Bad section param");
             return;
@@ -284,6 +287,7 @@ public class SearchServlet extends HttpServlet {
         searchManager = (SearchManager) config.getServletContext().getAttribute("searchManager");
         connectionCounter = (ConnectionCounter) config.getServletContext().getAttribute("connectionCounter");
         downloadManager = (DownloadManager) config.getServletContext().getAttribute("downloadManager");
+        uploadManager = (UploadManager) config.getServletContext().getAttribute("uploadManager");
         browseManager = (BrowseManager) config.getServletContext().getAttribute("browseManager");
         core = (Core) config.getServletContext().getAttribute("core");
     }
