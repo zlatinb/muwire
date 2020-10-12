@@ -99,11 +99,13 @@ class MainFrameView {
         
         int mainFrameX = 1
         int mainFrameY = 1
+        int dividerLocation = 750
         boolean pack = true
         if (settings.mainFrameX > 0 && settings.mainFrameY > 0) {
             pack = false
             mainFrameX = settings.mainFrameX
             mainFrameY = settings.mainFrameY
+            dividerLocation = (int)(mainFrameY * 0.75d)
         }
             
         builder.with {
@@ -225,7 +227,7 @@ class MainFrameView {
                     }
                     panel (constraints: "downloads window") {
                         gridLayout(rows : 1, cols : 1)
-                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 500 ) {
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: dividerLocation) {
                             panel {
                                 borderLayout()
                                 scrollPane (constraints : BorderLayout.CENTER) {
