@@ -12,7 +12,18 @@
 
 <html>
     <head>
-<%@include file="css.jsi"%>
+
+<%@include file="nonce.jsi"%>
+<title>MuWire ${version}</title>
+<link href="i2pbote.css?${version}" rel="stylesheet" type="text/css">
+<link href="muwire.css?${version}" rel="stylesheet" type="text/css">
+<link rel="icon" type="image/png" href="images/muwire_logo.png" />
+<script src="js/translate.js?${version}" type="text/javascript"></script>
+<script src="js/util.js?${version}" type="text/javascript"></script>
+<script nonce="<%=cspNonce%>" type="text/javascript">
+  var jsTranslations = '<%=Util.getJSTranslations()%>';
+</script>
+
     </head>
 <%@include file="header.jsi"%>
     <body>
