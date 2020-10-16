@@ -94,8 +94,9 @@ class MainFrameView {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         String revision = ""
-        if (metadata["build.revision"] != null)
-            revision = " revision " + metadata["build.revision"].substring(0,10)
+        String build = metadata["build.revision"]
+        if (build != null && !build.isEmpty())
+            revision = " revision " + build.substring(0,10)
         
         int mainFrameX = 1
         int mainFrameY = 1
