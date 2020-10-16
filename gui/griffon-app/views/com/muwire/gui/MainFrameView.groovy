@@ -1517,7 +1517,7 @@ class MainFrameView {
         rv
     }
     
-    private void closeApplication() {
+    void closeApplication() {
         Core core = application.getContext().get("core")
         
         def tabbedPane = builder.getVariable("result-tabs")
@@ -1531,17 +1531,16 @@ class MainFrameView {
         settings.mainFrameX = mainFrame.getSize().width
         settings.mainFrameY = mainFrame.getSize().height
         mainFrame.setVisible(false)
-        application.getWindowManager().findWindow("shutdown-window").setVisible(true)
+        application.getWindowManager().findWindow("shutdown-window")?.setVisible(true)
         if (core != null) {
             Thread t = new Thread({
                 core.shutdown()
                 application.shutdown()
             }as Runnable)
             t.start()
+            File uiPropsFile = new File(core.home, "gui.properties")
+            uiPropsFile.withOutputStream { settings.write(it) }
         }
-        
-        File uiPropsFile = new File(core.home, "gui.properties")
-        uiPropsFile.withOutputStream { settings.write(it) }
     }
 
     private static class TreeExpansions implements TreeExpansionListener {

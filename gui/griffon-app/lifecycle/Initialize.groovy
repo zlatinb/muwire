@@ -146,16 +146,10 @@ class Initialize extends AbstractLifecycleHandler {
 
                 def exit = new MenuItem(Translator.trans("EXIT"))
                 exit.addActionListener({
-                    application.getWindowManager().findWindow("main-frame").setVisible(false)
-                    application.getWindowManager().findWindow("shutdown-window").setVisible(true)
-                    Core core = application.getContext().get("core")
-                    if (core != null) {
-                        Thread t = new Thread({
-                            core.shutdown()
-                            application.shutdown()
-                        }as Runnable)
-                        t.start()
-                    } else
+                    def mainFrame = application.getMvcGroupManager().findGroup("MainFrame")
+                    if (mainFrame != null)
+                        mainFrame.view.closeApplication()
+                    else
                         application.shutdown()
                     tray.remove(trayIcon)
                 })
