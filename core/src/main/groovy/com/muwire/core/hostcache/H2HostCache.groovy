@@ -30,29 +30,41 @@ class H2HostCache extends HostCache {
     }
     @Override
     protected synchronized void hostDiscovered(Destination d, boolean fromHostcache) {
-        if (fromHostcache) 
+        if (fromHostcache) { 
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}';")
-        // TODO: check if already known in db
-        hosts.add(d)
+            hosts.add(d)
+        } else {
+            if (sql.rows("select * from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}'").size() == 0)
+                hosts.add(d)
+        }
     }
     
     @Override
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
         // remove from hosts
         hosts.remove(d)
+        
         // record into db
         def timestamp = new java.sql.Date(System.currentTimeMillis())
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
+        
+        // and re-rank
+        rankedHosts.put(d, rankHost(d))
     }
     @Override
     public synchronized List<Destination> getHosts(int n, Predicate<Destination> filter) {
         List<Destination> rv = getTopHosts(n, filter)
+        
+        log.fine("got ${rv.size()} ranked hosts out of $n requested")
+        
         Iterator<Destination> iter = hosts.iterator()
         while (rv.size() < n && iter.hasNext()) {
             Destination host = iter.next()
             if (filter.test(host))
                 rv.add(host)
         }
+        
+        log.fine("will return total of ${rv.size()} hosts")
         return rv;
     }
     @Override
@@ -124,9 +136,13 @@ class H2HostCache extends HostCache {
     private List<Destination> getTopHosts(int n, Predicate<Destination> filter) {
         List<RankedHost> ranked = new ArrayList<>(rankedHosts.values())
         ranked.sort({l,r -> Double.compare(r.probability, l.probability)})
+        
+        log.fine("before filtering there are ${ranked.size()} ranked hosts")
         ranked.retainAll {
             filter.test(it.destination)
         }
+        log.fine("after filtering there are ${ranked.size()} ranked hosts")
+        
         if (ranked.size() > n)
             ranked = ranked[0..n-1]
         ranked.collect { it.destination }
