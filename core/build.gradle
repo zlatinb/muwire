@@ -8,6 +8,8 @@ dependencies {
     api "net.i2p:i2p:${i2pVersion}"
     api "net.i2p:router:${i2pVersion}"
     api "net.i2p.client:mstreaming:${i2pVersion}"
+    implementation "com.h2database:h2:1.4.200"
+    implementation "org.codehaus.groovy:groovy-sql:${groovyVersion}"
     implementation "net.i2p.client:streaming:${i2pVersion}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
