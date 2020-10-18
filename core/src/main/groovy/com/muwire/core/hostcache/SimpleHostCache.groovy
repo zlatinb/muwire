@@ -1,6 +1,7 @@
 package com.muwire.core.hostcache
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Predicate
 
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Service
@@ -78,7 +79,7 @@ class SimpleHostCache extends HostCache {
         }
     }
 
-    List<Destination> getHosts(int n) {
+    List<Destination> getHosts(int n, Predicate<Destination> ignored) {
         List<Destination> rv
         
         synchronized(hosts) {

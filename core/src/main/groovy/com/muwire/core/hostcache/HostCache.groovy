@@ -2,6 +2,8 @@ package com.muwire.core.hostcache
 
 
 
+import java.util.function.Predicate
+
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Service
 import com.muwire.core.connection.ConnectionAttemptStatus
@@ -55,7 +57,7 @@ abstract class HostCache extends Service {
     
     protected abstract void onConnection(Destination d, ConnectionAttemptStatus status)
     
-    abstract List<Destination> getHosts(int n)
+    abstract List<Destination> getHosts(int n, Predicate<Destination> filter)
     abstract List<Destination> getGoodHosts(int n)
     
     abstract int countFailingHosts()
