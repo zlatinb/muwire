@@ -3,6 +3,7 @@ package com.muwire.core.connection
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.function.Predicate
 import java.util.logging.Level
 import java.util.zip.Deflater
 import java.util.zip.DeflaterInputStream
@@ -76,19 +77,10 @@ class ConnectionEstablisher {
         if (inProgress.size() >= CONCURRENT)
             return
 
-        def toTry = null
-        for (int i = 0; i < 5; i++) {
-            toTry = hostCache.getHosts(1)
-            if (toTry.isEmpty())
-                return
-            toTry = toTry[0]
-            if (!connectionManager.isConnected(toTry) &&
-                !inProgress.contains(toTry)) {
-                break
-            }
-        }
-        if (toTry == null)
+        def toTry = hostCache.getHosts(1, {!connectionManager.isConnected(it) && !inProgress.contains(it)} as Predicate)
+        if (toTry.isEmpty())
             return
+        toTry == toTry[0]
         if (!connectionManager.isConnected(toTry) && inProgress.add(toTry))
             executor.execute({connect(toTry)} as Runnable)
     }

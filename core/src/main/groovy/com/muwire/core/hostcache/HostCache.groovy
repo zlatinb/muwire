@@ -1,6 +1,7 @@
 package com.muwire.core.hostcache
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Predicate
 
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Service
@@ -90,12 +91,12 @@ class HostCache extends Service {
         }
     }
 
-    List<Destination> getHosts(int n) {
+    List<Destination> getHosts(int n, Predicate<Destination> filter) {
         List<Destination> rv
         
         synchronized(hosts) {
             rv = new ArrayList<>(hosts.keySet())
-            rv.retainAll {allowHost(hosts[it])}
+            rv.retainAll {allowHost(hosts[it]) && filter.test(it)}
             final long now = System.currentTimeMillis()
             rv.removeAll {
                 def h = hosts[it];

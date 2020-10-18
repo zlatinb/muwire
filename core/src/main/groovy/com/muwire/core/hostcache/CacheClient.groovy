@@ -1,6 +1,7 @@
 package com.muwire.core.hostcache
 
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Predicate
 
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
@@ -58,7 +59,7 @@ class CacheClient {
             return
         if (!manager.getConnections().isEmpty())
             return
-        if (!cache.getHosts(1).isEmpty())
+        if (!cache.getHosts(1, {true} as Predicate).isEmpty())
             return
 
         log.info "Will query hostcaches"
