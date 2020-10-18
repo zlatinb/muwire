@@ -80,7 +80,7 @@ class ConnectionEstablisher {
         def toTry = hostCache.getHosts(1, {!connectionManager.isConnected(it) && !inProgress.contains(it)} as Predicate)
         if (toTry.isEmpty())
             return
-        toTry == toTry[0]
+        toTry = toTry[0]
         if (!connectionManager.isConnected(toTry) && inProgress.add(toTry))
             executor.execute({connect(toTry)} as Runnable)
     }
