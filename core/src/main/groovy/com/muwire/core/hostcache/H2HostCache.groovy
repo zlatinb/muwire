@@ -141,7 +141,7 @@ class H2HostCache extends HostCache {
                 long timestamp = System.currentTimeMillis()
                 if (entry.lastSuccessfulAttempt != null)
                     timestamp = entry.lastSuccessfulAttempt
-                def tstamp = Date(timestamp)
+                def tstamp = new Date(timestamp)
                 tstamp = SDF.format(tstamp)
                 sql.execute("insert into HOST_ATTEMPTS VALUES ('${dest.toBase64()}', '$tstamp', 'SUCCESSFUL')")
             }
