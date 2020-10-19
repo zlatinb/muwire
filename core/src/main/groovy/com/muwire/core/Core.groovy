@@ -5,6 +5,7 @@ import com.muwire.core.files.PersisterFolderService
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.zip.ZipException
 
@@ -462,7 +463,7 @@ public class Core {
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
-        hostCache.start()
+        hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)
         connectionManager.start()
         cacheClient.start()
         connectionAcceptor.start()

@@ -2,6 +2,7 @@ package com.muwire.core.hostcache
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Predicate
+import java.util.function.Supplier
 
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Service
@@ -31,7 +32,7 @@ class SimpleHostCache extends HostCache {
         this.timer = new Timer("host-persister",true)
     }
 
-    void start() {
+    void start(Supplier<Collection<Destination>> ignored) {
         timer.schedule({load()} as TimerTask, 1)
     }
 

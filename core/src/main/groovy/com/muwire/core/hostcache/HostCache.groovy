@@ -3,6 +3,7 @@ package com.muwire.core.hostcache
 
 
 import java.util.function.Predicate
+import java.util.function.Supplier
 
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Service
@@ -63,6 +64,6 @@ abstract class HostCache extends Service {
     abstract int countFailingHosts()
     abstract int countHopelessHosts()
     
-    abstract void start()
+    public abstract void start(Supplier<Collection<Destination>> connected)
     abstract void stop()
 }
