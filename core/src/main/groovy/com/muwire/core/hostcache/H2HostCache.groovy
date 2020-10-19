@@ -3,6 +3,8 @@ package com.muwire.core.hostcache
 import java.util.function.Predicate
 import java.util.function.Supplier
 
+import java.text.SimpleDateFormat
+
 import com.muwire.core.MuWireSettings
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.trust.TrustService
@@ -14,6 +16,7 @@ import groovy.util.logging.Log
 @Log
 class H2HostCache extends HostCache {
     
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     private Sql sql
     private final File h2Home
     private final File home
@@ -28,7 +31,7 @@ class H2HostCache extends HostCache {
     
     private final Timer timer
     
-    private Collection<Destination> toVerify = new HashSet<>()
+    private Collection<Destination> toVerify = new LinkedHashSet<>()
     
     public H2HostCache(File home, TrustService trustService, MuWireSettings settings, Destination myself) {
         super(trustService, settings, myself)
@@ -54,7 +57,8 @@ class H2HostCache extends HostCache {
         hosts.remove(d)
         
         // record into db
-        def timestamp = new java.sql.Date(System.currentTimeMillis())
+        def timestamp = new Date(System.currentTimeMillis())
+        timestamp = SDF.format(timestamp)
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
         // and re-rank
@@ -137,7 +141,8 @@ class H2HostCache extends HostCache {
                 long timestamp = System.currentTimeMillis()
                 if (entry.lastSuccessfulAttempt != null)
                     timestamp = entry.lastSuccessfulAttempt
-                def tstamp = new java.sql.Date(timestamp)
+                def tstamp = Date(timestamp)
+                tstamp = SDF.format(tstamp)
                 sql.execute("insert into HOST_ATTEMPTS VALUES ('${dest.toBase64()}', '$tstamp', 'SUCCESSFUL')")
             }
             hostsJson.renameTo(new File(home, "hosts.json.bak"))
