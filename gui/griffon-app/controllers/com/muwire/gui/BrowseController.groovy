@@ -30,7 +30,8 @@ class BrowseController {
     void register() {
         core.eventBus.register(BrowseStatusEvent.class, this)
         core.eventBus.register(UIResultBatchEvent.class, this)
-        core.eventBus.publish(new UIBrowseEvent(host : model.host))
+        model.uuid = UUID.randomUUID()
+        core.eventBus.publish(new UIBrowseEvent(host : model.host, uuid: model.uuid))
     }
     
     void mvcGroupDestroy() {
@@ -39,12 +40,12 @@ class BrowseController {
     }
     
     void onBrowseStatusEvent(BrowseStatusEvent e) {
+        if (e.uuid != model.uuid)
+            return
         runInsideUIAsync {
             model.status = e.status
-            if (e.status == BrowseStatus.FETCHING) {
+            if (e.status == BrowseStatus.FETCHING) 
                 model.totalResults = e.totalResults
-                model.uuid = e.uuid
-            }
         }
     }
     

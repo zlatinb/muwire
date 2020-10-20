@@ -25,7 +25,7 @@ class BrowseManager {
     private final EventBus eventBus
     private final Persona me
     
-    private final Executor browserThread = Executors.newSingleThreadExecutor()
+    private final Executor browserThread = Executors.newCachedThreadPool()
     
     BrowseManager(I2PConnector connector, EventBus eventBus, Persona me) {
         this.connector = connector
@@ -37,7 +37,7 @@ class BrowseManager {
         browserThread.execute({
             Endpoint endpoint = null
             try {
-                eventBus.publish(new BrowseStatusEvent(host : e.host, status : BrowseStatus.CONNECTING))
+                eventBus.publish(new BrowseStatusEvent(host : e.host, status : BrowseStatus.CONNECTING, uuid: e.uuid))
                 endpoint = connector.connect(e.host.destination)
                 OutputStream os = endpoint.getOutputStream()
                 os.write("BROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -60,7 +60,7 @@ class BrowseManager {
                 boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
                 
                 // at this stage, start pulling the results
-                UUID uuid = UUID.randomUUID()
+                UUID uuid = e.uuid
                 eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FETCHING, 
                     totalResults : results, uuid : uuid))
                 log.info("Starting to fetch $results results with uuid $uuid")
@@ -90,11 +90,11 @@ class BrowseManager {
                     }
                 }
                 
-                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FINISHED))
+                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FINISHED, uuid : uuid))
                 
             } catch (Exception bad) {
                 log.log(Level.WARNING, "browse failed", bad)
-                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FAILED))
+                eventBus.publish(new BrowseStatusEvent(host: e.host, status : BrowseStatus.FAILED, uuid : e.uuid))
             } finally {
                 endpoint?.close()
             }
