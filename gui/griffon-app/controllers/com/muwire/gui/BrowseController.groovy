@@ -55,14 +55,21 @@ class BrowseController {
             model.chatActionEnabled = e.results[0].chat
             model.results.addAll(e.results.toList())
             model.resultCount = model.results.size()
+            
+            int [] selectedRows = view.resultsTable.getSelectedRows()
+            if (view.lastSortEvent != null) {
+                for (int i = 0; i < selectedRows.length; i ++)
+                    selectedRows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+            }
             view.resultsTable.model.fireTableDataChanged()
+            if (view.lastSortEvent != null) {
+                for (int i = 0; i < selectedRows.length; i ++)
+                    selectedRows[i] = view.resultsTable.rowSorter.convertRowIndexToView(selectedRows[i])
+            }
+            for (int row : selectedRows) 
+                view.resultsTable.selectionModel.addSelectionInterval(row, row)
+            
         }
-    }
-    
-    @ControllerAction
-    void dismiss() {
-        view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
     
     @ControllerAction
@@ -88,7 +95,6 @@ class BrowseController {
         }
         
         group.view.showDownloadsWindow.call()
-        dismiss()
     }
     
     @ControllerAction
@@ -127,7 +133,6 @@ class BrowseController {
     
     @ControllerAction
     void chat() {
-        dismiss()
         def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
         
         mainFrameGroup.controller.startChat(model.host)
