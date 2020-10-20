@@ -22,12 +22,10 @@ class H2HostCache extends HostCache {
     private final File home
     
     private Supplier<Collection<Destination>> connSupplier
-    
-    /** contains only hosts to whom there have been no connection attempts at all */
-    private final Set<Destination> hosts = new HashSet<>()
-    
-    /** contains hosts for whom we have computed probability of success */
-    private final Map<Destination, RankedHost> rankedHosts = new HashMap<>()
+
+    private final List<Destination> allHosts = new ArrayList<>()
+    private final Set<Destination> uniqueHosts = new HashSet<>()
+    private final Map<Destination, HostMCProfile> profiles = new HashMap<>()    
     
     private final Timer timer
     
@@ -42,30 +40,91 @@ class H2HostCache extends HostCache {
     
     @Override
     protected synchronized void hostDiscovered(Destination d, boolean fromHostcache) {
-        if (fromHostcache) { 
+        if (fromHostcache) {
+            // overwrite MC with optimistic values 
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}';")
-            hosts.add(d)
-        } else {
-            if (sql.rows("select * from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}'").size() == 0)
-                hosts.add(d)
+            profiles.put(d, new HostMCProfile())
+        } else if (uniqueHosts.add(d)) {
+            allHosts.add(d)
         }
     }
     
     @Override
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
-        // remove from hosts
-        hosts.remove(d)
         
         // record into db
         def timestamp = new Date(System.currentTimeMillis())
         timestamp = SDF.format(timestamp)
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
-        // and re-rank
-        rankedHosts.put(d, rankHost(d))
+        def count = sql.firstRow("select count(*) as COUNT from HOST_PROFILES where DESTINATION=${d.toBase64()}")
+        if (count.count < settings.hostProfileHistory) 
+            return
+       
+        log.fine("recomputing Markov for ${d.toBase32()}")
+        
+        int ss = 0
+        int sr = 0
+        int sf = 0
+        int rs = 0
+        int rr = 0
+        int rf = 0
+        int fs = 0
+        int fr = 0
+        int ff = 0
+        ConnectionAttemptStatus currentStatus = ConnectionAttemptStatus.SUCCESSFUL
+        
+        sql.eachRow("select STATUS from HOST_PROFILES where DESTINATION=${d.toBase64()} ORDER BY TSTAMP") {  
+            def recordedStatus = ConnectionAttemptStatus.valueOf(it.STATUS)
+            switch(currentStatus) {
+                case ConnectionAttemptStatus.SUCCESSFUL:
+                switch(recordedStatus) {
+                    case ConnectionAttemptStatus.SUCCESSFUL: ss++; break;
+                    case ConnectionAttemptStatus.REJECTED: sr++; break;
+                    case ConnectionAttemptStatus.FAILED: sf++; break;
+                }
+                break
+                case ConnectionAttemptStatus.REJECTED:
+                switch(recordedStatus) {
+                    case ConnectionAttemptStatus.SUCCESSFUL: rs++; break;
+                    case ConnectionAttemptStatus.REJECTED: rr++; break;
+                    case ConnectionAttemptStatus.FAILED: rf++; break;
+                }
+                break
+                case ConnectionAttemptStatus.FAILED:
+                switch(recordedStatus) {
+                    case ConnectionAttemptStatus.SUCCESSFUL: fs++; break;
+                    case ConnectionAttemptStatus.REJECTED: fr++; break;
+                    case ConnectionAttemptStatus.FAILED: ff++; break;
+                }
+                break
+            }
+            currentStatus = recordedStatus
+        }
+
+        sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}")
+        sql.execute("insert into HOST_PROFILES values (" +
+            "${d.toBase64()}," +
+            "${ss * 1.0d / count}," +
+            "${sr * 1.0d / count}," +
+            "${sf * 1.0d / count}," +
+            "${rs * 1.0d / count}," +
+            "${rr * 1.0d / count}," +
+            "${rf * 1.0d / count}," +
+            "${fs * 1.0d / count}," +
+            "${fr * 1.0d / count}," +
+            "${ff * 1.0d / count}," +
+            ")")
+        def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
+        profiles.put(d, new HostMCProfile(newProfile))
+        log.fine("profile updated")        
     }
+    
     @Override
     public synchronized List<Destination> getHosts(int n, Predicate<Destination> filter) {
+        if (allHosts.isEmpty())
+            return Collections.emptyList()
+        
         List<Destination> rv = new ArrayList<>()
         Iterator<Destination> verifyIter = toVerify.iterator()
         while((rv.size() < n) && (verifyIter.hasNext())) {
@@ -77,21 +136,29 @@ class H2HostCache extends HostCache {
         
         if (rv.size() == n)
             return rv
+
+        Set<Destination> cannotTry = new HashSet<>()                
+        while(rv.size() < n && cannotTry.size() < allHosts.size()) {
+            Destination d = allHosts.get((int)(Math.random() * allHosts.size()))
+            if (cannotTry.contains(d))
+                continue
+            if (!filter.test(d)) {
+                cannotTry.add(d)
+                continue
+            }
                 
-        rv.addAll(getTopHosts(n - rv.size(), filter))
-        
-        log.fine("got ${rv.size()} ranked hosts out of $n requested")
-        
-        Iterator<Destination> iter = hosts.iterator()
-        while (rv.size() < n && iter.hasNext()) {
-            Destination host = iter.next()
-            if (filter.test(host))
-                rv.add(host)
+            HostMCProfile profile = profiles.get(d)
+            ConnectionAttemptStatus predicted = profile.transition()
+            if (predicted != ConnectionAttemptStatus.FAILED)
+                rv.add(d)
+            else
+                cannotTry.add(d)
         }
         
-        log.fine("will return total of ${rv.size()} hosts")
-        return rv;
+        log.fine("got ${rv.size()} from profiles, cannot try ${cannotTry.size()}")
+        rv
     }
+    
     @Override
     public synchronized List<Destination> getGoodHosts(int n) {
         // TODO look into DB and give a random sample of successful hosts
@@ -119,7 +186,21 @@ class H2HostCache extends HostCache {
         
         boolean success = sql.execute("CREATE TABLE IF NOT EXISTS HOST_ATTEMPTS(DESTINATION VARCHAR(1024), TSTAMP TIMESTAMP," +
                     "STATUS ENUM('SUCCESSFUL','REJECTED','FAILED'))")
-        log.info("created table $success")
+        log.info("created table attempts $success")
+        
+        // TODO add primary key
+        success = sql.execute("CREATE TABLE IF NOT EXISTS HOST_PROFILES(" +
+            "DESTINATION VARCHAR(1024)," +
+            "SS VARCHAR(16)," +
+            "SR VARCHAR(16)," +
+            "SF VARCHAR(16)," +
+            "RS VARCHAR(16)," +
+            "RR VARCHAR(16)," +
+            "RF VARCHAR(16)," +
+            "FS VARCHAR(16)," +
+            "FR VARCHAR(16)," +
+            "FF VARCHAR(16)" +
+            ")")
 
         timer.schedule({load()} as TimerTask, 1)        
         
@@ -153,11 +234,17 @@ class H2HostCache extends HostCache {
         log.info("loading hosts from db")
         sql.eachRow("select distinct DESTINATION from HOST_ATTEMPTS") { 
             Destination dest = new Destination(it.DESTINATION)
-            RankedHost rankedHost = rankHost(dest)
-            rankedHosts.put(dest, rankedHost)
+            if (uniqueHosts.add(dest)) {
+                def fromDB = sql.firstRow("select from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
+                def profile = new HostMCProfile()
+                if (fromDB != null)
+                    profile = new HostMCProfile(fromDB)
+                profiles.put(dest, profile)
+                allHosts.add(dest)
+            }
         }
-        log.info("loaded ${rankedHosts.size()} hosts")
         
+        log.fine("loaded ${allHosts.size()} hosts from db")
         timer.schedule({verifyHosts()} as TimerTask, 60000, 60000)
         loaded = true
     }
@@ -192,35 +279,4 @@ class H2HostCache extends HostCache {
         log.fine("end verification")
     }
     
-    private List<Destination> getTopHosts(int n, Predicate<Destination> filter) {
-        List<RankedHost> ranked = new ArrayList<>(rankedHosts.values())
-        ranked.sort({l,r -> Double.compare(r.probability, l.probability)})
-        
-        log.fine("before filtering there are ${ranked.size()} ranked hosts")
-        ranked.retainAll {
-            filter.test(it.destination)
-        }
-        log.fine("after filtering there are ${ranked.size()} ranked hosts")
-        
-        if (ranked.size() > n)
-            ranked = ranked[0..n-1]
-        ranked.collect { it.destination }
-    }
-    
-    private RankedHost rankHost(Destination d) {
-        // TODO: load connection history for the host from the DB
-        // then use ML to compute probability of success.
-        
-        // until that is implemented, use random
-        return new RankedHost(d, Math.random())
-    }
-    
-    private static class RankedHost {
-        private final Destination destination
-        private final double probability
-        RankedHost(Destination destination, double probability) {
-            this.destination = destination
-            this.probability = probability
-        }
-    }
 }
