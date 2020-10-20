@@ -85,6 +85,7 @@ class MainFrameModel {
     @Observable boolean routerPresent
 
     def results = new ConcurrentHashMap<>()
+    def browses = new ConcurrentHashSet<String>()
     def downloads = []
     def uploads = []
     boolean treeVisible = true

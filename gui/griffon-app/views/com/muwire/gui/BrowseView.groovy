@@ -186,6 +186,7 @@ class BrowseView {
         controller.register()
         
         def mainFrameGroup = application.mvcGroupManager.findGroup("MainFrame")
+        mainFrameGroup.model.browses.add(model.host.getHumanReadableName())
         parent = mainFrameGroup.view.builder.getVariable("result-tabs")
         parent.addTab(model.host.getHumanReadableName(), p)
         
@@ -225,6 +226,9 @@ class BrowseView {
     }
     
     def closeTab = {
+        def mainFrameGroup = application.mvcGroupManager.findGroup("MainFrame")
+        mainFrameGroup.model.browses.remove(model.host.getHumanReadableName())
+        
         int index = parent.indexOfTab(model.host.getHumanReadableName())
         parent.removeTabAt(index)
         model.downloadActionEnabled = false

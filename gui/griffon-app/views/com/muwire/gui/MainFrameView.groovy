@@ -1525,6 +1525,7 @@ class MainFrameView {
         int count = tabbedPane.getTabCount()
         for (int i = 0; i < count; i++)
             settings.openTabs.add(tabbedPane.getTitleAt(i))
+        settings.openTabs.removeAll(model.browses)
         
             
         JFrame mainFrame = builder.getVariable("main-frame")
