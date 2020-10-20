@@ -49,7 +49,7 @@ class HostMCProfile {
             "RF:${R[2].probability},"+
             "FS:${F[0].probability},"+
             "FR:${F[1].probability},"+
-            "FF:${F[2].probability}"+
+            "FF:${F[2].probability}"
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
