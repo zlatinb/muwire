@@ -72,8 +72,8 @@ class HostMCProfile {
             case SUCCESSFUL :
                 switch(nextStatus) {
                     case SUCCESSFUL : return SS
-                    case REJECTED : return RS
-                    case FAILED : return FS
+                    case REJECTED : return SR
+                    case FAILED : return SF
                 }
             case REJECTED :
                 switch(nextStatus) {
