@@ -103,19 +103,49 @@ class H2HostCache extends HostCache {
             currentStatus = recordedStatus
         }
         
-        count = count.COUNT
+        int countS = ss + sr + sf
+        int countR = rs + rr + rf
+        int countF = fs + fr + ff
+        
+        double ssd = 0.98d
+        double srd = 0.01d
+        double sfd = 0.01d
+        if (countS > 0) {
+            ssd = ss * 1.0d / countS
+            srd = sr * 1.0d / countS
+            sfd = sf * 1.0d / countS
+        }
+        
+        double rsd = 0.98d
+        double rrd = 0.01d
+        double rfd = 0.01d
+        if (countR > 0) {
+            rsd = rs * 1.0d / countR
+            rrd = rr * 1.0d / countR
+            rfd = rf * 1.0d / countR
+        }
+        
+        double fsd = 0.98d
+        double frd = 0.01d
+        double ffd = 0.01d
+        if (countF > 0) {
+            fsd = fs * 1.0d / countF
+            frd = fr * 1.0d / countF
+            ffd = ff * 1.0d / countF
+        }
+        
         sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         sql.execute("insert into HOST_PROFILES values (" +
             "'${d.toBase64()}'," +
-            "'${String.format("%.6f",ss * 1.0d / count)}'," +
-            "'${String.format("%.6f",sr * 1.0d / count)}'," +
-            "'${String.format("%.6f",sf * 1.0d / count)}'," +
-            "'${String.format("%.6f",rs * 1.0d / count)}'," +
-            "'${String.format("%.6f",rr * 1.0d / count)}'," +
-            "'${String.format("%.6f",rf * 1.0d / count)}'," +
-            "'${String.format("%.6f",fs * 1.0d / count)}'," +
-            "'${String.format("%.6f",fr * 1.0d / count)}'," +
-            "'${String.format("%.6f",ff * 1.0d / count)}'" +
+            "'${String.format("%.6f",ssd)}'," +
+            "'${String.format("%.6f",srd)}'," +
+            "'${String.format("%.6f",sfd)}'," +
+            "'${String.format("%.6f",rsd)}'," +
+            "'${String.format("%.6f",rrd)}'," +
+            "'${String.format("%.6f",rfd)}'," +
+            "'${String.format("%.6f",fsd)}'," +
+            "'${String.format("%.6f",frd)}'," +
+            "'${String.format("%.6f",ffd)}'" +
             ")")
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         profiles.put(d, new HostMCProfile(newProfile))
