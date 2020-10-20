@@ -119,7 +119,9 @@ class H2HostCache extends HostCache {
             ")")
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         profiles.put(d, new HostMCProfile(newProfile))
-        log.fine("profile updated")        
+        log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
+        
+        sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}") 
     }
     
     @Override
@@ -244,6 +246,7 @@ class H2HostCache extends HostCache {
                     profile = new HostMCProfile(fromDB)
                 profiles.put(dest, profile)
                 allHosts.add(dest)
+                log.fine("Loaded profile for ${dest.toBase32()} $profile")
             }
         }
         

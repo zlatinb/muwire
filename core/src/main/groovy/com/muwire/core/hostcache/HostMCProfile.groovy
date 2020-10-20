@@ -18,6 +18,8 @@ class HostMCProfile {
     private final Probability[] S
     private final Probability[] R
     private final Probability[] F
+    
+    private final String toString
         
     // start with S
     ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
@@ -38,6 +40,16 @@ class HostMCProfile {
         F[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
         F[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
         F[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
+        
+        toString = "SS:${S[0].probability}," +
+            "SR:${S[1].probability},"+
+            "SF:${S[2].probability},"+
+            "RS:${R[0].probability},"+
+            "RR:${R[1].probability},"+
+            "RF:${R[2].probability},"+
+            "FS:${F[0].probability},"+
+            "FR:${F[1].probability},"+
+            "FF:${F[2].probability}"+
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
@@ -91,6 +103,16 @@ class HostMCProfile {
         bd.setScale(SCALE, MODE)
         F[2] = new Probability(bd, ConnectionAttemptStatus.FAILED)
         
+        toString = "SS:${S[0].probability}," +
+        "SR:${S[1].probability},"+
+        "SF:${S[2].probability},"+
+        "RS:${R[0].probability},"+
+        "RR:${R[1].probability},"+
+        "RF:${R[2].probability},"+
+        "FS:${F[0].probability},"+
+        "FR:${F[1].probability},"+
+        "FF:${F[2].probability}"
+        
         Arrays.sort(S)
         S[1].probability += S[0].probability
         S[2].probability += S[1].probability
@@ -131,6 +153,11 @@ class HostMCProfile {
         return state
     }
 
+    @Override
+    public String toString() {
+        toString
+    }
+    
     private static class Probability implements Comparable<Probability> {
         
         private BigDecimal probability
@@ -148,5 +175,6 @@ class HostMCProfile {
                 return -1
             return 1
         }
+        
     }
 }
