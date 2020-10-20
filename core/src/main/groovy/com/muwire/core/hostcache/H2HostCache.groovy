@@ -40,12 +40,13 @@ class H2HostCache extends HostCache {
     
     @Override
     protected synchronized void hostDiscovered(Destination d, boolean fromHostcache) {
+        // overwrite MC with optimistic values 
         if (fromHostcache) {
-            // overwrite MC with optimistic values 
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}';")
             profiles.put(d, new HostMCProfile())
         } else if (uniqueHosts.add(d)) {
             allHosts.add(d)
+            profiles.put(d, new HostMCProfile())
         }
     }
     
