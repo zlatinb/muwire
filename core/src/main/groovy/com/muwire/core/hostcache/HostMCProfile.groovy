@@ -2,7 +2,7 @@ package com.muwire.core.hostcache
 
 import java.math.RoundingMode
 
-import static com.muwire.core.connection.ConnectionAttemptStatus.*
+import com.muwire.core.connection.ConnectionAttemptStatus
 
 import groovy.sql.GroovyRowResult
 
@@ -18,6 +18,9 @@ class HostMCProfile {
     private final BigDecimal SS, SR, SF
     private final BigDecimal RS, RR, RF
     private final BigDecimal FS, FR, FF
+    
+    // start with S
+    ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
     
     /**
      * constructs an "optimistic" predictor for newly discovered hosts.
@@ -62,52 +65,50 @@ class HostMCProfile {
         FF.setScale(SCALE, MODE)
     }
     
-    /**
-     * @param current status of this host
-     * @param nextStatus the next status of this host
-     * @return probability of such status
-     */
-    private BigDecimal transition(def currentStatus, def nextStatus) {
-        switch(currentStatus) {
-            case SUCCESSFUL :
-                switch(nextStatus) {
-                    case SUCCESSFUL : return SS
-                    case REJECTED : return SR
-                    case FAILED : return SF
-                }
-            case REJECTED :
-                switch(nextStatus) {
-                    case SUCCESSFUL : return RS
-                    case REJECTED : return RR
-                    case FAILED : return RF
-                }
-            case FAILED :
-                switch(nextStatus) {
-                    case SUCCESSFUL : return FS
-                    case REJECTED : return FR
-                    case FAILED : return FF
-                }
+    ConnectionAttemptStatus transition() {
+        
+        SortedMap<BigDecimal, ConnectionAttemptStatus> ignitionMap = new TreeMap<>()
+        switch(state) {
+            case ConnectionAttemptStatus.SUCCESSFUL :
+                ignitionMap.put(SS, ConnectionAttemptStatus.SUCCESSFUL)
+                ignitionMap.put(SR, ConnectionAttemptStatus.REJECTED)
+                ignitionMap.put(SF, ConnectionAttemptStatus.FAILED)
+                break
+            case ConnectionAttemptStatus.REJECTED :
+                ignitionMap.put(RS, ConnectionAttemptStatus.SUCCESSFUL)
+                ignitionMap.put(RR, ConnectionAttemptStatus.REJECTED)
+                ignitionMap.put(RF, ConnectionAttemptStatus.FAILED)
+                break
+            case ConnectionAttemptStatus.FAILED:
+                ignitionMap.put(FS, ConnectionAttemptStatus.SUCCESSFUL)
+                ignitionMap.put(FR, ConnectionAttemptStatus.REJECTED)
+                ignitionMap.put(FF, ConnectionAttemptStatus.FAILED)
+                break
         }
+        
+        BigDecimal[] probs = new BigDecimal[3]
+        ConnectionAttemptStatus[] states = new ConnectionAttemptStatus[3]
+        
+        Iterator<BigDecimal> iter = ignitionMap.keySet().iterator()
+        probs[0] = iter.next()
+        states[0] = ignitionMap.get(probs[0])
+        probs[1] = iter.next()
+        states[1] = ignitionMap.get(probs[1])
+        probs[2] = iter.next()
+        states[2] = ignitionMap.get(probs[2])
+        
+        probs[1] += probs[0]
+        probs[2] += probs[1]
+        
+        final double random = Math.random()
+        if (random < probs[0]) 
+            state = states[0]
+        else if (random < probs[1])
+            state = states[1]
+        else
+            state = states[2] 
+
+        state
     }
-    
-    /**
-     * @param lastStatus last observed status
-     * @param periods how many periods ago
-     * @return probability of next status being SUCCESSFUL
-     */
-    public BigDecimal connectSuccessProbability(def lastStatus, int periods) {
-        if (periods == 0) {
-            return transition(lastStatus, SUCCESSFUL)
-        } else {
-            def toSuccess = transition(lastStatus, SUCCESSFUL)
-            def toReject = transition(lastStatus, REJECTED)
-            def toFail = transition(lastStatus, FAILED)
-            final newPeriods = periods - 1
-            BigDecimal rv = toSuccess * connectSuccessProbability(SUCCESSFUL, newPeriods) +
-                toReject * connectSuccessProbability(REJECTED, newPeriods) +
-                toFail * connectSuccessProbability(FAILED, newPeriods)
-            rv.setScale(SCALE, MODE)
-            return rv
-        }
-    }
+
 }
