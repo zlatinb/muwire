@@ -19,7 +19,7 @@ import java.util.zip.GZIPInputStream
 @Log
 class BrowseManager {
     
-    private static final int BATCH_SIZE = 32
+    private static final int BATCH_SIZE = 128
     
     private final I2PConnector connector
     private final EventBus eventBus
