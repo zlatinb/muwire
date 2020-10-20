@@ -15,10 +15,10 @@ class HostMCProfile {
     private static final int SCALE = 10
     private static final RoundingMode MODE = RoundingMode.HALF_UP
     
-    private final BigDecimal SS, SR, SF
-    private final BigDecimal RS, RR, RF
-    private final BigDecimal FS, FR, FF
-    
+    private final Probability[] S
+    private final Probability[] R
+    private final Probability[] F
+        
     // start with S
     ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
     
@@ -26,89 +26,127 @@ class HostMCProfile {
      * constructs an "optimistic" predictor for newly discovered hosts.
      */
     HostMCProfile() {
-        SS = 0.98
-        SR = 0.01
-        SF = 0.01
-        RS = 0.98
-        RR = 0.01
-        RF = 0.01
-        FS = 0.98
-        FR = 0.01
-        FF = 0.01
+        S = new Probability[3]
+        R = new Probability[3]
+        F = new Probability[3]
+        S[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
+        S[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
+        S[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
+        R[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
+        R[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
+        R[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
+        F[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
+        F[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
+        F[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
+        
+        Arrays.sort(S)
+        S[1].probability += S[0].probability
+        S[2].probability += S[1].probability
+        Arrays.sort(R)
+        R[1].probability += R[0].probability
+        R[2].probability += R[1].probability
+        Arrays.sort(F)
+        F[1].probability += F[0].probability
+        F[2].probability += F[1].probability
+        
     }
     
     /**
      * historical predictor loaded from database
      */
-    HostMCProfile(GroovyRowResult fromDB) {
-        SS = new BigDecimal(fromDB.SS)
-        SR = new BigDecimal(fromDB.SR)
-        SF = new BigDecimal(fromDB.SF)
-        RS = new BigDecimal(fromDB.RS)
-        RR = new BigDecimal(fromDB.RR)
-        RF = new BigDecimal(fromDB.RF)
-        FS = new BigDecimal(fromDB.FS)
-        FR = new BigDecimal(fromDB.FR)
-        FF = new BigDecimal(fromDB.FF)
-        setScale()
-    }
-    
-    private void setScale() {
-        SS.setScale(SCALE, MODE)
-        SR.setScale(SCALE, MODE)
-        SF.setScale(SCALE, MODE)
-        RS.setScale(SCALE, MODE)
-        RR.setScale(SCALE, MODE)
-        RF.setScale(SCALE, MODE)
-        FS.setScale(SCALE, MODE)
-        FR.setScale(SCALE, MODE)
-        FF.setScale(SCALE, MODE)
+    HostMCProfile(def fromDB) {
+        S = new Probability[3]
+        R = new Probability[3]
+        F = new Probability[3]
+
+        BigDecimal bd
+        
+        bd = new BigDecimal(fromDB.SS)
+        bd.setScale(SCALE, MODE)
+        S[0] = new Probability(bd, ConnectionAttemptStatus.SUCCESSFUL)
+        bd = new BigDecimal(fromDB.SR)
+        bd.setScale(SCALE, MODE)
+        S[1] = new Probability(bd, ConnectionAttemptStatus.REJECTED)
+        bd = new BigDecimal(fromDB.SF)
+        bd.setScale(SCALE, MODE)
+        S[2] = new Probability(bd, ConnectionAttemptStatus.FAILED)
+        
+        bd = new BigDecimal(fromDB.RS)
+        bd.setScale(SCALE, MODE)
+        R[0] = new Probability(bd, ConnectionAttemptStatus.SUCCESSFUL)
+        bd = new BigDecimal(fromDB.RR)
+        bd.setScale(SCALE, MODE)
+        R[1] = new Probability(bd, ConnectionAttemptStatus.REJECTED)
+        bd = new BigDecimal(fromDB.RF)
+        bd.setScale(SCALE, MODE)
+        R[2] = new Probability(bd, ConnectionAttemptStatus.FAILED)
+        
+        bd = new BigDecimal(fromDB.FS)
+        bd.setScale(SCALE, MODE)
+        F[0] = new Probability(bd, ConnectionAttemptStatus.SUCCESSFUL)
+        bd = new BigDecimal(fromDB.FR)
+        bd.setScale(SCALE, MODE)
+        F[1] = new Probability(bd, ConnectionAttemptStatus.REJECTED)
+        bd = new BigDecimal(fromDB.FF)
+        bd.setScale(SCALE, MODE)
+        F[2] = new Probability(bd, ConnectionAttemptStatus.FAILED)
+        
+        Arrays.sort(S)
+        S[1].probability += S[0].probability
+        S[2].probability += S[1].probability
+        Arrays.sort(R)
+        R[1].probability += R[0].probability
+        R[2].probability += R[1].probability
+        Arrays.sort(F)
+        F[1].probability += F[0].probability
+        F[2].probability += F[1].probability
+        
     }
     
     ConnectionAttemptStatus transition() {
         
-        SortedMap<BigDecimal, ConnectionAttemptStatus> ignitionMap = new TreeMap<>()
+        Probability[] lookup
         switch(state) {
             case ConnectionAttemptStatus.SUCCESSFUL :
-                ignitionMap.put(SS, ConnectionAttemptStatus.SUCCESSFUL)
-                ignitionMap.put(SR, ConnectionAttemptStatus.REJECTED)
-                ignitionMap.put(SF, ConnectionAttemptStatus.FAILED)
+                lookup = S
                 break
             case ConnectionAttemptStatus.REJECTED :
-                ignitionMap.put(RS, ConnectionAttemptStatus.SUCCESSFUL)
-                ignitionMap.put(RR, ConnectionAttemptStatus.REJECTED)
-                ignitionMap.put(RF, ConnectionAttemptStatus.FAILED)
+                lookup = R
                 break
             case ConnectionAttemptStatus.FAILED:
-                ignitionMap.put(FS, ConnectionAttemptStatus.SUCCESSFUL)
-                ignitionMap.put(FR, ConnectionAttemptStatus.REJECTED)
-                ignitionMap.put(FF, ConnectionAttemptStatus.FAILED)
+                lookup = F
                 break
         }
         
-        BigDecimal[] probs = new BigDecimal[3]
-        ConnectionAttemptStatus[] states = new ConnectionAttemptStatus[3]
-        
-        Iterator<BigDecimal> iter = ignitionMap.keySet().iterator()
-        probs[0] = iter.next()
-        states[0] = ignitionMap.get(probs[0])
-        probs[1] = iter.next()
-        states[1] = ignitionMap.get(probs[1])
-        probs[2] = iter.next()
-        states[2] = ignitionMap.get(probs[2])
-        
-        probs[1] += probs[0]
-        probs[2] += probs[1]
-        
+        ConnectionAttemptStatus state
         final double random = Math.random()
-        if (random < probs[0]) 
-            state = states[0]
-        else if (random < probs[1])
-            state = states[1]
+        if (random < lookup[0].probability)
+            state = lookup[0].state
+        else if (random < lookup[1].probability)
+            state = lookup[1].state
         else
-            state = states[2] 
-
-        state
+            state = lookup[2].state
+        
+        this.state = state
+        return state
     }
 
+    private static class Probability implements Comparable<Probability> {
+        
+        private BigDecimal probability
+        private final ConnectionAttemptStatus state
+        
+        Probability(BigDecimal probability, ConnectionAttemptStatus state) {
+            this.probability = probability
+            this.state = state
+        }
+        
+        public int compareTo(Probability other) {
+            if (probability == other.probability)
+                return 0
+            if (probability < other.probability)
+                return -1
+            return 1
+        }
+    }
 }
