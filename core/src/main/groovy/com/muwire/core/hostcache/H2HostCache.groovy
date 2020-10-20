@@ -58,8 +58,8 @@ class H2HostCache extends HostCache {
         timestamp = SDF.format(timestamp)
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
-        def count = sql.firstRow("select count(*) as COUNT from HOST_PROFILES where DESTINATION=${d.toBase64()}")
-        if (count.count < settings.hostProfileHistory) 
+        def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
+        if (count.COUNT < settings.hostProfileHistory) 
             return
        
         log.fine("recomputing Markov for ${d.toBase32()}")
