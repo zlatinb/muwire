@@ -29,12 +29,12 @@ public class BrowseManager {
         Browse browse = browses.get(e.getHost());
         if (browse == null)
             return; // hmm
+        if (!browse.uuid.equals(e.getUuid()))
+            return;
         browse.status = e.getStatus();
         browse.revision++;
-        if (browse.status == BrowseStatus.FETCHING) {
+        if (browse.status == BrowseStatus.FETCHING) 
             browse.totalResults = e.getTotalResults();
-            browse.uuid = e.getUuid();
-        }
     }
     
     public void onUIResultBatchEvent(UIResultBatchEvent e) {
@@ -51,6 +51,7 @@ public class BrowseManager {
         Browse browse = new Browse(p);
         browses.put(p, browse);
         UIBrowseEvent event = new UIBrowseEvent();
+        event.setUuid(browse.uuid);
         event.setHost(p);
         core.getEventBus().publish(event);
     }
@@ -72,11 +73,12 @@ public class BrowseManager {
         private volatile BrowseStatus status;
         private volatile int totalResults;
         private volatile long revision;
-        private volatile UUID uuid;
+        private final UUID uuid;
         private final List<UIResultEvent> results = Collections.synchronizedList(new ArrayList<>());
         
         Browse(Persona persona) {
             this.persona = persona;
+            this.uuid = UUID.randomUUID();
         }
 
         public BrowseStatus getStatus() {
