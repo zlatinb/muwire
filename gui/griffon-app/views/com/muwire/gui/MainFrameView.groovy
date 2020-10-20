@@ -339,7 +339,7 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
-                                            tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, jtree)
+                                            tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
                                         }
                                     }
                                 }
@@ -794,7 +794,7 @@ class MainFrameView {
             model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
         
-        def sharedFilesTree = builder.getVariable("shared-files-tree")
+        JTree sharedFilesTree = builder.getVariable("shared-files-tree")
         sharedFilesTree.addMouseListener(sharedFilesMouseListener)
 
         sharedFilesTree.addTreeSelectionListener({
@@ -813,7 +813,7 @@ class MainFrameView {
         })
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
-
+        
         // uploadsTable
         def uploadsTable = builder.getVariable("uploads-table")
         
@@ -1545,17 +1545,38 @@ class MainFrameView {
     }
 
     private static class TreeExpansions implements TreeExpansionListener {
+        private boolean manualExpansion
         private final Set<TreePath> expandedPaths = new HashSet<>()
 
 
         @Override
         public void treeExpanded(TreeExpansionEvent event) {
+            manualExpansion = true
             expandedPaths.add(event.getPath())
         }
 
         @Override
         public void treeCollapsed(TreeExpansionEvent event) {
+            manualExpansion = true
             expandedPaths.remove(event.getPath())
         }        
+    }
+    
+    /**
+     * Expands the tree until there is a path with more than one node
+     * unless there has been manual expansion already.
+     */
+    void magicTreeExpansion() {
+        if (expansionListener.manualExpansion)
+            return
+            
+        // magic tree expansion like in the plugin
+        JTree sharedFilesTree = builder.getVariable("shared-files-tree")
+        TreeNode currentNode = model.treeRoot
+        int currentRow = 0
+        while(currentNode.childCount == 1) {
+            sharedFilesTree.expandRow(currentRow++)
+            currentNode = currentNode.getChildAt(0)
+        }
     }    
 }

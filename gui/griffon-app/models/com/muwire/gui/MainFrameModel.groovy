@@ -13,6 +13,7 @@ import javax.swing.JOptionPane
 import javax.swing.JTable
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreeModel
 import javax.swing.tree.TreeNode
 
 import com.muwire.core.Core
@@ -90,7 +91,7 @@ class MainFrameModel {
     def uploads = []
     boolean treeVisible = true
     def shared 
-    def sharedTree 
+    TreeModel sharedTree 
     def treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
     def connectionList = []
@@ -310,6 +311,7 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
+            view.magicTreeExpansion()
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
