@@ -75,7 +75,7 @@ class H2HostCache extends HostCache {
         int ff = 0
         ConnectionAttemptStatus currentStatus = ConnectionAttemptStatus.SUCCESSFUL
         
-        sql.eachRow("select STATUS from HOST_PROFILES where DESTINATION=${d.toBase64()} ORDER BY TSTAMP") {  
+        sql.eachRow("select STATUS from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} ORDER BY TSTAMP") {  
             def recordedStatus = ConnectionAttemptStatus.valueOf(it.STATUS)
             switch(currentStatus) {
                 case ConnectionAttemptStatus.SUCCESSFUL:
@@ -102,19 +102,20 @@ class H2HostCache extends HostCache {
             }
             currentStatus = recordedStatus
         }
-
+        
+        count = count.COUNT
         sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         sql.execute("insert into HOST_PROFILES values (" +
-            "${d.toBase64()}," +
-            "${ss * 1.0d / count}," +
-            "${sr * 1.0d / count}," +
-            "${sf * 1.0d / count}," +
-            "${rs * 1.0d / count}," +
-            "${rr * 1.0d / count}," +
-            "${rf * 1.0d / count}," +
-            "${fs * 1.0d / count}," +
-            "${fr * 1.0d / count}," +
-            "${ff * 1.0d / count}," +
+            "'${d.toBase64()}'," +
+            "'${String.format("%.6f",ss * 1.0d / count)}'," +
+            "'${String.format("%.6f",sr * 1.0d / count)}'," +
+            "'${String.format("%.6f",sf * 1.0d / count)}'," +
+            "'${String.format("%.6f",rs * 1.0d / count)}'," +
+            "'${String.format("%.6f",rr * 1.0d / count)}'," +
+            "'${String.format("%.6f",rf * 1.0d / count)}'," +
+            "'${String.format("%.6f",fs * 1.0d / count)}'," +
+            "'${String.format("%.6f",fr * 1.0d / count)}'," +
+            "'${String.format("%.6f",ff * 1.0d / count)}'" +
             ")")
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         profiles.put(d, new HostMCProfile(newProfile))
@@ -138,10 +139,11 @@ class H2HostCache extends HostCache {
         if (rv.size() == n)
             return rv
 
-        Set<Destination> cannotTry = new HashSet<>()                
-        while(rv.size() < n && cannotTry.size() < allHosts.size()) {
+        Set<Destination> cannotTry = new HashSet<>()   
+        Set<Destination> wouldFail = new HashSet<>()             
+        while(rv.size() < n && (cannotTry.size() + wouldFail.size()) < allHosts.size()) {
             Destination d = allHosts.get((int)(Math.random() * allHosts.size()))
-            if (cannotTry.contains(d))
+            if (cannotTry.contains(d) || wouldFail.contains(d))
                 continue
             if (!filter.test(d)) {
                 cannotTry.add(d)
@@ -153,10 +155,10 @@ class H2HostCache extends HostCache {
             if (predicted != ConnectionAttemptStatus.FAILED)
                 rv.add(d)
             else
-                cannotTry.add(d)
+                wouldFail.add(d)
         }
         
-        log.fine("got ${rv.size()} from profiles, cannot try ${cannotTry.size()}")
+        log.fine("got ${rv.size()} from profiles, cannot try ${cannotTry.size()} would fail ${wouldFail.size()}")
         rv
     }
     
@@ -236,7 +238,7 @@ class H2HostCache extends HostCache {
         sql.eachRow("select distinct DESTINATION from HOST_ATTEMPTS") { 
             Destination dest = new Destination(it.DESTINATION)
             if (uniqueHosts.add(dest)) {
-                def fromDB = sql.firstRow("select from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
+                def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
                 def profile = new HostMCProfile()
                 if (fromDB != null)
                     profile = new HostMCProfile(fromDB)
