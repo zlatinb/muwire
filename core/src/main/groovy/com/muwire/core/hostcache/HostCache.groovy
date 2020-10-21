@@ -61,6 +61,7 @@ abstract class HostCache extends Service {
     abstract List<Destination> getHosts(int n, Predicate<Destination> filter)
     abstract List<Destination> getGoodHosts(int n)
     
+    abstract int countAllHosts()
     abstract int countFailingHosts()
     abstract int countHopelessHosts()
     

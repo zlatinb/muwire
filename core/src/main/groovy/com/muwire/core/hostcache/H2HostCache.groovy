@@ -107,27 +107,27 @@ class H2HostCache extends HostCache {
         int countR = rs + rr + rf
         int countF = fs + fr + ff
         
-        double ssd = 0.98d
-        double srd = 0.01d
-        double sfd = 0.01d
+        double ssd = HostMCProfile.DEFAULT_SS
+        double srd = HostMCProfile.DEFAULT_SR
+        double sfd = HostMCProfile.DEFAULT_SF
         if (countS > 0) {
             ssd = ss * 1.0d / countS
             srd = sr * 1.0d / countS
             sfd = sf * 1.0d / countS
         }
         
-        double rsd = 0.98d
-        double rrd = 0.01d
-        double rfd = 0.01d
+        double rsd = HostMCProfile.DEFAULT_RS
+        double rrd = HostMCProfile.DEFAULT_RR
+        double rfd = HostMCProfile.DEFAULT_RF
         if (countR > 0) {
             rsd = rs * 1.0d / countR
             rrd = rr * 1.0d / countR
             rfd = rf * 1.0d / countR
         }
         
-        double fsd = 0.98d
-        double frd = 0.01d
-        double ffd = 0.01d
+        double fsd = HostMCProfile.DEFAULT_FS
+        double frd = HostMCProfile.DEFAULT_FR
+        double ffd = HostMCProfile.DEFAULT_FF
         if (countF > 0) {
             fsd = fs * 1.0d / countF
             frd = fr * 1.0d / countF
@@ -171,16 +171,13 @@ class H2HostCache extends HostCache {
         if (rv.size() == n)
             return rv
 
-        Set<Destination> cannotTry = new HashSet<>()   
+        List<Destination> canTry = new ArrayList<>(allHosts)
+        canTry.removeAll { profiles.get(it).isHopeless() && !filter.test(it)}
         Set<Destination> wouldFail = new HashSet<>()             
-        while(rv.size() < n && (cannotTry.size() + wouldFail.size()) < allHosts.size()) {
-            Destination d = allHosts.get((int)(Math.random() * allHosts.size()))
-            if (cannotTry.contains(d) || wouldFail.contains(d))
+        while(rv.size() < n && wouldFail.size() < canTry.size()) {
+            Destination d = canTry.get((int)(Math.random() * canTry.size()))
+            if (wouldFail.contains(d))
                 continue
-            if (!filter.test(d)) {
-                cannotTry.add(d)
-                continue
-            }
                 
             HostMCProfile profile = profiles.get(d)
             ConnectionAttemptStatus predicted = profile.transition()
@@ -190,25 +187,34 @@ class H2HostCache extends HostCache {
                 wouldFail.add(d)
         }
         
-        log.fine("got ${rv.size()} from profiles, cannot try ${cannotTry.size()} would fail ${wouldFail.size()}")
+        log.fine("got ${rv.size()} from profiles, can try ${canTry.size()} would fail ${wouldFail.size()} total ${allHosts.size()}")
         rv
     }
     
     @Override
     public synchronized List<Destination> getGoodHosts(int n) {
-        // TODO look into DB and give a random sample of successful hosts
-        return Collections.emptyList();
+        List<Destination> rv = new ArrayList<>(allHosts)
+        rv.retainAll { profiles.get(it).shouldAdvertise() }
+        if (rv.size() <= n)
+            return rv
+        Collections.shuffle(rv)
+        rv[0..n-1]  
     }
+    
     @Override
     public synchronized int countFailingHosts() {
-        // TODO count from db
         return 0;
     }
+    
     @Override
     public synchronized int countHopelessHosts() {
-        // TODO count from db
-        return 0;
+        allHosts.count { profiles.get(it).isHopeless() }
     }
+    
+    public synchronized int countAllHosts() {
+        allHosts.size()
+    }
+    
     @Override
     public synchronized void start(Supplier<Collection<Destination>> connected) {
         this.connSupplier = connected

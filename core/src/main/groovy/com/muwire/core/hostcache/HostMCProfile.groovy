@@ -15,31 +15,48 @@ class HostMCProfile {
     private static final int SCALE = 10
     private static final RoundingMode MODE = RoundingMode.HALF_UP
     
+    static final BigDecimal DEFAULT_SS = 0.98
+    static final BigDecimal DEFAULT_SR = 0.01
+    static final BigDecimal DEFAULT_SF = 0.01
+    static final BigDecimal DEFAULT_RS = 0.98
+    static final BigDecimal DEFAULT_RR = 0.01
+    static final BigDecimal DEFAULT_RF = 0.01
+    static final BigDecimal DEFAULT_FS = 0.98
+    static final BigDecimal DEFAULT_FR = 0.01
+    static final BigDecimal DEFAULT_FF = 0.01
+    
+    private static final HOPELESS_THRESHOLD = 0.95
+    
     private final Probability[] S
     private final Probability[] R
     private final Probability[] F
+    private final BigDecimal FF
     
     private final String toString
         
     // start with S
     ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
     
+    final boolean hasHistory
+    
     /**
      * constructs an "optimistic" predictor for newly discovered hosts.
      */
     HostMCProfile() {
+        hasHistory = false
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
-        S[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
-        S[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
-        S[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
-        R[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
-        R[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
-        R[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
-        F[0] = new Probability(0.98, ConnectionAttemptStatus.SUCCESSFUL)
-        F[1] = new Probability(0.01, ConnectionAttemptStatus.REJECTED)
-        F[2] = new Probability(0.01, ConnectionAttemptStatus.FAILED)
+        S[0] = new Probability(DEFAULT_SS, ConnectionAttemptStatus.SUCCESSFUL)
+        S[1] = new Probability(DEFAULT_SR, ConnectionAttemptStatus.REJECTED)
+        S[2] = new Probability(DEFAULT_SF, ConnectionAttemptStatus.FAILED)
+        R[0] = new Probability(DEFAULT_RS, ConnectionAttemptStatus.SUCCESSFUL)
+        R[1] = new Probability(DEFAULT_RR, ConnectionAttemptStatus.REJECTED)
+        R[2] = new Probability(DEFAULT_RF, ConnectionAttemptStatus.FAILED)
+        F[0] = new Probability(DEFAULT_FS, ConnectionAttemptStatus.SUCCESSFUL)
+        F[1] = new Probability(DEFAULT_FR, ConnectionAttemptStatus.REJECTED)
+        F[2] = new Probability(DEFAULT_FF, ConnectionAttemptStatus.FAILED)
+        FF = DEFAULT_FF
         
         toString = "SS:${S[0].probability}," +
             "SR:${S[1].probability},"+
@@ -67,6 +84,8 @@ class HostMCProfile {
      * historical predictor loaded from database
      */
     HostMCProfile(def fromDB) {
+        hasHistory = true
+        
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
@@ -103,6 +122,8 @@ class HostMCProfile {
         bd.setScale(SCALE, MODE)
         F[2] = new Probability(bd, ConnectionAttemptStatus.FAILED)
         
+        FF = F[2].probability
+        
         toString = "SS:${S[0].probability}," +
         "SR:${S[1].probability},"+
         "SF:${S[2].probability},"+
@@ -125,8 +146,27 @@ class HostMCProfile {
         
     }
     
+    /**
+     * Transitions to the next state
+     * @return the next state
+     */
     ConnectionAttemptStatus transition() {
-        
+        this.state = nextState()
+        return state
+    }
+ 
+    /**
+     * @return if the host should be advertised in pongs
+     */
+    boolean shouldAdvertise() {
+        hasHistory && nextState() != ConnectionAttemptStatus.FAILED
+    }   
+    
+    /**
+     * Rolls the dice and tells us what the next state should be.
+     * Does not actually transition.
+     */
+    private ConnectionAttemptStatus nextState() {
         Probability[] lookup
         switch(state) {
             case ConnectionAttemptStatus.SUCCESSFUL :
@@ -139,7 +179,7 @@ class HostMCProfile {
                 lookup = F
                 break
         }
-        
+
         ConnectionAttemptStatus state
         final double random = Math.random()
         if (random < lookup[0].probability)
@@ -148,14 +188,19 @@ class HostMCProfile {
             state = lookup[1].state
         else
             state = lookup[2].state
-        
-        this.state = state
-        return state
+        state
+    }
+    
+    /**
+     * @return if host should be considered hopeless.
+     */
+    boolean isHopeless() {
+        state == ConnectionAttemptStatus.FAILED && hasHistory && FF > HOPELESS_THRESHOLD
     }
 
     @Override
     public String toString() {
-        toString
+        toString + " state " + state
     }
     
     private static class Probability implements Comparable<Probability> {

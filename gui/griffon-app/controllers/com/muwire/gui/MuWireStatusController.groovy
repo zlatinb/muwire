@@ -30,7 +30,7 @@ class MuWireStatusController {
         model.incomingConnections = incoming
         model.outgoingConnections = outgoing
 
-        model.knownHosts = core.hostCache.hosts.size()
+        model.knownHosts = core.hostCache.countAllHosts()
         model.failingHosts = core.hostCache.countFailingHosts()
         model.hopelessHosts = core.hostCache.countHopelessHosts()
         

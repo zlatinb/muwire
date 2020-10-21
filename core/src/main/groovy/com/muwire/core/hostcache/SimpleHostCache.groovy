@@ -113,6 +113,12 @@ class SimpleHostCache extends HostCache {
         rv[0..n-1]
     }
     
+    int countAllHosts() {
+        synchronized(hosts) {
+            return hosts.size()
+        }
+    }
+    
     int countFailingHosts() {
         List<Destination> rv
         synchronized(hosts) {
