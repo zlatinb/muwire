@@ -55,13 +55,13 @@ class H2HostCache extends HostCache {
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
         
         log.fine("onConnection ${d.toBase32()} status $status")
-        if (status == ConnectionAttemptStatus.SUCCESSFUL) {
-            if (uniqueHosts.add(d)) {
-                allHosts.add(d)
-                profiles.put(d, new HostMCProfile())
-            } 
+        if (uniqueHosts.add(d)) {
+            allHosts.add(d)
+            profiles.put(d, new HostMCProfile())
+        } 
+        if (status == ConnectionAttemptStatus.SUCCESSFUL) 
             profiles.get(d).successfulAttempt = true
-        }
+            
         int historyItems = profiles.get(d).hasHistory ? settings.hostProfileHistory : 1
         
         // record into db
