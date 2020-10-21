@@ -42,9 +42,10 @@ class H2HostCache extends HostCache {
     protected synchronized void hostDiscovered(Destination d, boolean fromHostcache) {
         // overwrite MC with optimistic values 
         if (fromHostcache) {
-            sql.execute("delete from HOST_ATTEMPTS where DESTINATION='${d.toBase64()}';")
+            sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
             profiles.put(d, new HostMCProfile())
-        } else if (uniqueHosts.add(d)) {
+        }
+        if (uniqueHosts.add(d)) {
             allHosts.add(d)
             profiles.put(d, new HostMCProfile())
         }
@@ -54,6 +55,11 @@ class H2HostCache extends HostCache {
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
         
         log.fine("onConnection ${d.toBase32()} status $status")
+        
+        if (status == ConnectionAttemptStatus.SUCCESSFUL && uniqueHosts.add(d)) {
+            allHosts.add(d)
+            profiles.put(d, new HostMCProfile())
+        }
         
         // record into db
         def timestamp = new Date(System.currentTimeMillis())
