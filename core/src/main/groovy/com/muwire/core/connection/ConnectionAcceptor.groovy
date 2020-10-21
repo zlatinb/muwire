@@ -399,7 +399,9 @@ class ConnectionAcceptor {
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
             }
             dos.flush()
-            dos.close()
+            try {
+                dos.close()
+            } catch (Exception ignored) {}
         } finally {
             e.close()
         }
@@ -522,7 +524,9 @@ class ConnectionAcceptor {
                 dos.writeShort(payload.length)
                 dos.write(payload)
             }
-            dos.close()
+            try {
+                dos.close()
+            } catch (Exception ignored) {}
         } finally {
             e.close()
         }
@@ -584,7 +588,9 @@ class ConnectionAcceptor {
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
             }
             dos.flush()
-            dos.close()
+            try {
+                dos.close()
+            } catch(Exception ignore) {}
         } finally {
             e.close()
         }

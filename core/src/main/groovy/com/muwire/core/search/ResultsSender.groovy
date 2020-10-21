@@ -150,7 +150,9 @@ class ResultsSender {
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
                         }
-                        dos.close()
+                        try {
+                            dos.close()
+                        } catch (Exception ignore) {}
                     } finally {
                         endpoint?.close()
                     }
