@@ -194,6 +194,7 @@ class H2HostCache extends HostCache {
                 
             HostMCProfile profile = profiles.get(d)
             ConnectionAttemptStatus predicted = profile.transition()
+            log.fine("predicted $predicted for ${d.toBase32()} profile $profile")
             if (predicted != ConnectionAttemptStatus.FAILED)
                 rv.add(d)
             else
