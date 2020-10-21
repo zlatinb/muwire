@@ -43,11 +43,11 @@ class H2HostCache extends HostCache {
         // overwrite MC with optimistic values 
         if (fromHostcache) {
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
-            profiles.put(d, new HostMCProfile())
+            profiles.put(d, new HostMCProfile(false))
         }
         if (uniqueHosts.add(d)) {
             allHosts.add(d)
-            profiles.put(d, new HostMCProfile())
+            profiles.put(d, new HostMCProfile(false))
         }
     }
     
@@ -56,9 +56,12 @@ class H2HostCache extends HostCache {
         
         log.fine("onConnection ${d.toBase32()} status $status")
         
-        if (status == ConnectionAttemptStatus.SUCCESSFUL && uniqueHosts.add(d)) {
-            allHosts.add(d)
-            profiles.put(d, new HostMCProfile())
+        if (status == ConnectionAttemptStatus.SUCCESSFUL) {
+            if (uniqueHosts.add(d)) {
+                allHosts.add(d)
+                profiles.put(d, new HostMCProfile(true))
+            } else
+                profiles.get(d).successfulAttempt = true
         }
         
         // record into db
@@ -285,7 +288,7 @@ class H2HostCache extends HostCache {
             Destination dest = new Destination(it.DESTINATION)
             if (uniqueHosts.add(dest)) {
                 def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
-                def profile = new HostMCProfile()
+                def profile = new HostMCProfile(true)
                 if (fromDB != null)
                     profile = new HostMCProfile(fromDB)
                 profiles.put(dest, profile)

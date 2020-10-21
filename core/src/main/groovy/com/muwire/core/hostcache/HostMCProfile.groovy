@@ -38,12 +38,13 @@ class HostMCProfile {
     ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
     
     final boolean hasHistory
+    boolean successfulAttempt
     
     /**
      * constructs an "optimistic" predictor for newly discovered hosts.
      */
-    HostMCProfile() {
-        hasHistory = false
+    HostMCProfile(boolean hasHistory) {
+        this.hasHistory = hasHistory
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
@@ -159,7 +160,7 @@ class HostMCProfile {
      * @return if the host should be advertised in pongs
      */
     boolean shouldAdvertise() {
-        hasHistory && nextState() != ConnectionAttemptStatus.FAILED
+        (hasHistory || successfulAttempt) && nextState() != ConnectionAttemptStatus.FAILED
     }   
     
     /**
