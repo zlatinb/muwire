@@ -53,6 +53,8 @@ class H2HostCache extends HostCache {
     @Override
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
         
+        log.fine("onConnection ${d.toBase32()} status $status")
+        
         // record into db
         def timestamp = new Date(System.currentTimeMillis())
         timestamp = SDF.format(timestamp)
@@ -287,7 +289,10 @@ class H2HostCache extends HostCache {
         }
         
         log.fine("loaded ${allHosts.size()} hosts from db")
-        timer.schedule({verifyHosts()} as TimerTask, 60000, 60000)
+        timer.schedule({
+            purgeHopeless()
+            verifyHosts()
+        } as TimerTask, 60000, 60000)
         loaded = true
     }
     
@@ -319,6 +324,38 @@ class H2HostCache extends HostCache {
             }
         }
         log.fine("end verification")
+    }
+    
+    private synchronized void purgeHopeless() {
+        log.fine("purging hopeless hosts from total ${allHosts.size()}")
+        
+        final long now = System.currentTimeMillis()
+        List<Destination> candidates = new ArrayList<>()
+        for (Destination d : allHosts) {
+            if (profiles.get(d).isHopeless()) {
+                log.fine("considering hopeless host ${d.toBase32()}")
+                def row = sql.firstRow("select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and STATUS='SUCCESSFUL' order by TSTAMP DESC LIMIT 1")
+                if (row == null) {
+                    log.fine("no successful attempts")
+                    candidates.add(d)
+                } else {
+                    if (now - row.TSTAMP.getTime() > settings.hostHopelessPurgeInterval * 60 * 1000) {
+                        log.fine("last successful attempt was at $row.TSTAMP , purging")
+                        candidates.add(d)
+                    }
+                }
+            }
+        }
+        
+        log.fine("will purge ${candidates.size()} hopeless hosts")
+        for (Destination hopeless : candidates) {
+            allHosts.remove(hopeless)
+            uniqueHosts.remove(hopeless)
+            sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${hopeless.toBase64()}")
+            sql.execute("delete from HOST_PROFILES where DESTINATION=${hopeless.toBase64()}")
+        }
+        log.fine("purged hopeless, remaining ${allHosts.size()}")
+        
     }
     
 }
