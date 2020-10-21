@@ -164,7 +164,7 @@ class H2HostCache extends HostCache {
         profiles.put(d, new HostMCProfile(newProfile))
         log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
         
-        sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}") 
+        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}") 
     }
     
     @Override
