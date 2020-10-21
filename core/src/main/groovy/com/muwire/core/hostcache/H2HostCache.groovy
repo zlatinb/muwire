@@ -48,6 +48,8 @@ class H2HostCache extends HostCache {
         if (uniqueHosts.add(d)) {
             allHosts.add(d)
             profiles.put(d, new HostMCProfile())
+            
+            log.fine("learned about ${d.toBase32()} from hostcache $fromHostcache")
         }
     }
     
@@ -73,7 +75,7 @@ class H2HostCache extends HostCache {
         if (count.COUNT < historyItems) 
             return
        
-        log.fine("recomputing Markov for ${d.toBase32()}")
+        log.fine("recomputing Markov for ${d.toBase32()} from history items $count.COUNT / $historyItems")
         
         int ss = 0
         int sr = 0
