@@ -43,11 +43,11 @@ class H2HostCache extends HostCache {
         // overwrite MC with optimistic values 
         if (fromHostcache) {
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
-            profiles.put(d, new HostMCProfile(false))
+            profiles.put(d, new HostMCProfile())
         }
         if (uniqueHosts.add(d)) {
             allHosts.add(d)
-            profiles.put(d, new HostMCProfile(false))
+            profiles.put(d, new HostMCProfile())
         }
     }
     
@@ -55,14 +55,14 @@ class H2HostCache extends HostCache {
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
         
         log.fine("onConnection ${d.toBase32()} status $status")
-        
         if (status == ConnectionAttemptStatus.SUCCESSFUL) {
             if (uniqueHosts.add(d)) {
                 allHosts.add(d)
-                profiles.put(d, new HostMCProfile(true))
-            } else
-                profiles.get(d).successfulAttempt = true
+                profiles.put(d, new HostMCProfile())
+            } 
+            profiles.get(d).successfulAttempt = true
         }
+        int historyItems = profiles.get(d).hasHistory ? settings.hostProfileHistory : 1
         
         // record into db
         def timestamp = new Date(System.currentTimeMillis())
@@ -70,7 +70,7 @@ class H2HostCache extends HostCache {
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
         def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
-        if (count.COUNT < settings.hostProfileHistory) 
+        if (count.COUNT < historyItems) 
             return
        
         log.fine("recomputing Markov for ${d.toBase32()}")
@@ -288,7 +288,7 @@ class H2HostCache extends HostCache {
             Destination dest = new Destination(it.DESTINATION)
             if (uniqueHosts.add(dest)) {
                 def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
-                def profile = new HostMCProfile(true)
+                def profile = new HostMCProfile()
                 if (fromDB != null)
                     profile = new HostMCProfile(fromDB)
                 profiles.put(dest, profile)

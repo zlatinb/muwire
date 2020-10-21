@@ -37,14 +37,14 @@ class HostMCProfile {
     // start with S
     ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
     
-    final boolean hasHistory
+    boolean hasHistory
     boolean successfulAttempt
     
     /**
      * constructs an "optimistic" predictor for newly discovered hosts.
      */
-    HostMCProfile(boolean hasHistory) {
-        this.hasHistory = hasHistory
+    HostMCProfile() {
+        this.hasHistory = false
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
