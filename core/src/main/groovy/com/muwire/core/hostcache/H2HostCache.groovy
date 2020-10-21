@@ -172,7 +172,7 @@ class H2HostCache extends HostCache {
             return rv
 
         List<Destination> canTry = new ArrayList<>(allHosts)
-        canTry.removeAll { profiles.get(it).isHopeless() && !filter.test(it)}
+        canTry.retainAll { !profiles.get(it).isHopeless() && filter.test(it)}
         Set<Destination> wouldFail = new HashSet<>()             
         while(rv.size() < n && wouldFail.size() < canTry.size()) {
             Destination d = canTry.get((int)(Math.random() * canTry.size()))
