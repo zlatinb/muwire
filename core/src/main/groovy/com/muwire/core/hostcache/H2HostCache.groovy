@@ -162,15 +162,15 @@ class H2HostCache extends HostCache {
         sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         sql.execute("insert into HOST_PROFILES values (" +
             "'${d.toBase64()}'," +
-            "'${String.format("%.6f",ssd)}'," +
-            "'${String.format("%.6f",srd)}'," +
-            "'${String.format("%.6f",sfd)}'," +
-            "'${String.format("%.6f",rsd)}'," +
-            "'${String.format("%.6f",rrd)}'," +
-            "'${String.format("%.6f",rfd)}'," +
-            "'${String.format("%.6f",fsd)}'," +
-            "'${String.format("%.6f",frd)}'," +
-            "'${String.format("%.6f",ffd)}'" +
+            "'${String.format(Locale.US, "%.6f",ssd)}'," +
+            "'${String.format(Locale.US, "%.6f",srd)}'," +
+            "'${String.format(Locale.US, "%.6f",sfd)}'," +
+            "'${String.format(Locale.US, "%.6f",rsd)}'," +
+            "'${String.format(Locale.US, "%.6f",rrd)}'," +
+            "'${String.format(Locale.US, "%.6f",rfd)}'," +
+            "'${String.format(Locale.US, "%.6f",fsd)}'," +
+            "'${String.format(Locale.US, "%.6f",frd)}'," +
+            "'${String.format(Locale.US, "%.6f",ffd)}'" +
             ")")
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         profiles.put(d, new HostMCProfile(newProfile))
