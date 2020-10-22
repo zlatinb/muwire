@@ -2,6 +2,7 @@ package com.muwire.core.hostcache
 
 import java.util.function.Predicate
 import java.util.function.Supplier
+import static java.lang.Double.isNaN
 
 import java.text.SimpleDateFormat
 
@@ -124,6 +125,11 @@ class H2HostCache extends HostCache {
             srd = sr * 1.0d / countS
             sfd = sf * 1.0d / countS
         }
+        if (isNaN(ssd) || isNaN(srd) || isNaN(sfd)) {
+            ssd = HostMCProfile.DEFAULT_SS
+            srd = HostMCProfile.DEFAULT_RR
+            sfd = HostMCProfile.DEFAULT_SF
+        }
         
         double rsd = HostMCProfile.DEFAULT_RS
         double rrd = HostMCProfile.DEFAULT_RR
@@ -133,6 +139,11 @@ class H2HostCache extends HostCache {
             rrd = rr * 1.0d / countR
             rfd = rf * 1.0d / countR
         }
+        if (isNaN(rsd) || isNaN(rrd) || isNaN(rfd)) {
+            rsd = HostMCProfile.DEFAULT_RS
+            rrd = HostMCProfile.DEFAULT_RR
+            rfd = HostMCProfile.DEFAULT_RF
+        }
         
         double fsd = HostMCProfile.DEFAULT_FS
         double frd = HostMCProfile.DEFAULT_FR
@@ -141,6 +152,11 @@ class H2HostCache extends HostCache {
             fsd = fs * 1.0d / countF
             frd = fr * 1.0d / countF
             ffd = ff * 1.0d / countF
+        }
+        if (isNaN(fsd) || isNaN(frd) || isNaN(ffd)) {
+            fsd = HostMCProfile.DEFAULT_FS
+            frd = HostMCProfile.DEFAULT_FR
+            ffd = HostMCProfile.DEFAULT_FF
         }
         
         sql.execute("delete from HOST_PROFILES where DESTINATION=${d.toBase64()}")
