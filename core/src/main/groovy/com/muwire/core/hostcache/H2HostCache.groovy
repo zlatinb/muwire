@@ -160,15 +160,9 @@ class H2HostCache extends HostCache {
         profiles.put(d, new HostMCProfile(newProfile))
         log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
 
-        def rows = sql.rows("select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} order by TSTAMP desc")
-        if (rows.size() <= settings.hostProfileHistory)
-            return
-            
-        def lastTstamp = rows[settings.hostProfileHistory - 1].TSTAMP     
-        lastTstamp = SDF.format(new Date(lastTstamp.getTime()))   
-        int limit = count.COUNT - settings.hostProfileHistory
-        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP < $lastTstamp limit $limit") 
-        log.fine("deleted $sql.updateCount old attempts older than $lastTstamp")
+        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP not in "+
+            "(select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} order by TSTAMP desc limit $settings.hostProfileHistory)") 
+        log.fine("deleted $sql.updateCount old attempts")
     }
     
     @Override
