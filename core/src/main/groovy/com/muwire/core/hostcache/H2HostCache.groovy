@@ -161,12 +161,13 @@ class H2HostCache extends HostCache {
         log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
 
         def rows = sql.rows("select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} order by TSTAMP desc limit ${settings.hostProfileHistory}")
-        if (rows.size() < settings.hostProfileHistory)
+        if (rows.size() <= settings.hostProfileHistory)
             return
             
         def lastTstamp = rows[settings.hostProfileHistory - 1].TSTAMP     
-        lastTimestamp = SDF.format(new Date(lastTstamp.getTime()))   
-        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP < $lastTstamp") 
+        lastTstamp = SDF.format(new Date(lastTstamp.getTime()))   
+        int limit = count.COUNT - settings.hostProfileHistory
+        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP < $lastTstamp limit $limit") 
         log.fine("deleted $sql.updateCount old attempts older than $lastTstamp")
     }
     
