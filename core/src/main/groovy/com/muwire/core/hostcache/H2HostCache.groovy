@@ -326,8 +326,8 @@ class H2HostCache extends HostCache {
     private synchronized void verifyHosts() {
         log.fine("starting verification")
         final long now = System.currentTimeMillis()
-        def nowTstamp = new java.sql.Date(now)
-        def hourAgo = new java.sql.Date(now - 60*60*1000)
+        def nowTstamp = SDF.format(new Date(now))
+        def hourAgo = SDF.format(new Date(now - 60*60*1000))
         
         List<String> allHosts = new ArrayList<>()
         sql.eachRow("select distinct DESTINATION from HOST_ATTEMPTS") {
