@@ -164,7 +164,8 @@ class H2HostCache extends HostCache {
         if (rows.size() < settings.hostProfileHistory)
             return
             
-        def lastTstamp = rows[settings.hostProfileHistory - 1].TSTAMP        
+        def lastTstamp = rows[settings.hostProfileHistory - 1].TSTAMP     
+        lastTimestamp = SDF.format(new Date(lastTstamp.getTime()))   
         sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP < $lastTstamp") 
         log.fine("deleted $sql.updateCount old attempts older than $lastTstamp")
     }
