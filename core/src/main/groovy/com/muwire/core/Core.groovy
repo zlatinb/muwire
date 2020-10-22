@@ -565,7 +565,7 @@ public class Core {
             }
         }
 
-        Core core = new Core(props, home, "0.7.7")
+        Core core = new Core(props, home, "0.8.0")
         core.startServices()
 
         // ... at the end, sleep or execute script
