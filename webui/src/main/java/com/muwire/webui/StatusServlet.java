@@ -21,7 +21,7 @@ public class StatusServlet extends HttpServlet {
         
         int incoming = (int)core.getConnectionManager().getConnections().stream().filter(c -> c.isIncoming()).count();
         int outgoing = (int)core.getConnectionManager().getConnections().stream().filter(c -> !c.isIncoming()).count();
-        int knownHosts = core.getHostCache().getHosts().size();
+        int knownHosts = core.getHostCache().countAllHosts();
         int failingHosts = core.getHostCache().countFailingHosts();
         int hopelessHosts = core.getHostCache().countHopelessHosts();
         int timesBrowsed = core.getConnectionAcceptor().getBrowsed();
