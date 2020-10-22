@@ -158,6 +158,7 @@ class ChatRoomController {
         params['host'] = p
         params['core'] = model.core
         mvcGroup.createMVCGroup("browse",groupId,params)
+        application.mvcGroupManager.findGroup("MainFrame").view.showSearchWindow.call()
     }
     
     void leaveRoom() {
