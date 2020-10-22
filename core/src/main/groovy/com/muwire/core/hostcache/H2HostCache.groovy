@@ -64,18 +64,14 @@ class H2HostCache extends HostCache {
         if (status == ConnectionAttemptStatus.SUCCESSFUL) 
             profiles.get(d).successfulAttempt = true
             
-        int historyItems = profiles.get(d).hasHistory ? settings.hostProfileHistory : 1
-        
         // record into db
         def timestamp = new Date(System.currentTimeMillis())
         timestamp = SDF.format(timestamp)
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
         def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
-        if (count.COUNT < historyItems) 
-            return
        
-        log.fine("recomputing Markov for ${d.toBase32()} from history items $count.COUNT / $historyItems")
+        log.fine("recomputing Markov for ${d.toBase32()} from history items $count.COUNT")
         
         int ss = 0
         int sr = 0
@@ -163,8 +159,14 @@ class H2HostCache extends HostCache {
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
         profiles.put(d, new HostMCProfile(newProfile))
         log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
-        
-        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}") 
+
+        def rows = sql.rows("select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} order by TSTAMP desc limit ${settings.hostProfileHistory}")
+        if (rows.size() < settings.hostProfileHistory)
+            return
+            
+        def lastTstamp = rows[rows.size() - 1].TSTAMP        
+        sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP < $lastTstamp") 
+        log.fine("deleted $sql.updateCount old attempts")
     }
     
     @Override
