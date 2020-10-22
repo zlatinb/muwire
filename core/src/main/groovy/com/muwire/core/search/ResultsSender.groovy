@@ -131,6 +131,7 @@ class ResultsSender {
                         endpoint?.close()
                     }
                 } else {
+                    DataOutputStream dos = null
                     try {
                         endpoint = connector.connect(target)
                         OutputStream os = endpoint.getOutputStream()
@@ -142,7 +143,7 @@ class ResultsSender {
                         boolean feed = settings.fileFeed && settings.advertiseFeed
                         os.write("Feed: $feed\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-                        DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+                        dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 
                             int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates)
@@ -150,8 +151,10 @@ class ResultsSender {
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
                         }
-                        dos.close()
                     } finally {
+                        try {
+                            dos?.close()
+                        } catch (Exception ignore) {}
                         endpoint?.close()
                     }
                 }

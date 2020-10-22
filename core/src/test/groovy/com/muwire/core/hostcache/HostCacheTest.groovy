@@ -53,7 +53,7 @@ class HostCacheTest {
     private void initMocks() {
         trust = trustMock.proxyInstance()
         settings = settingsMock.proxyInstance()
-        cache = new HostCache(trust, persist, 100, settings, new Destination())
+        cache = new SimpleHostCache(trust, persist, 100, settings, new Destination())
         cache.start()
         Thread.sleep(150)
     }

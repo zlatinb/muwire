@@ -349,6 +349,7 @@ class ConnectionAcceptor {
     }
     
     private void processBROWSE(Endpoint e) {
+        DataOutputStream dos = null
         try {
             byte [] rowse = new byte[7]
             DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -388,7 +389,7 @@ class ConnectionAcceptor {
             
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
-            DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+            dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
                 it.hit(browser, System.currentTimeMillis(), "Browse Host");
@@ -398,14 +399,17 @@ class ConnectionAcceptor {
                 dos.writeShort((short)json.length())
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
             }
-            dos.flush()
-            dos.close()
         } finally {
+            try {
+                dos?.flush()
+                dos?.close()
+            } catch (Exception ignored) {}
             e.close()
         }
     }
 
     private void processTRUST(Endpoint e) {
+        DataOutputStream dos = null
         try {
             byte[] RUST = new byte[6]
             DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -429,7 +433,7 @@ class ConnectionAcceptor {
             
             List<TrustService.TrustEntry> good = new ArrayList<>(trustService.good.values())
             List<TrustService.TrustEntry> bad = new ArrayList<>(trustService.bad.values())
-            DataOutputStream dos = new DataOutputStream(os)
+            dos = new DataOutputStream(os)
 
             if (!json) {
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -472,13 +476,16 @@ class ConnectionAcceptor {
                 }
             }
 
-            dos.flush()
         } finally {
+            try {
+                dos?.flush()
+            } catch (IOException ignore) {}
             e.close()
         }
     }
     
     private void processCERTIFICATES(Endpoint e) {
+        DataOutputStream dos = null
         try {
             byte [] ERTIFICATES = new byte[12]
             DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -514,7 +521,7 @@ class ConnectionAcceptor {
             os.write("Count: ${certs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             
-            DataOutputStream dos = new DataOutputStream(os)
+            dos = new DataOutputStream(os)
             certs.each { 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream()
                 it.write(baos)
@@ -522,8 +529,10 @@ class ConnectionAcceptor {
                 dos.writeShort(payload.length)
                 dos.write(payload)
             }
-            dos.close()
         } finally {
+            try {
+                dos?.close()
+            } catch (Exception ignored) {}
             e.close()
         }
     }
@@ -538,6 +547,7 @@ class ConnectionAcceptor {
     }
     
     private void processFEED(Endpoint e) {
+        DataOutputStream dos = null
         try {
             byte[] EED = new byte[5];
             DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -572,7 +582,7 @@ class ConnectionAcceptor {
             os.write("Count: ${published.size()}\r\n".getBytes(StandardCharsets.US_ASCII));
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
-            DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(os))
+            dos = new DataOutputStream(new GZIPOutputStream(os))
             JsonOutput jsonOutput = new JsonOutput()
             final long now = System.currentTimeMillis();
             published.each {
@@ -583,9 +593,11 @@ class ConnectionAcceptor {
                 dos.writeShort((short)json.length())
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
             }
-            dos.flush()
-            dos.close()
         } finally {
+            try {
+                dos?.flush()
+                dos?.close()
+            } catch(Exception ignore) {}
             e.close()
         }
     }

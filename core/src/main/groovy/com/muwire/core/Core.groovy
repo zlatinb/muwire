@@ -5,6 +5,7 @@ import com.muwire.core.files.PersisterFolderService
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.zip.ZipException
 
@@ -67,8 +68,10 @@ import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.DirectoryWatcher
 import com.muwire.core.hostcache.CacheClient
+import com.muwire.core.hostcache.H2HostCache
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
+import com.muwire.core.hostcache.SimpleHostCache
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
@@ -307,8 +310,7 @@ public class Core {
         eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
-        File hostStorage = new File(home, "hosts.json")
-        hostCache = new HostCache(trustService,hostStorage, 30000, props, i2pSession.getMyDestination())
+        hostCache = new H2HostCache(home,trustService, props, i2pSession.getMyDestination())
         eventBus.register(HostDiscoveredEvent.class, hostCache)
         eventBus.register(ConnectionEvent.class, hostCache)
 
@@ -461,7 +463,7 @@ public class Core {
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
-        hostCache.start()
+        hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)
         connectionManager.start()
         cacheClient.start()
         connectionAcceptor.start()

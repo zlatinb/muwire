@@ -59,7 +59,7 @@ class CacheClient {
             return
         if (!manager.getConnections().isEmpty())
             return
-        if (!cache.getHosts(1, {true} as Predicate).isEmpty())
+        if (!cache.getHosts(1, {true} as Predicate).isEmpty()) 
             return
 
         log.info "Will query hostcaches"

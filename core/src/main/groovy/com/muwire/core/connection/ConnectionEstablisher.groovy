@@ -34,7 +34,7 @@ class ConnectionEstablisher {
     final Timer timer
     final ExecutorService executor, closer
 
-    final Set inProgress = new ConcurrentHashSet()
+    final Set<Destination> inProgress = new ConcurrentHashSet()
     
     private volatile boolean shutdown
 
@@ -80,7 +80,7 @@ class ConnectionEstablisher {
         def toTry = hostCache.getHosts(1, {!connectionManager.isConnected(it) && !inProgress.contains(it)} as Predicate)
         if (toTry.isEmpty())
             return
-        toTry = toTry[0]
+        toTry = toTry.first()
         if (!connectionManager.isConnected(toTry) && inProgress.add(toTry))
             executor.execute({connect(toTry)} as Runnable)
     }

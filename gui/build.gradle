@@ -78,7 +78,6 @@ configurations.all {
         exclude group:'org.codehaus.groovy', module:'groovy-testng'
         exclude group:'org.codehaus.groovy', module:'groovy-test-junit5'
         exclude group:'org.codehaus.groovy', module:'groovy-ant'
-        exclude group:'org.codehaus.groovy', module:'groovy-sql'
         exclude group:'org.codehaus.groovy', module:'groovy-nio'
         exclude group:'org.codehaus.groovy', module:'groovy-servlet'
         exclude group:'org.codehaus.groovy', module:'groovy-jmx'
