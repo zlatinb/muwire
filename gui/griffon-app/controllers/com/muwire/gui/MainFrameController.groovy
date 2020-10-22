@@ -341,6 +341,7 @@ class MainFrameController {
         params['host'] = p
         params['core'] = model.core
         mvcGroup.createMVCGroup("browse",groupId,params)
+        view.showSearchWindow.call()
     }
     
     @ControllerAction
@@ -366,6 +367,7 @@ class MainFrameController {
         params['host'] = p
         params['core'] = model.core
         mvcGroup.createMVCGroup("browse",groupId,params)
+        view.showSearchWindow.call()
     }
     
     @ControllerAction
