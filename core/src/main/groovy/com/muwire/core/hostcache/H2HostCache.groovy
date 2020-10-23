@@ -71,7 +71,11 @@ class H2HostCache extends HostCache {
         sql.execute("insert into HOST_ATTEMPTS values ('${d.toBase64()}', '$timestamp', '${status.name()}');")
         
         def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
-       
+        if (count.COUNT < settings.minHostProfileHistory) {
+            log.fine("not enough history for Markov") 
+            return
+        }
+        
         log.fine("recomputing Markov for ${d.toBase32()} from history items $count.COUNT")
         
         int ss = 0
