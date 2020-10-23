@@ -259,7 +259,7 @@ class H2HostCache extends HostCache {
         log.info("created table attempts $success")
         
         // TODO add primary key
-        success = sql.execute("CREATE TABLE IF NOT EXISTS HOST_PROFILES(" +
+        success &= sql.execute("CREATE TABLE IF NOT EXISTS HOST_PROFILES(" +
             "DESTINATION VARCHAR(1024)," +
             "SS VARCHAR(16)," +
             "SR VARCHAR(16)," +
@@ -272,6 +272,7 @@ class H2HostCache extends HostCache {
             "FF VARCHAR(16)" +
             ")")
 
+        success &= sql.execute("CREATE TABLE IF NOT EXISTS CONNECTION_COUNT(TSTAMP TIMESTAMP, COUNT INT)")
         timer.schedule({load()} as TimerTask, 1)        
         
     }
@@ -319,6 +320,7 @@ class H2HostCache extends HostCache {
         timer.schedule({
             purgeHopeless()
             verifyHosts()
+            recordConnectionCount()
         } as TimerTask, 60000, 60000)
         loaded = true
     }
@@ -383,6 +385,13 @@ class H2HostCache extends HostCache {
         }
         log.fine("purged hopeless, remaining ${allHosts.size()}")
         
+    }
+    
+    private synchronized void recordConnectionCount() {
+        int count = connSupplier.get().size()
+        def tstamp = SDF.format(new Date())
+        sql.execute("insert into CONNECTION_COUNT values('$tstamp','$count')")
+        sql.execute("delete from CONNECTION_COUNT where TSTAMP not in (select TSTAMP from CONNECTION_COUNT order by TSTAMP desc limit ${settings.connectionHistory})")
     }
     
 }

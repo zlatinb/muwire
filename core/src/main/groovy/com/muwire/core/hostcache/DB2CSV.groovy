@@ -33,6 +33,10 @@ class DB2CSV {
                     println "${dest.toBase32()},$it.SS,$it.SR,$it.SF,$it.RS,$it.RR,$it.RF,$it.FS,$it.FR,$it.FF"
                 }
                 break
+            case "CONNECTION_COUNT" :
+                sql.eachRow("select * from CONNECTION_COUNT") { 
+                    println "$it.TSTAMP, $it.COUNT"
+                }
         }
         sql.close()
     }

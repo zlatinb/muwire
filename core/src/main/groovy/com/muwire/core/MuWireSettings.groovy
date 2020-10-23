@@ -43,6 +43,7 @@ class MuWireSettings {
     
     int peerConnections
     int leafConnections
+    int connectionHistory
     
     int responderCacheSize
     
@@ -117,6 +118,9 @@ class MuWireSettings {
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
         peerConnections = Integer.valueOf(props.getProperty("peerConnections","128"))
+        
+        // connection stats history
+        connectionHistory = Integer.valueOf(props.getProperty("connectionHistory","1024"))
         
         // responder cache settings
         responderCacheSize = Integer.valueOf(props.getProperty("responderCacheSize","32"))
@@ -194,6 +198,9 @@ class MuWireSettings {
         // ultrapeer connection settings
         props.setProperty("peerConnections", String.valueOf(peerConnections))
         props.setProperty("leafConnections", String.valueOf(leafConnections))
+        
+        // connection history
+        props.setProperty("connectionHistory", String.valueOf(connectionHistory))
         
         // responder cache settings
         props.setProperty("responderCacheSize", String.valueOf(responderCacheSize))
