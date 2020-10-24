@@ -34,8 +34,7 @@ class HostMCProfile {
     
     private final String toString
         
-    // start with S
-    ConnectionAttemptStatus state
+    final ConnectionAttemptStatus state
     
     boolean hasHistory
     boolean successfulAttempt
@@ -150,15 +149,6 @@ class HostMCProfile {
     }
     
     /**
-     * Transitions to the next state
-     * @return the next state
-     */
-    ConnectionAttemptStatus transition() {
-        this.state = nextState()
-        return state
-    }
- 
-    /**
      * @return if the host should be advertised in pongs
      */
     boolean shouldAdvertise() {
@@ -169,7 +159,7 @@ class HostMCProfile {
      * Rolls the dice and tells us what the next state should be.
      * Does not actually transition.
      */
-    private ConnectionAttemptStatus nextState() {
+    ConnectionAttemptStatus nextState() {
         Probability[] lookup
         switch(state) {
             case ConnectionAttemptStatus.SUCCESSFUL :
