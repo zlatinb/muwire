@@ -96,7 +96,7 @@ class MuWireSettings {
         hostRejectInterval = Integer.valueOf(props.getProperty("hostRejectInterval", "1"))
         hostHopelessPurgeInterval = Integer.valueOf(props.getProperty("hostHopelessPurgeInterval","1440"))
         hostProfileHistory = Integer.valueOf(props.getProperty("hostProfileHistory","100"))
-        minHostProfileHistory = Integer.valueOf(props.getProperty("minHostProfileHistory","3"))
+        minHostProfileHistory = Integer.valueOf(props.getProperty("minHostProfileHistory","5"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
         embeddedRouter = Boolean.valueOf(props.getProperty("embeddedRouter","false"))
         plugin = Boolean.valueOf(props.getProperty("plugin","false"))
