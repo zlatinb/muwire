@@ -87,10 +87,14 @@ class H2HostCache extends HostCache {
         int fs = 0
         int fr = 0
         int ff = 0
-        ConnectionAttemptStatus currentStatus = ConnectionAttemptStatus.SUCCESSFUL
+        ConnectionAttemptStatus currentStatus = null
         
         sql.eachRow("select STATUS from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} ORDER BY TSTAMP") {  
             def recordedStatus = ConnectionAttemptStatus.valueOf(it.STATUS)
+            if (currentStatus == null) {
+                currentStatus = recordedStatus
+                return
+            }
             switch(currentStatus) {
                 case ConnectionAttemptStatus.SUCCESSFUL:
                 switch(recordedStatus) {
