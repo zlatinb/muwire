@@ -74,7 +74,7 @@ class HostMCProfile {
             "RF:${R[2].probability},"+
             "FS:${F[0].probability},"+
             "FR:${F[1].probability},"+
-            "FF:${F[2].probability} " + state
+            "FF:${F[2].probability} " + state + " history: false"
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
@@ -141,7 +141,7 @@ class HostMCProfile {
         "RF:${R[2].probability},"+
         "FS:${F[0].probability},"+
         "FR:${F[1].probability},"+
-        "FF:${F[2].probability} " + state
+        "FF:${F[2].probability} " + state + " history: true"
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
