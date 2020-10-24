@@ -35,7 +35,7 @@ class HostMCProfile {
     private final String toString
         
     // start with S
-    ConnectionAttemptStatus state = ConnectionAttemptStatus.SUCCESSFUL
+    ConnectionAttemptStatus state
     
     boolean hasHistory
     boolean successfulAttempt
@@ -45,6 +45,7 @@ class HostMCProfile {
      */
     HostMCProfile() {
         this.hasHistory = false
+        this.state = ConnectionAttemptStatus.SUCCESSFUL
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
@@ -84,7 +85,8 @@ class HostMCProfile {
     /**
      * historical predictor loaded from database
      */
-    HostMCProfile(def fromDB) {
+    HostMCProfile(def fromDB, ConnectionAttemptStatus currentStatus) {
+        state = currentStatus
         hasHistory = true
         
         S = new Probability[3]

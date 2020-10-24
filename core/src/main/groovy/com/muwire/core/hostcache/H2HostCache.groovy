@@ -177,7 +177,7 @@ class H2HostCache extends HostCache {
             "'${String.format(Locale.US, "%.6f",ffd)}'" +
             ")")
         def newProfile = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${d.toBase64()}")
-        profiles.put(d, new HostMCProfile(newProfile))
+        profiles.put(d, new HostMCProfile(newProfile, status))
         log.fine("profile updated ${d.toBase32()} ${profiles.get(d)}")       
 
         sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and TSTAMP not in "+
@@ -313,7 +313,7 @@ class H2HostCache extends HostCache {
                 def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
                 def profile = new HostMCProfile()
                 if (fromDB != null)
-                    profile = new HostMCProfile(fromDB)
+                    profile = new HostMCProfile(fromDB, ConnectionAttemptStatus.SUCCESSFUL)
                 profiles.put(dest, profile)
                 allHosts.add(dest)
                 log.fine("Loaded profile for ${dest.toBase32()} $profile")
