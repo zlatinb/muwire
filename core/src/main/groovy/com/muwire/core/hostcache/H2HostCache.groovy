@@ -73,7 +73,7 @@ class H2HostCache extends HostCache {
         def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
         if (count.COUNT < settings.minHostProfileHistory) {
             log.fine("not enough history for Markov") 
-            profiles.put(d, new HostMCProfile(state))
+            profiles.put(d, new HostMCProfile(status))
             return
         }
         
