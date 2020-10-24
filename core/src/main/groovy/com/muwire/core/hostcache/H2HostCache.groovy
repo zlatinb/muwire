@@ -73,6 +73,7 @@ class H2HostCache extends HostCache {
         def count = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
         if (count.COUNT < settings.minHostProfileHistory) {
             log.fine("not enough history for Markov") 
+            profiles.put(d, new HostMCProfile(state))
             return
         }
         
@@ -316,8 +317,11 @@ class H2HostCache extends HostCache {
             if (uniqueHosts.add(dest)) {
                 def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
                 def profile = new HostMCProfile()
-                if (fromDB != null)
-                    profile = new HostMCProfile(fromDB, ConnectionAttemptStatus.SUCCESSFUL)
+                if (fromDB != null) {
+                    def lastObservation = sql.firstRow("select STATUS from HOST_ATTEMPTS where DESTINATION=${dest.toBase64()} order by TSTAMP desc limit 1")
+                    if (lastObservation != null) 
+                        profile = new HostMCProfile(fromDB, ConnectionAttemptStatus.valueOf(lastObservation.STATUS))
+                }
                 profiles.put(dest, profile)
                 allHosts.add(dest)
                 log.fine("Loaded profile for ${dest.toBase32()} $profile")

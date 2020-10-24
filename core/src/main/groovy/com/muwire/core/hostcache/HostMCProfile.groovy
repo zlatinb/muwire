@@ -40,11 +40,18 @@ class HostMCProfile {
     boolean successfulAttempt
     
     /**
-     * constructs an "optimistic" predictor for newly discovered hosts.
+     * Constructs an optimistic predictor for newly discovered hosts
      */
     HostMCProfile() {
+        this(ConnectionAttemptStatus.SUCCESSFUL)
+    }
+    
+    /**
+     * constructs a predictor with default values and the specified state
+     */
+    HostMCProfile(ConnectionAttemptStatus state) {
         this.hasHistory = false
-        this.state = ConnectionAttemptStatus.SUCCESSFUL
+        this.state = state
         S = new Probability[3]
         R = new Probability[3]
         F = new Probability[3]
@@ -67,7 +74,7 @@ class HostMCProfile {
             "RF:${R[2].probability},"+
             "FS:${F[0].probability},"+
             "FR:${F[1].probability},"+
-            "FF:${F[2].probability}"
+            "FF:${F[2].probability} " + state
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
@@ -134,7 +141,7 @@ class HostMCProfile {
         "RF:${R[2].probability},"+
         "FS:${F[0].probability},"+
         "FR:${F[1].probability},"+
-        "FF:${F[2].probability}"
+        "FF:${F[2].probability} " + state
         
         Arrays.sort(S)
         S[1].probability += S[0].probability
@@ -193,7 +200,7 @@ class HostMCProfile {
 
     @Override
     public String toString() {
-        toString + " state " + state
+        toString
     }
     
     private static class Probability implements Comparable<Probability> {
