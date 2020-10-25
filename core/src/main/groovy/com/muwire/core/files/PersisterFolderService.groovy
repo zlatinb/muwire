@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.logging.Level
+import java.util.stream.Stream
 
 /**
  * A persister that stores information about the files shared using
@@ -127,27 +128,33 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     /**
-     * Loads every JSON into memory
+     * Loads every JSON into memory.  If this is the plugin, load right away.
+     * If it's the standalone throttle and use a single thread because
+     * rapid fire events can make the GUI unresponsive.
      */
     private void _load() {
         int loaded = 0
-        def slurper = new JsonSlurper()
-        Files.walk(location.toPath())
-                .filter({
-                    it.getFileName().toString().endsWith(".json")
-                })
-                .forEach({
-                    def parsed = slurper.parse it.toFile()
-                    def event = fromJsonLite parsed
-                    if (event == null) return
+        Stream<Path> stream = Files.walk(location.toPath())
+        if (core.muOptions.plugin)
+            stream = stream.parallel()
+        stream.filter({
+            it.getFileName().toString().endsWith(".json")
+        })
+        .forEach({
+            def slurper = new JsonSlurper()
+            def parsed = slurper.parse it.toFile()
+            def event = fromJsonLite parsed
+            if (event == null) return
 
-                    log.fine("loaded file $event.loadedFile.file")
-                    listener.publish event
-                    loaded++
-                    if (loaded % 10 == 0)
-                        Thread.sleep(20)
+                log.fine("loaded file $event.loadedFile.file")
+            listener.publish event
+            if (!core.muOptions.plugin) {
+                loaded++
+                if (loaded % 10 == 0)
+                    Thread.sleep(20)
+            }
 
-                })
+        })
         listener.publish(new AllFilesLoadedEvent())
     }
 

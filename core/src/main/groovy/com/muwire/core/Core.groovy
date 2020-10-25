@@ -415,7 +415,7 @@ public class Core {
 
 
         log.info("initializing hasher service")
-        hasherService = new HasherService(new FileHasher(), eventBus, fileManager, props)
+        hasherService = new HasherService(eventBus, fileManager, props)
         eventBus.register(FileSharedEvent.class, hasherService)
         eventBus.register(FileUnsharedEvent.class, hasherService)
         eventBus.register(DirectoryUnsharedEvent.class, hasherService)
