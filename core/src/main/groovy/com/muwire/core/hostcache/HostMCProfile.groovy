@@ -15,15 +15,15 @@ class HostMCProfile {
     private static final int SCALE = 10
     private static final RoundingMode MODE = RoundingMode.HALF_UP
     
-    static final BigDecimal DEFAULT_SS = 0.5
+    static final BigDecimal DEFAULT_SS = 1.0
     static final BigDecimal DEFAULT_SR = 0.0
-    static final BigDecimal DEFAULT_SF = 0.5
-    static final BigDecimal DEFAULT_RS = 0.5
+    static final BigDecimal DEFAULT_SF = 0.0
+    static final BigDecimal DEFAULT_RS = 1.0
     static final BigDecimal DEFAULT_RR = 0.0
-    static final BigDecimal DEFAULT_RF = 0.5
-    static final BigDecimal DEFAULT_FS = 0.5
+    static final BigDecimal DEFAULT_RF = 0.0
+    static final BigDecimal DEFAULT_FS = 1.0
     static final BigDecimal DEFAULT_FR = 0.0
-    static final BigDecimal DEFAULT_FF = 0.5
+    static final BigDecimal DEFAULT_FF = 0.0
     
     private static final HOPELESS_THRESHOLD = 0.95
     
