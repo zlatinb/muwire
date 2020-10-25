@@ -34,7 +34,7 @@ class HasherService {
     }
 
     void start() {
-        executor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors() / 2 ))
+        executor = Executors.newFixedThreadPool((int)Math.max(1d, Runtime.getRuntime().availableProcessors() / 2d ))
     }
 
     void onFileSharedEvent(FileSharedEvent evt) {
