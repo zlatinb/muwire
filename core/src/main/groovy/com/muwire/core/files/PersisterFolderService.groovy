@@ -56,7 +56,7 @@ class PersisterFolderService extends BasePersisterService {
 
     void onPersisterDoneEvent(PersisterDoneEvent persisterDoneEvent) {
         log.info("Old persister done")
-        load()
+        persisterExecutor.execute({load()} as Runnable)
     }
 
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
