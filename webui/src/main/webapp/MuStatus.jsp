@@ -17,6 +17,7 @@ String buildNumber = (String)application.getAttribute("buildNumber");
 <html>
 	<head>
 <%@ include file="css.jsi"%>
+<script src="js/translate.js?<%=version%>" type="text/javascript"></script>
 <script src="js/status.js?<%=version%>" type="text/javascript"></script>
 <script nonce="<%=cspNonce%>" type="text/javascript">
     openAccordion = 3;
@@ -56,6 +57,7 @@ String buildNumber = (String)application.getAttribute("buildNumber");
 	    		<td><span id="times-browsed"></span></td>
 	    	</tr>
 	    </table>
+	    <div class="warning" id="failedFiles"></div>
 	    </section>
 	</body>
 </html>

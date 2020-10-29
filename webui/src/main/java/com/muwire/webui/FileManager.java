@@ -21,6 +21,7 @@ import com.muwire.core.files.FileTree;
 import com.muwire.core.files.FileTreeCallback;
 import com.muwire.core.files.FileUnsharedEvent;
 import com.muwire.core.files.UICommentEvent;
+import com.muwire.core.files.AllFilesLoadedEvent;
 import com.muwire.core.util.DataUtil;
 
 import net.i2p.data.Base64;
@@ -32,9 +33,14 @@ public class FileManager {
     
     private volatile String hashingFile;
     private volatile long revision;
+    private volatile int failed;
     
     public FileManager(Core core) {
         this.core = core;
+    }
+    
+    public void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+        failed = e.getFailed();
     }
     
     public void onFileLoadedEvent(FileLoadedEvent e) {
@@ -95,6 +101,10 @@ public class FileManager {
     
     int numSharedFiles() {
         return core.getFileManager().getFileToSharedFile().size();
+    }
+    
+    int getFailed() {
+        return failed;
     }
     
     long getRevision() {

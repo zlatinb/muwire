@@ -8,6 +8,7 @@ function refreshStatus() {
 			var failingHosts = this.responseXML.getElementsByTagName("FailingHosts")[0].childNodes[0].nodeValue
 			var hopelessHosts = this.responseXML.getElementsByTagName("HopelessHosts")[0].childNodes[0].nodeValue
 			var timesBrowsed = this.responseXML.getElementsByTagName("TimesBrowsed")[0].childNodes[0].nodeValue
+			var failedFiles = this.responseXML.getElementsByTagName("FailedFiles")[0].childNodes[0].nodeValue
 			
 			document.getElementById("incoming-connections").textContent = incomingConnections
 			document.getElementById("outgoing-connections").textContent = outgoingConnections
@@ -15,6 +16,9 @@ function refreshStatus() {
 			document.getElementById("failing-hosts").textContent = failingHosts
 			document.getElementById("hopeless-hosts").textContent = hopelessHosts
 			document.getElementById("times-browsed").textContent = timesBrowsed
+			
+			if (failedFiles != "0")
+				document.getElementById("failedFiles").textContent = _t("Failed to load {0} files", failedFiles)
 		}
 	}
 	xmlhttp.open("GET", "/MuWire/Status", true);

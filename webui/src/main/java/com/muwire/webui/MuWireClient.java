@@ -161,6 +161,7 @@ public class MuWireClient {
         core.getEventBus().register(FileHashingEvent.class, fileManager);
         core.getEventBus().register(FileUnsharedEvent.class, fileManager);
         core.getEventBus().register(DirectoryUnsharedEvent.class, fileManager);
+        core.getEventBus().register(AllFilesLoadedEvent.class, fileManager);
         
         BrowseManager browseManager = new BrowseManager(core);
         core.getEventBus().register(BrowseStatusEvent.class, browseManager);

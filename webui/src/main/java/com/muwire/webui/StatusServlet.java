@@ -13,6 +13,7 @@ import com.muwire.core.Core;
 public class StatusServlet extends HttpServlet {
     
     private Core core;
+    private FileManager fileManager;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -34,6 +35,7 @@ public class StatusServlet extends HttpServlet {
         sb.append("<FailingHosts>").append(failingHosts).append("</FailingHosts>");
         sb.append("<HopelessHosts>").append(hopelessHosts).append("</HopelessHosts>");
         sb.append("<TimesBrowsed>").append(timesBrowsed).append("</TimesBrowsed>");
+        sb.append("<FailedFiles>").append(fileManager.getFailed()).append("</FailedFiles>");
         sb.append("</Status>");
         
         resp.setContentType("text/xml");
@@ -49,5 +51,6 @@ public class StatusServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         core = (Core) config.getServletContext().getAttribute("core");
+        fileManager = (FileManager) config.getServletContext().getAttribute("fileManager");
     }
 }

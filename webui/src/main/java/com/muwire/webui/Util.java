@@ -59,6 +59,7 @@ public class Util {
         _x("Downloading"),
         _x("Enter Reason (Optional)"),
         _x("ETA"),
+        _x("Failed to load {0} files"),
         _x("Failing Hosts"),
         _x("Feed configuration for {0}"),
         _x("Feed update frequency (minutes)"),
