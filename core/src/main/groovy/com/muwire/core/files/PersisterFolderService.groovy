@@ -14,6 +14,7 @@ import java.nio.file.Paths
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Level
 import java.util.stream.Stream
 
@@ -134,6 +135,7 @@ class PersisterFolderService extends BasePersisterService {
      */
     private void _load() {
         int loaded = 0
+        AtomicInteger failed = new AtomicInteger()
         Stream<Path> stream = Files.walk(location.toPath())
         if (core.muOptions.plugin)
             stream = stream.parallel()
@@ -141,21 +143,26 @@ class PersisterFolderService extends BasePersisterService {
             it.getFileName().toString().endsWith(".json")
         })
         .forEach({
+            log.fine("processing path $it")
             def slurper = new JsonSlurper()
-            def parsed = slurper.parse it.toFile()
-            def event = fromJsonLite parsed
-            if (event == null) return
+            try {
+                def parsed = slurper.parse it.toFile()
+                def event = fromJsonLite parsed
+                if (event == null) return
 
-                log.fine("loaded file $event.loadedFile.file")
-            listener.publish event
-            if (!core.muOptions.plugin) {
-                loaded++
-                if (loaded % 10 == 0)
-                    Thread.sleep(20)
+                    log.fine("loaded file $event.loadedFile.file")
+                listener.publish event
+                if (!core.muOptions.plugin) {
+                    loaded++
+                    if (loaded % 10 == 0)
+                        Thread.sleep(20)
+                }
+            } catch (Exception e) {
+                log.log(Level.WARNING,"failed to load $it",e)
+                failed.incrementAndGet()
             }
-
         })
-        listener.publish(new AllFilesLoadedEvent())
+        listener.publish(new AllFilesLoadedEvent(failed : failed.get()))
     }
 
     private void persistFile(SharedFile sf, InfoHash ih) {
