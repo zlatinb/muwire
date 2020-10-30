@@ -363,6 +363,7 @@ class MainFrameView {
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
                                     button(text : trans("SHARE"), actionPerformed : shareFiles)
+                                    button(text : trans("CREATE_COLLECTION"), enabled : bind {model.collectionButtonEnabled}, collectionAction)
                                 }
                             }
                         }
@@ -783,8 +784,11 @@ class MainFrameView {
         selectionModel = sharedFilesTable.getSelectionModel()
         selectionModel.addListSelectionListener({
             def selectedFiles = selectedSharedFiles()
-            if (selectedFiles == null || selectedFiles.isEmpty())
+            if (selectedFiles == null || selectedFiles.isEmpty()) {
+                model.collectionButtonEnabled = false
                 return
+            }
+            model.collectionButtonEnabled = selectedFiles.size() > 1
             model.addCommentButtonEnabled = true
             model.publishButtonEnabled = true
             boolean unpublish = true
@@ -803,8 +807,13 @@ class MainFrameView {
             model.publishButtonEnabled = selectedNode != null
             
             def selectedFiles = selectedSharedFiles()
-            if (selectedFiles == null || selectedFiles.isEmpty())
+            if (selectedFiles == null || selectedFiles.isEmpty()) {
+                model.collectionButtonEnabled = false
                 return
+            }
+                
+            model.collectionButtonEnabled = selectedFiles.size() > 1
+            
             boolean unpublish = true
             selectedFiles.each {
                 unpublish &= it?.isPublished()

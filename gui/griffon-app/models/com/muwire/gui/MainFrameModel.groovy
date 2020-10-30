@@ -133,6 +133,7 @@ class MainFrameModel {
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
     @Observable boolean unsubscribeButtonEnabled
+    @Observable boolean collectionButtonEnabled
     
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled

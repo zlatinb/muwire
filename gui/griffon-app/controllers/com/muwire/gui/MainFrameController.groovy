@@ -650,6 +650,21 @@ class MainFrameController {
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }
     
+    @ControllerAction
+    void collection() {
+        
+        def files = view.selectedSharedFiles()
+        if (files == null || files.size() < 2)
+            return
+        
+        def params = [:]
+        params['files'] = files // TODO limit check
+        params['spk'] = model.core.spk
+        params['me'] = model.core.me
+        
+        mvcGroup.createMVCGroup("collection-wizard", params)
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]

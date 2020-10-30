@@ -146,4 +146,9 @@ mvcGroups {
         view = 'com.muwire.gui.wizard.WizardView'
         controller = 'com.muwire.gui.wizard.WizardController'
     }
+    'collection-wizard' {
+        model = 'com.muwire.gui.CollectionWizardModel'
+        view = 'com.muwire.gui.CollectionWizardView'
+        controller = 'com.muwire.gui.CollectionWizardController'
+    }
 }

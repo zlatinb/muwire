@@ -5,6 +5,8 @@ import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
 
+import static com.muwire.gui.Translator.trans
+
 import net.i2p.data.DataHelper
 
 class SizeRenderer extends DefaultTableCellRenderer {
@@ -19,7 +21,7 @@ class SizeRenderer extends DefaultTableCellRenderer {
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
         }
         Long l = (Long) value
-        String formatted = DataHelper.formatSize2Decimal(l, false)+"B"
+        String formatted = DataHelper.formatSize2Decimal(l, false) + trans("BYTES_SHORT")
         setText(formatted)
         if (isSelected) {
             setForeground(table.getSelectionForeground())
