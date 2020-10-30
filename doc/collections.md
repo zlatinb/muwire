@@ -25,25 +25,48 @@ byte 0: File entry version, currently fixed at "1".
 byte 1-33: hash of the file
 byte 34: Unsigned 8-bit number of path elements from root to where the file will ultimately be placed upon download.
 bytes 35-N : UTF-8 encoded length-prefixed path elements.  Each element can be at most 32kb long.  The last element is the name of the file.
-bytes N-M: free from description of the file (comment).  Format is UTF-8, maximum size is 32kb.
+bytes N-M: length-prefixed free from description of the file (comment).  Format is UTF-8, maximum size is 32kb.
 ```
 
 After the file entries follows a footer, which is simply a signature of the byte payload of the header and the file entries.
 
 ### Downloading
 
-Since the collection is created from individual shared files, every file within the collection is searchable.  It is possible to extend the shared file data structure to contain refererences to any collections the file belongs to - TBD.
+Since the collection is created from individual shared files, every file within the collection is searchable.  The returned result will contain a list of infohashes of collections that the file belongs to, since a single file may participate in multiple collections.
 
-When a user searches for a keyword or hash, they can find either the collection metafile itself or a file which is a member of one or more collections.  In the latter case, the user is given the option to download the collection metafile.
+When a node receives a query and there is keyword or infohash match for a file belonging to a collection, even if the collections is not downloaded yet it will return a search result.  
 
-If the user chooses to download the collection metafile, they will be presented with a dialog containing the metainformation contained in the collection descriptor.  They will be able to see directory structure contained in the collection and will be able to choose individual files to download.
+* If the query is hash and it matches the hash of the collection, all contained files are returned as results.
+* If the query is keyword and it matches the general description of the collection, all contained files are returned as results.
+* If the query is hash or keyword but matches only some file(s) from the collection, only that file is returned as result.  
 
-TBD - what happens when some of the files are already downloaded but are not in the final directory location?
+If the user chooses to fetch the collection metafile, they will be presented with a dialog containing the metainformation contained in the collection descriptor.  They will be able to see directory structure contained in the collection and will be able to choose individual files to download, or to download the entire collection at once.
+
+If some of the files are already downloaded but are not in the final directory location, they will be copied there.
 
 Finally, when starting the download, the downloader always queries the persona in the collection first, regardless of who returned the search result.  
 
-### Sharing
+### Sharing and storage
 
-When downloading the collection descriptor, the user makes the descriptor available for indexing.  This way collection descriptors can propagate on the network.
-TBD - do they also index the comments and file names in the descriptor, even if they haven't downloaded the files?
+Collection metafiles are not indexed the same way as regular files.  They are more similar to the way certificates work, i.e. they are stored in the MuWire home directory in a subdirectory called "collections".  Collections follow the naming convention "<hash of the collection>_<human-readable persona of the publisher>_<timestamp>.mwcollection".  To prevent leakage, such files are explicitly not going to be shareable.
+
+### Fetching the descriptor
+
+The downloader connects to the node that returned the search result which contained references to the collection(s) it is part of.  Ihen it issues a request starting with "METAFILE" followed by a space and comma-separated list of base64-encoded hashes of the referenced collections.  After the list the terminator \r\n is appended.
+
+A set of request headers follows, each terminated by \r\n.  After the last header an additional \r\n is appended.  The headers can be any, the only one being mandatory at this time is the "Version" header, currently fixed at 1.
+
+The uploader responds with a set of headers encoded in the same fashion, again the only mandatory header is the "Version" currently fixed at one.  After the headers a binary stream of the following format:
+
+```
+byte 0: number of collections returned
+bytes 1-33: hash of the first collection
+bytes 34-N: the payload of the first collection
+bytes N+1-N+33: hash of the second collection
+etc.
+```
+
+
+
+
 
