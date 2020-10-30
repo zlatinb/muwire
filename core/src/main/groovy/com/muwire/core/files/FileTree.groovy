@@ -96,6 +96,13 @@ class FileTree<T> {
         }
     }
     
+    synchronized File commonAncestor() {
+        TreeNode current = root
+        while(current.children.size() == 1)
+            current = current.children.first()
+        current.file
+    }
+    
     public static class TreeNode<T> {
         TreeNode parent
         File file
