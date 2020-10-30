@@ -20,6 +20,7 @@ bytes N+9 to M: Free-form description of the collection (comment).  Format is UT
 ```
 
 The header is followed by a file entry for each file in the collection.  The format is the follows:
+
 ```
 byte 0: File entry version, currently fixed at "1".
 byte 1-33: hash of the file
