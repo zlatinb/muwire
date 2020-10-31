@@ -24,8 +24,10 @@ The header is followed by a file entry for each file in the collection.  The for
 ```
 byte 0: File entry version, currently fixed at "1".
 byte 1-33: hash of the file
-byte 34: Unsigned 8-bit number of path elements from root to where the file will ultimately be placed upon download.
-bytes 35-N : UTF-8 encoded length-prefixed path elements.  Each element can be at most 32kb long.  The last element is the name of the file.
+byte 34: piece size power of 2
+bytes 35-43: length of the file
+byte 44: Unsigned 8-bit number of path elements from root to where the file will ultimately be placed upon download.
+bytes 45-N : UTF-8 encoded length-prefixed path elements.  Each element can be at most 32kb long.  The last element is the name of the file.
 bytes N-M: length-prefixed free from description of the file (comment).  Format is UTF-8, maximum size is 32kb.
 ```
 

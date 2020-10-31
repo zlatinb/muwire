@@ -84,7 +84,7 @@ class FileCollectionBuilder {
             String comment = sf.getComment() // TODO: check comment encoding
             if (comment == null)
                 comment = ""
-            def item = new FileCollectionItem(new InfoHash(sf.root), comment, sfPathElements.get(sf))
+            def item = new FileCollectionItem(new InfoHash(sf.root), comment, sfPathElements.get(sf), (byte)sf.pieceSize, sf.getCachedLength())
             files.add(item)
         } 
         

@@ -3,19 +3,24 @@ package com.muwire.core.collections
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Name
+import com.muwire.core.files.FileHasher
 
 class FileCollectionItem {
     
     private final InfoHash infoHash
     private final String comment
     private final File file
+    private final byte pieceSizePow2
+    private final long length
     private volatile byte[] payload
     private final List<String> pathElements = new ArrayList<>()
 
-    public FileCollectionItem(InfoHash infoHash, String comment, List<String> pathElements) {
+    public FileCollectionItem(InfoHash infoHash, String comment, List<String> pathElements, byte pieceSizePow2, long length) {
         this.infoHash = infoHash
         this.comment = comment
         this.pathElements = pathElements
+        this.pieceSizePow2 = pieceSizePow2
+        this.length = length
         
         File f = null
         pathElements.each { 
@@ -37,6 +42,14 @@ class FileCollectionItem {
         byte [] hash = new byte[32]
         dis.readFully(hash)
         infoHash = new InfoHash(hash)
+        
+        pieceSizePow2 = dis.readByte()
+        if (pieceSizePow2 < FileHasher.MIN_PIECE_SIZE_POW2 || pieceSizePow2 > FileHasher.MAX_PIECE_SIZE_POW2)
+            throw new InvalidCollectionException("invalid piece size $pieceSizePow2")
+        
+        length = dis.readLong()
+        if (length < 1 || length > FileHasher.MAX_SIZE)
+            throw new InvalidCollectionException("invalid length $length")
         
         int nPathElements = dis.readUnsignedByte()
         File f = null
@@ -62,6 +75,8 @@ class FileCollectionItem {
             
             daos.writeByte(Constants.COLLECTION_ENTRY_VERSION)
             daos.write(infoHash.getRoot())
+            daos.writeByte(pieceSizePow2)
+            daos.writeLong(length)
             daos.writeByte((byte) pathElements.size())
             pathElements.each { 
                 def name = new Name(it)
