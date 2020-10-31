@@ -63,7 +63,7 @@ class CollectionManager {
     private void load() {
         log.info("loading collections")
         Files.walk(localCollections.toPath())
-            .filter({it.getFileName().endsWith(".mwcomment")})
+            .filter({it.getFileName().toString().endsWith(".mwcollection")})
             .forEach({ path ->
                 log.fine("processing $path")
                 try {
