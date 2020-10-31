@@ -4,11 +4,14 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
+
 import javax.annotation.Nonnull
 
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionDeletedEvent
+import com.muwire.core.util.DataUtil
 
 @ArtifactProviderFor(GriffonController)
 class CollectionsToolController {
@@ -55,7 +58,7 @@ class CollectionsToolController {
         SharedFile sf = model.files.getAt(row)
         
         def params = [:]
-        params['text'] = sf.getComment()
+        params['text'] = DataUtil.readi18nString(Base64.decode(sf.getComment()))
         mvcGroup.createMVCGroup("show-comment", params)
     }
 }

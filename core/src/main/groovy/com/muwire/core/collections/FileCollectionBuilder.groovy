@@ -7,7 +7,9 @@ import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.files.FileTree
+import com.muwire.core.util.DataUtil
 
+import net.i2p.data.Base64
 import net.i2p.data.SigningPrivateKey
 
 class FileCollectionBuilder {
@@ -81,9 +83,11 @@ class FileCollectionBuilder {
             
         Set<FileCollectionItem> files = new LinkedHashSet<>()
         for (SharedFile sf : sfPathElements.keySet()) {
-            String comment = sf.getComment() // TODO: check comment encoding
+            String comment = sf.getComment()
             if (comment == null)
                 comment = ""
+            else
+                comment = DataUtil.readi18nString(Base64.decode(comment))
             def item = new FileCollectionItem(new InfoHash(sf.root), comment, sfPathElements.get(sf), (byte)sf.pieceSize, sf.getCachedLength())
             files.add(item)
         } 
