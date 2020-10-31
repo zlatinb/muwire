@@ -15,6 +15,8 @@ import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.ChatServer
 import com.muwire.core.chat.UIConnectChatEvent
 import com.muwire.core.chat.UIDisconnectChatEvent
+import com.muwire.core.collections.CollectionManager
+import com.muwire.core.collections.UICollectionCreatedEvent
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -135,6 +137,7 @@ public class Core {
     final DownloadManager downloadManager
     private final DirectoryWatcher directoryWatcher
     final FileManager fileManager
+    final CollectionManager collectionManager
     final UploadManager uploadManager
     final ContentManager contentManager
     final CertificateManager certificateManager
@@ -288,6 +291,14 @@ public class Core {
         eventBus.register(DirectoryUnsharedEvent.class, fileManager)
         eventBus.register(UICommentEvent.class, fileManager)
         eventBus.register(SideCarFileEvent.class, fileManager)
+        
+        log.info("initializing collection manager")
+        collectionManager = new CollectionManager(eventBus, fileManager, home)
+        eventBus.with { 
+            register(AllFilesLoadedEvent.class, collectionManager)
+            register(UICollectionCreatedEvent.class, collectionManager)
+        }
+        
 
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)
@@ -492,6 +503,8 @@ public class Core {
         persisterService.stop()
         log.info("shutting down persisterFolder service")
         persisterFolderService.stop()
+        log.info("shutting down collection manager")
+        collectionManager.stop()
         log.info("shutting down download manager")
         downloadManager.shutdown()
         log.info("shutting down connection acceptor")

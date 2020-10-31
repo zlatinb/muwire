@@ -661,6 +661,7 @@ class MainFrameController {
         params['files'] = files // TODO limit check
         params['spk'] = model.core.spk
         params['me'] = model.core.me
+        params['eventBus'] = model.core.eventBus
         
         mvcGroup.createMVCGroup("collection-wizard", params)
     }

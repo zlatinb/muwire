@@ -13,6 +13,7 @@ import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollectionBuilder
 import com.muwire.core.collections.PathTree
 import com.muwire.core.collections.PathTree.Callback
+import com.muwire.core.collections.UICollectionCreatedEvent
 
 @ArtifactProviderFor(GriffonController)
 class CollectionWizardController {
@@ -71,7 +72,7 @@ class CollectionWizardController {
     
     @ControllerAction
     void save() {
-        // TODO: emit event
+        model.eventBus.publish(new UICollectionCreatedEvent(collection : model.collection))
         cancel()
     }
 }

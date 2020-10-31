@@ -6,6 +6,7 @@ import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreeNode
 
+import com.muwire.core.EventBus
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
@@ -20,6 +21,7 @@ class CollectionWizardModel {
     List<SharedFile> files
     SigningPrivateKey spk
     Persona me
+    EventBus eventBus
     
     long timestamp
     @Observable String root

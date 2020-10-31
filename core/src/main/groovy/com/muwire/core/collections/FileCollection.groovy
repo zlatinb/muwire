@@ -12,14 +12,15 @@ import net.i2p.data.SigningPrivateKey
 
 class FileCollection {
     
-    private final long timestamp
-    private final Persona author
+    final long timestamp
+    final Persona author
     private final String comment
     private final byte[] sig
+    private final int hashCode
     
     private volatile byte[] payload
     
-    private final Set<FileCollectionItem> files = new LinkedHashSet<>()
+    final Set<FileCollectionItem> files = new LinkedHashSet<>()
     
     final PathTree tree
     
@@ -38,6 +39,8 @@ class FileCollection {
         byte [] signablePayload = signablePayload()
         Signature signature = DSAEngine.getInstance().sign(signablePayload, spk)
         this.sig = signature.getData()
+        
+        this.hashCode = Objects.hash(timestamp, author, comment, files)
     }
     
     FileCollection(InputStream is) {
@@ -62,6 +65,8 @@ class FileCollection {
         
         if (!verify())
             throw new InvalidCollectionException("invalid signature")
+            
+        this.hashCode = Objects.hash(timestamp, author, comment, files)
     }
     
     private boolean verify() {
@@ -117,5 +122,19 @@ class FileCollection {
             payload = baos.toByteArray()
         }
         os.write(payload)
+    }
+    
+    @Override
+    public int hashCode() {
+        hashCode
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        FileCollection other = (FileCollection)o
+        timestamp == other.timestamp &&
+            Objects.equals(author, other.author) &&
+            Objects.equals(comment, other.comment) &&
+            Objects.equals(files, other.files)
     }
 }

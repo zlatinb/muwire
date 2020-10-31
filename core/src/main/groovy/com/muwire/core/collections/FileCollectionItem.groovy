@@ -7,7 +7,7 @@ import com.muwire.core.files.FileHasher
 
 class FileCollectionItem {
     
-    private final InfoHash infoHash
+    final InfoHash infoHash
     private final String comment
     private final File file
     private final byte pieceSizePow2
@@ -15,6 +15,8 @@ class FileCollectionItem {
     private volatile byte[] payload
     private final List<String> pathElements = new ArrayList<>()
 
+    private final int hashCode
+    
     public FileCollectionItem(InfoHash infoHash, String comment, List<String> pathElements, byte pieceSizePow2, long length) {
         this.infoHash = infoHash
         this.comment = comment
@@ -31,6 +33,8 @@ class FileCollectionItem {
             f = new File(f, it)
         }
         this.file = f
+        
+        this.hashCode = Objects.hash(infoHash, comment, pathElements, pieceSizePow2, length)
     }
     
     public FileCollectionItem(InputStream is) {
@@ -66,6 +70,8 @@ class FileCollectionItem {
         
         def commentName = new Name(dis)
         comment = commentName.name
+        
+        this.hashCode = Objects.hash(infoHash, comment, pathElements, pieceSizePow2, length)
     }
     
     void write(OutputStream os) {
@@ -88,5 +94,21 @@ class FileCollectionItem {
             payload = baos.toByteArray()
         }
         os.write(payload)
+    }
+    
+    @Override
+    public int hashCode() {
+        hashCode
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        FileCollectionItem other = (FileCollectionItem) o
+        
+        return Objects.equals(infoHash, other.infoHash) &&
+            Objects.equals(comment, other.comment) &&
+            Objects.equals(pathElements, other.pathElements) &&
+            pieceSizePow2 == other.pieceSizePow2 &&
+            length == other.length
     }
 }
