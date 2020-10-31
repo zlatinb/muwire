@@ -108,6 +108,11 @@ class CollectionsToolView {
         selectedRow
     }
     
+    void clearFilesTable() {
+        model.files.clear()
+        filesTable.model.fireTableDataChanged()
+    }
+    
     void mvcGroupInit(Map<String,String> args) {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)

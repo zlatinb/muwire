@@ -30,6 +30,7 @@ class CollectionsToolController {
         model.eventBus.publish(e)
         model.collections.remove(row)
         view.collectionsTable.model.fireTableDataChanged()
+        view.clearFilesTable()
     }
     
     @ControllerAction
