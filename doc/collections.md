@@ -59,12 +59,11 @@ The downloader connects to the node that returned the search result which contai
 
 A set of request headers follows, each terminated by \r\n.  After the last header an additional \r\n is appended.  The headers can be any, the only one being mandatory at this time is the "Version" header, currently fixed at 1.
 
-The uploader responds with a set of headers encoded in the same fashion, again the only mandatory header is the "Version" currently fixed at one.  After the headers a binary stream of the following format:
+The uploader responds with a response code - 200 for ok or 404 for not found followed by \r\n and set of headers encoded in the same fashion.  The only mandatory headers are the "Version" currently fixed at 1 and the "Count" header which indicates how many collections are included in the body of the response.  After the headers a gzip-compressed binary stream of the following format:
 
 ```
-byte 0: number of collections returned
-bytes 1-33: hash of the first collection
-bytes 34-N: the payload of the first collection
+bytes 0-32: hash of the first collection
+bytes 33-N: the payload of the first collection
 bytes N+1-N+33: hash of the second collection
 etc.
 ```

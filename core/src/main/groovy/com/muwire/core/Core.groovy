@@ -16,8 +16,10 @@ import com.muwire.core.chat.ChatServer
 import com.muwire.core.chat.UIConnectChatEvent
 import com.muwire.core.chat.UIDisconnectChatEvent
 import com.muwire.core.collections.CollectionManager
+import com.muwire.core.collections.CollectionsClient
 import com.muwire.core.collections.UICollectionCreatedEvent
 import com.muwire.core.collections.UICollectionDeletedEvent
+import com.muwire.core.collections.UICollectionFetchEvent
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -301,7 +303,6 @@ public class Core {
             register(UICollectionDeletedEvent.class, collectionManager)
         }
         
-
         log.info("initializing mesh manager")
         MeshManager meshManager = new MeshManager(fileManager, home, props)
         eventBus.register(SourceDiscoveredEvent.class, meshManager)
@@ -356,6 +357,10 @@ public class Core {
 
         log.info("initializing connector")
         I2PConnector i2pConnector = new I2PConnector(i2pSocketManager)
+        
+        log.info("initializing collections client")
+        CollectionsClient collectionsClient = new CollectionsClient(i2pConnector, eventBus, me)
+        eventBus.register(UICollectionFetchEvent.class, collectionsClient)
 
         log.info("initializing certificate client")
         CertificateClient certificateClient = new CertificateClient(eventBus, i2pConnector)
