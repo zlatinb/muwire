@@ -17,6 +17,7 @@ import com.muwire.core.chat.UIConnectChatEvent
 import com.muwire.core.chat.UIDisconnectChatEvent
 import com.muwire.core.collections.CollectionManager
 import com.muwire.core.collections.UICollectionCreatedEvent
+import com.muwire.core.collections.UICollectionDeletedEvent
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -297,6 +298,7 @@ public class Core {
         eventBus.with { 
             register(AllFilesLoadedEvent.class, collectionManager)
             register(UICollectionCreatedEvent.class, collectionManager)
+            register(UICollectionDeletedEvent.class, collectionManager)
         }
         
 

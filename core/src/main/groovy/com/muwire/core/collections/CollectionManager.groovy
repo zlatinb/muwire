@@ -117,7 +117,7 @@ class CollectionManager {
     private synchronized void addToIndex(InfoHash infoHash, FileCollection collection) {
         rootToCollection.put(infoHash, collection)
         collection.files.each { 
-            Set<Collection> set = fileRootToCollections.get(it.infoHash)
+            Set<FileCollection> set = fileRootToCollections.get(it.infoHash)
             if (set == null) {
                 set = new HashSet<>()
                 fileRootToCollections.put(infoHash, set)
@@ -134,4 +134,32 @@ class CollectionManager {
             this.payload = payload
         }
     }
+    
+    void onUICollectionDeletedEvent(UICollectionDeletedEvent e) {
+        diskIO.execute({delete(e.collection)} as Runnable)
+    }
+    
+    private void delete(FileCollection collection) {
+        PayloadAndIH pih = infoHash(collection)
+        String hashB64 = Base64.encode(pih.infoHash.getRoot())
+        String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
+        
+        File file = new File(localCollections, fileName)
+        file.delete()
+        
+        removeFromIndex(pih.infoHash, collection)
+    }
+    
+    private synchronized void removeFromIndex(InfoHash infoHash, FileCollection collection) {
+        rootToCollection.remove(infoHash)
+        collection.files.each { 
+            Set<FileCollection> set = fileRootToCollections.get(it.infoHash)
+            if (set == null)
+                return // ?
+            set.remove(collection)
+            if (set.isEmpty())
+                fileRootToCollections.remove(it.infoHash)
+        }
+    }
+    
 }
