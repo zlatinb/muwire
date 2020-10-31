@@ -57,12 +57,12 @@ class CollectionsToolView {
                 scrollPane(constraints : BorderLayout.CENTER) {
                     collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.collections) {
-                            closureColumn(header : trans("NAME"), type : String, read : {it.name})
-                            closureColumn(header : trans("AUTHOR"), type : String, read : {it.author.getHumanReadableName()})
-                            closureColumn(header : trans("FILES"), type : Integer, read : {it.numFiles()})
-                            closureColumn(header : trans("SIZE"), type : Long, read : {it.totalSize()})
-                            closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.comment != ""})
-                            closureColumn(header : trans("CREATED"), type : Long, read : {it.timestamp})
+                            closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
+                            closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
+                            closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
+                            closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
+                            closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
+                            closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
                         }
                     }
                 }
@@ -76,9 +76,9 @@ class CollectionsToolView {
                 scrollPane(constraints : BorderLayout.CENTER) {
                     filesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.files) {
-                            closureColumn(header : trans("NAME"), type : String, read : {it.getCachedPath()})
-                            closureColumn(header : trans("SIZE"), type : Long, read : {it.getCachedLength()})
-                            closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.getComment() != null})
+                            closureColumn(header : trans("NAME"), preferredWidth : 200, type : String, read : {it.getCachedPath()})
+                            closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.getCachedLength()})
+                            closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.getComment() != null})
                         }
                     }
                 }
