@@ -141,6 +141,13 @@ class MainFrameView {
                         menuItem(trans("SYSTEM"), actionPerformed : {mvcGroup.createMVCGroup("system-status")})
                     }
                     menu (text : trans("TOOLS")) {
+                        menuItem(trans("COLLECTIONS"), actionPerformed : {
+                            def env = [:]
+                            env['fileManager'] = model.core.fileManager
+                            env['collectionManager'] = model.core.collectionManager
+                            env['eventBus'] = model.core.eventBus
+                            mvcGroup.createMVCGroup("collections-tool", env)
+                        })
                         menuItem(trans("CONTENT_CONTROL"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core

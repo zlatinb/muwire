@@ -47,7 +47,11 @@ class CollectionManager {
         localCollections.mkdirs()
         remoteCollections.mkdirs()        
     }
-    
+
+    synchronized List<FileCollection> getCollections() {
+        new ArrayList<>(rootToCollection.values())
+    }
+        
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         diskIO.execute({load()} as Runnable)
     }

@@ -14,9 +14,10 @@ class FileCollection {
     
     final long timestamp
     final Persona author
-    private final String comment
+    final String comment
     private final byte[] sig
     private final int hashCode
+    final String name
     
     private volatile byte[] payload
     
@@ -31,7 +32,8 @@ class FileCollection {
         this.comment = comment
         this.files = files
         
-        tree = new PathTree(files.first().pathElements.first())
+        name = files.first().pathElements.first()
+        tree = new PathTree(name)
         for(FileCollectionItem item : files) {
             tree.add(item.pathElements)
         }
@@ -65,7 +67,13 @@ class FileCollection {
         
         if (!verify())
             throw new InvalidCollectionException("invalid signature")
-            
+        
+        name = files.first().pathElements.first()
+        tree = new PathTree(name)
+        for(FileCollectionItem item : files) {
+            tree.add(item.pathElements)
+        }
+        
         this.hashCode = Objects.hash(timestamp, author, comment, files)
     }
     
@@ -122,6 +130,18 @@ class FileCollection {
             payload = baos.toByteArray()
         }
         os.write(payload)
+    }
+    
+    public long totalSize() {
+        long rv = 0
+        files.each { 
+            rv += it.length
+        }
+        rv
+    }
+    
+    public int numFiles() {
+        files.size()
     }
     
     @Override
