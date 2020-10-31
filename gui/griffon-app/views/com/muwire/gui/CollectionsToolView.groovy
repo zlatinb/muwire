@@ -140,6 +140,7 @@ class CollectionsToolView {
             filesTable.model.fireTableDataChanged()
         })   
         
+        filesTable.setDefaultRenderer(Long.class, new SizeRenderer())
         filesTable.rowSorter.addRowSorterListener({evt -> lastFilesSortEvent})
         filesTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = filesTable.getSelectionModel()
