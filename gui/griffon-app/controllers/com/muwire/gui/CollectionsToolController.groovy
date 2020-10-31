@@ -56,7 +56,7 @@ class CollectionsToolController {
         int row = view.selectedFileRow()
         if (row < 0)
             return
-        SharedFile sf = model.files.getAt(row)
+        SharedFile sf = model.files.get(row)
         
         def params = [:]
         params['text'] = DataUtil.readi18nString(Base64.decode(sf.getComment()))

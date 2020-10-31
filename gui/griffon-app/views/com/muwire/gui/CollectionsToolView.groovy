@@ -120,7 +120,7 @@ class CollectionsToolView {
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
         
-        collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionSortEvent})
+        collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionSortEvent = evt})
 
         def selectionModel = collectionsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -146,7 +146,7 @@ class CollectionsToolView {
         })   
         
         filesTable.setDefaultRenderer(Long.class, new SizeRenderer())
-        filesTable.rowSorter.addRowSorterListener({evt -> lastFilesSortEvent})
+        filesTable.rowSorter.addRowSorterListener({evt -> lastFilesSortEvent = evt})
         filesTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = filesTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
