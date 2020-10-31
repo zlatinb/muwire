@@ -12,6 +12,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
 
 import javax.swing.JDialog
+import javax.swing.JTree
 import javax.swing.SwingConstants
 import javax.annotation.Nonnull
 
@@ -27,6 +28,7 @@ class CollectionWizardView {
     def mainPanel
     
     def nameTextField // TODO: disable "Review" button if empty
+    def commentTextArea
     def filesTable
     
     void initUI() {
@@ -36,43 +38,68 @@ class CollectionWizardView {
         dialog = new JDialog(mainFrame, trans("COLLECTION_WIZARD"), true)
 
         mainPanel = builder.panel {
-            gridLayout(rows : 2, cols : 1)
-            panel {
-                borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
+            cardLayout()
+            panel(constraints : "configuration") {
+                gridLayout(rows : 2, cols : 1)
+                panel {
                     borderLayout()
-                    label(text : trans("COLLECTION_NAME"), constraints : BorderLayout.WEST)
-                    nameTextField = textField(constraints : BorderLayout.CENTER)
-                }
-                panel(constraints : BorderLayout.CENTER) {
-                    borderLayout()
-                    label(text: trans("COLLECTION_DESCRIPTION"), constraints : BorderLayout.NORTH)
-                    scrollPane(constraints : BorderLayout.CENTER) {
-                        textArea(editable : true, columns : 100, lineWrap : true, wrapStyleWord : true)
+                    panel(constraints : BorderLayout.NORTH) {
+                        borderLayout()
+                        label(text : trans("COLLECTION_NAME"), constraints : BorderLayout.WEST)
+                        nameTextField = textField(constraints : BorderLayout.CENTER)
                     }
-                }
-            }
-            panel {
-                borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
-                    label(text : trans("COLLECTION_TOTAL_FILES") + ":" + model.files.size())
-                    label(text : trans("COLLECTION_TOTAL_SIZE") + ":" + DataHelper.formatSize2Decimal(model.totalSize(), false) + trans("BYTES_SHORT"))
-                }
-                scrollPane(constraints : BorderLayout.CENTER) {
-                    filesTable = table(id : "files-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                        tableModel(list : model.files) {
-                            closureColumn(header : trans("NAME"), type : String, read : {it.getCachedPath()})
-                            closureColumn(header : trans("SIZE"), type : Long, preferredWidth: 30, read : {it.getCachedLength()})
-                            closureColumn(header : trans("COMMENT"), type : Boolean, preferredWidth : 20, read : {it.getComment() != null})
+                    panel(constraints : BorderLayout.CENTER) {
+                        borderLayout()
+                        label(text: trans("COLLECTION_DESCRIPTION"), constraints : BorderLayout.NORTH)
+                        scrollPane(constraints : BorderLayout.CENTER) {
+                            commentTextArea = textArea(editable : true, columns : 100, lineWrap : true, wrapStyleWord : true)
                         }
                     }
                 }
+                panel {
+                    borderLayout()
+                    panel(constraints : BorderLayout.NORTH) {
+                        label(text : trans("COLLECTION_TOTAL_FILES") + ":" + model.files.size())
+                        label(text : trans("COLLECTION_TOTAL_SIZE") + ":" + DataHelper.formatSize2Decimal(model.totalSize(), false) + trans("BYTES_SHORT"))
+                    }
+                    scrollPane(constraints : BorderLayout.CENTER) {
+                        filesTable = table(id : "files-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            tableModel(list : model.files) {
+                                closureColumn(header : trans("NAME"), type : String, read : {it.getCachedPath()})
+                                closureColumn(header : trans("SIZE"), type : Long, preferredWidth: 30, read : {it.getCachedLength()})
+                                closureColumn(header : trans("COMMENT"), type : Boolean, preferredWidth : 20, read : {it.getComment() != null})
+                            }
+                        }
+                    }
+                    panel(constraints : BorderLayout.SOUTH) {
+                        button(text : trans("CANCEL"), cancelAction)
+                        button(text : trans("REVIEW"), reviewAction)
+                    }
+                }
+            }
+            panel(constraints : "review") {
+                borderLayout()
+                label(text : trans("COLLECTION_REVIEW_TITLE"), constraints : BorderLayout.NORTH)
+                scrollPane(constraints : BorderLayout.CENTER) {
+                    def jtree = new JTree(model.tree)
+//                    jtree.setCellRenderer(new SharedTreeRenderer()) // TODO: create new renderer
+                    tree(id : "preview-tree", rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, jtree)
+                }
                 panel(constraints : BorderLayout.SOUTH) {
                     button(text : trans("CANCEL"), cancelAction)
-                    button(text : trans("REVIEW"), reviewAction)
+                    button(text : trans("PREVIOUS"), previousAction)
+                    button(text : trans("SAVE"), saveAction)
                 }
             }
         }        
+    }
+    
+    void switchToReview() {
+        mainPanel.getLayout().show(mainPanel, "review")
+    }
+    
+    void switchToConfiguration() {
+        mainPanel.getLayout().show(mainPanel, "configuration")
     }
     
     void mvcGroupInit(Map<String,String> args) {
