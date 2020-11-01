@@ -39,6 +39,8 @@ class CollectionTabController {
             infoHash : CollectionManager.hash(collection)
             )
         model.eventBus.publish(e)
+        
+        switchToDLTab()
     }
     
     @ControllerAction
@@ -58,6 +60,12 @@ class CollectionTabController {
                 infoHash : CollectionManager.hash(collection)
                 )
         model.eventBus.publish(e)
+        
+        switchToDLTab()
+    }
+    
+    private void switchToDLTab() {
+        application.mvcGroupManager.getGroups()['MainFrame'].view.showDownloadsWindow.call()
     }
     
     @ControllerAction
