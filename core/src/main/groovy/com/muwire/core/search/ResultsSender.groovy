@@ -82,6 +82,7 @@ class ResultsSender {
                 }
                 InfoHash ih = new InfoHash(it.getRoot())
                 int certificates = certificateManager.getByInfoHash(ih).size()
+                Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
                 def uiResultEvent = new UIResultEvent( sender : me,
                     name : it.getFile().getName(),
                     size : length,
@@ -94,7 +95,7 @@ class ResultsSender {
                     certificates : certificates,
                     chat : chatServer.isRunning() && settings.advertiseChat,
                     feed : settings.fileFeed && settings.advertiseFeed,
-                    collections : collectionManager.collectionsForFile(ih)
+                    collections : collections
                     )
                 uiResultEvents << uiResultEvent
             }
@@ -127,7 +128,7 @@ class ResultsSender {
                         results.each {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
-                            int collections = collectionManager.collectionsForFile(ih)
+                            Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
@@ -154,7 +155,7 @@ class ResultsSender {
                         results.each { 
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
-                            int collections = collectionManager.collectionsForFile(ih)
+                            Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
                             def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
@@ -173,7 +174,7 @@ class ResultsSender {
         }
     }
     
-    public static def sharedFileToObj(SharedFile sf, boolean browseFiles, int certificates, int collections) {
+    public static def sharedFileToObj(SharedFile sf, boolean browseFiles, int certificates, Set<InfoHash> collections) {
         byte [] name = sf.getFile().getName().getBytes(StandardCharsets.UTF_8)
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
@@ -197,7 +198,7 @@ class ResultsSender {
 
         obj.browse = browseFiles 
         obj.certificates = certificates
-        obj.collections = collections
+        obj.collections = collections.collect { Base64.encode(it.getRoot()) }
         obj
     }
 }

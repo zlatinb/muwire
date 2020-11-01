@@ -19,7 +19,7 @@ class UIResultEvent extends Event {
     int certificates
     boolean chat
     boolean feed
-    int collections
+    Set<InfoHash> collections
     
     @Override
     public String toString() {

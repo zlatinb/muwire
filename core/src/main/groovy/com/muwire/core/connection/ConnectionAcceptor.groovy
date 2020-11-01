@@ -402,7 +402,7 @@ class ConnectionAcceptor {
                 it.hit(browser, System.currentTimeMillis(), "Browse Host");
                 InfoHash ih = new InfoHash(it.getRoot())
                 int certificates = certificateManager.getByInfoHash(ih).size()
-                int collections = collectionManager.collectionsForFile(ih)
+                Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
                 def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections)
                 def json = jsonOutput.toJson(obj)
                 dos.writeShort((short)json.length())

@@ -2,10 +2,9 @@ package com.muwire.core.search
 
 import java.util.stream.Collectors
 
-import javax.naming.directory.InvalidSearchControlsException
-
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
+import com.muwire.core.collections.FileCollection
 import com.muwire.core.files.FileHasher
 import com.muwire.core.util.DataUtil
 
@@ -57,7 +56,7 @@ class ResultsParser {
             }
             InfoHash parsedIH = InfoHash.fromHashList(hashList)
             if (parsedIH.getRoot() != infoHash)
-                throw new InvalidSearchControlsException("infohash root doesn't match")
+                throw new InvalidSearchResultException("infohash root doesn't match")
 
              return new UIResultEvent( sender : p,
                  name : name,
@@ -106,9 +105,12 @@ class ResultsParser {
             if (json.certificates != null)
                 certificates = json.certificates
                 
-            int collections = 0
-            if (json.collections != null)
+            Set<InfoHash> collections = Collections.emptySet()
+            if (json.collections != null) {
+                collections = new HashSet<>()
+                json.collections.collect(collections, { new InfoHash(Base64.decode(it)) })
                 collections = json.collections
+            }
                 
             log.fine("Received result from ${p.getHumanReadableName()} name \"$name\" infoHash:\"${json.infohash}\"")
 

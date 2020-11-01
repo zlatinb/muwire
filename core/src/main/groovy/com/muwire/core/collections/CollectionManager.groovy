@@ -31,6 +31,8 @@ class CollectionManager {
     private final Map<InfoHash, FileCollection> rootToCollection = new HashMap<>()
     /** infohash of a collection item to every collection it is part of */
     private final Map<InfoHash, Set<FileCollection>> fileRootToCollections = new HashMap<>()
+    /** FileCollection object to it's corresponding infohash */
+    private final Map<Collection, InfoHash> collectionToHash = new HashMap<>()
     
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ r ->
         new Thread(r, "collections-io")
@@ -56,10 +58,12 @@ class CollectionManager {
         rootToCollection.get(ih)
     }
     
-    synchronized int collectionsForFile(InfoHash ih) {
-        int rv = 0
-        if (fileRootToCollections.containsKey(ih))
-            rv = fileRootToCollections.get(ih).size()
+    synchronized Set<InfoHash> collectionsForFile(InfoHash ih) {
+        def rv = Collections.emptySet()
+        if (fileRootToCollections.containsKey(ih)) {
+            rv = new HashSet<>()
+            fileRootToCollections.get(ih).collect(rv, { collectionToHash.get(it) })
+        }
         rv
     }
         
@@ -131,6 +135,7 @@ class CollectionManager {
 
     private synchronized void addToIndex(InfoHash infoHash, FileCollection collection) {
         rootToCollection.put(infoHash, collection)
+        collectionToHash.put(collection, infoHash)
         collection.files.each { 
             Set<FileCollection> set = fileRootToCollections.get(it.infoHash)
             if (set == null) {
@@ -167,6 +172,7 @@ class CollectionManager {
     
     private synchronized void removeFromIndex(InfoHash infoHash, FileCollection collection) {
         rootToCollection.remove(infoHash)
+        collectionToHash.remove(collection)
         collection.files.each { 
             Set<FileCollection> set = fileRootToCollections.get(it.infoHash)
             if (set == null)
