@@ -139,4 +139,23 @@ class BrowseController {
         mainFrameGroup.controller.startChat(model.host)
         mainFrameGroup.view.showChatWindow.call()
     }
+    
+    @ControllerAction
+    void viewCollections() {
+        def selectedResults = view.selectedResults()
+        if (selectedResults == null || selectedResults.size() != 1)
+            return
+        def event = selectedResults[0]
+        if (event.collections == null || event.collections.isEmpty())
+            return
+        
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params['fileName'] = event.name
+        params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
+        params['infoHashes'] = event.collections.collect()
+        params['uuid'] = uuid
+        params['host'] = event.sender
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+    }
 }

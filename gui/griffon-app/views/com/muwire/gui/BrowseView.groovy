@@ -58,6 +58,7 @@ class BrowseView {
                         closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
                         closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
                         closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                        closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read : {row -> row.collections.size()})
                     }
                 }
             }
@@ -65,6 +66,7 @@ class BrowseView {
                 button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
                 button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
                 button(text : trans("VIEW_CERTIFICATES"), enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                button(text : trans("VIEW_COLLECTIONS"), enabled : bind{model.viewCollectionsActionEnabled}, viewCollectionsAction)
                 button(text : trans("CHAT"), enabled : bind {model.chatActionEnabled}, chatAction)
                 label(text : trans("DOWNLOAD_SEQUENTIALLY"))
                 sequentialDownloadCheckbox = checkBox()
@@ -89,6 +91,7 @@ class BrowseView {
                 model.downloadActionEnabled = false
                 model.viewCommentActionEnabled = false
                 model.viewCertificatesActionEnabled = false
+                model.viewCollectionsActionEnabled = false
                 return
             }
             
@@ -101,6 +104,7 @@ class BrowseView {
             boolean downloadActionEnabled = true
             
             model.viewCertificatesActionEnabled = (rows.length == 1 && model.results[rows[0]].certificates > 0)
+            model.viewCollectionsActionEnabled = rows.length == 1 && model.results[rows[0]].collections.size() > 0
             
             if (rows.length == 1 && model.results[rows[0]].comment != null) 
                 model.viewCommentActionEnabled = true
