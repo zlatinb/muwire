@@ -388,7 +388,7 @@ public class Core {
         eventBus.register(UIFeedUpdateEvent.class, feedClient)
         
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer)
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer, collectionManager)
 
         log.info "initializing search manager"
         SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)

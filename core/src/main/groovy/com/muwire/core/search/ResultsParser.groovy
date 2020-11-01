@@ -106,6 +106,10 @@ class ResultsParser {
             if (json.certificates != null)
                 certificates = json.certificates
                 
+            int collections = 0
+            if (json.collections != null)
+                collections = json.collections
+                
             log.fine("Received result from ${p.getHumanReadableName()} name \"$name\" infoHash:\"${json.infohash}\"")
 
             return new UIResultEvent( sender : p,
@@ -117,7 +121,8 @@ class ResultsParser {
                 comment : comment,
                 browse : browse,
                 uuid: uuid,
-                certificates : certificates)
+                certificates : certificates,
+                collections : collections)
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }

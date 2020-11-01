@@ -400,8 +400,10 @@ class ConnectionAcceptor {
             JsonOutput jsonOutput = new JsonOutput()
             sharedFiles.each {
                 it.hit(browser, System.currentTimeMillis(), "Browse Host");
-                int certificates = certificateManager.getByInfoHash(new InfoHash(it.getRoot())).size()
-                def obj = ResultsSender.sharedFileToObj(it, false, certificates)
+                InfoHash ih = new InfoHash(it.getRoot())
+                int certificates = certificateManager.getByInfoHash(ih).size()
+                int collections = collectionManager.collectionsForFile(ih)
+                def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections)
                 def json = jsonOutput.toJson(obj)
                 dos.writeShort((short)json.length())
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))
