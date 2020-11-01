@@ -198,6 +198,8 @@ class CollectionManager {
     }
     
     synchronized void onUIDownloadCollectionEvent(UIDownloadCollectionEvent e) {
+        if (!e.full)
+            return
         rootToCollectionRemote.put(e.infoHash, e.collection)
         Set<InfoHash> infoHashes = new HashSet<>()
         e.collection.files.collect(infoHashes, {it.infoHash})
