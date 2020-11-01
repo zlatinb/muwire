@@ -62,6 +62,7 @@ class CollectionsToolView {
                             closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
                             closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
                             closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
+                            closureColumn(headre : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
                             closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
                         }
                     }
