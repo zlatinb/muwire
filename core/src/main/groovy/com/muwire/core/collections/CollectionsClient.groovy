@@ -14,7 +14,6 @@ import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.util.DataUtil
-import com.muwire.core.util.DataUtilTest
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
