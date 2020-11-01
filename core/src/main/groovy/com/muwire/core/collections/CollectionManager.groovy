@@ -18,6 +18,7 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
+import com.muwire.core.files.FileUnsharedEvent
 
 import groovy.util.logging.Log
 import net.i2p.data.Base64
@@ -209,7 +210,8 @@ class CollectionManager {
         PayloadAndIH pih = infoHash(collection)
         String hashB64 = Base64.encode(pih.infoHash.getRoot())
         String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
-        
+
+        log.fine("deleting $fileName")        
         File file = new File(localCollections, fileName)
         file.delete()
         
@@ -258,5 +260,17 @@ class CollectionManager {
             Files.move(file.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
             addToIndex(e.collectionInfoHash, collection)
         }
+    }
+    
+    synchronized void onFileUnsharedEvent(FileUnsharedEvent e) {
+        InfoHash infoHash = new InfoHash(e.unsharedFile.getRoot())
+        Set<FileCollection> affected = fileRootToCollections.get(infoHash)
+        if (affected == null || affected.isEmpty()) {
+            return
+        }
+        affected.each { c ->
+            diskIO.execute({delete(c)} as Runnable)
+        }
+        
     }
 }

@@ -304,6 +304,7 @@ public class Core {
             register(UICollectionDeletedEvent.class, collectionManager)
             register(UIDownloadCollectionEvent.class, collectionManager)
             register(FileDownloadedEvent.class, collectionManager)
+            register(FileUnsharedEvent.class, collectionManager)
         }
         
         log.info("initializing mesh manager")
