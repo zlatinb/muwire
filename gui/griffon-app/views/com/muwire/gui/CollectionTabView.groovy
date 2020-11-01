@@ -7,8 +7,12 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JLabel
 import javax.swing.JTable
+import javax.swing.JTextArea
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
+
+import com.muwire.core.collections.FileCollection
 
 import java.awt.BorderLayout
 
@@ -26,6 +30,7 @@ class CollectionTabView {
     
     JTable collectionsTable
     def lastCollectionsTableSortEvent
+    JTextArea commentArea
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -39,7 +44,7 @@ class CollectionTabView {
                         label(text : trans("STATUS") + ":")
                         label(text : bind {trans(model.status.name())})
                     }
-                    scrollPane(constraints : BorderLayout.CENTER) {
+                    scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                         collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.collections) {
                                 closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {it.name})
@@ -53,7 +58,14 @@ class CollectionTabView {
                     }
                 }
             }
-            panel {}
+            panel {
+                borderLayout()
+                panel(constraints: BorderLayout.NORTH) {
+                    label(text : trans("DESCRIPTION"))
+                }
+                commentArea = textArea(text : bind {model.comment}, editable : false, lineWrap : true, wrapStyleWord : true, constraints : BorderLayout.CENTER,
+                    border : etchedBorder())
+            }
             panel {}
         }
     }
@@ -91,6 +103,26 @@ class CollectionTabView {
         
         collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionsTableSortEvent = evt})
         collectionsTable.rowSorter.setSortsOnUpdates(true)
+        
+        def selectionModel = collectionsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int row = selectedCollection()
+            if (row < 0)
+                return
+            FileCollection selected = model.collections.get(row)
+            model.comment = selected.comment
+        })
+    }
+    
+    int selectedCollection() {
+        int row = collectionsTable.getSelectedRow()
+        if (row < 0)
+            return row
+        if (lastCollectionsTableSortEvent != null) 
+            row = collectionsTable.rowSorter.convertRowIndexToModel(row)
+        
+        return row
     }
     
     def closeTab = {
