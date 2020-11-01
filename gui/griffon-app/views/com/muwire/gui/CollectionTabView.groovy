@@ -32,6 +32,7 @@ class CollectionTabView {
     def lastCollectionsTableSortEvent
     JTextArea commentArea
     JTable itemsTable
+    def lastItemsTableSortEvent
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -82,6 +83,10 @@ class CollectionTabView {
                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})
                         }
                     }
+                }
+                panel(constraints : BorderLayout.SOUTH) {
+                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
+                    button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
                 }
             }
         }
@@ -138,6 +143,20 @@ class CollectionTabView {
         
         // items table
         itemsTable.setDefaultRenderer(Long.class, new SizeRenderer())
+        itemsTable.rowSorter.addRowSorterListener({evt -> lastItemsTableSortEvent = evt})
+        itemsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = itemsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener({
+            int [] rows = selectedItems()
+            if (rows.length == 0) {
+                model.viewCommentButtonEnabled = false
+                model.downloadItemButtonEnabled = false
+                return
+            }
+            model.downloadItemButtonEnabled = true
+            model.viewCommentButtonEnabled = rows.length == 1 && model.items.get(rows[0]).comment != ""
+        })
     }
     
     int selectedCollection() {
@@ -148,6 +167,17 @@ class CollectionTabView {
             row = collectionsTable.rowSorter.convertRowIndexToModel(row)
         
         return row
+    }
+    
+    int[] selectedItems() {
+        int [] rows = itemsTable.getSelectedRows()
+        if (rows.length == 0)
+            return rows
+        if (lastItemsTableSortEvent != null) {
+            for (int i = 0; i < rows.length; i++)
+                rows[i] = itemsTable.rowSorter.convertRowIndexToModel(rows[i])
+        }
+        rows
     }
     
     def closeTab = {

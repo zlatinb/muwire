@@ -10,9 +10,27 @@ import javax.annotation.Nonnull
 class CollectionTabController {
     @MVCMember @Nonnull
     CollectionTabModel model
+    @MVCMember @Nonnull
+    CollectionTabView view
 
     @ControllerAction
-    void click() {
-        model.clickCount++
+    void download() {
+        
+    }
+    
+    @ControllerAction
+    void viewComment() {
+        int []rows = view.selectedItems()
+        if (rows.length != 1)
+            return
+            
+        def item = model.items.get(rows[0])
+        String text = item.comment
+        String name = String.join(File.separator, item.pathElements)
+        
+        def params = [:]
+        params['text'] = text
+        params['name'] = name
+        mvcGroup.createMVCGroup("show-comment", params)
     }
 }

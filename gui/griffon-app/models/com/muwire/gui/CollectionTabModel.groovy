@@ -37,6 +37,8 @@ class CollectionTabModel {
     @Observable CollectionFetchStatus status
     @Observable String comment = trans("COLLECTION_SELECT")
     @Observable int totalCollections
+    @Observable boolean viewCommentButtonEnabled
+    @Observable boolean downloadItemButtonEnabled
     
     void mvcGroupInit(Map<String,String> args) {
         eventBus.with {
