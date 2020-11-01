@@ -110,6 +110,38 @@ class CollectionManager {
                     log.log(Level.WARNING, "failed to load collection $path", e)
                 }
             })
+            
+        Files.walk(remoteCollections.toPath())
+                .filter({it.getFileName().toString().endsWith(".mwcollection")})
+                .forEach { path ->
+                    log.fine("processing $path")
+                    try {
+                        File f = path.toFile()
+                        FileCollection collection
+                        f.withInputStream {
+                            collection = new FileCollection(it)
+                        }
+                        Set<InfoHash> remaining = new HashSet<>()
+                        collection.files.each {
+                            if (!fileManager.isShared(it.infoHash))
+                                remaining.add(it.infoHash)
+                        }
+                        InfoHash infoHash = infoHash(collection).infoHash
+                        if (!remaining.isEmpty()) {
+                            synchronized(this) {
+                                filesInRemoteCollection.put(collection, remaining)
+                                rootToCollectionRemote.put(infoHash, collection)
+                            }
+                        } else {
+                            log.fine("all files of remote collection were shared, moving to local")
+                            File target = new File(localCollections, f.getName())
+                            Files.move(path, target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+                            addToIndex(infoHash, collection)
+                        }
+                    } catch (Exception e) {
+                        log.log(Level.WARNING, "failed to load collection $path", e)
+                    }
+                }
     }
     
     void onUICollectionCreatedEvent(UICollectionCreatedEvent e) {
