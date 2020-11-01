@@ -630,7 +630,7 @@ class ConnectionAcceptor {
             
             Persona client = null
             if (headers.containsKey("Persona"))
-                client = new Persona(Base64.decode(headers['Persona']))
+                client = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
             
             Map<InfoHash, FileCollection> available = new HashMap<>()
             infoHashes.each { 
