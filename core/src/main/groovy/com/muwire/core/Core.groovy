@@ -20,6 +20,7 @@ import com.muwire.core.collections.CollectionsClient
 import com.muwire.core.collections.UICollectionCreatedEvent
 import com.muwire.core.collections.UICollectionDeletedEvent
 import com.muwire.core.collections.UICollectionFetchEvent
+import com.muwire.core.collections.UIDownloadCollectionEvent
 import com.muwire.core.connection.ConnectionAcceptor
 import com.muwire.core.connection.ConnectionEstablisher
 import com.muwire.core.connection.ConnectionEvent
@@ -415,6 +416,7 @@ public class Core {
         eventBus.register(UIDownloadPausedEvent.class, downloadManager)
         eventBus.register(UIDownloadResumedEvent.class, downloadManager)
         eventBus.register(DownloadHopelessEvent.class, downloadManager)
+        eventBus.register(UIDownloadCollectionEvent.class, downloadManager)
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)

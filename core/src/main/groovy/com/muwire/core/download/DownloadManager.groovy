@@ -25,6 +25,9 @@ import com.muwire.core.Persona
 import com.muwire.core.UILoadedEvent
 import com.muwire.core.chat.ChatManager
 import com.muwire.core.chat.ChatServer
+import com.muwire.core.collections.FileCollection
+import com.muwire.core.collections.FileCollectionItem
+import com.muwire.core.collections.UIDownloadCollectionEvent
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
@@ -45,6 +48,8 @@ public class DownloadManager {
     private final ChatServer chatServer
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
+    
+    private final Map<FileCollection, Set<Downloader>> collectionDownloaders = new ConcurrentHashMap<>()
 
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
         I2PConnector connector, File home, Persona me, ChatServer chatServer) {
@@ -90,7 +95,29 @@ public class DownloadManager {
             e.sequential, singleSource)
     }
     
-    private void doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
+    public void onUIDownloadCollectionEvent(UIDownloadCollectionEvent e) {
+        Set<Destination> senderAndAuthor = new HashSet<>()
+        senderAndAuthor.add(e.host.destination)
+        senderAndAuthor.add(e.collection.author.destination)
+        
+        Set<Downloader> downloaders = new HashSet<>()
+        
+        e.items.each {
+            File target = muSettings.downloadLocation
+            for (String pathElement : it.pathElements) {
+                target = new File(target, pathElement)
+            }
+            target.getParentFile().mkdirs()
+
+            Downloader downloader = doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor)
+            downloaders.add(downloader)
+        }
+        
+        if (e.full)
+            collectionDownloaders.put(e.collection, downloaders)
+    }
+    
+    private Downloader doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
         boolean sequential, Set<Destination> destinations) {
         File incompletes = muSettings.incompleteLocation
         if (incompletes == null)
@@ -105,6 +132,8 @@ public class DownloadManager {
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
+        
+        downloader
     }
 
     public void onUIDownloadCancelledEvent(UIDownloadCancelledEvent e) {

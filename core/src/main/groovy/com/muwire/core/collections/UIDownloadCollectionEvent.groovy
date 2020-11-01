@@ -9,4 +9,5 @@ class UIDownloadCollectionEvent extends Event {
     Set<FileCollectionItem> items
     boolean full
     Persona host
+    boolean sequential
 }
