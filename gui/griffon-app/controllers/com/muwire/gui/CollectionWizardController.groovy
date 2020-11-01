@@ -48,19 +48,10 @@ class CollectionWizardController {
         }
         model.collection = builder.build()
         
-        copyTree(model.treeRoot, model.collection.tree.root)    
+        TreeUtil.copy(model.treeRoot, model.collection.tree.root)    
         model.tree.nodeStructureChanged(model.treeRoot)
         
         view.switchToReview()
-    }
-    
-    private static void copyTree(DefaultMutableTreeNode jtreeNode, PathTree.PathNode pathNode) {
-        jtreeNode.setUserObject(pathNode.path)
-        pathNode.children.each { 
-            MutableTreeNode newChild = new DefaultMutableTreeNode()
-            jtreeNode.add(newChild)
-            copyTree(newChild, it)
-        }
     }
     
     @ControllerAction

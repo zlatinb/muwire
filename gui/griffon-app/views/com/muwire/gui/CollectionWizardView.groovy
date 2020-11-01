@@ -30,6 +30,7 @@ class CollectionWizardView {
     def nameTextField // TODO: disable "Review" button if empty
     def commentTextArea
     def filesTable
+    JTree jTree
     
     void initUI() {
         
@@ -81,9 +82,9 @@ class CollectionWizardView {
                 borderLayout()
                 label(text : trans("COLLECTION_REVIEW_TITLE"), constraints : BorderLayout.NORTH)
                 scrollPane(constraints : BorderLayout.CENTER) {
-                    def jtree = new JTree(model.tree)
+                    jTree = new JTree(model.tree)
 //                    jtree.setCellRenderer(new SharedTreeRenderer()) // TODO: create new renderer
-                    tree(id : "preview-tree", rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, jtree)
+                    tree(id : "preview-tree", rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, jTree)
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     button(text : trans("CANCEL"), cancelAction)
@@ -96,6 +97,7 @@ class CollectionWizardView {
     
     void switchToReview() {
         mainPanel.getLayout().show(mainPanel, "review")
+        TreeUtil.expand(jTree)
     }
     
     void switchToConfiguration() {
