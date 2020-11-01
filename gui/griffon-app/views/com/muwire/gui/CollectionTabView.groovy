@@ -98,6 +98,7 @@ class CollectionTabView {
                         borderLayout()
                         scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                             itemsTree = new JTree(model.fileTreeModel)
+                            itemsTree.setCellRenderer(new PathTreeRenderer())
                             tree(rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, itemsTree)
                         }
                     }

@@ -83,7 +83,7 @@ class CollectionWizardView {
                 label(text : trans("COLLECTION_REVIEW_TITLE"), constraints : BorderLayout.NORTH)
                 scrollPane(constraints : BorderLayout.CENTER) {
                     jTree = new JTree(model.tree)
-//                    jtree.setCellRenderer(new SharedTreeRenderer()) // TODO: create new renderer
+                    jTree.setCellRenderer(new PathTreeRenderer())
                     tree(id : "preview-tree", rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, jTree)
                 }
                 panel(constraints : BorderLayout.SOUTH) {

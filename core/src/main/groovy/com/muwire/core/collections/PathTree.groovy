@@ -7,6 +7,7 @@ class PathTree {
     final PathNode root
     PathTree(String root) {
         this.root = new PathNode(root, null)
+        this.root.setUserObject(root)
         keyToNode.put(this.root.key(), this.root)
     }
 
