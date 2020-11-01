@@ -6,6 +6,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.collections.CollectionManager
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.FileCollectionItem
 import com.muwire.core.collections.UIDownloadCollectionEvent
@@ -34,8 +35,8 @@ class CollectionTabController {
         UIDownloadCollectionEvent e = new UIDownloadCollectionEvent(
             collection : collection,
             items : collection.getFiles(),
-            full : true,
-            host : model.host
+            host : model.host,
+            infoHash : CollectionManager.hash(collection)
             )
         model.eventBus.publish(e)
     }
@@ -53,8 +54,8 @@ class CollectionTabController {
         UIDownloadCollectionEvent e = new UIDownloadCollectionEvent(
                 collection : collection,
                 items : new HashSet<>(items),
-                full : false,
-                host : model.host
+                host : model.host,
+                infoHash : CollectionManager.hash(collection)
                 )
         model.eventBus.publish(e)
     }

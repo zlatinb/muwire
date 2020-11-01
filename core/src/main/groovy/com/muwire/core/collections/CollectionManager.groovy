@@ -1,6 +1,9 @@
 package com.muwire.core.collections
 
 import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.MessageDigest
@@ -13,6 +16,7 @@ import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.files.AllFilesLoadedEvent
+import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
 
 import groovy.util.logging.Log
@@ -32,7 +36,10 @@ class CollectionManager {
     /** infohash of a collection item to every collection it is part of */
     private final Map<InfoHash, Set<FileCollection>> fileRootToCollections = new HashMap<>()
     /** FileCollection object to it's corresponding infohash */
-    private final Map<Collection, InfoHash> collectionToHash = new HashMap<>()
+    private final Map<FileCollection, InfoHash> collectionToHash = new HashMap<>()
+    /** infohash of the collection to collection */
+    private final Map<InfoHash, FileCollection> rootToCollectionRemote = new HashMap<>()
+    private final Map<FileCollection, Set<InfoHash>> filesInRemoteCollection = new HashMap<>()
     
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ r ->
         new Thread(r, "collections-io")
@@ -106,20 +113,27 @@ class CollectionManager {
     }
     
     void onUICollectionCreatedEvent(UICollectionCreatedEvent e) {
-        diskIO.execute({persist(e.collection)} as Runnable)
+        diskIO.execute({
+            def pih = persist(e.collection, localCollections)
+            addToIndex(pih.infoHash, e.collection)
+            } as Runnable)
     }
     
-    private void persist(FileCollection collection) {
+    private PayloadAndIH persist(FileCollection collection, File parent) {
         
         PayloadAndIH pih = infoHash(collection)
         String hashB64 = Base64.encode(pih.infoHash.getRoot())
         String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
         
-        File file = new File(localCollections, fileName)
+        File file = new File(parent, fileName)
         file.bytes = pih.payload
         
         log.info("persisted ${fileName}")
-        addToIndex(pih.infoHash, collection)
+        pih
+    }
+    
+    public static InfoHash hash(FileCollection collection) {
+        return infoHash(collection).infoHash
     }
     
     private static PayloadAndIH infoHash(FileCollection collection) {
@@ -183,4 +197,32 @@ class CollectionManager {
         }
     }
     
+    synchronized void onUIDownloadCollectionEvent(UIDownloadCollectionEvent e) {
+        rootToCollectionRemote.put(e.infoHash, e.collection)
+        Set<InfoHash> infoHashes = new HashSet<>()
+        e.collection.files.collect(infoHashes, {it.infoHash})
+        filesInRemoteCollection.put(e.collection, infoHashes)
+        diskIO.execute({persist(e.collection, remoteCollections)} as Runnable)
+    }
+    
+    synchronized void onFileDownloadedEvent(FileDownloadedEvent e) {
+        FileCollection collection = rootToCollectionRemote.get(e.collectionInfoHash)
+        if (collection == null)
+            return
+        Set<InfoHash> infoHashes = filesInRemoteCollection.get(collection)
+        if (infoHashes == null)
+            return
+        infoHashes.remove(e.infoHash)
+        if (infoHashes.isEmpty()) {
+
+            String hashB64 = Base64.encode(e.collectionInfoHash.getRoot())            
+            String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
+            log.info("moving $fileName to local collections")
+
+            File file = new File(remoteCollections, fileName)
+            File target = new File(localCollections, fileName)
+            Files.move(file.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            addToIndex(e.collectionInfoHash, collection)
+        }
+    }
 }

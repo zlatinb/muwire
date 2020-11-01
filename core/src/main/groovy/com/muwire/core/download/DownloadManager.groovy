@@ -49,8 +49,6 @@ public class DownloadManager {
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
     
-    private final Map<FileCollection, Set<Downloader>> collectionDownloaders = new ConcurrentHashMap<>()
-
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
         I2PConnector connector, File home, Persona me, ChatServer chatServer) {
         this.eventBus = eventBus
@@ -84,7 +82,7 @@ public class DownloadManager {
         destinations.addAll(e.sources)
         destinations.remove(me.destination)
 
-        doDownload(infohash, e.target, size, pieceSize, e.sequential, destinations)
+        doDownload(infohash, e.target, size, pieceSize, e.sequential, destinations, null)
 
     }
     
@@ -92,15 +90,13 @@ public class DownloadManager {
         Set<Destination> singleSource = new HashSet<>()
         singleSource.add(e.item.getPublisher().getDestination())
         doDownload(e.item.getInfoHash(), e.target, e.item.getSize(), e.item.getPieceSize(), 
-            e.sequential, singleSource)
+            e.sequential, singleSource, null)
     }
     
     public void onUIDownloadCollectionEvent(UIDownloadCollectionEvent e) {
         Set<Destination> senderAndAuthor = new HashSet<>()
         senderAndAuthor.add(e.host.destination)
         senderAndAuthor.add(e.collection.author.destination)
-        
-        Set<Downloader> downloaders = new HashSet<>()
         
         e.items.each {
             File target = muSettings.downloadLocation
@@ -109,16 +105,12 @@ public class DownloadManager {
             }
             target.getParentFile().mkdirs()
 
-            Downloader downloader = doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor)
-            downloaders.add(downloader)
+            doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor, e.infoHash)
         }
-        
-        if (e.full)
-            collectionDownloaders.put(e.collection, downloaders)
     }
     
     private Downloader doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
-        boolean sequential, Set<Destination> destinations) {
+        boolean sequential, Set<Destination> destinations, InfoHash collectionInfoHash) {
         File incompletes = muSettings.incompleteLocation
         if (incompletes == null)
             incompletes = new File(home, "incompletes")
@@ -126,14 +118,12 @@ public class DownloadManager {
         
         Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
         def downloader = new Downloader(eventBus, this, chatServer, me, target, size,
-                infoHash, pieceSize, connector, destinations,
+                infoHash, collectionInfoHash, pieceSize, connector, destinations,
                 incompletes, pieces, muSettings.downloadMaxFailures)
         downloaders.put(infoHash, downloader)
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
         eventBus.publish(new DownloadStartedEvent(downloader : downloader))
-        
-        downloader
     }
 
     public void onUIDownloadCancelledEvent(UIDownloadCancelledEvent e) {
@@ -179,6 +169,10 @@ public class DownloadManager {
                 infoHash = new InfoHash(root)
             }
             
+            InfoHash collectionInfoHash = null
+            if (json.collectionInfoHash != null)
+                collectionInfoHash = new InfoHash(Base64.decode(json.collectionInfoHash))
+            
             boolean sequential = false
             if (json.sequential != null)
                 sequential = json.sequential
@@ -197,7 +191,7 @@ public class DownloadManager {
             Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
             def downloader = new Downloader(eventBus, this, chatServer, me, file, (long)json.length,
-                infoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
+                infoHash, collectionInfoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
             if (json.paused != null)
                 downloader.paused = json.paused
                 
@@ -266,6 +260,9 @@ public class DownloadManager {
                     else
                         json.hashRoot = Base64.encode(infoHash.getRoot())
 
+                    if (downloader.collectionInfoHash != null)
+                        json.collectionInfoHash = Base64.encode(downloader.collectionInfoHash.getRoot())
+                        
                     json.paused = downloader.paused
                     
                     json.sequential = downloader.pieces.ratio == 0f

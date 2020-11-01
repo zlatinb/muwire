@@ -50,7 +50,7 @@ public class Downloader {
     private final File file
     private final Pieces pieces
     private final long length
-    private InfoHash infoHash
+    private InfoHash infoHash, collectionInfoHash
     private final int pieceSize
     private final I2PConnector connector
     private final Set<Destination> destinations
@@ -77,7 +77,7 @@ public class Downloader {
     private volatile BandwidthCounter bwCounter = new BandwidthCounter(0)
 
     public Downloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
-        Persona me, File file, long length, InfoHash infoHash,
+        Persona me, File file, long length, InfoHash infoHash, InfoHash collectionInfoHash,
         int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
         File incompletes, Pieces pieces, int maxFailures) {
         this.eventBus = eventBus
@@ -86,6 +86,7 @@ public class Downloader {
         this.chatServer = chatServer
         this.file = file
         this.infoHash = infoHash
+        this.collectionInfoHash = collectionInfoHash
         this.length = length
         this.connector = connector
         this.destinations = destinations
@@ -472,7 +473,8 @@ public class Downloader {
                         new FileDownloadedEvent(
                             downloadedFile : new DownloadedFile(file.getCanonicalFile(), getInfoHash().getRoot(), pieceSizePow2, successfulDestinations),
                         downloader : Downloader.this,
-                        infoHash: getInfoHash()))
+                        infoHash: getInfoHash(),
+                        collectionInfoHash : collectionInfoHash))
 
                 }
                 endpoint?.close()

@@ -302,6 +302,8 @@ public class Core {
             register(AllFilesLoadedEvent.class, collectionManager)
             register(UICollectionCreatedEvent.class, collectionManager)
             register(UICollectionDeletedEvent.class, collectionManager)
+            register(UIDownloadCollectionEvent.class, collectionManager)
+            register(FileDownloadedEvent.class, collectionManager)
         }
         
         log.info("initializing mesh manager")
