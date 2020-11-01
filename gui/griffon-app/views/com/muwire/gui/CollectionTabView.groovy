@@ -31,6 +31,7 @@ class CollectionTabView {
     JTable collectionsTable
     def lastCollectionsTableSortEvent
     JTextArea commentArea
+    JTable itemsTable
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -66,7 +67,23 @@ class CollectionTabView {
                 commentArea = textArea(text : bind {model.comment}, editable : false, lineWrap : true, wrapStyleWord : true, constraints : BorderLayout.CENTER,
                     border : etchedBorder())
             }
-            panel {}
+            panel {
+                borderLayout()
+                panel(constraints : BorderLayout.NORTH) {
+                    label(text: trans("FILES"))
+                }
+                scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
+                    itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                        tableModel(list : model.items) {
+                            closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
+                                String.join(File.separator, it.pathElements)
+                            })
+                            closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {it.length})
+                            closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -94,6 +111,7 @@ class CollectionTabView {
         parent.setTabComponentAt(index, tabPanel)
         mainFrameGroup.view.showSearchWindow.call()
         
+        // collections table
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -112,7 +130,14 @@ class CollectionTabView {
                 return
             FileCollection selected = model.collections.get(row)
             model.comment = selected.comment
+            model.items.clear()
+            model.items.addAll(selected.files)
+            itemsTable.model.fireTableDataChanged()
         })
+        
+        
+        // items table
+        itemsTable.setDefaultRenderer(Long.class, new SizeRenderer())
     }
     
     int selectedCollection() {

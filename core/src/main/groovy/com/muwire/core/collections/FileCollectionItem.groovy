@@ -8,12 +8,12 @@ import com.muwire.core.files.FileHasher
 class FileCollectionItem {
     
     final InfoHash infoHash
-    private final String comment
+    final String comment
     private final File file
     private final byte pieceSizePow2
-    private final long length
+    final long length
     private volatile byte[] payload
-    private final List<String> pathElements = new ArrayList<>()
+    final List<String> pathElements = new ArrayList<>()
 
     private final int hashCode
     
