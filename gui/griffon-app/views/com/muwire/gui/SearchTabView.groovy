@@ -108,6 +108,7 @@ class SearchTabView {
                                             closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
                                             closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
                                             closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
+                                            closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read : {UIResultEvent row -> row.collections.size()})
                                         }
                                     }
                                 }
@@ -175,6 +176,13 @@ class SearchTabView {
                                                 }
                                                 count
                                             })
+                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type : Integer, read : {
+                                                int count = 0
+                                                model.hashBucket[it].each { UIResultEvent row ->
+                                                    count += row.collections.size()
+                                                }
+                                                count
+                                            })
                                         }
                                     }
                                 }
@@ -202,6 +210,7 @@ class SearchTabView {
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {it.chat})
                                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
+                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Integer, read : {UIResultEvent row -> row.collections.size()})
                                             closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type : String, read : {
                                                 trans(model.core.trustService.getLevel(it.sender.destination).name())
                                             })

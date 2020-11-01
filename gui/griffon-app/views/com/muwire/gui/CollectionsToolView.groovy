@@ -62,7 +62,7 @@ class CollectionsToolView {
                             closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
                             closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
                             closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
-                            closureColumn(headre : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
+                            closureColumn(header : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
                             closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
                         }
                     }
@@ -119,7 +119,7 @@ class CollectionsToolView {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         collectionsTable.setDefaultRenderer(Integer.class,centerRenderer)
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
-        collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
+        collectionsTable.columnModel.getColumn(6).setCellRenderer(new DateRenderer())
         
         collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionSortEvent = evt})
 
