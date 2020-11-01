@@ -171,8 +171,8 @@ class CollectionTabView {
             
             model.root.removeAllChildren()
             TreeUtil.copy(model.root, selected.tree.root)
-            TreeUtil.expand(itemsTree)
             itemsTree.model.nodeStructureChanged(model.root)
+            TreeUtil.expand(itemsTree)
         })
         
         
