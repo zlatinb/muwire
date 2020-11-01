@@ -26,6 +26,7 @@ import com.muwire.core.util.DataUtil
 import com.muwire.core.util.BandwidthCounter
 
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
 
@@ -89,8 +90,10 @@ public class Downloader {
         this.connector = connector
         this.destinations = destinations
         this.incompletes = incompletes
-        this.piecesFile = new File(incompletes, file.getName()+".pieces")
-        this.incompleteFile = new File(incompletes, file.getName()+".part")
+        
+        String ih64 = Base64.encode(infoHash.getRoot())
+        this.piecesFile = new File(incompletes, file.getName()+"${ih64}.pieces")
+        this.incompleteFile = new File(incompletes, file.getName()+"${ih64}.part")
         this.pieceSizePow2 = pieceSizePow2
         this.pieceSize = 1 << pieceSizePow2
         this.pieces = pieces
