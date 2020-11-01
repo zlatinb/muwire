@@ -37,7 +37,7 @@ class FileCollection {
         name = files.first().pathElements.first()
         tree = new PathTree(name)
         for(FileCollectionItem item : files) {
-            tree.add(item.pathElements)
+            tree.add(item.pathElements, item)
         }
         
         byte [] signablePayload = signablePayload()
@@ -73,7 +73,7 @@ class FileCollection {
         name = files.first().pathElements.first()
         tree = new PathTree(name)
         for(FileCollectionItem item : files) {
-            tree.add(item.pathElements)
+            tree.add(item.pathElements, item)
         }
         
         this.hashCode = Objects.hash(timestamp, author, comment, files)

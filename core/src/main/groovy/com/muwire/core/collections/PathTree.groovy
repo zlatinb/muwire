@@ -10,7 +10,7 @@ class PathTree {
         keyToNode.put(this.root.key(), this.root)
     }
 
-    void add(List<String> paths) {
+    void add(List<String> paths, FileCollectionItem item) {
         PathNode current = null
         for (String path : paths) {
             if (current == null) {
@@ -28,7 +28,9 @@ class PathTree {
                 current.children.add(child)
             }
             current = keyToNode.get(childKey)
+            current.userObject = path
         }
+        current?.userObject = item
     }
     
     public void traverse(Callback cb) {
@@ -51,6 +53,7 @@ class PathTree {
         final PathNode parent
         final Set<PathNode> children = new LinkedHashSet<>()
         private final int hashCode
+        Object userObject
 
         PathNode(String path, PathNode parent) {
             this.parent = parent
