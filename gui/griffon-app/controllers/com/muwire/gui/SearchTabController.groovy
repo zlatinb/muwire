@@ -163,4 +163,18 @@ class SearchTabController {
         params['core'] = core
         mvcGroup.createMVCGroup("fetch-certificates", params)
     }
+    
+    @ControllerAction
+    void viewCollections() {
+        UIResultEvent event = view.getSelectedResult()
+        if (event == null || event.collections.isEmpty())
+            return
+            
+        def params = [:]
+        params['fileName'] = event.name
+        params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
+        params['collections'] = event.collections.collect()
+        params['uuid'] = UUID.randomUUID()
+        mvcGroup.createMVCGroup("collection-tab", params)
+    }
 }

@@ -118,8 +118,9 @@ class SearchTabView {
                                     button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
                                     button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
                                     button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
-                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 4, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
-                                    sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 5, gridy: 0, anchor : GridBagConstraints.LINE_END),
+                                    button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx:4, gridy:0), viewCollectionsAction)
+                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 5, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
+                                    sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 6, gridy: 0, anchor : GridBagConstraints.LINE_END),
                                     selected : false, enabled : bind {model.downloadActionEnabled})
                                 }
                             }
@@ -220,11 +221,13 @@ class SearchTabView {
                                 panel (constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows : 1, cols : 2)
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
-                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, showCommentAction)
-                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, viewCertificatesAction)
+                                        gridBagLayout()
+                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), browseAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), subscribeAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 2, gridy : 0), chatAction)
+                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 3, gridy : 0), showCommentAction)
+                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 4, gridy : 0), viewCertificatesAction)
+                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 5, gridy : 0), viewCollectionsAction)
                                     }
                                     panel (border : etchedBorder()) {
                                         button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
@@ -331,10 +334,12 @@ class SearchTabView {
                 model.viewCommentActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.subscribeActionEnabled = false
+                model.viewCollectionsActionEnabled = false
                 return
             } else {
                 model.viewCommentActionEnabled = result.comment != null
                 model.viewCertificatesActionEnabled = result.certificates > 0
+                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
             }
         })
         
@@ -378,6 +383,7 @@ class SearchTabView {
                 model.browseActionEnabled = false
                 model.chatActionEnabled = false
                 model.viewCertificatesActionEnabled = false
+                model.viewCollectionsActionEnabled = false
                 return
             }
             model.downloadActionEnabled = true
@@ -413,6 +419,7 @@ class SearchTabView {
                 model.chatActionEnabled = false
                 model.subscribeActionEnabled = false
                 model.viewCertificatesActionEnabled = false
+                model.viewCollectionsActionEnabled = false
                 model.trustButtonsEnabled = false
                 model.viewCommentActionEnabled = false
                 return
@@ -424,6 +431,7 @@ class SearchTabView {
             model.trustButtonsEnabled = true
             model.viewCommentActionEnabled = e.comment != null
             model.viewCertificatesActionEnabled = e.certificates > 0
+            model.viewCollectionsActionEnabled = !e.collections.isEmpty()
         })
        
         if (settings.groupByFile)
@@ -470,6 +478,13 @@ class SearchTabView {
                 JMenuItem viewCerts = new JMenuItem(trans("VIEW_CERTIFICATES"))
                 viewCerts.addActionListener({mvcGroup.controller.viewCertificates()})
                 menu.add(viewCerts)
+            }
+            
+            // view collections if any
+            if (model.viewCollectionsActionEnabled) {
+                JMenuItem viewCols = new JMenuItem(trans("VIEW_COLLECTIONS"))
+                viewCols.addActionListener({mvcGroup.controller.viewCollections()})
+                menu.add(viewCols)
             }
         }
         if (showMenu)

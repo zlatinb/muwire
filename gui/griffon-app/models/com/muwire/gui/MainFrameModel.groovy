@@ -87,6 +87,7 @@ class MainFrameModel {
 
     def results = new ConcurrentHashMap<>()
     def browses = new ConcurrentHashSet<String>()
+    def collections = new ConcurrentHashSet<String>()
     def downloads = []
     def uploads = []
     boolean treeVisible = true

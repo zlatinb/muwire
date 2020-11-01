@@ -156,4 +156,9 @@ mvcGroups {
         view = 'com.muwire.gui.CollectionsToolView'
         controller = 'com.muwire.gui.CollectionsToolController'
     }
+    'collection-tab' {
+        model = 'com.muwire.gui.CollectionTabModel'
+        view = 'com.muwire.gui.CollectionTabView'
+        controller = 'com.muwire.gui.CollectionTabController'
+    }
 }
