@@ -109,7 +109,6 @@ class ResultsParser {
             if (json.collections != null) {
                 collections = new HashSet<>()
                 json.collections.collect(collections, { new InfoHash(Base64.decode(it)) })
-                collections = json.collections
             }
                 
             log.fine("Received result from ${p.getHumanReadableName()} name \"$name\" infoHash:\"${json.infohash}\"")
