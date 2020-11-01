@@ -170,8 +170,8 @@ class ConnectionAcceptor {
                 case (byte)'F':
                     processFEED(e)
                     break
-                case (byte)'M':
-                    processMETAFILE(e)
+                case (byte)'O':
+                    processOLLECTION(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -611,14 +611,14 @@ class ConnectionAcceptor {
         }
     }
     
-    private void processMETAFILE(Endpoint e) {
+    private void processOLLECTION(Endpoint e) {
         DataOutputStream dos = null
         try {
-            byte [] ETAFILE = new byte[8]
+            byte [] OLLECTION = new byte[9]
             DataInputStream dis = new DataInputStream(e.getInputStream())
-            dis.readFully(ETAFILE)
-            if (ETAFILE != "ETAFILE ".getBytes(StandardCharsets.US_ASCII))
-                throw new Exception("invalid METAFILE connection")
+            dis.readFully(OLLECTION)
+            if (OLLECTION != "LLECTION ".getBytes(StandardCharsets.US_ASCII))
+                throw new Exception("invalid OLLECTION connection")
             
             String infoHashString = DataUtil.readTillRN(dis)
             def infoHashes = infoHashString.split(",").toList().collect {new InfoHash(Base64.decode(it))}

@@ -43,7 +43,7 @@ class CollectionsClient {
                 OutputStream os = endpoint.getOutputStream()
                 
                 String infoHashes = String.join(",", e.infoHashes.collect { Base64.encode(it.getRoot()) })
-                os.write("METAFILE ${infoHashes}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("OLLECTION ${infoHashes}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Version:1\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
