@@ -46,23 +46,23 @@ class CollectionTabView {
             panel {
                 borderLayout()
                 panel(constraints : BorderLayout.NORTH) {
-                    borderLayout()
-                    panel(constraints : BorderLayout.NORTH) {
-                        label(text : trans("STATUS") + ":")
-                        label(text : bind {trans(model.status.name())})
-                    }
-                    scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                        collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
-                            tableModel(list : model.collections) {
-                                closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {it.name})
-                                closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
-                                closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
-                                closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
-                                closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
-                                closureColumn(header: trans("CREATED"), preferredWidth: 50, type: Long, read: {it.timestamp})
-                            }
+                    label(text : trans("STATUS") + ":")
+                    label(text : bind {trans(model.status.name())})
+                }
+                scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
+                    collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                        tableModel(list : model.collections) {
+                            closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {it.name})
+                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
+                            closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
+                            closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
+                            closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
+                            closureColumn(header: trans("CREATED"), preferredWidth: 50, type: Long, read: {it.timestamp})
                         }
                     }
+                }
+                panel(constraints : BorderLayout.SOUTH) {
+                    button(text : trans("COLLECTION_DOWNLOAD"), enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
                 }
             }
             panel {
@@ -161,6 +161,7 @@ class CollectionTabView {
             int row = selectedCollection()
             if (row < 0)
                 return
+            model.downloadCollectionButtonEnabled = true
             FileCollection selected = model.collections.get(row)
             model.comment = selected.comment
             

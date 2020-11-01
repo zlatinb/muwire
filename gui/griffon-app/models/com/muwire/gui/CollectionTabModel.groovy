@@ -45,6 +45,7 @@ class CollectionTabModel {
     @Observable int totalCollections
     @Observable boolean viewCommentButtonEnabled
     @Observable boolean downloadItemButtonEnabled
+    @Observable boolean downloadCollectionButtonEnabled
     
     void mvcGroupInit(Map<String,String> args) {
         root = new DefaultMutableTreeNode()

@@ -16,6 +16,11 @@ class CollectionTabController {
     CollectionTabView view
 
     @ControllerAction
+    void downloadCollection() {
+        
+    }
+    
+    @ControllerAction
     void download() {
         
     }
