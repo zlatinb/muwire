@@ -17,6 +17,8 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.chat.ChatServer
+import com.muwire.core.collections.CollectionManager
+import com.muwire.core.collections.FileCollection
 import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filefeeds.FeedItems
@@ -54,6 +56,7 @@ class ConnectionAcceptor {
     final ConnectionEstablisher establisher
     final CertificateManager certificateManager
     final ChatServer chatServer
+    final CollectionManager collectionManager
 
     final ExecutorService acceptorThread
     final ExecutorService handshakerThreads
@@ -66,7 +69,7 @@ class ConnectionAcceptor {
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
         FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
-        ChatServer chatServer) {
+        ChatServer chatServer, CollectionManager collectionManager) {
         this.eventBus = eventBus
         this.manager = manager
         this.settings = settings
@@ -79,6 +82,7 @@ class ConnectionAcceptor {
         this.establisher = establisher
         this.certificateManager = certificateManager
         this.chatServer = chatServer
+        this.collectionManager = collectionManager
 
         acceptorThread = Executors.newSingleThreadExecutor { r ->
             def rv = new Thread(r)
@@ -165,6 +169,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'F':
                     processFEED(e)
+                    break
+                case (byte)'M':
+                    processMETAFILE(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -598,6 +605,63 @@ class ConnectionAcceptor {
                 dos?.flush()
                 dos?.close()
             } catch(Exception ignore) {}
+            e.close()
+        }
+    }
+    
+    private void processMETAFILE(Endpoint e) {
+        DataOutputStream dos = null
+        try {
+            byte [] ETAFILE = new byte[8]
+            DataInputStream dis = new DataInputStream(e.getInputStream())
+            dis.readFully(ETAFILE)
+            if (ETAFILE != "ETAFILE ".getBytes(StandardCharsets.US_ASCII))
+                throw new Exception("invalid METAFILE connection")
+            
+            String infoHashString = DataUtil.readTillRN(dis)
+            def infoHashes = infoHashString.split(",").toList().collect {new InfoHash(Base64.decode(it))}
+            infoHashes = new HashSet<>(infoHashes)
+            
+            Map<String,String> headers = DataUtil.readAllHeaders(dis)
+            if (headers['Version'] != "1")
+                throw new Exception("Unknown version ${headers['Version']}")
+            
+            Persona client = null
+            if (headers.containsKey("Persona"))
+                client = new Persona(Base64.decode(headers['Persona']))
+            
+            Map<InfoHash, FileCollection> available = new HashMap<>()
+            infoHashes.each { 
+                FileCollection col = collectionManager.getByInfoHash(it)
+                if (col != null) {
+                    available.put(it, col)
+                    col.hit(client)
+                }
+            }
+
+            OutputStream os = e.getOutputStream()            
+            
+            if (available.isEmpty()) {
+                os.write("404\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                return
+            }
+             
+            os.write("200\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Version:1\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count:${available.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            dos = new DataOutputStream(new GZIPOutputStream(os))
+            available.each { hash, collection ->
+                dos.write(hash.getRoot())
+                collection.write(dos)
+            }    
+                
+        } finally {
+            try {
+                dos?.flush()
+                dos?.close()
+            } catch (Exception ignore) {}
             e.close()
         }
     }

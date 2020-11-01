@@ -429,7 +429,7 @@ public class Core {
         I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
         connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
-            certificateManager, chatServer)
+            certificateManager, chatServer, collectionManager)
 
 
         log.info("initializing hasher service")

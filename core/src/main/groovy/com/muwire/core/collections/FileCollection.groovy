@@ -24,7 +24,9 @@ class FileCollection {
     final Set<FileCollectionItem> files = new LinkedHashSet<>()
     
     final PathTree tree
-    
+
+    final List<SearchHit> hits = new ArrayList<>()
+        
     FileCollection(long timestamp, Persona author, String comment, Set<FileCollectionItem> files,
         SigningPrivateKey spk) {
         this.timestamp = timestamp;
@@ -144,6 +146,10 @@ class FileCollection {
         files.size()
     }
     
+    public void hit(Persona searcher) {
+        hits.add(new SearchHit(searcher))
+    }
+    
     @Override
     public int hashCode() {
         hashCode
@@ -156,5 +162,14 @@ class FileCollection {
             Objects.equals(author, other.author) &&
             Objects.equals(comment, other.comment) &&
             Objects.equals(files, other.files)
+    }
+    
+    public static class SearchHit {
+        final Persona searcher
+        final long timestamp
+        SearchHit(Persona searcher) {
+            this.searcher = searcher
+            this.timestamp = System.currentTimeMillis()
+        }
     }
 }

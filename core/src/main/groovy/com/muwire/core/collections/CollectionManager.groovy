@@ -51,6 +51,10 @@ class CollectionManager {
     synchronized List<FileCollection> getCollections() {
         new ArrayList<>(rootToCollection.values())
     }
+    
+    synchronized FileCollection getByInfoHash(InfoHash ih) {
+        rootToCollection.get(ih)
+    }
         
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         diskIO.execute({load()} as Runnable)
