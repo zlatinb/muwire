@@ -140,7 +140,7 @@ class CollectionManager {
             Set<FileCollection> set = fileRootToCollections.get(it.infoHash)
             if (set == null) {
                 set = new HashSet<>()
-                fileRootToCollections.put(infoHash, set)
+                fileRootToCollections.put(it.infoHash, set)
             }
             set.add(collection)
         }
