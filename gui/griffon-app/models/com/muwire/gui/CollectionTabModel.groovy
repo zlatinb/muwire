@@ -3,6 +3,9 @@ package com.muwire.gui
 import static com.muwire.gui.Translator.trans
 
 import javax.annotation.Nonnull
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreeModel
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
@@ -33,6 +36,9 @@ class CollectionTabModel {
     
     List<FileCollection> collections = new ArrayList<>()
     List<FileCollectionItem> items = new ArrayList<>()
+    TreeModel fileTreeModel
+    DefaultMutableTreeNode root
+    boolean treeVisible = true
     
     @Observable CollectionFetchStatus status
     @Observable String comment = trans("COLLECTION_SELECT")
@@ -41,6 +47,8 @@ class CollectionTabModel {
     @Observable boolean downloadItemButtonEnabled
     
     void mvcGroupInit(Map<String,String> args) {
+        root = new DefaultMutableTreeNode()
+        fileTreeModel = new DefaultTreeModel(root)
         eventBus.with {
             register(CollectionFetchStatusEvent.class, this) 
             register(CollectionFetchedEvent.class, this)

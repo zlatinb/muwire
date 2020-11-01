@@ -15,7 +15,7 @@ class TreeUtil {
     }
     
     public static void copy(DefaultMutableTreeNode jtreeNode, PathTree.PathNode pathNode) {
-        jtreeNode.setUserObject(pathNode.path)
+        jtreeNode.setUserObject(pathNode.getUserObject())
         pathNode.children.each {
             MutableTreeNode newChild = new DefaultMutableTreeNode()
             jtreeNode.add(newChild)
@@ -34,5 +34,16 @@ class TreeUtil {
         
         def path = new TreePath(node.getPath())
         tree.expandPath(path)
+    }
+    
+    public static void getLeafs(DefaultMutableTreeNode node, List dest) {
+        if (node.isLeaf()) {
+            dest.add(node.getUserObject())
+            return
+        }
+        def children = node.children()
+        while(children.hasMoreElements()) {
+            getLeafs(children.nextElement(), dest)
+        }
     }
 }

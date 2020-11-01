@@ -6,6 +6,8 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
+import com.muwire.core.collections.FileCollectionItem
+
 @ArtifactProviderFor(GriffonController)
 class CollectionTabController {
     @MVCMember @Nonnull
@@ -20,11 +22,11 @@ class CollectionTabController {
     
     @ControllerAction
     void viewComment() {
-        int []rows = view.selectedItems()
-        if (rows.length != 1)
+        List<FileCollectionItem> items = view.selectedItems()
+        if (items.size() != 1)
             return
             
-        def item = model.items.get(rows[0])
+        def item = items.get(0)
         String text = item.comment
         String name = String.join(File.separator, item.pathElements)
         

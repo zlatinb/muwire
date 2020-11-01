@@ -8,11 +8,14 @@ import griffon.metadata.ArtifactProviderFor
 import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.JTextArea
+import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.TreePath
 
 import com.muwire.core.collections.FileCollection
+import com.muwire.core.collections.FileCollectionItem
 
 import java.awt.BorderLayout
 
@@ -31,8 +34,10 @@ class CollectionTabView {
     JTable collectionsTable
     def lastCollectionsTableSortEvent
     JTextArea commentArea
+    def itemsPanel
     JTable itemsTable
     def lastItemsTableSortEvent
+    JTree itemsTree
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -73,20 +78,42 @@ class CollectionTabView {
                 panel(constraints : BorderLayout.NORTH) {
                     label(text: trans("FILES"))
                 }
-                scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                    itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
-                        tableModel(list : model.items) {
-                            closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
-                                String.join(File.separator, it.pathElements)
-                            })
-                            closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {it.length})
-                            closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})
+                itemsPanel = panel(constraints : BorderLayout.CENTER) {
+                    cardLayout()
+                    panel(constraints : "table") {
+                        borderLayout()
+                        scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
+                            itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                tableModel(list : model.items) {
+                                    closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
+                                        String.join(File.separator, it.pathElements)
+                                    })
+                                    closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {it.length})
+                                    closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})
+                                }
+                            }
+                        }
+                    }
+                    panel(constraints : "tree") {
+                        borderLayout()
+                        scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
+                            itemsTree = new JTree(model.fileTreeModel)
+                            tree(rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, itemsTree)
                         }
                     }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
-                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
-                    button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
+                    gridLayout(rows : 1, cols : 3)
+                    panel {
+                        buttonGroup(id : "viewType")
+                        radioButton(text : trans("TREE"), selected : true, buttonGroup : viewType, actionPerformed : showTree)
+                        radioButton(text : trans("TABLE"), selected : false, buttonGroup : viewType, actionPerformed : showTable)
+                    }
+                    panel {
+                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
+                        button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
+                    }
+                    panel {}
                 }
             }
         }
@@ -135,9 +162,15 @@ class CollectionTabView {
                 return
             FileCollection selected = model.collections.get(row)
             model.comment = selected.comment
+            
             model.items.clear()
             model.items.addAll(selected.files)
             itemsTable.model.fireTableDataChanged()
+            
+            model.root.removeAllChildren()
+            TreeUtil.copy(model.root, selected.tree.root)
+            TreeUtil.expand(itemsTree)
+            itemsTree.model.nodeStructureChanged(model.root)
         })
         
         
@@ -148,15 +181,28 @@ class CollectionTabView {
         selectionModel = itemsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
-            int [] rows = selectedItems()
-            if (rows.length == 0) {
+            List<FileCollectionItem> items = selectedItems()
+            if (items.isEmpty()) {
                 model.viewCommentButtonEnabled = false
                 model.downloadItemButtonEnabled = false
                 return
             }
             model.downloadItemButtonEnabled = true
-            model.viewCommentButtonEnabled = rows.length == 1 && model.items.get(rows[0]).comment != ""
+            model.viewCommentButtonEnabled = items.size()== 1 && items.get(0).comment != ""
         })
+        
+        // items tree
+        itemsTree.addTreeSelectionListener({
+            List<FileCollectionItem> items = selectedItems()
+            if (items.isEmpty()) {
+                model.viewCommentButtonEnabled = false
+                model.downloadItemButtonEnabled = false
+                return
+            }
+            model.downloadItemButtonEnabled = true
+            model.viewCommentButtonEnabled = items.size()== 1 && items.get(0).comment != ""
+        })
+        showTree.call()
     }
     
     int selectedCollection() {
@@ -169,15 +215,35 @@ class CollectionTabView {
         return row
     }
     
-    int[] selectedItems() {
-        int [] rows = itemsTable.getSelectedRows()
-        if (rows.length == 0)
-            return rows
-        if (lastItemsTableSortEvent != null) {
-            for (int i = 0; i < rows.length; i++)
-                rows[i] = itemsTable.rowSorter.convertRowIndexToModel(rows[i])
+    List<FileCollectionItem> selectedItems() {
+        if (!model.treeVisible) {
+            int [] rows = itemsTable.getSelectedRows()
+            if (rows.length == 0)
+                return Collections.emptyList()
+            if (lastItemsTableSortEvent != null) {
+                for (int i = 0; i < rows.length; i++)
+                    rows[i] = itemsTable.rowSorter.convertRowIndexToModel(rows[i])
+            }
+            List<FileCollectionItem> rv = new ArrayList<>()
+            for(int i = 0; i < rows.length; i++)
+                rv.add(model.items.get(rows[i]))
+            return rv
+        } else {
+            List<FileCollectionItem> rv = new ArrayList<>()
+            for (TreePath path : itemsTree.getSelectionPaths())
+                TreeUtil.getLeafs(path.getLastPathComponent(), rv)
+            return rv
         }
-        rows
+    }
+    
+    def showTree = {
+        model.treeVisible = true
+        itemsPanel.getLayout().show(itemsPanel, "tree")
+    }
+    
+    def showTable = {
+        model.treeVisible = false
+        itemsPanel.getLayout().show(itemsPanel, "table")
     }
     
     def closeTab = {

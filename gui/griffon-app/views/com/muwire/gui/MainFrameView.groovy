@@ -1112,20 +1112,9 @@ class MainFrameView {
             def sharedFilesTree = builder.getVariable("shared-files-tree")
             List<SharedFile> rv = new ArrayList<>()
             for (TreePath path : sharedFilesTree.getSelectionPaths()) {
-                getLeafs(path.getLastPathComponent(), rv)
+                TreeUtil.getLeafs(path.getLastPathComponent(), rv)
             }
             return rv
-        }
-    }
-    
-    private static void getLeafs(TreeNode node, List<SharedFile> dest) {
-        if (node.isLeaf()) {
-            dest.add(node.getUserObject())
-            return
-        }
-        def children = node.children()
-        while(children.hasMoreElements()) {
-            getLeafs(children.nextElement(), dest)
         }
     }
     
