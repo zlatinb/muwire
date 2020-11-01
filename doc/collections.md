@@ -55,7 +55,7 @@ Collection metafiles are not indexed the same way as regular files.  They are mo
 
 ### Fetching the descriptor
 
-The downloader connects to the node that returned the search result which contained references to the collection(s) it is part of.  Ihen it issues a request starting with "METAFILE" followed by a space and comma-separated list of base64-encoded hashes of the referenced collections.  After the list the terminator \r\n is appended.
+The downloader connects to the node that returned the search result which contained references to the collection(s) it is part of.  Ihen it issues a request starting with "OLLECTION" followed by a space and comma-separated list of base64-encoded hashes of the referenced collections.  After the list the terminator \r\n is appended.
 
 A set of request headers follows, each terminated by \r\n.  After the last header an additional \r\n is appended.  The headers can be any, the only one being mandatory at this time is the "Version" header, currently fixed at 1.
 
