@@ -170,12 +170,13 @@ class SearchTabController {
         if (event == null || event.collections.isEmpty())
             return
             
+        UUID uuid = UUID.randomUUID()
         def params = [:]
         params['fileName'] = event.name
         params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
         params['infoHashes'] = event.collections.collect()
-        params['uuid'] = UUID.randomUUID()
+        params['uuid'] = uuid
         params['host'] = event.sender
-        mvcGroup.createMVCGroup("collection-tab", params)
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
 }
