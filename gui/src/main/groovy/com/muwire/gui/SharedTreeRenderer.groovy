@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import java.awt.Component
 
+import static com.muwire.gui.Translator.trans
+
 import javax.swing.ImageIcon
 import javax.swing.JTree
 import javax.swing.tree.DefaultTreeCellRenderer
@@ -30,7 +32,7 @@ class SharedTreeRenderer extends DefaultTreeCellRenderer {
         SharedFile sf = (SharedFile) userObject
         String name = sf.getFile().getName()
         long length = sf.getCachedLength()
-        String formatted = DataHelper.formatSize2Decimal(length, false)+"B"
+        String formatted = DataHelper.formatSize2Decimal(length, false)+ trans("BYTES_SHORT")
         
         
         setText("$name ($formatted)")
