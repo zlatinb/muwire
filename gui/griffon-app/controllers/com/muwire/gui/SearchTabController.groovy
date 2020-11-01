@@ -173,8 +173,9 @@ class SearchTabController {
         def params = [:]
         params['fileName'] = event.name
         params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
-        params['collections'] = event.collections.collect()
+        params['infoHashes'] = event.collections.collect()
         params['uuid'] = UUID.randomUUID()
+        params['host'] = event.sender
         mvcGroup.createMVCGroup("collection-tab", params)
     }
 }

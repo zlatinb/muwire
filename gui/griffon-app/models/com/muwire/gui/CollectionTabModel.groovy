@@ -1,29 +1,63 @@
 package com.muwire.gui
 
+import static com.muwire.gui.Translator.trans
+
+import javax.annotation.Nonnull
+
 import com.muwire.core.EventBus
+import com.muwire.core.InfoHash
+import com.muwire.core.Persona
+import com.muwire.core.collections.CollectionFetchStatus
+import com.muwire.core.collections.CollectionFetchStatusEvent
 import com.muwire.core.collections.CollectionFetchedEvent
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.FileCollectionItem
+import com.muwire.core.collections.UICollectionFetchEvent
 
 import griffon.core.artifact.GriffonModel
+import griffon.inject.MVCMember
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class CollectionTabModel {
+    
+    @MVCMember @Nonnull
+    CollectionTabView view
+    
     String fileName
     EventBus eventBus
-    List<FileCollection> collections
-    List<FileCollectionItem> items
-    @Observable String comment
+    Persona host
+    List<InfoHash> infoHashes
     UUID uuid
     
+    List<FileCollection> collections = new ArrayList<>()
+    List<FileCollectionItem> items = new ArrayList<>()
+    
+    @Observable CollectionFetchStatus status
+    @Observable String comment = trans("COLLECTION_SELECT")
+    @Observable int totalCollections
+    
     void mvcGroupInit(Map<String,String> args) {
-        eventBus.register(CollectionFetchedEvent.class, this)
+        eventBus.with {
+            register(CollectionFetchStatusEvent.class, this) 
+            register(CollectionFetchedEvent.class, this)
+            publish(new UICollectionFetchEvent(uuid : uuid, host : host, infoHashes : infoHashes))
+        }
     }
     
     void mvcGroupDestroy() {
         eventBus.unregister(CollectionFetchedEvent.class, this)
+    }
+    
+    void onCollectionFetchStatusEvent(CollectionFetchStatusEvent e) {
+        if (uuid != e.uuid)
+            return
+        runInsideUIAsync {
+            status = e.status
+            if (status == CollectionFetchStatus.FETCHING)
+                totalCollections = e.count
+        }
     }
     
     void onCollectionFetchedEvent(CollectionFetchedEvent e) {
@@ -31,7 +65,7 @@ class CollectionTabModel {
             return
         runInsideUIAsync {
             collections.add(e.collection)
-            // TODO: refresh tables
+            view.collectionsTable.model.fireTableDataChanged() // maybe preserving selection?
         }
     }
 }

@@ -1,9 +1,14 @@
 package com.muwire.gui
 
+import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+
+import javax.swing.JLabel
+import javax.swing.JTable
 import javax.swing.SwingConstants
+import javax.swing.table.DefaultTableCellRenderer
 
 import java.awt.BorderLayout
 
@@ -19,8 +24,38 @@ class CollectionTabView {
     def parent
     def p
     
+    JTable collectionsTable
+    def lastCollectionsTableSortEvent
+    
     void initUI() {
-        p = builder.panel {}
+        int rowHeight = application.context.get("row-height")
+        p = builder.panel {
+            gridLayout(rows : 3, cols: 1)
+            panel {
+                borderLayout()
+                panel(constraints : BorderLayout.NORTH) {
+                    borderLayout()
+                    panel(constraints : BorderLayout.NORTH) {
+                        label(text : trans("STATUS") + ":")
+                        label(text : bind {trans(model.status.name())})
+                    }
+                    scrollPane(constraints : BorderLayout.CENTER) {
+                        collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            tableModel(list : model.collections) {
+                                closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {it.name})
+                                closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
+                                closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
+                                closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
+                                closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
+                                closureColumn(header: trans("CREATED"), preferredWidth: 50, type: Long, read: {it.timestamp})
+                            }
+                        }
+                    }
+                }
+            }
+            panel {}
+            panel {}
+        }
     }
     
     void mvcGroupInit(Map<String, String> args) {
@@ -45,6 +80,17 @@ class CollectionTabView {
         }
 
         parent.setTabComponentAt(index, tabPanel)
+        mainFrameGroup.view.showSearchWindow.call()
+        
+        def centerRenderer = new DefaultTableCellRenderer()
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+        collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        
+        collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
+        collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
+        
+        collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionsTableSortEvent = evt})
+        collectionsTable.rowSorter.setSortsOnUpdates(true)
     }
     
     def closeTab = {
