@@ -5,6 +5,7 @@ import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.JCheckBox
 import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.JTextArea
@@ -38,6 +39,8 @@ class CollectionTabView {
     JTable itemsTable
     def lastItemsTableSortEvent
     JTree itemsTree
+    JCheckBox downloadSequentiallyCollectionCheckbox
+    JCheckBox downloadSequentiallyItemCheckbox
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -62,7 +65,16 @@ class CollectionTabView {
                     }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
-                    button(text : trans("COLLECTION_DOWNLOAD"), enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
+                    gridLayout(rows : 1, cols : 3)
+                    panel{}
+                    panel {
+                        button(text : trans("COLLECTION_DOWNLOAD"), enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
+                    }
+                    panel {
+                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                        downloadSequentiallyCollectionCheckbox = checkBox(selected : bind {model.downloadSequentiallyCollection}, 
+                            enabled : bind {model.downloadCollectionButtonEnabled})
+                    }
                 }
             }
             panel {
@@ -114,10 +126,22 @@ class CollectionTabView {
                         button(text : trans("DOWNLOAD"), enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
                         button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
                     }
-                    panel {}
+                    panel {
+                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                        downloadSequentiallyItemCheckbox = checkBox(selected : bind {model.downloadSequentiallyItem},
+                        enabled : bind {model.downloadItemButtonEnabled})
+                    }
                 }
             }
         }
+    }
+    
+    boolean isSequentialCollection() {
+        downloadSequentiallyCollectionCheckbox.model.isSelected()
+    }
+    
+    boolean isSequentialItem() {
+        downloadSequentiallyItemCheckbox.model.isSelected()
     }
     
     void mvcGroupInit(Map<String, String> args) {

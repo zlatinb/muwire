@@ -37,7 +37,8 @@ class CollectionTabController {
             items : collection.getFiles(),
             host : model.host,
             infoHash : collection.getInfoHash(),
-            full : true
+            full : true,
+            sequential : view.isSequentialCollection()
             )
         model.eventBus.publish(e)
         
@@ -59,7 +60,8 @@ class CollectionTabController {
                 items : new HashSet<>(items),
                 host : model.host,
                 infoHash : collection.getInfoHash(),
-                full : false
+                full : false,
+                sequential : view.isSequentialItem()
                 )
         model.eventBus.publish(e)
         
