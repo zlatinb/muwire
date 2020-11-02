@@ -14,6 +14,7 @@ import net.i2p.data.DataHelper
 import javax.swing.JDialog
 import javax.swing.JTree
 import javax.swing.SwingConstants
+import javax.swing.border.TitledBorder
 import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonView)
@@ -44,14 +45,14 @@ class CollectionWizardView {
                 gridLayout(rows : 2, cols : 1)
                 panel {
                     borderLayout()
-                    panel(constraints : BorderLayout.NORTH) {
+                    panel(constraints : BorderLayout.NORTH, 
+                            border : titledBorder(title: trans("COLLECTION_NAME"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                         borderLayout()
-                        label(text : trans("COLLECTION_NAME"), constraints : BorderLayout.WEST)
                         nameTextField = textField(constraints : BorderLayout.CENTER)
                     }
-                    panel(constraints : BorderLayout.CENTER) {
+                    panel(constraints : BorderLayout.CENTER,
+                        border : titledBorder(title: trans("COLLECTION_DESCRIPTION"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                         borderLayout()
-                        label(text: trans("COLLECTION_DESCRIPTION"), constraints : BorderLayout.NORTH)
                         scrollPane(constraints : BorderLayout.CENTER) {
                             commentTextArea = textArea(editable : true, columns : 100, lineWrap : true, wrapStyleWord : true)
                         }
