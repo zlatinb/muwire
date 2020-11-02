@@ -20,6 +20,7 @@ import javax.inject.Inject
 import javax.swing.JOptionPane
 import javax.swing.JTable
 
+import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
@@ -657,9 +658,14 @@ class MainFrameController {
         def files = view.selectedSharedFiles()
         if (files == null || files.size() < 2)
             return
-        
+
+        if (files.size() > Constants.COLLECTION_MAX_ITEMS) {
+            JOptionPane.showMessageDialog(null, trans("CREATE_COLLECTION_MAX_FILES", Constants.COLLECTION_MAX_ITEMS, files.size()),
+                trans("CREATE_COLLECTION_MAX_FILES_TITLE"), JOptionPane.WARNING_MESSAGE)
+            return
+        }        
         def params = [:]
-        params['files'] = files // TODO limit check
+        params['files'] = files
         params['spk'] = model.core.spk
         params['me'] = model.core.me
         params['eventBus'] = model.core.eventBus
