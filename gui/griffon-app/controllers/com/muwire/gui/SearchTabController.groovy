@@ -111,7 +111,18 @@ class SearchTabController {
     
     @ControllerAction
     void browseCollections() {
+        def sender = view.selectedSender()
+        if (sender == null)
+            return
         
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params['fileName'] = sender.getHumanReadableName()
+        params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
+        params['everything'] = true 
+        params['uuid'] = uuid
+        params['host'] = sender
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
     
     @ControllerAction

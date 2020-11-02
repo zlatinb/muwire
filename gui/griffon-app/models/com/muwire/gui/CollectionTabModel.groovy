@@ -33,6 +33,7 @@ class CollectionTabModel {
     Persona host
     List<InfoHash> infoHashes
     UUID uuid
+    boolean everything
     
     List<FileCollection> collections = new ArrayList<>()
     List<FileCollectionItem> items = new ArrayList<>()
@@ -55,7 +56,7 @@ class CollectionTabModel {
         eventBus.with {
             register(CollectionFetchStatusEvent.class, this) 
             register(CollectionFetchedEvent.class, this)
-            publish(new UICollectionFetchEvent(uuid : uuid, host : host, infoHashes : infoHashes))
+            publish(new UICollectionFetchEvent(uuid : uuid, host : host, infoHashes : infoHashes, everything : everything))
         }
     }
     

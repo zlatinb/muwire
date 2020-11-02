@@ -8,4 +8,5 @@ class UICollectionFetchEvent extends Event {
     UUID uuid
     Persona host
     Set<InfoHash> infoHashes
+    boolean everything
 }

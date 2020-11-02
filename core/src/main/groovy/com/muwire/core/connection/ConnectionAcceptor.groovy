@@ -621,8 +621,6 @@ class ConnectionAcceptor {
                 throw new Exception("invalid OLLECTION connection")
             
             String infoHashString = DataUtil.readTillRN(dis)
-            def infoHashes = infoHashString.split(",").toList().collect {new InfoHash(Base64.decode(it))}
-            infoHashes = new HashSet<>(infoHashes)
             
             Map<String,String> headers = DataUtil.readAllHeaders(dis)
             if (headers['Version'] != "1")
@@ -631,13 +629,23 @@ class ConnectionAcceptor {
             Persona client = null
             if (headers.containsKey("Persona"))
                 client = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
-            
+                    
             Map<InfoHash, FileCollection> available = new HashMap<>()
-            infoHashes.each { 
-                FileCollection col = collectionManager.getByInfoHash(it)
-                if (col != null) {
-                    available.put(it, col)
-                    col.hit(client)
+            if (infoHashString == "*") {
+                if (settings.browseFiles) {
+                    collectionManager.getCollections().each { 
+                        available.put(it.getInfoHash(), it)
+                    }
+                }
+            } else {
+                def infoHashes = infoHashString.split(",").toList().collect {new InfoHash(Base64.decode(it))}
+                infoHashes = new HashSet<>(infoHashes)
+                infoHashes.each {
+                    FileCollection col = collectionManager.getByInfoHash(it)
+                    if (col != null) {
+                        available.put(it, col)
+                        col.hit(client)
+                    }
                 }
             }
 

@@ -42,7 +42,11 @@ class CollectionsClient {
                 endpoint = connector.connect(e.host.destination)
                 OutputStream os = endpoint.getOutputStream()
                 
-                String infoHashes = String.join(",", e.infoHashes.collect { Base64.encode(it.getRoot()) })
+                String infoHashes
+                if (e.everything)
+                    infoHashes = "*"
+                else
+                    infoHashes = String.join(",", e.infoHashes.collect { Base64.encode(it.getRoot()) })
                 os.write("OLLECTION ${infoHashes}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Version:1\r\n".getBytes(StandardCharsets.US_ASCII))
