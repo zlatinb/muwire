@@ -20,6 +20,7 @@ class OptionsModel {
     @Observable String downloadLocation
     @Observable String incompleteLocation
     @Observable boolean searchComments
+    @Observable boolean searchCollections
     @Observable boolean browseFiles
     @Observable boolean allowTracking
     @Observable int speedSmoothSeconds
@@ -89,6 +90,7 @@ class OptionsModel {
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
+        searchCollections = settings.searchCollections
         browseFiles = settings.browseFiles
         allowTracking = settings.allowTracking
         speedSmoothSeconds = settings.speedSmoothSeconds

@@ -120,13 +120,14 @@ class MainFrameController {
         byte [] payload
         if (hashSearch) {
             searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true,
-                compressedResults : true, persona : core.me, collections : true)
+                compressedResults : true, persona : core.me, collections : core.muOptions.searchCollections)
             payload = root
         } else {
             def nonEmpty = SplitPattern.termify(search)
             payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
-            searchComments : core.muOptions.searchComments, compressedResults : true, persona : core.me)
+            searchComments : core.muOptions.searchComments, compressedResults : true, persona : core.me,
+            collections : core.muOptions.searchCollections)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
 

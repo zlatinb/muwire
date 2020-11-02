@@ -47,6 +47,7 @@ class OptionsView {
     def shareDownloadedCheckbox
     def shareHiddenCheckbox
     def searchCommentsCheckbox
+    def searchCollectionsCheckbox
     def browseFilesCheckbox
     def allowTrackingCheckbox
     def speedSmoothSecondsField
@@ -109,13 +110,17 @@ class OptionsView {
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 searchCommentsCheckbox = checkBox(selected : bind {model.searchComments}, constraints : gbc(gridx:1, gridy:0,
                 anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_ALLOW_BROWSING"), constraints : gbc(gridx : 0, gridy : 1, anchor : GridBagConstraints.LINE_START, 
+                label(text : trans("OPTIONS_SEARCH_IN_COLLECTIONS"), constraints:gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START,
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
-                browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 1,
+                searchCollectionsCheckbox = checkBox(selected : bind {model.searchCollections}, constraints : gbc(gridx:1, gridy:1,
                 anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_ALLOW_TRACKING"), constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_ALLOW_BROWSING"), constraints : gbc(gridx : 0, gridy : 2, anchor : GridBagConstraints.LINE_START, 
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
-                allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 2,
+                browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 2,
+                anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
+                label(text : trans("OPTIONS_ALLOW_TRACKING"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START,
+                    fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+                allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 3,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
             }
             

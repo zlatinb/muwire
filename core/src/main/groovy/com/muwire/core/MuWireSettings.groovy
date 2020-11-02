@@ -30,6 +30,7 @@ class MuWireSettings {
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
     boolean searchComments
+    boolean searchCollections
     boolean browseFiles
     boolean allowTracking
     
@@ -104,6 +105,7 @@ class MuWireSettings {
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
+        searchCollections = Boolean.valueOf(props.getProperty("searchCollections","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
         allowTracking = Boolean.valueOf(props.getProperty("allowTracking","true"))
         
@@ -185,6 +187,7 @@ class MuWireSettings {
         props.setProperty("inBw", String.valueOf(inBw))
         props.setProperty("outBw", String.valueOf(outBw))
         props.setProperty("searchComments", String.valueOf(searchComments))
+        props.setProperty("searchCollections", String.valueOf(searchCollections))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
         props.setProperty("allowTracking", String.valueOf(allowTracking))
         

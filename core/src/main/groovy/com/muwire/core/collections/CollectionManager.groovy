@@ -22,6 +22,7 @@ import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
+import com.muwire.core.search.SearchIndex
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Log
@@ -46,6 +47,10 @@ class CollectionManager {
     /** infohash of the collection to collection */
     private final Map<InfoHash, FileCollection> rootToCollectionRemote = new HashMap<>()
     private final Map<FileCollection, Set<InfoHash>> filesInRemoteCollection = new HashMap<>()
+    
+    private final SearchIndex index = new SearchIndex()
+    private final Map<String, Set<FileCollection>> nameToCollection = new HashMap<>()
+    private final Map<String, Set<FileCollection>> commentToCollection = new HashMap<>()
     
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ Runnable r ->
         new Thread(r, "collections-io")
@@ -179,6 +184,24 @@ class CollectionManager {
             }
             set.add(collection)
         }
+        
+        index.add(collection.name)
+        Set<FileCollection> existing = nameToCollection.get(collection.name)
+        if (existing == null) {
+            existing = new HashSet<>()
+            nameToCollection.put(collection.name, existing)
+        }
+        existing.add(collection)
+        
+        if (collection.comment != "") {
+            index.add(collection.comment)
+            existing = commentToCollection.get(collection.comment)
+            if (existing == null) {
+                existing = new HashSet<>()
+                commentToCollection.put(collection.comment, existing)
+            }
+            existing.add(collection)
+        }
     }
     
     void onUICollectionDeletedEvent(UICollectionDeletedEvent e) {
@@ -207,6 +230,24 @@ class CollectionManager {
             set.remove(collection)
             if (set.isEmpty())
                 fileRootToCollections.remove(it.infoHash)
+        }
+        
+        index.remove(collection.name)
+        Set<FileCollection> existing = nameToCollection.get(collection.name)
+        if (existing != null) {
+            existing.remove(collection)
+            if (existing.isEmpty())
+                nameToCollection.remove(collection.name)
+        }
+        
+        if (collection.comment != "") {
+            index.remove(collection.comment)
+            existing = commentToCollection.get(collection.comment)
+            if (existing != null) {
+                existing.remove(collection)
+                if (existing.isEmpty())
+                    commentToCollection.remove(collection.comment)
+            }
         }
     }
     
@@ -253,23 +294,58 @@ class CollectionManager {
     }
     
     synchronized void onSearchEvent(SearchEvent e) {
-        if (e.searchHash == null)
+        if (!e.collections)
             return
-        InfoHash ih = new InfoHash(e.searchHash)
-        def collection = rootToCollection.get(ih)
-        if (collection == null)
-            return
-        collection.hit(e.persona)
         
-        List<SharedFile> sharedFiles = new ArrayList<>()
-        collection.files.each { item ->
-            def sfs = fileManager.getRootToFiles().get(item.infoHash)
-            if (sfs == null || sfs.isEmpty())
-                return // hmm
-            sfs.each { sf -> sf.hit(e.persona, e.timestamp, "Collection Search")}
-            sharedFiles.addAll(sfs)
+        if (e.searchHash != null) {   
+            InfoHash ih = new InfoHash(e.searchHash)
+            def collection = rootToCollection.get(ih)
+            if (collection == null)
+                return
+            collection.hit(e.persona)
+
+            List<SharedFile> sharedFiles = new ArrayList<>()
+            collection.files.each { item ->
+                def sfs = fileManager.getRootToFiles().get(item.infoHash)
+                if (sfs == null || sfs.isEmpty())
+                    return // hmm
+                sfs.each { sf -> sf.hit(e.persona, e.timestamp, "Collection Search")}
+                sharedFiles.addAll(sfs)
+            }
+            def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
+            eventBus.publish(resultEvent)
+        } else {
+            String[]names = index.search(e.searchTerms)
+            Set<FileCollection> collections = new HashSet<>()
+            for(String name : names) {
+                Set<FileCollection> match = nameToCollection.get(name)
+                if (match != null)
+                    collections.addAll(match)
+                if (e.searchComments) {
+                    match = commentToCollection.get(name)
+                    if (match != null)
+                        collections.addAll(match)
+                }
+            }
+            
+            if (collections.isEmpty())
+                return
+                
+            List<SharedFile> sharedFiles = new ArrayList<>()
+            collections.each { c ->
+                c.hit(e.persona)
+                c.files.each { f-> 
+                    def sfs = fileManager.getRootToFiles().get(f.infoHash)
+                    if (sfs == null || sfs.isEmpty())
+                        return
+                    sfs.each { sf -> sf.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms))}
+                    sharedFiles.addAll(sfs)
+                }
+            }
+            if (sharedFiles.isEmpty())
+                return
+            def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
+            eventBus.publish(resultEvent)
         }
-        def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
-        eventBus.publish(resultEvent)
     }
 }
