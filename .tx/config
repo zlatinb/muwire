@@ -8,7 +8,7 @@ source_file = webui/locale/messages_en.po
 source_lang = en
 minimum_perc = 10
 
-[I2P.MuWireGUI]
+[muwire.MWGUI]
 type = UNICODEPROPERTIES
 file_filter = gui/griffon-app/i18n/messages_<lang>.properties
 source_file = gui/griffon-app/i18n/messages.properties
