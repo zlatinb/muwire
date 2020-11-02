@@ -4,6 +4,10 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Base64
+
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
 import javax.annotation.Nonnull
 import javax.swing.tree.DefaultMutableTreeNode
@@ -59,6 +63,14 @@ class CollectionWizardController {
         model.treeRoot.removeAllChildren()
         model.tree.nodeStructureChanged(model.treeRoot)
         view.switchToConfiguration()
+    }
+    
+    @ControllerAction
+    void copyHash() {
+        String b64 = Base64.encode(model.collection.getInfoHash().getRoot())
+        StringSelection selection = new StringSelection(b64)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
     }
     
     @ControllerAction

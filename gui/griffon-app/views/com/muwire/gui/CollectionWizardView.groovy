@@ -89,6 +89,7 @@ class CollectionWizardView {
                 panel(constraints : BorderLayout.SOUTH) {
                     button(text : trans("CANCEL"), cancelAction)
                     button(text : trans("PREVIOUS"), previousAction)
+                    button(text : trans("COPY_HASH_TO_CLIPBOARD"), copyHashAction)
                     button(text : trans("SAVE"), saveAction)
                 }
             }
