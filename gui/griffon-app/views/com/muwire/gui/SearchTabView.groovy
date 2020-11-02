@@ -221,16 +221,19 @@ class SearchTabView {
                                     }
                                 } 
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows : 1, cols : 2)
+                                    gridLayout(rows : 1, cols : 3)
+                                    panel (border : etchedBorder()) {
+                                        gridBagLayout()
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), subscribeAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), chatAction)
+                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 2, gridy : 0), showCommentAction)
+                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 3, gridy : 0), viewCertificatesAction)
+                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 4, gridy : 0), viewCollectionsAction)
+                                    }
                                     panel (border : etchedBorder()) {
                                         gridBagLayout()
                                         button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), browseAction)
                                         button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), browseCollectionsAction)
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 2, gridy : 0), subscribeAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 3, gridy : 0), chatAction)
-                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 4, gridy : 0), showCommentAction)
-                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 5, gridy : 0), viewCertificatesAction)
-                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 6, gridy : 0), viewCollectionsAction)
                                     }
                                     panel (border : etchedBorder()) {
                                         button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
