@@ -80,7 +80,9 @@ class CollectionWizardView {
             }
             panel(constraints : "review") {
                 borderLayout()
-                label(text : trans("COLLECTION_REVIEW_TITLE"), constraints : BorderLayout.NORTH)
+                panel (constraints : BorderLayout.NORTH) {
+                    label(text : trans("COLLECTION_REVIEW_TITLE"))
+                }
                 scrollPane(constraints : BorderLayout.CENTER) {
                     jTree = new JTree(model.tree)
                     jTree.setCellRenderer(new PathTreeRenderer())
