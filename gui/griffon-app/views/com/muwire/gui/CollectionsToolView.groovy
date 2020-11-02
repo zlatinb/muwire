@@ -69,6 +69,7 @@ class CollectionsToolView {
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                      button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentButtonEnabled}, viewCommentAction)
+                     button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteButtonEnabled}, copyHashAction)
                      button(text : trans("DELETE"), enabled : bind {model.deleteButtonEnabled}, deleteAction)  
                 }
             }
