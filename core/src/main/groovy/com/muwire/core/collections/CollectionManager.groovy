@@ -13,12 +13,15 @@ import java.util.concurrent.ThreadFactory
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
+import com.muwire.core.SharedFile
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.search.ResultsEvent
+import com.muwire.core.search.SearchEvent
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Log
@@ -247,6 +250,24 @@ class CollectionManager {
         affected.each { c ->
             diskIO.execute({delete(c)} as Runnable)
         }
-        
+    }
+    
+    synchronized void onSearchEvent(SearchEvent e) {
+        if (e.searchHash == null)
+            return
+        InfoHash ih = new InfoHash(e.searchHash)
+        def collection = rootToCollection.get(ih)
+        if (collection == null)
+            return
+        List<SharedFile> sharedFiles = new ArrayList<>()
+        collection.files.each { item ->
+            def sfs = fileManager.getRootToFiles().get(item.infoHash)
+            if (sfs == null || sfs.isEmpty())
+                return // hmm
+            sfs.each { sf -> sf.hit(e.persona, e.timestamp, "Collection Search")}
+            sharedFiles.addAll(sfs)
+        }
+        def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
+        eventBus.publish(resultEvent)
     }
 }

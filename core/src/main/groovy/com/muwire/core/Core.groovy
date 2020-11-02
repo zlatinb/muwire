@@ -305,6 +305,7 @@ public class Core {
             register(UIDownloadCollectionEvent.class, collectionManager)
             register(FileDownloadedEvent.class, collectionManager)
             register(FileUnsharedEvent.class, collectionManager)
+            register(SearchEvent.class, collectionManager)
         }
         
         log.info("initializing mesh manager")
