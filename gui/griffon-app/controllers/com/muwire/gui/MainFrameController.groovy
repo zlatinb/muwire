@@ -728,6 +728,18 @@ class MainFrameController {
         mvcGroup.createMVCGroup("show-comment", params)
     }
     
+    @ControllerAction
+    void showCollectionTool() {
+        int row = view.selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+        
+        def params = [:]
+        params['collection'] = collection
+        mvcGroup.createMVCGroup("collections-tool", params)
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]

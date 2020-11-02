@@ -444,6 +444,7 @@ class MainFrameView {
                             }
                             panel(constraints : BorderLayout.SOUTH) {
                                 button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
+                                button(text : trans("COLLECTION_SHOW_HITS"), enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
                                 button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
                                 button(text : trans("DELETE"), enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
                             }
@@ -1714,6 +1715,10 @@ class MainFrameView {
         JMenuItem delete = new JMenuItem(trans("DELETE"))
         delete.addActionListener({controller.deleteCollection()})
         menu.add(delete)
+        
+        JMenuItem showHits = new JMenuItem(trans("COLLECTION_SHOW_HITS"))
+        showHits.addActionListener({controller.showCollectionTool()})
+        menu.add(showHits)
         
         showPopupMenu(menu, e)
     }

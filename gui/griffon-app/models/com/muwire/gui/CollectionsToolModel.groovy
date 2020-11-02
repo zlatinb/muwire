@@ -12,22 +12,10 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class CollectionsToolModel {
-    
-    FileManager fileManager
-    CollectionManager collectionManager
-    EventBus eventBus
-    
-    @Observable boolean viewCommentButtonEnabled
-    @Observable boolean viewFileCommentButtonEnabled
-    @Observable boolean deleteButtonEnabled
-    @Observable boolean clearHitsButtonEnabled
-    
-    List<FileCollection> collections = new ArrayList<>()
-    List<SharedFile> files = new ArrayList<>()
-    FileCollection selectedCollection
+    FileCollection collection 
     List<FileCollection.SearchHit> hits = new ArrayList<>()
     
     void mvcGroupInit(Map<String,String> args) {
-        collections.addAll(collectionManager.getCollections())
-    }
+        hits.addAll(collection.hits)
+    }  
 }
