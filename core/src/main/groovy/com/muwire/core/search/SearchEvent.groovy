@@ -13,6 +13,7 @@ class SearchEvent extends Event {
     boolean searchComments
     boolean compressedResults
     Persona persona
+    boolean collections
 
     String toString() {
         def infoHash = null

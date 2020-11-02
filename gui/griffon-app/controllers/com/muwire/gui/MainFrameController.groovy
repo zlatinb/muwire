@@ -118,7 +118,8 @@ class MainFrameController {
         def searchEvent
         byte [] payload
         if (hashSearch) {
-            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true, compressedResults : true, persona : core.me)
+            searchEvent = new SearchEvent(searchHash : root, uuid : uuid, oobInfohash: true,
+                compressedResults : true, persona : core.me, collections : true)
             payload = root
         } else {
             def nonEmpty = SplitPattern.termify(search)
