@@ -78,4 +78,11 @@ class CollectionsToolController {
         def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, null)
     }
+    
+    @ControllerAction
+    void clearHits() {
+        model.selectedCollection.getHits().clear()
+        model.hits.clear()
+        view.hitsTable.model.fireTableDataChanged()
+    }
 }

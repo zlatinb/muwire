@@ -259,6 +259,8 @@ class CollectionManager {
         def collection = rootToCollection.get(ih)
         if (collection == null)
             return
+        collection.hit(e.persona)
+        
         List<SharedFile> sharedFiles = new ArrayList<>()
         collection.files.each { item ->
             def sfs = fileManager.getRootToFiles().get(item.infoHash)

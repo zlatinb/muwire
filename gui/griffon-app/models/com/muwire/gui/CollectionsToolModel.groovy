@@ -20,10 +20,12 @@ class CollectionsToolModel {
     @Observable boolean viewCommentButtonEnabled
     @Observable boolean viewFileCommentButtonEnabled
     @Observable boolean deleteButtonEnabled
+    @Observable boolean clearHitsButtonEnabled
     
     List<FileCollection> collections = new ArrayList<>()
     List<SharedFile> files = new ArrayList<>()
-    // TODO: add tree view
+    FileCollection selectedCollection
+    List<FileCollection.SearchHit> hits = new ArrayList<>()
     
     void mvcGroupInit(Map<String,String> args) {
         collections.addAll(collectionManager.getCollections())

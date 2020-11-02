@@ -42,6 +42,7 @@ class CollectionsToolView {
     
     JTable collectionsTable
     JTable filesTable
+    JTable hitsTable
     
     def lastCollectionSortEvent
     def lastFilesSortEvent
@@ -53,33 +54,56 @@ class CollectionsToolView {
         dialog.setResizable(true)
         
         mainPanel = builder.panel {
-            gridLayout(rows : 2, cols : 1)
+            gridLayout(rows : 1, cols : 2) 
             panel {
-                borderLayout()
-                panel (constraints : BorderLayout.NORTH) {
-                    label(text : trans("COLLECTION_TOOL_HEADER"))
-                }
-                scrollPane(constraints : BorderLayout.CENTER) {
-                    collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
-                        tableModel(list : model.collections) {
-                            closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
-                            closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
-                            closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
-                            closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
-                            closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
-                            closureColumn(header : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
-                            closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
+                gridLayout(rows : 2, cols : 1)
+                panel {
+                    borderLayout()
+                    panel (constraints : BorderLayout.NORTH) {
+                        label(text : trans("COLLECTION_TOOL_HEADER"))
+                    }
+                    scrollPane(constraints : BorderLayout.CENTER) {
+                        collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            tableModel(list : model.collections) {
+                                closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
+                                closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
+                                closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
+                                closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
+                                closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
+                                closureColumn(header : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
+                                closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
+                            }
                         }
                     }
+                    panel(constraints : BorderLayout.SOUTH) {
+                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentButtonEnabled}, viewCommentAction)
+                        button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteButtonEnabled}, copyHashAction)
+                        button(text : trans("DELETE"), enabled : bind {model.deleteButtonEnabled}, deleteAction)
+                    }
                 }
-                panel(constraints : BorderLayout.SOUTH) {
-                     button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentButtonEnabled}, viewCommentAction)
-                     button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteButtonEnabled}, copyHashAction)
-                     button(text : trans("DELETE"), enabled : bind {model.deleteButtonEnabled}, deleteAction)  
+                panel {
+                    borderLayout()
+                    panel(constraints : BorderLayout.NORTH) {
+                        label(text : trans("COLLECTION_VIEWS"))
+                    }
+                    scrollPane(constraints : BorderLayout.CENTER) {
+                        hitsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            tableModel(list : model.hits) {
+                                closureColumn(header : trans("SEARCHER"), preferredWidth : 100, type : String, read : {it.searcher.getHumanReadableName()})
+                                closureColumn(header : trans("TIMESTAMP"), preferredWidth : 100, type : Long, read : {it.timestamp})
+                            }
+                        }
+                    }
+                    panel(constraints : BorderLayout.SOUTH) {
+                        button(text : trans("CLEAR_HITS"), enabled : bind {model.clearHitsButtonEnabled}, clearHitsAction)
+                    }
                 }
             }
             panel {
                 borderLayout()
+                panel(constraints : BorderLayout.NORTH) {
+                    label(text : trans("FILES"))
+                }
                 scrollPane(constraints : BorderLayout.CENTER) {
                     filesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.files) {
@@ -136,11 +160,13 @@ class CollectionsToolView {
             if (selectedRow < 0) {
                 model.viewCommentButtonEnabled = false
                 model.deleteButtonEnabled = false
+                model.clearHitsButtonEnabled = false
                 return
             }
             
             model.deleteButtonEnabled = true
             FileCollection collection = model.collections.get(selectedRow)
+            model.selectedCollection = collection
             model.viewCommentButtonEnabled = collection.getComment() != ""
             
             model.files.clear()
@@ -148,8 +174,13 @@ class CollectionsToolView {
                 SharedFile sf = model.fileManager.getRootToFiles().get(it.infoHash).first()
                 model.files.add(sf)
             }
-            
             filesTable.model.fireTableDataChanged()
+            
+            model.hits.clear()
+            model.hits.addAll(collection.getHits())
+            if (!model.hits.isEmpty())
+                model.clearHitsButtonEnabled = true
+            hitsTable.model.fireTableDataChanged()
         })   
         
         collectionsTable.addMouseListener(new MouseAdapter() {
@@ -191,6 +222,9 @@ class CollectionsToolView {
                     showItemsMenu(e)
             }
         })
+        
+        // hits table
+        hitsTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         dialog.getContentPane().add(mainPanel)
         dialog.pack()
