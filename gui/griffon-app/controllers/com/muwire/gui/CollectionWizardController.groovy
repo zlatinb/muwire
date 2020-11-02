@@ -36,6 +36,11 @@ class CollectionWizardController {
     void review() {
         model.timestamp = System.currentTimeMillis()
         model.root = view.nameTextField.text
+        if (model.root == null || model.root.trim().length() == 0) {
+            view.warnMissingName()
+            return
+        }
+        model.root = model.root.trim()
         model.comment = view.commentTextArea.text
         if (model.comment == null)
             model.comment = ""

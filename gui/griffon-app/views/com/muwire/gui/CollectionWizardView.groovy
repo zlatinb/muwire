@@ -12,6 +12,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
 
 import javax.swing.JDialog
+import javax.swing.JOptionPane
 import javax.swing.JTree
 import javax.swing.SwingConstants
 import javax.swing.border.TitledBorder
@@ -106,6 +107,11 @@ class CollectionWizardView {
     
     void switchToConfiguration() {
         mainPanel.getLayout().show(mainPanel, "configuration")
+    }
+    
+    void warnMissingName() {
+        JOptionPane.showMessageDialog(dialog, trans("COLLECTION_NAME_WARNING"), 
+            trans("COLLECTION_NAME_WARNING_TITLE"), JOptionPane.WARNING_MESSAGE)
     }
     
     void mvcGroupInit(Map<String,String> args) {
