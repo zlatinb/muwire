@@ -90,6 +90,7 @@ class ResultsSender {
                     pieceSize : pieceSize,
                     uuid : uuid,
                     browse : settings.browseFiles,
+                    browseCollections : settings.browseFiles,
                     sources : suggested,
                     comment : comment,
                     certificates : certificates,
@@ -197,6 +198,7 @@ class ResultsSender {
             obj.comment = sf.getComment()
 
         obj.browse = browseFiles 
+        obj.browseCollections = browseFiles
         obj.certificates = certificates
         obj.collections = collections.collect { Base64.encode(it.getRoot()) }
         obj

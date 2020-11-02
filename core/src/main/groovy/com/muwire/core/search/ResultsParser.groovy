@@ -101,6 +101,10 @@ class ResultsParser {
             if (json.browse != null)
                 browse = json.browse
             
+            boolean browseCollections = false
+            if (json.browseCollections != null)
+                browseCollections = json.browseCollections
+            
             int certificates = 0
             if (json.certificates != null)
                 certificates = json.certificates
@@ -121,6 +125,7 @@ class ResultsParser {
                 sources : sources,
                 comment : comment,
                 browse : browse,
+                browseCollections : browseCollections,
                 uuid: uuid,
                 certificates : certificates,
                 collections : collections)

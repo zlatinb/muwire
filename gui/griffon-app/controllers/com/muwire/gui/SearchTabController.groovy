@@ -110,6 +110,11 @@ class SearchTabController {
     }
     
     @ControllerAction
+    void browseCollections() {
+        
+    }
+    
+    @ControllerAction
     void subscribe() {
         def sender = view.selectedSender()
         if (sender == null)

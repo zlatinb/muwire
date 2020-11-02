@@ -22,6 +22,7 @@ class SearchTabModel {
     @Observable boolean downloadActionEnabled
     @Observable boolean trustButtonsEnabled
     @Observable boolean browseActionEnabled
+    @Observable boolean browseCollectionsActionEnabled
     @Observable boolean viewCommentActionEnabled
     @Observable boolean viewCertificatesActionEnabled
     @Observable boolean chatActionEnabled
