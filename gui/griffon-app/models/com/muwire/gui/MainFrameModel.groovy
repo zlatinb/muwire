@@ -22,6 +22,8 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.SharedFile
+import com.muwire.core.collections.CollectionLoadedEvent
+import com.muwire.core.collections.FileCollection
 import com.muwire.core.connection.ConnectionAttemptStatus
 import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.connection.DisconnectionEvent
@@ -88,6 +90,8 @@ class MainFrameModel {
     def results = new ConcurrentHashMap<>()
     def browses = new ConcurrentHashSet<String>()
     def collections = new ConcurrentHashSet<String>()
+    List<FileCollection> localCollections = Collections.synchronizedList(new ArrayList<>())
+    List<SharedFile> collectionFiles = new ArrayList<>()
     def downloads = []
     def uploads = []
     boolean treeVisible = true
@@ -136,9 +140,14 @@ class MainFrameModel {
     @Observable boolean unsubscribeButtonEnabled
     @Observable boolean collectionButtonEnabled
     
+    @Observable boolean viewCollectionCommentButtonEnabled
+    @Observable boolean viewItemCommentButtonEnabled
+    @Observable boolean deleteCollectionButtonEnabled 
+    
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
+    @Observable boolean collectionsPaneButtonEnabled
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean feedsPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
@@ -256,6 +265,7 @@ class MainFrameModel {
             core.eventBus.register(FeedFetchEvent.class, this)
             core.eventBus.register(FeedItemFetchedEvent.class, this)
             core.eventBus.register(UIFeedConfigurationEvent.class, this)
+            core.eventBus.register(CollectionLoadedEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -755,5 +765,14 @@ class MainFrameModel {
             
         File target = new File(core.getMuOptions().getDownloadLocation(), e.item.getName())    
         core.eventBus.publish(new UIDownloadFeedItemEvent(item : e.item, target : target, sequential : feed.isSequential()))
+    }
+    
+    void onCollectionLoadedEvent(CollectionLoadedEvent e) {
+        if (!e.local)
+            return 
+        runInsideUIAsync {
+            localCollections.add(e.collection)
+            view.collectionsTable.model.fireTableDataChanged()
+        }
     }
 }

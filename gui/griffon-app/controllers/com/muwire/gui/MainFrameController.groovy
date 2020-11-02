@@ -26,6 +26,8 @@ import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.SplitPattern
+import com.muwire.core.collections.FileCollection
+import com.muwire.core.collections.UICollectionDeletedEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
@@ -672,6 +674,58 @@ class MainFrameController {
         params['eventBus'] = model.core.eventBus
         
         mvcGroup.createMVCGroup("collection-wizard", params)
+    }
+    
+    @ControllerAction
+    void viewCollectionComment() {
+        int row = view.selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+
+        def params = [:]
+        params['text'] = collection.comment
+        mvcGroup.createMVCGroup("show-comment", params)
+    }
+    
+    @ControllerAction
+    void copyCollectionHash() {
+        int row = view.selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+        
+        String b64 = Base64.encode(collection.getInfoHash().getRoot())
+        
+        StringSelection selection = new StringSelection(b64)
+        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, null)
+    }
+    
+    @ControllerAction
+    void deleteCollection() {
+        int row = view.selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+        UICollectionDeletedEvent e = new UICollectionDeletedEvent(collection : collection)
+        model.core.eventBus.publish(e)
+        model.localCollections.remove(row)
+        view.collectionsTable.model.fireTableDataChanged()
+        model.collectionFiles.clear()
+        view.collectionFilesTable.model.fireTableDataChanged()
+    }
+    
+    @ControllerAction
+    void viewItemComment() {
+        int row = view.selectedItemRow()
+        if (row < 0)
+            return
+        SharedFile sf = model.collectionFiles.get(row)
+        
+        def params = [:]
+        params['text'] = DataUtil.readi18nString(Base64.decode(sf.getComment()))
+        mvcGroup.createMVCGroup("show-comment", params)
     }
     
     void startChat(Persona p) {

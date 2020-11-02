@@ -39,6 +39,7 @@ import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+import com.muwire.core.collections.FileCollection
 import com.muwire.core.download.Downloader
 import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedFetchStatus
@@ -72,6 +73,8 @@ class MainFrameView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     MainFrameModel model
+    @MVCMember @Nonnull
+    MainFrameController controller
 
     @Inject @Nonnull GriffonApplication application
     @Inject Metadata metadata
@@ -88,6 +91,11 @@ class MainFrameView {
 
     UISettings settings
     ChatNotificator chatNotificator
+    
+    JTable collectionsTable
+    def lastCollectionSortEvent
+    JTable collectionFilesTable
+    def lastCollectionFilesSortEvent
     
     void initUI() {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
@@ -141,13 +149,6 @@ class MainFrameView {
                         menuItem(trans("SYSTEM"), actionPerformed : {mvcGroup.createMVCGroup("system-status")})
                     }
                     menu (text : trans("TOOLS")) {
-                        menuItem(trans("COLLECTIONS"), actionPerformed : {
-                            def env = [:]
-                            env['fileManager'] = model.core.fileManager
-                            env['collectionManager'] = model.core.collectionManager
-                            env['eventBus'] = model.core.eventBus
-                            mvcGroup.createMVCGroup("collections-tool", env)
-                        })
                         menuItem(trans("CONTENT_CONTROL"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core
@@ -185,6 +186,7 @@ class MainFrameView {
                         button(text: trans("SEARCHES"), enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
                         button(text: trans("DOWNLOADS"), enabled : bind{model.downloadsPaneButtonEnabled}, actionPerformed : showDownloadsWindow)
                         button(text: trans("UPLOADS"), enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
+                        button(text: trans("COLLECTIONS"), enabled : bind{model.collectionsPaneButtonEnabled}, actionPerformed : showCollectionsWindow)
                         if (settings.showMonitor)
                             button(text: trans("MONITOR"), enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
                         button(text: trans("FEEDS"), enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
@@ -420,6 +422,51 @@ class MainFrameView {
                             }
                         }
                     }
+                    panel (constraints : "collections window") {
+                        gridLayout(rows: 2, cols : 1)
+                        panel {
+                            borderLayout()
+                            panel (constraints : BorderLayout.NORTH) {
+                                label(text : trans("COLLECTION_TOOL_HEADER"))
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.localCollections) {
+                                        closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
+                                        closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
+                                        closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
+                                        closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
+                                        closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
+                                        closureColumn(header : trans("SEARCH_HITS"), preferredWidth : 10, type : Integer, read : {it.hits.size()})
+                                        closureColumn(header : trans("CREATED"), preferredWidth : 30, type : Long, read : {it.timestamp})
+                                    }
+                                }
+                            }
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
+                                button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
+                                button(text : trans("DELETE"), enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
+                            }
+                        }
+                        panel {
+                            borderLayout()
+                            panel(constraints : BorderLayout.NORTH) {
+                                label(text : trans("FILES"))
+                            }
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                table(id : "items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.collectionFiles) {
+                                        closureColumn(header : trans("NAME"), preferredWidth : 200, type : String, read : {it.getCachedPath()})
+                                        closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.getCachedLength()})
+                                        closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.getComment() != null})
+                                    }
+                                }
+                            }
+                            panel(constraints : BorderLayout.SOUTH) {
+                                button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewItemCommentButtonEnabled}, viewItemCommentAction)
+                            }
+                        }
+                    }
                     panel (constraints: "monitor window") {
                         gridLayout(rows : 1, cols : 2)
                         panel {
@@ -625,6 +672,10 @@ class MainFrameView {
 
             }
         }
+        
+        collectionsTable = builder.getVariable("collections-table")
+        collectionFilesTable = builder.getVariable("items-table")
+        
     }
 
     void mvcGroupInit(Map<String, String> args) {
@@ -808,6 +859,76 @@ class MainFrameView {
         })
         
         sharedFilesTree.addTreeExpansionListener(expansionListener)
+        
+        
+        
+        // collections table
+        collectionsTable.setDefaultRenderer(Integer.class,centerRenderer)
+        collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
+        collectionsTable.columnModel.getColumn(6).setCellRenderer(new DateRenderer())
+        
+        collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionSortEvent = evt})
+        
+        selectionModel = collectionsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = selectedCollectionRow()
+            if (selectedRow < 0) {
+                model.viewCollectionCommentButtonEnabled = false
+                model.deleteCollectionButtonEnabled = false
+                return
+            }
+            
+            model.deleteCollectionButtonEnabled = true
+            FileCollection collection = model.localCollections.get(selectedRow)
+            model.viewCollectionCommentButtonEnabled = collection.getComment() != ""
+            
+            model.collectionFiles.clear()
+            collection.files.each {
+                SharedFile sf = model.core.fileManager.getRootToFiles().get(it.infoHash).first()
+                model.collectionFiles.add(sf)
+            }
+            collectionFilesTable.model.fireTableDataChanged()
+        })
+        
+        collectionsTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionTableMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionTableMenu(e)
+            }
+        })
+        
+        
+        // collection files table
+        collectionFilesTable.setDefaultRenderer(Long.class, new SizeRenderer())
+        collectionFilesTable.rowSorter.addRowSorterListener({evt -> lastCollectionFilesSortEvent = evt})
+        collectionFilesTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = collectionFilesTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = selectedItemRow()
+            if (selectedRow < 0) {
+                model.viewItemCommentButtonEnabled = false
+                return
+            }
+            SharedFile sf = model.collectionFiles.get(selectedRow)
+            model.viewItemCommentButtonEnabled = sf.getComment() != null
+        })
+        
+        collectionFilesTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+        })
         
         // uploadsTable
         def uploadsTable = builder.getVariable("uploads-table")
@@ -1357,6 +1478,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = false
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -1370,6 +1492,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = false
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -1383,6 +1506,21 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = false
+        model.collectionsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
+    }
+    
+    def showCollectionsWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "collections window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = false
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -1396,6 +1534,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = false
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -1409,6 +1548,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
@@ -1422,6 +1562,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
@@ -1435,6 +1576,7 @@ class MainFrameView {
         model.searchesPaneButtonEnabled = true
         model.downloadsPaneButtonEnabled = true
         model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
@@ -1532,6 +1674,62 @@ class MainFrameView {
         for (int selectedRow : selectedRows)
             rv.add(model.feedItems[selectedRow])
         rv
+    }
+    
+    int selectedCollectionRow() {
+        int selectedRow = collectionsTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastCollectionSortEvent != null)
+            selectedRow = collectionsTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
+    int selectedItemRow() {
+        int selectedRow = collectionFilesTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastCollectionFilesSortEvent != null)
+            selectedRow = collectionFilesTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
+    private void showCollectionTableMenu(MouseEvent e) {
+        int row = selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+        
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
+        copyHashToClipboard.addActionListener({controller.copyCollectionHash()})
+        menu.add(copyHashToClipboard)
+        
+        if (collection.comment != "") {
+            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
+            viewComment.addActionListener({controller.viewCollectionComment()})
+            menu.add(viewComment)
+        }
+            
+        JMenuItem delete = new JMenuItem(trans("DELETE"))
+        delete.addActionListener({controller.deleteCollection()})
+        menu.add(delete)
+        
+        showPopupMenu(menu, e)
+    }
+    
+    private void showItemsMenu(MouseEvent e) {
+        int row = selectedItemRow()
+        if (row < 0)
+            return
+        SharedFile item = model.collectionFiles.get(row)
+        if (item.getComment() == null || item.getComment() == "")
+            return
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
+        viewComment.addActionListener({controller.viewItemComment()})
+        menu.add(viewComment)
+        showPopupMenu(menu, e)
     }
     
     void closeApplication() {
