@@ -745,37 +745,16 @@ class MainFrameView {
                     }
                 })
 
-        // shared files menu
-        JPopupMenu sharedFilesMenu = new JPopupMenu()
-        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
-        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
-        sharedFilesMenu.add(copyHashToClipboard)
-        JMenuItem unshareSelectedFiles = new JMenuItem(trans("UNSHARE_SELECTED_FILES"))
-        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
-        sharedFilesMenu.add(unshareSelectedFiles)
-        JMenuItem commentSelectedFiles = new JMenuItem(trans("COMMENT_SELECTED_FILES"))
-        commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
-        sharedFilesMenu.add(commentSelectedFiles)
-        JMenuItem certifySelectedFiles = new JMenuItem(trans("CERTIFY_SELECTED_FILES"))
-        certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
-        sharedFilesMenu.add(certifySelectedFiles)
-        JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
-        openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
-        sharedFilesMenu.add(openContainingFolder)
-        JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
-        showFileDetails.addActionListener({mvcGroup.controller.showFileDetails()})
-        sharedFilesMenu.add(showFileDetails)
-        
         def sharedFilesMouseListener = new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if (e.isPopupTrigger())
-                            showPopupMenu(sharedFilesMenu, e)
+                            showSharedFilesPopupMenu(e)
                     }
                     @Override
                     public void mousePressed(MouseEvent e) {
                         if (e.isPopupTrigger())
-                            showPopupMenu(sharedFilesMenu, e)
+                            showSharedFilesPopupMenu(e)
                     }
                 }
 
@@ -1324,6 +1303,39 @@ class MainFrameView {
         }
         
         showPopupMenu(uploadsTableMenu, e)
+    }
+    
+    void showSharedFilesPopupMenu(MouseEvent e) {
+        def selectedFiles = selectedSharedFiles()
+        
+        JPopupMenu sharedFilesMenu = new JPopupMenu()
+        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
+        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
+        sharedFilesMenu.add(copyHashToClipboard)
+        
+        if (selectedFiles != null && selectedFiles.size() > 1) {
+            JMenuItem createCollection = new JMenuItem(trans("CREATE_COLLECTION"))
+            createCollection.addActionListener({mvcGroup.controller.collection()})
+            sharedFilesMenu.add(createCollection)
+        }
+        
+        JMenuItem unshareSelectedFiles = new JMenuItem(trans("UNSHARE_SELECTED_FILES"))
+        unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
+        sharedFilesMenu.add(unshareSelectedFiles)
+        JMenuItem commentSelectedFiles = new JMenuItem(trans("COMMENT_SELECTED_FILES"))
+        commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
+        sharedFilesMenu.add(commentSelectedFiles)
+        JMenuItem certifySelectedFiles = new JMenuItem(trans("CERTIFY_SELECTED_FILES"))
+        certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
+        sharedFilesMenu.add(certifySelectedFiles)
+        JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
+        openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
+        sharedFilesMenu.add(openContainingFolder)
+        JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
+        showFileDetails.addActionListener({mvcGroup.controller.showFileDetails()})
+        sharedFilesMenu.add(showFileDetails)
+        
+        showPopupMenu(sharedFilesMenu, e)
     }
     
     void showRestoreOrEmpty() {

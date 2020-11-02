@@ -7,6 +7,8 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JCheckBox
 import javax.swing.JLabel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.JTextArea
 import javax.swing.JTree
@@ -19,6 +21,8 @@ import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.FileCollectionItem
 
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 
 import javax.annotation.Nonnull
 
@@ -28,6 +32,8 @@ class CollectionTabView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     CollectionTabModel model
+    @MVCMember @Nonnull
+    CollectionTabController controller
 
     def parent
     def p
@@ -199,6 +205,17 @@ class CollectionTabView {
             TreeUtil.expand(itemsTree)
         })
         
+        collectionsTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionMenu(e)
+            }
+        })
+        
         
         // items table
         itemsTable.setDefaultRenderer(Long.class, new SizeRenderer())
@@ -228,6 +245,22 @@ class CollectionTabView {
             model.downloadItemButtonEnabled = true
             model.viewCommentButtonEnabled = items.size()== 1 && items.get(0).comment != ""
         })
+        
+        // popup
+        def itemsMouseListener = new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+        }
+        itemsTable.addMouseListener(itemsMouseListener)
+        itemsTree.addMouseListener(itemsMouseListener)
+        
+        
         showTree.call()
     }
     
@@ -279,5 +312,39 @@ class CollectionTabView {
         int index = parent.indexOfTab(model.uuid.toString())
         parent.removeTabAt(index)
         mvcGroup.destroy()
+    }
+    
+    private void showCollectionMenu(MouseEvent e) {
+        int row = selectedCollection()
+        if (row < 0)
+            return
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem downloadCollection = new JMenuItem(trans("COLLECTION_DOWNLOAD"))
+        downloadCollection.addActionListener({controller.downloadCollection()})
+        menu.add(downloadCollection)
+        showPopupMenu(menu, e)
+    }
+    
+    private void showItemsMenu(MouseEvent e) {
+        List<FileCollectionItem> selected = selectedItems()
+        if (selected.isEmpty())
+            return
+        
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem download = new JMenuItem(trans("DOWNLOAD"))
+        download.addActionListener({controller.download()})
+        menu.add(download)
+        
+        if (model.viewCommentButtonEnabled) {
+            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
+            viewComment.addActionListener({controller.viewComment()})
+            menu.add(viewComment)
+        }
+        
+        showPopupMenu(menu, e)
+    }
+    
+    private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
+        menu.show(event.getComponent(), event.getX(), event.getY())
     }
 }

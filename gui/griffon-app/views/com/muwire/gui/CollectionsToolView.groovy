@@ -3,6 +3,8 @@ package com.muwire.gui
 import static com.muwire.gui.Translator.trans
 
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -12,6 +14,8 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.swing.JDialog
 import javax.swing.JLabel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -19,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
+import com.muwire.core.collections.FileCollectionItem
 
 import javax.annotation.Nonnull
 
@@ -147,6 +152,20 @@ class CollectionsToolView {
             filesTable.model.fireTableDataChanged()
         })   
         
+        collectionsTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionTableMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showCollectionTableMenu(e)
+            }
+        })
+        
+        
+        // files table
+        
         filesTable.setDefaultRenderer(Long.class, new SizeRenderer())
         filesTable.rowSorter.addRowSorterListener({evt -> lastFilesSortEvent = evt})
         filesTable.rowSorter.setSortsOnUpdates(true)
@@ -162,6 +181,17 @@ class CollectionsToolView {
             model.viewFileCommentButtonEnabled = sf.getComment() != null
         })
         
+        filesTable.addMouseListener(new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showItemsMenu(e)
+            }
+        })
+        
         dialog.getContentPane().add(mainPanel)
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)
@@ -172,5 +202,47 @@ class CollectionsToolView {
             }
         })
         dialog.show()
+    }
+    
+    private void showCollectionTableMenu(MouseEvent e) {
+        int row = selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.collections.get(row)
+        
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
+        copyHashToClipboard.addActionListener({controller.copyHash()})
+        menu.add(copyHashToClipboard)
+        
+        if (collection.comment != "") {
+            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
+            viewComment.addActionListener({controller.viewComment()})
+            menu.add(viewComment)
+        }
+            
+        JMenuItem delete = new JMenuItem(trans("DELETE"))
+        delete.addActionListener({controller.delete()})
+        menu.add(delete)
+        
+        showPopupMenu(menu, e)
+    }
+    
+    private void showItemsMenu(MouseEvent e) {
+        int row = selectedFileRow()
+        if (row < 0)
+            return
+        SharedFile item = model.files.get(row)
+        if (item.getComment() == null || item.getComment() == "")
+            return
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
+        viewComment.addActionListener({controller.viewFileComment()})
+        menu.add(viewComment)
+        showPopupMenu(menu, e)
+    }
+    
+    private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
+        menu.show(event.getComponent(), event.getX(), event.getY())
     }
 }
