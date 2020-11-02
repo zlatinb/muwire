@@ -20,9 +20,11 @@ import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileUnsharedEvent
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 
+@CompileStatic
 @Log
 class CollectionManager {
     
@@ -42,7 +44,7 @@ class CollectionManager {
     private final Map<InfoHash, FileCollection> rootToCollectionRemote = new HashMap<>()
     private final Map<FileCollection, Set<InfoHash>> filesInRemoteCollection = new HashMap<>()
     
-    private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ r ->
+    private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ Runnable r ->
         new Thread(r, "collections-io")
     } as ThreadFactory)
     
@@ -67,7 +69,7 @@ class CollectionManager {
     }
     
     synchronized Set<InfoHash> collectionsForFile(InfoHash ih) {
-        def rv = Collections.emptySet()
+        Set<InfoHash> rv = Collections.emptySet()
         if (fileRootToCollections.containsKey(ih)) {
             rv = new HashSet<>()
             fileRootToCollections.get(ih).collect(rv, { collectionToHash.get(it) })
@@ -100,8 +102,7 @@ class CollectionManager {
                         allFilesShared &= fileManager.isShared(it.infoHash)
                     }
                     if (allFilesShared) {
-                        PayloadAndIH pih = infoHash(collection)
-                        addToIndex(pih.infoHash, collection)
+                        addToIndex(collection.getInfoHash(), collection)
                         eventBus.publish(new CollectionLoadedEvent(collection : collection, local : true))
                     } else {
                         log.fine("not all files were shared from collection $path, deleting")
@@ -127,7 +128,7 @@ class CollectionManager {
                             if (!fileManager.isShared(it.infoHash))
                                 remaining.add(it.infoHash)
                         }
-                        InfoHash infoHash = infoHash(collection).infoHash
+                        InfoHash infoHash = collection.getInfoHash()
                         if (!remaining.isEmpty()) {
                             synchronized(this) {
                                 filesInRemoteCollection.put(collection, remaining)
@@ -147,39 +148,23 @@ class CollectionManager {
     
     void onUICollectionCreatedEvent(UICollectionCreatedEvent e) {
         diskIO.execute({
-            def pih = persist(e.collection, localCollections)
-            addToIndex(pih.infoHash, e.collection)
+            persist(e.collection, localCollections)
+            addToIndex(e.collection.getInfoHash(), e.collection)
             } as Runnable)
     }
     
-    private PayloadAndIH persist(FileCollection collection, File parent) {
+    private void persist(FileCollection collection, File parent) {
         
-        PayloadAndIH pih = infoHash(collection)
-        String hashB64 = Base64.encode(pih.infoHash.getRoot())
+        InfoHash infoHash = collection.getInfoHash()
+        String hashB64 = Base64.encode(infoHash.getRoot())
         String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
         
         File file = new File(parent, fileName)
-        file.bytes = pih.payload
+        file.bytes = collection.getPayload()
         
         log.info("persisted ${fileName}")
-        pih
     }
     
-    public static InfoHash hash(FileCollection collection) {
-        return infoHash(collection).infoHash
-    }
-    
-    private static PayloadAndIH infoHash(FileCollection collection) {
-        def baos = new ByteArrayOutputStream()
-        collection.write(baos)
-        byte [] payload = baos.toByteArray()
-
-        MessageDigest digester = MessageDigest.getInstance("SHA-256");
-        digester.update(payload)
-        InfoHash infoHash = new InfoHash(digester.digest())
-        new PayloadAndIH(infoHash, payload)
-    }
-
     private synchronized void addToIndex(InfoHash infoHash, FileCollection collection) {
         rootToCollection.put(infoHash, collection)
         collectionToHash.put(collection, infoHash)
@@ -193,29 +178,20 @@ class CollectionManager {
         }
     }
     
-    private static class PayloadAndIH {
-        private final InfoHash infoHash
-        private final byte [] payload
-        PayloadAndIH(InfoHash infoHash, byte[] payload) {
-            this.infoHash = infoHash
-            this.payload = payload
-        }
-    }
-    
     void onUICollectionDeletedEvent(UICollectionDeletedEvent e) {
         diskIO.execute({delete(e.collection)} as Runnable)
     }
     
     private void delete(FileCollection collection) {
-        PayloadAndIH pih = infoHash(collection)
-        String hashB64 = Base64.encode(pih.infoHash.getRoot())
+        InfoHash infoHash = collection.getInfoHash()
+        String hashB64 = Base64.encode(infoHash.getRoot())
         String fileName = "${hashB64}_${collection.author.getHumanReadableName()}_${collection.timestamp}.mwcollection"
 
         log.fine("deleting $fileName")        
         File file = new File(localCollections, fileName)
         file.delete()
         
-        removeFromIndex(pih.infoHash, collection)
+        removeFromIndex(infoHash, collection)
     }
     
     private synchronized void removeFromIndex(InfoHash infoHash, FileCollection collection) {

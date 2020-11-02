@@ -1,5 +1,7 @@
 package com.muwire.core.collections
 
+import java.security.MessageDigest
+
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Name
@@ -20,6 +22,7 @@ class FileCollection {
     final String name
     
     private volatile byte[] payload
+    private volatile InfoHash infoHash
     
     final Set<FileCollectionItem> files = new LinkedHashSet<>()
     
@@ -121,17 +124,30 @@ class FileCollection {
     }
     
     public void write(OutputStream os) {
+        os.write(getPayload())
+    }
+    
+    public byte[] getPayload() {
         if (payload == null) {
             def baos = new ByteArrayOutputStream()
             def daos = new DataOutputStream(baos)
-            
+
             daos.write(signablePayload())
             daos.write(sig)
-            
+
             daos.close()
             payload = baos.toByteArray()
         }
-        os.write(payload)
+        payload
+    }
+    
+    public InfoHash getInfoHash() {
+        if (infoHash == null) {
+            MessageDigest digester = MessageDigest.getInstance("SHA-256");
+            digester.update(getPayload())
+            infoHash = new InfoHash(digester.digest())
+        }
+        infoHash
     }
     
     public long totalSize() {

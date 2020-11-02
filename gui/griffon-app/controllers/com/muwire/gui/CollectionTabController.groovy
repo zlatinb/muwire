@@ -36,7 +36,7 @@ class CollectionTabController {
             collection : collection,
             items : collection.getFiles(),
             host : model.host,
-            infoHash : CollectionManager.hash(collection),
+            infoHash : collection.getInfoHash(),
             full : true
             )
         model.eventBus.publish(e)
@@ -58,7 +58,7 @@ class CollectionTabController {
                 collection : collection,
                 items : new HashSet<>(items),
                 host : model.host,
-                infoHash : CollectionManager.hash(collection),
+                infoHash : collection.getInfoHash(),
                 full : false
                 )
         model.eventBus.publish(e)
