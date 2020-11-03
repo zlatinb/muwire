@@ -802,6 +802,8 @@ class MainFrameModel {
         runInsideUIAsync {
             localCollections.remove(e.collection)
             view.collectionsTable.model.fireTableDataChanged()
+            collectionFiles.clear()
+            view.collectionFilesTable.model.fireTableDataChanged()
         }
     }
 }
