@@ -14,6 +14,8 @@ import com.muwire.core.Core
 import com.muwire.core.files.UICommentEvent
 import com.muwire.core.util.DataUtil
 
+import static com.muwire.gui.Translator.trans
+
 @ArtifactProviderFor(GriffonController)
 class AddCommentController {
     @MVCMember @Nonnull
@@ -27,8 +29,8 @@ class AddCommentController {
     void save() {
         String comment = view.textarea.getText()
         if (comment.length() > Constants.MAX_COMMENT_LENGTH ) {
-            JOptionPane.showMessageDialog(null, "Your comment is too long - ${comment.length()} bytes.  The maximum size is $Constants.MAX_COMMENT_LENGTH bytes", 
-                "Comment Too Long", JOptionPane.WARNING_MESSAGE)
+            JOptionPane.showMessageDialog(null, trans("ADD_COMMENT_TOO_LONG_BODY", comment.length(), Constants.MAX_COMMENT_LENGTH), 
+                trans("ADD_COMMENT_TOO_LONG"), JOptionPane.WARNING_MESSAGE)
             return
         }
         if (comment.trim().length() == 0)
