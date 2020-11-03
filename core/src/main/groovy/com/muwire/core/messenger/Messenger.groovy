@@ -142,7 +142,7 @@ class Messenger {
         Set<Persona> successful = new HashSet<>()
         for (Persona recipient : message.recipients) {
             if (deliverTo(message, recipient))
-                successful.add(message)
+                successful.add(recipient)
         }
         if (successful.containsAll(message.recipients)) {
             synchronized(this) {
