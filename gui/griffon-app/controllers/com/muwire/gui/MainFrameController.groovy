@@ -341,7 +341,7 @@ class MainFrameController {
             return
         Persona p = model.trusted[row].persona
         
-        String groupId = p.getHumanReadableName() + "-browse"
+        String groupId = UUID.randomUUID().toString()
         def params = [:]
         params['host'] = p
         params['core'] = model.core
@@ -367,7 +367,7 @@ class MainFrameController {
             return
         Persona p = u.getDownloaderPersona()
 
-        String groupId = p.getHumanReadableName() + "-browse"
+        String groupId = UUID.randomUUID().toString()
         def params = [:]
         params['host'] = p
         params['core'] = model.core
