@@ -24,6 +24,7 @@ import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.CollectionDownloadedEvent
 import com.muwire.core.collections.CollectionLoadedEvent
+import com.muwire.core.collections.CollectionUnsharedEvent
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionCreatedEvent
 import com.muwire.core.connection.ConnectionAttemptStatus
@@ -270,6 +271,7 @@ class MainFrameModel {
             core.eventBus.register(CollectionLoadedEvent.class, this)
             core.eventBus.register(UICollectionCreatedEvent.class, this)
             core.eventBus.register(CollectionDownloadedEvent.class, this)
+            core.eventBus.register(CollectionUnsharedEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -792,6 +794,13 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             localCollections.add(e.collection)
+            view.collectionsTable.model.fireTableDataChanged()
+        }
+    }
+    
+    void onCollectionUnsharedEvent(CollectionUnsharedEvent e) {
+        runInsideUIAsync {
+            localCollections.remove(e.collection)
             view.collectionsTable.model.fireTableDataChanged()
         }
     }

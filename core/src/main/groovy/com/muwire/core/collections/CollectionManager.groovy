@@ -291,6 +291,7 @@ class CollectionManager {
         }
         affected.each { c ->
             diskIO.execute({delete(c)} as Runnable)
+            eventBus.publish(new CollectionUnsharedEvent(collection : c))
         }
     }
     
