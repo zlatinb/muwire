@@ -2,7 +2,7 @@
 host = https://www.transifex.com
 lang_map = he: iw, id: in, ru_RU: ru, sv_SE: sv, tr_TR: tr, uk_UA: uk, yi: ji, zh_CN: zh
 
-[I2P.MuWire]
+[muwire.muwire-plugin]
 file_filter = webui/locale/messages_<lang>.po
 source_file = webui/locale/messages_en.po
 source_lang = en
