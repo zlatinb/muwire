@@ -1,5 +1,5 @@
 # MuWire Collections
-Status: Draft, Proposal, Unimplemented
+Status: Implemented, in testing
 
 MuWire collections are files containing meta-information about a grouping of files.  They serve a similar purpose like .torrent files, but the internal format is rather different to account for the MuWire identity management.
 
@@ -51,13 +51,13 @@ Finally, when starting the download, the downloader always queries the persona i
 
 ### Sharing and storage
 
-Collection metafiles are not indexed the same way as regular files.  They are more similar to the way certificates work, i.e. they are stored in the MuWire home directory in a subdirectory called "collections".  Collections follow the naming convention "<hash of the collection>_<human-readable persona of the publisher>_<timestamp>.mwcollection".  To prevent leakage, such files are explicitly not going to be shareable.
+Collection metafiles are not indexed the same way as regular files.  They are more similar to the way certificates work, i.e. they are stored in the MuWire home directory in a subdirectory called "collections".  Collections follow the naming convention `<hash of the collection>_<human-readable persona of the publisher>_<timestamp>.mwcollection`.  To prevent leakage, such files are explicitly not going to be shareable.
 
 ### Fetching the descriptor
 
-The downloader connects to the node that returned the search result which contained references to the collection(s) it is part of.  Ihen it issues a request starting with "OLLECTION" followed by a space and comma-separated list of base64-encoded hashes of the referenced collections.  After the list the terminator \r\n is appended.
+The downloader connects to the node that returned the search result which contained references to the collection(s) it is part of.  Ihen it issues a request starting with "OLLECTION" followed by a space and comma-separated list of base64-encoded hashes of the referenced collections.  After the list the terminator \r\n is appended.  If the downloader wants to fetch all collections, they send the '*' character instead.
 
-A set of request headers follows, each terminated by \r\n.  After the last header an additional \r\n is appended.  The headers can be any, the only one being mandatory at this time is the "Version" header, currently fixed at 1.
+A set of request headers follows, each terminated by \r\n.  After the last header an additional \r\n is appended.  The headers can be any, the only one being mandatory at this time is the "Version" header, currently fixed at 1.  MuWire currently sends the "Persona" header which contains the b64 persona of the downloader so that the uploader can keep stats.
 
 The uploader responds with a response code - 200 for ok or 404 for not found followed by \r\n and set of headers encoded in the same fashion.  The only mandatory headers are the "Version" currently fixed at 1 and the "Count" header which indicates how many collections are included in the body of the response.  After the headers a gzip-compressed binary stream of the following format:
 
