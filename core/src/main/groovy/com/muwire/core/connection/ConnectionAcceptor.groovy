@@ -24,6 +24,8 @@ import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.filefeeds.FeedItems
 import com.muwire.core.files.FileManager
 import com.muwire.core.hostcache.HostCache
+import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MessageReceivedEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 import com.muwire.core.upload.UploadManager
@@ -172,6 +174,9 @@ class ConnectionAcceptor {
                     break
                 case (byte)'O':
                     processOLLECTION(e)
+                    break
+                case (byte)'L':
+                    processETTER(e)
                     break
                 default:
                     throw new Exception("Invalid read $read")
@@ -672,6 +677,33 @@ class ConnectionAcceptor {
                 dos?.flush()
                 dos?.close()
             } catch (Exception ignore) {}
+            e.close()
+        }
+    }
+    
+    private void processETTER(Endpoint e) {
+        byte [] ETTER = "ETTER\r\n".getBytes(StandardCharsets.US_ASCII)
+        byte [] read = new byte[ETTER.length]
+        
+        DataInputStream dis = new DataInputStream(e.getInputStream())
+        try {
+            dis.readFully(read)
+            if (ETTER != read)
+                throw new Exception("invalid ETTER")
+                
+            Map<String,String> headers = DataUtil.readAllHeaders(dis)
+            if (headers['Version'] != 1)
+                throw new Exception("unrecognized version")
+            int count = Integer.parseInt(headers['Count'])
+            
+            dis = new DataInputStream(new GZIPInputStream(dis))
+            count.times { 
+                MWMessage m = new MWMessage(dis)
+                eventBus.publish(new MessageReceivedEvent(message : m))
+            }
+        } catch (Exception bad) {
+            log.log(Level.WARNING, "failed to process LETTER", bad)
+        } finally {
             e.close()
         }
     }

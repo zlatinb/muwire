@@ -15,6 +15,7 @@ import net.i2p.data.SigningPrivateKey
 class MWMessage {
 
     final Persona sender
+    final Set<Persona> recipients = new LinkedHashSet<>()
     final String subject
     final long timestamp
     final String body
@@ -25,18 +26,19 @@ class MWMessage {
     private volatile byte[] payload
     private volatile InfoHash infoHash
     
-    MWMessage(Persona sender, String subject, long timestamp, String body, 
+    MWMessage(Persona sender, Set<Persona> recipients, String subject, long timestamp, String body, 
         Set<MWMessageAttachment> attachments, SigningPrivateKey spk) {
         this.sender = sender
         this.subject = subject
         this.timestamp = timestamp
         this.attachments = attachments
+        this.recipients = recipients
         
         byte [] signablePayload = signablePayload()
         Signature signature = DSAEngine.getInstance().sign(signablePayload, spk)
         this.sig = signature.getData()
         
-        this.hashCode = Objects.hash(sender, subject, timestamp, body, attachments)
+        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments)
     }
     
     MWMessage(InputStream is) {
@@ -46,6 +48,12 @@ class MWMessage {
             throw new InvalidMessageException("unknown version $version")
         
         sender = new Persona(dis)
+        
+        int nRecipients = dis.readByte()
+        nRecipients.times { 
+            recipients.add(new Persona(dis))
+        }
+        
         timestamp = dis.readLong()
         def n = new Name(dis)
         subject = n.name
@@ -63,7 +71,7 @@ class MWMessage {
         if (!verify())
             throw new InvalidMessageException("verification failed")
             
-        this.hashCode = Objects.hash(sender, subject, timestamp, body, attachments)
+        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments)
     }
     
     private byte[] signablePayload() {
@@ -72,6 +80,13 @@ class MWMessage {
         
         daos.writeByte(Constants.MESSENGER_MESSAGE_VERSION)
         sender.write(daos)
+        
+        daos.writeByte(recipients.size())
+        recipients.each { 
+            it.write(daos)
+        }
+        
+        
         daos.writeLong(timestamp)
         
         def n = new Name(subject)
@@ -125,9 +140,10 @@ class MWMessage {
     public boolean equals(Object o) {
         MWMessage other = (MWMessage) o
         return Objects.equals(sender, other.sender) &&
-            Objects.equals(subject, other.subject) &&
-            Objects.equals(body, other.body) &&
-            timestamp == other.timestamp &&
-            Objects.equals(attachments, other.attachments)
+                timestamp == other.timestamp &&
+                Objects.equals(subject, other.subject) &&
+                Objects.equals(body, other.body) &&
+                Objects.equals(attachments, other.attachments) &&
+                Objects.equals(recipients, other.recipients)
     }
 }

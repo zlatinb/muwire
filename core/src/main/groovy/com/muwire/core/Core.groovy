@@ -79,6 +79,9 @@ import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.hostcache.SimpleHostCache
 import com.muwire.core.mesh.MeshManager
+import com.muwire.core.messenger.MessageReceivedEvent
+import com.muwire.core.messenger.Messenger
+import com.muwire.core.messenger.UIMessageEvent
 import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResponderCache
@@ -147,6 +150,7 @@ public class Core {
     final CertificateManager certificateManager
     final ChatServer chatServer
     final ChatManager chatManager
+    final Messenger messenger
     final FeedManager feedManager
     private final FeedClient feedClient
     private final WatchedDirectoryConverter watchedDirectoryConverter
@@ -480,6 +484,13 @@ public class Core {
             register(DirectoryUnsharedEvent.class, directoryWatcher)
             register(WatchedDirectoryConfigurationEvent.class, directoryWatcher)
         }
+        
+        log.info("initializing messenger")
+        messenger = new Messenger(eventBus, home, i2pConnector, props)
+        eventBus.with { 
+            register(MessageReceivedEvent.class, messenger)
+            register(UIMessageEvent.class, messenger)
+        }
     }
 
     public void startServices() {
@@ -497,6 +508,7 @@ public class Core {
         feedManager.start()
         feedClient.start()
         trackerResponder.start()
+        messenger.start()
     }
 
     public void shutdown() {
@@ -546,6 +558,8 @@ public class Core {
             log.info("shutting down update client")
             updateClient.stop()
         }
+        log.info("shutting down messenger")
+        messenger.stop()
         log.info("killing socket manager")
         i2pSocketManager.destroySocketManager()
         if (router != null) {

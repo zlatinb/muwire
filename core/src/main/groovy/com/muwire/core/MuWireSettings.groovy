@@ -42,6 +42,8 @@ class MuWireSettings {
     int defaultFeedItemsToKeep
     boolean defaultFeedSequential
     
+    int messageSendInterval
+    
     int peerConnections
     int leafConnections
     int connectionHistory
@@ -117,6 +119,9 @@ class MuWireSettings {
         defaultFeedItemsToKeep = Integer.valueOf(props.getProperty("defaultFeedItemsToKeep", "1000"))
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
         defaultFeedUpdateInterval = Long.valueOf(props.getProperty("defaultFeedUpdateInterval", "3600000"))
+        
+        // messenger settings
+        messageSendInterval = Integer.valueOf(props.getProperty("messageSendInterval","1"))
         
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
@@ -199,6 +204,9 @@ class MuWireSettings {
         props.setProperty("defaultFeedItemsToKeep", String.valueOf(defaultFeedItemsToKeep))
         props.setProperty("defaultFeedSequential", String.valueOf(defaultFeedSequential))
         props.setProperty("defaultFeedUpdateInterval", String.valueOf(defaultFeedUpdateInterval))
+        
+        // messenger settings
+        props.setProperty("messageSendInterval", String.valueOf(messageSendInterval))
         
         // ultrapeer connection settings
         props.setProperty("peerConnections", String.valueOf(peerConnections))
