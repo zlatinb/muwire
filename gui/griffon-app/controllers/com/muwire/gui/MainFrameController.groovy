@@ -403,11 +403,31 @@ class MainFrameController {
     }
 
     void unshareSelectedFile() {
-        def sf = view.selectedSharedFiles()
-        if (sf == null)
+        def sfs = view.selectedSharedFiles()
+        if (sfs == null)
             return
-        sf.each {  
-            core.eventBus.publish(new FileUnsharedEvent(unsharedFile : it))
+        sfs.each { SharedFile sf ->
+            
+            if (view.settings.collectionWarning) {
+                Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(new InfoHash(sf.root))
+                if (collectionsInfoHashes != null) {
+                    String[] affected = collectionsInfoHashes.collect({core.collectionManager.getByInfoHash(it)}).collect{it.name}.toArray(new String[0])
+
+                    boolean [] answer = new boolean[1]
+                    def props = [:]
+                    props.collections = affected
+                    props.answer = answer
+                    props.fileName = sf.file.getName()
+                    props.settings = view.settings
+                    props.home = core.home
+                    def mvc = mvcGroup.createMVCGroup("collection-warning", props)
+                    mvc.destroy()
+                    if (!answer[0])
+                        return
+                }
+            }
+            
+            core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
         }
     }
     

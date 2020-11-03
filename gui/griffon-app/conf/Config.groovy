@@ -161,4 +161,9 @@ mvcGroups {
         view = 'com.muwire.gui.CollectionTabView'
         controller = 'com.muwire.gui.CollectionTabController'
     }
+    'collection-warning' {
+        model = "com.muwire.gui.CollectionWarningModel"
+        view = "com.muwire.gui.CollectionWarningView"
+        controller = "com.muwire.gui.CollectionWarningController"
+    }
 }
