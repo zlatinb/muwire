@@ -142,6 +142,11 @@ class BrowseView {
             viewComment.addActionListener({controller.viewComment()})
             menu.add(viewComment)
         }
+        if (model.viewCollectionsActionEnabled) {
+            JMenuItem viewCollections = new JMenuItem(trans("VIEW_COLLECTIONS"))
+            viewCollections.addActionListener({controller.viewCollections()})
+            menu.add(viewCollections)
+        }
         if (model.viewCertificatesActionEnabled) {
             JMenuItem viewCertificates = new JMenuItem(trans("VIEW_CERTIFICATES"))
             viewCertificates.addActionListener({controller.viewCertificates()})
