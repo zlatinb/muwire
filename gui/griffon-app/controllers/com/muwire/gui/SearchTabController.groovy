@@ -106,7 +106,7 @@ class SearchTabController {
         params['host'] = sender
         params['core'] = core
 
-        mvcGroup.createMVCGroup("browse", groupId, params)
+        mvcGroup.parentGroup.createMVCGroup("browse", groupId, params)
     }
     
     @ControllerAction
@@ -122,7 +122,7 @@ class SearchTabController {
         params['everything'] = true 
         params['uuid'] = uuid
         params['host'] = sender
-        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+        mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
     
     @ControllerAction
@@ -193,6 +193,6 @@ class SearchTabController {
         params['infoHashes'] = event.collections.collect()
         params['uuid'] = uuid
         params['host'] = event.sender
-        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+        mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
 }

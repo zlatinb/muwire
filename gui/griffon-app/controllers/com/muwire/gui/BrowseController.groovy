@@ -156,6 +156,6 @@ class BrowseController {
         params['infoHashes'] = event.collections.collect()
         params['uuid'] = uuid
         params['host'] = event.sender
-        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+        mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
 }
