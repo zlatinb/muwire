@@ -880,7 +880,7 @@ class MainFrameModel {
             messageHeadersMap.get(SENT).add(e.message)
             if (folderIdx != INBOX) {
                 messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(idx))
+                messageHeaders.addAll(messageHeadersMap.get(folderIdx))
                 view.messageHeaderTable.model.fireTableDataChanged()
             }
         }
