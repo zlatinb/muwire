@@ -42,11 +42,13 @@ import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.messenger.MWMessage
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustService.TrustEntry
 import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.upload.HashListUploader
 import com.muwire.core.upload.Uploader
@@ -762,12 +764,37 @@ class MainFrameController {
     
     @ControllerAction
     void messageReply() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
         
+        def params = [:]
+        params.reply = msg
+        params.recipient = msg.sender
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
     
     @ControllerAction
     void messageDelete() {
         
+    }
+    
+    @ControllerAction
+    void messageCompose() {
+        
+    }
+    
+    @ControllerAction
+    void messageFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        TrustEntry te = model.trusted[row]
+        
+        def params = [:]
+        params.recipient = te.persona
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
     
     void startChat(Persona p) {

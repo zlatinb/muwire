@@ -166,4 +166,9 @@ mvcGroups {
         view = "com.muwire.gui.CollectionWarningView"
         controller = "com.muwire.gui.CollectionWarningController"
     }
+    'new-message' {
+        model = "com.muwire.gui.NewMessageModel"
+        view = "com.muwire.gui.NewMessageView"
+        controller = "com.muwire.gui.NewMessageController"
+    }
 }

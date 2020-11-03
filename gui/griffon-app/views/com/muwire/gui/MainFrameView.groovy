@@ -601,6 +601,7 @@ class MainFrameView {
                                     button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
                                     button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
                                     button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
+                                    button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageFromTrustedButtonEnabled}, constraints : gbc(gridx:5, gridy:0), messageFromTrustedAction)
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -667,6 +668,7 @@ class MainFrameView {
                                             textArea(id : "message-body-textarea", editable : false)
                                         }
                                         panel(constraints : BorderLayout.SOUTH) {
+                                            button(text : trans("COMPOSE"), enabled : bind{model.messageButtonsEnabled}, messageComposeAction)
                                             button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
                                             button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
                                         }
@@ -1169,12 +1171,14 @@ class MainFrameView {
                 model.markNeutralFromTrustedButtonEnabled = false
                 model.chatFromTrustedButtonEnabled = false
                 model.browseFromTrustedButtonEnabled = false
+                model.messageFromTrustedButtonEnabled = false
             } else {
                 model.subscribeButtonEnabled = true
                 model.markDistrustedButtonEnabled = true
                 model.markNeutralFromTrustedButtonEnabled = true
                 model.chatFromTrustedButtonEnabled = true
                 model.browseFromTrustedButtonEnabled = true
+                model.messageFromTrustedButtonEnabled = true
             }
         })
         
@@ -1194,6 +1198,9 @@ class MainFrameView {
         JMenuItem chatItem = new JMenuItem(trans("CHAT"))
         chatItem.addActionListener({mvcGroup.controller.chatFromTrusted()})
         trustMenu.add(chatItem)
+        JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+        messageItem.addActionListener({mvcGroup.controller.messageFromTrusted()})
+        trustMenu.add(messageItem)
         
         trustedTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
