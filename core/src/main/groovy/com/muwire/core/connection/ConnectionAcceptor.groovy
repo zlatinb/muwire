@@ -692,7 +692,7 @@ class ConnectionAcceptor {
                 throw new Exception("invalid ETTER")
                 
             Map<String,String> headers = DataUtil.readAllHeaders(dis)
-            if (headers['Version'] != 1)
+            if (headers['Version'] != "1")
                 throw new Exception("unrecognized version")
             int count = Integer.parseInt(headers['Count'])
             

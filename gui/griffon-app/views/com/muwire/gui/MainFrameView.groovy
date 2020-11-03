@@ -1244,6 +1244,7 @@ class MainFrameView {
             messageHeaderTable.model.fireTableDataChanged()
         })
         
+        messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = messageHeaderTable.getSelectionModel()

@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.logging.Level
+import java.util.zip.GZIPOutputStream
 
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
@@ -116,13 +117,14 @@ class Messenger {
         String name = deriveName(message)
         File f = new File(outbox, name)
         File target = new File(sent, name)
-        Files.move(f.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
+        Files.move(f.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         eventBus.publish(new MessageSentEvent(message : message))
+        log.fine("moved message to ${message.recipients} to sent folder")
     }
     
     private static String deriveName(MWMessage message) {
         String ih = Base64.encode(message.getInfoHash().getRoot())
-        "${ih}_${message.sender.getHumanReadableName()}_${message.timestamp}"
+        "${ih}_${message.sender.getHumanReadableName()}_${message.timestamp}.mwmessage"
     }
     
     private synchronized void send() {
@@ -132,7 +134,7 @@ class Messenger {
             if (inProcess.contains(candidate))
                 continue
             inProcess.add(candidate)
-            netIO.execute(deliver(candidate))
+            netIO.execute({deliver(candidate)})
         }
     }
     
@@ -161,13 +163,16 @@ class Messenger {
         try {
             Endpoint e = connector.connect(recipient.destination)
             OutputStream os = e.getOutputStream()
-            os.write("ETTER\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("LETTER\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Version:1\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Count:1\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+            os = new GZIPOutputStream(os)
             message.write(os)
             os.flush()
-            os.close()
+            try {
+                os.close()
+            } catch (Exception ignore) {}
             return true
         } catch (Exception e) {
             log.log(Level.WARNING, "failed to send message to ${recipient.getHumanReadableName()}", e)

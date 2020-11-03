@@ -1,5 +1,7 @@
 package com.muwire.core.messenger
 
-class UIMessageEvent extends MWMessage {
+import com.muwire.core.Event
+
+class UIMessageEvent extends Event {
     MWMessage message
 }

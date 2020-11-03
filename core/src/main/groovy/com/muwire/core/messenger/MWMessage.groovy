@@ -33,6 +33,7 @@ class MWMessage {
         this.timestamp = timestamp
         this.attachments = attachments
         this.recipients = recipients
+        this.body = body
         
         byte [] signablePayload = signablePayload()
         Signature signature = DSAEngine.getInstance().sign(signablePayload, spk)
@@ -107,7 +108,7 @@ class MWMessage {
         byte [] signable = signablePayload()
         def spk = sender.destination.getSigningPublicKey()
         def signature = new Signature(spk.getType(), sig)
-        DSAEngine.getInstance().verifySig(signature, signable, spk)
+        DSAEngine.getInstance().verifySignature(signature, signable, spk)
     }
     
     private byte [] getPayload() {

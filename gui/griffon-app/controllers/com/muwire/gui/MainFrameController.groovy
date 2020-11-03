@@ -794,6 +794,7 @@ class MainFrameController {
         
         def params = [:]
         params.recipient = te.persona
+        params.core = core
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
     

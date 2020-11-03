@@ -833,6 +833,15 @@ class MainFrameModel {
         }
     }
     
+    void addToOutbox(MWMessage message) {
+        messageHeadersMap.get(OUTBOX).add(message)
+        if (folderIdx == OUTBOX) {
+            messageHeaders.clear()
+            messageHeaders.addAll(messageHeadersMap.get(OUTBOX))
+            view.messageHeaderTable.model.fireTableDataChanged()
+        }
+    }
+    
     void onMessageLoadedEvent(MessageLoadedEvent e) {
         runInsideUIAsync {
             int idx = 0
@@ -844,7 +853,7 @@ class MainFrameModel {
                     throw new IllegalStateException("unknown folder $e.folder")
 
             }
-
+            
             messageHeadersMap.get(idx).add(e.message)
             if (idx == folderIdx) {
                 messageHeaders.clear()
