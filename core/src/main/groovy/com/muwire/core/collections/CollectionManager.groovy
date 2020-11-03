@@ -279,6 +279,7 @@ class CollectionManager {
             File target = new File(localCollections, fileName)
             Files.move(file.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
             addToIndex(e.collectionInfoHash, collection)
+            eventBus.publish(new CollectionDownloadedEvent(collection : collection))
         }
     }
     

@@ -22,6 +22,7 @@ import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.SharedFile
+import com.muwire.core.collections.CollectionDownloadedEvent
 import com.muwire.core.collections.CollectionLoadedEvent
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionCreatedEvent
@@ -268,6 +269,7 @@ class MainFrameModel {
             core.eventBus.register(UIFeedConfigurationEvent.class, this)
             core.eventBus.register(CollectionLoadedEvent.class, this)
             core.eventBus.register(UICollectionCreatedEvent.class, this)
+            core.eventBus.register(CollectionDownloadedEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -779,6 +781,13 @@ class MainFrameModel {
     }
     
     void onUICollectionCreatedEvent(UICollectionCreatedEvent e) {
+        runInsideUIAsync {
+            localCollections.add(e.collection)
+            view.collectionsTable.model.fireTableDataChanged()
+        }
+    }
+    
+    void onCollectionDownloadedEvent(CollectionDownloadedEvent e) {
         runInsideUIAsync {
             localCollections.add(e.collection)
             view.collectionsTable.model.fireTableDataChanged()
