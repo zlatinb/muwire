@@ -760,6 +760,16 @@ class MainFrameController {
         mvcGroup.createMVCGroup("collections-tool", params)
     }
     
+    @ControllerAction
+    void messageReply() {
+        
+    }
+    
+    @ControllerAction
+    void messageDelete() {
+        
+    }
+    
     void startChat(Persona p) {
         if (!mvcGroup.getChildrenGroups().containsKey(p.getHumanReadableName())) {
             def params = [:]

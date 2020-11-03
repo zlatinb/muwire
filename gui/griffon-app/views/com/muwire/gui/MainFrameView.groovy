@@ -16,10 +16,12 @@ import javax.swing.JComboBox
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JList
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTable
+import javax.swing.JTextArea
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -45,6 +47,7 @@ import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.messenger.MWMessage
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.upload.Uploader
 
@@ -96,6 +99,11 @@ class MainFrameView {
     def lastCollectionSortEvent
     JTable collectionFilesTable
     def lastCollectionFilesSortEvent
+    
+    JList messageFolderList
+    JTable messageHeaderTable
+    def lastMessageHeaderTableSortEvent
+    JTextArea messageBody
     
     void initUI() {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
@@ -191,6 +199,7 @@ class MainFrameView {
                             button(text: trans("MONITOR"), enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
                         button(text: trans("FEEDS"), enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
                         button(text: trans("CONTACTS"), enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
+                        button(text : trans("MESSAGES"), enabled: bind {model.messagesPaneButtonEnabled},actionPerformed : showMessagesWindow)
                         button(text: trans("CHAT"), enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
@@ -634,6 +643,38 @@ class MainFrameView {
                             }
                         }
                     }
+                    panel(constraints : "messages window") {
+                        gridLayout(rows : 1, cols : 1) 
+                        splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100) {
+                            panel {
+                                list(id : "message-folders-list", items:model.messageFolders)
+                            }
+                            panel {
+                                gridLayout(rows :1, cols : 1)
+                                splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 500) {
+                                    scrollPane {
+                                        table(id : "message-header-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                            tableModel(list : model.messageHeaders) {
+                                                closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.sender.getHumanReadableName()})
+                                                closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.subject})
+                                                closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.timestamp})
+                                            }
+                                        }
+                                    }
+                                    panel {
+                                        borderLayout()
+                                        scrollPane(constraints : BorderLayout.CENTER) {
+                                            textArea(id : "message-body-textarea", editable : false)
+                                        }
+                                        panel(constraints : BorderLayout.SOUTH) {
+                                            button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
+                                            button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     panel(constraints : "chat window") {
                         borderLayout()
                         tabbedPane(id : "chat-tabs", constraints : BorderLayout.CENTER)
@@ -676,6 +717,10 @@ class MainFrameView {
         
         collectionsTable = builder.getVariable("collections-table")
         collectionFilesTable = builder.getVariable("items-table")
+        
+        messageFolderList = builder.getVariable("message-folders-list")
+        messageHeaderTable = builder.getVariable("message-header-table")
+        messageBody = builder.getVariable("message-body-textarea")
         
     }
 
@@ -1178,6 +1223,28 @@ class MainFrameView {
             }
         })
         
+        
+        // messages tab
+        
+        // TODO
+        
+        messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
+        messageHeaderTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = messageHeaderTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = selectedMessageHeader()
+            if (selectedRow < 0) {
+                model.messageButtonsEnabled = false
+                messageBody.setText("")
+            } else {
+                MWMessage selected = model.messageHeaders.getAt(selectedRow)
+                messageBody.setText(selected.body)
+            }
+                
+        })
+        
+        
         // chat tabs
         def chatTabbedPane = builder.getVariable("chat-tabs")
         chatTabbedPane.addChangeListener({e -> chatNotificator.serverTabChanged(e.getSource())})
@@ -1483,6 +1550,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1497,6 +1565,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1511,6 +1580,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1525,6 +1595,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1539,6 +1610,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = false
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1553,6 +1625,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1567,6 +1640,22 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
+        model.messagesPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
+    }
+    
+    def showMessagesWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "messages window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1581,6 +1670,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()
     }
@@ -1735,6 +1825,15 @@ class MainFrameView {
         viewComment.addActionListener({controller.viewItemComment()})
         menu.add(viewComment)
         showPopupMenu(menu, e)
+    }
+    
+    int selectedMessageHeader() {
+        int selectedRow = messageHeaderTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastCollectionFilesSortEvent != null)
+            selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
     }
     
     void closeApplication() {

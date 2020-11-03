@@ -50,6 +50,7 @@ import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.SideCarFileEvent
+import com.muwire.core.messenger.MWMessage
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -64,6 +65,8 @@ import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 import com.muwire.core.upload.Uploader
 import com.muwire.core.util.BandwidthCounter
+
+import static com.muwire.gui.Translator.trans
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -110,6 +113,9 @@ class MainFrameModel {
     def feeds = []
     def feedItems = []
     
+    def messageFolders = [trans("INBOX"), trans("OUTBOX"), trans("SENT")] 
+    List<MWMessage> messageHeaders = new ArrayList<>()
+    
     boolean sessionRestored
 
     @Observable int connections
@@ -147,6 +153,8 @@ class MainFrameModel {
     @Observable boolean viewItemCommentButtonEnabled
     @Observable boolean deleteCollectionButtonEnabled 
     
+    @Observable boolean messageButtonsEnabled
+    
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
@@ -154,6 +162,7 @@ class MainFrameModel {
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean feedsPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
+    @Observable boolean messagesPaneButtonEnabled
     @Observable boolean chatPaneButtonEnabled
     
     @Observable boolean chatServerRunning
