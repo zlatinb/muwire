@@ -51,6 +51,9 @@ import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MessageLoadedEvent
+import com.muwire.core.messenger.MessageReceivedEvent
+import com.muwire.core.messenger.MessageSentEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -115,6 +118,12 @@ class MainFrameModel {
     
     def messageFolders = [trans("INBOX"), trans("OUTBOX"), trans("SENT")] 
     List<MWMessage> messageHeaders = new ArrayList<>()
+    Map<Integer, Set<MWMessage>> messageHeadersMap = new HashMap<>()
+    int folderIdx
+    
+    private final static int INBOX = 0
+    private final static int OUTBOX = 1
+    private final static int SENT = 2
     
     boolean sessionRestored
 
@@ -199,6 +208,10 @@ class MainFrameModel {
         shared = []
         treeRoot = new DefaultMutableTreeNode()
         sharedTree = new DefaultTreeModel(treeRoot)
+        
+        messageHeadersMap.put(0, new LinkedHashSet<>())
+        messageHeadersMap.put(1, new LinkedHashSet<>())
+        messageHeadersMap.put(2, new LinkedHashSet<>())
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -281,6 +294,9 @@ class MainFrameModel {
             core.eventBus.register(UICollectionCreatedEvent.class, this)
             core.eventBus.register(CollectionDownloadedEvent.class, this)
             core.eventBus.register(CollectionUnsharedEvent.class, this)
+            core.eventBus.register(MessageLoadedEvent.class, this)
+            core.eventBus.register(MessageReceivedEvent.class, this)
+            core.eventBus.register(MessageSentEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -813,6 +829,50 @@ class MainFrameModel {
             view.collectionsTable.model.fireTableDataChanged()
             collectionFiles.clear()
             view.collectionFilesTable.model.fireTableDataChanged()
+        }
+    }
+    
+    void onMessageLoadedEvent(MessageLoadedEvent e) {
+        runInsideUIAsync {
+            int idx = 0
+            switch(e.folder) {
+                case "inbox" : idx = INBOX; break
+                case "outbox" : idx = OUTBOX; break
+                case "sent" : idx = SENT; break
+                default :
+                    throw new IllegalStateException("unknown folder $e.folder")
+
+            }
+
+            messageHeadersMap.get(idx).add(e.message)
+            if (idx == folderIdx) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(idx))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    void onMessageReceivedEvent(MessageReceivedEvent e) {
+        runInsideUIAsync {
+            messageHeadersMap.get(INBOX).add(e.message)
+            if (folderIdx == INBOX) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(INBOX))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    void onMessageSentEvent(MessageSentEvent e) {
+        runInsideUIAsync {
+            messageHeadersMap.get(OUTBOX).remove(e.message)
+            messageHeadersMap.get(SENT).add(e.message)
+            if (folderIdx != INBOX) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(idx))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
         }
     }
 }

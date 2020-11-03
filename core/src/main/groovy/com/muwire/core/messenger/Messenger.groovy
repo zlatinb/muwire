@@ -12,6 +12,7 @@ import java.util.logging.Level
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
+import com.muwire.core.UILoadedEvent
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 
@@ -61,7 +62,7 @@ class Messenger {
         sent.mkdirs()
     }
     
-    public void start() {
+    public void onUILoadedEvent(UILoadedEvent e) {
         diskIO.execute({load()} as Runnable)
     }
     
@@ -116,7 +117,7 @@ class Messenger {
         File f = new File(outbox, name)
         File target = new File(sent, name)
         Files.move(f.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE)
-        eventBus.publish(new MessageSentEvent())
+        eventBus.publish(new MessageSentEvent(message : message))
     }
     
     private static String deriveName(MWMessage message) {

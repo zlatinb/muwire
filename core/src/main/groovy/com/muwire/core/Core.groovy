@@ -488,6 +488,7 @@ public class Core {
         log.info("initializing messenger")
         messenger = new Messenger(eventBus, home, i2pConnector, props)
         eventBus.with { 
+            register(UILoadedEvent.class, messenger)
             register(MessageReceivedEvent.class, messenger)
             register(UIMessageEvent.class, messenger)
         }
@@ -508,7 +509,6 @@ public class Core {
         feedManager.start()
         feedClient.start()
         trackerResponder.start()
-        messenger.start()
     }
 
     public void shutdown() {

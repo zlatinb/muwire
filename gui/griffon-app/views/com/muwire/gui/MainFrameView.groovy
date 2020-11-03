@@ -1226,7 +1226,16 @@ class MainFrameView {
         
         // messages tab
         
-        // TODO
+        messageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        messageFolderList.addListSelectionListener({
+            int index = messageFolderList.getSelectedIndex()
+            if (index < 0)
+                index = 0
+            model.folderIdx = index
+            model.messageHeaders.clear()
+            model.messageHeaders.addAll(model.messageHeadersMap.get(index))
+            messageHeaderTable.model.fireTableDataChanged()
+        })
         
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
