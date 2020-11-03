@@ -788,6 +788,8 @@ class MainFrameModel {
     }
     
     void onCollectionDownloadedEvent(CollectionDownloadedEvent e) {
+        if (!core.muOptions.shareDownloadedFiles)
+            return
         runInsideUIAsync {
             localCollections.add(e.collection)
             view.collectionsTable.model.fireTableDataChanged()
