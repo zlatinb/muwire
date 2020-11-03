@@ -8,9 +8,13 @@ public class Constants {
     public static final int MAX_NICKNAME_LENGTH = 30;
     public static final byte FILE_CERT_VERSION = (byte)2;
     public static final int CHAT_VERSION = 1;
+    
     public static final byte COLLECTION_VERSION = (byte)1;
     public static final byte COLLECTION_ENTRY_VERSION = (byte)1;
     public static final int COLLECTION_MAX_ITEMS = (0x1 << 16) - 1;
+    
+    public static final byte MESSENGER_MESSAGE_VERSION = (byte)1;
+    public static final byte MESSENGER_ATTACHMENT_VERSION = (byte)1;
     
     public static final SigType SIG_TYPE = SigType.EdDSA_SHA512_Ed25519;
 
