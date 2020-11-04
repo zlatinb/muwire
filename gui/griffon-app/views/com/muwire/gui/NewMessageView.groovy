@@ -5,13 +5,16 @@ import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.DefaultListModel
 import javax.swing.JComponent
 import javax.swing.JFrame
+import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.JTextArea
 import javax.swing.JTextField
+import javax.swing.ListModel
 import javax.swing.SwingConstants
 import javax.swing.TransferHandler
 import javax.swing.TransferHandler.TransferSupport
@@ -38,12 +41,20 @@ class NewMessageView {
     NewMessageModel model
 
     def window
+    DefaultListModel recipientsModel
+    JList recipientsList
     JTextField subjectField
     JTextArea bodyArea
     JTable attachmentsTable
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
+        
+        recipientsModel = new DefaultListModel()
+        model.recipients.each { 
+            recipientsModel.addElement(it.getHumanReadableName())
+        }
+        recipientsList = new JList(recipientsModel)
         
         window = builder.frame(visible : false, locationRelativeTo : null,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
@@ -52,8 +63,10 @@ class NewMessageView {
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
                 panel(constraints : BorderLayout.NORTH) {
-                    label(text : trans("RECIPIENT"))
-                    label(text : model.recipients.first().getHumanReadableName()) // TODO convert to list
+                    label(text : trans("RECIPIENTS"))
+                    scrollPane {
+                        widget(recipientsList)
+                    }
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
@@ -103,6 +116,10 @@ class NewMessageView {
         
         bodyArea.setText(model.replyBody)
         
+        // recipients list
+        transferHandler = new PersonaTransferHandler()
+        recipientsList.setTransferHandler(transferHandler)
+        
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 mvcGroup.destroy()
@@ -141,6 +158,30 @@ class NewMessageView {
             }
             attachmentsTable.model.fireTableDataChanged()
             true
+        }
+    }
+    
+    class PersonaTransferHandler extends TransferHandler {
+        @Override
+        public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+            for (DataFlavor df : transferFlavors) {
+                if (df == CopyPasteSupport.LIST_FLAVOR) {
+                    return true
+                }
+            }
+            return false
+        }
+        public boolean importData(JComponent c, Transferable t) {
+            List<?> items = t.getTransferData(CopyPasteSupport.LIST_FLAVOR)
+            if (items == null || items.isEmpty()) {
+                return false
+            }
+            
+            items.each { 
+                if (model.recipients.add(it))
+                    recipientsModel.insertElementAt(it.getHumanReadableName(),0)
+            }
+            return true
         }
     }
 }

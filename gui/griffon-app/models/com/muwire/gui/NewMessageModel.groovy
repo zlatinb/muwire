@@ -24,7 +24,7 @@ class NewMessageModel {
     
     Core core
     MWMessage reply
-    List<Persona> recipients 
+    Set<Persona> recipients 
     List<?> attachments = new ArrayList<>()
     
     void mvcGroupInit(Map<String, String> args) {

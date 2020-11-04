@@ -43,6 +43,7 @@ import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.download.Downloader
@@ -604,7 +605,8 @@ class MainFrameView {
                             panel (border : etchedBorder()){
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight, 
+                                        dragEnabled : true, transferHandler : new PersonaTransferHandler()) {
                                         tableModel(list : model.trusted) {
                                             closureColumn(header : trans("TRUSTED_USERS"), type : String, read : { it.persona.getHumanReadableName() } )
                                             closureColumn(header : trans("REASON"), type : String, read : {it.reason})
@@ -2009,7 +2011,7 @@ class MainFrameView {
         @Override
         protected Transferable createTransferable(JComponent c) {
             if (c instanceof JTree || c instanceof JTable) {
-                return new SFTransferable(selectedSharedFiles())
+                return new MWTransferable(selectedSharedFiles())
             }
             return null
         }
@@ -2021,29 +2023,28 @@ class MainFrameView {
         
     }
     
-    private static class SFTransferable implements Transferable {
-        
-        private final List<SharedFile> sfs
-        SFTransferable(List<SharedFile> sfs) {
-            this.sfs = sfs
+    private static class MWTransferable<T> implements Transferable {
+        private final List<T> data
+        MWTransferable(List<T> data) {
+            this.data = data
         }
-
+        
         @Override
         public DataFlavor[] getTransferDataFlavors() {
             CopyPasteSupport.FLAVORS
         }
-
+        
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             flavor == CopyPasteSupport.LIST_FLAVOR
         }
-
+        
         @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
             if (flavor != CopyPasteSupport.LIST_FLAVOR) {
                 return null
             }
-            return sfs
+            return data
         }
     }
     
@@ -2054,7 +2055,7 @@ class MainFrameView {
                 int row = selectedCollectionRow()
                 if (row < 0)
                     return null
-                return new FCTransferable(Collections.singletonList(model.localCollections.get(row)))
+                return new MWTransferable(Collections.singletonList(model.localCollections.get(row)))
             }
             return null
         }
@@ -2064,29 +2065,20 @@ class MainFrameView {
         }
     }
     
-    private static class FCTransferable implements Transferable {
-
-        private final List<FileCollection> collections
-        FCTransferable(List<FileCollection> collections) {
-            this.collections = collections
-        }
-        
+    private class PersonaTransferHandler extends TransferHandler {
         @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            CopyPasteSupport.FLAVORS
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof JTable) {
+                int row = getSelectedTrustTablesRow("trusted-table")
+                if (row < 0)
+                    return null
+                return new MWTransferable(Collections.singletonList(model.trusted.get(row).persona))
+            }
+            return null
         }
-
         @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            flavor == CopyPasteSupport.LIST_FLAVOR
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
         }
-
-        @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-            if (flavor != CopyPasteSupport.LIST_FLAVOR)
-                return null
-            return collections
-        }
-        
     }
 }
