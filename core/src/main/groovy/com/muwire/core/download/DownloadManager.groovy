@@ -112,7 +112,7 @@ public class DownloadManager {
     
     public void onUIDownloadAttachmentEvent(UIDownloadAttachmentEvent e) {
         Set<Destination> sender = new HashSet<>()
-        sender.add(e.sender)
+        sender.add(e.sender.destination)
         
         File target = muSettings.downloadLocation
         target = new File(target, e.attachment.name)

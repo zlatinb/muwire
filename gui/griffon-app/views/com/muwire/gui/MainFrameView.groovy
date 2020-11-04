@@ -51,6 +51,7 @@ import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.upload.Uploader
 
@@ -110,6 +111,9 @@ class MainFrameView {
     JTable messageHeaderTable
     def lastMessageHeaderTableSortEvent
     JTextArea messageBody
+    JTable messageAttachmentsTable
+    def lastMessageAttachmentsTableSortEvent
+    JSplitPane messageSplitPane
     
     void initUI() {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
@@ -677,8 +681,40 @@ class MainFrameView {
                                     }
                                     panel {
                                         borderLayout()
-                                        scrollPane(constraints : BorderLayout.CENTER) {
-                                            textArea(id : "message-body-textarea", editable : false)
+                                        panel(constraints : BorderLayout.CENTER) {
+                                            gridLayout(rows : 1, cols : 1)
+                                            splitPane(id : "message-attachments-split-pane", orientation : JSplitPane.VERTICAL_SPLIT,
+                                            continuousLayout : true, dividerLocation : 100) {
+                                                scrollPane {
+                                                    textArea(id : "message-body-textarea", editable : false)
+                                                }
+                                                panel {
+                                                    borderLayout()
+                                                    scrollPane(constraints : BorderLayout.CENTER) {
+                                                        table(id : "message-attachments-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                                            tableModel(list : model.messageAttachments) {
+                                                                closureColumn(header : trans("NAME"), preferredWidth : 300, type : String, read : {it.name})
+                                                                closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read :{
+                                                                    if (it instanceof MWMessageAttachment)
+                                                                        return it.length
+                                                                    else
+                                                                        return it.totalSize()
+                                                                })
+                                                                closureColumn(header : trans("COLLECTION"), preferredWidth : 20, type: Boolean, read : {
+                                                                    it instanceof FileCollection
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+                                                    panel(constraints: BorderLayout.EAST) {
+                                                        gridBagLayout()
+                                                        button(text : trans("DOWNLOAD"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
+                                                            constraints : gbc(gridx:0, gridy:0), downloadAttachmentAction)
+                                                        button(text : trans("DOWNLOAD_ALL"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
+                                                            constraints : gbc(gridx: 0, gridy: 1), downloadAllAttachmentsAction)
+                                                    }
+                                                }
+                                            }
                                         }
                                         panel(constraints : BorderLayout.SOUTH) {
                                             button(text : trans("COMPOSE"), enabled : bind{model.messageButtonsEnabled}, messageComposeAction)
@@ -736,6 +772,8 @@ class MainFrameView {
         messageFolderList = builder.getVariable("message-folders-list")
         messageHeaderTable = builder.getVariable("message-header-table")
         messageBody = builder.getVariable("message-body-textarea")
+        messageAttachmentsTable = builder.getVariable("message-attachments-table")
+        messageSplitPane = builder.getVariable("message-attachments-split-pane")
         
     }
 
@@ -1251,15 +1289,39 @@ class MainFrameView {
             int selectedRow = selectedMessageHeader()
             if (selectedRow < 0) {
                 model.messageButtonsEnabled = false
+                model.messageAttachmentsButtonEnabled = false
                 messageBody.setText("")
             } else {
                 MWMessage selected = model.messageHeaders.getAt(selectedRow)
                 messageBody.setText(selected.body)
                 model.messageButtonsEnabled = true
+                
+                if (selected.attachments.isEmpty())
+                    messageSplitPane.setDividerLocation(1.0d)
+                else {
+                    messageSplitPane.setDividerLocation(0.7d)
+                    model.messageAttachments.clear()
+                    model.messageAttachments.addAll(selected.attachments)
+                    model.messageAttachments.addAll(selected.collections)
+                    messageAttachmentsTable.model.fireTableDataChanged()
+                }
             }
                 
         })
         
+        messageAttachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer()) 
+        messageAttachmentsTable.rowSorter.addRowSorterListener({evt -> lastMessageAttachmentsTableSortEvent = evt})
+        messageAttachmentsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = messageAttachmentsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener({
+            List selected = selectedMessageAttachments()
+            if (selected.isEmpty()) {
+                model.messageAttachmentsButtonEnabled = false
+            } else {
+                model.messageAttachmentsButtonEnabled = true
+            }
+        })
         
         // chat tabs
         def chatTabbedPane = builder.getVariable("chat-tabs")
@@ -1850,6 +1912,21 @@ class MainFrameView {
         if (lastCollectionFilesSortEvent != null)
             selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
+    }
+    
+    List<?> selectedMessageAttachments() {
+        int[] rows = messageAttachmentsTable.getSelectedRows()
+        if (rows.length == 0)
+            return Collections.emptyList()
+        if (lastMessageAttachmentsTableSortEvent != null) {
+            for (int i = 0; i < rows.length; i++) {
+                rows[i] = messageAttachmentsTable.rowSorter.convertRowIndexToModel(rows[i])
+            }
+        }
+        List rv = new ArrayList()
+        for (int i = 0; i < rows.length; i++)
+            rv.add(model.messageAttachments.get(rows[i]))
+        rv
     }
     
     void closeApplication() {

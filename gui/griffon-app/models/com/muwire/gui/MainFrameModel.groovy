@@ -120,6 +120,7 @@ class MainFrameModel {
     List<MWMessage> messageHeaders = new ArrayList<>()
     Map<Integer, Set<MWMessage>> messageHeadersMap = new HashMap<>()
     int folderIdx
+    List<Object> messageAttachments = new ArrayList<>()
     
     private final static int INBOX = 0
     private final static int OUTBOX = 1
@@ -164,6 +165,7 @@ class MainFrameModel {
     @Observable boolean deleteCollectionButtonEnabled 
     
     @Observable boolean messageButtonsEnabled
+    @Observable boolean messageAttachmentsButtonEnabled
     
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
