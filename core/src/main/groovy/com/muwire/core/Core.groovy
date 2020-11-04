@@ -81,6 +81,7 @@ import com.muwire.core.hostcache.SimpleHostCache
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.messenger.MessageReceivedEvent
 import com.muwire.core.messenger.Messenger
+import com.muwire.core.messenger.UIDownloadAttachmentEvent
 import com.muwire.core.messenger.UIMessageEvent
 import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
@@ -425,6 +426,7 @@ public class Core {
         eventBus.register(UIDownloadResumedEvent.class, downloadManager)
         eventBus.register(DownloadHopelessEvent.class, downloadManager)
         eventBus.register(UIDownloadCollectionEvent.class, downloadManager)
+        eventBus.register(UIDownloadAttachmentEvent.class, downloadManager)
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)

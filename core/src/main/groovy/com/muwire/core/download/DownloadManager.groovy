@@ -6,6 +6,7 @@ import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHasher
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.mesh.MeshManager
+import com.muwire.core.messenger.UIDownloadAttachmentEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
@@ -107,6 +108,16 @@ public class DownloadManager {
 
             doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor, e.infoHash)
         }
+    }
+    
+    public void onUIDownloadAttachmentEvent(UIDownloadAttachmentEvent e) {
+        Set<Destination> sender = new HashSet<>()
+        sender.add(e.sender)
+        
+        File target = muSettings.downloadLocation
+        target = new File(target, e.attachment.name)
+        
+        doDownload(e.attachment.infoHash, target, e.attachment.length, e.attachment.pieceSizePow2, e.sequential, sender, null)
     }
     
     private Downloader doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
