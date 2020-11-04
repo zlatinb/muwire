@@ -53,7 +53,7 @@ class NewMessageView {
                 borderLayout()
                 panel(constraints : BorderLayout.NORTH) {
                     label(text : trans("RECIPIENT"))
-                    label(text : model.recipient.getHumanReadableName())
+                    label(text : model.recipients.first().getHumanReadableName()) // TODO convert to list
                 }
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
@@ -75,7 +75,12 @@ class NewMessageView {
                             attachmentsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) { 
                                 tableModel(list : model.attachments) {
                                     closureColumn(header : trans("NAME"), type : String, read : {it.name})
-                                    closureColumn(header : trans("SIZE"), type : Long, read : {it.length})
+                                    closureColumn(header : trans("SIZE"), type : Long, read : {
+                                        if (it instanceof MWMessageAttachment)
+                                            return it.length
+                                        else 
+                                            return it.totalSize()
+                                    })
                                 }
                             }
                         }
@@ -120,13 +125,17 @@ class NewMessageView {
         }
         public boolean importData(JComponent c, Transferable t) {
             
-            List<SharedFile> sfs = t.getTransferData(CopyPasteSupport.LIST_FLAVOR)
-            if (sfs == null) {
-                return
+            List<?> items = t.getTransferData(CopyPasteSupport.LIST_FLAVOR)
+            if (items == null || items.isEmpty()) {
+                return false
             }
             
-            sfs.each { 
-                def attachment = new MWMessageAttachment(new InfoHash(it.getRoot()), it.file.getName(), it.getCachedLength(), (byte)it.pieceSize)
+            items.each {
+                def attachment
+                if (it instanceof SharedFile)
+                    attachment = new MWMessageAttachment(new InfoHash(it.getRoot()), it.file.getName(), it.getCachedLength(), (byte)it.pieceSize)
+                else
+                    attachment = it
                 model.attachments.add(attachment)
                 
             }

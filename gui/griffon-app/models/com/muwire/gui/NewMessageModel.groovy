@@ -5,6 +5,7 @@ import javax.annotation.Nonnull
 import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
+import com.muwire.core.collections.FileCollection
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
 
@@ -23,8 +24,8 @@ class NewMessageModel {
     
     Core core
     MWMessage reply
-    Persona recipient
-    List<MWMessageAttachment> attachments = new ArrayList<>()
+    List<Persona> recipients 
+    List<?> attachments = new ArrayList<>()
     
     void mvcGroupInit(Map<String, String> args) {
         if (reply == null)

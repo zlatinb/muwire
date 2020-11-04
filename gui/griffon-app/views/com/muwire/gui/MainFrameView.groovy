@@ -132,6 +132,7 @@ class MainFrameView {
         }
         
         def transferHandler = new MWTransferHandler()
+        def collectionsTransferHandler = new FileCollectionTransferHandler()
             
         builder.with {
             application(size : [mainFrameX,mainFrameY], id: 'main-frame',
@@ -450,7 +451,8 @@ class MainFrameView {
                                 label(text : trans("COLLECTION_TOOL_HEADER"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight,
+                                    dragEnabled : true, transferHandler : collectionsTransferHandler) {
                                     tableModel(list : model.localCollections) {
                                         closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
                                         closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
@@ -1944,16 +1946,14 @@ class MainFrameView {
     
     private static class SFTransferable implements Transferable {
         
-        private static final DataFlavor[] FLAVORS = new DataFlavor[1]
         private final List<SharedFile> sfs
         SFTransferable(List<SharedFile> sfs) {
             this.sfs = sfs
-            FLAVORS[0] = CopyPasteSupport.LIST_FLAVOR
         }
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            FLAVORS
+            CopyPasteSupport.FLAVORS
         }
 
         @Override
@@ -1967,6 +1967,48 @@ class MainFrameView {
                 return null
             }
             return sfs
+        }
+    }
+    
+    private class FileCollectionTransferHandler extends TransferHandler {
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof JTable) {
+                int row = selectedCollectionRow()
+                if (row < 0)
+                    return null
+                return new FCTransferable(Collections.singletonList(model.localCollections.get(row)))
+            }
+            return null
+        }
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
+    }
+    
+    private static class FCTransferable implements Transferable {
+
+        private final List<FileCollection> collections
+        FCTransferable(List<FileCollection> collections) {
+            this.collections = collections
+        }
+        
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            CopyPasteSupport.FLAVORS
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            flavor == CopyPasteSupport.LIST_FLAVOR
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            if (flavor != CopyPasteSupport.LIST_FLAVOR)
+                return null
+            return collections
         }
         
     }

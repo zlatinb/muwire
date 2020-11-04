@@ -6,6 +6,7 @@ import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Name
 import com.muwire.core.Persona
+import com.muwire.core.collections.FileCollection
 
 import groovy.transform.CompileStatic
 import net.i2p.crypto.DSAEngine
@@ -20,6 +21,7 @@ class MWMessage {
     final long timestamp
     final String body
     final Set<MWMessageAttachment> attachments = new LinkedHashSet<>()
+    final Set<FileCollection> collections = new LinkedHashSet<>()
     
     private final byte[] sig
     private final int hashCode
@@ -27,11 +29,12 @@ class MWMessage {
     private volatile InfoHash infoHash
     
     MWMessage(Persona sender, Set<Persona> recipients, String subject, long timestamp, String body, 
-        Set<MWMessageAttachment> attachments, SigningPrivateKey spk) {
+        Set<MWMessageAttachment> attachments, Set<FileCollection> collections, SigningPrivateKey spk) {
         this.sender = sender
         this.subject = subject
         this.timestamp = timestamp
         this.attachments = attachments
+        this.collections = collections
         this.recipients = recipients
         this.body = body
         
@@ -39,7 +42,7 @@ class MWMessage {
         Signature signature = DSAEngine.getInstance().sign(signablePayload, spk)
         this.sig = signature.getData()
         
-        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments)
+        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments, collections)
     }
     
     MWMessage(InputStream is) {
@@ -66,13 +69,18 @@ class MWMessage {
             attachments.add(new MWMessageAttachment(dis))
         }
         
+        int nCollections = dis.readByte()
+        nCollections.times { 
+            collections.add(new FileCollection(dis))
+        }
+        
         sig = new byte[Constants.SIG_TYPE.getSigLen()]
         dis.readFully(sig)
         
         if (!verify())
             throw new InvalidMessageException("verification failed")
             
-        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments)
+        this.hashCode = Objects.hash(sender, recipients, subject, timestamp, body, attachments, collections)
     }
     
     private byte[] signablePayload() {
@@ -97,6 +105,11 @@ class MWMessage {
         
         daos.writeByte(attachments.size())
         attachments.each { 
+            it.write(daos)
+        }
+        
+        daos.writeByte(collections.size())
+        collections.each { 
             it.write(daos)
         }
         
@@ -145,6 +158,7 @@ class MWMessage {
                 Objects.equals(subject, other.subject) &&
                 Objects.equals(body, other.body) &&
                 Objects.equals(attachments, other.attachments) &&
-                Objects.equals(recipients, other.recipients)
+                Objects.equals(recipients, other.recipients) &&
+                Objects.equals(collections, other.collections)
     }
 }

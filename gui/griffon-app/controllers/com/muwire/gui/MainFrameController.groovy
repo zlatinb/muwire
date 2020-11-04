@@ -771,7 +771,7 @@ class MainFrameController {
         
         def params = [:]
         params.reply = msg
-        params.recipient = msg.sender
+        params.recipients = Collections.singletonList(msg.sender)
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
     
@@ -793,7 +793,7 @@ class MainFrameController {
         TrustEntry te = model.trusted[row]
         
         def params = [:]
-        params.recipient = te.persona
+        params.recipients = Collections.singletonList(te.persona)
         params.core = core
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
