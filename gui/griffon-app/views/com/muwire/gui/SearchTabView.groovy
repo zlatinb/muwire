@@ -77,6 +77,7 @@ class SearchTabView {
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
                                             closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browseCollections})
                                             closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
+                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().messages})
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
                                             closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { row ->
                                                 trans(model.core.trustService.getLevel(row.destination).name())
@@ -85,12 +86,15 @@ class SearchTabView {
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows: 1, cols : 2)
+                                    gridLayout(rows: 1, cols : 3)
                                     panel (border : etchedBorder()){
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
+                                        button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageActionEnabled}, messageAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
+                                    }
+                                    panel (border : etchedBorder()) {
                                         button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
                                         button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
                                     }
                                     panel (border : etchedBorder()){
                                         button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
@@ -210,6 +214,7 @@ class SearchTabView {
                                             closureColumn(header : trans("SENDER"), preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type : Boolean, read : {it.browse})
                                             closureColumn(header : trans("FEED"), preferredWidth : 20, type: Boolean, read : {it.feed})
+                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type: Boolean, read : {it.messages})
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {it.chat})
                                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
                                             closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
@@ -221,19 +226,26 @@ class SearchTabView {
                                     }
                                 } 
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows : 1, cols : 3)
+                                    gridLayout(rows : 1, cols : 5)
+                                    panel (border : etchedBorder()) {
+                                        gridLayout()
+                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), showCommentAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), subscribeAction)
+                                    }
                                     panel (border : etchedBorder()) {
                                         gridBagLayout()
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), subscribeAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), chatAction)
-                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 2, gridy : 0), showCommentAction)
-                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 3, gridy : 0), viewCertificatesAction)
-                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 4, gridy : 0), viewCollectionsAction)
+                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), viewCertificatesAction)
+                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), viewCollectionsAction)
                                     }
                                     panel (border : etchedBorder()) {
                                         gridBagLayout()
                                         button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), browseAction)
                                         button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), browseCollectionsAction)
+                                    }
+                                    panel (border : etchedBorder()) {
+                                        gridBagLayout()
+                                        button(text : trans("MESSAGE_VERB"), enabled : bind {model.messageActionEnabled}, constraints : gbc(gridx : 0, gridy :0), messageAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), chatAction)
                                     }
                                     panel (border : etchedBorder()) {
                                         button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
@@ -362,12 +374,15 @@ class SearchTabView {
                 model.browseActionEnabled = false
                 model.subscribeActionEnabled = false
                 model.browseCollectionsActionEnabled = false
+                model.chatActionEnabled = false
+                model.messageActionEnabled = false
                 return
             } else {
                 Persona sender = model.senders[row]
                 model.browseActionEnabled = model.sendersBucket[sender].first().browse
                 model.browseCollectionsActionEnabled = model.sendersBucket[sender].first().browseCollections
                 model.chatActionEnabled = model.sendersBucket[sender].first().chat
+                model.messageActionEnabled = model.sendersBucket[sender].first().messages
                 model.subscribeActionEnabled = model.sendersBucket[sender].first().feed &&
                     model.core.feedManager.getFeed(sender) == null
                 model.trustButtonsEnabled = true
@@ -391,6 +406,7 @@ class SearchTabView {
                 model.browseActionEnabled = false
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
+                model.messageActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.viewCollectionsActionEnabled = false
                 return
@@ -427,6 +443,7 @@ class SearchTabView {
                 model.browseActionEnabled = false
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
+                model.messageActionEnabled = false
                 model.subscribeActionEnabled = false
                 model.viewCertificatesActionEnabled = false
                 model.viewCollectionsActionEnabled = false
@@ -438,6 +455,7 @@ class SearchTabView {
             model.browseActionEnabled = e.browse
             model.browseCollectionsActionEnabled = e.browseCollections
             model.chatActionEnabled = e.chat
+            model.messageActionEnabled = e.messages
             model.subscribeActionEnabled = e.feed && model.core.feedManager.getFeed(e.getSender()) == null 
             model.trustButtonsEnabled = true
             model.viewCommentActionEnabled = e.comment != null
