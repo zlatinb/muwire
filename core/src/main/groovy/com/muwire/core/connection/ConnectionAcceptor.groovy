@@ -327,6 +327,9 @@ class ConnectionAcceptor {
             boolean chat = false
             if (headers.containsKey('Chat'))
                 chat = Boolean.parseBoolean(headers['Chat'])
+            boolean messages = false
+            if (headers.containsKey('Messages'))
+                messages = Boolean.parseBoolean(headers['Messages'])
             boolean feed = false
             if (headers.containsKey('Feed'))
                 feed = Boolean.parseBoolean(headers['Feed'])
@@ -349,6 +352,7 @@ class ConnectionAcceptor {
                 def json = slurper.parse(payload)
                 results[i] = ResultsParser.parse(sender, resultsUUID, json)
                 results[i].chat = chat
+                results[i].messages = messages
                 results[i].feed = feed
             }
             eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
