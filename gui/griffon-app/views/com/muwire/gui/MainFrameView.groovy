@@ -12,7 +12,9 @@ import net.i2p.data.DataHelper
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.DropMode
 import javax.swing.JComboBox
+import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -33,6 +35,7 @@ import javax.swing.event.DocumentListener
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
@@ -61,6 +64,9 @@ import java.awt.Rectangle
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
+import java.awt.datatransfer.Transferable
+import java.awt.datatransfer.UnsupportedFlavorException
+import java.awt.event.InputEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
@@ -124,6 +130,8 @@ class MainFrameView {
             mainFrameY = settings.mainFrameY
             dividerLocation = (int)(mainFrameY * 0.75d)
         }
+        
+        def transferHandler = new MWTransferHandler()
             
         builder.with {
             application(size : [mainFrameX,mainFrameY], id: 'main-frame',
@@ -333,10 +341,11 @@ class MainFrameView {
                                 borderLayout()
                                 panel (id : "shared-files-panel", constraints : BorderLayout.CENTER){
                                     cardLayout()
-                                    panel (constraints : "shared files table") {
+                                    panel (constraints : "shared files table", transferHandler: transferHandler) {
                                         borderLayout()
                                         scrollPane(constraints : BorderLayout.CENTER) {
-                                            table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
+                                            JTable table = table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight, 
+                                                dragEnabled : true, transferHandler: transferHandler) {
                                                 tableModel(list : model.shared) {
                                                     closureColumn(header : trans("NAME"), preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                     closureColumn(header : trans("SIZE"), preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
@@ -357,6 +366,8 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
+                                            jtree.setDragEnabled(true)
+                                            jtree.setTransferHandler(transferHandler)
                                             tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
                                         }
                                     }
@@ -729,21 +740,6 @@ class MainFrameView {
     void mvcGroupInit(Map<String, String> args) {
 
         def mainFrame = builder.getVariable("main-frame")
-        mainFrame.setTransferHandler(new TransferHandler() {
-                    public boolean canImport(TransferHandler.TransferSupport support) {
-                        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                    }
-                    public boolean importData(TransferHandler.TransferSupport support) {
-                        def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
-                        files.each {
-                            File canonical = it.getCanonicalFile()
-                            model.core.fileManager.negativeTree.remove(canonical)
-                            model.core.eventBus.publish(new FileSharedEvent(file : canonical))
-                        }
-                        showUploadsWindow.call()
-                        true
-                    }
-                })
         
         mainFrame.addWindowListener(new WindowAdapter(){
                     public void windowClosing(WindowEvent e) {
@@ -1915,4 +1911,56 @@ class MainFrameView {
             currentNode = currentNode.getChildAt(0)
         }
     }    
+    
+    private class MWTransferHandler extends TransferHandler {
+        public boolean canImport(TransferHandler.TransferSupport support) {
+            return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+        }
+        public boolean importData(TransferHandler.TransferSupport support) {
+            def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
+            files.each {
+                File canonical = it.getCanonicalFile()
+                model.core.fileManager.negativeTree.remove(canonical)
+                model.core.eventBus.publish(new FileSharedEvent(file : canonical))
+            }
+            showUploadsWindow.call()
+            true
+        }
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof DefaultMutableTreeNode) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)c
+                return new SFTransferable(node.getUserObject())
+            }
+            new StringSelection("blah")
+        }
+    }
+    
+    private static class SFTransferable implements Transferable {
+        
+        private final SharedFile sf
+        SFTransferable(SharedFile sf) {
+            this.sf = sf
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            def rv = new DataFlavor[1]
+            rv[0] = DataFlavor.javaJVMLocalObjectMimeType
+            rv
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            flavor == DataFlavor.javaJVMLocalObjectMimeType
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            if (flavor != DataFlavor.javaJVMLocalObjectMimeType)
+                return null
+            return sf
+        }
+        
+    }
 }
