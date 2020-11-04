@@ -1253,6 +1253,7 @@ class MainFrameView {
             } else {
                 MWMessage selected = model.messageHeaders.getAt(selectedRow)
                 messageBody.setText(selected.body)
+                model.messageButtonsEnabled = true
             }
                 
         })

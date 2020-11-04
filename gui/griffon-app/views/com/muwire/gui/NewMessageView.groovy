@@ -96,6 +96,8 @@ class NewMessageView {
         attachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer())
         attachmentsTable.rowSorter.setSortsOnUpdates(true)
         
+        bodyArea.setText(model.replyBody)
+        
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 mvcGroup.destroy()
