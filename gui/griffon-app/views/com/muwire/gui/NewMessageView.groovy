@@ -18,6 +18,7 @@ import javax.swing.ListModel
 import javax.swing.SwingConstants
 import javax.swing.TransferHandler
 import javax.swing.TransferHandler.TransferSupport
+import javax.swing.border.TitledBorder
 
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
@@ -62,28 +63,27 @@ class NewMessageView {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
-                    label(text : trans("RECIPIENTS"))
-                    scrollPane {
+                panel(constraints : BorderLayout.NORTH, border : titledBorder(title : trans("RECIPIENTS_TITLE"), 
+                    border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
+                    borderLayout()
+                    scrollPane(constraints : BorderLayout.CENTER) {
                         widget(recipientsList)
                     }
                 }
-                panel(constraints : BorderLayout.SOUTH) {
+                panel(constraints : BorderLayout.SOUTH, border : titledBorder(title : trans("SUBJECT"),
+                    border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                     borderLayout()
-                    label(text : trans("SUBJECT"), constraints : BorderLayout.WEST)
                     subjectField = textField(constraints : BorderLayout.CENTER)
                 }
             }
             panel(constraints : BorderLayout.CENTER) {
                 splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 300) {
-                    scrollPane {
+                    scrollPane(border : titledBorder(title : trans("MESSAGE_NOUN"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                         bodyArea = textArea(editable : true, rows : 10, columns : 50)
                     }
-                    panel {
+                    panel (border : titledBorder(title : trans("ATTACHMENT_DROP_TABLE_TITLE"),
+                        border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                         borderLayout()
-                        panel(constraints : BorderLayout.NORTH) {
-                            label(text : trans("ATTACHMENT_DROP_TABLE_TITLE"))
-                        }
                         scrollPane(constraints : BorderLayout.CENTER) {
                             attachmentsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) { 
                                 tableModel(list : model.attachments) {
