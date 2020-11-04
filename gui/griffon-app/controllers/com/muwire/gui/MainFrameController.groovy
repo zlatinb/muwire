@@ -774,6 +774,7 @@ class MainFrameController {
         
         def params = [:]
         params.reply = msg
+        params.core = core
         params.recipients = new HashSet<>(Collections.singletonList(msg.sender))
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
