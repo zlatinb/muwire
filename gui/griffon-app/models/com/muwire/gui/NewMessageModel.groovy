@@ -4,6 +4,7 @@ import com.muwire.core.Core
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
 import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MWMessageAttachment
 
 import griffon.core.artifact.GriffonModel
 import griffon.transform.Observable
@@ -15,4 +16,5 @@ class NewMessageModel {
     Core core
     MWMessage reply
     Persona recipient
+    List<MWMessageAttachment> attachments = new ArrayList<>()
 }

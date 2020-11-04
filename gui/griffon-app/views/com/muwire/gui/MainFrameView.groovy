@@ -1928,38 +1928,44 @@ class MainFrameView {
         }
         @Override
         protected Transferable createTransferable(JComponent c) {
-            if (c instanceof DefaultMutableTreeNode) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode)c
-                return new SFTransferable(node.getUserObject())
+            if (c instanceof JTree || c instanceof JTable) {
+                return new SFTransferable(selectedSharedFiles())
             }
-            new StringSelection("blah")
+            return null
         }
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
+        
+        
     }
     
     private static class SFTransferable implements Transferable {
         
-        private final SharedFile sf
-        SFTransferable(SharedFile sf) {
-            this.sf = sf
+        private static final DataFlavor[] FLAVORS = new DataFlavor[1]
+        private final List<SharedFile> sfs
+        SFTransferable(List<SharedFile> sfs) {
+            this.sfs = sfs
+            FLAVORS[0] = CopyPasteSupport.LIST_FLAVOR
         }
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            def rv = new DataFlavor[1]
-            rv[0] = DataFlavor.javaJVMLocalObjectMimeType
-            rv
+            FLAVORS
         }
 
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
-            flavor == DataFlavor.javaJVMLocalObjectMimeType
+            flavor == CopyPasteSupport.LIST_FLAVOR
         }
 
         @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-            if (flavor != DataFlavor.javaJVMLocalObjectMimeType)
+            if (flavor != CopyPasteSupport.LIST_FLAVOR) {
                 return null
-            return sf
+            }
+            return sfs
         }
         
     }
