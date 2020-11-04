@@ -719,7 +719,7 @@ class MainFrameView {
                                             }
                                         }
                                         panel(constraints : BorderLayout.SOUTH) {
-                                            button(text : trans("COMPOSE"), enabled : bind{model.messageButtonsEnabled}, messageComposeAction)
+                                            button(text : trans("COMPOSE"), messageComposeAction)
                                             button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
                                             button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
                                         }

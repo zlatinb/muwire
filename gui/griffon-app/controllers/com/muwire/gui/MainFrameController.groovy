@@ -785,7 +785,10 @@ class MainFrameController {
     
     @ControllerAction
     void messageCompose() {
-        
+        def params = [:]
+        params.recipients = new HashSet<>()
+        params.core = core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
     
     @ControllerAction
