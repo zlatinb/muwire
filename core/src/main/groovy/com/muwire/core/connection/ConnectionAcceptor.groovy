@@ -685,6 +685,16 @@ class ConnectionAcceptor {
         byte [] ETTER = "ETTER\r\n".getBytes(StandardCharsets.US_ASCII)
         byte [] read = new byte[ETTER.length]
         
+        if (!settings.allowMessages) {
+            e.close()
+            return
+        }
+        
+        if (settings.allowOnlyTrustedMessages && trustService.getLevel(e.destination) != TrustLevel.TRUSTED) {
+            e.close()
+            return
+        }
+        
         DataInputStream dis = new DataInputStream(e.getInputStream())
         try {
             dis.readFully(read)
