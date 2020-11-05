@@ -1962,7 +1962,7 @@ class MainFrameView {
         int selectedRow = messageHeaderTable.getSelectedRow()
         if (selectedRow < 0)
             return -1
-        if (lastCollectionFilesSortEvent != null)
+        if (lastMessageHeaderTableSortEvent != null)
             selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
     }
