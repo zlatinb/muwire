@@ -718,7 +718,9 @@ class MainFrameController {
             JOptionPane.showMessageDialog(null, trans("CREATE_COLLECTION_MAX_FILES", Constants.COLLECTION_MAX_ITEMS, files.size()),
                 trans("CREATE_COLLECTION_MAX_FILES_TITLE"), JOptionPane.WARNING_MESSAGE)
             return
-        }        
+        }
+        if (files == null)
+            files = new ArrayList<>()        
         def params = [:]
         params['files'] = files
         params['spk'] = model.core.spk
