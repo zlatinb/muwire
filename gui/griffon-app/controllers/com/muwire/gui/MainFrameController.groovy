@@ -836,6 +836,19 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void messageComposeFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+        
+        def params = [:]
+        params.recipients = new HashSet<>(Collections.singletonList(p))
+        params.core = core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
     void messageFromTrusted() {
         int row = view.getSelectedTrustTablesRow("trusted-table")
         if (row < 0)
