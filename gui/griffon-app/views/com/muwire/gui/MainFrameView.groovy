@@ -1591,6 +1591,9 @@ class MainFrameView {
             JMenuItem browseItem = new JMenuItem(trans("BROWSE_HOST"))
             browseItem.addActionListener({mvcGroup.controller.browseFromUpload()})
             uploadsTableMenu.add(browseItem)
+            JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
+            browseCollectionsItem.addActionListener({mvcGroup.controller.browseCollectionsFromUpload()})
+            uploadsTableMenu.add(browseCollectionsItem)
         }
         
         if (uploader.isFeedEnabled() && mvcGroup.controller.core.feedManager.getFeed(uploader.getDownloaderPersona()) == null) {
@@ -1603,6 +1606,12 @@ class MainFrameView {
             JMenuItem chatItem = new JMenuItem(trans("CHAT"))
             chatItem.addActionListener({mvcGroup.controller.chatFromUpload()})
             uploadsTableMenu.add(chatItem)
+        }
+        
+        if (uploader.isMessageEnabled()) {
+            JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+            messageItem.addActionListener({mvcGroup.controller.messageCompose()})
+            uploadsTableMenu.add(messageItem)
         }
         
         showPopupMenu(uploadsTableMenu, e)

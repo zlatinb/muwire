@@ -382,6 +382,25 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void browseCollectionsFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+        
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params.fileName = p.getHumanReadableName()
+        params.eventBus = core.eventBus
+        params.host = p
+        params.uuid = uuid
+        params.everything = true
+        
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+        view.showSearchWindow.call()
+    }
+    
+    @ControllerAction
     void subscribeFromUpload() {
         Uploader u = view.selectedUploader()
         if (u == null)
