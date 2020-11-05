@@ -1328,7 +1328,7 @@ class MainFrameView {
                 model.messageButtonsEnabled = true
                 model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})
                 
-                if (selected.attachments.isEmpty())
+                if (selected.attachments.isEmpty() && selected.collections.isEmpty())
                     messageSplitPane.setDividerLocation(1.0d)
                 else {
                     messageSplitPane.setDividerLocation(0.7d)
