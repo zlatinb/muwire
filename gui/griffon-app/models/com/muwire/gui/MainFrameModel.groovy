@@ -155,7 +155,6 @@ class MainFrameModel {
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
     @Observable boolean unsubscribeButtonEnabled
-    @Observable boolean collectionButtonEnabled
     
     @Observable boolean viewCollectionCommentButtonEnabled
     @Observable boolean viewItemCommentButtonEnabled
@@ -847,7 +846,7 @@ class MainFrameModel {
             messageHeadersMap.get(e.folder).add(e.message)
             if (e.folder == folderIdx) {
                 messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(idx))
+                messageHeaders.addAll(messageHeadersMap.get(folderIdx))
                 view.messageHeaderTable.model.fireTableDataChanged()
             }
         }

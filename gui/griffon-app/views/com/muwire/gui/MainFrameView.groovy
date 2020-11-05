@@ -398,7 +398,7 @@ class MainFrameView {
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
                                     button(text : trans("SHARE"), actionPerformed : shareFiles)
-                                    button(text : trans("CREATE_COLLECTION"), enabled : bind {model.collectionButtonEnabled}, collectionAction)
+                                    button(text : trans("CREATE_COLLECTION"), collectionAction)
                                 }
                             }
                         }
@@ -927,10 +927,8 @@ class MainFrameView {
         selectionModel.addListSelectionListener({
             def selectedFiles = selectedSharedFiles()
             if (selectedFiles == null || selectedFiles.isEmpty()) {
-                model.collectionButtonEnabled = false
                 return
             }
-            model.collectionButtonEnabled = selectedFiles.size() > 1
             model.addCommentButtonEnabled = true
             model.publishButtonEnabled = true
             boolean unpublish = true
@@ -950,12 +948,9 @@ class MainFrameView {
             
             def selectedFiles = selectedSharedFiles()
             if (selectedFiles == null || selectedFiles.isEmpty()) {
-                model.collectionButtonEnabled = false
                 return
             }
                 
-            model.collectionButtonEnabled = selectedFiles.size() > 1
-            
             boolean unpublish = true
             selectedFiles.each {
                 unpublish &= it?.isPublished()
@@ -1635,12 +1630,10 @@ class MainFrameView {
         copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
         sharedFilesMenu.add(copyHashToClipboard)
         
-        if (selectedFiles != null && selectedFiles.size() > 1) {
-            JMenuItem createCollection = new JMenuItem(trans("CREATE_COLLECTION"))
-            createCollection.addActionListener({mvcGroup.controller.collection()})
-            sharedFilesMenu.add(createCollection)
-        }
-        
+        JMenuItem createCollection = new JMenuItem(trans("CREATE_COLLECTION"))
+        createCollection.addActionListener({mvcGroup.controller.collection()})
+        sharedFilesMenu.add(createCollection)
+
         JMenuItem unshareSelectedFiles = new JMenuItem(trans("UNSHARE_SELECTED_FILES"))
         unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
         sharedFilesMenu.add(unshareSelectedFiles)

@@ -18,6 +18,7 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonModel)
 class CollectionWizardModel {
+    Set<SharedFile> uniqueFiles
     List<SharedFile> files
     SigningPrivateKey spk
     Persona me
@@ -30,6 +31,10 @@ class CollectionWizardModel {
     DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode()
     TreeModel tree = new DefaultTreeModel(treeRoot)
     FileCollection collection
+    
+    void mvcGroupInit(Map<String,String> args) {
+        uniqueFiles = new HashSet<>(files)
+    }
     
     long totalSize() {
         long rv = 0

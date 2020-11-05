@@ -709,12 +709,9 @@ class MainFrameController {
     
     @ControllerAction
     void collection() {
-        
         def files = view.selectedSharedFiles()
-        if (files == null || files.size() < 2)
-            return
 
-        if (files.size() > Constants.COLLECTION_MAX_ITEMS) {
+        if (files != null && files.size() > Constants.COLLECTION_MAX_ITEMS) {
             JOptionPane.showMessageDialog(null, trans("CREATE_COLLECTION_MAX_FILES", Constants.COLLECTION_MAX_ITEMS, files.size()),
                 trans("CREATE_COLLECTION_MAX_FILES_TITLE"), JOptionPane.WARNING_MESSAGE)
             return
@@ -725,7 +722,7 @@ class MainFrameController {
         params['me'] = model.core.me
         params['eventBus'] = model.core.eventBus
         
-        mvcGroup.createMVCGroup("collection-wizard", params)
+        mvcGroup.createMVCGroup("collection-wizard", UUID.randomUUID().toString(), params)
     }
     
     @ControllerAction
