@@ -780,8 +780,25 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void messageReplyAll() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
+
+        Set<Persona> all = new HashSet<>()
+        all.add(msg.sender)
+        all.addAll(msg.recipients)
+
+        def params = [:]
+        params.reply = msg
+        params.core = core
+        params.recipients = all
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
     void messageDelete() {
-        
     }
     
     @ControllerAction

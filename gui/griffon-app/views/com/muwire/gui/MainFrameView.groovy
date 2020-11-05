@@ -729,6 +729,7 @@ class MainFrameView {
                                         panel(constraints : BorderLayout.SOUTH) {
                                             button(text : trans("COMPOSE"), messageComposeAction)
                                             button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
+                                            button(text : trans("REPLY_ALL"), enabled : bind{model.messageButtonsEnabled}, messageReplyAllAction)
                                             button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
                                         }
                                     }
@@ -1326,6 +1327,9 @@ class MainFrameView {
         JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
         replyMenuItem.addActionListener({controller.messageReply()})
         messagesMenu.add(replyMenuItem)
+        JMenuItem replyAllMenuItem = new JMenuItem(trans("REPLY_ALL"))
+        replyAllMenuItem.addActionListener({controller.messageReplyAll()})
+        messagesMenu.add(replyAllMenuItem)
         JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
         deleteMenuItem.addActionListener({controller.messageDelete()})
         messagesMenu.add(deleteMenuItem)
