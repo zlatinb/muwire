@@ -398,7 +398,6 @@ class MainFrameView {
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
                                     button(text : trans("SHARE"), actionPerformed : shareFiles)
-                                    button(text : trans("CREATE_COLLECTION"), collectionAction)
                                 }
                             }
                         }
@@ -470,10 +469,16 @@ class MainFrameView {
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
-                                button(text : trans("COLLECTION_SHOW_HITS"), enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
-                                button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
-                                button(text : trans("DELETE"), enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
+                                gridLayout(rows : 1, cols : 2)
+                                panel {
+                                    button(text : trans("CREATE_COLLECTION"), collectionAction)
+                                    button(text : trans("DELETE"), enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
+                                }
+                                panel {
+                                    button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
+                                    button(text : trans("COLLECTION_SHOW_HITS"), enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
+                                    button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
+                                }
                             }
                         }
                         panel {
