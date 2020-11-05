@@ -195,4 +195,16 @@ class SearchTabController {
         params['host'] = event.sender
         mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
+    
+    @ControllerAction
+    void message() {
+        Persona recipient = view.selectedSender()
+        if (recipient == null)
+            return
+        
+        def params = [:]
+        params.recipient = recipient
+        params.core = model.core
+        mvcGroup.parentGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
 }

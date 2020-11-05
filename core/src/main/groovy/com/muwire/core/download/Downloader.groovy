@@ -408,6 +408,7 @@ public class Downloader {
                 boolean browse = downloadManager.muSettings.browseFiles
                 boolean feed = downloadManager.muSettings.fileFeed && downloadManager.muSettings.advertiseFeed
                 boolean chat = chatServer.isRunning() && downloadManager.muSettings.advertiseChat
+                boolean message = downloadManager.muSettings.allowMessages
                 
                 Set<Integer> queuedPieces = new HashSet<>()
                 boolean requestPerformed
@@ -418,7 +419,7 @@ public class Downloader {
                             available.removeAll(queuedPieces)
                             def currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                                     endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
-                                    browse, feed, chat)
+                                    browse, feed, chat, message)
                             if (currentSession.sendRequest()) {
                                 queuedPieces.add(currentSession.piece)
                                 sessionQueue.addLast(currentSession)
@@ -432,7 +433,7 @@ public class Downloader {
                     available.removeAll(queuedPieces)
                     def nextSession = new DownloadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
                                 endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
-                                browse, feed, chat)
+                                browse, feed, chat, message)
                     if (nextSession.sendRequest()) {
                         sessionQueue.addLast(nextSession)
                         queuedPieces.add(nextSession.piece)

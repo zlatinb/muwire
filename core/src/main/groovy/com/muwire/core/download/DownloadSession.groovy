@@ -37,7 +37,7 @@ class DownloadSession {
     private final long fileLength
     private final Set<Integer> available
     private final MessageDigest digest
-    private final boolean browse, feed, chat
+    private final boolean browse, feed, chat, message
 
     private final AtomicLong dataSinceLastRead
 
@@ -49,7 +49,7 @@ class DownloadSession {
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
-        boolean browse, boolean feed, boolean chat) {
+        boolean browse, boolean feed, boolean chat, boolean message) {
         this.eventBus = eventBus
         this.meB64 = meB64
         this.pieces = pieces
@@ -63,6 +63,7 @@ class DownloadSession {
         this.browse = browse
         this.feed = feed
         this.chat = chat
+        this.message = message
         try {
             digest = MessageDigest.getInstance("SHA-256")
         } catch (NoSuchAlgorithmException impossible) {
@@ -111,6 +112,8 @@ class DownloadSession {
                 os.write("Feed: true\r\n".getBytes(StandardCharsets.US_ASCII))
             if (chat)
                 os.write("Chat: true\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (message)
+                os.write("Message: true\r\n".getBytes(StandardCharsets.US_ASCII))
             String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
             os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             headersSent = true

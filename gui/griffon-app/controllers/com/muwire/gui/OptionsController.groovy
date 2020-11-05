@@ -181,6 +181,8 @@ class OptionsController {
         model.trustListInterval = trustListInterval
         settings.trustListInterval = Integer.parseInt(trustListInterval)
         
+        // chat settings
+        
         boolean startChatServer = view.startChatServerCheckbox.model.isSelected()
         model.startChatServer = startChatServer
         settings.startChatServer = startChatServer
@@ -199,7 +201,22 @@ class OptionsController {
         
         if (model.chatWelcomeFile != null)
             settings.chatWelcomeFile = new File(model.chatWelcomeFile)
-
+            
+        // messaging settings
+        
+        boolean allowMessages = view.allowMessagesCheckbox.model.isSelected()
+        model.allowMessages = allowMessages
+        settings.allowMessages = allowMessages
+        
+        boolean allowOnlyTrustedMessages = view.allowOnlyTrustedMessagesCheckbox.model.isSelected()
+        model.allowOnlyTrustedMessages = allowOnlyTrustedMessages
+        settings.allowOnlyTrustedMessages = allowOnlyTrustedMessages
+        
+        int messageSendInterval = Integer.parseInt(view.messageSendIntervalField.text)
+        model.messageSendInterval = messageSendInterval
+        settings.messageSendInterval = messageSendInterval
+        
+        
         core.saveMuSettings()
 
         // UI Setttings

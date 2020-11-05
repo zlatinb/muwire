@@ -95,6 +95,7 @@ class ResultsSender {
                     comment : comment,
                     certificates : certificates,
                     chat : chatServer.isRunning() && settings.advertiseChat,
+                    messages : settings.allowMessages,
                     feed : settings.fileFeed && settings.advertiseFeed,
                     collections : collections
                     )
@@ -151,6 +152,8 @@ class ResultsSender {
                         os.write("Chat: $chat\r\n".getBytes(StandardCharsets.US_ASCII))
                         boolean feed = settings.fileFeed && settings.advertiseFeed
                         os.write("Feed: $feed\r\n".getBytes(StandardCharsets.US_ASCII))
+                        boolean messages = settings.allowMessages
+                        os.write("Messages: $messages\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 

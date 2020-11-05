@@ -93,6 +93,11 @@ class HashListUploader extends Uploader {
     }
 
     @Override
+    public boolean isMessageEnabled() {
+        return false;
+    }
+    
+    @Override
     public Persona getDownloaderPersona() {
         request.downloader
     }

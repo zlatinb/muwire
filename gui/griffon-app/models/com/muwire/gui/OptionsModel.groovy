@@ -77,6 +77,11 @@ class OptionsModel {
     @Observable int maxChatLines
     @Observable String chatWelcomeFile
     
+    // messaging options
+    @Observable boolean allowMessages
+    @Observable boolean allowOnlyTrustedMessages
+    @Observable int messageSendInterval
+    
     boolean disableUpdates
 
     void mvcGroupInit(Map<String, String> args) {
@@ -143,6 +148,10 @@ class OptionsModel {
         advertiseChat = settings.advertiseChat
         maxChatLines = uiSettings.maxChatLines
         chatWelcomeFile = settings.chatWelcomeFile?.getAbsolutePath()
+        
+        allowMessages = settings.allowMessages
+        allowOnlyTrustedMessages = settings.allowOnlyTrustedMessages
+        messageSendInterval = settings.messageSendInterval
         
         disableUpdates = settings.disableUpdates
     }

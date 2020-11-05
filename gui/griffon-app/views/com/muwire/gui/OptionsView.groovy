@@ -93,6 +93,10 @@ class OptionsView {
     def advertiseChatCheckbox
     def maxChatLinesField
     
+    def allowMessagesCheckbox
+    def allowOnlyTrustedMessagesCheckbox
+    def messageSendIntervalField
+    
     def buttonsPanel
 
     def mainFrame
@@ -369,7 +373,17 @@ class OptionsView {
                     button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
                 }
             }
-            panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
+            panel (border : titledBorder(title : trans("OPTIONS_MESSAGING_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
+                constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                gridBagLayout()
+                label(text : trans("OPTIONS_ALLOW_MESSAGES"), constraints : gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                allowMessagesCheckbox = checkBox(selected : bind{model.allowMessages}, constraints : gbc(gridx:2, gridy:0, anchor:GridBagConstraints.LINE_END))
+                label(text : trans("OPTIONS_ALLOW_TRUSTED_MESSAGES"), constraints : gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                allowOnlyTrustedMessagesCheckbox = checkBox(selected : bind{model.allowOnlyTrustedMessages}, constraints : gbc(gridx:2, gridy:1, anchor:GridBagConstraints.LINE_END))
+                label(text : trans("OPTIONS_MESSAGE_SEND_INTERVAL"), constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                messageSendIntervalField = textField(text : bind{model.messageSendInterval}, constraints : gbc(gridx : 2, gridy : 2, anchor : GridBagConstraints.LINE_END))
+            }
+            panel(constraints : gbc(gridx: 0, gridy : 2, weighty: 100))
         }
 
 
@@ -391,7 +405,7 @@ class OptionsView {
         }
         tabbedPane.addTab(trans("FEED"), feed)
         tabbedPane.addTab(trans("TRUST_NOUN"), trust)
-        tabbedPane.addTab(trans("CHAT"), chat)
+        tabbedPane.addTab(trans("COMMUNICATIONS"), chat)
 
         JPanel panel = new JPanel()
         panel.setLayout(new BorderLayout())

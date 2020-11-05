@@ -59,10 +59,11 @@ class Request {
         boolean browse = headers.containsKey("Browse") && Boolean.parseBoolean(headers['Browse'])
         boolean feed = headers.containsKey("Feed") && Boolean.parseBoolean(headers['Feed'])
         boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
+        boolean message = headers.containsKey("Message") && Boolean.parseBoolean(headers['Message'])
         
         new ContentRequest( infoHash : infoHash, range : new Range(start, end),
             headers : headers, downloader : downloader, have : have,
-            browse : browse, feed : feed, chat : chat)
+            browse : browse, feed : feed, chat : chat, message : message)
     }
 
     static Request parseHashListRequest(InfoHash infoHash, InputStream is) throws IOException {

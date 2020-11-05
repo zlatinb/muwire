@@ -12,14 +12,18 @@ import net.i2p.data.DataHelper
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.DropMode
 import javax.swing.JComboBox
+import javax.swing.JComponent
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JList
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTable
+import javax.swing.JTextArea
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
@@ -31,6 +35,7 @@ import javax.swing.event.DocumentListener
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
@@ -38,6 +43,7 @@ import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.download.Downloader
@@ -45,6 +51,8 @@ import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
+import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.upload.Uploader
 
@@ -58,6 +66,9 @@ import java.awt.Rectangle
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
+import java.awt.datatransfer.Transferable
+import java.awt.datatransfer.UnsupportedFlavorException
+import java.awt.event.InputEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
@@ -97,6 +108,14 @@ class MainFrameView {
     JTable collectionFilesTable
     def lastCollectionFilesSortEvent
     
+    JList messageFolderList
+    JTable messageHeaderTable
+    def lastMessageHeaderTableSortEvent
+    JTextArea messageBody
+    JTable messageAttachmentsTable
+    def lastMessageAttachmentsTableSortEvent
+    JSplitPane messageSplitPane
+    
     void initUI() {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
         settings = application.context.get("ui-settings")
@@ -116,6 +135,9 @@ class MainFrameView {
             mainFrameY = settings.mainFrameY
             dividerLocation = (int)(mainFrameY * 0.75d)
         }
+        
+        def transferHandler = new MWTransferHandler()
+        def collectionsTransferHandler = new FileCollectionTransferHandler()
             
         builder.with {
             application(size : [mainFrameX,mainFrameY], id: 'main-frame',
@@ -190,8 +212,9 @@ class MainFrameView {
                         if (settings.showMonitor)
                             button(text: trans("MONITOR"), enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
                         button(text: trans("FEEDS"), enabled: bind {model.feedsPaneButtonEnabled}, actionPerformed : showFeedsWindow)
-                        button(text: trans("CONTACTS"), enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
+                        button(text : trans("MESSAGES"), enabled: bind {model.messagesPaneButtonEnabled},actionPerformed : showMessagesWindow)
                         button(text: trans("CHAT"), enabled : bind{model.chatPaneButtonEnabled}, actionPerformed : showChatWindow)
+                        button(text: trans("CONTACTS"), enabled:bind{model.trustPaneButtonEnabled},actionPerformed : showTrustWindow)
                     }
                     panel(id: "top-panel", constraints: BorderLayout.CENTER) {
                         cardLayout()
@@ -324,10 +347,11 @@ class MainFrameView {
                                 borderLayout()
                                 panel (id : "shared-files-panel", constraints : BorderLayout.CENTER){
                                     cardLayout()
-                                    panel (constraints : "shared files table") {
+                                    panel (constraints : "shared files table", transferHandler: transferHandler) {
                                         borderLayout()
                                         scrollPane(constraints : BorderLayout.CENTER) {
-                                            table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
+                                            JTable table = table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight, 
+                                                dragEnabled : true, transferHandler: transferHandler) {
                                                 tableModel(list : model.shared) {
                                                     closureColumn(header : trans("NAME"), preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
                                                     closureColumn(header : trans("SIZE"), preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
@@ -348,6 +372,8 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
+                                            jtree.setDragEnabled(true)
+                                            jtree.setTransferHandler(transferHandler)
                                             tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
                                         }
                                     }
@@ -430,7 +456,8 @@ class MainFrameView {
                                 label(text : trans("COLLECTION_TOOL_HEADER"))
                             }
                             scrollPane(constraints : BorderLayout.CENTER) {
-                                table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight,
+                                    dragEnabled : true, transferHandler : collectionsTransferHandler) {
                                     tableModel(list : model.localCollections) {
                                         closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
                                         closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
@@ -578,7 +605,8 @@ class MainFrameView {
                             panel (border : etchedBorder()){
                                 borderLayout()
                                 scrollPane(constraints : BorderLayout.CENTER) {
-                                    table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight, 
+                                        dragEnabled : true, transferHandler : new PersonaTransferHandler()) {
                                         tableModel(list : model.trusted) {
                                             closureColumn(header : trans("TRUSTED_USERS"), type : String, read : { it.persona.getHumanReadableName() } )
                                             closureColumn(header : trans("REASON"), type : String, read : {it.reason})
@@ -586,12 +614,23 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    gridBagLayout()
-                                    button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
-                                    button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
-                                    button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
-                                    button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
-                                    button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
+                                    gridLayout(rows : 1, cols : 3)
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("ADD_CONTACT"), constraints : gbc(gridx : 0, gridy : 0), addContactAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), subscribeAction)
+                                    }
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                        button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy:0), markDistrustedAction)
+                                    }
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:0, gridy:0), browseFromTrustedAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:1, gridy:0), chatFromTrustedAction)
+                                        button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageFromTrustedButtonEnabled}, constraints : gbc(gridx:2, gridy:0), messageFromTrustedAction)
+                                    }
                                 }
                             }
                             panel (border : etchedBorder()){
@@ -631,6 +670,80 @@ class MainFrameView {
                                 button(text : trans("REVIEW"), enabled : bind {model.reviewButtonEnabled}, reviewAction)
                                 button(text : trans("UPDATE"), enabled : bind {model.updateButtonEnabled}, updateAction)
                                 button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
+                            }
+                        }
+                    }
+                    panel(constraints : "messages window") {
+                        gridLayout(rows : 1, cols : 1) 
+                        splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100) {
+                            panel {
+                                list(id : "message-folders-list", items:model.messageFolders)
+                            }
+                            panel {
+                                gridLayout(rows :1, cols : 1)
+                                splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 500) {
+                                    scrollPane {
+                                        table(id : "message-header-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                            tableModel(list : model.messageHeaders) {
+                                                closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.sender.getHumanReadableName()})
+                                                closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.subject})
+                                                closureColumn(header : trans("RECIPIENTS"), preferredWidth: 20, type:Integer, read : {it.recipients.size()})
+                                                closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.timestamp})
+                                            }
+                                        }
+                                    }
+                                    panel {
+                                        borderLayout()
+                                        panel(constraints : BorderLayout.CENTER) {
+                                            borderLayout()
+                                            panel (constraints : BorderLayout.NORTH) {
+                                                borderLayout()
+                                                panel(constraints : BorderLayout.WEST) {
+                                                    label(text : trans("RECIPIENTS") + ":")
+                                                    label(text : bind{model.messageRecipientList})
+                                                }
+                                            }
+                                            splitPane(id : "message-attachments-split-pane", orientation : JSplitPane.VERTICAL_SPLIT,
+                                            continuousLayout : true, dividerLocation : 500, constraints : BorderLayout.CENTER) {
+                                                scrollPane {
+                                                    textArea(id : "message-body-textarea", editable : false)
+                                                }
+                                                panel {
+                                                    borderLayout()
+                                                    scrollPane(constraints : BorderLayout.CENTER) {
+                                                        table(id : "message-attachments-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                                            tableModel(list : model.messageAttachments) {
+                                                                closureColumn(header : trans("NAME"), preferredWidth : 300, type : String, read : {it.name})
+                                                                closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read :{
+                                                                    if (it instanceof MWMessageAttachment)
+                                                                        return it.length
+                                                                    else
+                                                                        return it.totalSize()
+                                                                })
+                                                                closureColumn(header : trans("COLLECTION"), preferredWidth : 20, type: Boolean, read : {
+                                                                    it instanceof FileCollection
+                                                                })
+                                                            }
+                                                        }
+                                                    }
+                                                    panel(constraints: BorderLayout.EAST) {
+                                                        gridBagLayout()
+                                                        button(text : trans("DOWNLOAD"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
+                                                            constraints : gbc(gridx:0, gridy:0), downloadAttachmentAction)
+                                                        button(text : trans("DOWNLOAD_ALL"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
+                                                            constraints : gbc(gridx: 0, gridy: 1), downloadAllAttachmentsAction)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        panel(constraints : BorderLayout.SOUTH) {
+                                            button(text : trans("COMPOSE"), messageComposeAction)
+                                            button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
+                                            button(text : trans("REPLY_ALL"), enabled : bind{model.messageButtonsEnabled}, messageReplyAllAction)
+                                            button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -677,26 +790,17 @@ class MainFrameView {
         collectionsTable = builder.getVariable("collections-table")
         collectionFilesTable = builder.getVariable("items-table")
         
+        messageFolderList = builder.getVariable("message-folders-list")
+        messageHeaderTable = builder.getVariable("message-header-table")
+        messageBody = builder.getVariable("message-body-textarea")
+        messageAttachmentsTable = builder.getVariable("message-attachments-table")
+        messageSplitPane = builder.getVariable("message-attachments-split-pane")
+        
     }
 
     void mvcGroupInit(Map<String, String> args) {
 
         def mainFrame = builder.getVariable("main-frame")
-        mainFrame.setTransferHandler(new TransferHandler() {
-                    public boolean canImport(TransferHandler.TransferSupport support) {
-                        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                    }
-                    public boolean importData(TransferHandler.TransferSupport support) {
-                        def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
-                        files.each {
-                            File canonical = it.getCanonicalFile()
-                            model.core.fileManager.negativeTree.remove(canonical)
-                            model.core.eventBus.publish(new FileSharedEvent(file : canonical))
-                        }
-                        showUploadsWindow.call()
-                        true
-                    }
-                })
         
         mainFrame.addWindowListener(new WindowAdapter(){
                     public void windowClosing(WindowEvent e) {
@@ -1124,12 +1228,14 @@ class MainFrameView {
                 model.markNeutralFromTrustedButtonEnabled = false
                 model.chatFromTrustedButtonEnabled = false
                 model.browseFromTrustedButtonEnabled = false
+                model.messageFromTrustedButtonEnabled = false
             } else {
                 model.subscribeButtonEnabled = true
                 model.markDistrustedButtonEnabled = true
                 model.markNeutralFromTrustedButtonEnabled = true
                 model.chatFromTrustedButtonEnabled = true
                 model.browseFromTrustedButtonEnabled = true
+                model.messageFromTrustedButtonEnabled = true
             }
         })
         
@@ -1149,6 +1255,9 @@ class MainFrameView {
         JMenuItem chatItem = new JMenuItem(trans("CHAT"))
         chatItem.addActionListener({mvcGroup.controller.chatFromTrusted()})
         trustMenu.add(chatItem)
+        JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+        messageItem.addActionListener({mvcGroup.controller.messageFromTrusted()})
+        trustMenu.add(messageItem)
         
         trustedTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -1175,6 +1284,88 @@ class MainFrameView {
             } else {
                 model.markTrustedButtonEnabled = true
                 model.markNeutralFromDistrustedButtonEnabled = true
+            }
+        })
+        
+        
+        // messages tab
+        
+        messageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        messageFolderList.addListSelectionListener({
+            int index = messageFolderList.getSelectedIndex()
+            if (index < 0)
+                index = 0
+            model.folderIdx = index
+            model.messageHeaders.clear()
+            model.messageHeaders.addAll(model.messageHeadersMap.get(index))
+            messageHeaderTable.model.fireTableDataChanged()
+        })
+        
+        messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
+        messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
+        messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
+        messageHeaderTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = messageHeaderTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = selectedMessageHeader()
+            if (selectedRow < 0) {
+                model.messageButtonsEnabled = false
+                model.messageAttachmentsButtonEnabled = false
+                messageBody.setText("")
+                model.messageRecipientList = ""
+            } else {
+                MWMessage selected = model.messageHeaders.getAt(selectedRow)
+                messageBody.setText(selected.body)
+                model.messageButtonsEnabled = true
+                model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})
+                
+                if (selected.attachments.isEmpty())
+                    messageSplitPane.setDividerLocation(1.0d)
+                else {
+                    messageSplitPane.setDividerLocation(0.7d)
+                    model.messageAttachments.clear()
+                    model.messageAttachments.addAll(selected.attachments)
+                    model.messageAttachments.addAll(selected.collections)
+                    messageAttachmentsTable.model.fireTableDataChanged()
+                }
+            }
+                
+        })
+        
+        JPopupMenu messagesMenu = new JPopupMenu()
+        JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
+        replyMenuItem.addActionListener({controller.messageReply()})
+        messagesMenu.add(replyMenuItem)
+        JMenuItem replyAllMenuItem = new JMenuItem(trans("REPLY_ALL"))
+        replyAllMenuItem.addActionListener({controller.messageReplyAll()})
+        messagesMenu.add(replyAllMenuItem)
+        JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
+        deleteMenuItem.addActionListener({controller.messageDelete()})
+        messagesMenu.add(deleteMenuItem)
+        messageHeaderTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(messagesMenu, e)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(messagesMenu, e)
+            }
+        })
+        
+        
+        messageAttachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer()) 
+        messageAttachmentsTable.rowSorter.addRowSorterListener({evt -> lastMessageAttachmentsTableSortEvent = evt})
+        messageAttachmentsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = messageAttachmentsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener({
+            List selected = selectedMessageAttachments()
+            if (selected.isEmpty()) {
+                model.messageAttachmentsButtonEnabled = false
+            } else {
+                model.messageAttachmentsButtonEnabled = true
             }
         })
         
@@ -1410,6 +1601,9 @@ class MainFrameView {
             JMenuItem browseItem = new JMenuItem(trans("BROWSE_HOST"))
             browseItem.addActionListener({mvcGroup.controller.browseFromUpload()})
             uploadsTableMenu.add(browseItem)
+            JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
+            browseCollectionsItem.addActionListener({mvcGroup.controller.browseCollectionsFromUpload()})
+            uploadsTableMenu.add(browseCollectionsItem)
         }
         
         if (uploader.isFeedEnabled() && mvcGroup.controller.core.feedManager.getFeed(uploader.getDownloaderPersona()) == null) {
@@ -1422,6 +1616,12 @@ class MainFrameView {
             JMenuItem chatItem = new JMenuItem(trans("CHAT"))
             chatItem.addActionListener({mvcGroup.controller.chatFromUpload()})
             uploadsTableMenu.add(chatItem)
+        }
+        
+        if (uploader.isMessageEnabled()) {
+            JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+            messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload()})
+            uploadsTableMenu.add(messageItem)
         }
         
         showPopupMenu(uploadsTableMenu, e)
@@ -1483,6 +1683,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1497,6 +1698,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1511,6 +1713,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1525,6 +1728,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1539,6 +1743,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = false
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1553,6 +1758,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = false
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1567,6 +1773,22 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = false
+        model.messagesPaneButtonEnabled = true
+        model.chatPaneButtonEnabled = true
+        chatNotificator.mainWindowDeactivated()
+    }
+    
+    def showMessagesWindow = {
+        def cardsPanel = builder.getVariable("cards-panel")
+        cardsPanel.getLayout().show(cardsPanel, "messages window")
+        model.searchesPaneButtonEnabled = true
+        model.downloadsPaneButtonEnabled = true
+        model.uploadsPaneButtonEnabled = true
+        model.collectionsPaneButtonEnabled = true
+        model.monitorPaneButtonEnabled = true
+        model.feedsPaneButtonEnabled = true
+        model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
     }
@@ -1581,6 +1803,7 @@ class MainFrameView {
         model.monitorPaneButtonEnabled = true
         model.feedsPaneButtonEnabled = true
         model.trustPaneButtonEnabled = true
+        model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()
     }
@@ -1737,6 +1960,30 @@ class MainFrameView {
         showPopupMenu(menu, e)
     }
     
+    int selectedMessageHeader() {
+        int selectedRow = messageHeaderTable.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastCollectionFilesSortEvent != null)
+            selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
+    List<?> selectedMessageAttachments() {
+        int[] rows = messageAttachmentsTable.getSelectedRows()
+        if (rows.length == 0)
+            return Collections.emptyList()
+        if (lastMessageAttachmentsTableSortEvent != null) {
+            for (int i = 0; i < rows.length; i++) {
+                rows[i] = messageAttachmentsTable.rowSorter.convertRowIndexToModel(rows[i])
+            }
+        }
+        List rv = new ArrayList()
+        for (int i = 0; i < rows.length; i++)
+            rv.add(model.messageAttachments.get(rows[i]))
+        rv
+    }
+    
     void closeApplication() {
         Core core = application.getContext().get("core")
         
@@ -1799,4 +2046,92 @@ class MainFrameView {
             currentNode = currentNode.getChildAt(0)
         }
     }    
+    
+    private class MWTransferHandler extends TransferHandler {
+        public boolean canImport(TransferHandler.TransferSupport support) {
+            return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+        }
+        public boolean importData(TransferHandler.TransferSupport support) {
+            def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
+            files.each {
+                File canonical = it.getCanonicalFile()
+                model.core.fileManager.negativeTree.remove(canonical)
+                model.core.eventBus.publish(new FileSharedEvent(file : canonical))
+            }
+            showUploadsWindow.call()
+            true
+        }
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof JTree || c instanceof JTable) {
+                return new MWTransferable(selectedSharedFiles())
+            }
+            return null
+        }
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
+        
+        
+    }
+    
+    private static class MWTransferable<T> implements Transferable {
+        private final List<T> data
+        MWTransferable(List<T> data) {
+            this.data = data
+        }
+        
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            CopyPasteSupport.FLAVORS
+        }
+        
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            flavor == CopyPasteSupport.LIST_FLAVOR
+        }
+        
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            if (flavor != CopyPasteSupport.LIST_FLAVOR) {
+                return null
+            }
+            return data
+        }
+    }
+    
+    private class FileCollectionTransferHandler extends TransferHandler {
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof JTable) {
+                int row = selectedCollectionRow()
+                if (row < 0)
+                    return null
+                return new MWTransferable(Collections.singletonList(model.localCollections.get(row)))
+            }
+            return null
+        }
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
+    }
+    
+    private class PersonaTransferHandler extends TransferHandler {
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c instanceof JTable) {
+                int row = getSelectedTrustTablesRow("trusted-table")
+                if (row < 0)
+                    return null
+                return new MWTransferable(Collections.singletonList(model.trusted.get(row).persona))
+            }
+            return null
+        }
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
+    }
 }

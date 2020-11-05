@@ -42,16 +42,23 @@ class MuWireSettings {
     int defaultFeedItemsToKeep
     boolean defaultFeedSequential
     
+    int messageSendInterval
+    
     int peerConnections
     int leafConnections
     int connectionHistory
     
     int responderCacheSize
     
+    
     boolean startChatServer
     int maxChatConnections
     boolean advertiseChat
     File chatWelcomeFile
+    
+    boolean allowMessages
+    boolean allowOnlyTrustedMessages
+    
     Set<String> watchedDirectories
     float downloadSequentialRatio
     int hostClearInterval, hostHopelessInterval, hostRejectInterval, hostHopelessPurgeInterval
@@ -118,6 +125,9 @@ class MuWireSettings {
         defaultFeedSequential = Boolean.valueOf(props.getProperty("defaultFeedSequential", "false"))
         defaultFeedUpdateInterval = Long.valueOf(props.getProperty("defaultFeedUpdateInterval", "3600000"))
         
+        // messenger settings
+        messageSendInterval = Integer.valueOf(props.getProperty("messageSendInterval","30"))
+        
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))
         peerConnections = Integer.valueOf(props.getProperty("peerConnections","128"))
@@ -131,12 +141,18 @@ class MuWireSettings {
         speedSmoothSeconds = Integer.valueOf(props.getProperty("speedSmoothSeconds","10"))
         totalUploadSlots = Integer.valueOf(props.getProperty("totalUploadSlots","-1"))
         uploadSlotsPerUser = Integer.valueOf(props.getProperty("uploadSlotsPerUser","-1"))
+        
+        // chat settings
         startChatServer = Boolean.valueOf(props.getProperty("startChatServer","false"))
-        maxChatConnections = Integer.valueOf(props.get("maxChatConnections", "-1"))
+        maxChatConnections = Integer.valueOf(props.getProperty("maxChatConnections", "-1"))
         advertiseChat = Boolean.valueOf(props.getProperty("advertiseChat","true"))
         String chatWelcomeProp = props.getProperty("chatWelcomeFile")
         if (chatWelcomeProp != null)
             chatWelcomeFile = new File(chatWelcomeProp)
+            
+        // messaging settings
+        allowMessages = Boolean.valueOf(props.getProperty("allowMessages","true"))
+        allowOnlyTrustedMessages = Boolean.valueOf(props.getProperty("allowOnlyTrustedMessages","false"))
         
         watchedDirectories = DataUtil.readEncodedSet(props, "watchedDirectories")
         watchedKeywords = DataUtil.readEncodedSet(props, "watchedKeywords")
@@ -200,6 +216,9 @@ class MuWireSettings {
         props.setProperty("defaultFeedSequential", String.valueOf(defaultFeedSequential))
         props.setProperty("defaultFeedUpdateInterval", String.valueOf(defaultFeedUpdateInterval))
         
+        // messenger settings
+        props.setProperty("messageSendInterval", String.valueOf(messageSendInterval))
+        
         // ultrapeer connection settings
         props.setProperty("peerConnections", String.valueOf(peerConnections))
         props.setProperty("leafConnections", String.valueOf(leafConnections))
@@ -213,11 +232,18 @@ class MuWireSettings {
         props.setProperty("speedSmoothSeconds", String.valueOf(speedSmoothSeconds))
         props.setProperty("totalUploadSlots", String.valueOf(totalUploadSlots))
         props.setProperty("uploadSlotsPerUser", String.valueOf(uploadSlotsPerUser))
+        
+        // chat settings
         props.setProperty("startChatServer", String.valueOf(startChatServer))
         props.setProperty("maxChatConnectios", String.valueOf(maxChatConnections))
         props.setProperty("advertiseChat", String.valueOf(advertiseChat))
         if (chatWelcomeFile != null)
             props.setProperty("chatWelcomeFile", chatWelcomeFile.getAbsolutePath())
+            
+        // messaging settings
+        props.setProperty("allowMessages", String.valueOf(allowMessages))
+        props.setProperty("allowOnlyTrustedMessages", String.valueOf(allowOnlyTrustedMessages))
+        
 
         DataUtil.writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         DataUtil.writeEncodedSet(watchedKeywords, "watchedKeywords", props)

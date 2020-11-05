@@ -28,6 +28,7 @@ import com.muwire.core.SharedFile
 import com.muwire.core.SplitPattern
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionDeletedEvent
+import com.muwire.core.collections.UIDownloadCollectionEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
@@ -42,11 +43,16 @@ import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
+import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MWMessageAttachment
+import com.muwire.core.messenger.UIDownloadAttachmentEvent
+import com.muwire.core.messenger.UIMessageDeleteEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustService.TrustEntry
 import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.upload.HashListUploader
 import com.muwire.core.upload.Uploader
@@ -237,6 +243,13 @@ class MainFrameController {
          model.clearButtonEnabled = false
 
     }
+    
+    @ControllerAction
+    void addContact() {
+        def params = [:]
+        params.core = core
+        mvcGroup.createMVCGroup("add-contact", params)
+    }
 
     private void markTrust(String tableName, TrustLevel level, def list) {
         int row = view.getSelectedTrustTablesRow(tableName)
@@ -372,6 +385,25 @@ class MainFrameController {
         params['host'] = p
         params['core'] = model.core
         mvcGroup.createMVCGroup("browse",groupId,params)
+        view.showSearchWindow.call()
+    }
+    
+    @ControllerAction
+    void browseCollectionsFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+        
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params.fileName = p.getHumanReadableName()
+        params.eventBus = core.eventBus
+        params.host = p
+        params.uuid = uuid
+        params.everything = true
+        
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
         view.showSearchWindow.call()
     }
     
@@ -758,6 +790,120 @@ class MainFrameController {
         def params = [:]
         params['collection'] = collection
         mvcGroup.createMVCGroup("collections-tool", params)
+    }
+    
+    @ControllerAction
+    void messageReply() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
+        
+        def params = [:]
+        params.reply = msg
+        params.core = core
+        params.recipients = new HashSet<>(Collections.singletonList(msg.sender))
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
+    void messageReplyAll() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
+
+        Set<Persona> all = new HashSet<>()
+        all.add(msg.sender)
+        all.addAll(msg.recipients)
+
+        def params = [:]
+        params.reply = msg
+        params.core = core
+        params.recipients = all
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
+    void messageDelete() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
+        model.deleteMessage(msg)
+        core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.folderIdx))
+    }
+    
+    @ControllerAction
+    void messageCompose() {
+        def params = [:]
+        params.recipients = new HashSet<>()
+        params.core = core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
+    void messageComposeFromUpload() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        Persona p = u.getDownloaderPersona()
+        
+        def params = [:]
+        params.recipients = new HashSet<>(Collections.singletonList(p))
+        params.core = core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
+    void messageFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        TrustEntry te = model.trusted[row]
+        
+        def params = [:]
+        params.recipients = new HashSet<>(Collections.singletonList(te.persona))
+        params.core = core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
+    void downloadAttachment() {
+        List selected = view.selectedMessageAttachments()
+        if (selected.isEmpty())
+            return
+        
+        doDownloadAttachments(selected)    
+    }
+    
+    @ControllerAction
+    void downloadAllAttachments() {
+        doDownloadAttachments(model.messageAttachments)
+    }
+    
+    private void doDownloadAttachments(List attachments) {
+        int messageRow = view.selectedMessageHeader()
+        if (messageRow < 0)
+            return
+
+        MWMessage message = model.messageHeaders.get(messageRow)
+        attachments.each {
+            if (it instanceof MWMessageAttachment)
+                core.eventBus.publish(new UIDownloadAttachmentEvent(attachment : it, sender : message.sender))
+            else {
+                def event = new UIDownloadCollectionEvent(
+                    collection : it,
+                    items : it.getFiles(),
+                    host : message.sender,
+                    infoHash : it.getInfoHash(),
+                    full : true
+                    )
+                core.eventBus.publish(event)
+            }
+        }
+        
+        view.showDownloadsWindow.call()
     }
     
     void startChat(Persona p) {

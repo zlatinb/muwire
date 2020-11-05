@@ -50,6 +50,11 @@ import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.SideCarFileEvent
+import com.muwire.core.messenger.MWMessage
+import com.muwire.core.messenger.MessageLoadedEvent
+import com.muwire.core.messenger.MessageReceivedEvent
+import com.muwire.core.messenger.MessageSentEvent
+import com.muwire.core.messenger.Messenger
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -64,6 +69,8 @@ import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 import com.muwire.core.upload.Uploader
 import com.muwire.core.util.BandwidthCounter
+
+import static com.muwire.gui.Translator.trans
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -110,6 +117,12 @@ class MainFrameModel {
     def feeds = []
     def feedItems = []
     
+    def messageFolders = [trans("INBOX"), trans("OUTBOX"), trans("SENT")] 
+    List<MWMessage> messageHeaders = new ArrayList<>()
+    Map<Integer, Set<MWMessage>> messageHeadersMap = new HashMap<>()
+    int folderIdx
+    List<Object> messageAttachments = new ArrayList<>()
+    
     boolean sessionRestored
 
     @Observable int connections
@@ -136,6 +149,7 @@ class MainFrameModel {
     @Observable boolean markDistrustedButtonEnabled
     @Observable boolean browseFromTrustedButtonEnabled
     @Observable boolean chatFromTrustedButtonEnabled
+    @Observable boolean messageFromTrustedButtonEnabled
     @Observable boolean markNeutralFromDistrustedButtonEnabled
     @Observable boolean markTrustedButtonEnabled
     @Observable boolean reviewButtonEnabled
@@ -147,6 +161,10 @@ class MainFrameModel {
     @Observable boolean viewItemCommentButtonEnabled
     @Observable boolean deleteCollectionButtonEnabled 
     
+    @Observable boolean messageButtonsEnabled
+    @Observable boolean messageAttachmentsButtonEnabled
+    @Observable String messageRecipientList
+    
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled
@@ -154,6 +172,7 @@ class MainFrameModel {
     @Observable boolean monitorPaneButtonEnabled
     @Observable boolean feedsPaneButtonEnabled
     @Observable boolean trustPaneButtonEnabled
+    @Observable boolean messagesPaneButtonEnabled
     @Observable boolean chatPaneButtonEnabled
     
     @Observable boolean chatServerRunning
@@ -190,6 +209,10 @@ class MainFrameModel {
         shared = []
         treeRoot = new DefaultMutableTreeNode()
         sharedTree = new DefaultTreeModel(treeRoot)
+        
+        messageHeadersMap.put(0, new LinkedHashSet<>())
+        messageHeadersMap.put(1, new LinkedHashSet<>())
+        messageHeadersMap.put(2, new LinkedHashSet<>())
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -272,6 +295,9 @@ class MainFrameModel {
             core.eventBus.register(UICollectionCreatedEvent.class, this)
             core.eventBus.register(CollectionDownloadedEvent.class, this)
             core.eventBus.register(CollectionUnsharedEvent.class, this)
+            core.eventBus.register(MessageLoadedEvent.class, this)
+            core.eventBus.register(MessageReceivedEvent.class, this)
+            core.eventBus.register(MessageSentEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
@@ -805,5 +831,56 @@ class MainFrameModel {
             collectionFiles.clear()
             view.collectionFilesTable.model.fireTableDataChanged()
         }
+    }
+    
+    void addToOutbox(MWMessage message) {
+        messageHeadersMap.get(Messenger.OUTBOX).add(message)
+        if (folderIdx == Messenger.OUTBOX) {
+            messageHeaders.clear()
+            messageHeaders.addAll(messageHeadersMap.get(Messenger.OUTBOX))
+            view.messageHeaderTable.model.fireTableDataChanged()
+        }
+    }
+    
+    void onMessageLoadedEvent(MessageLoadedEvent e) {
+        runInsideUIAsync {
+            messageHeadersMap.get(e.folder).add(e.message)
+            if (e.folder == folderIdx) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(idx))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    void onMessageReceivedEvent(MessageReceivedEvent e) {
+        runInsideUIAsync {
+            messageHeadersMap.get(Messenger.INBOX).add(e.message)
+            if (folderIdx == Messenger.INBOX) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    void onMessageSentEvent(MessageSentEvent e) {
+        runInsideUIAsync {
+            messageHeadersMap.get(Messenger.OUTBOX).remove(e.message)
+            messageHeadersMap.get(Messenger.SENT).add(e.message)
+            if (folderIdx != Messenger.INBOX) {
+                messageHeaders.clear()
+                messageHeaders.addAll(messageHeadersMap.get(folderIdx))
+                view.messageHeaderTable.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    void deleteMessage(MWMessage message) {
+        messageHeadersMap.get(folderIdx).remove(message)
+        messageHeaders.remove(message)
+        view.messageHeaderTable.model.fireTableDataChanged()
+        view.messageBody.setText("")
+        view.messageSplitPane.setDividerLocation(1.0d)
     }
 }

@@ -48,6 +48,7 @@ abstract class Uploader {
     abstract boolean isBrowseEnabled();
     abstract boolean isFeedEnabled();
     abstract boolean isChatEnabled();
+    abstract boolean isMessageEnabled();
     
     int dataSinceLastRead() {
         dataSinceLastRead.getAndSet(0)
