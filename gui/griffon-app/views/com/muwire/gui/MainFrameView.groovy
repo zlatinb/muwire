@@ -1322,6 +1322,25 @@ class MainFrameView {
                 
         })
         
+        JPopupMenu messagesMenu = new JPopupMenu()
+        JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
+        replyMenuItem.addActionListener({controller.messageReply()})
+        messagesMenu.add(replyMenuItem)
+        JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
+        deleteMenuItem.addActionListener({controller.messageDelete()})
+        messagesMenu.add(deleteMenuItem)
+        messageHeaderTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(messagesMenu, e)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(messagesMenu, e)
+            }
+        })
+        
+        
         messageAttachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer()) 
         messageAttachmentsTable.rowSorter.addRowSorterListener({evt -> lastMessageAttachmentsTableSortEvent = evt})
         messageAttachmentsTable.rowSorter.setSortsOnUpdates(true)
