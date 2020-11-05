@@ -316,7 +316,7 @@ class OptionsController {
         }
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
-            model.chatWelcomeFile = getSelectedFile().getAbsolutePath()
+            model.chatWelcomeFile = chooser.getSelectedFile().getAbsolutePath()
     }
     
     @ControllerAction
