@@ -177,6 +177,10 @@ class Messenger {
         } catch (Exception e) {
             log.log(Level.WARNING, "failed to send message to ${recipient.getHumanReadableName()}", e)
             return false
+        } finally {
+            synchronized(this) {
+                inProcess.remove(message)
+            }
         }
     }
 }
