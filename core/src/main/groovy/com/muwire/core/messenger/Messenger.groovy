@@ -23,6 +23,9 @@ import net.i2p.data.Base64
 @Log
 class Messenger {
 
+    public final static int INBOX = 0
+    public final static int OUTBOX = 1
+    public final static int SENT = 2
     
     private static final int MAX_IN_PROCESS = 4
     
@@ -76,14 +79,14 @@ class Messenger {
     
     private void load() {
         log.info("loading messages")
-        loadFolder(inbox, inboxMessages, "inbox")
-        loadFolder(outbox, outboxMessages, "outbox")
-        loadFolder(sent, sentMessages, "sent")
+        loadFolder(inbox, inboxMessages, INBOX)
+        loadFolder(outbox, outboxMessages, OUTBOX)
+        loadFolder(sent, sentMessages, SENT)
         log.info("loaded messages")
         timer.schedule({send()} as TimerTask, 1000, 1000)
     }
     
-    private void loadFolder(File file, Set<MWMessage> dest, String folderName) {
+    private void loadFolder(File file, Set<MWMessage> dest, int folder) {
         Files.walk(file.toPath())
             .filter({it.getFileName().toString().endsWith(".mwmessage")})
             .forEach { Path path ->
@@ -93,7 +96,7 @@ class Messenger {
                     message = new MWMessage(it)
                 }
                 addMessage(message, dest)
-                eventBus.publish(new MessageLoadedEvent(message : message, folder : folderName))
+                eventBus.publish(new MessageLoadedEvent(message : message, folder : folder))
         }
     }
     
@@ -188,5 +191,19 @@ class Messenger {
                 inProcess.remove(message)
             }
         }
+    }
+    
+    public synchronized void onUIMessageDeleteEvent(UIMessageDeleteEvent e) {
+        switch(e.folder) {
+            case INBOX : deleteFromFolder(e.message, inboxMessages, inbox); break;
+            case OUTBOX : deleteFromFolder(e.message, outboxMessages, outbox); break;
+            case SENT : deleteFromFolder(e.message, sentMessages, sent); break
+        }
+    }
+    
+    private void deleteFromFolder(MWMessage message, Set<MWMessage> set, File file) {
+        set.remove(message)
+        File messageFile = new File(file, deriveName(message))
+        messageFile.delete()
     }
 }

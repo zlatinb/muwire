@@ -54,6 +54,7 @@ import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MessageLoadedEvent
 import com.muwire.core.messenger.MessageReceivedEvent
 import com.muwire.core.messenger.MessageSentEvent
+import com.muwire.core.messenger.Messenger
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -121,10 +122,6 @@ class MainFrameModel {
     Map<Integer, Set<MWMessage>> messageHeadersMap = new HashMap<>()
     int folderIdx
     List<Object> messageAttachments = new ArrayList<>()
-    
-    private final static int INBOX = 0
-    private final static int OUTBOX = 1
-    private final static int SENT = 2
     
     boolean sessionRestored
 
@@ -837,28 +834,18 @@ class MainFrameModel {
     }
     
     void addToOutbox(MWMessage message) {
-        messageHeadersMap.get(OUTBOX).add(message)
-        if (folderIdx == OUTBOX) {
+        messageHeadersMap.get(Messenger.OUTBOX).add(message)
+        if (folderIdx == Messenger.OUTBOX) {
             messageHeaders.clear()
-            messageHeaders.addAll(messageHeadersMap.get(OUTBOX))
+            messageHeaders.addAll(messageHeadersMap.get(Messenger.OUTBOX))
             view.messageHeaderTable.model.fireTableDataChanged()
         }
     }
     
     void onMessageLoadedEvent(MessageLoadedEvent e) {
         runInsideUIAsync {
-            int idx = 0
-            switch(e.folder) {
-                case "inbox" : idx = INBOX; break
-                case "outbox" : idx = OUTBOX; break
-                case "sent" : idx = SENT; break
-                default :
-                    throw new IllegalStateException("unknown folder $e.folder")
-
-            }
-            
-            messageHeadersMap.get(idx).add(e.message)
-            if (idx == folderIdx) {
+            messageHeadersMap.get(e.folder).add(e.message)
+            if (e.folder == folderIdx) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(idx))
                 view.messageHeaderTable.model.fireTableDataChanged()
@@ -868,10 +855,10 @@ class MainFrameModel {
     
     void onMessageReceivedEvent(MessageReceivedEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(INBOX).add(e.message)
-            if (folderIdx == INBOX) {
+            messageHeadersMap.get(Messenger.INBOX).add(e.message)
+            if (folderIdx == Messenger.INBOX) {
                 messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(INBOX))
+                messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
                 view.messageHeaderTable.model.fireTableDataChanged()
             }
         }
@@ -879,13 +866,21 @@ class MainFrameModel {
     
     void onMessageSentEvent(MessageSentEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(OUTBOX).remove(e.message)
-            messageHeadersMap.get(SENT).add(e.message)
-            if (folderIdx != INBOX) {
+            messageHeadersMap.get(Messenger.OUTBOX).remove(e.message)
+            messageHeadersMap.get(Messenger.SENT).add(e.message)
+            if (folderIdx != Messenger.INBOX) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(folderIdx))
                 view.messageHeaderTable.model.fireTableDataChanged()
             }
         }
+    }
+    
+    void deleteMessage(MWMessage message) {
+        messageHeadersMap.get(folderIdx).remove(message)
+        messageHeaders.remove(message)
+        view.messageHeaderTable.model.fireTableDataChanged()
+        view.messageBody.setText("")
+        view.messageSplitPane.setDividerLocation(1.0d)
     }
 }

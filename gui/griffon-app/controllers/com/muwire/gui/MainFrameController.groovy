@@ -46,6 +46,7 @@ import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
+import com.muwire.core.messenger.UIMessageDeleteEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
@@ -799,6 +800,12 @@ class MainFrameController {
     
     @ControllerAction
     void messageDelete() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessage msg = model.messageHeaders.get(row)
+        model.deleteMessage(msg)
+        core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.folderIdx))
     }
     
     @ControllerAction
