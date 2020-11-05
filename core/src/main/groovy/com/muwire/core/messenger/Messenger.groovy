@@ -46,6 +46,7 @@ class Messenger {
     } as ThreadFactory)
     
     private final Timer timer = new Timer()
+    private long lastSendTime
     
     
     public Messenger(EventBus eventBus, File home, I2PConnector connector, MuWireSettings settings) {
@@ -79,8 +80,7 @@ class Messenger {
         loadFolder(outbox, outboxMessages, "outbox")
         loadFolder(sent, sentMessages, "sent")
         log.info("loaded messages")
-        long interval = settings.messageSendInterval * 1000L
-        timer.schedule({send()} as TimerTask, interval, interval)
+        timer.schedule({send()} as TimerTask, 1000, 1000)
     }
     
     private void loadFolder(File file, Set<MWMessage> dest, String folderName) {
@@ -128,6 +128,13 @@ class Messenger {
     }
     
     private synchronized void send() {
+        final long now = System.currentTimeMillis()
+        if (now - lastSendTime < settings.messageSendInterval * 1000)
+            return
+        lastSendTime = now
+        
+        log.fine("sending messages...")
+        
         Iterator<MWMessage> iter = outboxMessages.iterator()
         while(inProcess.size() < MAX_IN_PROCESS && iter.hasNext()) {
             MWMessage candidate = iter.next()
@@ -146,7 +153,6 @@ class Messenger {
         }
         if (successful.containsAll(message.recipients)) {
             synchronized(this) {
-                inProcess.remove(message)
                 outboxMessages.remove(message)
                 sentMessages.add(message)
             }
