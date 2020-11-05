@@ -366,6 +366,24 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void browseCollectionsFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        Persona p = model.trusted[row].persona
+        
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params.fileName = p.getHumanReadableName()
+        params.eventBus = core.eventBus
+        params.everything = true
+        params.uuid = uuid
+        params.host = p
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
+        view.showSearchWindow.call()
+    }
+    
+    @ControllerAction
     void chatFromTrusted() {
         int row = view.getSelectedTrustTablesRow("trusted-table")
         if (row < 0)
