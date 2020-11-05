@@ -207,7 +207,7 @@ class MainFrameView {
                         gridLayout(rows:1, cols: 2)
                         button(text: trans("SEARCHES"), enabled : bind{model.searchesPaneButtonEnabled},actionPerformed : showSearchWindow)
                         button(text: trans("DOWNLOADS"), enabled : bind{model.downloadsPaneButtonEnabled}, actionPerformed : showDownloadsWindow)
-                        button(text: trans("UPLOADS"), enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
+                        button(text: trans("LIBRARY"), enabled : bind{model.uploadsPaneButtonEnabled}, actionPerformed : showUploadsWindow)
                         button(text: trans("COLLECTIONS"), enabled : bind{model.collectionsPaneButtonEnabled}, actionPerformed : showCollectionsWindow)
                         if (settings.showMonitor)
                             button(text: trans("MONITOR"), enabled: bind{model.monitorPaneButtonEnabled},actionPerformed : showMonitorWindow)
