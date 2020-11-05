@@ -57,6 +57,7 @@ import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.upload.Uploader
+import com.muwire.gui.MainFrameModel.MWMessageStatus
 
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -692,10 +693,11 @@ class MainFrameView {
                                     scrollPane {
                                         table(id : "message-header-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                             tableModel(list : model.messageHeaders) {
-                                                closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.sender.getHumanReadableName()})
-                                                closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.subject})
-                                                closureColumn(header : trans("RECIPIENTS"), preferredWidth: 20, type:Integer, read : {it.recipients.size()})
-                                                closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.timestamp})
+                                                closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.message.sender.getHumanReadableName()})
+                                                closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.message.subject})
+                                                closureColumn(header : trans("RECIPIENTS"), preferredWidth: 20, type:Integer, read : {it.message.recipients.size()})
+                                                closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.message.timestamp})
+                                                closureColumn(header : trans("UNREAD"), preferredWidth : 20, type : Boolean, read : {it.status})
                                             }
                                         }
                                     }
@@ -1319,7 +1321,9 @@ class MainFrameView {
                 messageBody.setText("")
                 model.messageRecipientList = ""
             } else {
-                MWMessage selected = model.messageHeaders.getAt(selectedRow)
+                MWMessageStatus selectedStatus = model.messageHeaders.getAt(selectedRow)
+                controller.markMessageRead(selectedStatus)
+                MWMessage selected = selectedStatus.message
                 messageBody.setText(selected.body)
                 model.messageButtonsEnabled = true
                 model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})

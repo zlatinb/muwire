@@ -84,6 +84,7 @@ import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
 import com.muwire.core.messenger.UIMessageDeleteEvent
 import com.muwire.core.messenger.UIMessageEvent
+import com.muwire.core.messenger.UIMessageReadEvent
 import com.muwire.core.search.BrowseManager
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.ResponderCache
@@ -495,6 +496,7 @@ public class Core {
             register(MessageReceivedEvent.class, messenger)
             register(UIMessageEvent.class, messenger)
             register(UIMessageDeleteEvent.class, messenger)
+            register(UIMessageReadEvent.class, messenger)
         }
     }
 

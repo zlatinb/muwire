@@ -118,8 +118,8 @@ class MainFrameModel {
     def feedItems = []
     
     def messageFolders = [trans("INBOX"), trans("OUTBOX"), trans("SENT")] 
-    List<MWMessage> messageHeaders = new ArrayList<>()
-    Map<Integer, Set<MWMessage>> messageHeadersMap = new HashMap<>()
+    List<MWMessageStatus> messageHeaders = new ArrayList<>()
+    Map<Integer, Set<MWMessageStatus>> messageHeadersMap = new HashMap<>()
     int folderIdx
     List<Object> messageAttachments = new ArrayList<>()
     
@@ -833,7 +833,7 @@ class MainFrameModel {
     }
     
     void addToOutbox(MWMessage message) {
-        messageHeadersMap.get(Messenger.OUTBOX).add(message)
+        messageHeadersMap.get(Messenger.OUTBOX).add(new MWMessageStatus(message, false))
         if (folderIdx == Messenger.OUTBOX) {
             messageHeaders.clear()
             messageHeaders.addAll(messageHeadersMap.get(Messenger.OUTBOX))
@@ -843,7 +843,7 @@ class MainFrameModel {
     
     void onMessageLoadedEvent(MessageLoadedEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(e.folder).add(e.message)
+            messageHeadersMap.get(e.folder).add(new MWMessageStatus(e.message, e.unread))
             if (e.folder == folderIdx) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(folderIdx))
@@ -854,7 +854,7 @@ class MainFrameModel {
     
     void onMessageReceivedEvent(MessageReceivedEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(Messenger.INBOX).add(e.message)
+            messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))
             if (folderIdx == Messenger.INBOX) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
@@ -865,8 +865,9 @@ class MainFrameModel {
     
     void onMessageSentEvent(MessageSentEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(Messenger.OUTBOX).remove(e.message)
-            messageHeadersMap.get(Messenger.SENT).add(e.message)
+            MWMessageStatus status = new MWMessageStatus(e.message, false)
+            messageHeadersMap.get(Messenger.OUTBOX).remove(status)
+            messageHeadersMap.get(Messenger.SENT).add(status)
             if (folderIdx != Messenger.INBOX) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(folderIdx))
@@ -876,10 +877,29 @@ class MainFrameModel {
     }
     
     void deleteMessage(MWMessage message) {
-        messageHeadersMap.get(folderIdx).remove(message)
-        messageHeaders.remove(message)
+        MWMessageStatus status = new MWMessageStatus(message, false)
+        messageHeadersMap.get(folderIdx).remove(status)
+        messageHeaders.remove(status)
         view.messageHeaderTable.model.fireTableDataChanged()
         view.messageBody.setText("")
         view.messageSplitPane.setDividerLocation(1.0d)
+    }
+    
+    static class MWMessageStatus {
+        private final MWMessage message
+        private boolean status
+        MWMessageStatus(MWMessage message, boolean status) {
+            this.message = message
+            this.status = status
+        }
+        
+        public int hashCode() {
+            message.hashCode()
+        }
+        
+        public boolean equals(Object o) {
+            MWMessageStatus other = (MWMessageStatus) o
+            message.equals(other.message)
+        }
     }
 }

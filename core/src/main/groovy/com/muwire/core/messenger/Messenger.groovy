@@ -96,7 +96,8 @@ class Messenger {
                     message = new MWMessage(it)
                 }
                 addMessage(message, dest)
-                eventBus.publish(new MessageLoadedEvent(message : message, folder : folder))
+                File unread = new File(file, deriveUnread(message))
+                eventBus.publish(new MessageLoadedEvent(message : message, folder : folder, unread : unread.exists()))
         }
     }
     
@@ -107,6 +108,13 @@ class Messenger {
     synchronized void onUIMessageEvent(UIMessageEvent e) {
         outboxMessages.add(e.message)
         diskIO.execute({persist(e.message, outbox)})
+    }
+    
+    synchronized void onUIMessageReadEvent(UIMessageReadEvent e) {
+        diskIO.execute({
+            File unread = new File(inbox, deriveUnread(e.message))
+            unread.delete()
+        })
     }
     
     private void persist(MWMessage message, File folder) {
@@ -126,8 +134,16 @@ class Messenger {
     }
     
     private static String deriveName(MWMessage message) {
+        namePrefix(message) + ".mwmessage"
+    }
+    
+    private static String deriveUnread(MWMessage message) {
+        namePrefix(message) + ".unread"
+    }
+    
+    private static String namePrefix(MWMessage message) {
         String ih = Base64.encode(message.getInfoHash().getRoot())
-        "${ih}_${message.sender.getHumanReadableName()}_${message.timestamp}.mwmessage"
+        "${ih}_${message.sender.getHumanReadableName()}_${message.timestamp}"
     }
     
     private synchronized void send() {
@@ -165,7 +181,11 @@ class Messenger {
     
     public synchronized void onMessageReceivedEvent(MessageReceivedEvent e) {
         inboxMessages.add(e.message)
-        diskIO.execute({persist(e.message, inbox)})
+        diskIO.execute({
+            File unread = new File(inbox, deriveUnread(e.message))
+            unread.createNewFile()
+            persist(e.message, inbox)
+        })
     }
     
     private boolean deliverTo(MWMessage message, Persona recipient) {

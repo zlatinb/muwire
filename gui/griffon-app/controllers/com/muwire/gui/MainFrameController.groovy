@@ -8,6 +8,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
+import net.i2p.data.i2cp.MessageStatusMessage
 
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -47,6 +48,7 @@ import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
 import com.muwire.core.messenger.UIMessageDeleteEvent
+import com.muwire.core.messenger.UIMessageReadEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
@@ -57,6 +59,7 @@ import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.upload.HashListUploader
 import com.muwire.core.upload.Uploader
 import com.muwire.core.util.DataUtil
+import com.muwire.gui.MainFrameModel.MWMessageStatus
 
 @ArtifactProviderFor(GriffonController)
 class MainFrameController {
@@ -794,7 +797,7 @@ class MainFrameController {
         int row = view.selectedMessageHeader()
         if (row < 0)
             return
-        MWMessage msg = model.messageHeaders.get(row)
+        MWMessage msg = model.messageHeaders.get(row).message
         
         def params = [:]
         params.reply = msg
@@ -808,7 +811,7 @@ class MainFrameController {
         int row = view.selectedMessageHeader()
         if (row < 0)
             return
-        MWMessage msg = model.messageHeaders.get(row)
+        MWMessage msg = model.messageHeaders.get(row).message
 
         Set<Persona> all = new HashSet<>()
         all.add(msg.sender)
@@ -826,7 +829,7 @@ class MainFrameController {
         int row = view.selectedMessageHeader()
         if (row < 0)
             return
-        MWMessage msg = model.messageHeaders.get(row)
+        MWMessage msg = model.messageHeaders.get(row).message
         model.deleteMessage(msg)
         core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.folderIdx))
     }
@@ -879,12 +882,17 @@ class MainFrameController {
         doDownloadAttachments(model.messageAttachments)
     }
     
+    void markMessageRead(MWMessageStatus status) {
+        status.status = false
+        model.core.eventBus.publish(new UIMessageReadEvent(message : status.message))
+    }
+    
     private void doDownloadAttachments(List attachments) {
         int messageRow = view.selectedMessageHeader()
         if (messageRow < 0)
             return
 
-        MWMessage message = model.messageHeaders.get(messageRow)
+        MWMessage message = model.messageHeaders.get(messageRow).message
         attachments.each {
             if (it instanceof MWMessageAttachment)
                 core.eventBus.publish(new UIDownloadAttachmentEvent(attachment : it, sender : message.sender))
