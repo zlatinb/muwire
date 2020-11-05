@@ -79,7 +79,7 @@ class NewMessageView {
             panel(constraints : BorderLayout.CENTER) {
                 splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 300) {
                     scrollPane(border : titledBorder(title : trans("MESSAGE_NOUN"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
-                        bodyArea = textArea(editable : true, rows : 10, columns : 50)
+                        bodyArea = textArea(editable : true, rows : 10, columns : 50, lineWrap : true, wrapStyleWord : true)
                     }
                     panel (border : titledBorder(title : trans("ATTACHMENT_DROP_TABLE_TITLE"),
                         border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
