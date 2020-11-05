@@ -48,7 +48,10 @@ class NewMessageModel {
         
         replyBody = sb.toString()
         
-        replySubject = "Re: " + reply.subject
+        if (!reply.subject.startsWith("Re: "))
+            replySubject = "Re: " + reply.subject
+        else
+            replySubject = reply.subject
         
     }
 }
