@@ -126,7 +126,7 @@ class MuWireSettings {
         defaultFeedUpdateInterval = Long.valueOf(props.getProperty("defaultFeedUpdateInterval", "3600000"))
         
         // messenger settings
-        messageSendInterval = Integer.valueOf(props.getProperty("messageSendInterval","1"))
+        messageSendInterval = Integer.valueOf(props.getProperty("messageSendInterval","30"))
         
         // ultrapeer connection settings
         leafConnections = Integer.valueOf(props.getProperty("leafConnections","512"))

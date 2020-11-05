@@ -79,7 +79,7 @@ class Messenger {
         loadFolder(outbox, outboxMessages, "outbox")
         loadFolder(sent, sentMessages, "sent")
         log.info("loaded messages")
-        long interval = settings.messageSendInterval * 60 * 1000L
+        long interval = settings.messageSendInterval * 1000L
         timer.schedule({send()} as TimerTask, interval, interval)
     }
     

@@ -95,6 +95,7 @@ class OptionsView {
     
     def allowMessagesCheckbox
     def allowOnlyTrustedMessagesCheckbox
+    def messageSendIntervalField
     
     def buttonsPanel
 
@@ -379,6 +380,8 @@ class OptionsView {
                 allowMessagesCheckbox = checkBox(selected : bind{model.allowMessages}, constraints : gbc(gridx:2, gridy:0, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_ALLOW_TRUSTED_MESSAGES"), constraints : gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 allowOnlyTrustedMessagesCheckbox = checkBox(selected : bind{model.allowOnlyTrustedMessages}, constraints : gbc(gridx:2, gridy:1, anchor:GridBagConstraints.LINE_END))
+                label(text : trans("OPTIONS_MESSAGE_SEND_INTERVAL"), constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                messageSendIntervalField = textField(text : bind{model.messageSendInterval}, constraints : gbc(gridx : 2, gridy : 2, anchor : GridBagConstraints.LINE_END))
             }
             panel(constraints : gbc(gridx: 0, gridy : 2, weighty: 100))
         }

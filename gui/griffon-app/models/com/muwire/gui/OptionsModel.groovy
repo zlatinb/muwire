@@ -80,6 +80,7 @@ class OptionsModel {
     // messaging options
     @Observable boolean allowMessages
     @Observable boolean allowOnlyTrustedMessages
+    @Observable int messageSendInterval
     
     boolean disableUpdates
 
@@ -150,6 +151,7 @@ class OptionsModel {
         
         allowMessages = settings.allowMessages
         allowOnlyTrustedMessages = settings.allowOnlyTrustedMessages
+        messageSendInterval = settings.messageSendInterval
         
         disableUpdates = settings.disableUpdates
     }

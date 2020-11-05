@@ -211,7 +211,12 @@ class OptionsController {
         boolean allowOnlyTrustedMessages = view.allowOnlyTrustedMessagesCheckbox.model.isSelected()
         model.allowOnlyTrustedMessages = allowOnlyTrustedMessages
         settings.allowOnlyTrustedMessages = allowOnlyTrustedMessages
-
+        
+        int messageSendInterval = Integer.parseInt(view.messageSendIntervalField.text)
+        model.messageSendInterval = messageSendInterval
+        settings.messageSendInterval = messageSendInterval
+        
+        
         core.saveMuSettings()
 
         // UI Setttings
