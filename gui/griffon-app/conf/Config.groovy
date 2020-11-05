@@ -171,4 +171,9 @@ mvcGroups {
         view = "com.muwire.gui.NewMessageView"
         controller = "com.muwire.gui.NewMessageController"
     }
+    'add-contact' {
+        model = "com.muwire.gui.AddContactModel"
+        view = "com.muwire.gui.AddContactView"
+        controller = "com.muwire.gui.AddContactController"
+    }
 }

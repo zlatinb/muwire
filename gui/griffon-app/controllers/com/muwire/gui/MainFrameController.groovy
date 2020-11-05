@@ -243,6 +243,13 @@ class MainFrameController {
          model.clearButtonEnabled = false
 
     }
+    
+    @ControllerAction
+    void addContact() {
+        def params = [:]
+        params.core = core
+        mvcGroup.createMVCGroup("add-contact", params)
+    }
 
     private void markTrust(String tableName, TrustLevel level, def list) {
         int row = view.getSelectedTrustTablesRow(tableName)

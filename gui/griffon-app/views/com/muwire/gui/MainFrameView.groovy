@@ -614,13 +614,23 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    gridBagLayout()
-                                    button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 0, gridy : 0), subscribeAction)
-                                    button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy: 0), markNeutralFromTrustedAction)
-                                    button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 2, gridy:0), markDistrustedAction)
-                                    button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:3, gridy:0), browseFromTrustedAction)
-                                    button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:4, gridy:0), chatFromTrustedAction)
-                                    button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageFromTrustedButtonEnabled}, constraints : gbc(gridx:5, gridy:0), messageFromTrustedAction)
+                                    gridLayout(rows : 1, cols : 3)
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("ADD_CONTACT"), constraints : gbc(gridx : 0, gridy : 0), addContactAction)
+                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), subscribeAction)
+                                    }
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                        button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy:0), markDistrustedAction)
+                                    }
+                                    panel (border : etchedBorder()){
+                                        gridBagLayout()
+                                        button(text : trans("BROWSE"), enabled : bind{model.browseFromTrustedButtonEnabled}, constraints:gbc(gridx:0, gridy:0), browseFromTrustedAction)
+                                        button(text : trans("CHAT"), enabled : bind{model.chatFromTrustedButtonEnabled} ,constraints : gbc(gridx:1, gridy:0), chatFromTrustedAction)
+                                        button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageFromTrustedButtonEnabled}, constraints : gbc(gridx:2, gridy:0), messageFromTrustedAction)
+                                    }
                                 }
                             }
                             panel (border : etchedBorder()){
