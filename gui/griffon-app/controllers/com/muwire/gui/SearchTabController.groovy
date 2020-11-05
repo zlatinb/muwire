@@ -203,7 +203,7 @@ class SearchTabController {
             return
         
         def params = [:]
-        params.recipient = recipient
+        params.recipients = new HashSet<>(Collections.singletonList(recipient))
         params.core = model.core
         mvcGroup.parentGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
