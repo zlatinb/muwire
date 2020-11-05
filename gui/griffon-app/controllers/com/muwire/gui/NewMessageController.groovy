@@ -1,11 +1,15 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonController
+import static com.muwire.gui.Translator.trans
+
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
+import javax.swing.JOptionPane
 
+import com.muwire.core.Constants
 import com.muwire.core.Persona
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.messenger.MWMessage
@@ -21,6 +25,12 @@ class NewMessageController {
     
     @ControllerAction
     void send() {
+        String text = view.bodyArea.getText()
+        if (text.length() > Constants.MAX_COMMENT_LENGTH) {
+            JOptionPane.showMessageDialog(null, trans("MESSAGE_TOO_LONG_BODY", text.length(), Constants.MAX_COMMENT_LENGTH),
+                trans("MESSAGE_TOO_LONG"), JOptionPane.WARNING_MESSAGE)
+            return
+        }
         Set<Persona> recipients = new HashSet<>()
         recipients.addAll(model.recipients)
         
