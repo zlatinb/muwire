@@ -166,6 +166,7 @@ class MainFrameModel {
     
     @Observable boolean messageButtonsEnabled
     @Observable boolean messageAttachmentsButtonEnabled
+    @Observable String messageRecipientList
     
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled

@@ -677,6 +677,7 @@ class MainFrameView {
                                             tableModel(list : model.messageHeaders) {
                                                 closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.sender.getHumanReadableName()})
                                                 closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.subject})
+                                                closureColumn(header : trans("RECIPIENTS"), preferredWidth: 20, type:Integer, read : {it.recipients.size()})
                                                 closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.timestamp})
                                             }
                                         }
@@ -684,9 +685,16 @@ class MainFrameView {
                                     panel {
                                         borderLayout()
                                         panel(constraints : BorderLayout.CENTER) {
-                                            gridLayout(rows : 1, cols : 1)
+                                            borderLayout()
+                                            panel (constraints : BorderLayout.NORTH) {
+                                                borderLayout()
+                                                panel(constraints : BorderLayout.WEST) {
+                                                    label(text : trans("RECIPIENTS") + ":")
+                                                    label(text : bind{model.messageRecipientList})
+                                                }
+                                            }
                                             splitPane(id : "message-attachments-split-pane", orientation : JSplitPane.VERTICAL_SPLIT,
-                                            continuousLayout : true, dividerLocation : 500) {
+                                            continuousLayout : true, dividerLocation : 500, constraints : BorderLayout.CENTER) {
                                                 scrollPane {
                                                     textArea(id : "message-body-textarea", editable : false)
                                                 }
@@ -1282,6 +1290,7 @@ class MainFrameView {
             messageHeaderTable.model.fireTableDataChanged()
         })
         
+        messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
@@ -1293,10 +1302,12 @@ class MainFrameView {
                 model.messageButtonsEnabled = false
                 model.messageAttachmentsButtonEnabled = false
                 messageBody.setText("")
+                model.messageRecipientList = ""
             } else {
                 MWMessage selected = model.messageHeaders.getAt(selectedRow)
                 messageBody.setText(selected.body)
                 model.messageButtonsEnabled = true
+                model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})
                 
                 if (selected.attachments.isEmpty())
                     messageSplitPane.setDividerLocation(1.0d)
