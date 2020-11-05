@@ -114,6 +114,7 @@ class NewMessageView {
         attachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer())
         attachmentsTable.rowSorter.setSortsOnUpdates(true)
         
+        subjectField.setText(model.replySubject)
         bodyArea.setText(model.replyBody)
         
         // recipients list

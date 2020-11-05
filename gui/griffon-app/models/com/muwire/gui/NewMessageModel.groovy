@@ -20,6 +20,7 @@ class NewMessageModel {
     @MVCMember @Nonnull
     NewMessageView view
     
+    String replySubject = ""
     String replyBody = ""
     
     Core core
@@ -32,18 +33,22 @@ class NewMessageModel {
             return
         String text = reply.body
         String [] lines = text.split("\n")
-        Stack<String> stack = new Stack<>()
+        List<String> l = new ArrayList<>()
         for (String line : lines) {
             line = line.trim()
             line = "> " + line
-            stack.push(line)
+            l.add(line)
         }
         
         StringBuilder sb = new StringBuilder()
-        while(stack.size() > 0) {
-            sb.append(stack.pop()).append('\n')
+        sb.append('\n')
+        for (String line : l) {
+            sb.append(line).append('\n')
         }
         
         replyBody = sb.toString()
+        
+        replySubject = "Re: " + reply.subject
+        
     }
 }
