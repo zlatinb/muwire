@@ -713,7 +713,7 @@ class MainFrameView {
                                             splitPane(id : "message-attachments-split-pane", orientation : JSplitPane.VERTICAL_SPLIT,
                                             continuousLayout : true, dividerLocation : 500, constraints : BorderLayout.CENTER) {
                                                 scrollPane {
-                                                    textArea(id : "message-body-textarea", editable : false)
+                                                    textArea(id : "message-body-textarea", editable : false, lineWrap : true, wrapStyleWord : true)
                                                 }
                                                 panel {
                                                     borderLayout()
