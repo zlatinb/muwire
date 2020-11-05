@@ -31,8 +31,22 @@ class NewMessageController {
                 trans("MESSAGE_TOO_LONG"), JOptionPane.WARNING_MESSAGE)
             return
         }
+        
+        text = view.subjectField.getText()
+        if (text.length() > Constants.MAX_COMMENT_LENGTH) {
+            JOptionPane.showMessageDialog(null, trans("SUBJECT_TOO_LONG_BODY", text.length(), Constants.MAX_COMMENT_LENGTH),
+                trans("SUBJECT_TOO_LONG"), JOptionPane.WARNING_MESSAGE)
+            return
+        }
+        
         Set<Persona> recipients = new HashSet<>()
         recipients.addAll(model.recipients)
+        
+        if (recipients.isEmpty()) {
+            JOptionPane.showMessageDialog(null, trans("NO_RECIPIENTS_BODY"),
+                trans("NO_RECIPIENTS"), JOptionPane.WARNING_MESSAGE)
+            return
+        }
         
         Set<MWMessageAttachment> attachments = new HashSet<>()
         Set<FileCollection> collections = new HashSet<>()
