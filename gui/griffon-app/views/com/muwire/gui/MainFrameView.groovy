@@ -26,6 +26,8 @@ import javax.swing.JTable
 import javax.swing.JTextArea
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
+import javax.swing.RowSorter
+import javax.swing.SortOrder
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
@@ -1305,6 +1307,8 @@ class MainFrameView {
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
+        def sortKey = new RowSorter.SortKey(3, SortOrder.ASCENDING)
+        messageHeaderTable.rowSorter.setSortKeys(Collections.singletonList(sortKey))
         selectionModel = messageHeaderTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
