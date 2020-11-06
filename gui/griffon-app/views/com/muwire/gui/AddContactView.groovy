@@ -54,7 +54,7 @@ class AddContactView {
                     reasonArea = textArea(editable : true, lineWrap : true, wrapStyleWord : true)
                 }
                 panel(constraints : BorderLayout.SOUTH) {
-                    button(text : trans("ADD_CONTACT"), addAction)
+                    button(text : trans("ADD_CONTACT_SPECIFIC"), addAction)
                     button(text : trans("CANCEL"), cancelAction)
                 }
             }
