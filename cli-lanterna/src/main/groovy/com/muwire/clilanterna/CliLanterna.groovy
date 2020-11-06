@@ -32,7 +32,7 @@ import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 
 class CliLanterna {
-    private static final String MW_VERSION = "0.8.2"
+    private static final String MW_VERSION = "0.8.3"
     
     private static volatile Core core
     
