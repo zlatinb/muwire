@@ -2,9 +2,11 @@ The GitHub repo is mirrored from the in-I2P GitLab repo.  Please open PRs and is
 
 # MuWire - Easy Anonymous File-Sharing
 
-MuWire is an easy to use file-sharing program which offers anonymity using [I2P technology](http://geti2p.net).  It works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi.
+MuWire is a file publishing and networking tool that protects the identity of its users by using I2P technology. Anyone with a desktop computer and an internet connection can create a unique anonymous online persona and publish information of any kind without fear of censorship or persecution.
 
-The current stable release - 0.8.2 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+Users can then use their MuWire identities to publish files, search for files published by others, subscribe to each other’s publications and communicate through chat and messaging. Furthermore, users can establish trust-based relationship with each other where they assign a “trust level” to their contacts. 
+
+The current stable release - 0.8.3 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  MuWire works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi. 
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
