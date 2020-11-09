@@ -51,6 +51,9 @@ MuWire is available as a Docker image.  For more information see the [Docker] pa
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki [Translate] page.
 
+## Creating your own MuWire network
+If you want to create your own MuWire network instructions are on the [Wiki].
+
 ## Related Projects
 ### MuWire Tracker Daemon
 The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent tracking to MuWire.  For more info see the [Tracker] page.
