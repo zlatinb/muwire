@@ -207,4 +207,12 @@ class SearchTabController {
         params.core = model.core
         mvcGroup.parentGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
+    
+    @ControllerAction
+    void copyFullID() {
+        Persona sender = view.selectedSender()
+        if (sender == null)
+            return
+        CopyPasteSupport.copyToClipboard(sender.toBase64())
+    }
 }

@@ -318,6 +318,25 @@ class SearchTabView {
         parent.setTabComponentAt(index, tabPanel)
         mvcGroup.parentGroup.view.showSearchWindow.call()
 
+        
+        // senders popup menu
+        JPopupMenu popupMenu = new JPopupMenu()
+        JMenuItem copyFullIDItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyFullIDItem.addActionListener({mvcGroup.controller.copyFullID()})
+        popupMenu.add(copyFullIDItem)
+        
+        def mouseListener = new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+        }
+        
+        
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
@@ -360,6 +379,7 @@ class SearchTabView {
         })
         
         // senders table
+        sendersTable.addMouseListener(mouseListener)
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
@@ -389,6 +409,7 @@ class SearchTabView {
                 resultsTable.model.fireTableDataChanged()
             }
         })
+        
         
         // results table 2
         resultsTable2.setDefaultRenderer(Integer.class,centerRenderer)
@@ -430,6 +451,7 @@ class SearchTabView {
         // TODO: add download right-click action
         
         // senders table 2
+        sendersTable2.addMouseListener(mouseListener)
         sendersTable2.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
         sendersTable2.rowSorter.setSortsOnUpdates(true)

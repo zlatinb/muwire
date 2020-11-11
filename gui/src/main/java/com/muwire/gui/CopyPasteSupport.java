@@ -1,6 +1,8 @@
 package com.muwire.gui;
 
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 
 public class CopyPasteSupport {
 
@@ -13,5 +15,10 @@ public class CopyPasteSupport {
         } catch (Exception impossible) {
             throw new RuntimeException(impossible);
         }
+    }
+    
+    public static void copyToClipboard(String str) {
+        StringSelection selection = new StringSelection(str);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
     }
 }
