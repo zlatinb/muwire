@@ -1267,6 +1267,9 @@ class MainFrameView {
         JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
         messageItem.addActionListener({mvcGroup.controller.messageFromTrusted()})
         trustMenu.add(messageItem)
+        JMenuItem copyIdFromTrustedItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyIdFromTrustedItem.addActionListener({mvcGroup.controller.copyIdFromTrusted()})
+        trustMenu.add(copyIdFromTrustedItem)
         
         trustedTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -1296,6 +1299,21 @@ class MainFrameView {
             }
         })
         
+        JPopupMenu distrustedMenu = new JPopupMenu()
+        JMenuItem copyIdFromDistrustedItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyIdFromDistrustedItem.addActionListener({mvcGroup.controller.copyIdFromUntrusted()})
+        distrustedMenu.add(copyIdFromDistrustedItem)
+        
+        distrustedTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(distrustedMenu, e)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(distrustedMenu, e)
+            }
+        }) 
         
         // messages tab
         
@@ -1358,6 +1376,9 @@ class MainFrameView {
         JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
         deleteMenuItem.addActionListener({controller.messageDelete()})
         messagesMenu.add(deleteMenuItem)
+        JMenuItem copyIdFromMessageItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyIdFromMessageItem.addActionListener({controller.copyIdFromMessage()})
+        messagesMenu.add(copyIdFromMessageItem)
         messageHeaderTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
@@ -1546,6 +1567,10 @@ class MainFrameView {
         configure.addActionListener({mvcGroup.controller.configureFileFeed()})
         menu.add(configure)
         
+        JMenuItem copyId = new JMenuItem(trans("COPY_FULL_ID"))
+        copyId.addActionListener({controller.copyIdFromFeed()})
+        menu.add(copyId)
+        
         showPopupMenu(menu,e)
     }
     
@@ -1638,6 +1663,10 @@ class MainFrameView {
             messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload()})
             uploadsTableMenu.add(messageItem)
         }
+        
+        JMenuItem copyIDItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyIDItem.addActionListener({mvcGroup.controller.copyIdFromUploads()})
+        uploadsTableMenu.add(copyIDItem)
         
         showPopupMenu(uploadsTableMenu, e)
     }

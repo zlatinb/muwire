@@ -909,6 +909,49 @@ class MainFrameController {
         }
     }
     
+    @ControllerAction
+    void copyIdFromUploads() {
+        Uploader u = view.selectedUploader()
+        if (u == null)
+            return
+        CopyPasteSupport.copyToClipboard(u.getDownloaderPersona().toBase64())
+    }
+    
+    @ControllerAction
+    void copyIdFromTrusted() {
+        int row = view.getSelectedTrustTablesRow("trusted-table")
+        if (row < 0)
+            return
+        TrustEntry te = model.trusted.get(row)
+        CopyPasteSupport.copyToClipboard(te.persona.toBase64())
+    }
+    
+    @ControllerAction
+    void copyIdFromUntrusted() {
+        int row = view.getSelectedTrustTablesRow("distrusted-table")
+        if (row < 0)
+            return
+        TrustEntry te = model.distrusted.get(row)
+        CopyPasteSupport.copyToClipboard(te.persona.toBase64())
+    }
+    
+    @ControllerAction
+    void copyIdFromMessage() {
+        int row = view.selectedMessageHeader()
+        if (row < 0)
+            return
+        MWMessageStatus status = model.messageHeaders.get(row)
+        CopyPasteSupport.copyToClipboard(status.message.sender.toBase64())
+    }
+    
+    @ControllerAction
+    void copyIdFromFeed() {
+        Feed feed = view.selectedFeed()
+        if (feed == null)
+            return
+        CopyPasteSupport.copyToClipboard(feed.getPublisher().toBase64())
+    }
+    
     private void doDownloadAttachments(List attachments) {
         int messageRow = view.selectedMessageHeader()
         if (messageRow < 0)
