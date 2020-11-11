@@ -9,24 +9,30 @@ import javax.swing.DefaultListModel
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JList
+import javax.swing.JMenuItem
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.ListModel
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.TransferHandler
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.border.TitledBorder
 
 import com.muwire.core.InfoHash
+import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.messenger.MWMessageAttachment
 
 import java.awt.BorderLayout
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -53,7 +59,7 @@ class NewMessageView {
         
         recipientsModel = new DefaultListModel()
         model.recipients.each { 
-            recipientsModel.addElement(it.getHumanReadableName())
+            recipientsModel.addElement(new Recipient(it))
         }
         recipientsList = new JList(recipientsModel)
         
@@ -121,6 +127,25 @@ class NewMessageView {
         // recipients list
         transferHandler = new PersonaTransferHandler()
         recipientsList.setTransferHandler(transferHandler)
+        recipientsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        
+        JPopupMenu recipientsMenu = new JPopupMenu()
+        JMenuItem removeItem = new JMenuItem(trans("REMOVE"))
+        removeItem.addActionListener({removeSelectedRecipients()})
+        recipientsMenu.add(removeItem)
+        
+        recipientsList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    recipientsMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    recipientsMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+        })
+        
+        // general window 
         
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -129,6 +154,17 @@ class NewMessageView {
         })
         window.pack()
         window.setVisible(true)
+    }
+    
+    void removeSelectedRecipients() {
+        int [] selected = recipientsList.getSelectedIndices()
+        if (selected.length == 0)
+            return
+        Arrays.sort(selected)
+        for (int i = selected.length - 1; i >= 0; i--) {
+            Recipient removed = recipientsModel.remove(selected[i])
+            model.recipients.remove(removed.persona)
+        }
     }
     
     class AttachmentTransferHandler extends TransferHandler {
@@ -181,9 +217,20 @@ class NewMessageView {
             
             items.each { 
                 if (model.recipients.add(it))
-                    recipientsModel.insertElementAt(it.getHumanReadableName(),0)
+                    recipientsModel.insertElementAt(new Recipient(it),0)
             }
             return true
+        }
+    }
+    
+    private static class Recipient {
+        private final Persona persona
+        Recipient(Persona persona) {
+            this.persona = persona
+        }
+        
+        public String toString() {
+            persona.getHumanReadableName()
         }
     }
 }
