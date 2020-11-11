@@ -53,6 +53,7 @@ class NewMessageView {
     JTextField subjectField
     JTextArea bodyArea
     JTable attachmentsTable
+    def lastAttachmentsTableSortEvent
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -115,14 +116,33 @@ class NewMessageView {
     }
     
     void mvcGroupInit(Map<String, String> args) {
+        subjectField.setText(model.replySubject)
+        bodyArea.setText(model.replyBody)
+        
+        // attachments table
         def transferHandler = new AttachmentTransferHandler()
         attachmentsTable.setTransferHandler(transferHandler)
         attachmentsTable.setFillsViewportHeight(true)
         attachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer())
         attachmentsTable.rowSorter.setSortsOnUpdates(true)
+        attachmentsTable.rowSorter.addRowSorterListener({evt -> lastAttachmentsTableSortEvent = evt})
+        attachmentsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         
-        subjectField.setText(model.replySubject)
-        bodyArea.setText(model.replyBody)
+        JPopupMenu attachmentsMenu = new JPopupMenu()
+        JMenuItem removeAttachmentItem = new JMenuItem(trans("REMOVE"))
+        removeAttachmentItem.addActionListener({removeSelectedAttachments()})
+        attachmentsMenu.add(removeAttachmentItem)
+        attachmentsTable.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    attachmentsMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    attachmentsMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+        })
+        
         
         // recipients list
         transferHandler = new PersonaTransferHandler()
@@ -165,6 +185,21 @@ class NewMessageView {
             Recipient removed = recipientsModel.remove(selected[i])
             model.recipients.remove(removed.persona)
         }
+    }
+    
+    void removeSelectedAttachments() {
+        int [] selected = attachmentsTable.getSelectedRows()
+        if (selected.length == 0)
+            return
+        if (lastAttachmentsTableSortEvent != null) {
+            for (int i = 0; i < selected.length; i++)
+                selected[i] = attachmentsTable.rowSorter.convertRowIndexToModel(selected[i])
+        }
+        Arrays.sort(selected)
+        for (int i = selected.length - 1; i >= 0; i--)
+            model.attachments.remove(selected[i])
+        attachmentsTable.model.fireTableDataChanged()
+            
     }
     
     class AttachmentTransferHandler extends TransferHandler {
