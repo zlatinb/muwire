@@ -97,8 +97,7 @@ class SearchTabView {
                                         button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
                                     }
                                     panel (border : etchedBorder()){
-                                        button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : trans("ADD_CONTACT"), enabled: bind {model.trustButtonsEnabled }, trustAction)
                                         button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
                                 }
@@ -248,8 +247,7 @@ class SearchTabView {
                                         button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), chatAction)
                                     }
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("TRUST_VERB"), enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : trans("NEUTRAL"), enabled: bind {model.trustButtonsEnabled}, neutralAction)
+                                        button(text : trans("ADD_CONTACT"), enabled: bind {model.trustButtonsEnabled }, trustAction)
                                         button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
                                 }
