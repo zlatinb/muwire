@@ -77,6 +77,7 @@ class NewMessageView {
                 }
             }
             panel(constraints : BorderLayout.CENTER) {
+                gridLayout(rows : 1, cols : 1)
                 splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 300) {
                     scrollPane(border : titledBorder(title : trans("MESSAGE_NOUN"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
                         bodyArea = textArea(editable : true, rows : 10, columns : 50, lineWrap : true, wrapStyleWord : true)
