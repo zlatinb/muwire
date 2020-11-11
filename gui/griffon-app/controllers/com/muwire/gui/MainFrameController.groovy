@@ -903,8 +903,10 @@ class MainFrameController {
     }
     
     void markMessageRead(MWMessageStatus status) {
-        status.status = false
-        model.core.eventBus.publish(new UIMessageReadEvent(message : status.message))
+        if (status.status) {
+            status.status = false
+            model.core.eventBus.publish(new UIMessageReadEvent(message : status.message))
+        }
     }
     
     private void doDownloadAttachments(List attachments) {

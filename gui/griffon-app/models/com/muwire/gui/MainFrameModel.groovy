@@ -55,6 +55,7 @@ import com.muwire.core.messenger.MessageLoadedEvent
 import com.muwire.core.messenger.MessageReceivedEvent
 import com.muwire.core.messenger.MessageSentEvent
 import com.muwire.core.messenger.Messenger
+import com.muwire.core.messenger.UIMessageReadEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
@@ -126,6 +127,7 @@ class MainFrameModel {
     boolean sessionRestored
 
     @Observable int connections
+    @Observable int messages
     @Observable String me
     @Observable int loadedFiles
     @Observable File hashingFile
@@ -296,6 +298,7 @@ class MainFrameModel {
             core.eventBus.register(CollectionUnsharedEvent.class, this)
             core.eventBus.register(MessageLoadedEvent.class, this)
             core.eventBus.register(MessageReceivedEvent.class, this)
+            core.eventBus.register(UIMessageReadEvent.class, this)
             core.eventBus.register(MessageSentEvent.class, this)
 
             core.muOptions.watchedKeywords.each {
@@ -422,7 +425,7 @@ class MainFrameModel {
             table.model.fireTableDataChanged()
         }
     }
-
+    
     void onFileHashingEvent(FileHashingEvent e) {
         runInsideUIAsync {
             hashingFile = e.hashingFile
@@ -854,6 +857,7 @@ class MainFrameModel {
     
     void onMessageReceivedEvent(MessageReceivedEvent e) {
         runInsideUIAsync {
+            messages++
             messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))
             if (folderIdx == Messenger.INBOX) {
                 messageHeaders.clear()
@@ -873,6 +877,12 @@ class MainFrameModel {
                 messageHeaders.addAll(messageHeadersMap.get(folderIdx))
                 view.messageHeaderTable.model.fireTableDataChanged()
             }
+        }
+    }
+    
+    void onUIMessageReadEvent(UIMessageReadEvent e) {
+        runInsideUIAsync {
+            messages--
         }
     }
     

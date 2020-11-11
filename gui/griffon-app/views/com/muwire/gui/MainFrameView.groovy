@@ -788,6 +788,8 @@ class MainFrameView {
                         }
                     }
                     panel (constraints : BorderLayout.EAST) {
+                        label(icon : imageIcon("/email.png"))
+                        label(text : bind {model.messages})
                         label("   " + trans("CONNECTIONS") + ":")
                         label(text : bind {model.connections})
                     }
@@ -1324,7 +1326,7 @@ class MainFrameView {
                 messageBody.setText("")
                 model.messageRecipientList = ""
             } else {
-                MWMessageStatus selectedStatus = model.messageHeaders.getAt(selectedRow)
+                MWMessageStatus selectedStatus = model.messageHeaders.get(selectedRow)
                 controller.markMessageRead(selectedStatus)
                 MWMessage selected = selectedStatus.message
                 messageBody.setText(selected.body)
