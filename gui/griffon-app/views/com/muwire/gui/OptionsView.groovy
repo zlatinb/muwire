@@ -19,6 +19,7 @@ import com.muwire.core.Core
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.SystemTray
+import java.awt.Taskbar
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -71,6 +72,7 @@ class OptionsView {
     def showSearchHashesCheckbox
     def clearUploadsCheckbox
     def storeSearchHistoryCheckbox
+    def messageNotificationsCheckbox
 
     def inBwField
     def outBwField
@@ -382,6 +384,11 @@ class OptionsView {
                 allowOnlyTrustedMessagesCheckbox = checkBox(selected : bind{model.allowOnlyTrustedMessages}, constraints : gbc(gridx:2, gridy:1, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MESSAGE_SEND_INTERVAL"), constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 messageSendIntervalField = textField(text : bind{model.messageSendInterval}, constraints : gbc(gridx : 2, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                
+                if (Taskbar.isTaskbarSupported()) {
+                    label(text : trans("OPTIONS_MESSAGE_NOTIFICATIONS"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                    messageNotificationsCheckbox = checkBox(selected : bind{model.messageNotifications}, constraints : gbc(gridx:2, gridy:3, anchor:GridBagConstraints.LINE_END))
+                }
             }
             panel(constraints : gbc(gridx: 0, gridy : 2, weighty: 100))
         }

@@ -123,6 +123,7 @@ class MainFrameModel {
     Map<Integer, Set<MWMessageStatus>> messageHeadersMap = new HashMap<>()
     int folderIdx
     List<Object> messageAttachments = new ArrayList<>()
+    MessageNotificator messageNotificator
     
     boolean sessionRestored
 
@@ -206,6 +207,8 @@ class MainFrameModel {
     void mvcGroupInit(Map<String, Object> args) {
 
         uiSettings = application.context.get("ui-settings")
+        
+        messageNotificator = new MessageNotificator(uiSettings)
         
         shared = []
         treeRoot = new DefaultMutableTreeNode()
@@ -847,6 +850,10 @@ class MainFrameModel {
     void onMessageLoadedEvent(MessageLoadedEvent e) {
         runInsideUIAsync {
             messageHeadersMap.get(e.folder).add(new MWMessageStatus(e.message, e.unread))
+            if (e.unread) {
+                messages++
+                messageNotificator.messages(messages)
+            }
             if (e.folder == folderIdx) {
                 messageHeaders.clear()
                 messageHeaders.addAll(messageHeadersMap.get(folderIdx))
@@ -859,6 +866,8 @@ class MainFrameModel {
         runInsideUIAsync {
             if (messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))) {
                 messages++
+                messageNotificator.newMessage()
+                messageNotificator.messages(messages)
                 if (folderIdx == Messenger.INBOX) {
                     messageHeaders.clear()
                     messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
@@ -884,6 +893,7 @@ class MainFrameModel {
     void onUIMessageReadEvent(UIMessageReadEvent e) {
         runInsideUIAsync {
             messages--
+            messageNotificator.messages(messages)
         }
     }
     

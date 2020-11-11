@@ -216,6 +216,12 @@ class OptionsController {
         model.messageSendInterval = messageSendInterval
         settings.messageSendInterval = messageSendInterval
         
+        if (view.messageNotificationsCheckbox != null) {
+            boolean messageNotifications = view.messageNotificationsCheckbox.model.isSelected()
+            model.messageNotifications = messageNotifications
+            uiSettings.messageNotifications = messageNotifications
+        }
+        
         
         core.saveMuSettings()
 

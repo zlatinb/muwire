@@ -27,6 +27,7 @@ class UISettings {
     int maxChatLines
     Set<String> searchHistory
     Set<String> openTabs
+    boolean messageNotifications
     
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
@@ -54,6 +55,8 @@ class UISettings {
         
         searchHistory = DataUtil.readEncodedSet(props, "searchHistory")
         openTabs = DataUtil.readEncodedSet(props, "openTabs")
+        
+        messageNotifications = Boolean.parseBoolean(props.getProperty("messageNotifications","true"))
     }
 
     void write(OutputStream out) throws IOException {
@@ -84,6 +87,8 @@ class UISettings {
 
         DataUtil.writeEncodedSet(searchHistory, "searchHistory", props)
         DataUtil.writeEncodedSet(openTabs, "openTabs", props)
+        
+        props.setProperty("messageNotifications", String.valueOf(messageNotifications))
 
         props.store(out, "UI Properties")
     }

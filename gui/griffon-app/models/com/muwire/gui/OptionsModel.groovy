@@ -50,6 +50,7 @@ class OptionsModel {
     @Observable boolean groupByFile
     @Observable boolean exitOnClose
     @Observable boolean closeDecisionMade 
+    @Observable boolean messageNotifications
 
     // bw options
     @Observable String inBw
@@ -124,6 +125,7 @@ class OptionsModel {
         exitOnClose = uiSettings.exitOnClose
         storeSearchHistory = uiSettings.storeSearchHistory
         groupByFile = uiSettings.groupByFile
+        messageNotifications = uiSettings.messageNotifications
 
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)
