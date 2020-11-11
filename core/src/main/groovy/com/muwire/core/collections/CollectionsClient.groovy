@@ -55,6 +55,10 @@ class CollectionsClient {
                 
                 InputStream is = endpoint.getInputStream()
                 String code = DataUtil.readTillRN(is)
+                if (code.startsWith("404")) {
+                    eventBus.publish(new CollectionFetchStatusEvent(status : CollectionFetchStatus.FINISHED, uuid : e.uuid))
+                    return
+                }
                 if (!code.startsWith("200"))
                     throw new Exception("invalid code $code")
                 

@@ -681,6 +681,9 @@ class ConnectionAcceptor {
                 dos?.flush()
                 dos?.close()
             } catch (Exception ignore) {}
+            try {
+                e.getOutputStream().close()
+            } catch(Exception ignore) {}
             e.close()
         }
     }
