@@ -630,7 +630,7 @@ class MainFrameView {
                                     }
                                     panel (border : etchedBorder()){
                                         gridBagLayout()
-                                        button(text : trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
+                                        button(text : trans("REMOVE_CONTACT"), enabled : bind {model.markNeutralFromTrustedButtonEnabled}, constraints : gbc(gridx: 0, gridy: 0), markNeutralFromTrustedAction)
                                         button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy:0), markDistrustedAction)
                                     }
                                     panel (border : etchedBorder()){
@@ -653,7 +653,7 @@ class MainFrameView {
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    button(text: trans("MARK_NEUTRAL"), enabled : bind {model.markNeutralFromDistrustedButtonEnabled}, constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
+                                    button(text: trans("REMOVE_CONTACT"), enabled : bind {model.markNeutralFromDistrustedButtonEnabled}, constraints: gbc(gridx: 0, gridy: 0), markNeutralFromDistrustedAction)
                                     button(text: trans("MARK_TRUSTED"), enabled : bind {model.markTrustedButtonEnabled}, constraints : gbc(gridx: 1, gridy : 0), markTrustedAction)
                                 }
                             }
@@ -1247,7 +1247,7 @@ class MainFrameView {
         JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
         subscribeItem.addActionListener({mvcGroup.controller.subscribe()})
         trustMenu.add(subscribeItem)
-        JMenuItem markNeutralItem = new JMenuItem(trans("MARK_NEUTRAL"))
+        JMenuItem markNeutralItem = new JMenuItem(trans("REMOVE_CONTACT"))
         markNeutralItem.addActionListener({mvcGroup.controller.markNeutralFromTrusted()})
         trustMenu.add(markNeutralItem)
         JMenuItem markDistrustedItem = new JMenuItem(trans("MARK_DISTRUSTED"))
