@@ -857,12 +857,13 @@ class MainFrameModel {
     
     void onMessageReceivedEvent(MessageReceivedEvent e) {
         runInsideUIAsync {
-            messages++
-            messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))
-            if (folderIdx == Messenger.INBOX) {
-                messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
-                view.messageHeaderTable.model.fireTableDataChanged()
+            if (messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))) {
+                messages++
+                if (folderIdx == Messenger.INBOX) {
+                    messageHeaders.clear()
+                    messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
+                    view.messageHeaderTable.model.fireTableDataChanged()
+                }
             }
         }
     }

@@ -180,12 +180,13 @@ class Messenger {
     }
     
     public synchronized void onMessageReceivedEvent(MessageReceivedEvent e) {
-        inboxMessages.add(e.message)
-        diskIO.execute({
-            File unread = new File(inbox, deriveUnread(e.message))
-            unread.createNewFile()
-            persist(e.message, inbox)
-        })
+        if (inboxMessages.add(e.message)) {
+            diskIO.execute({
+                File unread = new File(inbox, deriveUnread(e.message))
+                unread.createNewFile()
+                persist(e.message, inbox)
+            })
+        }
     }
     
     private boolean deliverTo(MWMessage message, Persona recipient) {
