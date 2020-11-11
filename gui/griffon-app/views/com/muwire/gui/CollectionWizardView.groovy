@@ -6,6 +6,8 @@ import static com.muwire.gui.Translator.trans
 import java.awt.BorderLayout
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -16,10 +18,13 @@ import net.i2p.data.DataHelper
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JFrame
+import javax.swing.JMenuItem
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JTable
 import javax.swing.JTree
+import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.TransferHandler
 import javax.swing.border.TitledBorder
@@ -38,6 +43,7 @@ class CollectionWizardView {
     def nameTextField 
     def commentTextArea
     JTable filesTable
+    def lastFilesTableSortEvent
     JTree jTree
     
     void initUI() {
@@ -132,6 +138,24 @@ class CollectionWizardView {
     void mvcGroupInit(Map<String,String> args) {
         filesTable.setDefaultRenderer(Long.class, new SizeRenderer())
         filesTable.setTransferHandler(new SFTransferHandler())
+        filesTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        filesTable.rowSorter.addRowSorterListener({evt -> lastFilesTableSortEvent = evt})
+        
+        JPopupMenu filesMenu = new JPopupMenu()
+        JMenuItem removeItem = new JMenuItem(trans("REMOVE"))
+        removeItem.addActionListener({removeSelectedFiles()})
+        filesMenu.add(removeItem)
+        
+        filesTable.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    filesMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                    filesMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+        })
         
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -140,6 +164,23 @@ class CollectionWizardView {
         })
         window.pack()
         window.setVisible(true)
+    }
+    
+    void removeSelectedFiles() {
+        int[] selected = filesTable.getSelectedRows()
+        if (selected.length == 0)
+            return
+        if (lastFilesTableSortEvent != null) {
+            for (int i = 0; i < selected.length; i++)
+                selected[i] = filesTable.rowSorter.convertRowIndexToModel(selected[i])
+        }
+        
+        Arrays.sort(selected)
+        for(int i = selected.length - 1; i >= 0; i--) {
+            def sf = model.files.remove(selected[i])
+            model.uniqueFiles.remove(sf)
+        }
+        filesTable.model.fireTableDataChanged()
     }
     
     private class SFTransferHandler extends TransferHandler {
