@@ -171,7 +171,7 @@ class Initialize extends AbstractLifecycleHandler {
                 
                 
                 trayIcon.addActionListener(showMW)
-                application.getContext().put("tray-icon", true)
+                application.getContext().put("tray-icon", trayIcon)
             } catch (Exception bad) {
                 log.log(Level.WARNING,"couldn't set tray icon",bad)
             }

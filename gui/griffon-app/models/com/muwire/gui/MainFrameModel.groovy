@@ -208,7 +208,7 @@ class MainFrameModel {
 
         uiSettings = application.context.get("ui-settings")
         
-        messageNotificator = new MessageNotificator(uiSettings)
+        messageNotificator = new MessageNotificator(uiSettings, application.context.get("tray-icon"))
         
         shared = []
         treeRoot = new DefaultMutableTreeNode()
@@ -866,7 +866,7 @@ class MainFrameModel {
         runInsideUIAsync {
             if (messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))) {
                 messages++
-                messageNotificator.newMessage()
+                messageNotificator.newMessage(e.message.sender.getHumanReadableName())
                 messageNotificator.messages(messages)
                 if (folderIdx == Messenger.INBOX) {
                     messageHeaders.clear()

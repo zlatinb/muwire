@@ -816,7 +816,7 @@ class MainFrameView {
         mainFrame.addWindowListener(new WindowAdapter(){
                     public void windowClosing(WindowEvent e) {
                         chatNotificator.mainWindowDeactivated()
-                        if (application.getContext().get("tray-icon")) {
+                        if (application.getContext().get("tray-icon") != null) {
                             if (settings.closeWarning) {
                                 runInsideUIAsync {
                                     Map<String, Object> args2 = new HashMap<>()
