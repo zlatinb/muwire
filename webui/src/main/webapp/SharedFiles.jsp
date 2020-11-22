@@ -64,8 +64,10 @@ if (viewAs == null)
 		<p><span id="hashing"></span></p>
 		<hr/>
 		<div id="dropBox">
-			<span id="dropBoxText"><%=Util._t("Drag and drop files here to share in your DropBox")%></span>
-			<span id="dropBoxLoader"></span>
+			<br/><br/>
+			<img id="dropBoxImg" src="images/outbox.png" alt=""/>
+			<br/>
+			<span id="dropBoxText"><%=Util._t("Drag and drop files here to share them")%></span>
 		</div>
 		<hr/>
 <% if (viewAs.equals("tree")) { %>

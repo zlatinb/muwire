@@ -1,22 +1,9 @@
 
-function showLoader() {
-	const textSpan = document.getElementById("dropBoxText")
-	textSpan.style.display = "none"
-	const loaderSpan = document.getElementById("dropBoxLoader")
-	loaderSpan.style.display = "inline"
-}
-
-function hideLoader() {
-	const textSpan = document.getElementById("dropBoxText")
-	textSpan.style.display = "inline"
-	const loaderSpan = document.getElementById("dropBoxLoader")
-	loaderSpan.style.display = "none"
-}
-
 function sendFiles(files) {
 	const uri = "/MuWire/DropBox"
 	const xhr = new XMLHttpRequest()
 	const fd = new FormData()
+	const dropBoxText = document.getElementById("dropBoxText")
 	
 	for (let i = 0; i < files.length; i ++) {
 		fd.append("myFile", files[i])
@@ -25,9 +12,10 @@ function sendFiles(files) {
 	xhr.open("POST", uri, true)
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4 && xhr.status == 200) {
-			hideLoader()		
+			dropBoxText.innerText = _t("Drag and drop files here to share them")
 		}
 	}
+	dropBoxText.innerText = _t("Sending {0} files to your MuWire drop box, please wait.", files.length)
 	xhr.send(fd)
 }
 
@@ -42,8 +30,8 @@ function initDropBox() {
 		e.stopPropagation()
 		e.preventDefault()
 		
-		showLoader()
-		const filesArray = event.dataTransfer.files;
+		
+		const filesArray = e.dataTransfer.files;
 		sendFiles(filesArray)
 	}
 }
