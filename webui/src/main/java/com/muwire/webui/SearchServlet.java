@@ -149,7 +149,7 @@ public class SearchServlet extends HttpServlet {
             }
             
             SearchResults searchResults = searchManager.getResults().get(uuid);
-            Set<UIResultEvent> results = searchResults.getBySender().get(sender);
+            Set<UIResultEvent> results = searchResults.getBySender().getOrDefault(sender, Collections.emptySet());
             List<ResultFromSender> resultsFromSender = new ArrayList<>();
             results.forEach(result -> {
                 ResultStatus resultStatus = ResultStatus.AVAILABLE;
@@ -234,7 +234,7 @@ public class SearchServlet extends HttpServlet {
             
             Set<UIResultEvent> resultSet = searchResults.getByInfoHash(infoHash);
             if (resultSet == null) 
-                return;
+                resultSet = Collections.emptySet();
             
             List<SenderForResult> sendersForResult = new ArrayList<>();
             resultSet.forEach(event -> {
