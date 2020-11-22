@@ -48,8 +48,20 @@ public class InitServlet extends HttpServlet {
             else if (!incompleteLocationFile.canWrite())
                 throw new Exception("Incomplete files location not writeable");
             
+            String dropBoxLocation = req.getParameter("dropbox_location");
+            if (dropBoxLocation == null)
+                throw new Exception("DropBox location cannot be blank");
+            File dropBoxLocationFile = new File(dropBoxLocation);
+            if (!dropBoxLocationFile.exists()) {
+                if (!dropBoxLocationFile.mkdirs())
+                    throw new Exception("Couldn't create DropBox location");
+            } else if (dropBoxLocationFile.isFile())
+                throw new Exception("DropBox location must point to a directory");
+            else if (!dropBoxLocationFile.canWrite())
+                throw new Exception("DropBox location not writeable");
+            
             MuWireClient client = (MuWireClient) req.getServletContext().getAttribute("mwClient");
-            client.initMWProps(nickname, downloadLocationFile, incompleteLocationFile);
+            client.initMWProps(nickname, downloadLocationFile, incompleteLocationFile, dropBoxLocationFile);
             client.start();
             resp.sendRedirect("/MuWire/index");
         } catch (Throwable e) {

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class ConfigurationServlet extends HttpServlet {
         INPUT_VALIDATORS.put("uploadSlotsPerUser", new IntegerValidator("Upload slots per user (-1 means unlimited)"));
         INPUT_VALIDATORS.put("downloadLocation", new DirectoryValidator());
         INPUT_VALIDATORS.put("incompleteLocation", new DirectoryValidator());
+        INPUT_VALIDATORS.put("dropBoxLocation", new DirectoryValidator());
         INPUT_VALIDATORS.put("speedSmoothSeconds", new PositiveIntegerValidator("Download speed smoothing interval (seconds)"));
         INPUT_VALIDATORS.put("inbound.length", new PositiveIntegerValidator("Inbound tunnel length"));
         INPUT_VALIDATORS.put("inbound.quantity", new PositiveIntegerValidator("Inbound tunnel quantity"));
@@ -37,6 +39,7 @@ public class ConfigurationServlet extends HttpServlet {
         INPUT_VALIDATORS.put("defaultFeedItemsToKeep", new IntegerValidator("Number of items to keep on disk (-1 means unlimited)"));
     }
     
+    private WebUISettings webSettings;
     private Core core;
     private ServletContext context;
 
@@ -60,6 +63,11 @@ public class ConfigurationServlet extends HttpServlet {
                 String value = req.getParameter(name);
                 update(name, value);
             }
+            
+            PrintWriter pw = new PrintWriter(new File(core.getHome(), "webui.properties"), "UTF-8");
+            webSettings.write(pw);
+            pw.close();
+            
             core.saveMuSettings();
             core.saveI2PSettings();
             context.setAttribute("MWConfigError", null);
@@ -98,6 +106,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "uploadSlotsPerUser" : core.getMuOptions().setUploadSlotsPerUser(Integer.parseInt(value)); break;
         case "downloadLocation" : core.getMuOptions().setDownloadLocation(getDirectory(value)); break;
         case "incompleteLocation" : core.getMuOptions().setIncompleteLocation(getDirectory(value)); break;
+        case "dropBoxLocation" : webSettings.setDropBoxLocation(getDirectory(value)); break;
         case "shareDownloadedFiles" : core.getMuOptions().setShareDownloadedFiles(true); break;
         case "shareHiddenFiles" : core.getMuOptions().setShareHiddenFiles(true); break;
         case "searchComments" : core.getMuOptions().setSearchComments(true); break;
@@ -116,7 +125,6 @@ public class ConfigurationServlet extends HttpServlet {
         case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * Long.parseLong(value)); break;
         case "defaultFeedItemsToKeep" : core.getMuOptions().setDefaultFeedItemsToKeep(Integer.parseInt(value)); break;
         
-        // TODO: ui settings
         }
     }
     
@@ -178,6 +186,7 @@ public class ConfigurationServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         context = config.getServletContext();
         core = (Core) config.getServletContext().getAttribute("core");
+        webSettings = (WebUISettings) config.getServletContext().getAttribute("webSettings");
     }
 
 }

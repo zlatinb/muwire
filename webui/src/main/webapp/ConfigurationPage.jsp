@@ -14,6 +14,7 @@
 String pagetitle=Util._t("Configuration");
 String helptext = Util._t("Use this page to change MuWire options.");
 
+WebUISettings webSettings = (WebUISettings) application.getAttribute("webSettings");
 Core core = (Core) application.getAttribute("core");
 
 String inboundLength = core.getI2pOptions().getProperty("inbound.length");
@@ -127,6 +128,13 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 			<div class="configuration-section">
 				<h3><%=Util._t("Sharing")%></h3>
 				<table>
+					<tr>
+						<td><div class="tooltip"><%=Util._t("Drop Box directory")%>
+							<span class="tooltiptext"><%=Util._t("Where to store files you share with drag and drop")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="text" size="30" name="dropBoxLocation" value="<%= webSettings.getDropBoxLocation().getAbsoluteFile()%>"></p></td>
+					</tr>
 					<tr>
 						<td><div class="tooltip"><%=Util._t("Share downloaded files")%>
 							<span class="tooltiptext"><%=Util._t("Automatically share files you have downloaded with MuWire")%></span>

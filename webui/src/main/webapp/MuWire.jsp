@@ -30,8 +30,10 @@
     	<%
     		String defaultDownloadLocation = System.getProperty("user.home")+File.separator+"Downloads";
     		String defaultIncompletesLocation = System.getProperty("user.home") + File.separator+"MuWire Incompletes";
+    		String defaultDropBoxLocation = System.getProperty("user.home") + File.separator + "MuWire DropBox";
     		session.setAttribute("defaultDownloadLocation",defaultDownloadLocation);
     		session.setAttribute("defaultIncompletesLocation",defaultIncompletesLocation);
+    		session.setAttribute("defaultDropBoxLocation",defaultDropBoxLocation);
     		
     		Throwable error = (Throwable) application.getAttribute("MWInitError");
     	%>
@@ -55,6 +57,8 @@
         <input type='text' name='download_location' value="${defaultDownloadLocation}"><br/>
         <%=Util._t("Directory for storing incomplete files")%>:<br/>
         <input type='text' name='incomplete_location' value="${defaultIncompletesLocation}"><br/>
+        <%=Util._t("Drop Box for files you share with MuWire")%>:<br/>
+        <input type='text' name='dropbox_location' value="${defaultDropBoxLocation}"><br/>
         <input type="submit" value="<%=Util._t("Submit")%>">
     </body>
 </html>

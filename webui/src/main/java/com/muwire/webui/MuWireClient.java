@@ -59,7 +59,7 @@ public class MuWireClient {
     private final ServletContext servletContext;
     private final String version;
     private final String home;
-    private final File mwProps;
+    private final File mwProps, webUIProps;
     
     private volatile Core core;
     private volatile boolean coreLoaded;
@@ -70,6 +70,7 @@ public class MuWireClient {
         this.version = version;
         this.home = home;
         this.mwProps = new File(home, "MuWire.properties");
+        this.webUIProps = new File(home, "webui.properties");
     }
 
     public void start() throws Throwable {
@@ -87,8 +88,19 @@ public class MuWireClient {
             logger.addHandler(new I2PLogHandler(ctx));
         }
         
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mwProps), StandardCharsets.UTF_8));
+        BufferedReader reader;
         Properties props = new Properties();
+
+        if (webUIProps.exists() && webUIProps.isFile()) {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(webUIProps), StandardCharsets.UTF_8));
+            props.load(reader);
+            reader.close();
+        }
+        WebUISettings webSettings = new WebUISettings(props);
+        servletContext.setAttribute("webSettings", webSettings);
+        
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(mwProps), StandardCharsets.UTF_8));
+        props = new Properties();
         props.load(reader);
         reader.close();
         
@@ -113,11 +125,13 @@ public class MuWireClient {
         return !mwProps.exists();
     }
     
-    public void initMWProps(String nickname, File downloadLocation, File incompleteLocation) throws Exception {
+    public void initMWProps(String nickname, File downloadLocation, File incompleteLocation, File dropBoxLocation) throws Exception {
         if (!downloadLocation.exists())
             downloadLocation.mkdirs();
         if (!incompleteLocation.exists())
             incompleteLocation.mkdirs();
+        if (!dropBoxLocation.exists())
+            dropBoxLocation.mkdirs();
         
         MuWireSettings settings = new MuWireSettings();
         settings.setNickname(nickname);
@@ -127,6 +141,13 @@ public class MuWireClient {
         
         PrintWriter pw = new PrintWriter(mwProps, "UTF-8");
         settings.write(pw);
+        pw.close();
+        
+        WebUISettings webSettings = new WebUISettings();
+        webSettings.setDropBoxLocation(dropBoxLocation);
+        
+        pw = new PrintWriter(webUIProps, "UTF-8");
+        webSettings.write(pw);
         pw.close();
     }
     
