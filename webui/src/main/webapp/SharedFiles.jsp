@@ -19,6 +19,7 @@ if (viewAs == null)
 <html>
 	<head>
 <%@ include file="css.jsi"%>
+<script src="js/dropBox.js?<%=version%>" type="text/javascript"></script>
 <% if (viewAs.equals("tree")) { %>
 	<script src="js/files.js?<%=version%>" type="text/javascript"></script>
 <% } else { %>
@@ -61,6 +62,11 @@ if (viewAs == null)
 	    <section class="main foldermain">
 		<p><%=Util._t("Shared Files")%> <span id="count">0</span></p>
 		<p><span id="hashing"></span></p>
+		<hr/>
+		<div id="dropBox">
+			<span id="dropBoxText"><%=Util._t("Drag and drop files here to share in your DropBox")%></span>
+			<span id="dropBoxLoader"></span>
+		</div>
 		<hr/>
 <% if (viewAs.equals("tree")) { %>
 			<ul>

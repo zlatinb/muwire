@@ -95,6 +95,16 @@
     <servlet-class>com.muwire.webui.SignServlet</servlet-class>
 </servlet>
 
+<servlet>
+    <servlet-name>com.muwire.webui.DropBoxServlet</servlet-name>
+    <servlet-class>com.muwire.webui.DropBoxServlet</servlet-class>
+    <multipart-config>
+        <max-file-size>-1</max-file-size>
+        <max-request-size>-1</max-request-size>
+        <file-size-threshold>1024000</file-size-threshold>
+    </multipart-config>
+</servlet>
+
 <servlet-mapping>
     <servlet-name>com.muwire.webui.MuWireServlet</servlet-name>
     <url-pattern>/index.jsp</url-pattern>
@@ -173,6 +183,11 @@
 <servlet-mapping>
     <servlet-name>com.muwire.webui.SignServlet</servlet-name>
     <url-pattern>/Sign</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>com.muwire.webui.DropBoxServlet</servlet-name>
+    <url-pattern>/DropBox</url-pattern>
 </servlet-mapping>
 
 __JASPER__
