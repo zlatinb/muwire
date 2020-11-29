@@ -105,6 +105,7 @@ public class MuWireClient {
         reader.close();
         
         MuWireSettings settings = new MuWireSettings(props);
+        settings.setAllowMessages(false);
         Core core = new Core(settings, new File(home), version);
         setCore(core);
         MWStarter starter = new MWStarter(core, this);
