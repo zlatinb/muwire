@@ -1,5 +1,7 @@
 package com.muwire.core.connection
 
+import com.muwire.core.hostcache.SimpleHostCache
+
 import static org.junit.Assert.fail
 
 import java.util.concurrent.CopyOnWriteArrayList
@@ -56,7 +58,7 @@ class ConnectionAcceptorTest {
     void before() {
         connectionManagerMock = new MockFor(UltrapeerConnectionManager.class)
         i2pAcceptorMock = new MockFor(I2PAcceptor.class)
-        hostCacheMock = new MockFor(HostCache.class)
+        hostCacheMock = new MockFor(SimpleHostCache.class)
         trustServiceMock = new MockFor(TrustService.class)
         searchManagerMock = new MockFor(SearchManager.class)
         uploadManagerMock = new MockFor(UploadManager.class)
@@ -95,7 +97,7 @@ class ConnectionAcceptorTest {
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
         acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor,
-            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null)
+            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null)
         acceptor.start()
         Thread.sleep(100)
     }

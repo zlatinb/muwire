@@ -26,7 +26,7 @@ class HasherServiceTest {
         eventBus = new EventBus()
         hasher = new FileHasher()
         def props = new MuWireSettings()
-        service = new HasherService(hasher, eventBus, new FileManager(eventBus, props), props)
+        service = new HasherService(eventBus, new FileManager(eventBus, props), props)
         eventBus.register(FileHashedEvent.class, listener)
         eventBus.register(FileSharedEvent.class, service)
         service.start()

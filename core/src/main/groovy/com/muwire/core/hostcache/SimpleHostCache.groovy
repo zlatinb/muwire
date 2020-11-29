@@ -23,7 +23,11 @@ class SimpleHostCache extends HostCache {
     final int interval
     final Timer timer
     final Map<Destination, Host> hosts = Collections.synchronizedMap(new HashMap<>())
-    
+
+    SimpleHostCache() {
+        super(null,null,null)
+    }
+
     public SimpleHostCache(TrustService trustService, File storage, int interval,
         MuWireSettings settings, Destination myself) {
         super(trustService, settings, myself)

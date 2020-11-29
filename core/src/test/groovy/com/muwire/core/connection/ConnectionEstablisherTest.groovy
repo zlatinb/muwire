@@ -1,5 +1,7 @@
 package com.muwire.core.connection
 
+import com.muwire.core.hostcache.SimpleHostCache
+
 import java.util.concurrent.CopyOnWriteArrayList
 
 import org.junit.After
@@ -55,7 +57,7 @@ class ConnectionEstablisherTest {
         eventBus.register(HostDiscoveredEvent.class, listener)
         i2pConnectorMock = new MockFor(I2PConnector.class)
         connectionManagerMock = new MockFor(ConnectionManager.class)
-        hostCacheMock = new MockFor(HostCache.class)
+        hostCacheMock = new MockFor(SimpleHostCache.class)
     }
 
     @After
@@ -83,7 +85,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock.ignore.needsConnections {
             true
         }
-        hostCacheMock.ignore.getHosts { num ->
+        hostCacheMock.ignore.getHosts { num, filter ->
             assert num == 1
             [destinations.dest1]
         }
@@ -113,7 +115,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock.ignore.needsConnections {
             true
         }
-        hostCacheMock.ignore.getHosts { num ->
+        hostCacheMock.ignore.getHosts { num, filter ->
             assert num == 1
             [destinations.dest1]
         }
@@ -156,7 +158,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock.ignore.needsConnections {
             true
         }
-        hostCacheMock.ignore.getHosts { num ->
+        hostCacheMock.ignore.getHosts { num, filter ->
             assert num == 1
             [destinations.dest1]
         }
@@ -198,7 +200,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock.ignore.needsConnections {
             true
         }
-        hostCacheMock.ignore.getHosts { num ->
+        hostCacheMock.ignore.getHosts { num, filter ->
             assert num == 1
             [destinations.dest1]
         }
@@ -241,7 +243,7 @@ class ConnectionEstablisherTest {
         connectionManagerMock.ignore.needsConnections {
             true
         }
-        hostCacheMock.ignore.getHosts { num ->
+        hostCacheMock.ignore.getHosts { num, filter ->
             assert num == 1
             [destinations.dest1]
         }

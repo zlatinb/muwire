@@ -46,7 +46,7 @@ class DownloadSessionTest {
         eventBus = new EventBus()
     }
 
-    private void initSession(int size, def claimedPieces = [], boolean browse = false, boolean feed = false, boolean chat = false) {
+    private void initSession(int size, def claimedPieces = [], boolean browse = false, boolean feed = false, boolean chat = false, boolean message = false) {
         Random r = new Random()
         byte [] content = new byte[size]
         r.nextBytes(content)
@@ -79,7 +79,7 @@ class DownloadSessionTest {
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
 
         session = new DownloadSession(eventBus, "",pieces, infoHash, endpoint, target, pieceSize, size, available, new AtomicLong(),
-            browse, feed, chat)
+            browse, feed, chat, message)
         downloadThread = new Thread( { perform() } as Runnable)
         downloadThread.setDaemon(true)
         downloadThread.start()
