@@ -1,9 +1,26 @@
 package com.muwire.core.files
 
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class FileTreeTest {
-    
+
+    @Before
+    @After
+    public void cleanup() {
+        File a = new File("a")
+        File b = new File("b")
+        [a,b].each {
+            if (it.exists()) {
+                if (it.isDirectory())
+                    it.deleteDir()
+                else
+                    it.delete()
+            }
+        }
+    }
+
     @Test
     public void testRemoveEmtpyDirs() {
         File a = new File("a")
@@ -108,10 +125,13 @@ class FileTreeTest {
         }
         
         File a = new File("a")
+        a.delete()
         a.createNewFile()
         File b = new File("b")
+        b.delete()
         b.mkdir()
         File c = new File(b, "c")
+        c.delete()
         c.createNewFile()
         
         FileTree<String> tree = new FileTree<>()
