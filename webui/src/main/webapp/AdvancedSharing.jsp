@@ -6,7 +6,7 @@
 <% 
 
 String pagetitle=Util._t("Advanced Sharing"); 
-String helptext = Util._t("Use this page to configure advanced settings for each shared directory.");
+String helptext = Util._t("Use this page to configure advanced settings for each shared folder.");
 
 %>
 
@@ -25,7 +25,7 @@ String helptext = Util._t("Use this page to configure advanced settings for each
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
-	    	<p><%=Util._t("Shared directories can be watched automatically or periodically.  Automatic watching is recommended, but may not work on some NAS devices.")%></p>
+	    	<p><%=Util._t("Shared folders can be watched automatically or periodically.  Automatic watching is recommended, but may not work on some NAS devices.")%></p>
 		    <div id="table-wrapper">
 				<div class="paddedTable" id="table-scroll">
 					<div id="dirsTable"></div>

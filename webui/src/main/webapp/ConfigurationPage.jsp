@@ -91,14 +91,14 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 						<td><p align="right"><input type="text" size="1" name="downloadMaxFailures" class="right" value="<%= core.getMuOptions().getDownloadMaxFailures()%>"></p></td>
 					</tr>
 					<tr>
-						<td><div class="tooltip"><%=Util._t("Directory for downloaded files")%>
+						<td><div class="tooltip"><%=Util._t("Folder for downloaded files")%>
 							<span class="tooltiptext"><%=Util._t("Where to save downloaded files. MuWire must be able to write to this location.")%></span>
 							</div>
 						</td>
 						<td><p align="right"><input type="text" size="30" name="downloadLocation" value="<%= core.getMuOptions().getDownloadLocation().getAbsoluteFile()%>"></p></td>
 					</tr>
 					<tr> 
-						<td><div class="tooltip"><%=Util._t("Directory for incomplete files")%>
+						<td><div class="tooltip"><%=Util._t("Folder for incomplete files")%>
 							<span class="tooltiptext"><%=Util._t("Where to store partial data of files which are currently being downloaded.")%></span>
 							</div>
 						</td>

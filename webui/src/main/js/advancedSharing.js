@@ -99,12 +99,12 @@ function configure(path) {
 	var dir = pathToDir.get(path)
 	
 	var html = "<form action='/MuWire/AdvancedShare' method='post'>"
-	html += "<h3>" + _t("Directory configuration for {0}", dir.directory) + "</h3>"
+	html += "<h3>" + _t("Folder configuration for {0}", dir.directory) + "</h3>"
 	
 	html += "<table>"
 	
 	html += "<tr>"
-	html += "<td>" + _t("Monitor directory for changes") + "</td>"
+	html += "<td>" + _t("Monitor folder for changes") + "</td>"
 	html += "<td><p align='right'><input type='checkbox' name='autoWatch' value='true'"
 	if (dir.autoWatch == "true")
 		html += " checked "
@@ -112,7 +112,7 @@ function configure(path) {
 	html += "</tr>"
 	
 	html += "<tr>"
-	html += "<td>" + _t("Directory sync frequency (seconds, 0 means never)") + "</td>"
+	html += "<td>" + _t("Folder sync frequency (seconds, 0 means never)") + "</td>"
 	html += "<td><p align='right'><input type='text' size='3' name='syncInterval' value='" + dir.syncInterval + "'></p></td>"
 	html += "</tr>"
 	

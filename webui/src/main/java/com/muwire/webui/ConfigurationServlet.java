@@ -171,7 +171,7 @@ public class ConfigurationServlet extends HttpServlet {
             if (!f.exists())
                 throw new Exception(Util._t("Bad input") + " : " + Util._t("{0} does not exist",input));
             if (!f.isDirectory())
-                throw new Exception(Util._t("Bad input") + " : " + Util._t("{0} is not a directory",input));
+                throw new Exception(Util._t("Bad input") + " : " + Util._t("{0} is not a folder",input));
             if (!f.canWrite())
                 throw new Exception(Util._t("Bad input") + " : " + Util._t("{0} not writeable",input));
         }

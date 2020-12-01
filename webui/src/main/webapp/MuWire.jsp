@@ -53,9 +53,9 @@
         <form action="/MuWire/init" method="post">
         <%=Util._t("Nickname")%>:<br/>
         <input type="text" name="nickname"><br>
-        <%=Util._t("Directory for saving downloaded files")%>:<br/>
+        <%=Util._t("Folder for saving downloaded files")%>:<br/>
         <input type='text' name='download_location' value="${defaultDownloadLocation}"><br/>
-        <%=Util._t("Directory for storing incomplete files")%>:<br/>
+        <%=Util._t("Folder for storing incomplete files")%>:<br/>
         <input type='text' name='incomplete_location' value="${defaultIncompletesLocation}"><br/>
         <%=Util._t("Drop Box for files you share with MuWire")%>:<br/>
         <input type='text' name='dropbox_location' value="${defaultDropBoxLocation}"><br/>
