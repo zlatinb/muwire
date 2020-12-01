@@ -129,7 +129,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<h3><%=Util._t("Sharing")%></h3>
 				<table>
 					<tr>
-						<td><div class="tooltip"><%=Util._t("Drop Box directory")%>
+						<td><div class="tooltip"><%=Util._t("Drop Box folder")%>
 							<span class="tooltiptext"><%=Util._t("Where to store files you share with drag and drop")%></span>
 							</div>
 						</td>
