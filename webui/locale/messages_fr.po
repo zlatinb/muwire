@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-22 16:51+0000\n"
+"POT-Creation-Date: 2020-12-01 20:16+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>, 2020\n"
 "Language-Team: French (https://www.transifex.com/otf/teams/114288/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -321,7 +321,7 @@ msgstr "Parcourir"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:207
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:208
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:229
-#: src/main/java//com/muwire/webui/Util.java:67
+#: src/main/java//com/muwire/webui/Util.java:65
 msgid "Feeds"
 msgstr "Fils"
 
@@ -537,18 +537,17 @@ msgid "Sign"
 msgstr "Signer"
 
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:133
-msgid ""
-"Use this page to configure advanced settings for each shared directory."
+msgid "Use this page to configure advanced settings for each shared folder."
 msgstr ""
-"Utilisez cette page pour configurer les paramètres avancés de chaque "
-"répertoire partagé."
+"Utilisez cette page pour configurer les paramètres avancés de chaque dossier"
+" partagé."
 
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:240
 msgid ""
-"Shared directories can be watched automatically or periodically.  Automatic "
+"Shared folders can be watched automatically or periodically.  Automatic "
 "watching is recommended, but may not work on some NAS devices."
 msgstr ""
-"Les répertoires partagés peuvent être surveillés automatiquement ou "
+"Les dossiers partagés peuvent être surveillés automatiquement ou "
 "périodiquement. La surveillance automatique est recommandée, mais pourrait "
 "ne pas fonctionner sur certaines unités NAS."
 
@@ -630,8 +629,8 @@ msgstr ""
 "source de téléchargement par MuWire."
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:308
-msgid "Directory for downloaded files"
-msgstr "Répertoire des fichiers téléchargés"
+msgid "Folder for downloaded files"
+msgstr "Dossier des fichiers téléchargés"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:310
 msgid ""
@@ -642,8 +641,8 @@ msgstr ""
 "écrire dans cet emplacement."
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:314
-msgid "Directory for incomplete files"
-msgstr "Répertoire des fichiers incomplets"
+msgid "Folder for incomplete files"
+msgstr "Dossier des fichiers incomplets"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:316
 msgid ""
@@ -681,12 +680,12 @@ msgid "Sharing"
 msgstr "Partage"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:336
-msgid "Drop Box directory"
-msgstr ""
+msgid "Drop Box folder"
+msgstr "Dossier de la boîte de dépôt"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:338
 msgid "Where to store files you share with drag and drop"
-msgstr ""
+msgstr "Emplacement des fichiers partagés par glisser-déposer"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:342
 msgid "Share downloaded files"
@@ -747,7 +746,7 @@ msgid "Default settings for new feeds"
 msgstr "Paramètres par défaut pour les nouveaux fils"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:376
-#: src/main/java//com/muwire/webui/Util.java:55
+#: src/main/java//com/muwire/webui/Util.java:53
 msgid "Download published files automatically"
 msgstr "Télécharger automatiquement les fichiers publiés"
 
@@ -756,7 +755,7 @@ msgid "Download every file published to the given feed"
 msgstr "Télécharger tout fichier publié dans le fils indiqué"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:382
-#: src/main/java//com/muwire/webui/Util.java:53
+#: src/main/java//com/muwire/webui/Util.java:51
 msgid "Download each file sequentially"
 msgstr "Télécharger séquentiellement tous les fichiers"
 
@@ -770,7 +769,7 @@ msgstr ""
 "disponibilité du fichier pour autrui."
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:388
-#: src/main/java//com/muwire/webui/Util.java:66
+#: src/main/java//com/muwire/webui/Util.java:64
 msgid "Feed update frequency (minutes)"
 msgstr "Fréquence de mise à jour du fil (en minutes)"
 
@@ -997,7 +996,7 @@ msgid "Known Hosts"
 msgstr "Hôtes connus"
 
 #: build/tmp_jsp/com/muwire/webui/MuStatus_jsp.java:256
-#: src/main/java//com/muwire/webui/Util.java:64
+#: src/main/java//com/muwire/webui/Util.java:62
 msgid "Failing Hosts"
 msgstr "Hôtes en échec"
 
@@ -1028,24 +1027,24 @@ msgstr ""
 "téléchargement"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:189
-msgid "These directories will be created if they do not already exist"
-msgstr "Ces répertoires seront créés s’ils n’existent pas déjà"
+msgid "These folders will be created if they do not already exist"
+msgstr "Ces dossiers seront créés s’ils n’existent pas déjà"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:191
 msgid "Nickname"
 msgstr "Pseudonyme"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:193
-msgid "Directory for saving downloaded files"
-msgstr "Répertoire d’enregistrement des fichiers téléchargés"
+msgid "Folder for saving downloaded files"
+msgstr "Dossier d’enregistrement des fichiers téléchargés"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:197
-msgid "Directory for storing incomplete files"
-msgstr "Répertoire d’enregistrement des fichiers incomplets"
+msgid "Folder for storing incomplete files"
+msgstr "Dossier d’enregistrement des fichiers incomplets"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:201
 msgid "Drop Box for files you share with MuWire"
-msgstr ""
+msgstr "Boîte de dépôt pour les fichiers que vous partagez avec MuWire"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:205
 #: src/main/java//com/muwire/webui/Util.java:128
@@ -1103,9 +1102,9 @@ msgid "View As Tree"
 msgstr "Visualiser en arborescence"
 
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:278
-#: src/main/java//com/muwire/webui/Util.java:60
+#: src/main/java//com/muwire/webui/Util.java:58
 msgid "Drag and drop files here to share them"
-msgstr ""
+msgstr "Glisser-déposer des fichiers ici pour les partager"
 
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:130
 msgid "This page shows the trust lists you are subscribed to."
@@ -1170,8 +1169,8 @@ msgstr "{0} n’existe pas"
 
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:174
 #, java-format
-msgid "{0} is not a directory"
-msgstr "{0} n’est pas un répertoire"
+msgid "{0} is not a folder"
+msgstr "{0} n’est pas un dossier"
 
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:176
 #, java-format
@@ -1195,7 +1194,7 @@ msgstr "Connexion"
 
 #: src/main/java//com/muwire/webui/EnumStrings.java:23
 #: src/main/java//com/muwire/webui/EnumStrings.java:44
-#: src/main/java//com/muwire/webui/Util.java:59
+#: src/main/java//com/muwire/webui/Util.java:57
 msgid "Downloading"
 msgstr "Téléchargement"
 
@@ -1272,7 +1271,7 @@ msgid "Neutral"
 msgstr "Neutre"
 
 #: src/main/java//com/muwire/webui/EnumStrings.java:81
-#: src/main/java//com/muwire/webui/Util.java:49
+#: src/main/java//com/muwire/webui/Util.java:47
 msgid "Distrusted"
 msgstr "Non fiable"
 
@@ -1349,77 +1348,77 @@ msgstr "Copier l’empreinte dans le presse-papiers"
 msgid "Copy To Clipboard"
 msgstr "Copier dans le presse-papiers"
 
-#: src/main/java//com/muwire/webui/Util.java:47
-#, java-format
-msgid "Directory configuration for {0}"
-msgstr "Configuration du répertoire pour {0}"
-
 #: src/main/java//com/muwire/webui/Util.java:48
-msgid "Directory sync frequency (seconds, 0 means never)"
-msgstr ""
-"Fréquence de synchronisation du répertoire (en secondes, 0 signifie jamais)"
-
-#: src/main/java//com/muwire/webui/Util.java:50
 msgid "Distrusted User"
 msgstr "Utilisateur non fiable"
 
-#: src/main/java//com/muwire/webui/Util.java:51
+#: src/main/java//com/muwire/webui/Util.java:49
 msgid "Down"
 msgstr "Bas"
 
-#: src/main/java//com/muwire/webui/Util.java:52
+#: src/main/java//com/muwire/webui/Util.java:50
 msgid "Download"
 msgstr "Téléchargement"
 
-#: src/main/java//com/muwire/webui/Util.java:54
+#: src/main/java//com/muwire/webui/Util.java:52
 msgid "Download Location"
 msgstr "Emplacement de téléchargement"
 
-#: src/main/java//com/muwire/webui/Util.java:56
+#: src/main/java//com/muwire/webui/Util.java:54
 msgid "Downloaded"
 msgstr "Téléchargé"
 
-#: src/main/java//com/muwire/webui/Util.java:57
+#: src/main/java//com/muwire/webui/Util.java:55
 msgid "Downloaded Pieces"
 msgstr "Morceaux téléchargés"
 
-#: src/main/java//com/muwire/webui/Util.java:58
+#: src/main/java//com/muwire/webui/Util.java:56
 msgid "Downloader"
 msgstr "Téléchargeur"
 
-#: src/main/java//com/muwire/webui/Util.java:61
+#: src/main/java//com/muwire/webui/Util.java:59
 msgid "Enter Reason (Optional)"
 msgstr "Saisir une raison (facultative)"
 
-#: src/main/java//com/muwire/webui/Util.java:62
+#: src/main/java//com/muwire/webui/Util.java:60
 msgid "ETA"
 msgstr "Fin prévue"
 
-#: src/main/java//com/muwire/webui/Util.java:63
+#: src/main/java//com/muwire/webui/Util.java:61
 #, java-format
 msgid "Failed to load {0} files"
-msgstr ""
+msgstr "Échec de chargement de {0} fichiers"
 
-#: src/main/java//com/muwire/webui/Util.java:65
+#: src/main/java//com/muwire/webui/Util.java:63
 #, java-format
 msgid "Feed configuration for {0}"
 msgstr "Configuration du fil pour {0}"
 
-#: src/main/java//com/muwire/webui/Util.java:68
+#: src/main/java//com/muwire/webui/Util.java:66
 msgid "Fetching Certificates"
 msgstr "Récupération des certificats"
 
-#: src/main/java//com/muwire/webui/Util.java:69
+#: src/main/java//com/muwire/webui/Util.java:67
 msgid "Feed"
 msgstr "Fil"
 
-#: src/main/java//com/muwire/webui/Util.java:70
+#: src/main/java//com/muwire/webui/Util.java:68
 msgid "File"
 msgstr "Fichier"
 
-#: src/main/java//com/muwire/webui/Util.java:71
+#: src/main/java//com/muwire/webui/Util.java:69
 msgid "Files"
 msgstr "Fichiers"
+
+#: src/main/java//com/muwire/webui/Util.java:70
+#, java-format
+msgid "Folder configuration for {0}"
+msgstr "Configuration du dossier pour {0}"
+
+#: src/main/java//com/muwire/webui/Util.java:71
+msgid "Folder sync frequency (seconds, 0 means never)"
+msgstr ""
+"Fréquence de synchronisation du dossier (en secondes, 0 signifie jamais)"
 
 #: src/main/java//com/muwire/webui/Util.java:72
 msgid "Hash copied to clipboard"
@@ -1470,8 +1469,8 @@ msgid "Mark Trusted"
 msgstr "Marquer comme fiable"
 
 #: src/main/java//com/muwire/webui/Util.java:87
-msgid "Monitor directory for changes"
-msgstr "Surveiller les changements dans le répertoire"
+msgid "Monitor folder for changes"
+msgstr "Surveiller les changements dans le dossier"
 
 #: src/main/java//com/muwire/webui/Util.java:90
 msgid "Name"
@@ -1552,7 +1551,7 @@ msgstr "Expéditeurs"
 #: src/main/java//com/muwire/webui/Util.java:118
 #, java-format
 msgid "Sending {0} files to your MuWire drop box, please wait."
-msgstr ""
+msgstr "Envoi de {0} fichiers vers votre boîte de dépôt, veuillez patienter."
 
 #: src/main/java//com/muwire/webui/Util.java:121
 msgid "Show Comment"

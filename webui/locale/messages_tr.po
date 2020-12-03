@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-22 16:51+0000\n"
+"POT-Creation-Date: 2020-12-01 20:16+0000\n"
 "Last-Translator: AO <ao@localizationlab.org>, 2020\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/otf/teams/114288/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -322,7 +322,7 @@ msgstr "Göz at"
 #: build/tmp_jsp/com/muwire/webui/TrustLists_jsp.java:207
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:208
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:229
-#: src/main/java//com/muwire/webui/Util.java:67
+#: src/main/java//com/muwire/webui/Util.java:65
 msgid "Feeds"
 msgstr "Akışlar"
 
@@ -538,20 +538,14 @@ msgid "Sign"
 msgstr "İmzala"
 
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:133
-msgid ""
-"Use this page to configure advanced settings for each shared directory."
+msgid "Use this page to configure advanced settings for each shared folder."
 msgstr ""
-"Bu bölümde her bir paylaşılan klasör için gelişmiş izinleri "
-"yapılandırabilirsiniz."
 
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:240
 msgid ""
-"Shared directories can be watched automatically or periodically.  Automatic "
+"Shared folders can be watched automatically or periodically.  Automatic "
 "watching is recommended, but may not work on some NAS devices."
 msgstr ""
-"Paylaşılan klasörler otomatik ya da düzenli olarak izlenebilir. Otomatik "
-"izlemenin kullanılması önerilir ancak bazı NAS aygıtları üzerinde "
-"çalışmayabilir."
 
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:137
 msgid "Browse Host"
@@ -631,8 +625,8 @@ msgid ""
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:308
-msgid "Directory for downloaded files"
-msgstr "İndirilmiş dosya klasörü"
+msgid "Folder for downloaded files"
+msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:310
 msgid ""
@@ -643,8 +637,8 @@ msgstr ""
 "yazma izni olmalıdır."
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:314
-msgid "Directory for incomplete files"
-msgstr "Tamamlanmamış dosya klasörü"
+msgid "Folder for incomplete files"
+msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:316
 msgid ""
@@ -679,7 +673,7 @@ msgid "Sharing"
 msgstr "Paylaşılıyor"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:336
-msgid "Drop Box directory"
+msgid "Drop Box folder"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:338
@@ -748,7 +742,7 @@ msgid "Default settings for new feeds"
 msgstr "Yeni akışların varsayılan ayarları"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:376
-#: src/main/java//com/muwire/webui/Util.java:55
+#: src/main/java//com/muwire/webui/Util.java:53
 msgid "Download published files automatically"
 msgstr "Yayınlanmış dosyalar otomatik olarak indirilsin"
 
@@ -758,7 +752,7 @@ msgstr ""
 "Bu seçenek etkinleştirildiğinde, akışta yayınlanan her dosya indirilir"
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:382
-#: src/main/java//com/muwire/webui/Util.java:53
+#: src/main/java//com/muwire/webui/Util.java:51
 msgid "Download each file sequentially"
 msgstr "Her dosya sırayla indirilsin"
 
@@ -772,7 +766,7 @@ msgstr ""
 "kullanıcılar tarafından kullanılabilmesini olumsuz etkilebilir."
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:388
-#: src/main/java//com/muwire/webui/Util.java:66
+#: src/main/java//com/muwire/webui/Util.java:64
 msgid "Feed update frequency (minutes)"
 msgstr "Akış güncelleme sıklığı (dakika)"
 
@@ -1001,7 +995,7 @@ msgid "Known Hosts"
 msgstr "Bilinen Sunucular"
 
 #: build/tmp_jsp/com/muwire/webui/MuStatus_jsp.java:256
-#: src/main/java//com/muwire/webui/Util.java:64
+#: src/main/java//com/muwire/webui/Util.java:62
 msgid "Failing Hosts"
 msgstr "Başarısız Sunucular"
 
@@ -1030,20 +1024,20 @@ msgstr ""
 "konumlarını seçin"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:189
-msgid "These directories will be created if they do not already exist"
-msgstr "Bu klasörler zaten yoksa oluşturulacak"
+msgid "These folders will be created if they do not already exist"
+msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:191
 msgid "Nickname"
 msgstr "Takma ad"
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:193
-msgid "Directory for saving downloaded files"
-msgstr "İndirilen dosyaların kaydedileceği klasör"
+msgid "Folder for saving downloaded files"
+msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:197
-msgid "Directory for storing incomplete files"
-msgstr "Tamamlanmamış dosyaların kaydedileceği klasör"
+msgid "Folder for storing incomplete files"
+msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/MuWire_jsp.java:201
 msgid "Drop Box for files you share with MuWire"
@@ -1102,7 +1096,7 @@ msgid "View As Tree"
 msgstr "Ağaç Görünümü"
 
 #: build/tmp_jsp/com/muwire/webui/SharedFiles_jsp.java:278
-#: src/main/java//com/muwire/webui/Util.java:60
+#: src/main/java//com/muwire/webui/Util.java:58
 msgid "Drag and drop files here to share them"
 msgstr ""
 
@@ -1167,8 +1161,8 @@ msgstr "{0} bulunamadı"
 
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:174
 #, java-format
-msgid "{0} is not a directory"
-msgstr "{0} bir klasör değil"
+msgid "{0} is not a folder"
+msgstr ""
 
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:176
 #, java-format
@@ -1192,7 +1186,7 @@ msgstr ""
 
 #: src/main/java//com/muwire/webui/EnumStrings.java:23
 #: src/main/java//com/muwire/webui/EnumStrings.java:44
-#: src/main/java//com/muwire/webui/Util.java:59
+#: src/main/java//com/muwire/webui/Util.java:57
 msgid "Downloading"
 msgstr "İndiriliyor"
 
@@ -1269,7 +1263,7 @@ msgid "Neutral"
 msgstr ""
 
 #: src/main/java//com/muwire/webui/EnumStrings.java:81
-#: src/main/java//com/muwire/webui/Util.java:49
+#: src/main/java//com/muwire/webui/Util.java:47
 msgid "Distrusted"
 msgstr "Güvenilmez"
 
@@ -1344,76 +1338,76 @@ msgstr "Karmayı panoya kopyala"
 msgid "Copy To Clipboard"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/Util.java:47
-#, java-format
-msgid "Directory configuration for {0}"
-msgstr "{0} için klasör yapılandırması"
-
 #: src/main/java//com/muwire/webui/Util.java:48
-msgid "Directory sync frequency (seconds, 0 means never)"
-msgstr "Klasör eşitleme sıklığı (saniye, 0 asla anlamına gelir)"
-
-#: src/main/java//com/muwire/webui/Util.java:50
 msgid "Distrusted User"
 msgstr "Güvenilmez Kullanıcı"
 
-#: src/main/java//com/muwire/webui/Util.java:51
+#: src/main/java//com/muwire/webui/Util.java:49
 msgid "Down"
 msgstr "Aşağı"
 
-#: src/main/java//com/muwire/webui/Util.java:52
+#: src/main/java//com/muwire/webui/Util.java:50
 msgid "Download"
 msgstr "İndir"
 
-#: src/main/java//com/muwire/webui/Util.java:54
+#: src/main/java//com/muwire/webui/Util.java:52
 msgid "Download Location"
 msgstr "İndirme Konumu"
 
-#: src/main/java//com/muwire/webui/Util.java:56
+#: src/main/java//com/muwire/webui/Util.java:54
 msgid "Downloaded"
 msgstr "İndirilen"
 
-#: src/main/java//com/muwire/webui/Util.java:57
+#: src/main/java//com/muwire/webui/Util.java:55
 msgid "Downloaded Pieces"
 msgstr "İndirilmiş Parçalar"
 
-#: src/main/java//com/muwire/webui/Util.java:58
+#: src/main/java//com/muwire/webui/Util.java:56
 msgid "Downloader"
 msgstr "İndiren"
 
-#: src/main/java//com/muwire/webui/Util.java:61
+#: src/main/java//com/muwire/webui/Util.java:59
 msgid "Enter Reason (Optional)"
 msgstr "Bir neden yazın (isteğe bağlı)"
 
-#: src/main/java//com/muwire/webui/Util.java:62
+#: src/main/java//com/muwire/webui/Util.java:60
 msgid "ETA"
 msgstr "KAL"
 
-#: src/main/java//com/muwire/webui/Util.java:63
+#: src/main/java//com/muwire/webui/Util.java:61
 #, java-format
 msgid "Failed to load {0} files"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/Util.java:65
+#: src/main/java//com/muwire/webui/Util.java:63
 #, java-format
 msgid "Feed configuration for {0}"
 msgstr "{0} için akış yapılandırması"
 
-#: src/main/java//com/muwire/webui/Util.java:68
+#: src/main/java//com/muwire/webui/Util.java:66
 msgid "Fetching Certificates"
 msgstr "Sertifikalar Alınıyor"
 
-#: src/main/java//com/muwire/webui/Util.java:69
+#: src/main/java//com/muwire/webui/Util.java:67
 msgid "Feed"
 msgstr "Akış"
 
-#: src/main/java//com/muwire/webui/Util.java:70
+#: src/main/java//com/muwire/webui/Util.java:68
 msgid "File"
 msgstr "Dosya"
 
-#: src/main/java//com/muwire/webui/Util.java:71
+#: src/main/java//com/muwire/webui/Util.java:69
 msgid "Files"
 msgstr "Dosyalar"
+
+#: src/main/java//com/muwire/webui/Util.java:70
+#, java-format
+msgid "Folder configuration for {0}"
+msgstr ""
+
+#: src/main/java//com/muwire/webui/Util.java:71
+msgid "Folder sync frequency (seconds, 0 means never)"
+msgstr ""
 
 #: src/main/java//com/muwire/webui/Util.java:72
 msgid "Hash copied to clipboard"
@@ -1464,8 +1458,8 @@ msgid "Mark Trusted"
 msgstr "Güvenilir Olarak İşaretle"
 
 #: src/main/java//com/muwire/webui/Util.java:87
-msgid "Monitor directory for changes"
-msgstr "Klasördeki değişiklikler izlensin"
+msgid "Monitor folder for changes"
+msgstr ""
 
 #: src/main/java//com/muwire/webui/Util.java:90
 msgid "Name"
