@@ -361,7 +361,7 @@ class MainFrameView {
                                                     closureColumn(header : trans("COMMENTS"), preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
                                                     closureColumn(header : trans("CERTIFIED"), preferredWidth : 50, type : Boolean, read : {
                                                         Core core = application.context.get("core")
-                                                        core.certificateManager.hasLocalCertificate(new InfoHash(it.getRoot()))
+                                                        core.certificateManager.hasLocalCertificate(it.getRootInfoHash())
                                                     })
                                                     closureColumn(header : trans("PUBLISHED"), preferredWidth : 50, type : Boolean, read : {row -> row.isPublished()})
                                                     closureColumn(header : trans("SEARCH_HITS"), preferredWidth: 50, type : Integer, read : {it.getHits()})

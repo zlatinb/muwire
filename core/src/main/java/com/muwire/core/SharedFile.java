@@ -20,6 +20,7 @@ public class SharedFile {
 
     private final File file;
     private final byte[] root;
+    private final InfoHash rootInfoHash;
     private final int pieceSize;
 
     private final String cachedPath;
@@ -37,6 +38,7 @@ public class SharedFile {
     public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
         this.root = root;
+        this.rootInfoHash = new InfoHash(root);
         this.pieceSize = pieceSize;
         this.cachedPath = file.getAbsolutePath();
         this.cachedLength = file.length();
@@ -63,6 +65,8 @@ public class SharedFile {
     public byte[] getRoot() {
         return root;
     }
+
+    public InfoHash getRootInfoHash() {return rootInfoHash;}
 
     public int getPieceSize() {
         return pieceSize;
