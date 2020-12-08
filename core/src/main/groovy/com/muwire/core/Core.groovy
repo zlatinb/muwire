@@ -166,6 +166,8 @@ public class Core {
     
     final SigningPrivateKey spk
 
+    private final List<MWModule> modules = new ArrayList<>()
+
     public Core(MuWireSettings props, File home, String myVersion) {
         this.home = home
         this.version = myVersion
@@ -499,9 +501,25 @@ public class Core {
             register(UIMessageDeleteEvent.class, messenger)
             register(UIMessageReadEvent.class, messenger)
         }
+
+        File modulesProps = new File(home, "mwmodules.list")
+        if (modulesProps.exists()) {
+            log.info("loading modules")
+            modulesProps.eachLine {
+                Class moduleClass = Class.forName(it)
+                MWModule module = moduleClass.newInstance()
+                modules.add(module)
+            }
+        }
     }
 
     public void startServices() {
+
+        modules.each {
+            log.info("initializing module ${it.getName()}")
+            it.init(this)
+        }
+
         i2pSession.connect()
         hasherService.start()
         trustService.start()
@@ -516,6 +534,11 @@ public class Core {
         feedManager.start()
         feedClient.start()
         trackerResponder.start()
+
+        modules.each {
+            log.info("starting module ${it.getName()}")
+            it.start()
+        }
     }
 
     public void shutdown() {
@@ -523,6 +546,12 @@ public class Core {
             log.info("already shutting down")
             return
         }
+
+        modules.each {
+            log.info("shutting down module ${it.getName()}")
+            it.stop()
+        }
+
         log.info("saving settings")
         saveMuSettings()
         log.info("shutting down host cache")
