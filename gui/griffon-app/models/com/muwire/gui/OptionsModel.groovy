@@ -113,12 +113,12 @@ class OptionsModel {
 
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor
-        if (uiSettings.lnf.equalsIgnoreCase("system"))
-            systemLnf = true
+        if (uiSettings.lnf.equalsIgnoreCase("metal"))
+            metalLnf = true
         else if (uiSettings.lnf.equalsIgnoreCase("com.bulenkov.darcula.DarculaLaf"))
             darculaLnf = true
         else
-            metalLnf = true
+            systemLnf = true
         font = uiSettings.font
         automaticFontSize = uiSettings.autoFontSize
         customFontSize = uiSettings.fontSize
