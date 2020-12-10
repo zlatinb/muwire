@@ -91,7 +91,8 @@ configurations.all {
 dependencies {
     compile project(":core")
     compile "org.codehaus.griffon:griffon-guice:${griffon.version}"
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}" 
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile group: 'com.bulenkov', name: 'darcula', version: '2018.2' 
 
     // runtime "org.slf4j:slf4j-simple:${slf4jVersion}"
 
