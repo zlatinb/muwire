@@ -36,7 +36,9 @@ class OptionsModel {
 
     // gui options
     @Observable boolean showMonitor
-    @Observable String lnf
+    @Observable boolean systemLnf
+    @Observable boolean darculaLnf
+    @Observable boolean metalLnf
     @Observable String font
     @Observable boolean automaticFontSize
     @Observable int customFontSize
@@ -111,7 +113,12 @@ class OptionsModel {
 
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor
-        lnf = uiSettings.lnf
+        if (uiSettings.lnf.equalsIgnoreCase("system"))
+            systemLnf = true
+        else if (uiSettings.lnf.equalsIgnoreCase("com.bulenkov.darcula.DarculaLaf"))
+            darculaLnf = true
+        else
+            metalLnf = true
         font = uiSettings.font
         automaticFontSize = uiSettings.autoFontSize
         customFontSize = uiSettings.fontSize

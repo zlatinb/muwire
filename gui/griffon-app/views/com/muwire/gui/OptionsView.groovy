@@ -1,6 +1,8 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+import net.i2p.util.SystemVersion
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -60,7 +62,6 @@ class OptionsView {
     def i2pUDPPortField
     def i2pNTCPPortField
 
-    def lnfField
     def monitorCheckbox
     def fontField
     def fontSizeField
@@ -140,9 +141,8 @@ class OptionsView {
                 label(text : trans("OPTIONS_GIVE_UP_SOURCES"), constraints: gbc(gridx: 0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : 2, 
                     constraints : gbc(gridx: 2, gridy: 1, anchor : GridBagConstraints.LINE_END, weightx: 0))
-                
-                // this is a Java bug.  File choosers don't appear on Aqua L&F.
-                if (model.lnf != "Aqua") {
+
+                if (!isAqua()) {
                     label(text : trans("OPTIONS_SAVE_DOWNLOADED_FILES") + ":", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
                     label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
                     button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:2), downloadLocationAction)
@@ -234,7 +234,13 @@ class OptionsView {
             constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_LOOK_AND_FEEL"), constraints : gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                lnfField = textField(text : bind {model.lnf}, columns : 4, constraints : gbc(gridx : 3, gridy : 0, anchor : GridBagConstraints.LINE_START))
+                buttonGroup(id:"lnfGroup")
+                radioButton(text: "System", selected : bind {model.systemLnf}, buttonGroup : lnfGroup,
+                constraints: gbc(gridx: 1, gridy:0, anchor: GridBagConstraints.LINE_START), systemLnfAction)
+                radioButton(text: "Darcula", selected : bind {model.darculaLnf}, buttonGroup : lnfGroup,
+                        constraints: gbc(gridx: 2, gridy:0, anchor: GridBagConstraints.LINE_START), darculaLnfAction)
+                radioButton(text: "Metal", selected : bind {model.metalLnf}, buttonGroup : lnfGroup,
+                        constraints: gbc(gridx: 3, gridy:0, anchor: GridBagConstraints.LINE_START), metalLnfAction)
                 label(text : trans("OPTIONS_FONT"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
 
@@ -369,7 +375,7 @@ class OptionsView {
                 advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END))
-                if (model.lnf != "Aqua") {
+                if (!isAqua()) {
                     label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 4, anchor : GridBagConstraints.LINE_START, weightx: 100))
                     label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 4))
                     button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
@@ -399,6 +405,11 @@ class OptionsView {
             button(text : trans("SAVE"), constraints : gbc(gridx : 1, gridy: 2), saveAction)
             button(text : trans("CANCEL"), constraints : gbc(gridx : 2, gridy: 2), cancelAction)
         }
+    }
+
+    boolean isAqua() {
+        // this is a Java bug.  File choosers don't appear on Aqua L&F.
+        model.systemLnf && SystemVersion.isMac()
     }
 
     void mvcGroupInit(Map<String,String> args) {

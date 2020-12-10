@@ -116,7 +116,7 @@ class OptionsController {
         model.speedSmoothSeconds = Integer.valueOf(text)
         settings.speedSmoothSeconds = Integer.valueOf(text)
         
-        if (model.lnf != "Aqua") {
+        if (!view.isAqua()) {
             String downloadLocation = model.downloadLocation
             settings.downloadLocation = new File(downloadLocation)
 
@@ -227,8 +227,12 @@ class OptionsController {
 
         // UI Setttings
 
-        text = view.lnfField.text
-        model.lnf = text
+        if (model.systemLnf)
+            text = "system"
+        else if (model.darculaLnf)
+            text = "com.bulenkov.darcula.DarculaLaf"
+        else
+            text = "metal"
         uiSettings.lnf = text
 
         text = view.fontField.text
@@ -324,7 +328,28 @@ class OptionsController {
         if (rv == JFileChooser.APPROVE_OPTION)
             model.chatWelcomeFile = chooser.getSelectedFile().getAbsolutePath()
     }
-    
+
+    @ControllerAction
+    void systemLnf() {
+        model.systemLnf = true
+        model.darculaLnf = false
+        model.metalLnf = false
+    }
+
+    @ControllerAction
+    void darculaLnf() {
+        model.darculaLnf = true
+        model.systemLnf = false
+        model.metalLnf = false
+    }
+
+    @ControllerAction
+    void metalLnf() {
+        model.metalLnf = true
+        model.darculaLnf = false
+        model.systemLnf = false
+    }
+
     @ControllerAction
     void automaticFont() {
         model.automaticFontSize = true
