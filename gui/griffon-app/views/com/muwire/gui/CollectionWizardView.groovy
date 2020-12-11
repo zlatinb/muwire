@@ -76,8 +76,8 @@ class CollectionWizardView {
                         panel(constraints : BorderLayout.NORTH) {
                             gridLayout(rows : 1, cols :3)
                             panel  {
-                                label(text : trans("COLLECTION_TOTAL_FILES") + ":" + model.files.size())
-                                label(text : trans("COLLECTION_TOTAL_SIZE") + ":" + formatSize(model.totalSize()))
+                                label(text : bind { trans("COLLECTION_TOTAL_FILES") + ":" + model.numFiles })
+                                label(text : bind { trans("COLLECTION_TOTAL_SIZE") + ":" + formatSize(model.totalSize) })
                             }
                             panel {
                                 label(text : trans("COLLECTION_DND"))
@@ -178,6 +178,8 @@ class CollectionWizardView {
         for(int i = selected.length - 1; i >= 0; i--) {
             def sf = model.files.remove(selected[i])
             model.uniqueFiles.remove(sf)
+            model.numFiles--
+            model.totalSize -= sf.getCachedLength()
         }
         filesTable.model.fireTableDataChanged()
     }
@@ -203,6 +205,8 @@ class CollectionWizardView {
             items.each { 
                 if (model.uniqueFiles.add(it)) {
                     model.files.add(it)
+                    model.numFiles++
+                    model.totalSize += it.getCachedLength()
                     filesTable.model.fireTableDataChanged()
                 }
             }

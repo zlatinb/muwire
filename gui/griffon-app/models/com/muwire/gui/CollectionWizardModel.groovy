@@ -27,6 +27,8 @@ class CollectionWizardModel {
     long timestamp
     @Observable String root
     @Observable String comment
+    @Observable int numFiles
+    @Observable long totalSize
     
     DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode()
     TreeModel tree = new DefaultTreeModel(treeRoot)
@@ -34,13 +36,9 @@ class CollectionWizardModel {
     
     void mvcGroupInit(Map<String,String> args) {
         uniqueFiles = new HashSet<>(files)
-    }
-    
-    long totalSize() {
-        long rv = 0
-        files.each { 
-            rv += it.getCachedLength()
+        numFiles = uniqueFiles.size()
+        uniqueFiles.each {
+            totalSize += it.getCachedLength()
         }
-        rv
-    }   
+    }
 }
