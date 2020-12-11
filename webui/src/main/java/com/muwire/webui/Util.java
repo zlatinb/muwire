@@ -1,6 +1,7 @@
 package com.muwire.webui;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -244,5 +245,38 @@ public class Util {
      */
     public static String _x(String s) {
         return s;
+    }
+
+    /**
+     * Same as the one in net.i2p.util except divides by 1024
+     */
+    public static String formatSize2Decimal(long bytes) {
+        String space = " ";
+        if (bytes < 1024)
+            return bytes + space;
+        double val = bytes;
+        int scale = 0;
+        while (val >= 1024) {
+            scale++;
+            val /= 1024;
+        }
+        DecimalFormat fmt = new DecimalFormat("##0.##");
+        if (val >= 200) {
+            fmt.setMaximumFractionDigits(0);
+        } else if (val >= 20) {
+            fmt.setMaximumFractionDigits(1);
+        }
+        String str = fmt.format(val) + space;
+        switch (scale) {
+            case 1: return str + "K";
+            case 2: return str + "M";
+            case 3: return str + "G";
+            case 4: return str + "T";
+            case 5: return str + "P";
+            case 6: return str + "E";
+            case 7: return str + "Z";
+            case 8: return str + "Y";
+            default: return bytes + space;
+        }
     }
 }

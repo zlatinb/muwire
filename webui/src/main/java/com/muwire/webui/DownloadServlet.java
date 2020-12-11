@@ -218,14 +218,14 @@ public class DownloadServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<State>").append(state.toString()).append("</State>");
             sb.append("<StateString>").append(Util._t(EnumStrings.DOWNLOAD_STATES.get(state))).append("</StateString>");
-            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed, false)).append("B/sec").append("</Speed>");
+            sb.append("<Speed>").append(Util.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
             String ETAString;
             if (ETA == Long.MAX_VALUE)
                 ETAString = Util._t("Unknown");
             else
                 ETAString = DataHelper.formatDuration(ETA);
             sb.append("<ETA>").append(ETAString).append("</ETA>");
-            String progress = String.format("%2d", percent) + "% of "+DataHelper.formatSize2Decimal(totalSize, false) + "B";
+            String progress = String.format("%2d", percent) + "% of "+Util.formatSize2Decimal(totalSize) + "B";
             sb.append("<Progress>").append(progress).append("</Progress>");
             sb.append("</Download>");
         }

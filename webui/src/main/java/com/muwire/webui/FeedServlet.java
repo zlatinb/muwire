@@ -313,7 +313,7 @@ public class FeedServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(feedItem.getName())).append("</Name>");
             sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
             sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultStatus))).append("</ResultStatusString>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(feedItem.getSize(), false) + "B").append("</Size>");
+            sb.append("<Size>").append(Util.formatSize2Decimal(feedItem.getSize()) + "B").append("</Size>");
             sb.append("<Timestamp>").append(DataHelper.formatTime(feedItem.getTimestamp())).append("</Timestamp>");
             sb.append("<InfoHash>").append(Base64.encode(feedItem.getInfoHash().getRoot())).append("</InfoHash>");
             sb.append("<Certificates>").append(feedItem.getCertificates()).append("</Certificates>");

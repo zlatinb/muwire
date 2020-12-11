@@ -114,7 +114,7 @@ public class UploadServlet extends HttpServlet {
             sb.append("<Downloader>").append(Util.escapeHTMLinXML(downloader)).append("</Downloader>");
             sb.append("<DownloaderB64>").append(b64).append("</DownloaderB64>");
             sb.append("<RemotePieces>").append(remotePieces).append("/").append(totalPieces).append("</RemotePieces>");
-            sb.append("<Speed>").append(DataHelper.formatSize2Decimal(speed, false)).append("B/sec").append("</Speed>");
+            sb.append("<Speed>").append(Util.formatSize2Decimal(speed)).append("B/sec").append("</Speed>");
             sb.append("<Browse>").append(browse).append("</Browse>");
             sb.append("<Browsing>").append(browsing).append("</Browsing>");
             sb.append("<Feed>").append(feed).append("</Feed>");

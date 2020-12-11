@@ -205,7 +205,7 @@ public class FilesServlet extends HttpServlet {
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<Path>").append(Util.escapeHTMLinXML(path)).append("</Path>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            sb.append("<Size>").append(Util.formatSize2Decimal(size)).append("B").append("</Size>");
             if (comment != null) {
                 sb.append("<Comment>").append(Util.escapeHTMLinXML(comment)).append("</Comment>");
             }
@@ -264,7 +264,7 @@ public class FilesServlet extends HttpServlet {
             sb.append("<File>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(sf.getFile().getName())).append("</Name>");
             sb.append("<Path>").append(Util.escapeHTMLinXML(sf.getCachedPath())).append("</Path>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
+            sb.append("<Size>").append(Util.formatSize2Decimal(sf.getCachedLength())).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(sf.getRoot())).append("</InfoHash>");
             if (sf.getComment() != null) {
                 String comment = DataUtil.readi18nString(Base64.decode(sf.getComment()));

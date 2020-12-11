@@ -101,7 +101,7 @@ public class BrowseServlet extends HttpServlet {
                 sb.append("<Name>").append(Util.escapeHTMLinXML(result.getName())).append("</Name>");
                 sb.append("<ResultStatus>").append(resultWrapper.resultStatus).append("</ResultStatus>");
                 sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultWrapper.resultStatus))).append("</ResultStatusString>");
-                sb.append("<Size>").append(DataHelper.formatSize2Decimal(result.getSize(), false)).append("B").append("</Size>");
+                sb.append("<Size>").append(Util.formatSize2Decimal(result.getSize())).append("B").append("</Size>");
                 sb.append("<InfoHash>").append(Base64.encode(result.getInfohash().getRoot())).append("</InfoHash>");
                 if (result.getComment() != null) {
                     sb.append("<Comment>").append(Util.escapeHTMLinXML(result.getComment())).append("</Comment>");

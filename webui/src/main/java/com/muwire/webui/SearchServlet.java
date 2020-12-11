@@ -262,8 +262,8 @@ public class SearchServlet extends HttpServlet {
             }
             sb.append("<NetworkStatus>");
             sb.append("<Connections>").append(connectionCounter.getConnections()).append("</Connections>");
-            sb.append("<DownBW>").append(DataHelper.formatSize2Decimal(core.getDownloadManager().totalDownloadSpeed(), false) + Util._t("B/sec")).append("</DownBW>");
-            sb.append("<UpBW>").append(DataHelper.formatSize2Decimal(uploadManager.totalUploadSpeed(), false) + Util._t("B/sec")).append("</UpBW>");
+            sb.append("<DownBW>").append(Util.formatSize2Decimal(core.getDownloadManager().totalDownloadSpeed()) + Util._t("B/sec")).append("</DownBW>");
+            sb.append("<UpBW>").append(Util.formatSize2Decimal(uploadManager.totalUploadSpeed()) + Util._t("B/sec")).append("</UpBW>");
             sb.append("</NetworkStatus>");
         } else {
             resp.sendError(403, "Bad section param");
@@ -347,7 +347,7 @@ public class SearchServlet extends HttpServlet {
         void toXML(StringBuilder sb) {
             sb.append("<Result>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            sb.append("<Size>").append(Util.formatSize2Decimal(size)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
             sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultStatus))).append("</ResultStatusString>");
@@ -376,7 +376,7 @@ public class SearchServlet extends HttpServlet {
         void toXML(StringBuilder sb) {
             sb.append("<Result>");
             sb.append("<Name>").append(Util.escapeHTMLinXML(name)).append("</Name>");
-            sb.append("<Size>").append(DataHelper.formatSize2Decimal(size, false)).append("B").append("</Size>");
+            sb.append("<Size>").append(Util.formatSize2Decimal(size)).append("B").append("</Size>");
             sb.append("<InfoHash>").append(Base64.encode(infoHash.getRoot())).append("</InfoHash>");
             sb.append("<ResultStatus>").append(resultStatus).append("</ResultStatus>");
             sb.append("<ResultStatusString>").append(Util._t(EnumStrings.RESULT_STATES.get(resultStatus))).append("</ResultStatusString>");
