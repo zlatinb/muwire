@@ -13,11 +13,13 @@ import com.muwire.core.SharedFile
 import net.i2p.data.DataHelper
 
 class SharedTreeRenderer extends DefaultTreeCellRenderer {
-    
+    private final String bShort;
     private final ImageIcon commentIcon
+    private final StringBuffer sb = new StringBuffer(32)
     
     SharedTreeRenderer() {
         commentIcon = new ImageIcon((URL) SharedTreeRenderer.class.getResource("/comment.png"))
+        bShort = trans("BYTES_SHORT")
     }
     
     public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -32,10 +34,10 @@ class SharedTreeRenderer extends DefaultTreeCellRenderer {
         SharedFile sf = (SharedFile) userObject
         String name = sf.getFile().getName()
         long length = sf.getCachedLength()
-        String formatted = DataHelper.formatSize2Decimal(length, false)+ trans("BYTES_SHORT")
+        SizeFormatter.format(length,sb)
+        sb.append(bShort)
         
-        
-        setText("$name ($formatted)")
+        setText("$name (${sb.toString()})")
         setEnabled(true)
         if (sf.comment != null) {
             setIcon(commentIcon)
