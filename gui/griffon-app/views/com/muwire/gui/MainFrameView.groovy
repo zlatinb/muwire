@@ -273,7 +273,7 @@ class MainFrameView {
                                             closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> trans(row.downloader.getCurrentState().name())})
                                             closureColumn(header: trans("PROGRESS"), preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
                                             closureColumn(header: trans("SPEED"), preferredWidth: 50, type:String, read :{row ->
-                                                DataHelper.formatSize2Decimal(row.downloader.speed(), false) + trans("B_SEC")
+                                                formatSize(row.downloader.speed(),"B_SEC")
                                             })
                                             closureColumn(header : trans("ETA"), preferredWidth : 50, type:String, read :{ row ->
                                                 def speed = row.downloader.speed()
@@ -341,8 +341,7 @@ class MainFrameView {
                                         trans("YOU_CAN_DRAG_AND_DROP")
                                     } else {
                                         trans("HASHING") + ": " +
-                                            model.hashingFile.getAbsolutePath() + " (" + DataHelper.formatSize2Decimal(model.hashingFile.length(), false) + 
-                                            trans("BYTES_SHORT") + ")"
+                                            model.hashingFile.getAbsolutePath() + " (" + formatSize(model.hashingFile.length(),"BYTES_SHORT") + ")"
                                     }
                                 })
                             }
@@ -434,13 +433,13 @@ class MainFrameView {
                                             if (size >= 0 ) {
                                                 totalSize = trans("PERCENT_OF",
                                                         String.format("%02d", percent),
-                                                        DataHelper.formatSize2Decimal(size, false)) + trans("BYTES_SHORT")
+                                                        formatSize(size, "BYTES_SHORT"))
                                             }
                                             "${totalSize} ($done/$pieces".toString() + trans("PIECES_SHORT")+ ")"
                                         })
                                         closureColumn(header : trans("SPEED"), type : String, read : { row ->
                                             int speed = row.speed()
-                                            DataHelper.formatSize2Decimal(speed, false) + trans("B_SEC")
+                                            formatSize(speed, "B_SEC")
                                         })
                                     }
                                 }
@@ -779,12 +778,12 @@ class MainFrameView {
                         panel (constraints : gbc(gridx : 0, gridy : 0)){
                             borderLayout()
                             label(icon : imageIcon('/down_arrow.png'), constraints : BorderLayout.CENTER)
-                            label(text : bind { DataHelper.formatSize2Decimal(model.downSpeed, false) + trans("B_SEC") }, constraints : BorderLayout.EAST)
+                            label(text : bind { formatSize(model.downSpeed, "B_SEC") }, constraints : BorderLayout.EAST)
                         }
                         panel (constraints : gbc(gridx: 1, gridy : 0)){
                             borderLayout()
                             label(icon : imageIcon('/up_arrow.png'), constraints : BorderLayout.CENTER)
-                            label(text : bind { DataHelper.formatSize2Decimal(model.upSpeed, false) + trans("B_SEC") }, constraints : BorderLayout.EAST)
+                            label(text : bind { formatSize(model.upSpeed, "B_SEC") }, constraints : BorderLayout.EAST)
                         }
                     }
                     panel (constraints : BorderLayout.EAST) {
@@ -2087,8 +2086,16 @@ class MainFrameView {
             sharedFilesTree.expandRow(currentRow++)
             currentNode = currentNode.getChildAt(0)
         }
-    }    
-    
+    }
+
+    private static String formatSize(long size, String suffix) {
+        StringBuffer sb = new StringBuffer(32)
+        suffix = trans(suffix)
+        SizeFormatter.format(size, sb)
+        sb.append(suffix)
+        sb.toString()
+    }
+
     private class MWTransferHandler extends TransferHandler {
         public boolean canImport(TransferHandler.TransferSupport support) {
             return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)

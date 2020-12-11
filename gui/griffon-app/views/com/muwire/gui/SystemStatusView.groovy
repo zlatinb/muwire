@@ -4,7 +4,6 @@ import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import net.i2p.data.DataHelper
 
 import javax.swing.JDialog
 import javax.swing.JPanel
@@ -49,11 +48,11 @@ class SystemStatusView {
             constraints : gbc(gridx : 0, gridy: 1, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
                 label(text : trans("USED"), constraints : gbc(gridx:0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                label(text : bind {DataHelper.formatSize2Decimal(model.usedRam,false)+"B"}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : bind {formatRam(model.usedRam)}, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("TOTAL"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                label(text : bind {DataHelper.formatSize2Decimal(model.totalRam,false)+"B"}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : bind {formatRam(model.totalRam)}, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("MAX"), constraints : gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                label(text : bind {DataHelper.formatSize2Decimal(model.maxRam,false)+"B"}, constraints : gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_END))
+                label(text : bind {formatRam(model.maxRam)}, constraints : gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_END))
             }
             buttonsPanel = builder.panel {
                 gridBagLayout()
@@ -80,5 +79,13 @@ class SystemStatusView {
             }
         })
         dialog.show()
+    }
+
+    private static String formatRam(long ram) {
+        StringBuffer sb = new StringBuffer(32)
+        String bTrans = trans("BYTES_SHORT")
+        SizeFormatter.format(ram,sb)
+        sb.append(bTrans)
+        sb.toString()
     }
 }

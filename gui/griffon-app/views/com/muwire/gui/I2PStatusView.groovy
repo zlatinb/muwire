@@ -4,7 +4,6 @@ import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import net.i2p.data.DataHelper
 
 import javax.swing.JDialog
 import javax.swing.JPanel
@@ -71,9 +70,9 @@ class I2PStatusView {
             constraints : gbc(gridx: 0, gridy: 3, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
                 label(text : trans("RECEIVE_15"), constraints : gbc(gridx:0, gridy:0, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                label(text : bind {DataHelper.formatSize2Decimal(model.receiveBps,false)+"B"}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                label(text : bind {formatBW(model.receiveBps)}, constraints : gbc(gridx: 1, gridy:0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("SEND_15"), constraints : gbc(gridx:0, gridy:1, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                label(text : bind {DataHelper.formatSize2Decimal(model.sendBps, false)+"B"}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : bind {formatBW(model.sendBps)}, constraints : gbc(gridx: 1, gridy:1, anchor : GridBagConstraints.LINE_END))
             }
         }
 
@@ -100,5 +99,13 @@ class I2PStatusView {
             }
         })
         dialog.show()
+    }
+
+    private static String formatBW(long bw) {
+        StringBuffer sb = new StringBuffer(32)
+        String bTrans = trans("BYTES_SHORT")
+        SizeFormatter.format(bw,sb)
+        sb.append(bTrans)
+        sb.toString()
     }
 }

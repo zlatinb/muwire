@@ -13,7 +13,6 @@ import java.awt.event.WindowEvent
 
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import net.i2p.data.DataHelper
 
 import javax.swing.JComponent
 import javax.swing.JDialog
@@ -78,7 +77,7 @@ class CollectionWizardView {
                             gridLayout(rows : 1, cols :3)
                             panel  {
                                 label(text : trans("COLLECTION_TOTAL_FILES") + ":" + model.files.size())
-                                label(text : trans("COLLECTION_TOTAL_SIZE") + ":" + DataHelper.formatSize2Decimal(model.totalSize(), false) + trans("BYTES_SHORT"))
+                                label(text : trans("COLLECTION_TOTAL_SIZE") + ":" + formatSize(model.totalSize()))
                             }
                             panel {
                                 label(text : trans("COLLECTION_DND"))
@@ -208,5 +207,13 @@ class CollectionWizardView {
                 }
             }
         }
+    }
+
+    private static String formatSize(long size) {
+        StringBuffer sb = new StringBuffer(32)
+        String bTrans = trans("BYTES_SHORT")
+        SizeFormatter.format(size,sb)
+        sb.append(bTrans)
+        sb.toString()
     }
 }
