@@ -21,10 +21,7 @@ class SizeFormatter {
             scale++
             val /= 1024d
         }
-        if (val >= 200)
-            fmt.setMaximumFractionDigits(0)
-        else if (val >= 20)
-            fmt.setMaximumFractionDigits(1)
+
         fmt.format(val,sb, DontCareFieldPosition.INSTANCE)
         sb.append(' ')
         switch(scale) {
