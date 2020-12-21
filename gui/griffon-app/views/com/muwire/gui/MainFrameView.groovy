@@ -1620,6 +1620,8 @@ class MainFrameView {
             int row = model.shared.indexOf(sf)
             if (row < 0)
                 return
+            if (lastSharedSortEvent != null)
+                row = table.rowSorter.convertRowIndexToView(row)
             table.setRowSelectionInterval(row, row)
             
             table.scrollRectToVisible(new Rectangle(table.getCellRect(row, 0, true)))
