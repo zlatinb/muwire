@@ -81,6 +81,8 @@ public class MuWireClient {
         while(loggerNames.hasMoreElements()) {
             String name = loggerNames.nextElement();
             Logger logger = LogManager.getLogManager().getLogger(name);
+            if (logger == null)
+                continue; // strange, probably jre error
             for (Handler h : logger.getHandlers()) {
                 logger.removeHandler(h);
                 h.close();
