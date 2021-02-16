@@ -19,6 +19,7 @@ This helps with scalability
 * Confidential files visible only to certain users
 * Download queue with priorities 
 * Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
+* PORTABLE - figure out how to handle incomplete files
 
 ### Chat
 * break up lines on CR/LF, send multiple messages
@@ -30,13 +31,17 @@ This helps with scalability
 * I2P Status panel - display message when connected to external router
 * Search box - left identation
 * Ability to disable switching of tabs on actions
+* Right-click and paste in various text input fields
+* Open containing folder from downloads table for finished downloads
+* Subscribe to feed by full id
+* Check for duplicate feed subscriptions
 
 ### Web UI/Plugin
 * HTML 5 media players
 * Remove versions from jar names
-* Security: POST nonces, CSP headers
-* Upload files from browser to plugin via drag-and-drop
+* Security: POST nonces, CSP header - is this done?s
 * Check permissions, display better errors when sharing local folders
+* collections, messages - requires drag-and-drop from library
 
 ### mwtrackerd
 * `save` and `load` JSON-RPC commands that save and load swarm state respectively
