@@ -275,17 +275,19 @@ class DownloadSessionTest {
         int start = Integer.parseInt(matcher[0][1])
         int end = Integer.parseInt(matcher[0][2])
 
+        /* In case the downloader requests 0th piece first, pretend we have another one */
+        int iHave = 0
         if (start == 0)
-            fail("inconlcusive")
-
+            iHave = 1
+        
         toDownloader.write("416 don't have it \r\n".bytes)
-        toDownloader.write("X-Have: ${encodeXHave([0],2)}\r\n\r\n".bytes)
+        toDownloader.write("X-Have: ${encodeXHave([iHave],2)}\r\n\r\n".bytes)
         toDownloader.flush()
         downloadThread.join()
 
         assert performed
         performed = false
-        assert available.contains(0)
+        assert available.contains(iHave)
         assert thrown == null
 
         // request same session
@@ -304,7 +306,7 @@ class DownloadSessionTest {
         assert matcher.groupCount() > 0
         start = Integer.parseInt(matcher[0][1])
         end = Integer.parseInt(matcher[0][2])
-        assert start == 0
+        assert start == iHave * (1 << pieceSize)
     }
 
     @Test
