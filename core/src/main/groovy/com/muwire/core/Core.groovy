@@ -224,6 +224,7 @@ public class Core {
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
             routerProps.setProperty("i2cp.disableInterface", "true")
             routerProps.setProperty("i2np.ntcp.nodelay", "true")
+            routerProps.setProperty("router.encType","4")
             routerProps.setProperty("i2np.ntcp.port", i2pOptions["i2np.ntcp.port"])
             routerProps.setProperty("i2np.udp.port", i2pOptions["i2np.udp.port"])
             routerProps.setProperty("i2np.udp.internalPort", i2pOptions["i2np.udp.port"])
