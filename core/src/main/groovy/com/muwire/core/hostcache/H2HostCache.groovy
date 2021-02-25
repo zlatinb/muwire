@@ -253,16 +253,24 @@ class H2HostCache extends HostCache {
         allHosts.size()
     }
     
-    @Override
-    public synchronized void start(Supplier<Collection<Destination>> connected) {
-        this.connSupplier = connected
-        
+    private synchronized void initSQL() {
         def db = [ url : "jdbc:h2:" + h2Home.getAbsolutePath(),
             user : "muwire",
             password : "",
             driver : "org.h2.Driver" ]
         sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
+    }
+    
+    private synchronized void recycleSQL() {
+        sql?.close()
+        initSQL()
+    }
+    
+    @Override
+    public synchronized void start(Supplier<Collection<Destination>> connected) {
+        this.connSupplier = connected
         
+        initSQL()   
         boolean success = sql.execute("CREATE TABLE IF NOT EXISTS HOST_ATTEMPTS(DESTINATION VARCHAR(1024), TSTAMP TIMESTAMP," +
                     "STATUS ENUM('SUCCESSFUL','REJECTED','FAILED'))")
         log.info("created table attempts $success")
@@ -331,6 +339,7 @@ class H2HostCache extends HostCache {
         
         log.fine("loaded ${allHosts.size()} hosts from db")
         timer.schedule({
+            recycleSQL()
             purgeHopeless()
             verifyHosts()
             recordConnectionCount()
