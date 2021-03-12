@@ -2,6 +2,7 @@ package com.muwire.core.hostcache
 
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import com.muwire.core.Destinations
@@ -19,7 +20,7 @@ import groovy.mock.interceptor.StubFor
 import net.i2p.data.Destination
 
 import java.util.function.Predicate
-
+@Ignore("Tests a class that is not being used")
 class HostCacheTest {
 
     def filter = {true} as Predicate
