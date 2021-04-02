@@ -227,6 +227,7 @@ class Initialize extends AbstractLifecycleHandler {
         SwingUtilities.invokeAndWait({
             frame.pack()
             frame.setVisible(true)
+            frame.requestFocus()
         })
         latch.await()
         languageComboBox.getSelectedItem().locale.toLanguageTag()
