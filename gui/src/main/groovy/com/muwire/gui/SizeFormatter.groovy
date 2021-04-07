@@ -1,8 +1,6 @@
 package com.muwire.gui
 
 import java.text.DecimalFormat
-import java.text.FieldPosition
-import java.text.Format
 
 class SizeFormatter {
 
@@ -22,7 +20,7 @@ class SizeFormatter {
             val /= 1024d
         }
 
-        fmt.format(val,sb, DontCareFieldPosition.INSTANCE)
+        fmt.format(val,sb, java.text.DontCareFieldPosition.INSTANCE)
         sb.append(' ')
         switch(scale) {
             case 1 : sb.append('K'); break;
@@ -35,28 +33,6 @@ class SizeFormatter {
             case 8 : sb.append('Y'); break;
             default :
                 sb.append(' ')
-        }
-    }
-
-    private static class DontCareFieldPosition extends FieldPosition {
-        // The singleton of DontCareFieldPosition.
-        static final FieldPosition INSTANCE = new java.text.DontCareFieldPosition();
-
-        private final Format.FieldDelegate noDelegate = new Format.FieldDelegate() {
-            public void formatted(Format.Field attr, Object value, int start,
-                                  int end, StringBuffer buffer) {
-            }
-            public void formatted(int fieldID, Format.Field attr, Object value,
-                                  int start, int end, StringBuffer buffer) {
-            }
-        };
-
-        private DontCareFieldPosition() {
-            super(0);
-        }
-
-        Format.FieldDelegate getFieldDelegate() {
-            return noDelegate;
         }
     }
 }
