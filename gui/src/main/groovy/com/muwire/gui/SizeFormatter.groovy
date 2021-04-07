@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import java.text.DecimalFormat
+import java.text.FieldPosition
 
 class SizeFormatter {
 
@@ -20,7 +21,7 @@ class SizeFormatter {
             val /= 1024d
         }
 
-        fmt.format(val,sb, java.text.DontCareFieldPosition.INSTANCE)
+        fmt.format(val,sb, new FieldPosition(0))
         sb.append(' ')
         switch(scale) {
             case 1 : sb.append('K'); break;
