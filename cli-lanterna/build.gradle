@@ -21,7 +21,7 @@ apply plugin : 'com.github.johnrengelman.shadow'
 
 
 dependencies {
-    compile project(":core")
-    compile 'com.googlecode.lanterna:lanterna:3.0.1'
+    implementation project(":core")
+    implementation 'com.googlecode.lanterna:lanterna:3.0.1'
 }
 

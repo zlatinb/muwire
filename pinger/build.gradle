@@ -1,5 +1,5 @@
 apply plugin: 'application'
 mainClassName = 'com.muwire.pinger.Pinger'
 dependencies {
-   compile "net.i2p:i2p:${i2pVersion}"
+   implementation "net.i2p:i2p:${i2pVersion}"
 }

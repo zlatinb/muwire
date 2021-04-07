@@ -17,6 +17,6 @@ apply plugin : 'com.github.johnrengelman.shadow'
 applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 
 dependencies {
-    compile project(":core")
+    implementation project(":core")
 }
 

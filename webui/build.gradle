@@ -9,7 +9,7 @@ dependencies {
     providedCompile(project(':core')) {
         transitive = false
     }
-    compile fileTree("../i2pjars") { include '*.jar' }
+    implementation fileTree("../i2pjars") { include '*.jar' }
 }
 
 war {
@@ -35,7 +35,7 @@ task precompileJsp {
     doLast {
         ant.taskdef (name : 'jasper', 
             classname: 'org.apache.jasper.JspC', 
-            classpath: configurations.compile.asPath)
+            classpath: configurations.compileClasspath.asPath)
         def generated = new File("$buildDir/tmp_jsp")
         generated.mkdirs()
         ant.jasper(package: 'com.muwire.webui',

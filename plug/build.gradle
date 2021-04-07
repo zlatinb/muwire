@@ -9,7 +9,7 @@ buildscript {
 apply plugin : 'java'
 
 dependencies {
-    compile project(":webui")
+    implementation project(":webui")
 }
 
 def buildDir = new File("$buildDir")
@@ -64,7 +64,7 @@ task pluginDir {
         libDir.mkdirs()
         def webapp = project(":webui")
         def i2pjars = task.project.fileTree("../i2pjars").getFiles()
-        webapp.configurations.runtime.each {
+        webapp.configurations.runtimeClasspath.each {
             if (!i2pjars.contains(it)) {
                 def dest = new File(libDir, it.getName())
                         java.nio.file.Files.copy(it.toPath(), dest.toPath())

@@ -1,12 +1,13 @@
 subprojects {
     apply plugin: 'groovy'
+    apply plugin: 'java-library'
 
     dependencies {
-        compile "org.codehaus.groovy:groovy:${groovyVersion}"
-        compile "org.codehaus.groovy:groovy-jsr223:${groovyVersion}"
-        compile "org.codehaus.groovy:groovy-json:${groovyVersion}"
-        compile "com.h2database:h2:1.4.200"
-        compile "org.codehaus.groovy:groovy-sql:${groovyVersion}"
+        api "org.codehaus.groovy:groovy:${groovyVersion}"
+        api "org.codehaus.groovy:groovy-jsr223:${groovyVersion}"
+        api "org.codehaus.groovy:groovy-json:${groovyVersion}"
+        api "com.h2database:h2:1.4.200"
+        api "org.codehaus.groovy:groovy-sql:${groovyVersion}"
     }
 
     compileGroovy {

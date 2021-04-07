@@ -35,13 +35,13 @@ springBoot {
 }
 
 dependencies {
-    compile project(":core")
-    compile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.3'
+    implementation project(":core")
+    implementation 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.3'
 
-    compile 'org.springframework.boot:spring-boot-starter'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    runtime 'javax.jws:jsr181-api:1.0-MR1'
+    runtimeOnly 'javax.jws:jsr181-api:1.0-MR1'
 }
 
