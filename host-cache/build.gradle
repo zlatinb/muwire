@@ -4,9 +4,9 @@ applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties
 
 dependencies {
     implementation "net.i2p:i2p:${i2pVersion}"
-    testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testCompileOnly 'junit:junit:4.12'
-    testCompileOnly "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
 }
 
 configurations.testImplementation {
