@@ -1489,9 +1489,13 @@ class MainFrameView {
         boolean pauseEnabled = false
         boolean cancelEnabled = false
         boolean retryEnabled = false
+        boolean openFolderEnabled = false
         String resumeText = "RETRY"
         Downloader downloader = model.downloads[selected].downloader
         switch(downloader.currentState) {
+            case Downloader.DownloadState.FINISHED:
+                openFolderEnabled = true
+                break
             case Downloader.DownloadState.DOWNLOADING:
             case Downloader.DownloadState.HASHLIST:
             case Downloader.DownloadState.CONNECTING:
@@ -1542,6 +1546,12 @@ class MainFrameView {
             JMenuItem retry = new JMenuItem(resumeText)
             retry.addActionListener({mvcGroup.controller.resume()})
             menu.add(retry)
+        }
+        
+        if (openFolderEnabled) {
+            JMenuItem open = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
+            open.addActionListener({mvcGroup.controller.openContainingFolderFromDownload()})
+            menu.add(open)
         }
 
         showPopupMenu(menu, e)

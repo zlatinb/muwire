@@ -246,6 +246,15 @@ class MainFrameController {
          model.clearButtonEnabled = false
 
     }
+
+    @ControllerAction
+    void openContainingFolderFromDownload() {
+        def downloader = model.downloads[selectedDownload()].downloader
+
+        try {
+            Desktop.getDesktop().open(downloader.file.getParentFile())
+        } catch (Exception ignored) {}
+    }
     
     @ControllerAction
     void addContact() {
