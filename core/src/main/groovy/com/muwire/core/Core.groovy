@@ -192,7 +192,7 @@ public class Core {
             if (!i2pOptions.containsKey("outbound.nickname"))
                 i2pOptions["outbound.nickname"] = "MuWire"
             if (!i2pOptions.containsKey("router.excludePeerCaps"))
-                i2pOptions["router.excludePeerCaps"] = "KLMNO"
+                i2pOptions["router.excludePeerCaps"] = "KLM"
         }
         if (!(i2pOptions.containsKey("i2np.ntcp.port")
                 && i2pOptions.containsKey("i2np.udp.port")
