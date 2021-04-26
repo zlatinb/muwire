@@ -204,7 +204,7 @@ public class Core {
             i2pOptionsFile.withOutputStream { i2pOptions.store(it, "") }
         }
         
-        i2pOptions['i2cp.leaseSetEncType']='4,0'
+        i2pOptions['i2cp.leaseSetEncType']='4'
 
         if (!props.embeddedRouter) {
             if (!(I2PAppContext.getGlobalContext() instanceof RouterContext)) {
