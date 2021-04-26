@@ -54,12 +54,22 @@ class TunnelStep extends WizardStep {
 
     @Override
     protected void apply(MuWireSettings muSettings, Properties i2pSettings) {
+        String tunnelQuantity = tunnelQuantitySlider.value
+        i2pSettings['inbound.quantity'] = tunnelQuantity
+        i2pSettings['outbound.quantity'] = tunnelQuantity
+        
         String tunnelLength = String.valueOf(tunnelLengthSlider.value)
         i2pSettings['inbound.length'] = tunnelLength
         i2pSettings['outbound.length'] = tunnelLength
         
-        String tunnelQuantity = tunnelQuantitySlider.value
-        i2pSettings['inbound.quantity'] = tunnelQuantity
-        i2pSettings['outbound.quantity'] = tunnelQuantity
+        String excludePeerCaps
+        switch (tunnelLength) {
+            case "1" : excludePeerCaps = "KLMNO"; break;
+            case "2" : excludePeerCaps = "KLMN"; break;
+            case "3" : excludePeerCaps = "KLM"; break
+            default :
+                excludePeerCaps = "" // assume user knows what they're doing
+        }
+        i2pSettings['router.excludePeerCaps'] = excludePeerCaps
     }
 }
