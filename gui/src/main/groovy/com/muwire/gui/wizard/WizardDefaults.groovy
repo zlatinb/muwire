@@ -27,8 +27,8 @@ class WizardDefaults {
         i2npTcpPort = Integer.parseInt(props.getProperty("i2npTcpPort", String.valueOf(randomPort)))
         i2npUdpPort = Integer.parseInt(props.getProperty("i2npUdpPort", String.valueOf(randomPort)))
         
-        inBw = Integer.parseInt(props.getProperty("inBw","512"))
-        outBw = Integer.parseInt(props.getProperty("outBw","256"))
+        inBw = Integer.parseInt(props.getProperty("inBw","1024"))
+        outBw = Integer.parseInt(props.getProperty("outBw","512"))
         
         tunnelLength = Integer.parseInt(props.getProperty("tunnelLength","3"))
         tunnelQuantity = Integer.parseInt(props.getProperty("tunnelQuantity","4"))
