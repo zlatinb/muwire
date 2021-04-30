@@ -648,7 +648,7 @@ class MainFrameView {
                         gridLayout(rows : 1, cols : 1) 
                         splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100) {
                             panel {
-                                list(id : "message-folders-list", items:model.messageFolders)
+                                list(id : "message-folders-list", items:model.messageFolderTx)
                             }
                             panel {
                                 gridLayout(rows :1, cols : 1)
@@ -1254,9 +1254,9 @@ class MainFrameView {
             int index = messageFolderList.getSelectedIndex()
             if (index < 0)
                 index = 0
-            model.folderIdx = index
+            model.folderIdx = model.messageFolders[index]
             model.messageHeaders.clear()
-            model.messageHeaders.addAll(model.messageHeadersMap.get(index))
+            model.messageHeaders.addAll(model.messageHeadersMap.get(model.folderIdx))
             messageHeaderTable.model.fireTableDataChanged()
         })
         

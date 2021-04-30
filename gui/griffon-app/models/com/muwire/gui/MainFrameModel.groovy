@@ -117,10 +117,12 @@ class MainFrameModel {
     def feeds = []
     def feedItems = []
     
-    def messageFolders = [trans("INBOX"), trans("OUTBOX"), trans("SENT")] 
+    def messageFolders = [Messenger.INBOX, Messenger.OUTBOX, Messenger.SENT] 
+    def messageFolderTx = messageFolders.collect {trans(it.toUpperCase())}
+    
     List<MWMessageStatus> messageHeaders = new ArrayList<>()
-    Map<Integer, Set<MWMessageStatus>> messageHeadersMap = new HashMap<>()
-    int folderIdx
+    Map<String, Set<MWMessageStatus>> messageHeadersMap = new HashMap<>()
+    String folderIdx
     List<Object> messageAttachments = new ArrayList<>()
     MessageNotificator messageNotificator
     
@@ -213,9 +215,9 @@ class MainFrameModel {
         treeRoot = new DefaultMutableTreeNode()
         sharedTree = new DefaultTreeModel(treeRoot)
         
-        messageHeadersMap.put(0, new LinkedHashSet<>())
-        messageHeadersMap.put(1, new LinkedHashSet<>())
-        messageHeadersMap.put(2, new LinkedHashSet<>())
+        messageHeadersMap.put(Messenger.INBOX, new LinkedHashSet<>())
+        messageHeadersMap.put(Messenger.OUTBOX, new LinkedHashSet<>())
+        messageHeadersMap.put(Messenger.SENT, new LinkedHashSet<>())
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({

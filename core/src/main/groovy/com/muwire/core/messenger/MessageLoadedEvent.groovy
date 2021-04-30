@@ -4,6 +4,6 @@ import com.muwire.core.Event
 
 class MessageLoadedEvent extends Event {
     MWMessage message
-    int folder
+    String folder
     boolean unread
 }

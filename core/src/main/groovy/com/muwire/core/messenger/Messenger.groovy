@@ -23,17 +23,24 @@ import net.i2p.data.Base64
 @Log
 class Messenger {
 
-    public final static int INBOX = 0
-    public final static int OUTBOX = 1
-    public final static int SENT = 2
+    public final static String INBOX = "inbox"
+    public final static String OUTBOX = "outbox"
+    public final static String SENT = "sent"
+    private static final Set<String> RESERVED_FOLDERS = new HashSet<>()
+    static {
+        RESERVED_FOLDERS.add(INBOX)
+        RESERVED_FOLDERS.add(OUTBOX)
+        RESERVED_FOLDERS.add(SENT)
+    }
     
     private static final int MAX_IN_PROCESS = 4
     
     private final EventBus eventBus
-    private final File inbox, outbox, sent
+    private final Map<String,File> folders = new HashMap<>()
     private final I2PConnector connector
     private final MuWireSettings settings
     
+    private final Map<File, Set<MWMessage>> messages = new HashMap<>()
     private final Set<MWMessage> inboxMessages = new LinkedHashSet<>()
     private final Set<MWMessage> outboxMessages = new LinkedHashSet<>()
     private final Set<MWMessage> sentMessages = new LinkedHashSet<>()
@@ -52,26 +59,32 @@ class Messenger {
     private long lastSendTime
     
     
-    public Messenger(EventBus eventBus, File home, I2PConnector connector, MuWireSettings settings) {
+    Messenger(EventBus eventBus, File home, I2PConnector connector, MuWireSettings settings) {
         this.eventBus = eventBus
         this.connector = connector
         this.settings = settings
         
         File messages = new File(home, "messages")
-        inbox = new File(messages, "inbox")
-        outbox = new File(messages, "outbox")
-        sent = new File(messages, "sent")
-        
-        inbox.mkdirs()
-        outbox.mkdirs()
-        sent.mkdirs()
+        folders.put(INBOX, new File(messages, INBOX))
+        folders.put(OUTBOX, new File(messages, OUTBOX))
+        folders.put(SENT, new File(messages, SENT))
+     
+        folders.values().each {it.mkdirs()}
+
+        this.messages.put(folders[INBOX], inboxMessages)
+        this.messages.put(folders[OUTBOX], outboxMessages)
+        this.messages.put(folders[SENT], sentMessages)
     }
     
-    public void onUILoadedEvent(UILoadedEvent e) {
+    Set<String> getFolderNames() {
+        folders.keySet()
+    }
+    
+    void onUILoadedEvent(UILoadedEvent e) {
         diskIO.execute({load()} as Runnable)
     }
     
-    public void stop() {
+    void stop() {
         diskIO.shutdown()
         netIO.shutdown()
         timer.cancel()
@@ -79,14 +92,20 @@ class Messenger {
     
     private void load() {
         log.info("loading messages")
-        loadFolder(inbox, inboxMessages, INBOX)
-        loadFolder(outbox, outboxMessages, OUTBOX)
-        loadFolder(sent, sentMessages, SENT)
+        folders.each {name, file ->
+            log.info("loading message folder $name")    
+            Set<MWMessage> set = messages.get(file)
+            if (set == null) {
+                set = new LinkedHashSet<>()
+                messages.put(file, set)
+            }
+            loadFolder(file, set, name)
+        }
         log.info("loaded messages")
         timer.schedule({send()} as TimerTask, 1000, 1000)
     }
     
-    private void loadFolder(File file, Set<MWMessage> dest, int folder) {
+    private void loadFolder(File file, Set<MWMessage> dest, String folder) {
         Files.walk(file.toPath())
             .filter({it.getFileName().toString().endsWith(".mwmessage")})
             .forEach { Path path ->
