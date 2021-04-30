@@ -10,10 +10,6 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 import net.i2p.data.DataHelper
 
-import javax.swing.BorderFactory
-import javax.swing.Box
-import javax.swing.BoxLayout
-import javax.swing.DropMode
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JFileChooser
@@ -29,29 +25,20 @@ import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.RowSorter
 import javax.swing.SortOrder
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
-import javax.swing.border.Border
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
-import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
-import com.muwire.core.Constants
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
-import com.muwire.core.Persona
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.download.Downloader
 import com.muwire.core.filefeeds.Feed
-import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.messenger.MWMessage
@@ -61,24 +48,16 @@ import com.muwire.core.upload.Uploader
 import com.muwire.gui.MainFrameModel.MWMessageStatus
 
 import java.awt.BorderLayout
-import java.awt.CardLayout
-import java.awt.FlowLayout
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
 import java.awt.Rectangle
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
-import java.awt.event.InputEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.nio.charset.StandardCharsets
-
 import javax.annotation.Nonnull
 import javax.inject.Inject
 
@@ -796,35 +775,38 @@ class MainFrameView {
     void mvcGroupInit(Map<String, String> args) {
 
         def mainFrame = builder.getVariable("main-frame")
-        
-        mainFrame.addWindowListener(new WindowAdapter(){
-                    public void windowClosing(WindowEvent e) {
-                        chatNotificator.mainWindowDeactivated()
-                        if (application.getContext().get("tray-icon") != null) {
-                            if (settings.closeWarning) {
-                                runInsideUIAsync {
-                                    Map<String, Object> args2 = new HashMap<>()
-                                    args2.put("settings", settings)
-                                    args2.put("home", model.core.home)
-                                    mvcGroup.createMVCGroup("close-warning", "Close Warning", args2)
-                                }
-                            } else if (settings.exitOnClose)
-                                closeApplication()
-                        } else {
-                            closeApplication()
+
+        mainFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                chatNotificator.mainWindowDeactivated()
+                if (application.getContext().get("tray-icon") != null) {
+                    if (settings.closeWarning) {
+                        runInsideUIAsync {
+                            Map<String, Object> args2 = new HashMap<>()
+                            args2.put("settings", settings)
+                            args2.put("home", model.core.home)
+                            mvcGroup.createMVCGroup("close-warning", "Close Warning", args2)
                         }
-                    }
-                    public void windowDeactivated(WindowEvent e) {
-                        chatNotificator.mainWindowDeactivated()
-                    }
-                    public void windowActivated(WindowEvent e) {
-                        if (!model.chatPaneButtonEnabled)
-                            chatNotificator.mainWindowActivated()
-                    }})
+                    } else if (settings.exitOnClose)
+                        closeApplication()
+                } else {
+                    closeApplication()
+                }
+            }
+
+            public void windowDeactivated(WindowEvent e) {
+                chatNotificator.mainWindowDeactivated()
+            }
+
+            public void windowActivated(WindowEvent e) {
+                if (!model.chatPaneButtonEnabled)
+                    chatNotificator.mainWindowActivated()
+            }
+        })
 
         // search field
         def searchField = builder.getVariable("search-field")
-        
+
         // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
@@ -838,7 +820,7 @@ class MainFrameView {
                 model.pauseButtonEnabled = false
                 model.previewButtonEnabled = false
                 model.downloader = null
-                downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"select-download")
+                downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "select-download")
                 return
             }
             def downloader = model.downloads[selectedRow]?.downloader
@@ -846,10 +828,10 @@ class MainFrameView {
                 return
             model.downloader = downloader
             model.previewButtonEnabled = true
-            downloadDetailsPanel.getLayout().show(downloadDetailsPanel,"download-selected")
-            switch(downloader.getCurrentState()) {
-                case Downloader.DownloadState.CONNECTING :
-                case Downloader.DownloadState.DOWNLOADING :
+            downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "download-selected")
+            switch (downloader.getCurrentState()) {
+                case Downloader.DownloadState.CONNECTING:
+                case Downloader.DownloadState.DOWNLOADING:
                 case Downloader.DownloadState.HASHLIST:
                     model.cancelButtonEnabled = true
                     model.pauseButtonEnabled = true
@@ -879,41 +861,43 @@ class MainFrameView {
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
         downloadsTable.setDefaultRenderer(Downloader.class, new DownloadProgressRenderer())
 
-        downloadsTable.rowSorter.addRowSorterListener({evt -> lastDownloadSortEvent = evt})
+        downloadsTable.rowSorter.addRowSorterListener({ evt -> lastDownloadSortEvent = evt })
         downloadsTable.rowSorter.setSortsOnUpdates(true)
         downloadsTable.rowSorter.setComparator(2, new DownloaderComparator())
 
         downloadsTable.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showDownloadsMenu(e)
-                    }
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showDownloadsMenu(e)
-                    }
-                })
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showDownloadsMenu(e)
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showDownloadsMenu(e)
+            }
+        })
 
         def sharedFilesMouseListener = new MouseAdapter() {
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showSharedFilesPopupMenu(e)
-                    }
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showSharedFilesPopupMenu(e)
-                    }
-                }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showSharedFilesPopupMenu(e)
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showSharedFilesPopupMenu(e)
+            }
+        }
 
         // shared files table and tree
         def sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
 
-        sharedFilesTable.rowSorter.addRowSorterListener({evt -> lastSharedSortEvent = evt})
+        sharedFilesTable.rowSorter.addRowSorterListener({ evt -> lastSharedSortEvent = evt })
         sharedFilesTable.rowSorter.setSortsOnUpdates(true)
 
         sharedFilesTable.addMouseListener(sharedFilesMouseListener)
@@ -927,12 +911,12 @@ class MainFrameView {
             model.addCommentButtonEnabled = true
             model.publishButtonEnabled = true
             boolean unpublish = true
-            selectedFiles.each { 
+            selectedFiles.each {
                 unpublish &= it?.isPublished()
             }
             model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
-        
+
         JTree sharedFilesTree = builder.getVariable("shared-files-tree")
         sharedFilesTree.addMouseListener(sharedFilesMouseListener)
 
@@ -940,30 +924,29 @@ class MainFrameView {
             def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
             model.addCommentButtonEnabled = selectedNode != null
             model.publishButtonEnabled = selectedNode != null
-            
+
             def selectedFiles = selectedSharedFiles()
             if (selectedFiles == null || selectedFiles.isEmpty()) {
                 return
             }
-                
+
             boolean unpublish = true
             selectedFiles.each {
                 unpublish &= it?.isPublished()
             }
             model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
-        
+
         sharedFilesTree.addTreeExpansionListener(expansionListener)
-        
-        
-        
+
+
         // collections table
-        collectionsTable.setDefaultRenderer(Integer.class,centerRenderer)
+        collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(6).setCellRenderer(new DateRenderer())
-        
-        collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionSortEvent = evt})
-        
+
+        collectionsTable.rowSorter.addRowSorterListener({ evt -> lastCollectionSortEvent = evt })
+
         selectionModel = collectionsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
@@ -973,11 +956,11 @@ class MainFrameView {
                 model.deleteCollectionButtonEnabled = false
                 return
             }
-            
+
             model.deleteCollectionButtonEnabled = true
             FileCollection collection = model.localCollections.get(selectedRow)
             model.viewCollectionCommentButtonEnabled = collection.getComment() != ""
-            
+
             model.collectionFiles.clear()
             collection.files.each {
                 SharedFile sf = model.core.fileManager.getRootToFiles().get(it.infoHash).first()
@@ -985,22 +968,23 @@ class MainFrameView {
             }
             collectionFilesTable.model.fireTableDataChanged()
         })
-        
+
         collectionsTable.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showCollectionTableMenu(e)
             }
+
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showCollectionTableMenu(e)
             }
         })
-        
-        
+
+
         // collection files table
         collectionFilesTable.setDefaultRenderer(Long.class, new SizeRenderer())
-        collectionFilesTable.rowSorter.addRowSorterListener({evt -> lastCollectionFilesSortEvent = evt})
+        collectionFilesTable.rowSorter.addRowSorterListener({ evt -> lastCollectionFilesSortEvent = evt })
         collectionFilesTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = collectionFilesTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -1013,24 +997,25 @@ class MainFrameView {
             SharedFile sf = model.collectionFiles.get(selectedRow)
             model.viewItemCommentButtonEnabled = sf.getComment() != null
         })
-        
+
         collectionFilesTable.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showItemsMenu(e)
             }
+
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showItemsMenu(e)
             }
         })
-        
+
         // uploadsTable
         def uploadsTable = builder.getVariable("uploads-table")
-        
-        uploadsTable.rowSorter.addRowSorterListener({evt -> lastUploadsSortEvent = evt})
+
+        uploadsTable.rowSorter.addRowSorterListener({ evt -> lastUploadsSortEvent = evt })
         uploadsTable.rowSorter.setSortsOnUpdates(true)
-        
+
         selectionModel = uploadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         uploadsTable.addMouseListener(new MouseAdapter() {
@@ -1038,43 +1023,45 @@ class MainFrameView {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
                     showUploadsMenu(e)
             }
+
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
                     showUploadsMenu(e)
             }
         })
-        
+
         // searches table
         def searchesTable = builder.getVariable("searches-table")
         JPopupMenu searchTableMenu = new JPopupMenu()
 
         JMenuItem copySearchToClipboard = new JMenuItem(trans("COPY_SEARCH_TO_CLIPBOARD"))
-        copySearchToClipboard.addActionListener({mvcGroup.view.copySearchToClipboard(searchesTable)})
+        copySearchToClipboard.addActionListener({ mvcGroup.view.copySearchToClipboard(searchesTable) })
         JMenuItem trustSearcher = new JMenuItem(trans("TRUST_SEARCHER"))
-        trustSearcher.addActionListener({mvcGroup.controller.trustPersonaFromSearch()})
+        trustSearcher.addActionListener({ mvcGroup.controller.trustPersonaFromSearch() })
         JMenuItem distrustSearcher = new JMenuItem(trans("DISTRUST_SEARCHER"))
-        distrustSearcher.addActionListener({mvcGroup.controller.distrustPersonaFromSearch()})
+        distrustSearcher.addActionListener({ mvcGroup.controller.distrustPersonaFromSearch() })
 
         searchTableMenu.add(copySearchToClipboard)
         searchTableMenu.add(trustSearcher)
         searchTableMenu.add(distrustSearcher)
 
         searchesTable.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showPopupMenu(searchTableMenu, e)
-                    }
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (e.isPopupTrigger())
-                            showPopupMenu(searchTableMenu, e)
-                    }
-                })
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(searchTableMenu, e)
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showPopupMenu(searchTableMenu, e)
+            }
+        })
 
         // feeds table
         def feedsTable = builder.getVariable("feeds-table")
-        feedsTable.rowSorter.addRowSorterListener({evt -> lastFeedsSortEvent = evt})
+        feedsTable.rowSorter.addRowSorterListener({ evt -> lastFeedsSortEvent = evt })
         feedsTable.rowSorter.setSortsOnUpdates(true)
         feedsTable.setDefaultRenderer(Integer.class, centerRenderer)
         feedsTable.setDefaultRenderer(Long.class, new DateRenderer())
@@ -1092,11 +1079,11 @@ class MainFrameView {
             model.unsubscribeFileFeedButtonEnabled = true
             model.configureFileFeedButtonEnabled = true
             model.updateFileFeedButtonEnabled = !selectedFeed.getStatus().isActive()
-            
+
             def items = model.core.feedManager.getFeedItems(selectedFeed.getPublisher())
             model.feedItems.clear()
             model.feedItems.addAll(items)
-            
+
             def feedItemsTable = builder.getVariable("feed-items-table")
             int selectedItemRow = feedItemsTable.getSelectedRow()
             feedItemsTable.model.fireTableDataChanged()
@@ -1106,25 +1093,26 @@ class MainFrameView {
         feedsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     showFeedsPopupMenu(e)
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
-                if(e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     showFeedsPopupMenu(e)
             }
         })
-        
-        
+
+
         // feed items table
         def feedItemsTable = builder.getVariable("feed-items-table")
-        feedItemsTable.rowSorter.addRowSorterListener({evt -> lastFeedItemsSortEvent = evt})
+        feedItemsTable.rowSorter.addRowSorterListener({ evt -> lastFeedItemsSortEvent = evt })
         feedItemsTable.rowSorter.setSortsOnUpdates(true)
         feedItemsTable.setDefaultRenderer(Integer.class, centerRenderer)
         feedItemsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         feedItemsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
-        
+
         selectionModel = feedItemsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
@@ -1151,23 +1139,23 @@ class MainFrameView {
                 if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     showFeedItemsPopupMenu(e)
                 else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 &&
-                    selectedItems != null && selectedItems.size() == 1 &&
-                    model.canDownload(selectedItems.get(0).getInfoHash())) {
+                        selectedItems != null && selectedItems.size() == 1 &&
+                        model.canDownload(selectedItems.get(0).getInfoHash())) {
                     mvcGroup.controller.downloadFeedItem()
                 }
             }
-            
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     showFeedItemsPopupMenu(e)
             }
         })
-        
+
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
-        subscriptionTable.rowSorter.addRowSorterListener({evt -> trustTablesSortEvents["subscription-table"] = evt})
+        subscriptionTable.rowSorter.addRowSorterListener({ evt -> trustTablesSortEvents["subscription-table"] = evt })
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = subscriptionTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -1182,7 +1170,7 @@ class MainFrameView {
             def trustList = model.subscriptions[selectedRow]
             if (trustList == null)
                 return
-            switch(trustList.status) {
+            switch (trustList.status) {
                 case RemoteTrustList.Status.NEW:
                 case RemoteTrustList.Status.UPDATING:
                     model.reviewButtonEnabled = false
@@ -1201,12 +1189,12 @@ class MainFrameView {
                     break
             }
         })
-        
+
         subscriptionTable.setDefaultRenderer(Long.class, new DateRenderer())
 
         // contacts table
         def contactsTable = builder.getVariable("contacts-table")
-        contactsTable.rowSorter.addRowSorterListener({evt -> lastContactsSortEvent = evt})
+        contactsTable.rowSorter.addRowSorterListener({ evt -> lastContactsSortEvent = evt })
         contactsTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = contactsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -1223,10 +1211,10 @@ class MainFrameView {
                 return
             }
             model.removeContactButtonEnabled = true
-            
+
             TrustLevel level = model.core.trustService.getLevel(model.contacts[selectedRow].persona.destination)
-            switch(level) {
-                case TrustLevel.TRUSTED : 
+            switch (level) {
+                case TrustLevel.TRUSTED:
                     model.subscribeButtonEnabled = true
                     model.markDistrustedButtonEnabled = true
                     model.markTrustedButtonEnabled = false
@@ -1248,40 +1236,14 @@ class MainFrameView {
     
         })
         
-        JPopupMenu trustMenu = new JPopupMenu()
-        JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
-        subscribeItem.addActionListener({mvcGroup.controller.subscribe()})
-        trustMenu.add(subscribeItem)
-        JMenuItem markNeutralItem = new JMenuItem(trans("REMOVE_CONTACT"))
-        markNeutralItem.addActionListener({mvcGroup.controller.removeContact()})
-        trustMenu.add(markNeutralItem)
-        JMenuItem markDistrustedItem = new JMenuItem(trans("MARK_DISTRUSTED"))
-        markDistrustedItem.addActionListener({mvcGroup.controller.markDistrusted()})
-        trustMenu.add(markDistrustedItem)
-        JMenuItem browseItem = new JMenuItem(trans("BROWSE"))
-        browseItem.addActionListener({mvcGroup.controller.browseFromTrusted()})
-        trustMenu.add(browseItem)
-        JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
-        browseCollectionsItem.addActionListener({mvcGroup.controller.browseCollectionsFromTrusted()})
-        trustMenu.add(browseCollectionsItem)
-        JMenuItem chatItem = new JMenuItem(trans("CHAT"))
-        chatItem.addActionListener({mvcGroup.controller.chatFromTrusted()})
-        trustMenu.add(chatItem)
-        JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
-        messageItem.addActionListener({mvcGroup.controller.messageFromTrusted()})
-        trustMenu.add(messageItem)
-        JMenuItem copyIdFromTrustedItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIdFromTrustedItem.addActionListener({mvcGroup.controller.copyIdFromTrusted()})
-        trustMenu.add(copyIdFromTrustedItem)
-        
         contactsTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(trustMenu, e)
+                    showContactsMenu(e)
             }
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(trustMenu, e)
+                    showContactsMenu(e)
             }
         })
 
@@ -2006,6 +1968,51 @@ class MainFrameView {
         for (int i = 0; i < rows.length; i++)
             rv.add(model.messageAttachments.get(rows[i]))
         rv
+    }
+    
+    void showContactsMenu(MouseEvent e) {
+        JPopupMenu trustMenu = new JPopupMenu()
+        if (model.subscribeButtonEnabled) {
+            JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
+            subscribeItem.addActionListener({ mvcGroup.controller.subscribe() })
+            trustMenu.add(subscribeItem)
+        }
+        JMenuItem markNeutralItem = new JMenuItem(trans("REMOVE_CONTACT"))
+        markNeutralItem.addActionListener({mvcGroup.controller.removeContact()})
+        trustMenu.add(markNeutralItem)
+        if (model.markDistrustedButtonEnabled) {
+            JMenuItem markDistrustedItem = new JMenuItem(trans("MARK_DISTRUSTED"))
+            markDistrustedItem.addActionListener({ mvcGroup.controller.markDistrusted() })
+            trustMenu.add(markDistrustedItem)
+        }
+        if (model.markTrustedButtonEnabled) {
+            JMenuItem markTrustedItem = new JMenuItem(trans("MARK_TRUSTED"))
+            markTrustedItem.addActionListener({mvcGroup.controller.markTrusted()})
+            trustMenu.add(markTrustedItem)
+        }
+        if (model.browseFromTrustedButtonEnabled) {
+            JMenuItem browseItem = new JMenuItem(trans("BROWSE"))
+            browseItem.addActionListener({ mvcGroup.controller.browseFromTrusted() })
+            trustMenu.add(browseItem)
+            JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
+            browseCollectionsItem.addActionListener({ mvcGroup.controller.browseCollectionsFromTrusted() })
+            trustMenu.add(browseCollectionsItem)
+        }
+        if (model.chatFromTrustedButtonEnabled) {
+            JMenuItem chatItem = new JMenuItem(trans("CHAT"))
+            chatItem.addActionListener({ mvcGroup.controller.chatFromTrusted() })
+            trustMenu.add(chatItem)
+        }
+        if (model.messageFromTrustedButtonEnabled) {
+            JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+            messageItem.addActionListener({ mvcGroup.controller.messageFromTrusted() })
+            trustMenu.add(messageItem)
+        }
+        JMenuItem copyIdFromTrustedItem = new JMenuItem(trans("COPY_FULL_ID"))
+        copyIdFromTrustedItem.addActionListener({mvcGroup.controller.copyIdFromTrusted()})
+        trustMenu.add(copyIdFromTrustedItem)
+        
+        showPopupMenu(trustMenu, e)
     }
     
     void closeApplication() {
