@@ -20,7 +20,7 @@ class TunnelStep extends WizardStep {
     }
 
     @Override
-    protected void buildUI(FactoryBuilderSupport builder) {
+    protected void buildUI(FactoryBuilderSupport builder, def nextAction) {
         builder.panel (constraints : getConstraint()) {
             gridBagLayout()
             panel (border : titledBorder(title : trans("SPEED_VS_ANONYMITY"), border : etchedBorder(), titlePosition: TitledBorder.TOP,

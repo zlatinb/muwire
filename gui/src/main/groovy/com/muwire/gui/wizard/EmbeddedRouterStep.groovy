@@ -21,7 +21,7 @@ class EmbeddedRouterStep extends WizardStep {
     }
 
     @Override
-    protected void buildUI(FactoryBuilderSupport builder) {
+    protected void buildUI(FactoryBuilderSupport builder, def nextAction) {
         builder.panel(constraints : getConstraint()) {
             gridBagLayout()
             panel(border : titledBorder(title : trans("PORT_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,

@@ -13,7 +13,7 @@ class LastStep extends WizardStep {
     }
 
     @Override
-    protected void buildUI(FactoryBuilderSupport builder) {
+    protected void buildUI(FactoryBuilderSupport builder, def nextAction) {
         builder.panel(constraints: getConstraint()) {
             gridBagLayout()
             label(text: trans("WIZARD_COMPLETE"), constraints : gbc(gridx: 0, gridy: 0))

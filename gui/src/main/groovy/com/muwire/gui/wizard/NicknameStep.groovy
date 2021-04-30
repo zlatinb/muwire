@@ -14,10 +14,10 @@ class NicknameStep extends WizardStep {
     }
 
     @Override
-    protected void buildUI(FactoryBuilderSupport builder) {
+    protected void buildUI(FactoryBuilderSupport builder, def nextAction) {
         builder.panel(constraints : getConstraint()) {
             label(text: trans("SELECT_A_NICKNAME"))
-            nickField = textField(columns: 30)
+            nickField = textField(columns: 30, action : nextAction)
         }
     }
 

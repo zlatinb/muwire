@@ -13,7 +13,7 @@ abstract class WizardStep {
     }
     
     
-    protected abstract void buildUI(FactoryBuilderSupport builder)
+    protected abstract void buildUI(FactoryBuilderSupport builder, def nextAction)
     
     /**
      * @return list of errors, null if validation is successful
