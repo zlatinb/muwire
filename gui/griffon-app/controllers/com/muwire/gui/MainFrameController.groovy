@@ -262,60 +262,48 @@ class MainFrameController {
         params.core = core
         mvcGroup.createMVCGroup("add-contact", params)
     }
+    
+    @ControllerAction
+    void removeContact() {
+        markTrust(TrustLevel.NEUTRAL)
+    }
 
-    private void markTrust(String tableName, TrustLevel level, def list) {
-        int row = view.getSelectedTrustTablesRow(tableName)
+    private void markTrust(TrustLevel level) {
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
         String reason = null
         if (level != TrustLevel.NEUTRAL)
             reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
-        builder.getVariable(tableName).model.fireTableDataChanged()
-        core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level, reason : reason))
+        builder.getVariable("contacts-table").model.fireTableDataChanged()
+        core.eventBus.publish(new TrustEvent(persona : model.contacts[row].persona, level : level, reason : reason))
     }
 
     @ControllerAction
     void markTrusted() {
-        markTrust("distrusted-table", TrustLevel.TRUSTED, model.distrusted)
+        markTrust(TrustLevel.TRUSTED)
         model.markTrustedButtonEnabled = false
-        model.markNeutralFromDistrustedButtonEnabled = false
-    }
-
-    @ControllerAction
-    void markNeutralFromDistrusted() {
-        markTrust("distrusted-table", TrustLevel.NEUTRAL, model.distrusted)
-        model.markTrustedButtonEnabled = false
-        model.markNeutralFromDistrustedButtonEnabled = false
     }
 
     @ControllerAction
     void markDistrusted() {
-        markTrust("trusted-table", TrustLevel.DISTRUSTED, model.trusted)
+        markTrust(TrustLevel.DISTRUSTED)
         model.subscribeButtonEnabled = false
         model.markDistrustedButtonEnabled = false
-        model.markNeutralFromTrustedButtonEnabled = false
-    }
-
-    @ControllerAction
-    void markNeutralFromTrusted() {
-        markTrust("trusted-table", TrustLevel.NEUTRAL, model.trusted)
-        model.subscribeButtonEnabled = false
-        model.markDistrustedButtonEnabled = false
-        model.markNeutralFromTrustedButtonEnabled = false
     }
 
     @ControllerAction
     void subscribe() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona p = model.trusted[row].persona
+        Persona p = model.contacts[row].persona
         core.muOptions.trustSubscriptions.add(p)
         saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
         model.subscribeButtonEnabled = false
         model.markDistrustedButtonEnabled = false
-        model.markNeutralFromTrustedButtonEnabled = false
+        model.removeContactButtonEnabled = false
     }
 
     @ControllerAction
@@ -361,10 +349,10 @@ class MainFrameController {
     
     @ControllerAction
     void browseFromTrusted() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona p = model.trusted[row].persona
+        Persona p = model.contacts[row].persona
         
         String groupId = UUID.randomUUID().toString()
         def params = [:]
@@ -376,10 +364,10 @@ class MainFrameController {
     
     @ControllerAction
     void browseCollectionsFromTrusted() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona p = model.trusted[row].persona
+        Persona p = model.contacts[row].persona
         
         UUID uuid = UUID.randomUUID()
         def params = [:]
@@ -394,10 +382,10 @@ class MainFrameController {
     
     @ControllerAction
     void chatFromTrusted() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona p = model.trusted[row].persona
+        Persona p = model.contacts[row].persona
         
         startChat(p)
         view.showChatWindow.call()
@@ -886,10 +874,10 @@ class MainFrameController {
     
     @ControllerAction
     void messageFromTrusted() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        TrustEntry te = model.trusted[row]
+        TrustEntry te = model.contacts[row]
         
         def params = [:]
         params.recipients = new HashSet<>(Collections.singletonList(te.persona))
@@ -928,19 +916,10 @@ class MainFrameController {
     
     @ControllerAction
     void copyIdFromTrusted() {
-        int row = view.getSelectedTrustTablesRow("trusted-table")
+        int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        TrustEntry te = model.trusted.get(row)
-        CopyPasteSupport.copyToClipboard(te.persona.toBase64())
-    }
-    
-    @ControllerAction
-    void copyIdFromUntrusted() {
-        int row = view.getSelectedTrustTablesRow("distrusted-table")
-        if (row < 0)
-            return
-        TrustEntry te = model.distrusted.get(row)
+        TrustEntry te = model.contacts.get(row)
         CopyPasteSupport.copyToClipboard(te.persona.toBase64())
     }
     

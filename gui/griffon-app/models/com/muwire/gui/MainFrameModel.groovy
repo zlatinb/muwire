@@ -112,8 +112,7 @@ class MainFrameModel {
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
     def connectionList = []
     def searches = new LinkedList()
-    def trusted = []
-    def distrusted = []
+    def contacts = []
     def subscriptions = []
     def feeds = []
     def feedItems = []
@@ -148,12 +147,12 @@ class MainFrameModel {
     @Observable boolean viewFeedItemCommentButtonEnabled
     @Observable boolean viewFeedItemCertificatesButtonEnabled
     @Observable boolean subscribeButtonEnabled
-    @Observable boolean markNeutralFromTrustedButtonEnabled
+    
+    @Observable boolean removeContactButtonEnabled
     @Observable boolean markDistrustedButtonEnabled
     @Observable boolean browseFromTrustedButtonEnabled
     @Observable boolean chatFromTrustedButtonEnabled
     @Observable boolean messageFromTrustedButtonEnabled
-    @Observable boolean markNeutralFromDistrustedButtonEnabled
     @Observable boolean markTrustedButtonEnabled
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
@@ -252,8 +251,7 @@ class MainFrameModel {
 
                 updateTablePreservingSelection("uploads-table")
                 updateTablePreservingSelection("downloads-table")
-                updateTablePreservingSelection("trusted-table")
-                updateTablePreservingSelection("distrusted-table")
+                updateTablePreservingSelection("contacts-table")
                 
                 int totalUpload = 0
                 uploads.each { 
@@ -337,8 +335,8 @@ class MainFrameModel {
             }, 1000, 1000)
 
             runInsideUIAsync {
-                trusted.addAll(core.trustService.good.values())
-                distrusted.addAll(core.trustService.bad.values())
+                contacts.addAll(core.trustService.good.values())
+                contacts.addAll(core.trustService.bad.values())
 
                 resumeButtonText = "RETRY"
                 publishButtonText = "PUBLISH"
@@ -535,13 +533,11 @@ class MainFrameModel {
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
 
-            trusted.clear()
-            trusted.addAll(core.trustService.good.values())
-            distrusted.clear()
-            distrusted.addAll(core.trustService.bad.values())
+            contacts.clear()
+            contacts.addAll(core.trustService.good.values())
+            contacts.addAll(core.trustService.bad.values())
 
-            updateTablePreservingSelection("trusted-table")
-            updateTablePreservingSelection("distrusted-table")
+            updateTablePreservingSelection("contacts-table")
 
             results.values().each { MVCGroup group ->
                 if (group.alive) {
