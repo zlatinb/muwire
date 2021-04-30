@@ -2,6 +2,11 @@ package com.muwire.gui
 
 import com.muwire.core.trust.TrustLevel
 import griffon.core.GriffonApplication
+import griffon.core.mvc.MVCGroup
+
+import javax.swing.DefaultListModel
+import javax.swing.JPanel
+
 import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
 import griffon.core.env.Metadata
@@ -20,11 +25,8 @@ import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTable
-import javax.swing.JTextArea
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
-import javax.swing.RowSorter
-import javax.swing.SortOrder
 import javax.swing.TransferHandler
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
@@ -41,11 +43,8 @@ import com.muwire.core.download.Downloader
 import com.muwire.core.filefeeds.Feed
 import com.muwire.core.filefeeds.FeedItem
 import com.muwire.core.files.FileSharedEvent
-import com.muwire.core.messenger.MWMessage
-import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.upload.Uploader
-import com.muwire.gui.MainFrameModel.MWMessageStatus
 
 import java.awt.BorderLayout
 import java.awt.Rectangle
@@ -92,12 +91,7 @@ class MainFrameView {
     def lastCollectionFilesSortEvent
     
     JList messageFolderList
-    JTable messageHeaderTable
-    def lastMessageHeaderTableSortEvent
-    JTextArea messageBody
-    JTable messageAttachmentsTable
-    def lastMessageAttachmentsTableSortEvent
-    JSplitPane messageSplitPane
+    JPanel messageFolderContents
     
     void initUI() {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
@@ -648,74 +642,10 @@ class MainFrameView {
                         gridLayout(rows : 1, cols : 1) 
                         splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100) {
                             panel {
-                                list(id : "message-folders-list", items:model.messageFolderTx)
+                                list(id : "message-folders-list", model: model.messageFolderListModel)
                             }
-                            panel {
-                                gridLayout(rows :1, cols : 1)
-                                splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 500) {
-                                    scrollPane {
-                                        table(id : "message-header-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                            tableModel(list : model.messageHeaders) {
-                                                closureColumn(header : trans("SENDER"), preferredWidth:200, type : String, read : {it.message.sender.getHumanReadableName()})
-                                                closureColumn(header : trans("SUBJECT"), preferredWidth:300, type: String, read : {it.message.subject})
-                                                closureColumn(header : trans("RECIPIENTS"), preferredWidth: 20, type:Integer, read : {it.message.recipients.size()})
-                                                closureColumn(header : trans("DATE"), preferredWidth : 50, type : Long, read : {it.message.timestamp})
-                                                closureColumn(header : trans("UNREAD"), preferredWidth : 20, type : Boolean, read : {it.status})
-                                            }
-                                        }
-                                    }
-                                    panel {
-                                        borderLayout()
-                                        panel(constraints : BorderLayout.CENTER) {
-                                            borderLayout()
-                                            panel (constraints : BorderLayout.NORTH) {
-                                                borderLayout()
-                                                panel(constraints : BorderLayout.WEST) {
-                                                    label(text : trans("RECIPIENTS") + ":")
-                                                    label(text : bind{model.messageRecipientList})
-                                                }
-                                            }
-                                            splitPane(id : "message-attachments-split-pane", orientation : JSplitPane.VERTICAL_SPLIT,
-                                            continuousLayout : true, dividerLocation : 500, constraints : BorderLayout.CENTER) {
-                                                scrollPane {
-                                                    textArea(id : "message-body-textarea", editable : false, lineWrap : true, wrapStyleWord : true)
-                                                }
-                                                panel {
-                                                    borderLayout()
-                                                    scrollPane(constraints : BorderLayout.CENTER) {
-                                                        table(id : "message-attachments-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                                            tableModel(list : model.messageAttachments) {
-                                                                closureColumn(header : trans("NAME"), preferredWidth : 300, type : String, read : {it.name})
-                                                                closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read :{
-                                                                    if (it instanceof MWMessageAttachment)
-                                                                        return it.length
-                                                                    else
-                                                                        return it.totalSize()
-                                                                })
-                                                                closureColumn(header : trans("COLLECTION"), preferredWidth : 20, type: Boolean, read : {
-                                                                    it instanceof FileCollection
-                                                                })
-                                                            }
-                                                        }
-                                                    }
-                                                    panel(constraints: BorderLayout.EAST) {
-                                                        gridBagLayout()
-                                                        button(text : trans("DOWNLOAD"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
-                                                            constraints : gbc(gridx:0, gridy:0), downloadAttachmentAction)
-                                                        button(text : trans("DOWNLOAD_ALL"), enabled : bind{model.messageAttachmentsButtonEnabled}, 
-                                                            constraints : gbc(gridx: 0, gridy: 1), downloadAllAttachmentsAction)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        panel(constraints : BorderLayout.SOUTH) {
-                                            button(text : trans("COMPOSE"), messageComposeAction)
-                                            button(text : trans("REPLY"), enabled : bind{model.messageButtonsEnabled}, messageReplyAction)
-                                            button(text : trans("REPLY_ALL"), enabled : bind{model.messageButtonsEnabled}, messageReplyAllAction)
-                                            button(text : trans("DELETE"), enabled : bind{model.messageButtonsEnabled}, messageDeleteAction)
-                                        }
-                                    }
-                                }
+                            panel (id : "message-folder-contents"){
+                                cardLayout()
                             }
                         }
                     }
@@ -765,11 +695,7 @@ class MainFrameView {
         collectionFilesTable = builder.getVariable("items-table")
         
         messageFolderList = builder.getVariable("message-folders-list")
-        messageHeaderTable = builder.getVariable("message-header-table")
-        messageBody = builder.getVariable("message-body-textarea")
-        messageAttachmentsTable = builder.getVariable("message-attachments-table")
-        messageSplitPane = builder.getVariable("message-attachments-split-pane")
-        
+        messageFolderContents = builder.getVariable("message-folder-contents")
     }
 
     void mvcGroupInit(Map<String, String> args) {
@@ -1254,87 +1180,8 @@ class MainFrameView {
             int index = messageFolderList.getSelectedIndex()
             if (index < 0)
                 index = 0
-            model.folderIdx = model.messageFolders[index]
-            model.messageHeaders.clear()
-            model.messageHeaders.addAll(model.messageHeadersMap.get(model.folderIdx))
-            messageHeaderTable.model.fireTableDataChanged()
-        })
-        
-        messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
-        messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
-        messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
-        messageHeaderTable.rowSorter.setSortsOnUpdates(true)
-        def sortKey = new RowSorter.SortKey(3, SortOrder.ASCENDING)
-        messageHeaderTable.rowSorter.setSortKeys(Collections.singletonList(sortKey))
-        selectionModel = messageHeaderTable.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        selectionModel.addListSelectionListener({
-            int selectedRow = selectedMessageHeader()
-            if (selectedRow < 0) {
-                model.messageButtonsEnabled = false
-                model.messageAttachmentsButtonEnabled = false
-                messageBody.setText("")
-                model.messageRecipientList = ""
-            } else {
-                MWMessageStatus selectedStatus = model.messageHeaders.get(selectedRow)
-                controller.markMessageRead(selectedStatus)
-                MWMessage selected = selectedStatus.message
-                messageBody.setText(selected.body)
-                model.messageButtonsEnabled = true
-                model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})
-                
-                if (selected.attachments.isEmpty() && selected.collections.isEmpty()) {
-                    messageSplitPane.setDividerLocation(1.0d)
-                    model.messageAttachments.clear()
-                    messageAttachmentsTable.model.fireTableDataChanged()
-                } else {
-                    messageSplitPane.setDividerLocation(0.7d)
-                    model.messageAttachments.clear()
-                    model.messageAttachments.addAll(selected.attachments)
-                    model.messageAttachments.addAll(selected.collections)
-                    messageAttachmentsTable.model.fireTableDataChanged()
-                }
-            }
-                
-        })
-        
-        JPopupMenu messagesMenu = new JPopupMenu()
-        JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
-        replyMenuItem.addActionListener({controller.messageReply()})
-        messagesMenu.add(replyMenuItem)
-        JMenuItem replyAllMenuItem = new JMenuItem(trans("REPLY_ALL"))
-        replyAllMenuItem.addActionListener({controller.messageReplyAll()})
-        messagesMenu.add(replyAllMenuItem)
-        JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
-        deleteMenuItem.addActionListener({controller.messageDelete()})
-        messagesMenu.add(deleteMenuItem)
-        JMenuItem copyIdFromMessageItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIdFromMessageItem.addActionListener({controller.copyIdFromMessage()})
-        messagesMenu.add(copyIdFromMessageItem)
-        messageHeaderTable.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(messagesMenu, e)
-            }
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(messagesMenu, e)
-            }
-        })
-        
-        
-        messageAttachmentsTable.setDefaultRenderer(Long.class, new SizeRenderer()) 
-        messageAttachmentsTable.rowSorter.addRowSorterListener({evt -> lastMessageAttachmentsTableSortEvent = evt})
-        messageAttachmentsTable.rowSorter.setSortsOnUpdates(true)
-        selectionModel = messageAttachmentsTable.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-        selectionModel.addListSelectionListener({
-            List selected = selectedMessageAttachments()
-            if (selected.isEmpty()) {
-                model.messageAttachmentsButtonEnabled = false
-            } else {
-                model.messageAttachmentsButtonEnabled = true
-            }
+            model.folderIdx = model.messageFolders[index].model.name
+            messageFolderContents.getLayout().show(messageFolderContents, model.folderIdx)
         })
         
         // chat tabs
@@ -1821,6 +1668,14 @@ class MainFrameView {
             }
         }
     }
+    
+    void addSystemMessageFolder(MVCGroup group) {
+        model.messageFolders.add(group)
+        model.messageFoldersMap.put(group.model.name, group)
+        model.messageFolderListModel.addElement(trans(group.model.txKey))
+
+        messageFolderContents.add(group.view.folderPanel, group.model.name)
+    }
 
     int getSelectedContactsTableRow() {
         def table = builder.getVariable("contacts-table")
@@ -1944,30 +1799,6 @@ class MainFrameView {
         viewComment.addActionListener({controller.viewItemComment()})
         menu.add(viewComment)
         showPopupMenu(menu, e)
-    }
-    
-    int selectedMessageHeader() {
-        int selectedRow = messageHeaderTable.getSelectedRow()
-        if (selectedRow < 0)
-            return -1
-        if (lastMessageHeaderTableSortEvent != null)
-            selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
-        selectedRow
-    }
-    
-    List<?> selectedMessageAttachments() {
-        int[] rows = messageAttachmentsTable.getSelectedRows()
-        if (rows.length == 0)
-            return Collections.emptyList()
-        if (lastMessageAttachmentsTableSortEvent != null) {
-            for (int i = 0; i < rows.length; i++) {
-                rows[i] = messageAttachmentsTable.rowSorter.convertRowIndexToModel(rows[i])
-            }
-        }
-        List rv = new ArrayList()
-        for (int i = 0; i < rows.length; i++)
-            rv.add(model.messageAttachments.get(rows[i]))
-        rv
     }
     
     void showContactsMenu(MouseEvent e) {

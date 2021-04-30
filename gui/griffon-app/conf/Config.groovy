@@ -176,4 +176,9 @@ mvcGroups {
         view = "com.muwire.gui.AddContactView"
         controller = "com.muwire.gui.AddContactController"
     }
+    'message-folder' {
+        model = 'com.muwire.gui.MessageFolderModel'
+        view = 'com.muwire.gui.MessageFolderView'
+        controller = 'com.muwire.gui.MessageFolderController'
+    }
 }

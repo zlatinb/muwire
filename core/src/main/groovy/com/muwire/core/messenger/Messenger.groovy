@@ -45,6 +45,8 @@ class Messenger {
     private final Set<MWMessage> outboxMessages = new LinkedHashSet<>()
     private final Set<MWMessage> sentMessages = new LinkedHashSet<>()
     
+    private File localFolders
+    
     private final Set<MWMessage> inProcess = new HashSet<>()
     
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ Runnable r ->
@@ -65,6 +67,9 @@ class Messenger {
         this.settings = settings
         
         File messages = new File(home, "messages")
+        localFolders = new File(messages, "folders")
+        localFolders.mkdirs()
+        
         folders.put(INBOX, new File(messages, INBOX))
         folders.put(OUTBOX, new File(messages, OUTBOX))
         folders.put(SENT, new File(messages, SENT))
@@ -92,8 +97,15 @@ class Messenger {
     
     private void load() {
         log.info("loading messages")
-        folders.each {name, file ->
-            log.info("loading message folder $name")    
+
+        localFolders.listFiles().toList().stream().filter({ it.isDirectory() }).
+                forEach({
+                    folders.put(it.getName(), it)
+                    eventBus.publish(new MessageFolderLoadingEvent(folder: it.getName()))
+                })
+
+        folders.each { name, file ->
+            log.info("loading message folder $name")
             Set<MWMessage> set = messages.get(file)
             if (set == null) {
                 set = new LinkedHashSet<>()

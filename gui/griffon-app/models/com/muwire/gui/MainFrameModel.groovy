@@ -1,11 +1,8 @@
 
 package com.muwire.gui
 
+import javax.swing.DefaultListModel
 import java.util.concurrent.ConcurrentHashMap
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.Calendar
-import java.util.UUID
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -18,7 +15,6 @@ import javax.swing.tree.TreeNode
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
-import com.muwire.core.MuWireSettings
 import com.muwire.core.Persona
 import com.muwire.core.RouterDisconnectedEvent
 import com.muwire.core.SharedFile
@@ -47,7 +43,6 @@ import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
 import com.muwire.core.files.FileLoadedEvent
-import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.files.SideCarFileEvent
 import com.muwire.core.messenger.MWMessage
@@ -61,7 +56,6 @@ import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
-import com.muwire.core.trust.TrustService
 import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.trust.TrustSubscriptionUpdatedEvent
 import com.muwire.core.update.UpdateAvailableEvent
@@ -78,7 +72,6 @@ import griffon.core.artifact.GriffonModel
 import griffon.core.env.Metadata
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
-import griffon.transform.FXObservable
 import griffon.transform.Observable
 import net.i2p.data.Base64
 import net.i2p.data.Destination
@@ -117,13 +110,11 @@ class MainFrameModel {
     def feeds = []
     def feedItems = []
     
-    def messageFolders = [Messenger.INBOX, Messenger.OUTBOX, Messenger.SENT] 
-    def messageFolderTx = messageFolders.collect {trans(it.toUpperCase())}
+    final DefaultListModel messageFolderListModel = new DefaultListModel()
+    final Map<String, MVCGroup> messageFoldersMap = new HashMap<>()
+    final List<MVCGroup> messageFolders = [] 
     
-    List<MWMessageStatus> messageHeaders = new ArrayList<>()
-    Map<String, Set<MWMessageStatus>> messageHeadersMap = new HashMap<>()
     String folderIdx
-    List<Object> messageAttachments = new ArrayList<>()
     MessageNotificator messageNotificator
     
     boolean sessionRestored
@@ -162,11 +153,7 @@ class MainFrameModel {
     
     @Observable boolean viewCollectionCommentButtonEnabled
     @Observable boolean viewItemCommentButtonEnabled
-    @Observable boolean deleteCollectionButtonEnabled 
-    
-    @Observable boolean messageButtonsEnabled
-    @Observable boolean messageAttachmentsButtonEnabled
-    @Observable String messageRecipientList
+    @Observable boolean deleteCollectionButtonEnabled
     
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
@@ -214,10 +201,6 @@ class MainFrameModel {
         shared = []
         treeRoot = new DefaultMutableTreeNode()
         sharedTree = new DefaultTreeModel(treeRoot)
-        
-        messageHeadersMap.put(Messenger.INBOX, new LinkedHashSet<>())
-        messageHeadersMap.put(Messenger.OUTBOX, new LinkedHashSet<>())
-        messageHeadersMap.put(Messenger.SENT, new LinkedHashSet<>())
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -304,6 +287,7 @@ class MainFrameModel {
             core.eventBus.register(UIMessageReadEvent.class, this)
             core.eventBus.register(MessageSentEvent.class, this)
 
+            
             core.muOptions.watchedKeywords.each {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
             }
@@ -350,6 +334,8 @@ class MainFrameModel {
                 feedsPaneButtonEnabled = true
                 trustPaneButtonEnabled = true
                 chatPaneButtonEnabled = true
+
+                initSystemMessageFolders()
                 
                 if (core.muOptions.startChatServer)
                     controller.startChatServer()
@@ -847,15 +833,10 @@ class MainFrameModel {
     
     void onMessageLoadedEvent(MessageLoadedEvent e) {
         runInsideUIAsync {
-            messageHeadersMap.get(e.folder).add(new MWMessageStatus(e.message, e.unread))
+            messageFoldersMap.get(e.folder).model.processMessageLoadedEvent(e)
             if (e.unread) {
                 messages++
                 messageNotificator.messages(messages)
-            }
-            if (e.folder == folderIdx) {
-                messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(folderIdx))
-                view.messageHeaderTable.model.fireTableDataChanged()
             }
         }
     }
@@ -895,30 +876,30 @@ class MainFrameModel {
         }
     }
     
-    void deleteMessage(MWMessage message) {
-        MWMessageStatus status = new MWMessageStatus(message, false)
-        messageHeadersMap.get(folderIdx).remove(status)
-        messageHeaders.remove(status)
-        view.messageHeaderTable.model.fireTableDataChanged()
-        view.messageBody.setText("")
-        view.messageSplitPane.setDividerLocation(1.0d)
-    }
-    
-    static class MWMessageStatus {
-        private final MWMessage message
-        private boolean status
-        MWMessageStatus(MWMessage message, boolean status) {
-            this.message = message
-            this.status = status
-        }
-        
-        public int hashCode() {
-            message.hashCode()
-        }
-        
-        public boolean equals(Object o) {
-            MWMessageStatus other = (MWMessageStatus) o
-            message.equals(other.message)
-        }
+    private void initSystemMessageFolders() {
+        // create system mail folders
+        def props = [:]
+        props['core'] = core
+
+        // inbox
+        props['outgoing'] = false
+        props['name'] = Messenger.INBOX
+        props['txKey'] = "INBOX"
+        def inbox = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-inbox', props)
+        view.addSystemMessageFolder(inbox)
+
+        // outbox
+        props['outgoing'] = true
+        props['name'] = Messenger.OUTBOX
+        props['txKey'] = "OUTBOX"
+        def outbox = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-outbox', props)
+        view.addSystemMessageFolder(outbox)
+
+        // sent
+        props['outgoing'] = true
+        props['name'] = Messenger.SENT
+        props['txKey'] = "SENT"
+        def sent = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-sent', props)
+        view.addSystemMessageFolder(sent)
     }
 }
