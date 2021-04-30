@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
 
+import java.awt.event.ActionListener
+
 import static com.muwire.gui.Translator.trans
 
 import java.awt.BorderLayout
@@ -54,6 +56,9 @@ class AddContactView {
                     reasonArea = textArea(editable : true, lineWrap : true, wrapStyleWord : true)
                 }
                 panel(constraints : BorderLayout.SOUTH) {
+                    buttonGroup(id : "trustLevel")
+                    radioButton(text : trans("TRUSTED"), selected : bind {model.trusted}, buttonGroup : trustLevel, actionPerformed : setTrusted )
+                    radioButton(text : trans("DISTRUSTED"), selected : bind {!model.trusted}, buttonGroup: trustLevel, actionPerformed : setDistrusted )
                     button(text : trans("ADD_CONTACT_SPECIFIC"), addAction)
                     button(text : trans("CANCEL"), cancelAction)
                 }
@@ -72,5 +77,13 @@ class AddContactView {
             }
         })
         dialog.show()
+    }
+    
+    def setTrusted = {
+        model.trusted = true
+    }
+    
+    def setDistrusted = {
+        model.trusted = false
     }
 }

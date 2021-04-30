@@ -9,4 +9,5 @@ import griffon.metadata.ArtifactProviderFor
 @ArtifactProviderFor(GriffonModel)
 class AddContactModel {
     Core core
+    @Observable boolean trusted = true
 }

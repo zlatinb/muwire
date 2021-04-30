@@ -27,7 +27,8 @@ class AddContactController {
         Persona p
         try {
             p = new Persona(new ByteArrayInputStream(Base64.decode(text)))
-            TrustEvent e = new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : view.reasonArea.getText())
+            TrustLevel tl = model.trusted ? TrustLevel.TRUSTED : TrustLevel.DISTRUSTED
+            TrustEvent e = new TrustEvent(persona : p, level : tl, reason : view.reasonArea.getText())
             model.core.eventBus.publish(e)
             cancel()
         } catch (Exception e) {
