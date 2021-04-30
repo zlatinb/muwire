@@ -258,8 +258,8 @@ class SearchTabView {
                 panel (constraints : BorderLayout.SOUTH) {
                     label(text : trans("GROUP_BY"))
                     buttonGroup(id : "groupBy")
-                    radioButton(text : "Sender", selected : bind  {!model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
-                    radioButton(text : "File", selected : bind {model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showFileGrouping)
+                    radioButton(text : trans("SENDER"), selected : bind  {!model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
+                    radioButton(text : trans("FILE"), selected : bind {model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showFileGrouping)
                 }
             }
 
