@@ -24,6 +24,7 @@ import javax.swing.table.DefaultTableCellRenderer
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
 
@@ -52,12 +53,22 @@ class MessageFolderView {
             splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
                 scrollPane {
                     table(id: "message-header-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
-                        tableModel(list: model.messageHeaders) {
-                            closureColumn(header: trans("SENDER"), preferredWidth: 200, type: String, read: { it.message.sender.getHumanReadableName() })
-                            closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
-                            closureColumn(header: trans("RECIPIENTS"), preferredWidth: 20, type: Integer, read: { it.message.recipients.size() })
-                            closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
-                            closureColumn(header: trans("UNREAD"), preferredWidth: 20, type: Boolean, read: { it.status })
+                        if (!model.outgoing) {
+                            tableModel(list: model.messageHeaders) {
+                                closureColumn(header: trans("SENDER"), preferredWidth: 200, type: String, read: { it.message.sender.getHumanReadableName() })
+                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
+                                closureColumn(header: trans("RECIPIENTS"), preferredWidth: 20, type: Integer, read: { it.message.recipients.size() })
+                                closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
+                                closureColumn(header: trans("UNREAD"), preferredWidth: 20, type: Boolean, read: { it.status })
+                            }
+                        } else {
+                            tableModel(list : model.messageHeaders) {
+                                closureColumn(header: trans("RECIPIENTS"), preferredWidth: 400, type: String, read : {
+                                    it.message.recipients.stream().map({it.getHumanReadableName()}).collect(Collectors.joining(","))
+                                })
+                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
+                                closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
+                            }
                         }
                     }
                 }
@@ -153,8 +164,9 @@ class MessageFolderView {
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
-        def sortKey = new RowSorter.SortKey(3, SortOrder.ASCENDING)
+        def sortKey = new RowSorter.SortKey(model.outgoing ? 2 : 3, SortOrder.ASCENDING)
         messageHeaderTable.rowSorter.setSortKeys(Collections.singletonList(sortKey))
+        
         def selectionModel = messageHeaderTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
