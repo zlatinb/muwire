@@ -69,7 +69,7 @@ class MessageFolderController {
     void messageCompose() {
         def params = [:]
         params.recipients = new HashSet<>()
-        params.core = core
+        params.core = model.core
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
 
@@ -108,7 +108,7 @@ class MessageFolderController {
             }
         }
 
-        application.mvcGroupManager.findGroup('main-frame').view.showDownloadsWindow.call()
+        application.mvcGroupManager.findGroup('MainFrame').view.showDownloadsWindow.call()
     }
 
     void markMessageRead(MWMessageStatus status) {

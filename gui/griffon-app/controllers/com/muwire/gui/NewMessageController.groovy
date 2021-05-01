@@ -1,6 +1,10 @@
 package com.muwire.gui
 
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 
 import griffon.core.controller.ControllerAction
@@ -22,6 +26,8 @@ class NewMessageController {
     NewMessageModel model
     @MVCMember @Nonnull
     NewMessageView view
+    @Inject @Nonnull
+    GriffonApplication application
     
     @ControllerAction
     void send() {

@@ -823,12 +823,8 @@ class MainFrameModel {
     }
     
     void addToOutbox(MWMessage message) {
-        messageHeadersMap.get(Messenger.OUTBOX).add(new MWMessageStatus(message, false))
-        if (folderIdx == Messenger.OUTBOX) {
-            messageHeaders.clear()
-            messageHeaders.addAll(messageHeadersMap.get(Messenger.OUTBOX))
-            view.messageHeaderTable.model.fireTableDataChanged()
-        }
+        def status = new MWMessageStatus(message, false)
+        messageFoldersMap.get(Messenger.OUTBOX).model.add(status)
     }
     
     void onMessageLoadedEvent(MessageLoadedEvent e) {
@@ -843,15 +839,10 @@ class MainFrameModel {
     
     void onMessageReceivedEvent(MessageReceivedEvent e) {
         runInsideUIAsync {
-            if (messageHeadersMap.get(Messenger.INBOX).add(new MWMessageStatus(e.message, true))) {
+            if (messageFoldersMap.get(Messenger.INBOX).model.processMessageReceivedEvent(e)) {
                 messages++
                 messageNotificator.newMessage(e.message.sender.getHumanReadableName())
                 messageNotificator.messages(messages)
-                if (folderIdx == Messenger.INBOX) {
-                    messageHeaders.clear()
-                    messageHeaders.addAll(messageHeadersMap.get(Messenger.INBOX))
-                    view.messageHeaderTable.model.fireTableDataChanged()
-                }
             }
         }
     }
@@ -859,13 +850,8 @@ class MainFrameModel {
     void onMessageSentEvent(MessageSentEvent e) {
         runInsideUIAsync {
             MWMessageStatus status = new MWMessageStatus(e.message, false)
-            messageHeadersMap.get(Messenger.OUTBOX).remove(status)
-            messageHeadersMap.get(Messenger.SENT).add(status)
-            if (folderIdx != Messenger.INBOX) {
-                messageHeaders.clear()
-                messageHeaders.addAll(messageHeadersMap.get(folderIdx))
-                view.messageHeaderTable.model.fireTableDataChanged()
-            }
+            messageFoldersMap.get(Messenger.OUTBOX).model.remove(status)
+            messageFoldersMap.get(Messenger.SENT).model.add(status)
         }
     }
     

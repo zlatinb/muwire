@@ -138,12 +138,12 @@ class Messenger {
     
     synchronized void onUIMessageEvent(UIMessageEvent e) {
         outboxMessages.add(e.message)
-        diskIO.execute({persist(e.message, outbox)})
+        diskIO.execute({persist(e.message, folders.get(OUTBOX))})
     }
     
     synchronized void onUIMessageReadEvent(UIMessageReadEvent e) {
         diskIO.execute({
-            File unread = new File(inbox, deriveUnread(e.message))
+            File unread = new File(folders.get(INBOX), deriveUnread(e.message))
             unread.delete()
         })
     }
@@ -157,8 +157,8 @@ class Messenger {
     
     private void moveToSent(MWMessage message) {
         String name = deriveName(message)
-        File f = new File(outbox, name)
-        File target = new File(sent, name)
+        File f = new File(folders.get(OUTBOX), name)
+        File target = new File(folders.get(SENT), name)
         Files.move(f.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         eventBus.publish(new MessageSentEvent(message : message))
         log.fine("moved message to ${message.recipients} to sent folder")
@@ -213,9 +213,9 @@ class Messenger {
     public synchronized void onMessageReceivedEvent(MessageReceivedEvent e) {
         if (inboxMessages.add(e.message)) {
             diskIO.execute({
-                File unread = new File(inbox, deriveUnread(e.message))
+                File unread = new File(folders.get(INBOX), deriveUnread(e.message))
                 unread.createNewFile()
-                persist(e.message, inbox)
+                persist(e.message, folders.get(INBOX))
             })
         }
     }
@@ -247,9 +247,9 @@ class Messenger {
     
     public synchronized void onUIMessageDeleteEvent(UIMessageDeleteEvent e) {
         switch(e.folder) {
-            case INBOX : deleteFromFolder(e.message, inboxMessages, inbox); break;
-            case OUTBOX : deleteFromFolder(e.message, outboxMessages, outbox); break;
-            case SENT : deleteFromFolder(e.message, sentMessages, sent); break
+            case INBOX : deleteFromFolder(e.message, inboxMessages, folders.get(INBOX)); break;
+            case OUTBOX : deleteFromFolder(e.message, outboxMessages, folders.get(OUTBOX)); break;
+            case SENT : deleteFromFolder(e.message, sentMessages, folders.get(SENT)); break
         }
     }
     

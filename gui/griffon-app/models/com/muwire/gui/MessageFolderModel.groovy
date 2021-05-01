@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.Core
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MessageLoadedEvent
+import com.muwire.core.messenger.MessageReceivedEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.transform.Observable
@@ -39,7 +40,31 @@ class MessageFolderModel {
         def status = new MWMessageStatus(e.message, e.unread)
         if (messages.add(status)) {
             messageHeaders.add(status)
+            view.messageHeaderTable.model.fireTableDataChanged()
         }
-        view.messageHeaderTable.model.fireTableDataChanged()
+    }
+    
+    boolean processMessageReceivedEvent(MessageReceivedEvent e) {
+        def status = new MWMessageStatus(e.message, true)
+        if (messages.add(status)) {
+            messageHeaders.add(status)
+            view.messageHeaderTable.model.fireTableDataChanged()
+            return true
+        }
+        false
+    }
+    
+    void remove(MWMessageStatus status) {
+        if (messages.remove(status)) {
+            messageHeaders.remove(status)
+            view.messageHeaderTable.model.fireTableDataChanged()
+        }
+    }
+    
+    void add(MWMessageStatus status) {
+        if (messages.add(status)) {
+            messageHeaders.add(status)
+            view.messageHeaderTable.model.fireTableDataChanged()
+        }
     }
 }
