@@ -32,7 +32,7 @@ class MessageFolderController {
 
         def params = [:]
         params.reply = msg
-        params.core = core
+        params.core = model.core
         params.recipients = new HashSet<>(Collections.singletonList(msg.sender))
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
@@ -50,7 +50,7 @@ class MessageFolderController {
 
         def params = [:]
         params.reply = msg
-        params.core = core
+        params.core = model.core
         params.recipients = all
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
