@@ -25,10 +25,10 @@ class MessageFolderController {
 
     @ControllerAction
     void messageReply() {
-        int row = view.selectedMessageHeader()
-        if (row < 0)
+        int[] rows = view.selectedMessageHeaders()
+        if (rows.length == 0)
             return
-        MWMessage msg = model.messageHeaders.get(row).message
+        MWMessage msg = model.messageHeaders.get(rows[0]).message
 
         def params = [:]
         params.reply = msg
@@ -39,10 +39,10 @@ class MessageFolderController {
 
     @ControllerAction
     void messageReplyAll() {
-        int row = view.selectedMessageHeader()
-        if (row < 0)
+        int[] rows = view.selectedMessageHeaders()
+        if (rows.length == 0)
             return
-        MWMessage msg = model.messageHeaders.get(row).message
+        MWMessage msg = model.messageHeaders.get(rows[0]).message
 
         Set<Persona> all = new HashSet<>()
         all.add(msg.sender)
@@ -57,12 +57,18 @@ class MessageFolderController {
 
     @ControllerAction
     void messageDelete() {
-        int row = view.selectedMessageHeader()
-        if (row < 0)
+        int[] rows = view.selectedMessageHeaders()
+        if (rows.length == 0)
             return
-        MWMessage msg = model.messageHeaders.get(row).message
-        model.deleteMessage(msg)
-        model.core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.name))
+        List<MWMessage> toDelete = new ArrayList<>()
+        for (int row : rows) {
+            MWMessage msg = model.messageHeaders.get(row).message
+            toDelete.add(msg)
+        }
+        toDelete.each {msg ->
+            model.deleteMessage(msg)
+            model.core.eventBus.publish(new UIMessageDeleteEvent(message: msg, folder: model.name))
+        }
     }
 
     @ControllerAction
@@ -88,11 +94,11 @@ class MessageFolderController {
     }
 
     private void doDownloadAttachments(List attachments) {
-        int messageRow = view.selectedMessageHeader()
-        if (messageRow < 0)
+        int[] messageRows = view.selectedMessageHeaders()
+        if (messageRows.length == 0)
             return
 
-        MWMessage message = model.messageHeaders.get(messageRow).message
+        MWMessage message = model.messageHeaders.get(messageRows[0]).message
         attachments.each {
             if (it instanceof MWMessageAttachment)
                 model.core.eventBus.publish(new UIDownloadAttachmentEvent(attachment : it, sender : message.sender))

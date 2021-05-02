@@ -136,13 +136,15 @@ class MessageFolderView {
         messageAttachmentsTable = builder.getVariable("message-attachments-table")
     }
 
-    int selectedMessageHeader() {
-        int selectedRow = messageHeaderTable.getSelectedRow()
-        if (selectedRow < 0)
-            return -1
-        if (lastMessageHeaderTableSortEvent != null)
-            selectedRow = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRow)
-        selectedRow
+    int[] selectedMessageHeaders() {
+        int[] selectedRows = messageHeaderTable.getSelectedRows()
+        if (selectedRows.length == 0)
+            return selectedRows
+        if (lastMessageHeaderTableSortEvent != null) {
+            for (int i = 0; i < selectedRows.length; i++)
+                selectedRows[i] = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+        }
+        selectedRows
     }
 
     List<?> selectedMessageAttachments() {
@@ -183,16 +185,16 @@ class MessageFolderView {
         messageHeaderTable.rowSorter.setSortKeys(Collections.singletonList(sortKey))
         
         def selectionModel = messageHeaderTable.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
-            int selectedRow = selectedMessageHeader()
-            if (selectedRow < 0) {
+            int[] selectedRows = selectedMessageHeaders()
+            if (selectedRows.length == 0) {
                 model.messageButtonsEnabled = false
                 model.messageAttachmentsButtonEnabled = false
                 messageBody.setText("")
                 model.messageRecipientList = ""
             } else {
-                MWMessageStatus selectedStatus = model.messageHeaders.get(selectedRow)
+                MWMessageStatus selectedStatus = model.messageHeaders.get(selectedRows[0])
                 controller.markMessageRead(selectedStatus)
                 MWMessage selected = selectedStatus.message
                 messageBody.setText(selected.body)

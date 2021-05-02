@@ -900,7 +900,7 @@ class MainFrameModel {
         props['core'] = core
         props['outgoing'] = false
         props['name'] = e.name
-        def folder = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-${e.name}', props)
+        def folder = application.mvcGroupManager.createMVCGroup('message-folder', "folder-${e.name}", props)
         view.addUserMessageFolder(folder)
     }
 }

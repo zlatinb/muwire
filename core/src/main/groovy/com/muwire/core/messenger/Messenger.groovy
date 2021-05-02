@@ -1,11 +1,9 @@
 package com.muwire.core.messenger
 
-import com.sun.tools.doclets.standard.Standard
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -293,8 +291,9 @@ class Messenger {
 
             File from = new File(containerFrom, e.from)
             from = new File(from, deriveName(e.message))
-            if (!from.exists())
+            if (!from.exists()) {
                 return
+            }
 
             File unread = new File(containerFrom, e.from)
             unread = new File(unread, deriveUnread(e.message))
@@ -311,8 +310,9 @@ class Messenger {
             File to = new File(containerTo, e.to)
             to = new File(to, deriveName(e.message))
 
-            if (to.exists())
+            if (to.exists()) {
                 return
+            }
 
             Files.move(from.toPath(), to.toPath(), StandardCopyOption.ATOMIC_MOVE)
 
