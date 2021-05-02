@@ -245,12 +245,10 @@ class Messenger {
         }
     }
     
-    public synchronized void onUIMessageDeleteEvent(UIMessageDeleteEvent e) {
-        switch(e.folder) {
-            case INBOX : deleteFromFolder(e.message, inboxMessages, folders.get(INBOX)); break;
-            case OUTBOX : deleteFromFolder(e.message, outboxMessages, folders.get(OUTBOX)); break;
-            case SENT : deleteFromFolder(e.message, sentMessages, folders.get(SENT)); break
-        }
+    synchronized void onUIMessageDeleteEvent(UIMessageDeleteEvent e) {
+        def file = folders.get(e.folder)
+        def set = messages.get(file)
+        deleteFromFolder(e.message, set, file)
     }
     
     private void deleteFromFolder(MWMessage message, Set<MWMessage> set, File file) {

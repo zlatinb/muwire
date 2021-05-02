@@ -62,7 +62,7 @@ class MessageFolderController {
             return
         MWMessage msg = model.messageHeaders.get(row).message
         model.deleteMessage(msg)
-        model.core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.folderIdx))
+        model.core.eventBus.publish(new UIMessageDeleteEvent(message : msg, folder : model.name))
     }
 
     @ControllerAction
