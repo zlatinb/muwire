@@ -1,10 +1,14 @@
 package com.muwire.gui
 
+import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
+import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
+import org.h2.value.Transfer
 
+import javax.swing.DropMode
 import javax.swing.JPanel
 import java.awt.GridBagConstraints
 
@@ -1198,7 +1202,9 @@ class MainFrameView {
         })
 
         // messages tab
-        
+        def folderTransferHandler = new FolderImportTransferHandler()
+        systemMessageFolderList.setDropMode(DropMode.ON)
+        systemMessageFolderList.setTransferHandler(folderTransferHandler)
         systemMessageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         systemMessageFolderList.addListSelectionListener({
             int index = systemMessageFolderList.getSelectedIndex()
@@ -1210,6 +1216,8 @@ class MainFrameView {
             model.deleteMessageFolderButtonEnabled = false
         })
         
+        userMessageFolderList.setDropMode(DropMode.ON)
+        userMessageFolderList.setTransferHandler(folderTransferHandler)
         userMessageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         userMessageFolderList.addListSelectionListener({
             int index = userMessageFolderList.getSelectedIndex()
@@ -2017,31 +2025,6 @@ class MainFrameView {
         
     }
     
-    private static class MWTransferable<T> implements Transferable {
-        private final List<T> data
-        MWTransferable(List<T> data) {
-            this.data = data
-        }
-        
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            CopyPasteSupport.FLAVORS
-        }
-        
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            flavor == CopyPasteSupport.LIST_FLAVOR
-        }
-        
-        @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-            if (flavor != CopyPasteSupport.LIST_FLAVOR) {
-                return null
-            }
-            return data
-        }
-    }
-    
     private class FileCollectionTransferHandler extends TransferHandler {
         @Override
         protected Transferable createTransferable(JComponent c) {
@@ -2073,6 +2056,58 @@ class MainFrameView {
         @Override
         public int getSourceActions(JComponent c) {
             return LINK | COPY | MOVE
+        }
+    }
+    
+    private class FolderImportTransferHandler extends TransferHandler {
+        @Override
+        public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+            for (DataFlavor df : transferFlavors) {
+                if (df == CopyPasteSupport.LIST_FLAVOR) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        @Override
+        boolean importData(JComponent comp, Transferable t) {
+
+            List<?> items = t.getTransferData(CopyPasteSupport.LIST_FLAVOR)
+            if (items == null || items.isEmpty()) {
+                return false
+            }
+            JList target = (JList) comp
+
+            int index = target.getDropLocation().index
+            String to
+
+            if (comp == systemMessageFolderList)
+                to = model.messageFolders[index].model.name
+            else
+                to = model.messageFolders[index + Messenger.RESERVED_FOLDERS.size()].model.name
+
+            Set<MWMessage> toRemove = new HashSet<>()
+            String from = null
+            items.each {
+                MWMessageTransferable transferable = it
+                from = transferable.from
+                def event = new UIMessageMovedEvent(message: transferable.message,
+                        from: transferable.from, to: to)
+                model.core.eventBus.publish(event)
+                toRemove.add(transferable.message)
+            }
+
+            MVCGroup fromGroup = null
+            model.messageFolders.each {
+                if (it.model.name == from) {
+                    fromGroup = it
+                    return
+                }
+            }
+
+            fromGroup.view.removeMessages(toRemove)
+            return true
         }
     }
 }

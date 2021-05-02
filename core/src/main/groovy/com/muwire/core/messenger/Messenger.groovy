@@ -1,8 +1,11 @@
 package com.muwire.core.messenger
 
+import com.sun.tools.doclets.standard.Standard
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -44,7 +47,7 @@ class Messenger {
     private final Set<MWMessage> inboxMessages = new LinkedHashSet<>()
     private final Set<MWMessage> outboxMessages = new LinkedHashSet<>()
     private final Set<MWMessage> sentMessages = new LinkedHashSet<>()
-    
+    private final File home
     private File localFolders
     
     private final Set<MWMessage> inProcess = new HashSet<>()
@@ -63,6 +66,7 @@ class Messenger {
     
     Messenger(EventBus eventBus, File home, I2PConnector connector, MuWireSettings settings) {
         this.eventBus = eventBus
+        this.home = home
         this.connector = connector
         this.settings = settings
         
@@ -276,5 +280,51 @@ class Messenger {
         diskIO.execute({
             folder.deleteDir()
         })
+    }
+    
+    synchronized void onUIMessageMovedEvent(UIMessageMovedEvent e) {
+        diskIO.execute {
+            File containerFrom
+            if (RESERVED_FOLDERS.contains(e.from)) {
+                containerFrom = new File(home, "messages")
+            } else {
+                containerFrom = localFolders
+            }
+
+            File from = new File(containerFrom, e.from)
+            from = new File(from, deriveName(e.message))
+            if (!from.exists())
+                return
+
+            File unread = new File(containerFrom, e.from)
+            unread = new File(unread, deriveUnread(e.message))
+            boolean unreadExists = unread.exists()
+
+
+            File containerTo
+            if (RESERVED_FOLDERS.contains(e.to)) {
+                containerTo = new File(home, "messages")
+            } else {
+                containerTo = localFolders
+            }
+
+            File to = new File(containerTo, e.to)
+            to = new File(to, deriveName(e.message))
+
+            if (to.exists())
+                return
+
+            Files.move(from.toPath(), to.toPath(), StandardCopyOption.ATOMIC_MOVE)
+
+            if (unreadExists) {
+                unread.delete()
+                unread = new File(containerTo, e.to)
+                unread = new File(unread, deriveUnread(e.message))
+                unread.createNewFile()
+            }
+
+            eventBus.publish(new MessageLoadedEvent(message: e.message, folder: e.to,
+                    unread: unreadExists))
+        }
     }
 }

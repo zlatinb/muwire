@@ -4,6 +4,7 @@ import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
+import com.muwire.core.messenger.UIMessageMovedEvent
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
@@ -503,6 +504,7 @@ public class Core {
             register(UIMessageReadEvent.class, messenger)
             register(UIFolderCreateEvent.class, messenger)
             register(UIFolderDeleteEvent.class, messenger)
+            register(UIMessageMovedEvent.class, messenger)
         }
 
         File modulesProps = new File(home, "mwmodules.list")

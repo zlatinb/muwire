@@ -9,6 +9,7 @@ import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.inject.Inject
+import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JPanel
@@ -20,8 +21,10 @@ import javax.annotation.Nonnull
 import javax.swing.ListSelectionModel
 import javax.swing.RowSorter
 import javax.swing.SortOrder
+import javax.swing.TransferHandler
 import javax.swing.table.DefaultTableCellRenderer
 import java.awt.BorderLayout
+import java.awt.datatransfer.Transferable
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.util.stream.Collectors
@@ -52,7 +55,8 @@ class MessageFolderView {
             gridLayout(rows: 1, cols: 1)
             splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
                 scrollPane {
-                    table(id: "message-header-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                    table(id: "message-header-table", autoCreateRowSorter: true, rowHeight: rowHeight,
+                        dragEnabled: true, transferHandler: new MessageExportTransferHandler()) {
                         if (!model.outgoing) {
                             tableModel(list: model.messageHeaders) {
                                 closureColumn(header: trans("SENDER"), preferredWidth: 200, type: String, read: { it.message.sender.getHumanReadableName() })
@@ -156,6 +160,17 @@ class MessageFolderView {
         rv
     }
     
+    void removeMessages(Set<MWMessage> set) {
+        for(Iterator<MWMessageStatus> iter = model.messageHeaders.iterator(); iter.hasNext();) {
+            def status = iter.next()
+            if (set.contains(status.message)) {
+                model.messages.remove(status)
+                iter.remove()
+            }
+        }
+        messageHeaderTable.model.fireTableDataChanged()
+    }
+    
     void mvcGroupInit(Map<String, String> args) {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
@@ -241,5 +256,35 @@ class MessageFolderView {
 
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {
         menu.show(event.getComponent(), event.getX(), event.getY())
+    }
+    
+    private class MessageExportTransferHandler extends TransferHandler {
+        
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            if (c != messageHeaderTable)
+                return null
+            int [] selectedRows = messageHeaderTable.getSelectedRows()
+            if (selectedRows.length == 0)
+                return null
+            
+            if (lastMessageHeaderTableSortEvent != null) {
+                for (int i = 0; i < selectedRows.length; i++) {
+                    selectedRows[i] = messageHeaderTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+                }
+            }
+            List<MWMessage> toTransfer = new ArrayList<>()
+            selectedRows.each {
+                MWMessage message = model.messageHeaders[it].message
+                toTransfer.add(new MWMessageTransferable(message: message, from: model.name))
+            }
+            
+            return new MWTransferable(toTransfer)
+        }
+        
+        @Override
+        public int getSourceActions(JComponent c) {
+            return LINK | COPY | MOVE
+        }
     }
 }

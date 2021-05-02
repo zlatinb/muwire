@@ -31,6 +31,7 @@ class MessageFolderModel {
     void deleteMessage(MWMessage message) {
         MWMessageStatus status = new MWMessageStatus(message, false)
         messageHeaders.remove(status)
+        messages.remove(status)
         view.messageHeaderTable.model.fireTableDataChanged()
         view.messageBody.setText("")
         view.messageSplitPane.setDividerLocation(1.0d)
