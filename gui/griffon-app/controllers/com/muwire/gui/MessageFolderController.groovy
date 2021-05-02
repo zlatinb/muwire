@@ -120,7 +120,7 @@ class MessageFolderController {
     void markMessageRead(MWMessageStatus status) {
         if (status.status) {
             status.status = false
-            model.core.eventBus.publish(new UIMessageReadEvent(message : status.message))
+            model.core.eventBus.publish(new UIMessageReadEvent(message : status.message, folder: model.name))
         }
     }
 }

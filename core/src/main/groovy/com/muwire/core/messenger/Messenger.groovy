@@ -145,7 +145,7 @@ class Messenger {
     
     synchronized void onUIMessageReadEvent(UIMessageReadEvent e) {
         diskIO.execute({
-            File unread = new File(folders.get(INBOX), deriveUnread(e.message))
+            File unread = new File(folders.get(e.folder), deriveUnread(e.message))
             unread.delete()
         })
     }

@@ -4,4 +4,5 @@ import com.muwire.core.Event
 
 class UIMessageReadEvent extends Event {
     MWMessage message
+    String folder
 }
