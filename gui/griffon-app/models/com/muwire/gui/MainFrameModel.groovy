@@ -158,6 +158,8 @@ class MainFrameModel {
     @Observable boolean viewItemCommentButtonEnabled
     @Observable boolean deleteCollectionButtonEnabled
     
+    @Observable boolean deleteMessageFolderButtonEnabled
+    
     @Observable boolean searchesPaneButtonEnabled
     @Observable boolean downloadsPaneButtonEnabled
     @Observable boolean uploadsPaneButtonEnabled

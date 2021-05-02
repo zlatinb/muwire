@@ -256,4 +256,25 @@ class Messenger {
         File messageFile = new File(file, deriveName(message))
         messageFile.delete()
     }
+    
+    synchronized void onUIFolderCreateEvent(UIFolderCreateEvent e) {
+        File folder = new File(localFolders, e.name)
+        if (folder.mkdir()) {
+            folders.put(e.name, folder)
+            messages.put(folder, new LinkedHashSet())
+        }
+    }
+    
+    synchronized void onUIFolderDeleteEvent(UIFolderDeleteEvent e) {
+        File folder = new File(localFolders, e.name)
+        if (!folder.exists())
+            return
+        
+        folders.remove(e.name)
+        messages.remove(folder)
+        
+        diskIO.execute({
+            folder.deleteDir()
+        })
+    }
 }

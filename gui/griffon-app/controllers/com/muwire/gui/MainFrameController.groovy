@@ -1,4 +1,8 @@
 package com.muwire.gui
+
+import com.muwire.core.messenger.UIFolderCreateEvent
+import com.muwire.core.messenger.UIFolderDeleteEvent
+
 import static com.muwire.gui.Translator.trans
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
@@ -861,6 +865,59 @@ class MainFrameController {
         if (feed == null)
             return
         CopyPasteSupport.copyToClipboard(feed.getPublisher().toBase64())
+    }
+    
+    @ControllerAction
+    void createMessageFolder() {
+        String name = null
+        while(name == null) {
+            name = JOptionPane.showInputDialog(trans("FOLDER_ENTER_NAME"))
+            if (name == null)
+                return
+            name = name.trim()
+            if (name.length() == 0) {
+                JOptionPane.showMessageDialog(null, trans("FOLDER_NAME_EMPTY"),
+                    trans("FOLDER_NAME_EMPTY"), JOptionPane.WARNING_MESSAGE)
+                name = null
+                continue
+            }
+            if (model.messageFoldersMap.containsKey(name)) {
+                JOptionPane.showMessageDialog(null, trans("FOLDER_ALREADY_EXISTS"),
+                    trans("FOLDER_ALREADY_EXISTS"), JOptionPane.WARNING_MESSAGE)
+                name = null
+                continue
+            }
+        }
+        
+        def params = [:]
+        params['core'] = core
+        params['outgoing'] = false
+        params['name'] = name
+        def group = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-$name', params)
+        view.addUserMessageFolder(group)
+
+        UIFolderCreateEvent event = new UIFolderCreateEvent(name: name)
+        core.eventBus.publish(event)
+    }
+    
+    @ControllerAction
+    void deleteMessageFolder() {
+        
+        def group = model.messageFoldersMap.get(model.folderIdx)
+        if (group == null)
+            return
+        
+        if (!group.model.messages.isEmpty()) {
+            int result = JOptionPane.showConfirmDialog(null, trans("FOLDER_CONFIRM_DELETE"),
+                    trans("FOLDER_CONFIRM_DELETE_TITLE"), JOptionPane.YES_NO_OPTION)
+            if (result != JOptionPane.YES_OPTION)
+                return
+        }
+        
+        view.deleteUserMessageFolder(model.folderIdx)
+
+        UIFolderDeleteEvent event = new UIFolderDeleteEvent(name: model.folderIdx)
+        core.eventBus.publish(event)
     }
     
     void startChat(Persona p) {

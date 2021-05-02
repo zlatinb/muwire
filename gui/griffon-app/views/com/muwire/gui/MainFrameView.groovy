@@ -650,7 +650,16 @@ class MainFrameView {
                                     list(id: "message-folders-list", model: model.messageFolderListModel, 
                                             constraints: gbc(weightx: 100, anchor: GridBagConstraints.LINE_START))
                                 }
-                                panel(border: etchedBorder(), constraints : gbc(gridx:0, gridy:1, fill: GridBagConstraints.BOTH, 
+                                panel(border: etchedBorder(), constraints : gbc(gridx: 0, gridy:1, fill: GridBagConstraints.HORIZONTAL,
+                                        weightx:0, weighty: 0)) {
+                                    gridBagLayout()
+                                    label(text : trans("FOLDERS"), constraints : gbc(gridx:0, gridy: 0))
+                                    button(text : trans("CREATE_FOLDER"), constraints : gbc(gridx:0, gridy: 1, weightx: 100, fill:GridBagConstraints.HORIZONTAL),
+                                            createMessageFolderAction)
+                                    button(text : trans("DELETE_FOLDER"), enabled : bind {model.deleteMessageFolderButtonEnabled}, 
+                                            constraints : gbc(gridx:0, gridy: 2, weightx: 100, fill: GridBagConstraints.HORIZONTAL), deleteMessageFolderAction)
+                                }
+                                panel(border: etchedBorder(), constraints : gbc(gridx:0, gridy:2, fill: GridBagConstraints.BOTH, 
                                         weightx: 100, weighty: 100)) {
                                     gridLayout(rows: 1, cols: 1)
                                     scrollPane() {
@@ -1198,16 +1207,36 @@ class MainFrameView {
             model.folderIdx = model.messageFolders[index].model.name
             messageFolderContents.getLayout().show(messageFolderContents, model.folderIdx)
             userMessageFolderList.clearSelection()
+            model.deleteMessageFolderButtonEnabled = false
         })
         
         userMessageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         userMessageFolderList.addListSelectionListener({
             int index = userMessageFolderList.getSelectedIndex()
-            if (index < 0)
+            if (index < 0) {
+                model.deleteMessageFolderButtonEnabled = false
                 return
+            }
             model.folderIdx = model.messageFolders[index + Messenger.RESERVED_FOLDERS.size()].model.name
             messageFolderContents.getLayout().show(messageFolderContents, model.folderIdx)
             systemMessageFolderList.clearSelection()
+            model.deleteMessageFolderButtonEnabled = true
+        })
+        
+        JPopupMenu folderMenu = new JPopupMenu()
+        JMenuItem deleteItem = new JMenuItem(trans("DELETE_FOLDER"))
+        deleteItem.addActionListener({controller.deleteMessageFolder()})
+        folderMenu.add(deleteItem)
+        
+        userMessageFolderList.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(folderMenu, e)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(folderMenu, e)
+            }
         })
         
         // chat tabs
@@ -1709,6 +1738,14 @@ class MainFrameView {
         model.userMessageFolderListModel.addElement(group.model.name)
 
         messageFolderContents.add(group.view.folderPanel, group.model.name)
+    }
+    
+    void deleteUserMessageFolder(String name) {
+        def group = model.messageFoldersMap.remove(name)
+        if (group == null)
+            return
+        model.userMessageFolderListModel.removeElement(name)
+        messageFolderContents.remove(group.view.folderPanel)
     }
 
     int getSelectedContactsTableRow() {
