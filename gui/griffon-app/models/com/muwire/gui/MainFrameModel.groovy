@@ -1,6 +1,8 @@
 
 package com.muwire.gui
 
+import com.muwire.core.messenger.MessageFolderLoadingEvent
+
 import javax.swing.DefaultListModel
 import java.util.concurrent.ConcurrentHashMap
 
@@ -111,6 +113,7 @@ class MainFrameModel {
     def feedItems = []
     
     final DefaultListModel messageFolderListModel = new DefaultListModel()
+    final DefaultListModel userMessageFolderListModel = new DefaultListModel()
     final Map<String, MVCGroup> messageFoldersMap = new HashMap<>()
     final List<MVCGroup> messageFolders = [] 
     
@@ -286,6 +289,7 @@ class MainFrameModel {
             core.eventBus.register(MessageReceivedEvent.class, this)
             core.eventBus.register(UIMessageReadEvent.class, this)
             core.eventBus.register(MessageSentEvent.class, this)
+            core.eventBus.register(MessageFolderLoadingEvent.class, this)
 
             
             core.muOptions.watchedKeywords.each {
@@ -887,5 +891,14 @@ class MainFrameModel {
         props['txKey'] = "SENT"
         def sent = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-sent', props)
         view.addSystemMessageFolder(sent)
+    }
+    
+    void onMessageFolderLoadingEvent(MessageFolderLoadingEvent e) {
+        def props = [:]
+        props['core'] = core
+        props['outgoing'] = false
+        props['name'] = e.name
+        def folder = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-${e.name}', props)
+        view.addUserMessageFolder(folder)
     }
 }

@@ -1,11 +1,12 @@
 package com.muwire.gui
 
+import com.muwire.core.messenger.Messenger
 import com.muwire.core.trust.TrustLevel
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
 
-import javax.swing.DefaultListModel
 import javax.swing.JPanel
+import java.awt.GridBagConstraints
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
@@ -90,7 +91,7 @@ class MainFrameView {
     JTable collectionFilesTable
     def lastCollectionFilesSortEvent
     
-    JList messageFolderList
+    JList systemMessageFolderList, userMessageFolderList
     JPanel messageFolderContents
     
     void initUI() {
@@ -642,7 +643,20 @@ class MainFrameView {
                         gridLayout(rows : 1, cols : 1) 
                         splitPane(orientation : JSplitPane.HORIZONTAL_SPLIT, continuousLayout : true, dividerLocation : 100) {
                             panel {
-                                list(id : "message-folders-list", model: model.messageFolderListModel)
+                                gridBagLayout()
+                                panel(border: etchedBorder(), constraints : gbc(gridx:0, gridy:0, weightx: 100, weighty: 0,
+                                        fill : GridBagConstraints.BOTH)) {
+                                    gridBagLayout()
+                                    list(id: "message-folders-list", model: model.messageFolderListModel, 
+                                            constraints: gbc(weightx: 100, anchor: GridBagConstraints.LINE_START))
+                                }
+                                panel(border: etchedBorder(), constraints : gbc(gridx:0, gridy:1, fill: GridBagConstraints.BOTH, 
+                                        weightx: 100, weighty: 100)) {
+                                    gridLayout(rows: 1, cols: 1)
+                                    scrollPane() {
+                                        list(id: "user-message-folders-list", model: model.userMessageFolderListModel)
+                                    }
+                                }
                             }
                             panel (id : "message-folder-contents"){
                                 cardLayout()
@@ -694,7 +708,8 @@ class MainFrameView {
         collectionsTable = builder.getVariable("collections-table")
         collectionFilesTable = builder.getVariable("items-table")
         
-        messageFolderList = builder.getVariable("message-folders-list")
+        systemMessageFolderList = builder.getVariable("message-folders-list")
+        userMessageFolderList = builder.getVariable("user-message-folders-list")
         messageFolderContents = builder.getVariable("message-folder-contents")
     }
 
@@ -1175,13 +1190,24 @@ class MainFrameView {
 
         // messages tab
         
-        messageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        messageFolderList.addListSelectionListener({
-            int index = messageFolderList.getSelectedIndex()
+        systemMessageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        systemMessageFolderList.addListSelectionListener({
+            int index = systemMessageFolderList.getSelectedIndex()
             if (index < 0)
-                index = 0
+                return
             model.folderIdx = model.messageFolders[index].model.name
             messageFolderContents.getLayout().show(messageFolderContents, model.folderIdx)
+            userMessageFolderList.clearSelection()
+        })
+        
+        userMessageFolderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        userMessageFolderList.addListSelectionListener({
+            int index = userMessageFolderList.getSelectedIndex()
+            if (index < 0)
+                return
+            model.folderIdx = model.messageFolders[index + Messenger.RESERVED_FOLDERS.size()].model.name
+            messageFolderContents.getLayout().show(messageFolderContents, model.folderIdx)
+            systemMessageFolderList.clearSelection()
         })
         
         // chat tabs
@@ -1673,6 +1699,14 @@ class MainFrameView {
         model.messageFolders.add(group)
         model.messageFoldersMap.put(group.model.name, group)
         model.messageFolderListModel.addElement(trans(group.model.txKey))
+
+        messageFolderContents.add(group.view.folderPanel, group.model.name)
+    }
+    
+    void addUserMessageFolder(MVCGroup group) {
+        model.messageFolders.add(group)
+        model.messageFoldersMap.put(group.model.name, group)
+        model.userMessageFolderListModel.addElement(group.model.name)
 
         messageFolderContents.add(group.view.folderPanel, group.model.name)
     }

@@ -26,7 +26,7 @@ class Messenger {
     public final static String INBOX = "inbox"
     public final static String OUTBOX = "outbox"
     public final static String SENT = "sent"
-    private static final Set<String> RESERVED_FOLDERS = new HashSet<>()
+    public static final Set<String> RESERVED_FOLDERS = new HashSet<>()
     static {
         RESERVED_FOLDERS.add(INBOX)
         RESERVED_FOLDERS.add(OUTBOX)
@@ -101,7 +101,7 @@ class Messenger {
         localFolders.listFiles().toList().stream().filter({ it.isDirectory() }).
                 forEach({
                     folders.put(it.getName(), it)
-                    eventBus.publish(new MessageFolderLoadingEvent(folder: it.getName()))
+                    eventBus.publish(new MessageFolderLoadingEvent(name: it.getName()))
                 })
 
         folders.each { name, file ->
