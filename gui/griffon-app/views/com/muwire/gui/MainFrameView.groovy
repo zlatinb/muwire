@@ -82,6 +82,7 @@ class MainFrameView {
     def lastUploadsSortEvent
     def lastSharedSortEvent
     def lastContactsSortEvent
+    def lastContactsSubscriptionSortEvent
     def expansionListener = new TreeExpansions()
     def lastFeedsSortEvent
     def lastFeedItemsSortEvent
@@ -1109,12 +1110,12 @@ class MainFrameView {
         // subscription table
         def subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
-        subscriptionTable.rowSorter.addRowSorterListener({ evt -> trustTablesSortEvents["subscription-table"] = evt })
+        subscriptionTable.rowSorter.addRowSorterListener({ evt -> lastContactsSubscriptionSortEvent = evt })
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = subscriptionTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
-            int selectedRow = getSelectedTrustTablesRow("subscription-table")
+            int selectedRow = getSelectedContactSubscriptionTableRow()
             if (selectedRow < 0) {
                 model.reviewButtonEnabled = false
                 model.updateButtonEnabled = false
@@ -1765,6 +1766,17 @@ class MainFrameView {
             selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
         selectedRow
     }
+    
+    int getSelectedContactSubscriptionTableRow() {
+        def table = builder.getVariable("subscription-table")
+        int selectedRow = table.getSelectedRow()
+        if (selectedRow < 0)
+            return -1
+        if (lastContactsSubscriptionSortEvent != null)
+            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
+        selectedRow
+    }
+    
     
     public void refreshSharedFiles() {
         def tree = builder.getVariable("shared-files-tree")

@@ -339,7 +339,7 @@ class MainFrameController {
     }
 
     private RemoteTrustList getSelectedTrustList() {
-        int row = view.getSelectedTrustTablesRow("subscription-table")
+        int row = view.getSelectedContactSubscriptionTableRow()
         if (row < 0)
             return null
         model.subscriptions[row]
