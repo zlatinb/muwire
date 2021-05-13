@@ -183,6 +183,7 @@ task griffonManifest {
 jar {
     dependsOn griffonManifest
     from("$buildDir/griffonManifest") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
         into ("META-INF/griffon")
     }
 }
