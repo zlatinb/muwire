@@ -2,42 +2,44 @@ buildscript {
     repositories {
         jcenter()
         mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2"
+        }
     }
     
     dependencies {
-        classpath 'org.codehaus.griffon:gradle-griffon-plugin:2.15.1'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
-        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
-        classpath 'org.gradle.api.plugins:gradle-izpack-plugin:0.2.3'
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-        classpath 'com.github.cr0:gradle-macappbundle-plugin:3.1.0'
-        classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-        classpath 'de.gliderpilot.gradle.jnlp:gradle-jnlp-plugin:1.2.5'
-        classpath 'net.nemerosa:versioning:2.6.1'
     }
 }
 
-apply plugin: 'org.codehaus.griffon.griffon'
-apply plugin: 'net.nemerosa.versioning'
-
-Date buildTimeAndDate = new Date()
-ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
-    macosx = System.getProperty('os.name').contains('Mac OS')
+plugins {
+    id  'application'
+    id  "com.github.johnrengelman.shadow" version "5.2.0"
 }
 
-griffon {
-    disableDependencyResolution = false
-    includeGroovyDependencies = true
-    version = '2.15.1'
-    toolkit = 'swing'
-    applicationProperties = [
-        'build_date'    : buildDate,
-        'build_time'    : buildTime,
-        'build_revision': versioning.info.commit
-    ]
+repositories {
+    jcenter()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        groovy {
+            srcDir 'griffon-app/conf'
+            srcDir 'griffon-app/controllers'
+            srcDir 'griffon-app/lifecycle'
+            srcDir 'griffon-app/models'
+            srcDir 'griffon-app/resources'
+            srcDir 'griffon-app/services'
+            srcDir 'griffon-app/views'
+        }
+        resources {
+            srcDir 'griffon-app/i18n'
+            srcDir 'griffon-app/resources'
+        }
+    }
 }
 
 application {
@@ -63,16 +65,6 @@ startScripts.doFirst {
                                    
 }
 
-apply from: 'gradle/publishing.gradle'
-// apply from: 'gradle/code-coverage.gradle'
-// apply from: 'gradle/code-quality.gradle'
-// apply from: 'gradle/integration-test.gradle'
-// apply from: 'gradle/package.gradle'
-apply from: 'gradle/docs.gradle'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'org.kordamp.gradle.stats'
-apply plugin: 'com.github.ben-manes.versions'
-apply plugin: 'com.github.kt3k.coveralls'
 
 
 configurations.all {
@@ -92,7 +84,14 @@ configurations.all {
 
 dependencies {
     implementation project(":core")
-    implementation "org.codehaus.griffon:griffon-guice:${griffon.version}"
+    implementation "org.codehaus.griffon:griffon-swing-groovy:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-groovy:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-groovy-compile:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-swing:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-guice:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-core:${griffonVersion}"
+    implementation "org.codehaus.griffon:griffon-core-compile:${griffonVersion}"
+
     implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
     implementation group: 'com.bulenkov', name: 'darcula', version: '2018.2' 
 
@@ -106,19 +105,12 @@ dependencies {
     // because java 14 doesn't come with it
     runtimeOnly 'mrj:MRJToolkitStubs:1.0'
 
-    testCompileOnly "org.codehaus.griffon:griffon-fest-test:${griffon.version}"
+    testCompileOnly "org.codehaus.griffon:griffon-fest-test:${griffonVersion}"
     testCompileOnly "org.spockframework:spock-core:${spockVersion}"
     testCompileOnly('org.awaitility:awaitility-groovy:3.1.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testCompileOnly "org.codehaus.groovy:groovy-all:${groovyVersion}"
-}
-
-task sourceJar(type: Jar) {
-    group 'Build'
-    description 'An archive of the source code'
-    classifier 'sources'
-    from sourceSets.main.allSource
 }
 
 tasks.withType(JavaCompile) {
@@ -131,58 +123,72 @@ tasks.withType(GroovyCompile) {
     targetCompatibility = project.targetCompatibility
 }
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.*
-import java.text.SimpleDateFormat
-
-ext.backgroundImage = 'i2plogo.png'
-
-shadowJar {
-    transform(ServiceFileTransformer)
-    transform(ServiceFileTransformer) {
-        path = 'META-INF/griffon'
-    }
-    transform(ServiceFileTransformer) {
-        path = 'META-INF/types'
-    }
-    transform(PropertiesFileTransformer) {
-        paths = [
-            'META-INF/editors/java.beans.PropertyEditor'
-        ]
-    }
-}
-
-startScripts {
-    doLast {
-        if (!macosx) unixScript.text = unixScript.text.replaceAll('"(-Xdock:(name|icon)=)([^"]*?)(")', ' ')
-        windowsScript.text = windowsScript.text.replaceAll('"(-Xdock:(name|icon)=)([^"]*?)(")', ' ')
-    }
-}
-
 if (hasProperty('debugRun') && ((project.debugRun as boolean))) {
     run {
         jvmArgs '-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005'
     }
 }
 
-/*
-task jacocoRootMerge(type: org.gradle.testing.jacoco.tasks.JacocoMerge, dependsOn: [test, jacocoTestReport, jacocoIntegrationTestReport]) {
-    executionData = files(jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData)
-    destinationFile = file("${buildDir}/jacoco/root.exec")
+import java.nio.file.Path
+import java.nio.file.Paths
+
+String className(File f, String prefix) {
+    Path pwd = file(".").getAbsoluteFile().toPath()
+    Path prefixPath = Paths.get(pwd.toString(),prefix)
+    
+    Path filePath = f.toPath()
+    Path relative = prefixPath.relativize(filePath)
+    String name = relative.toString()
+    name.replace(File.separator,'.').substring(0, name.lastIndexOf(".") )
 }
 
-task jacocoRootReport(dependsOn: jacocoRootMerge, type: JacocoReport) {
-    group = 'Reporting'
-    description = 'Generate Jacoco coverage reports after running all tests.'
-    executionData file("${buildDir}/jacoco/root.exec")
-    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-    classDirectories = files(sourceSets.main.output)
-    reports {
-        csv.enabled = false
-        xml.enabled = true
-        html.enabled = true
-        html.destination = file("${buildDir}/reports/jacoco/root/html")
-        xml.destination = file("${buildDir}/reports/jacoco/root/root.xml")
+task griffonManifest {
+    doLast {
+        def models = fileTree("griffon-app/models").getFiles().collect {
+            className(it, "griffon-app/models")
+        }.sort()
+        def views = fileTree("griffon-app/views").getFiles().collect {
+            className(it, "griffon-app/views")
+        }.sort()
+        def controllers = fileTree("griffon-app/controllers").getFiles().collect {
+            className(it, "griffon-app/controllers")
+        }.sort()
+        
+        def manifest = file("$buildDir/griffonManifest")
+        manifest.mkdirs()
+        
+        def controllerFile = new File(manifest, "griffon.core.artifact.GriffonController")
+        controllerFile.withPrintWriter {writer ->
+            controllers.each {controller ->
+                writer.println(controller)
+            }
+        }
+
+        def modelsFile = new File(manifest, "griffon.core.artifact.GriffonModel")
+        modelsFile.withPrintWriter {writer ->
+            models.each {model ->
+                writer.println(model)
+            }
+        }
+
+        def viewsFile = new File(manifest, "griffon.core.artifact.GriffonView")
+        viewsFile.withPrintWriter {writer ->
+            views.each {view ->
+                writer.println(view)
+            }
+        }
     }
 }
-*/
 
+jar {
+    dependsOn griffonManifest
+    from("$buildDir/griffonManifest") {
+        into ("META-INF/griffon")
+    }
+}
+
+shadowJar {
+    from("shadow/services") {
+        into ("META-INF/services")
+    }
+}
