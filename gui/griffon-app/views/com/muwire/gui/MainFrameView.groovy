@@ -103,10 +103,6 @@ class MainFrameView {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager())
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
-        String revision = ""
-        String build = metadata["build.revision"]
-        if (build != null && !build.isEmpty())
-            revision = " revision " + build.substring(0,10)
         
         int mainFrameX = 1
         int mainFrameY = 1
@@ -127,7 +123,7 @@ class MainFrameView {
             locationRelativeTo : null,
             defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
             title: application.configuration['application.title'] + " " +
-            metadata["application.version"] + revision,
+            metadata["application.version"],
             iconImage:   imageIcon('/MuWire-48x48.png').image,
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
