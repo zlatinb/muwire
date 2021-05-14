@@ -38,6 +38,10 @@ subprojects {
             stripJar(it.archivePath)
         }
     }
+    
+    tasks.withType(Jar) {
+        metadataCharset = "US-ASCII"
+    }
 }
 import java.util.jar.*
 void stripJar(File file) {

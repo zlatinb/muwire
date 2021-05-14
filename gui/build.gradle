@@ -158,25 +158,25 @@ task griffonManifest {
         manifest.mkdirs()
         
         def controllerFile = new File(manifest, "griffon.core.artifact.GriffonController")
-        controllerFile.withPrintWriter {writer ->
+        controllerFile.withPrintWriter("US-ASCII", {writer ->
             controllers.each {controller ->
                 writer.println(controller)
             }
-        }
+        })
 
         def modelsFile = new File(manifest, "griffon.core.artifact.GriffonModel")
-        modelsFile.withPrintWriter {writer ->
+        modelsFile.withPrintWriter("US-ASCII", {writer ->
             models.each {model ->
                 writer.println(model)
             }
-        }
+        })
 
         def viewsFile = new File(manifest, "griffon.core.artifact.GriffonView")
-        viewsFile.withPrintWriter {writer ->
+        viewsFile.withPrintWriter("US-ASCII", {writer ->
             views.each {view ->
                 writer.println(view)
             }
-        }
+        })
     }
 }
 
