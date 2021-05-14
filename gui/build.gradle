@@ -160,21 +160,24 @@ task griffonManifest {
         def controllerFile = new File(manifest, "griffon.core.artifact.GriffonController")
         controllerFile.withPrintWriter("US-ASCII", {writer ->
             controllers.each {controller ->
-                writer.println(controller)
+                writer.print(controller)
+                writer.print('\n')
             }
         })
 
         def modelsFile = new File(manifest, "griffon.core.artifact.GriffonModel")
         modelsFile.withPrintWriter("US-ASCII", {writer ->
             models.each {model ->
-                writer.println(model)
+                writer.print(model)
+                writer.print('\n')
             }
         })
 
         def viewsFile = new File(manifest, "griffon.core.artifact.GriffonView")
         viewsFile.withPrintWriter("US-ASCII", {writer ->
             views.each {view ->
-                writer.println(view)
+                writer.print(view)
+                writer.print('\n')
             }
         })
     }

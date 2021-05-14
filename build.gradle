@@ -44,6 +44,7 @@ subprojects {
     }
 }
 import java.util.jar.*
+import java.nio.file.*
 void stripJar(File file) {
     if (file.getName().endsWith('.tar'))
         return
@@ -59,7 +60,9 @@ void stripJar(File file) {
             out << jf.getInputStream(it)
         }
         out.finish()
+        jf.close()
     }
-    newFile.renameTo file
+    Files.copy(newFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    newFile.delete()
 }
 
