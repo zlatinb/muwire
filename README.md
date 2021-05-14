@@ -48,6 +48,9 @@ The CLI is in maintenance mode and will not be getting any new features.
 
 MuWire is available as a Docker image.  For more information see the [Docker] page.
 
+## Reproducible build
+
+The `zip` distribution of MuWire can be build reproducibly on some systems.  For more info see the [reproducible build] page.
 ## Translations
 If you want to help translate MuWire, instructions are on the wiki [Translate] page.
 
@@ -82,3 +85,4 @@ You can find the full key at https://keybase.io/zlatinb
 [jlesage/docker-baseimage-gui]: https://github.com/jlesage/docker-baseimage-gui
 [Tracker]: https://github.com/zlatinb/muwire/wiki/Tracker-Daemon
 [MuCats]: https://github.com/zlatinb/mucats
+[reproducible build]: https://github.com/zlatinb/muwire/wiki/Reproducible-build
