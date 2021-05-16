@@ -16,6 +16,8 @@ import net.i2p.data.Destination
 
 @Log
 class UltrapeerConnectionManager extends ConnectionManager {
+    
+    private static final int QUERY_FACTOR = 2
 
     final int maxPeers, maxLeafs
     final TrustService trustService
@@ -52,7 +54,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
         final int connCount = peerConnections.size()
         if (connCount == 0)
             return
-        final int treshold = (int)(Math.sqrt(connCount)) + 1
+        final int treshold = QUERY_FACTOR * ((int)(Math.sqrt(connCount)) + 1)
         peerConnections.values().each {
             // 1. do not send query back to originator
             // 2. if firstHop forward to everyone
