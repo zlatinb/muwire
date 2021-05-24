@@ -91,6 +91,7 @@ class UploaderTest {
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 0-19" == readUntilRN()
         assert readUntilRN().startsWith("X-Have")
+        assert readUntilRN().startsWith("Head")
         assert "" == readUntilRN()
 
         byte [] data = new byte[20]
@@ -107,6 +108,7 @@ class UploaderTest {
         assert "200 OK" == readUntilRN()
         assert "Content-Range: 5-15" == readUntilRN()
         assert readUntilRN().startsWith("X-Have")
+        assert readUntilRN().startsWith("Head")
         assert "" == readUntilRN()
 
         byte [] data = new byte[11]
@@ -132,6 +134,7 @@ class UploaderTest {
         fillFile(length)
         request = new ContentRequest(range : new Range(0, length - 1))
         startUpload()
+        readUntilRN()
         readUntilRN()
         readUntilRN()
         readUntilRN()

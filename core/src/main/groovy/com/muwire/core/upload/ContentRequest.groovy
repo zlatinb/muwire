@@ -1,7 +1,5 @@
 package com.muwire.core.upload
 
-class ContentRequest extends Request {
+class ContentRequest extends HeadRequest {
     Range range
-    int have
-    boolean browse, feed, chat, message
 }

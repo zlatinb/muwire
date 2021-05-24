@@ -8,6 +8,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.util.DataUtil
+import org.h2.engine.Session
 
 import static com.muwire.core.util.DataUtil.readTillRN
 
@@ -46,6 +47,7 @@ class DownloadSession {
     private boolean steal
     int piece, position
     private long pieceStart, start, end
+    boolean supportsHead
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
@@ -79,7 +81,6 @@ class DownloadSession {
      */
     public boolean sendRequest() throws IOException {
         OutputStream os = endpoint.getOutputStream()
-        InputStream is = endpoint.getInputStream()
 
         int[] pieceAndPosition
         if (available.isEmpty())
@@ -106,16 +107,8 @@ class DownloadSession {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
-            if (browse)
-                os.write("Browse: true\r\n".getBytes(StandardCharsets.US_ASCII))
-            if (feed)
-                os.write("Feed: true\r\n".getBytes(StandardCharsets.US_ASCII))
-            if (chat)
-                os.write("Chat: true\r\n".getBytes(StandardCharsets.US_ASCII))
-            if (message)
-                os.write("Message: true\r\n".getBytes(StandardCharsets.US_ASCII))
-            String xHave = DataUtil.encodeXHave(pieces.getDownloaded(), pieces.nPieces)
-            os.write("X-Have: $xHave\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+            SessionSupport.writeInteractionHeaders(os, browse, chat, feed, message)
+            SessionSupport.writeXHave(os, pieces)
             headersSent = true
             return true
         } finally {
@@ -154,6 +147,9 @@ class DownloadSession {
 
             // parse all headers
             Map<String,String> headers = DataUtil.readAllHeaders(is)
+            
+            if (headers.containsKey("Head") && Boolean.parseBoolean(headers["Head"]))
+                supportsHead = true
 
             // prase X-Alt if present
             if (headers.containsKey("X-Alt")) {

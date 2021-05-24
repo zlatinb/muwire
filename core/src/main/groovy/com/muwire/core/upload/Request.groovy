@@ -43,27 +43,40 @@ class Request {
         if (start < 0 || end < start)
             throw new IOException("Invalid range $start - $end")
 
-        Persona downloader = null
+        def state = parseCommonHeaders(headers)
+        
+        new ContentRequest( infoHash : infoHash, range : new Range(start, end),
+            headers : headers, downloader : state.downloader, have : state.have,
+            browse : state.browse, feed : state.feed, chat : state.chat, message : state.message)
+    }
+    
+    static Request parseHeadRequest(InfoHash infoHash, InputStream is) throws IOException {
+        Map<String, String> headers = DataUtil.readAllHeaders(is)
+        def state = parseCommonHeaders(headers)
+        new HeadRequest(infoHash: infoHash, headers: headers, downloader: state.downloader, have: state.have,
+            browse: state.browse, feed: state.feed, chat: state.chat, message: state.message)
+    }
+    
+    private static RequestParsingState parseCommonHeaders(Map<String,String> headers) throws IOException {
+        RequestParsingState rv = new RequestParsingState()
+        
+        rv.browse = headers.containsKey("Browse") && Boolean.parseBoolean(headers['Browse'])
+        rv.feed = headers.containsKey("Feed") && Boolean.parseBoolean(headers['Feed'])
+        rv.chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
+        rv.message = headers.containsKey("Message") && Boolean.parseBoolean(headers['Message'])
+        
+        if (headers.containsKey("X-Have")) {
+            def encoded = headers["X-Have"].trim()
+            rv.have = DataUtil.decodeXHave(encoded).size()
+        }
+        
         if (headers.containsKey("X-Persona")) {
             def encoded = headers["X-Persona"].trim()
             def decoded = Base64.decode(encoded)
-            downloader = new Persona(new ByteArrayInputStream(decoded))
-        }
-
-        int have = 0
-        if (headers.containsKey("X-Have")) {
-            def encoded = headers["X-Have"].trim()
-            have = DataUtil.decodeXHave(encoded).size()
+            rv.downloader = new Persona(new ByteArrayInputStream(decoded))
         }
         
-        boolean browse = headers.containsKey("Browse") && Boolean.parseBoolean(headers['Browse'])
-        boolean feed = headers.containsKey("Feed") && Boolean.parseBoolean(headers['Feed'])
-        boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
-        boolean message = headers.containsKey("Message") && Boolean.parseBoolean(headers['Message'])
-        
-        new ContentRequest( infoHash : infoHash, range : new Range(start, end),
-            headers : headers, downloader : downloader, have : have,
-            browse : browse, feed : feed, chat : chat, message : message)
+        rv
     }
 
     static Request parseHashListRequest(InfoHash infoHash, InputStream is) throws IOException {
@@ -75,5 +88,11 @@ class Request {
             downloader = new Persona(new ByteArrayInputStream(decoded))
         }
         new HashListRequest(infoHash : infoHash, headers : headers, downloader : downloader)
+    }
+    
+    private static class RequestParsingState {
+        Persona downloader
+        boolean browse, feed, chat, message
+        int have
     }
 }

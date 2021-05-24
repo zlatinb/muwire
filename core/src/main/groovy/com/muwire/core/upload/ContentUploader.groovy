@@ -1,33 +1,24 @@
 package com.muwire.core.upload
 
-import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
-import java.util.stream.Collectors
 
-import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.util.DataUtil
 
-import net.i2p.data.Destination
+class ContentUploader extends MeshUploader {
 
-class ContentUploader extends Uploader {
-
-    private final File file
     private final ContentRequest request
-    private final Mesh mesh
     private final int pieceSize
     
     private volatile boolean done
 
     ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize) {
-        super(endpoint)
-        this.file = file
+        super(file, request, endpoint, mesh)
         this.request = request
-        this.mesh = mesh
         this.pieceSize = pieceSize
     }
 
@@ -56,6 +47,7 @@ class ContentUploader extends Uploader {
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Content-Range: $range.start-$range.end\r\n".getBytes(StandardCharsets.US_ASCII))
         writeMesh(request.downloader)
+        writeHeadSupport()
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
         FileChannel channel = null
@@ -84,22 +76,6 @@ class ContentUploader extends Uploader {
         }
     }
 
-    private void writeMesh(Persona toExclude) {
-        String xHave = DataUtil.encodeXHave(mesh.pieces.getDownloaded(), mesh.pieces.nPieces)
-        endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
-
-        Set<Persona> sources = mesh.getRandom(9, toExclude)
-        if (!sources.isEmpty()) {
-            String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
-            endpoint.getOutputStream().write("X-Alt: $xAlts\r\n".getBytes(StandardCharsets.US_ASCII))
-        }
-    }
-
-    @Override
-    public String getName() {
-        return file.getName();
-    }
-
     @Override
     public synchronized int getProgress() {
         if (mapped == null)
@@ -107,59 +83,5 @@ class ContentUploader extends Uploader {
         int position = mapped.position()
         int total = request.getRange().end - request.getRange().start
         (int)(position * 100.0d / total)
-    }
-
-    @Override
-    public String getDownloader() {
-        request.downloader.getHumanReadableName()
-    }
-
-    @Override
-    public int getDonePieces() {
-        return request.have;
-    }
-
-    @Override
-    public int getTotalPieces() {
-        return mesh.pieces.nPieces;
-    }
-
-    @Override
-    public long getTotalSize() {
-        return file.length();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof ContentUploader)) 
-            return false
-        ContentUploader other = (ContentUploader)o
-        request.infoHash == other.request.infoHash &&
-            request.getDownloader() == other.request.getDownloader()
-    }
-
-    @Override
-    public boolean isBrowseEnabled() {
-        request.browse
-    }
-
-    @Override
-    public boolean isFeedEnabled() {
-        request.feed
-    }
-
-    @Override
-    public boolean isChatEnabled() {
-        request.chat
-    }
-    
-    @Override
-    public boolean isMessageEnabled() {
-        request.message
-    }
-
-    @Override
-    public Persona getDownloaderPersona() {
-        request.downloader
     }
 }

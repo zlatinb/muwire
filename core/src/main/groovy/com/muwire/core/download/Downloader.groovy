@@ -412,6 +412,7 @@ public class Downloader {
                 
                 Set<Integer> queuedPieces = new HashSet<>()
                 boolean requestPerformed
+                boolean supportsHead = false
                 while(!pieces.isComplete()) {
                     if (sessionQueue.isEmpty()) {
                         boolean sentAnyRequests = false
@@ -446,6 +447,14 @@ public class Downloader {
                         break
                     successfulDestinations.add(endpoint.destination)
                     writePieces()
+                    supportsHead = currentSession.supportsHead
+                }
+                
+                // issue a HEAD request when everything is done
+                if (supportsHead) {
+                    HeadSession headSession = new HeadSession(eventBus, me.toBase64(), pieces, getInfoHash(),
+                            endpoint, browse, feed, chat, message)
+                    headSession.performRequest()
                 }
             } catch (Exception bad) {
                 log.log(Level.WARNING,"Exception while downloading",DataUtil.findRoot(bad))

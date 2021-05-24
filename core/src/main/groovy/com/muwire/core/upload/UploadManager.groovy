@@ -52,20 +52,25 @@ public class UploadManager {
         DataInputStream dis = new DataInputStream(e.getInputStream())
         boolean first = true
         while(true) {
+            boolean head = false
             if (first)
                 first = false
             else {
                 byte[] get = new byte[4]
                 dis.readFully(get)
                 if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
-                    log.warning("received a method other than GET on subsequent call")
-                    e.close()
-                    return
+                    if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == ' ') {
+                        head = true
+                    } else {
+                        log.warning("received a method other than GET on subsequent call")
+                        e.close()
+                        return
+                    }
                 }
             }
             dis.readFully(infoHashStringBytes)
             String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
-            log.info("Responding to upload request for root $infoHashString")
+            log.info("Responding to upload request for root $infoHashString head $head")
 
             byte [] infoHashRoot = Base64.decode(infoHashString)
             InfoHash infoHash = new InfoHash(infoHashRoot)
@@ -82,12 +87,16 @@ public class UploadManager {
             byte [] rn = new byte[2]
             dis.readFully(rn)
             if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
-                log.warning("Malformed GET header")
+                log.warning("Malformed GET/HEAD header")
                 e.close()
                 return
             }
 
-            ContentRequest request = Request.parseContentRequest(infoHash, e.getInputStream())
+            HeadRequest request
+            if (head)
+                request = Request.parseHeadRequest(infoHash, e.getInputStream())
+            else
+                request = Request.parseContentRequest(infoHash, e.getInputStream())
             if (request.downloader != null && request.downloader.destination != e.destination) {
                 log.info("Downloader persona doesn't match their destination")
                 e.close()
@@ -119,12 +128,17 @@ public class UploadManager {
                 file = sharedFile.file
                 pieceSize = sharedFile.pieceSize
             }
-
-            Uploader uploader = new ContentUploader(file, request, e, mesh, pieceSize)
+            
+            Uploader uploader
+            if (head)
+                uploader = new HeadUploader(file, request, e, mesh)
+            else
+                uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
-                eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
+                if (!head)
+                    eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
             } finally {
                 decrementUploads(request.downloader)
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
@@ -203,10 +217,15 @@ public class UploadManager {
         while(true) {
             byte[] get = new byte[4]
             dis.readFully(get)
+            boolean head = false
             if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
-                log.warning("received a method other than GET on subsequent call")
-                e.close()
-                return
+                if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == ' ') {
+                    head = true
+                } else {
+                    log.warning("received a method other than GET or HEAD on subsequent call")
+                    e.close()
+                    return
+                }
             }
             dis.readFully(infoHashStringBytes)
             infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
@@ -232,7 +251,10 @@ public class UploadManager {
                 return
             }
 
-            request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
+            if (head)
+                request = Request.parseHeadRequest(new InfoHash(infoHashRoot), e.getInputStream())
+            else
+                request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
             if (request.downloader != null && request.downloader.destination != e.destination) {
                 log.info("Downloader persona doesn't match their destination")
                 e.close()
@@ -257,11 +279,15 @@ public class UploadManager {
                 pieceSize = sharedFile.pieceSize
             }
 
-            uploader = new ContentUploader(file, request, e, mesh, pieceSize)
+            if (head)
+                uploader = new HeadUploader(file, request, endpoint, mesh)
+            else
+                uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
             try {
                 uploader.respond()
-                eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
+                if (!head)
+                    eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
             } finally {
                 eventBus.publish(new UploadFinishedEvent(uploader : uploader))
             }
