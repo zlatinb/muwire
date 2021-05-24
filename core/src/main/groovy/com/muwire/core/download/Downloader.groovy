@@ -107,7 +107,7 @@ public class Downloader {
             queueSize++
         if (pieceSizePow2 < 18)
             queueSize++
-        this.queueSize = queueSize
+        this.queueSize = Math.min(this.nPieces - 1, queueSize)
     }
 
     public synchronized InfoHash getInfoHash() {
@@ -427,7 +427,7 @@ public class Downloader {
                                 sentAnyRequests = true
                             }
                         }
-                        if (!sentAnyRequests)
+                        if (!sentAnyRequests && queueSize > 0)
                             break;
                         endpoint.getOutputStream().flush()
                     }
