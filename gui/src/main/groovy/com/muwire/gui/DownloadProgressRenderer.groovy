@@ -22,7 +22,7 @@ class DownloadProgressRenderer extends DefaultTableCellRenderer {
         int done = d.donePieces()
         int percent = -1
         if (pieces != 0)
-            percent = (done * 100 / pieces)
+            percent = (int)(done * 100.0d / pieces)
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(d.length, sb)
         String totalSize = sb.toString() + "B"
