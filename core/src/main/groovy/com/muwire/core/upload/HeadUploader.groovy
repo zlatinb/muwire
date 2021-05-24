@@ -21,6 +21,7 @@ class HeadUploader extends MeshUploader {
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII)) // what else can be said?
         writeMesh(downloader)
         writeHeadSupport()
+        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         os.flush()
     }
 
