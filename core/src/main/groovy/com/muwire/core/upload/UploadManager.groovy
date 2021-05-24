@@ -280,7 +280,7 @@ public class UploadManager {
             }
 
             if (head)
-                uploader = new HeadUploader(file, request, endpoint, mesh)
+                uploader = new HeadUploader(file, request, e, mesh)
             else
                 uploader = new ContentUploader(file, request, e, mesh, pieceSize)
             eventBus.publish(new UploadEvent(uploader : uploader))
