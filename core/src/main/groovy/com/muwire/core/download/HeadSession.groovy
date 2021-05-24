@@ -43,6 +43,7 @@ class HeadSession {
         os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
         SessionSupport.writeInteractionHeaders(os, browse, chat, feed, message)
         SessionSupport.writeXHave(os, pieces)
+        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         os.flush()
         
         InputStream is = endpoint.getInputStream()
