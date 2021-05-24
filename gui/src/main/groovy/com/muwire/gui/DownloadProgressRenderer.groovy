@@ -23,7 +23,9 @@ class DownloadProgressRenderer extends DefaultTableCellRenderer {
         int percent = -1
         if (pieces != 0)
             percent = (done * 100 / pieces)
-        String totalSize = DataHelper.formatSize2Decimal(d.length, false) + "B"
+        StringBuffer sb = new StringBuffer()
+        SizeFormatter.format(d.length, sb)
+        String totalSize = sb.toString() + "B"
         setText(String.format("%2d", percent) + "% of ${totalSize}".toString())
         
         if (isSelected) {
