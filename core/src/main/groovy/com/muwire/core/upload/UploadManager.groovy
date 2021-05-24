@@ -59,10 +59,10 @@ public class UploadManager {
                 byte[] get = new byte[4]
                 dis.readFully(get)
                 if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
-                    if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == ' ') {
+                    if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == (byte)32) {
                         head = true
                     } else {
-                        log.warning("received a method other than GET on subsequent call")
+                        log.warning("received a method other than GET or HEAD on subsequent call")
                         e.close()
                         return
                     }
@@ -219,7 +219,7 @@ public class UploadManager {
             dis.readFully(get)
             boolean head = false
             if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
-                if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == ' ') {
+                if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == (byte)32) {
                     head = true
                 } else {
                     log.warning("received a method other than GET or HEAD on subsequent call")
