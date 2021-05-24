@@ -458,7 +458,7 @@ class MainFrameController {
             
             if (view.settings.collectionWarning) {
                 Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(new InfoHash(sf.root))
-                if (collectionsInfoHashes != null) {
+                if (!collectionsInfoHashes.isEmpty()) {
                     String[] affected = collectionsInfoHashes.collect({core.collectionManager.getByInfoHash(it)}).collect{it.name}.toArray(new String[0])
 
                     boolean [] answer = new boolean[1]
