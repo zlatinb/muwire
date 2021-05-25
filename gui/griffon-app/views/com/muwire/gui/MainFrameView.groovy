@@ -1381,7 +1381,7 @@ class MainFrameView {
         }
 
         if (retryEnabled) {
-            JMenuItem retry = new JMenuItem(resumeText)
+            JMenuItem retry = new JMenuItem(trans(resumeText))
             retry.addActionListener({mvcGroup.controller.resume()})
             menu.add(retry)
         }
