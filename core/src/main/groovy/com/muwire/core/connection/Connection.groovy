@@ -33,6 +33,9 @@ abstract class Connection implements Closeable {
     
     private static final int SEARCHES = 10
     private static final long INTERVAL = 1000
+    
+    private static final MAX_PONGS_V1 = 2
+    private static final MAX_PONGS_V2 = 3
 
     final EventBus eventBus
     final Endpoint endpoint
@@ -133,7 +136,7 @@ abstract class Connection implements Closeable {
     void sendPing() {
         def ping = [:]
         ping.type = "Ping"
-        ping.version = 1
+        ping.version = 2
         lastPingUUID = UUID.randomUUID()
         ping.uuid = lastPingUUID.toString()
         messages.put(ping)
@@ -166,18 +169,33 @@ abstract class Connection implements Closeable {
     }
 
     protected void handlePing(def ping) {
-        log.fine("$name received ping")
+        log.fine("$name received ping version ${ping.version}")
+        if (ping.version < 2)
+            handlePingV1(ping)
+        else
+            handlePingV2(ping)
+    }
+    
+    private void handlePingV1(def ping) {
         def pong = [:]
         pong.type = "Pong"
         pong.version = 1
         if (ping.uuid != null)
             pong.uuid = ping.uuid
-        pong.pongs = hostCache.getGoodHosts(2).collect { d -> d.toBase64() }
+        pong.pongs = hostCache.getGoodHosts(MAX_PONGS_V1).collect { d -> d.toBase64() }
         messages.put(pong)
+    }
+    
+    private void handlePingV2(def ping) {
+        if (ping.uuid == null)
+            throw new Exception("Ping V2 without an UUID")
+        UUID uuid = UUID.fromString(ping.uuid)
+        byte [] pongPayload = MessageUtil.createPongV2(uuid, hostCache.getGoodHosts(MAX_PONGS_V2))
+        messages.put(pongPayload)
     }
 
     protected void handlePong(def pong) {
-        log.fine("$name received pong")
+        log.fine("$name received pong version ${pong.version}")
         lastPongReceivedTime = System.currentTimeMillis()
         if (pong.pongs == null)
             throw new Exception("Pong doesn't have pongs")
@@ -197,7 +215,8 @@ abstract class Connection implements Closeable {
         }
         lastPingUUID = null
         
-        pong.pongs.stream().limit(2).forEach {
+        int limit = pong.version == 1 ? MAX_PONGS_V1 : MAX_PONGS_V2
+        pong.pongs.stream().limit(limit).forEach {
             def dest = new Destination(it)
             eventBus.publish(new HostDiscoveredEvent(destination: dest))
         }

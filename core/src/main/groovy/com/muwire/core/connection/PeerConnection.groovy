@@ -20,6 +20,8 @@ import net.i2p.data.Destination
  */
 @Log
 class PeerConnection extends Connection {
+    
+    private static final int MAX_PAYLOAD_SIZE = 0x1 << 20
 
     private final DataInputStream dis
     private final DataOutputStream dos
@@ -42,23 +44,27 @@ class PeerConnection extends Connection {
         dis.readFully(readHeader)
         int length = DataUtil.readLength(readHeader)
         log.fine("$name read length $length")
+        
+        if (length > MAX_PAYLOAD_SIZE)
+            throw new Exception("Rejecting large message $length")
 
         byte[] payload = new byte[length]
         dis.readFully(payload)
 
+        def json
         if ((readHeader[0] & (byte)0x80) == 0x80) {
-            // TODO process binary
+            json = MessageUtil.parseBinaryMessage(payload)
         } else {
-            def json = slurper.parse(payload)
-            if (json.type == null)
-                throw new Exception("missing json type")
-            switch(json.type) {
-                case "Ping" : handlePing(json); break;
-                case "Pong" : handlePong(json); break;
-                case "Search": handleSearch(json); break
-                default :
-                    throw new Exception("unknown json type ${json.type}")
-            }
+            json = slurper.parse(payload)
+        }
+        if (json.type == null)
+            throw new Exception("missing json type")
+        switch(json.type) {
+            case "Ping" : handlePing(json); break;
+            case "Pong" : handlePong(json); break;
+            case "Search": handleSearch(json); break
+            default :
+                throw new Exception("unknown json type ${json.type}")
         }
     }
 
@@ -70,9 +76,13 @@ class PeerConnection extends Connection {
             DataUtil.packHeader(payload.length, writeHeader)
             log.fine "$name writing message type ${message.type} length $payload.length"
             writeHeader[0] &= (byte)0x7F
-        } else {
-            // TODO: write binary
-        }
+        } else if (message instanceof byte[]) {
+            payload = (byte[]) message
+            DataUtil.packHeader(payload.length, writeHeader)
+            log.fine "$name writing binary message length ${payload.length}"
+            writeHeader[0] |= (byte)80
+        } else
+            throw new IllegalArgumentException()
 
         dos.write(writeHeader)
         dos.write(payload)
