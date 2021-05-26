@@ -75,7 +75,7 @@ public class HostCache {
         unverified.mkdir()
         timer.schedule({hostPool.serialize(verified, unverified)} as TimerTask, 10000, 60 * 60 * 1000)
 
-        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 2, crawler: crawler),
+        session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 3, crawler: crawler),
             I2PSession.PROTO_DATAGRAM, I2PSession.PORT_ANY)
         session.connect()
         log.info("connected, going to sleep")
