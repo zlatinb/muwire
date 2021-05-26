@@ -23,7 +23,7 @@ import net.i2p.util.ConcurrentHashSet
 @Log
 class ConnectionEstablisher {
 
-    private static final int CONCURRENT = 4
+    private static final int CONCURRENT = 8
 
     final EventBus eventBus
     final I2PConnector i2pConnector

@@ -51,7 +51,7 @@ class MessageUtil {
         byte count = dis.readByte()
         List<Destination> destinations = new ArrayList<>(count)
         count.times {
-            destinations << Destination.create(dis)
+            destinations << Destination.create(dis).toBase64()
         }
         rv.pongs = destinations
         

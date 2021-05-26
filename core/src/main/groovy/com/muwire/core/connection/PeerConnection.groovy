@@ -43,7 +43,7 @@ class PeerConnection extends Connection {
     protected void read() {
         dis.readFully(readHeader)
         int length = DataUtil.readLength(readHeader)
-        log.fine("$name read length $length")
+        log.fine("$name read length $length read header ${readHeader[0]}")
         
         if (length > MAX_PAYLOAD_SIZE)
             throw new Exception("Rejecting large message $length")
@@ -52,7 +52,7 @@ class PeerConnection extends Connection {
         dis.readFully(payload)
 
         def json
-        if ((readHeader[0] & (byte)0x80) == 0x80) {
+        if ((readHeader[0] & (byte)0x80) == (byte)0x80) {
             json = MessageUtil.parseBinaryMessage(payload)
         } else {
             json = slurper.parse(payload)

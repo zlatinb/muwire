@@ -35,7 +35,7 @@ abstract class Connection implements Closeable {
     private static final long INTERVAL = 1000
     
     private static final MAX_PONGS_V1 = 2
-    private static final MAX_PONGS_V2 = 3
+    private static final MAX_PONGS_V2 = 4
 
     final EventBus eventBus
     final Endpoint endpoint
