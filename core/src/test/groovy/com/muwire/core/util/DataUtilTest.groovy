@@ -32,6 +32,13 @@ class DataUtilTest {
         DataUtil.packHeader(value, header)
         assert value == DataUtil.readLength(header)
     }
+    
+    private static binaryHeader(int value) {
+        byte [] header = new byte[3]
+        DataUtil.packHeader(value, header)
+        header[0] |= (byte)0x80
+        assert value == DataUtil.readLength(header)
+    }
 
     @Test
     void testHeader() {
@@ -43,5 +50,18 @@ class DataUtilTest {
             header(8 * 1024 *  1024)
             fail()
         } catch (IllegalArgumentException expected) {}
+    }
+    
+    @Test
+    void testBinaryHeader() {
+        binaryHeader(0)
+        binaryHeader(1)
+        binaryHeader(556)
+        binaryHeader(8 * 1024 * 1024 - 1)
+        try {
+            binaryHeader(8 * 1024 *  1024)
+            fail()
+        } catch (IllegalArgumentException expected) {}
+        
     }
 }

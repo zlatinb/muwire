@@ -80,7 +80,7 @@ class PeerConnection extends Connection {
             payload = (byte[]) message
             DataUtil.packHeader(payload.length, writeHeader)
             log.fine "$name writing binary message length ${payload.length}"
-            writeHeader[0] |= (byte)80
+            writeHeader[0] |= (byte)0x80
         } else
             throw new IllegalArgumentException()
 
