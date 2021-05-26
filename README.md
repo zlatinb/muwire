@@ -6,7 +6,7 @@ MuWire is a file publishing and networking tool that protects the identity of it
 
 Users can then use their MuWire identities to publish files, search for files published by others, subscribe to each other’s publications and communicate through chat and messaging. Furthermore, users can establish trust-based relationship with each other where they assign a “trust level” to their contacts. 
 
-The current stable release - 0.8.6 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  MuWire works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi. 
+The current stable release - 0.8.7 is avaiable for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  MuWire works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi. 
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -37,12 +37,6 @@ The setup wizard will ask you for the host and port of an I2P or I2Pd router.
 ## Running the Web UI / Plugin
 
 There is a Web-based UI under development.  It is intended to be run as a plugin to the Java I2P router.  Instructions how to build it are available at the wiki [Plugin] page.
-
-## Running the CLI
-
-Look inside `cli-lanterna/build/distributions`.  Untar/unzip one of the `shadow` files and then run the jar contained inside by typing `java -jar cli-lanterna-x.y.z-all.jar` in a terminal.  The CLI options are documented here [cli options]
-
-The CLI is in maintenance mode and will not be getting any new features.
 
 ## Docker
 
