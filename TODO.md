@@ -10,6 +10,10 @@ This reduces query traffic by not sending last hop queries to peers that definit
 
 This helps with scalability
 
+##### Pings with Bloom filter
+
+This is an idea to include a bloom filter in the ping payload.  Then the responding node can ensure it only gives nodes that the pinger definitely does not have.  If combined with not responding with empty pongs then this can reduce background traffic significantly.
+
 ### Core
 
 * Metadata parsing and search
@@ -20,6 +24,7 @@ This helps with scalability
 * Download queue with priorities 
 * Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
 * PORTABLE - figure out how to handle incomplete files
+* Configurable list of file extensions (or regexes?) to not share
 
 ### Chat
 * break up lines on CR/LF, send multiple messages
@@ -32,7 +37,6 @@ This helps with scalability
 * Search box - left identation
 * Ability to disable switching of tabs on actions
 * Right-click and paste in various text input fields
-* Open containing folder from downloads table for finished downloads
 * Subscribe to feed by full id
 * Check for duplicate feed subscriptions
 
