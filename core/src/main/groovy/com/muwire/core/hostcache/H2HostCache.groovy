@@ -198,11 +198,13 @@ class H2HostCache extends HostCache {
         List<Destination> rv = new ArrayList<>()
         Iterator<Destination> verifyIter = toVerify.iterator()
         while((rv.size() < n) && (verifyIter.hasNext())) {
-            rv.add(verifyIter.next())
+            def d = verifyIter.next()
+            if (filter.test(d))
+                rv.add(d)
             verifyIter.remove()
         }
         
-        log.fine("got ${rv.size()} from toVerify list")
+        log.fine("got ${rv.size()} from toVerify list, which is now ${toVerify.size()}")
         
         if (rv.size() == n)
             return rv
