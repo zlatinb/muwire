@@ -851,15 +851,6 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void copyIdFromMessage() {
-        int row = view.selectedMessageHeader()
-        if (row < 0)
-            return
-        MWMessageStatus status = model.messageHeaders.get(row)
-        CopyPasteSupport.copyToClipboard(status.message.sender.toBase64())
-    }
-    
-    @ControllerAction
     void copyIdFromFeed() {
         Feed feed = view.selectedFeed()
         if (feed == null)

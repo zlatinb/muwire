@@ -216,27 +216,14 @@ class MessageFolderView {
 
         })
 
-        JPopupMenu messagesMenu = new JPopupMenu()
-        JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
-        replyMenuItem.addActionListener({controller.messageReply()})
-        messagesMenu.add(replyMenuItem)
-        JMenuItem replyAllMenuItem = new JMenuItem(trans("REPLY_ALL"))
-        replyAllMenuItem.addActionListener({controller.messageReplyAll()})
-        messagesMenu.add(replyAllMenuItem)
-        JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
-        deleteMenuItem.addActionListener({controller.messageDelete()})
-        messagesMenu.add(deleteMenuItem)
-        JMenuItem copyIdFromMessageItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIdFromMessageItem.addActionListener({controller.copyIdFromMessage()})
-        messagesMenu.add(copyIdFromMessageItem)
         messageHeaderTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(messagesMenu, e)
+                    showPopupMenu(buildMessagesMenu(), e)
             }
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(messagesMenu, e)
+                    showPopupMenu(buildMessagesMenu(), e)
             }
         })
 
@@ -254,6 +241,30 @@ class MessageFolderView {
                 model.messageAttachmentsButtonEnabled = true
             }
         })
+    }
+    
+    private JPopupMenu buildMessagesMenu() {
+        boolean singleSelected = selectedMessageHeaders().length == 1
+
+        JPopupMenu messagesMenu = new JPopupMenu()
+        if (singleSelected) {
+            JMenuItem replyMenuItem = new JMenuItem(trans("REPLY"))
+            replyMenuItem.addActionListener({ controller.messageReply() })
+            messagesMenu.add(replyMenuItem)
+            JMenuItem replyAllMenuItem = new JMenuItem(trans("REPLY_ALL"))
+            replyAllMenuItem.addActionListener({ controller.messageReplyAll() })
+            messagesMenu.add(replyAllMenuItem)
+        }
+        JMenuItem deleteMenuItem = new JMenuItem(trans("DELETE"))
+        deleteMenuItem.addActionListener({controller.messageDelete()})
+        messagesMenu.add(deleteMenuItem)
+        
+        if (singleSelected) {
+            JMenuItem copyIdFromMessageItem = new JMenuItem(trans("COPY_FULL_ID"))
+            copyIdFromMessageItem.addActionListener({ controller.copyIdFromMessage() })
+            messagesMenu.add(copyIdFromMessageItem)
+        }
+        messagesMenu
     }
 
     private static void showPopupMenu(JPopupMenu menu, MouseEvent event) {

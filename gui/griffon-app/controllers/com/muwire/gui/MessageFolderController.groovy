@@ -56,6 +56,15 @@ class MessageFolderController {
     }
 
     @ControllerAction
+    void copyIdFromMessage() {
+        int []rows = view.selectedMessageHeaders()
+        if (rows.length != 1)
+            return
+        MWMessageStatus status = model.messageHeaders.get(rows[0])
+        CopyPasteSupport.copyToClipboard(status.message.sender.toBase64())
+    }
+
+    @ControllerAction
     void messageDelete() {
         int[] rows = view.selectedMessageHeaders()
         if (rows.length == 0)
