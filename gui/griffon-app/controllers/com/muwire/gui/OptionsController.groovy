@@ -103,6 +103,10 @@ class OptionsController {
         boolean shareHidden = view.shareHiddenCheckbox.model.isSelected()
         model.shareHiddenFiles = shareHidden
         settings.shareHiddenFiles = shareHidden
+        
+        int hashingCores = Integer.parseInt(view.hashingCoresTextField.text)
+        model.hashingCores = hashingCores
+        settings.hashingCores = hashingCores
 
         boolean browseFiles = view.browseFilesCheckbox.model.isSelected()
         model.browseFiles = browseFiles

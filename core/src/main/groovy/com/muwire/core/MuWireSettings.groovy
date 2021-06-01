@@ -29,6 +29,7 @@ class MuWireSettings {
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
+    int hashingCores
     boolean searchComments
     boolean searchCollections
     boolean browseFiles
@@ -98,6 +99,7 @@ class MuWireSettings {
         updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
         shareHiddenFiles = Boolean.parseBoolean(props.getProperty("shareHiddenFiles","false"))
+        hashingCores = Integer.parseInt(props.getProperty("hashingCores", String.valueOf(numHashingCores())))
         downloadSequentialRatio = Float.valueOf(props.getProperty("downloadSequentialRatio","0.8"))
         hostClearInterval = Integer.valueOf(props.getProperty("hostClearInterval","15"))
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "60"))
@@ -189,6 +191,7 @@ class MuWireSettings {
         props.setProperty("updateType",String.valueOf(updateType))
         props.setProperty("shareDownloadedFiles", String.valueOf(shareDownloadedFiles))
         props.setProperty("shareHiddenFiles", String.valueOf(shareHiddenFiles))
+        props.setProperty("hashingCores", String.valueOf(hashingCores))
         props.setProperty("downloadSequentialRatio", String.valueOf(downloadSequentialRatio))
         props.setProperty("hostClearInterval", String.valueOf(hostClearInterval))
         props.setProperty("hostHopelessInterval", String.valueOf(hostHopelessInterval))
@@ -282,5 +285,9 @@ class MuWireSettings {
 
     String getNickname() {
         nickname
+    }
+    
+    private static int numHashingCores() {
+        return (int) Math.max(1d, Runtime.getRuntime().availableProcessors() / 2d)
     }
 }

@@ -17,6 +17,7 @@ class OptionsModel {
     @Observable boolean autoDownloadUpdate
     @Observable boolean shareDownloadedFiles
     @Observable boolean shareHiddenFiles
+    @Observable int hashingCores
     @Observable String downloadLocation
     @Observable String incompleteLocation
     @Observable boolean searchComments
@@ -95,6 +96,7 @@ class OptionsModel {
         autoDownloadUpdate = settings.autoDownloadUpdate
         shareDownloadedFiles = settings.shareDownloadedFiles
         shareHiddenFiles = settings.shareHiddenFiles
+        hashingCores = settings.hashingCores
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments

@@ -49,6 +49,7 @@ class OptionsView {
     def autoDownloadUpdateCheckbox
     def shareDownloadedCheckbox
     def shareHiddenCheckbox
+    def hashingCoresTextField
     def searchCommentsCheckbox
     def searchCollectionsCheckbox
     def browseFilesCheckbox
@@ -172,6 +173,10 @@ class OptionsView {
                 
                 label(text : trans("OPTIONS_SHARE_HIDDEN_FILES"), constraints : gbc(gridx : 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0))
+                
+                label(text : trans("OPTIONS_HASHING_CORES"), constraints : gbc(gridx: 0 , gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                hashingCoresTextField = textField(text : bind {model.hashingCores}, columns: 2, 
+                    constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
             }
             
             if (!model.disableUpdates) {
