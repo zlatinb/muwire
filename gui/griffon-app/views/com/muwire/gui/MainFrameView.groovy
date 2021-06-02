@@ -313,11 +313,13 @@ class MainFrameView {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH) {
                                 label(text : bind {
-                                    if (model.hashingFile == null) {
+                                    if (model.hashingFile == null && model.hashingFiles == 0) {
                                         trans("YOU_CAN_DRAG_AND_DROP")
-                                    } else {
+                                    } else if (model.hashingFiles == 1 && model.hashingFile != null) {
                                         trans("HASHING") + ": " +
                                             model.hashingFile.getAbsolutePath() + " (" + formatSize(model.hashingFile.length(),"BYTES_SHORT") + ")"
+                                    } else {
+                                        trans("HASHING") + " " + model.hashingFiles + " " + trans("FILES")
                                     }
                                 })
                             }

@@ -126,6 +126,7 @@ class MainFrameModel {
     @Observable int messages
     @Observable String me
     @Observable int loadedFiles
+    @Observable int hashingFiles
     @Observable File hashingFile
     @Observable boolean cancelButtonEnabled
     @Observable boolean retryButtonEnabled
@@ -423,17 +424,18 @@ class MainFrameModel {
     
     void onFileHashingEvent(FileHashingEvent e) {
         runInsideUIAsync {
+            hashingFiles++
             hashingFile = e.hashingFile
         }
     }
 
     void onFileHashedEvent(FileHashedEvent e) {
-        runInsideUIAsync {
-            hashingFile = null
-        }
         if (e.error != null)
             return // TODO do something
         runInsideUIAsync {
+            hashingFiles--
+            if (e.sharedFile.file == hashingFile)
+                hashingFile = null
             shared << e.sharedFile
             loadedFiles = shared.size()
             JTable table = builder.getVariable("shared-files-table")
