@@ -84,6 +84,8 @@ class HasherService {
                     eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
                 } else if (f.length() > FileHasher.MAX_SIZE) {
                     eventBus.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
+                } else if (!f.canRead()) {
+                    eventBus.publish(new FileHashedEvent(error: "$f cannot be read"))
                 } else {
                     eventBus.publish new FileHashingEvent(hashingFile: f)
                     def hash = HASHER_TL.get().hashFile f
