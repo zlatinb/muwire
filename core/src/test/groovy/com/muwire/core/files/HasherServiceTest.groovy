@@ -13,7 +13,6 @@ import com.muwire.core.MuWireSettings
 class HasherServiceTest {
 
     HasherService service
-    FileHasher hasher
     EventBus eventBus
     def listener = new ArrayBlockingQueue(100) {
         void onFileHashedEvent(FileHashedEvent evt) {
@@ -24,7 +23,6 @@ class HasherServiceTest {
     @Before
     void before() {
         eventBus = new EventBus()
-        hasher = new FileHasher()
         def props = new MuWireSettings()
         service = new HasherService(eventBus, new FileManager(eventBus, props), props)
         eventBus.register(FileHashedEvent.class, listener)

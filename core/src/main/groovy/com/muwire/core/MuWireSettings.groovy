@@ -29,7 +29,7 @@ class MuWireSettings {
     CrawlerResponse crawlerResponse
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
-    int hashingCores
+    volatile int hashingCores
     boolean searchComments
     boolean searchCollections
     boolean browseFiles
@@ -288,6 +288,6 @@ class MuWireSettings {
     }
     
     private static int numHashingCores() {
-        return (int) Math.max(1d, Runtime.getRuntime().availableProcessors() / 2d)
+        return (int) Math.max(1d, Runtime.getRuntime().availableProcessors() / 4d)
     }
 }
