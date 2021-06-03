@@ -1,5 +1,7 @@
 package com.muwire.core.files
 
+import com.muwire.core.util.DataUtil
+
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -8,8 +10,6 @@ import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
 
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 class HasherService {
     
@@ -48,6 +48,8 @@ class HasherService {
         if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
         if (canonical.isFile() && fileManager.negativeTree.fileToNode.containsKey(canonical))
+            return
+        if (settings.ignoredFileTypes.contains(DataUtil.getFileExtension(canonical)))
             return
         if (canonical.getName().endsWith(".mwcollection"))
             return

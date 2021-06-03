@@ -1,10 +1,6 @@
 package com.muwire.core.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -224,5 +220,14 @@ public class DataUtil {
             if (name.indexOf(Constants.INVALID_NICKNAME_CHARS.charAt(i)) >= 0)
                 return false;
         return true;
+    }
+    
+    public static String getFileExtension(File f) {
+        String name = f.getName();
+        int lastDot = name.lastIndexOf('.');
+        if (lastDot == -1 || lastDot == name.length() - 1) {
+            return "";
+        }
+        return name.substring(lastDot + 1);
     }
 }

@@ -30,6 +30,7 @@ class MuWireSettings {
     boolean shareDownloadedFiles
     boolean shareHiddenFiles
     volatile int hashingCores
+    Set<String> ignoredFileTypes
     boolean searchComments
     boolean searchCollections
     boolean browseFiles
@@ -156,6 +157,7 @@ class MuWireSettings {
         allowMessages = Boolean.valueOf(props.getProperty("allowMessages","true"))
         allowOnlyTrustedMessages = Boolean.valueOf(props.getProperty("allowOnlyTrustedMessages","false"))
         
+        ignoredFileTypes = DataUtil.readEncodedSet(props, "ignoredFileTypes")
         watchedDirectories = DataUtil.readEncodedSet(props, "watchedDirectories")
         watchedKeywords = DataUtil.readEncodedSet(props, "watchedKeywords")
         watchedRegexes = DataUtil.readEncodedSet(props, "watchedRegexes")
@@ -248,6 +250,7 @@ class MuWireSettings {
         props.setProperty("allowOnlyTrustedMessages", String.valueOf(allowOnlyTrustedMessages))
         
 
+        DataUtil.writeEncodedSet(ignoredFileTypes, "ignoredFileTypes", props)
         DataUtil.writeEncodedSet(watchedDirectories, "watchedDirectories", props)
         DataUtil.writeEncodedSet(watchedKeywords, "watchedKeywords", props)
         DataUtil.writeEncodedSet(watchedRegexes, "watchedRegexes", props)

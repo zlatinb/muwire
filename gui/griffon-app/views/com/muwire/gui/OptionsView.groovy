@@ -50,6 +50,7 @@ class OptionsView {
     def shareDownloadedCheckbox
     def shareHiddenCheckbox
     def hashingCoresTextField
+    def ignoredFileTypesTextField
     def searchCommentsCheckbox
     def searchCollectionsCheckbox
     def browseFilesCheckbox
@@ -169,14 +170,18 @@ class OptionsView {
                 constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_SHARE_DOWNLOADED_FILES"), constraints : gbc(gridx : 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:0, weightx : 0))
+                shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:0, weightx : 0, anchor: GridBagConstraints.LINE_END))
                 
                 label(text : trans("OPTIONS_SHARE_HIDDEN_FILES"), constraints : gbc(gridx : 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0))
+                shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0, anchor: GridBagConstraints.LINE_END))
                 
                 label(text : trans("OPTIONS_HASHING_CORES"), constraints : gbc(gridx: 0 , gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 hashingCoresTextField = textField(text : bind {model.hashingCores}, columns: 2, 
                     constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
+                
+                label(text : trans("OPTIONS_IGNORED_FILE_TYPES"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx : 100))
+                ignoredFileTypesTextField = textField(text : bind {model.ignoredFileTypes}, columns: 25,
+                        constraints: gbc(gridx: 1, gridy: 3, anchor: GridBagConstraints.LINE_END, fill: GridBagConstraints.HORIZONTAL))
             }
             
             if (!model.disableUpdates) {

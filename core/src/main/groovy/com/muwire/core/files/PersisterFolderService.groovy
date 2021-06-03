@@ -3,7 +3,7 @@ package com.muwire.core.files
 import com.muwire.core.*
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
-
+import com.muwire.core.util.DataUtil
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
@@ -150,7 +150,12 @@ class PersisterFolderService extends BasePersisterService {
                 def event = fromJsonLite parsed
                 if (event == null) return
 
-                    log.fine("loaded file $event.loadedFile.file")
+                if (core.muOptions.ignoredFileTypes.contains(DataUtil.getFileExtension(event.loadedFile.file))) {
+                    log.fine("ignoring file ${event.loadedFile.file}")
+                    return
+                }
+                
+                log.fine("loaded file $event.loadedFile.file")
                 listener.publish event
                 if (!core.muOptions.plugin) {
                     loaded++

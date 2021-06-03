@@ -24,7 +24,6 @@ This is an idea to include a bloom filter in the ping payload.  Then the respond
 * Download queue with priorities 
 * Use tracker pings - either embedded logic or external mwtrackerd to add more sources to downloads
 * PORTABLE - figure out how to handle incomplete files
-* Configurable list of file extensions (or regexes?) to not share
 
 ### Chat
 * break up lines on CR/LF, send multiple messages

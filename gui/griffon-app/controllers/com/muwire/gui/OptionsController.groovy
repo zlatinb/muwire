@@ -108,6 +108,11 @@ class OptionsController {
         model.hashingCores = hashingCores
         settings.hashingCores = hashingCores
 
+        text = view.ignoredFileTypesTextField.text
+        model.ignoredFileTypes = text
+        settings.ignoredFileTypes.clear()
+        text.split(",").each {settings.ignoredFileTypes.add(it)}
+        
         boolean browseFiles = view.browseFilesCheckbox.model.isSelected()
         model.browseFiles = browseFiles
         settings.browseFiles = browseFiles
