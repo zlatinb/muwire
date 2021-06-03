@@ -190,17 +190,24 @@ public class DataUtil {
     }
     
     public static Set<String> readEncodedSet(Properties props, String property) {
+        return readEncodedSet(props, property, null);
+    }
+
+    public static Set<String> readEncodedSet(Properties props, String property, String defaults) {
         Set<String> rv = new ConcurrentHashSet<>();
         if (props.containsKey(property)) {
-            String [] encoded = props.getProperty(property).split(",");
-            for(String s : encoded)
+            String[] encoded = props.getProperty(property).split(",");
+            for (String s : encoded)
                 rv.add(readi18nString(Base64.decode(s)));
+        } else if (defaults != null) {
+            for (String s : defaults.split(","))
+                rv.add(s);
         }
         return rv;
     }
     
     public static void writeEncodedSet(Set<String> set, String property, Properties props) {
-        if (set.isEmpty())
+        if (set.isEmpty()) 
             return;
         String encoded = set.stream().map(s -> Base64.encode(encodei18nString(s)))
                 .collect(Collectors.joining(","));

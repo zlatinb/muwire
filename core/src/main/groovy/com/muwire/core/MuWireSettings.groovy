@@ -157,7 +157,7 @@ class MuWireSettings {
         allowMessages = Boolean.valueOf(props.getProperty("allowMessages","true"))
         allowOnlyTrustedMessages = Boolean.valueOf(props.getProperty("allowOnlyTrustedMessages","false"))
         
-        ignoredFileTypes = DataUtil.readEncodedSet(props, "ignoredFileTypes")
+        ignoredFileTypes = DataUtil.readEncodedSet(props, "ignoredFileTypes", "part,az!,ut!,!qb")
         watchedDirectories = DataUtil.readEncodedSet(props, "watchedDirectories")
         watchedKeywords = DataUtil.readEncodedSet(props, "watchedKeywords")
         watchedRegexes = DataUtil.readEncodedSet(props, "watchedRegexes")
