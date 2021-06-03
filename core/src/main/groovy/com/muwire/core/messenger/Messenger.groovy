@@ -123,14 +123,18 @@ class Messenger {
         Files.walk(file.toPath())
             .filter({it.getFileName().toString().endsWith(".mwmessage")})
             .forEach { Path path ->
-                File f = path.toFile()
-                MWMessage message
-                f.withInputStream { 
-                    message = new MWMessage(it)
+                try {
+                    File f = path.toFile()
+                    MWMessage message
+                    f.withInputStream {
+                        message = new MWMessage(it)
+                    }
+                    addMessage(message, dest)
+                    File unread = new File(file, deriveUnread(message))
+                    eventBus.publish(new MessageLoadedEvent(message: message, folder: folder, unread: unread.exists()))
+                } catch (IOException iox) {
+                    log.warning("couldn't load message from $path" )
                 }
-                addMessage(message, dest)
-                File unread = new File(file, deriveUnread(message))
-                eventBus.publish(new MessageLoadedEvent(message : message, folder : folder, unread : unread.exists()))
         }
     }
     
