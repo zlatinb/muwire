@@ -81,7 +81,7 @@ abstract class BasePersisterService extends Service{
             
         def file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
         file = file.getCanonicalFile()
-        if (!file.exists() || file.isDirectory())
+        if (!file.exists() || file.isDirectory() || file.length() == 0 || !file.canRead())
             return null
         long length = Long.valueOf(json.length)
         if (length != file.length())
