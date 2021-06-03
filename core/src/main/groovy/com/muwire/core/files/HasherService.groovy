@@ -2,6 +2,9 @@ package com.muwire.core.files
 
 import com.muwire.core.util.DataUtil
 
+import java.nio.file.DirectoryStream
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -78,8 +81,10 @@ class HasherService {
     private void process(File f) {
         try {
             if (f.isDirectory()) {
-                f.listFiles().each {
-                    eventBus.publish new FileSharedEvent(file: it)
+                try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(f.toPath())) {
+                    for (Path p : directoryStream) {
+                        eventBus.publish new FileSharedEvent(file : p.toFile())
+                    }
                 }
             } else {
                 if (f.length() == 0) {
