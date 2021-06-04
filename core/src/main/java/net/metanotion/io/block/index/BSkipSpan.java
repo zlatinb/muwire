@@ -39,6 +39,7 @@ import net.metanotion.util.skiplist.SkipSpan;
 
 public class BSkipSpan extends SkipSpan {
 
+	private final BSkipList bsl;
 	protected BlockFile bf;
 	protected int page;
 	protected int overflowPage;
@@ -113,12 +114,14 @@ public class BSkipSpan extends SkipSpan {
 				}
 				keyData = this.keySer.getBytes(keys[i]);
 				valData = this.valSer.getBytes(vals[i]);
+				vals[i] = null;
 				pageCounter[0] += 4;
 				bf.file.writeShort(keyData.length);
 				bf.file.writeShort(valData.length);
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
+			vals = null;
 			BlockFile.pageSeek(bf.file, this.page);
 			this.overflowPage = bf.file.readInt();
 		} catch(IOException ioe) { throw new Error(); }
@@ -171,8 +174,20 @@ public class BSkipSpan extends SkipSpan {
 
 	}
 
-	protected BSkipSpan() { }
+	protected void load() {
+		try {
+			BSkipSpan.load(this, bf, bsl, page, keySer, valSer);
+		} catch (IOException bad) {
+			bad.printStackTrace();
+		}
+	}
+	
+	private BSkipSpan(BSkipList bsl) {
+		this.bsl = bsl;
+	}
+	
 	public BSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+		this.bsl = bsl;
 		BSkipSpan.load(this, bf, bsl, spanPage, key, val);
 		this.next = null;
 		this.prev = null;
@@ -186,7 +201,7 @@ public class BSkipSpan extends SkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.next = new BSkipSpan();
+			bss.next = new BSkipSpan(bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
 			bss = (BSkipSpan) bss.next;
@@ -203,7 +218,7 @@ public class BSkipSpan extends SkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.prev = new BSkipSpan();
+			bss.prev = new BSkipSpan(bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
 			bss = (BSkipSpan) bss.prev;

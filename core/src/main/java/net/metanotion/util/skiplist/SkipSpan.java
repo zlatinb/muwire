@@ -28,21 +28,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
-public class SkipSpan {
+public abstract class SkipSpan {
 	public int nKeys = 0;
 	public Comparable[] keys;
 	public Object[] vals;
 	public SkipSpan next, prev;
 
-	public SkipSpan newInstance(SkipList sl) { return new SkipSpan(keys.length); }
+	public abstract SkipSpan newInstance(SkipList sl);
 	public void killInstance() { }
 	public void flush() { }
-
-	protected SkipSpan() { }
-	public SkipSpan(int size) {
-		keys = new Comparable[size];
-		vals = new Object[size];
+	
+	private void loadVals() {
+		if (vals == null)
+			load();
 	}
+	
+	protected abstract void load();
 
 	public void print() {
 		System.out.println("Span");
@@ -101,10 +102,12 @@ public class SkipSpan {
 		}
 		int loc = binarySearch(key);
 		if(loc < 0) { return null; }
+		loadVals();
 		return vals[loc];
 	}
 
 	private void pushTogether(int hole) {
+		loadVals();
 		for(int i=hole;i<(nKeys - 1);i++) {
 			keys[i] = keys[i+1];
 			vals[i] = vals[i+1];
@@ -113,6 +116,7 @@ public class SkipSpan {
 	}
 
 	private void pushApart(int start) {
+		loadVals();
 		for(int i=(nKeys-1);i>=start;i--) {
 			keys[i+1] = keys[i];
 			vals[i+1] = vals[i];
@@ -121,6 +125,7 @@ public class SkipSpan {
 	}
 
 	private void split(int loc, Comparable key, Object val, SkipList sl) {
+		loadVals();
 		SkipSpan right = newInstance(sl);
 		sl.spans++;
 
@@ -156,6 +161,7 @@ public class SkipSpan {
 	}
 
 	private SkipSpan insert(int loc, Comparable key, Object val, SkipList sl) {
+		loadVals();
 		sl.size++;
 		if(nKeys == keys.length) {
 			// split.
@@ -171,6 +177,7 @@ public class SkipSpan {
 	}
 
 	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
+		loadVals();
 		if(nKeys == 0) {
 			sl.size++;
 			keys[0] = key;
@@ -225,6 +232,7 @@ public class SkipSpan {
 		}
 		int loc = binarySearch(key);
 		if(loc < 0) { return null; }
+		loadVals();
 		Object o = vals[loc];
 		Object[] res = new Object[2];
 		res[0] = o;
@@ -233,6 +241,7 @@ public class SkipSpan {
 			if(sl.spans > 1) { sl.spans--; }
 			if((this.prev == null) && (this.next != null)) {
 				res[1] = this.next;
+				next.loadVals();
 				// We're the first node in the list...
 				for(int i=0;i<next.nKeys;i++) {
 					keys[i] = next.keys[i];
