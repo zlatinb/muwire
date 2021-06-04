@@ -7,7 +7,7 @@ class SearchIndexTest {
     SearchIndex index
 
     private void initIndex(List<String> entries) {
-        index = new SearchIndex()
+        index = new SearchIndex("testIndex")
         entries.each {
             index.add(it)
         }

@@ -26,7 +26,7 @@ class FileManager {
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
-    final SearchIndex index = new SearchIndex()
+    final SearchIndex index
     final FileTree<Void> negativeTree = new FileTree<>()
     final FileTree<SharedFile> positiveTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
@@ -34,7 +34,7 @@ class FileManager {
     FileManager(EventBus eventBus, MuWireSettings settings) {
         this.settings = settings
         this.eventBus = eventBus
-        
+        this.index = new SearchIndex("fileManager")
         for (String negative : settings.negativeFileTree) {
             negativeTree.add(new File(negative), null)
         }

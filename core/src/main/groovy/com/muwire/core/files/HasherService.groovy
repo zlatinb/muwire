@@ -5,6 +5,7 @@ import com.muwire.core.util.DataUtil
 import java.nio.file.DirectoryStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -12,6 +13,10 @@ import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
+
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 
 class HasherService {
@@ -29,6 +34,9 @@ class HasherService {
     final FileManager fileManager
     final Set<File> hashed = new HashSet<>()
     final MuWireSettings settings
+    
+    private static final int TARGET_Q_SIZE = 1024 * 8
+    private final BlockingQueue<Runnable> runnables = new LinkedBlockingQueue<>()
     Executor throttlerExecutor
     Executor executor
     private int currentHashes 
@@ -40,8 +48,9 @@ class HasherService {
     }
 
     void start() {
-        throttlerExecutor = Executors.newSingleThreadExecutor()
         executor = Executors.newCachedThreadPool()
+        throttlerExecutor = new ThreadPoolExecutor(1, 1, 0L, 
+                TimeUnit.MILLISECONDS, runnables)
     }
 
     void onFileSharedEvent(FileSharedEvent evt) {
@@ -59,8 +68,12 @@ class HasherService {
         if (canonical.getName().endsWith(".mwcomment")) { 
             if (canonical.length() <= Constants.MAX_COMMENT_LENGTH)
                 eventBus.publish(new SideCarFileEvent(file : canonical))
-        } else if (hashed.add(canonical))
-            throttlerExecutor.execute( { throttle(canonical) } as Runnable)
+        } else if (hashed.add(canonical)) {
+            if (canonical.isDirectory())
+                executor.execute({processDirectory(canonical)} as Runnable)
+            else
+                throttlerExecutor.execute({ throttle(canonical) } as Runnable)
+        }
     }
     
     void onFileUnsharedEvent(FileUnsharedEvent evt) {
@@ -73,37 +86,41 @@ class HasherService {
 
     private synchronized void throttle(File f) {
         while(currentHashes >= settings.hashingCores)
-            wait(100)
+            wait(10)
         currentHashes++
-        executor.execute({process(f)} as Runnable)
+        executor.execute({processFile(f)} as Runnable)
     }
     
-    private void process(File f) {
+    private void processDirectory(File f) {
+        try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(f.toPath())) {
+            for (Path p : directoryStream) {
+                synchronized(this) {
+                    while(runnables.size() >= TARGET_Q_SIZE)
+                        wait(10)
+                }
+                eventBus.publish new FileSharedEvent(file : p.toFile())
+            }
+        }
+    }
+    
+    private void processFile(File f) {
         try {
-            if (f.isDirectory()) {
-                try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(f.toPath())) {
-                    for (Path p : directoryStream) {
-                        eventBus.publish new FileSharedEvent(file : p.toFile())
-                    }
-                }
+            if (f.length() == 0) {
+                eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
+            } else if (f.length() > FileHasher.MAX_SIZE) {
+                eventBus.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
+            } else if (!f.canRead()) {
+                eventBus.publish(new FileHashedEvent(error: "$f cannot be read"))
             } else {
-                if (f.length() == 0) {
-                    eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
-                } else if (f.length() > FileHasher.MAX_SIZE) {
-                    eventBus.publish new FileHashedEvent(error: "$f is too large to be shared ${f.length()}")
-                } else if (!f.canRead()) {
-                    eventBus.publish(new FileHashedEvent(error: "$f cannot be read"))
-                } else {
-                    eventBus.publish new FileHashingEvent(hashingFile: f)
-                    def hash = HASHER_TL.get().hashFile f
-                    eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length())),
-                            infoHash: hash)
-                }
+                eventBus.publish new FileHashingEvent(hashingFile: f)
+                def hash = HASHER_TL.get().hashFile f
+                eventBus.publish new FileHashedEvent(sharedFile: new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length())),
+                        infoHash: hash)
             }
         } finally {
             synchronized (this) {
                 currentHashes--
-                this.notify()
+                this.notifyAll()
             }
         }
     }
