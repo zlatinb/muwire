@@ -34,7 +34,7 @@ import java.util.Random;
 
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipList<K extends Comparable<? super K>, V> implements Flushable, Iterable<V> {
+public abstract class SkipList<K extends Comparable<? super K>, V> implements Flushable, Iterable<V> {
 	/** the probability of each next higher level */
 	protected static final int P = 2;
 	private static final int MIN_SLOTS = 4;
@@ -45,20 +45,8 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable, 
 
 	protected int size;
 
-	public void flush() { }
-	protected SkipList() { }
+	public abstract void flush() throws IOException;
 
-	/*
-	 *  @param span span size
-	 *  @throws IllegalArgumentException if size too big or too small
-	 */
-	public SkipList(int span) {
-		if(span < 1 || span > SkipSpan.MAX_SIZE)
-			throw new IllegalArgumentException("Invalid span size");
-		first = new SkipSpan<K, V>(span);
-		stack = new SkipLevels<K, V>(1, first);
-		//rng = new Random(System.currentTimeMillis());
-	}
 
 	public int size() { return size; }
 
@@ -94,7 +82,7 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable, 
 	}
 
 	@SuppressWarnings("unchecked")
-	public void put(K key, V val)	{
+	public void put(K key, V val) throws IOException {
 		if(key == null) { throw new NullPointerException(); }
 		if(val == null) { throw new NullPointerException(); }
 		SkipLevels<K, V> slvls = stack.put(stack.levels.length - 1, key, val, this);
@@ -135,7 +123,7 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable, 
 		return null;
 	}
 
-	public V get(K key) {
+	public V get(K key) throws IOException {
 		if(key == null) { throw new NullPointerException(); }
 		return stack.get(stack.levels.length - 1, key);
 	}

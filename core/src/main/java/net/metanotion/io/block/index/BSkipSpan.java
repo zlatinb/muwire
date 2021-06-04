@@ -185,6 +185,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				}
 				keyData = this.keySer.getBytes(keys[i]);
 				valData = this.valSer.getBytes(vals[i]);
+				vals[i] = null;
 				// Drop bad entry without throwing exception
 				if (keyData.length > 65535 || valData.length > 65535) {
 					nKeys--;
@@ -197,6 +198,9 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
+			
+			vals = null;
+			
 			BlockFile.pageSeek(bf.file, this.page);
 			bf.file.skipBytes(4);  // skip magic
 			this.overflowPage = bf.file.readInt();
@@ -220,6 +224,10 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 		loadInit(bss, bf, bsl, spanPage, key, val);
 		bss.loadData();
 	}
+	
+	protected void reload() throws IOException {
+		BSkipSpan.load(this, bf, bsl, page, keySer, valSer);
+	}
 
 	/**
 	 * I2P - first half of load()
@@ -233,7 +241,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 		bss.keySer = key;
 		bss.valSer = val;
 
-		bsl.spanHash.put(Integer.valueOf(spanPage), bss);
+		bsl.spanHash.put(spanPage, bss);
 
 		BlockFile.pageSeek(bf.file, spanPage);
 

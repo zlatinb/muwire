@@ -88,7 +88,7 @@ public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable
 
 	public K key() { return bottom.firstKey(); }
 
-	public V get(int start, K key) {
+	public V get(int start, K key) throws IOException {
 		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
 			if((levels[i] != null) && (levels[i].key().compareTo(key) <= 0)) {
 				return levels[i].get(i,key);
@@ -169,7 +169,7 @@ public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable
 	 *          and the new level is taller than our level;
 	 *          else null if it went in an existing level or the new level is our height or less.
 	 */
-	public SkipLevels<K, V> put(int start, K key, V val, SkipList<K, V> sl) {
+	public SkipLevels<K, V> put(int start, K key, V val, SkipList<K, V> sl) throws IOException {
 		boolean modified = false;
 		for(int i = Math.min(start, levels.length - 1); i >= 0; i--) {
 			// is key equal to or after the start of the level?
