@@ -83,7 +83,7 @@ public class BlockFile implements Closeable {
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
 	private int mounted = 0;
-	public int spanSize = 16;
+	public int spanSize = 127;
 
 	/** I2P was the file locked when we opened it? */
 	private final boolean _wasMounted;
