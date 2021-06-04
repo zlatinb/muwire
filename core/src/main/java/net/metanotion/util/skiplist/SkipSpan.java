@@ -103,7 +103,9 @@ public abstract class SkipSpan {
 		int loc = binarySearch(key);
 		if(loc < 0) { return null; }
 		loadVals();
-		return vals[loc];
+		Object rv = vals[loc];
+		vals = null;
+		return rv;
 	}
 
 	private void pushTogether(int hole) {
