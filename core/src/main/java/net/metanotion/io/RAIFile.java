@@ -45,7 +45,7 @@ import java.util.Set;
 
 public class RAIFile implements RandomAccessInterface {
 	
-	private static final long MAX_SIZE = Integer.MAX_VALUE;
+	private static final long MAX_SIZE = 0x1 << 29;
 	
 	private File f;
 	private final ByteBuffer byteBuffer;
