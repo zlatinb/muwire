@@ -12,12 +12,7 @@ class SearchIndex {
     private final SkipList keywords
     
     SearchIndex(String name) {
-        File f = File.createTempFile(name, "db")
-        if (f.exists())
-            f.delete()
-        f.createNewFile()
-        f.deleteOnExit()
-        BlockFile blockFile = new BlockFile(f, true)
+        BlockFile blockFile = new BlockFile(name, true)
         keywords = blockFile.makeIndex("keywords", new KeySerializer(), new ValueSerializer())
     }
     

@@ -245,7 +245,7 @@ public class BlockFile implements Closeable {
 	}
 
 	/** File must be writable */
-	public BlockFile(File f, boolean init) throws IOException { this(new RAIFile(f, true, true), init); }
+	public BlockFile(String prefix, boolean init) throws IOException { this(new RAIFile(prefix), init); }
 
 	/** Use this constructor with a readonly RAI and init = false for a readonly blockfile */
 	public BlockFile(RandomAccessInterface rai, boolean init) throws IOException {
