@@ -28,52 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
-@SuppressWarnings("unchecked")
-public class SkipLevels {
-	/*	"Next" pointers
-		The highest indexed level is the "highest" level in the list.
-		The "bottom" level is the direct pointer to a SkipSpan.
-	*/
-	public SkipLevels[] levels;
-	public SkipSpan bottom;
+import java.io.Flushable;
+import java.io.IOException;
 
-	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) { return new SkipLevels(levels, ss); }
-	public void killInstance() { }
+import net.metanotion.io.block.BlockFile;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
+public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable {
+	/** We can't have more than 2**32 pages */
+	public static final int MAX_SIZE = 32;
+
+	/*
+	 *	"Next" pointers
+	 *	The highest indexed level is the "highest" level in the list.
+	 *	The "bottom" level is the direct pointer to a SkipSpan.
+	 */
+	// levels is almost final
+	public SkipLevels<K, V>[] levels;
+	// bottom is final
+	public SkipSpan<K, V> bottom;
+
+	public SkipLevels<K, V> newInstance(int levels, SkipSpan<K, V> ss, SkipList<K, V> sl) {
+		return new SkipLevels<K, V>(levels, ss);
+	}
+
+	public void killInstance() throws IOException { }
 	public void flush() { }
 
 	protected SkipLevels() { }
-	public SkipLevels(int size, SkipSpan span) {
-		if(size < 1) { throw new Error("Invalid Level Skip size"); }
-		levels = new SkipLevels[size];
+
+	/*
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
+	@SuppressWarnings("unchecked")
+	public SkipLevels(int size, SkipSpan<K, V> span) {
+		if(size < 1 || size > MAX_SIZE)
+			throw new IllegalArgumentException("Invalid Level Skip size");
+		levels = (SkipLevels<K, V>[]) new SkipLevels[size];
 		bottom = span;
 	}
 
-	public void print() {
-		SkipLevels prev = null;
-		SkipLevels max = null;
-		System.out.print("SL:" + key() + "::");
-		for(int i=0;i<levels.length;i++) {
-			if(levels[i] != null) {
-				max = levels[i];
-				System.out.print(i + "->" + levels[i].key() + " ");
-			} else {
-				System.out.print(i + "->() ");
-			}
-		}
-		System.out.print("\n");
-		if(levels[0] != null) {
-			levels[0].print();
-		}
-	}
-
-	public SkipSpan getEnd() {
+	public SkipSpan<K, V> getEnd() {
 		for(int i=(levels.length - 1);i>=0;i--) {
 			if(levels[i] != null) { return levels[i].getEnd(); }
 		}
 		return bottom.getEnd();
 	}
 
-	public SkipSpan getSpan(int start, Comparable key, int[] search) {
+	public SkipSpan<K, V> getSpan(int start, K key, int[] search) {
 		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
 			if((levels[i] != null) && (levels[i].key().compareTo(key) <= 0)) {
 				return levels[i].getSpan(i,key,search);
@@ -82,9 +86,9 @@ public class SkipLevels {
 		return bottom.getSpan(key, search);
 	}
 
-	public Comparable key() { return bottom.keys[0]; }
+	public K key() { return bottom.firstKey(); }
 
-	public Object get(int start, Comparable key) {
+	public V get(int start, K key) {
 		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
 			if((levels[i] != null) && (levels[i].key().compareTo(key) <= 0)) {
 				return levels[i].get(i,key);
@@ -93,19 +97,28 @@ public class SkipLevels {
 		return bottom.get(key);
 	}
 
-	public Object[] remove(int start, Comparable key, SkipList sl) {
-		SkipSpan ss = null;
+	/**
+	 *  @return An array of two objects or null.
+	 *          rv[0] is the removed object.
+	 *          rv[1] is the deleted SkipLevels if the removed object was the last in the SkipLevels,
+	 *                and the deleted SkipLevels is taller than this SkipLevels.
+	 *          rv is null if no object was removed.
+	 */
+	@SuppressWarnings("unchecked")
+	public Object[] remove(int start, K key, SkipList<K, V> sl) throws IOException {
 		Object[] res = null;
-		SkipLevels slvls = null;
-		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
+		SkipLevels<K, V> slvls = null;
+		for(int i = Math.min(start, levels.length - 1); i >= 0; i--) {
 			if(levels[i] != null) {
 				int cmp = levels[i].key().compareTo(key);
 				if((cmp < 0) || ((i==0) && (cmp <= 0)))  {
 					res = levels[i].remove(i, key, sl);
 					if((res != null) && (res[1] != null)) {
-						slvls = (SkipLevels) res[1];
-						if(levels.length >= slvls.levels.length) { res[1] = null; }
-						for(int j=0;j<(Math.min(slvls.levels.length,levels.length));j++) {
+						slvls = (SkipLevels<K, V>) res[1];
+						if(levels.length >= slvls.levels.length) {
+							res[1] = null;
+						}
+						for(int j = 0 ; j < Math.min(slvls.levels.length, levels.length); j++) {
 							if(levels[j] == slvls) {
 								levels[j] = slvls.levels[j];
 							}
@@ -121,49 +134,92 @@ public class SkipLevels {
 			if(res[1] == bottom) {
 				res[1] = this;
 			} else {
+				// Special handling required if we are the head SkipLevels to fix up our level pointers
+				// if the returned SkipSpan was already copied to us
+				boolean isFirst = sl.first == bottom;
+				if (isFirst && levels[0] != null) {
+					SkipSpan<K, V> ssres = (SkipSpan<K, V>)res[1];
+					if (bottom.firstKey().equals(ssres.firstKey())) {
+						// bottom copied the next span to itself
+						SkipLevels<K, V> replace = levels[0];
+						for (int i = 0; i < levels.length; i++) {
+							if (levels[i] == null)
+								break;
+							if (i >= replace.levels.length)
+								break;
+							if (levels[i].key().equals(replace.key())) {
+								levels[i] = replace.levels[i];
+							} 
+						}
+						this.flush();
+						replace.killInstance();
+					}
+				}
 				res[1] = null;
 			}
 		}
-		if((bottom.nKeys == 0) && (sl.first != bottom)) { this.killInstance(); }
+		if((bottom.nKeys == 0) && (sl.first != bottom)) {
+			this.killInstance();
+		}
 		return res;
 	}
 
-	public SkipLevels put(int start, Comparable key, Object val, SkipList sl) {
-		SkipSpan ss = null;
-		SkipLevels slvls = null;
-		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
+	/**
+	 *  @return the new level if it caused a split and we made a new level,
+	 *          and the new level is taller than our level;
+	 *          else null if it went in an existing level or the new level is our height or less.
+	 */
+	public SkipLevels<K, V> put(int start, K key, V val, SkipList<K, V> sl) {
+		boolean modified = false;
+		for(int i = Math.min(start, levels.length - 1); i >= 0; i--) {
+			// is key equal to or after the start of the level?
 			if((levels[i] != null) && (levels[i].key().compareTo(key) <= 0)) {
-				slvls = levels[i].put(i, key, val, sl);
+				SkipLevels<K, V> slvls = levels[i].put(i, key, val, sl);
 				if(slvls != null) {
-					for(int j=i+1;j<(Math.min(slvls.levels.length,levels.length));j++) {
+					for (int j = i + 1; j < Math.min(slvls.levels.length, levels.length); j++) {
+						// he points to where we used to point
+						// and we now point to him
 						slvls.levels[j] = levels[j];
 						levels[j] = slvls;
+						modified = true;
 					}
 					if(levels.length < slvls.levels.length) {
-						this.flush();
+						if (modified) {
+							this.flush();
+							slvls.flush();
+						}
 						return slvls;
 					}
 				}
-				this.flush();
+				if (modified) {
+					this.flush();
+					if (slvls != null)
+						slvls.flush();
+				}
 				return null;
 			}
 		}
-		ss = bottom.put(key,val,sl);
+		SkipSpan<K, V> ss = bottom.put(key,val,sl);
 		if(ss!=null) {
 			int height = sl.generateColHeight();
 			if(height != 0) {
-				slvls = this.newInstance(height, ss, sl);
+				SkipLevels<K, V> slvls = this.newInstance(height, ss, sl);
 				for(int i=0;i<(Math.min(height,levels.length));i++) {
+					// he points to where we used to point
+					// and we now point to him
 					slvls.levels[i] = levels[i];
 					levels[i] = slvls;
+					modified = true;
 				}
+				if (modified) {
+					this.flush();
+					slvls.flush();
+				}
+				if(levels.length < height)
+					return slvls;
 			}
-			this.flush();
-			if(levels.length >= height) { return null; }
-			return slvls;
-		} else {
-			return null;
 		}
+		return null;
 	}
 }
 

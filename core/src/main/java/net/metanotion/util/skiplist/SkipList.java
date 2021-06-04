@@ -28,47 +28,80 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+import java.io.Flushable;
+import java.io.IOException;
 import java.util.Random;
 
-public class SkipList {
-	protected SkipSpan first;
-	protected SkipLevels stack;
-	public Random rng;
+//import net.metanotion.io.block.BlockFile;
 
-	public int size=0;
-	public int spans=0;
+public class SkipList<K extends Comparable<? super K>, V> implements Flushable, Iterable<V> {
+	/** the probability of each next higher level */
+	protected static final int P = 2;
+	private static final int MIN_SLOTS = 4;
+	// these two are really final
+	protected SkipSpan<K, V> first;
+	protected SkipLevels<K, V> stack;
+	public static final Random rng = new Random(System.currentTimeMillis());
+
+	protected int size;
 
 	public void flush() { }
 	protected SkipList() { }
 
+	/*
+	 *  @param span span size
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
+	public SkipList(int span) {
+		if(span < 1 || span > SkipSpan.MAX_SIZE)
+			throw new IllegalArgumentException("Invalid span size");
+		first = new SkipSpan<K, V>(span);
+		stack = new SkipLevels<K, V>(1, first);
+		//rng = new Random(System.currentTimeMillis());
+	}
+
 	public int size() { return size; }
 
-	public int maxLevels() {
-		int hob = 0, s = spans;
-		while(spans > 0) {
-			hob++;
-			spans = spans / 2;
-		}
-		return (hob > 4) ? hob : 4;
+	public void addItem() {
+		size++;
 	}
 
+	public void delItem() {
+		if (size > 0)
+			size--;
+	}
+
+	/**
+	 *  @return 4 since we don't track span count here any more - see override
+	 *  Fix if for some reason you want a huge in-memory skiplist.
+	 */
+	public int maxLevels() {
+		return MIN_SLOTS;
+	}
+
+	/**
+	 *  @return 0..maxLevels(), each successive one with probability 1 / P
+	 */
 	public int generateColHeight() {
 		int bits = rng.nextInt();
-		boolean cont = true;
-		int res=0;
-		for(res=0; cont; res++) {
-			cont = ((bits % 2) == 0) ? true : false;
-			bits = bits / 2;
+		int max = maxLevels();
+		for(int res = 0; res < max; res++) {
+			if (bits % P == 0)
+				return res;
+			bits /= P;
 		}
-		return Math.max(0, Math.min(res, maxLevels()));
+		return max;
 	}
 
-	public void put(Comparable key, Object val)	{
+	@SuppressWarnings("unchecked")
+	public void put(K key, V val)	{
 		if(key == null) { throw new NullPointerException(); }
 		if(val == null) { throw new NullPointerException(); }
-		SkipLevels slvls = stack.put(stack.levels.length - 1, key, val, this);
+		SkipLevels<K, V> slvls = stack.put(stack.levels.length - 1, key, val, this);
 		if(slvls != null) {
-			SkipLevels[] levels = new SkipLevels[slvls.levels.length];
+			// grow our stack
+			//BlockFile.log.info("Top level old hgt " + stack.levels.length +  " new hgt " + slvls.levels.length);
+			SkipLevels<K, V>[] levels = (SkipLevels<K, V>[]) new SkipLevels[slvls.levels.length];
 			for(int i=0;i < slvls.levels.length; i++) {
 				if(i < stack.levels.length) {
 					levels[i] = stack.levels[i];
@@ -82,12 +115,13 @@ public class SkipList {
 		}
 	}
 
-	public Object remove(Comparable key) {
+	@SuppressWarnings("unchecked")
+	public V remove(K key) throws IOException {
 		if(key == null) { throw new NullPointerException(); }
 		Object[] res = stack.remove(stack.levels.length - 1, key, this);
 		if(res != null) {
 			if(res[1] != null) {
-				SkipLevels slvls = (SkipLevels) res[1];
+				SkipLevels<K, V> slvls = (SkipLevels<K, V>) res[1];
 				for(int i=0;i < slvls.levels.length; i++) {
 					if(stack.levels[i] == slvls) {
 						stack.levels[i] = slvls.levels[i];
@@ -96,42 +130,25 @@ public class SkipList {
 				stack.flush();
 			}
 			flush();
-			return res[0];
+			return (V) res[0];
 		}
 		return null;
 	}
 
-	public void printSL() {
-		System.out.println("List size " + size + " spans " + spans);
-		stack.print();
-	}
-
-	public void print() {
-		System.out.println("List size " + size + " spans " + spans);
-		first.print();
-	}
-
-	public Object get(Comparable key) {
+	public V get(K key) {
 		if(key == null) { throw new NullPointerException(); }
 		return stack.get(stack.levels.length - 1, key);
 	}
 
-	public SkipIterator iterator() { return new SkipIterator(first, 0); }
+	public SkipIterator<K, V> iterator() { return new SkipIterator<K, V>(first, 0); }
 
-	public SkipIterator min() { return new SkipIterator(first, 0); }
-
-	public SkipIterator max() {
-		SkipSpan ss = stack.getEnd();
-		return new SkipIterator(ss, ss.nKeys - 1);
-	}
-
-	public SkipIterator find(Comparable key) {
+	/** @return an iterator where nextKey() is the first one greater than or equal to 'key' */
+	public SkipIterator<K, V> find(K key) {
 		int[] search = new int[1];
-		SkipSpan ss = stack.getSpan(stack.levels.length - 1, key, search);
+		SkipSpan<K, V> ss = stack.getSpan(stack.levels.length - 1, key, search);
 		if(search[0] < 0) { search[0] = -1 * (search[0] + 1); }
-		return new SkipIterator(ss, search[0]);
+		return new SkipIterator<K, V>(ss, search[0]);
 	}
-
 
 	// Levels adjusted to guarantee O(log n) search
 	// This is expensive proportional to the number of spans.

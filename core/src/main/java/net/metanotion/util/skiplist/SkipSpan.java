@@ -28,57 +28,75 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
-@SuppressWarnings("unchecked")
-public abstract class SkipSpan {
+import java.io.Flushable;
+import java.io.IOException;
+
+//import net.metanotion.io.block.BlockFile;
+
+public class SkipSpan<K extends Comparable<? super K>, V> implements Flushable {
+	/** This is actually limited by BlockFile.spanSize which is much smaller */
+	public static final int MAX_SIZE = 256;
+
 	public int nKeys = 0;
-	public Comparable[] keys;
-	public Object[] vals;
-	public SkipSpan next, prev;
+	public K[] keys;
+	public V[] vals;
+	public SkipSpan<K, V> next, prev;
 
-	public abstract SkipSpan newInstance(SkipList sl);
-	public void killInstance() { }
+	public SkipSpan<K, V> newInstance(SkipList<K, V> sl) { return new SkipSpan<K, V>(keys.length); }
+	public void killInstance() throws IOException  { }
 	public void flush() { }
-	
-	private void loadVals() {
-		if (vals == null)
-			load();
-	}
-	
-	protected abstract void load();
 
-	public void print() {
-		System.out.println("Span");
-		for(int i=0;i<nKeys;i++) {
-			System.out.println("\t" + keys[i] + " => " + vals[i]);
+	protected SkipSpan() { }
+
+	/*
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
+	@SuppressWarnings("unchecked")
+	public SkipSpan(int size) {
+		if(size < 1 || size > MAX_SIZE)
+			throw new IllegalArgumentException("Invalid span size " + size);
+		keys = (K[]) new Comparable[size];
+		vals = (V[]) new Object[size];
+	}
+
+	/** dumps all the data from here to the end */
+	public String print() {
+		StringBuilder buf = new StringBuilder(1024);
+		buf.append("Span with ").append(nKeys).append(" keys\n");
+		if (nKeys > 0 && keys != null && vals != null) {
+			for(int i=0;i<nKeys;i++) {
+				buf.append('\t').append(keys[i]).append(" => ").append(vals[i]).append('\n');
+			}
 		}
-		if(next != null) { next.print(); }
+		if (next != null) { buf.append(next.print()); }
+		return buf.toString();
 	}
 
-	private int binarySearch(Comparable key) {
- 		int high = nKeys - 1;
- 		int low = 0;
- 		int cur;
- 		int cmp;
- 		while(low <= high) {
- 			cur = (low + high) >>> 1;
- 			cmp = keys[cur].compareTo(key);
- 			if(cmp > 0) {
- 				high = cur - 1;
- 			} else if(cmp < 0) {
- 				low = cur + 1;
- 			} else {
- 				return cur;
- 			}
- 		}
- 		return (-1 * (low + 1));
+	private int binarySearch(K key) {
+		int high = nKeys - 1;
+		int low = 0;
+		int cur;
+		int cmp;
+		while(low <= high) {
+			cur = (low + high) >>> 1;
+			cmp = keys[cur].compareTo(key);
+			if(cmp > 0) {
+				high = cur - 1;
+			} else if(cmp < 0) {
+				low = cur + 1;
+			} else {
+				return cur;
+			}
+		}
+		return (-1 * (low + 1));
 	}
 
-	public SkipSpan getEnd() {
+	public SkipSpan<K, V> getEnd() {
 		if(next == null) { return this; }
 		return next.getEnd();
 	}
 
-	public SkipSpan getSpan(Comparable key, int[] search) {
+	public SkipSpan<K, V> getSpan(K key, int[] search) {
 		if(nKeys == 0) {
 			search[0] = -1;
 			return this;
@@ -95,7 +113,7 @@ public abstract class SkipSpan {
 		return this;
 	}
 
-	public Object get(Comparable key) {
+	public V get(K key) {
 		if(nKeys == 0) { return null; }
 		if(keys[nKeys - 1].compareTo(key) < 0) {
 			if(next == null) { return null; }
@@ -103,14 +121,10 @@ public abstract class SkipSpan {
 		}
 		int loc = binarySearch(key);
 		if(loc < 0) { return null; }
-		loadVals();
-		Object rv = vals[loc];
-		vals = null;
-		return rv;
+		return vals[loc];
 	}
 
 	private void pushTogether(int hole) {
-		loadVals();
 		for(int i=hole;i<(nKeys - 1);i++) {
 			keys[i] = keys[i+1];
 			vals[i] = vals[i+1];
@@ -119,7 +133,6 @@ public abstract class SkipSpan {
 	}
 
 	private void pushApart(int start) {
-		loadVals();
 		for(int i=(nKeys-1);i>=start;i--) {
 			keys[i+1] = keys[i];
 			vals[i+1] = vals[i];
@@ -127,10 +140,8 @@ public abstract class SkipSpan {
 		nKeys++;
 	}
 
-	private void split(int loc, Comparable key, Object val, SkipList sl) {
-		loadVals();
-		SkipSpan right = newInstance(sl);
-		sl.spans++;
+	private void split(int loc, K key, V val, SkipList<K, V> sl) {
+		SkipSpan<K, V> right = newInstance(sl);
 
 		if(this.next != null) { this.next.prev = right; }
 		right.next = this.next;
@@ -140,10 +151,10 @@ public abstract class SkipSpan {
 		int start = ((keys.length+1)/2);
 		for(int i=start;i < keys.length; i++) {
 			try {
-			right.keys[i-start] = keys[i];
-			right.vals[i-start] = vals[i];
-			right.nKeys++;
-			this.nKeys--;
+				right.keys[i-start] = keys[i];
+				right.vals[i-start] = vals[i];
+				right.nKeys++;
+				this.nKeys--;
 			} catch (ArrayIndexOutOfBoundsException e) {
 				System.out.println("i " + i + " start " + start);
 				System.out.println("key: " + keys[i].toString());
@@ -163,9 +174,11 @@ public abstract class SkipSpan {
 		this.next.flush();
 	}
 
-	private SkipSpan insert(int loc, Comparable key, Object val, SkipList sl) {
-		loadVals();
-		sl.size++;
+	/**
+	 *  @return the new span if it caused a split, else null if it went in this span
+	 */
+	private SkipSpan<K, V> insert(int loc, K key, V val, SkipList<K, V> sl) {
+		sl.addItem();
 		if(nKeys == keys.length) {
 			// split.
 			split(loc, key, val, sl);
@@ -179,10 +192,12 @@ public abstract class SkipSpan {
 		}
 	}
 
-	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
-		loadVals();
+	/**
+	 *  @return the new span if it caused a split, else null if it went in an existing span
+	 */
+	public SkipSpan<K, V> put(K key, V val, SkipList<K, V> sl)	{
 		if(nKeys == 0) {
-			sl.size++;
+			sl.addItem();
 			keys[0] = key;
 			vals[0] = val;
 			nKeys++;
@@ -193,7 +208,7 @@ public abstract class SkipSpan {
 		if(loc < 0) {
 			loc = -1 * (loc + 1);
 			if(next != null) {
-				int cmp = next.keys[0].compareTo(key);
+				int cmp = next.firstKey().compareTo(key);
 				if((loc >= nKeys) && (cmp > 0)) {
 					// It fits in between this span and the next
 					// Try to avoid a split...
@@ -227,7 +242,13 @@ public abstract class SkipSpan {
 		}
 	}
 
-	public Object[] remove(Comparable key, SkipList sl) {
+	/**
+	 *  @return An array of two objects or null.
+	 *          rv[0] is the removed object.
+	 *          rv[1] is the deleted SkipSpan if the removed object was the last in the SkipSpan.
+	 *          rv is null if no object was removed.
+	 */
+	public Object[] remove(K key, SkipList<K, V> sl) throws IOException {
 		if(nKeys == 0) { return null; }
 		if(keys[nKeys - 1].compareTo(key) < 0) {
 			if(next == null) { return null; }
@@ -235,28 +256,33 @@ public abstract class SkipSpan {
 		}
 		int loc = binarySearch(key);
 		if(loc < 0) { return null; }
-		loadVals();
 		Object o = vals[loc];
 		Object[] res = new Object[2];
 		res[0] = o;
-		sl.size--;
+		sl.delItem();
 		if(nKeys == 1) {
-			if(sl.spans > 1) { sl.spans--; }
 			if((this.prev == null) && (this.next != null)) {
 				res[1] = this.next;
-				next.loadVals();
-				// We're the first node in the list...
+				// We're the first node in the list... copy the next node over and kill it. See also bottom of SkipLevels.java
 				for(int i=0;i<next.nKeys;i++) {
 					keys[i] = next.keys[i];
 					vals[i] = next.vals[i];
 				}
+
 				nKeys = next.nKeys;
-				SkipSpan nn = next.next;
+				//BlockFile.log.error("Killing next span " + next + ") and copying to this span " + this + " in remove of " + key);
+				// Make us point to next.next and him point back to us
+				SkipSpan<K, V> nn = next.next;
 				next.killInstance();
-				this.flush();
+				if (nn != null) {
+					nn.prev = this;
+					nn.flush();
+				}
 				this.next = nn;
+				this.flush();
 			} else {
-				res[1] = this;
+				// Normal situation. We are now empty, kill ourselves
+				//BlockFile.log.error("Killing this span " + this + ", prev " + this.prev + ", next " + this.next);
 				if(this.prev != null) {
 					this.prev.next = this.next;
 					this.prev.flush();
@@ -264,16 +290,30 @@ public abstract class SkipSpan {
 				if(this.next != null) {
 					this.next.prev = this.prev;
 					this.next.flush();
+					this.next = null;
 				}
-				this.next = null;
-				this.prev = null;
+				if (this.prev != null) {
+					// Kill ourselves
+					this.prev = null;
+					this.killInstance();
+					res[1] = this;
+				} else {
+					// Never kill first span
+					//BlockFile.log.error("Not killing First span, now empty!!!!!!!!!!!!!!!!!!");
+					this.flush();
+					res[1] = null;
+				}
 				nKeys = 0;
-				this.killInstance();
 			}
 		} else {
 			pushTogether(loc);
 			this.flush();
 		}
 		return res;
+	}
+
+	/** I2P */
+	public K firstKey() {
+		return keys[0];
 	}
 }
