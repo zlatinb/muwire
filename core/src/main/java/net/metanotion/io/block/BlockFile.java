@@ -187,7 +187,6 @@ public class BlockFile {
 			}
 		}
 //		if(mounted != 0) { throw new CorruptFileException(); }
-		if(fileLen != file.length()) { throw new CorruptFileException(); }
 		mount();
 
 		metaIndex = new BSkipList(spanSize, this, 2, new StringBytes(), new IntBytes());

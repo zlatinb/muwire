@@ -28,59 +28,84 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io;
 
-import java.io.DataInput;
-import java.io.DataOutput;
+import com.muwire.core.util.DataUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.Set;
 
-public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
+public class RAIFile implements RandomAccessInterface {
+	
+	private static final long MAX_SIZE = Integer.MAX_VALUE;
+	
 	private File f;
-	private RandomAccessFile delegate;
+	private final ByteBuffer byteBuffer;
+	private final FileChannel fileChannel;
+			
 	private boolean r=false, w=false;
+	
+	private int maxPosition = 2048; // PAGESIZE * 2
 
-	public RAIFile(RandomAccessFile file) throws FileNotFoundException {
+	public RAIFile(RandomAccessFile file) throws IOException {
 		this.f = null;
-		this.delegate = file;
+		fileChannel = file.getChannel();
+		byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, MAX_SIZE);
 	}
 
-	public RAIFile(File file, boolean read, boolean write) throws FileNotFoundException {
+	public RAIFile(File file, boolean read, boolean write) throws FileNotFoundException, IOException {
 		this.f = file;
 		this.r = read;
 		this.w = write;
-		String mode = "";
-		if(this.r) { mode += "r"; }
-		if(this.w) { mode += "w"; }
-		this.delegate = new RandomAccessFile(file, mode);
+		Set<OpenOption> openOptionSet = new HashSet<>();
+		if(this.r) { openOptionSet.add(StandardOpenOption.READ); }
+		if(this.w) { openOptionSet.add(StandardOpenOption.WRITE); }
+		fileChannel = (FileChannel) Files.newByteChannel(f.toPath(), openOptionSet);
+		byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE,0, MAX_SIZE);
+	}
+	
+	private void updateMaxPosition() {
+		maxPosition = Math.max(maxPosition, byteBuffer.position());
 	}
 
-	public long getFilePointer()		throws IOException { return delegate.getFilePointer(); }
-	public long length()				throws IOException { return delegate.length(); }
-	public int read()					throws IOException { return delegate.read(); }
-	public int read(byte[] b)			throws IOException { return delegate.read(b); }
-	public int read(byte[] b, int off, int len) throws IOException { return delegate.read(b,off,len); }
-	public void seek(long pos)			throws IOException { delegate.seek(pos); }
-	public void setLength(long newLength) throws IOException { delegate.setLength(newLength); }
+	public long getFilePointer()		throws IOException { return byteBuffer.position(); }
+	public long length()				throws IOException { return maxPosition; }
+	public void setLength(long length) {
+		maxPosition = (int)length;
+	}
+	public int read()					throws IOException { return byteBuffer.get(); }
+	public int read(byte[] b)			throws IOException { byteBuffer.get(b); return b.length; }
+	public int read(byte[] b, int off, int len) throws IOException { byteBuffer.get(b,off,len); return len; }
+	public void seek(long pos)			throws IOException { byteBuffer.position((int)pos); updateMaxPosition();}
 
 	// Closeable Methods
 	// TODO May need to change.
-	public void close()					throws IOException { delegate.close(); }
+	public void close()	throws IOException { 
+		fileChannel.close();
+		DataUtil.tryUnmap(byteBuffer);
+	}
 
 	// DataInput Methods
-	public boolean readBoolean()		throws IOException { return delegate.readBoolean(); }
-	public byte readByte()				throws IOException { return delegate.readByte(); }
-	public char readChar()				throws IOException { return delegate.readChar(); }
-	public double readDouble()			throws IOException { return delegate.readDouble(); }
-	public float readFloat()			throws IOException { return delegate.readFloat(); }
-	public void readFully(byte[] b)		throws IOException { delegate.readFully(b); }
-	public void readFully(byte[] b, int off, int len) throws IOException { delegate.readFully(b,off,len); }
-	public int readInt()				throws IOException { return delegate.readInt(); }
-	public String readLine()			throws IOException { return delegate.readLine(); }
-	public long readLong()				throws IOException { return delegate.readLong(); }
-	public short readShort()			throws IOException { return delegate.readShort(); }
-	public int readUnsignedByte()		throws IOException { return delegate.readUnsignedByte(); }
-	public int readUnsignedShort()		throws IOException { return delegate.readUnsignedShort(); }
+	public boolean readBoolean()		throws IOException { return byteBuffer.get() == (byte)1; }
+	public byte readByte()				throws IOException { return byteBuffer.get(); }
+	public char readChar()				throws IOException { return byteBuffer.getChar(); }
+	public double readDouble()			throws IOException { return byteBuffer.getDouble(); }
+	public float readFloat()			throws IOException { return byteBuffer.getFloat(); }
+	public void readFully(byte[] b)		throws IOException { byteBuffer.get(b); }
+	public void readFully(byte[] b, int off, int len) throws IOException { byteBuffer.get(b,off,len); }
+	public int readInt()				throws IOException { return byteBuffer.getInt(); }
+	public long readLong()				throws IOException { return byteBuffer.getLong(); }
+	public short readShort()			throws IOException { return byteBuffer.getShort(); }
+	public int readUnsignedByte()		throws IOException { return byteBuffer.get() & 0xFF; }
+	public int readUnsignedShort()		throws IOException { return byteBuffer.getShort() & 0xFFFF; }
 
 	/** Read a UTF encoded string
 	 	I would delegate here. But Java's read/writeUTF combo suck.
@@ -92,31 +117,33 @@ public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 	 	returned by String.getBytes("UTF-8");
 	*/
 	public String readUTF()				throws IOException {
-		int len = delegate.readInt();
+		int len = byteBuffer.getInt();
 		if((len < 0) || (len >= 16777216)) { throw new IOException("Bad Length Encoding"); }
 		byte[] bytes = new byte[len];
-		int l = delegate.read(bytes);
-		if(l==-1) { throw new IOException("EOF while reading String"); }
-		String s = new String(bytes, "UTF-8");
+		byteBuffer.get(bytes);
+		String s = new String(bytes, StandardCharsets.UTF_8);
 		return s;
 	}
 
-	public int skipBytes(int n)			throws IOException { return delegate.skipBytes(n); }
+	public int skipBytes(int n) throws IOException { 
+		byteBuffer.position(byteBuffer.position() + n);
+		updateMaxPosition();
+		return n;
+	}
 
 	// DataOutput Methods
-	public void write(int b)			throws IOException { delegate.write(b); }
-	public void write(byte[] b)			throws IOException { delegate.write(b); }
-	public void write(byte[] b, int off, int len) throws IOException { delegate.write(b,off,len); }
-	public void writeBoolean(boolean v)	throws IOException { delegate.writeBoolean(v); }
-	public void writeByte(int v)		throws IOException { delegate.writeByte(v); }
-	public void writeShort(int v)		throws IOException { delegate.writeShort(v); }
-	public void writeChar(int v)		throws IOException { delegate.writeChar(v); }
-	public void writeInt(int v)			throws IOException {  delegate.writeInt(v); }
-	public void writeLong(long v)		throws IOException {  delegate.writeLong(v); }
-	public void writeFloat(float v)		throws IOException { delegate.writeFloat(v); }
-	public void writeDouble(double v)	throws IOException { delegate.writeDouble(v); }
-	public void writeBytes(String s)	throws IOException { delegate.writeBytes(s); }
-	public void writeChars(String s)	throws IOException { delegate.writeChars(s); }
+	public void write(int b)			throws IOException { byteBuffer.put((byte)b); updateMaxPosition(); }
+	public void write(byte[] b)			throws IOException { byteBuffer.put(b); updateMaxPosition();}
+	public void write(byte[] b, int off, int len) throws IOException { byteBuffer.put(b,off,len); updateMaxPosition();}
+	public void writeBoolean(boolean v)	throws IOException { byteBuffer.put(v ? (byte)1 : (byte)0); updateMaxPosition();}
+	public void writeByte(int v)		throws IOException { byteBuffer.put((byte)v); updateMaxPosition();}
+	public void writeShort(int v)		throws IOException { byteBuffer.putShort((short)v); updateMaxPosition();}
+	public void writeChar(int v)		throws IOException { byteBuffer.putChar((char)v); updateMaxPosition();}
+	public void writeInt(int v)			throws IOException { byteBuffer.putInt(v); updateMaxPosition();}
+	public void writeLong(long v)		throws IOException { byteBuffer.putLong(v); updateMaxPosition();}
+	public void writeFloat(float v)		throws IOException { byteBuffer.putFloat(v); updateMaxPosition();}
+	public void writeDouble(double v)	throws IOException { byteBuffer.putDouble(v); updateMaxPosition();}
+	public void writeBytes(String s)	throws IOException { byteBuffer.put(s.getBytes()); updateMaxPosition();}
 
 	/** Write a UTF encoded string
 	 	I would delegate here. But Java's read/writeUTF combo suck.
@@ -128,9 +155,10 @@ public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 	 	returned by String.getBytes("UTF-8");
 	*/
 	public void writeUTF(String str)	throws IOException {
-		byte[] string = str.getBytes("UTF-8");
+		byte[] string = str.getBytes(StandardCharsets.UTF_8);
 		if(string.length >= 16777216) { throw new IOException("String to long for encoding type"); }
-		delegate.writeInt(string.length);
-		delegate.write(string);
+		byteBuffer.putInt(string.length);
+		byteBuffer.put(string);
+		updateMaxPosition();
 	}
 }

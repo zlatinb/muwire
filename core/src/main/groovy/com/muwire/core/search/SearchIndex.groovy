@@ -15,6 +15,7 @@ class SearchIndex {
         File f = File.createTempFile(name, "db")
         if (f.exists())
             f.delete()
+        f.createNewFile()
         f.deleteOnExit()
         BlockFile blockFile = new BlockFile(f, true)
         keywords = blockFile.makeIndex("keywords", new KeySerializer(), new ValueSerializer())

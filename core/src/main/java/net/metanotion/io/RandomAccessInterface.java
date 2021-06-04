@@ -33,11 +33,11 @@ import java.io.IOException;
 public interface RandomAccessInterface {
 	public long getFilePointer() throws IOException;
 	public long length() throws IOException;
+	public void setLength(long length);
 	public int read() throws IOException;
 	public int read(byte[] b) throws IOException;
 	public int read(byte[] b, int off, int len) throws IOException;
 	public void seek(long pos) throws IOException;
-	public void setLength(long newLength) throws IOException;
 
 	// Closeable Methods
 	public void close() throws IOException;
@@ -51,7 +51,6 @@ public interface RandomAccessInterface {
 	public void readFully(byte[] b) throws IOException;
 	public void readFully(byte[] b, int off, int len) throws IOException;
 	public int readInt() throws IOException;
-	public String readLine() throws IOException;
 	public long readLong() throws IOException;
 	public short readShort() throws IOException;
 	public int readUnsignedByte() throws IOException;
@@ -72,6 +71,5 @@ public interface RandomAccessInterface {
 	public void writeFloat(float v) throws IOException;
 	public void writeDouble(double v) throws IOException;
 	public void writeBytes(String s) throws IOException;
-	public void writeChars(String s) throws IOException;
 	public void writeUTF(String str) throws IOException;
 }
