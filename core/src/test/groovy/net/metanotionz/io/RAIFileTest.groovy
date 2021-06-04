@@ -53,4 +53,16 @@ class RAIFileTest {
         rf.seek(zeroes)
         assert Long.MAX_VALUE == rf.readLong()
     }
+    
+    @Test
+    void writeHugeArray() {
+        byte [] huge = new byte[RAIFile.MAX_SIZE * 3]
+        Arrays.fill(huge, (byte)1)
+        rf.write(huge)
+        assert RAIFile.MAX_SIZE * 3 == rf.getFilePointer()
+        byte [] huge2 = new byte[huge.length]
+        rf.seek(0)
+        rf.read(huge2)
+        assert huge == huge2
+    }
 }

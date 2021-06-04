@@ -116,16 +116,15 @@ public class RAIFile implements RandomAccessInterface {
 	}
 	
 	public int read(byte[] b, int off, int len) throws IOException {
-		if (len > MAX_SIZE)
-			throw new IllegalArgumentException("length too long " + len);
 		int remaining = current.byteBuffer.remaining();
 		int rv = 0;
-		if (remaining < len) {
+		while (remaining < len) {
 			current.byteBuffer.get(b, off, remaining);
 			off += remaining;
 			len -= remaining;
 			rv += remaining;
-			switchChunk(current.position() + 1);
+			switchChunk(current.position());
+			remaining = current.byteBuffer.remaining();
 		}
 		current.byteBuffer.get(b, off, len);
 		return rv + len;
@@ -234,14 +233,13 @@ public class RAIFile implements RandomAccessInterface {
 	public void write(byte[] b)	throws IOException { write(b, 0, b.length);}
 	
 	public void write(byte[] b, int off, int len) throws IOException {
-		if (len > MAX_SIZE)
-			throw new IllegalArgumentException("length too long " + len);
 		int remaining = current.byteBuffer.remaining();
-		if (remaining < len) {
+		while (remaining < len) {
 			current.byteBuffer.put(b, off, remaining);
 			off += remaining;
 			len -= remaining;
 			switchChunk(current.position());
+			remaining = current.byteBuffer.remaining();
 		}
 		current.byteBuffer.put(b, off, len);
 		updateMaxPosition();
