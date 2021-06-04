@@ -60,6 +60,7 @@ import net.metanotion.util.skiplist.SkipIterator;
  * Pages are 1 KB and are numbered starting from 1.
  * e.g. the Metaindex skiplist is at offset 1024 bytes
  */
+@SuppressWarnings("unchecked")
 public class BlockFile implements Closeable {
 	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
@@ -489,7 +490,7 @@ public class BlockFile implements Closeable {
 		delIndex(name);
 		closeIndex(name);
 		closeIndex(tmpName);
-		Integer page = (Integer) metaIndex.get(tmpName);
+		Integer page = metaIndex.get(tmpName);
 		metaIndex.put(name, page);
 		metaIndex.remove(tmpName);
 	}
