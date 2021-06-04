@@ -1,4 +1,4 @@
-package net.metanotion.io
+package net.metanotionz.io
 
 import org.junit.After
 import org.junit.Before

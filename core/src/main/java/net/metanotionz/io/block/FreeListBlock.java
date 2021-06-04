@@ -26,14 +26,14 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.io.block;
+package net.metanotionz.io.block;
 
 import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-import net.metanotion.io.RandomAccessInterface;
+import net.metanotionz.io.RandomAccessInterface;
 
 /**
  * On-disk format:

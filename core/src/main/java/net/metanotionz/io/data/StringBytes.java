@@ -26,37 +26,22 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.io;
+package net.metanotionz.io.data;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-import net.metanotion.io.Serializer;
+import net.metanotionz.io.Serializer;
 
-public abstract class SerialStreams implements Serializer {
+public class StringBytes implements Serializer {
 	public byte[] getBytes(Object o) {
 		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(baos);
-			writeOut(dos, o);
-			return baos.toByteArray();
-		} catch (IOException ioe) { throw new Error(); }
+			return ((String) o).getBytes("US-ASCII");
+		} catch (UnsupportedEncodingException uee) { throw new Error("Unsupported Encoding"); }
 	}
 
 	public Object construct(byte[] b) {
 		try {
-			ByteArrayInputStream bais = new ByteArrayInputStream(b);
-			DataInputStream dis = new DataInputStream(bais);
-			return readIn(dis);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			throw new Error();
-		}
+			return new String(b, "US-ASCII");
+		} catch (UnsupportedEncodingException uee) { throw new Error("Unsupported Encoding"); }
 	}
-
-	abstract public void writeOut(DataOutputStream dos, Object o) throws IOException;
-	abstract public Object readIn(DataInputStream dis) throws IOException;
 }

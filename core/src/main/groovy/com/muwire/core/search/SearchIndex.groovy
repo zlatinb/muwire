@@ -1,9 +1,9 @@
 package com.muwire.core.search
 
 import com.muwire.core.SplitPattern
-import net.metanotion.io.Serializer
-import net.metanotion.io.block.BlockFile
-import net.metanotion.util.skiplist.SkipList
+import net.metanotionz.io.Serializer
+import net.metanotionz.io.block.BlockFile
+import net.metanotionz.util.skiplist.SkipList
 
 import java.nio.charset.StandardCharsets
 

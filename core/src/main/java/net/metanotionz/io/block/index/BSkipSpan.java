@@ -26,14 +26,14 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.io.block.index;
+package net.metanotionz.io.block.index;
 
 import java.io.IOException;
 
-import net.metanotion.io.Serializer;
-import net.metanotion.io.block.BlockFile;
-import net.metanotion.util.skiplist.SkipList;
-import net.metanotion.util.skiplist.SkipSpan;
+import net.metanotionz.io.Serializer;
+import net.metanotionz.io.block.BlockFile;
+import net.metanotionz.util.skiplist.SkipList;
+import net.metanotionz.util.skiplist.SkipSpan;
 
 /**
  * On-disk format:

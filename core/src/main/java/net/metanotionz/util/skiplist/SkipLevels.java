@@ -26,15 +26,10 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.util.skiplist;
+package net.metanotionz.util.skiplist;
 
 import java.io.Flushable;
 import java.io.IOException;
-
-import net.metanotion.io.block.BlockFile;
-
-import net.i2p.I2PAppContext;
-import net.i2p.util.Log;
 
 public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable {
 	/** We can't have more than 2**32 pages */

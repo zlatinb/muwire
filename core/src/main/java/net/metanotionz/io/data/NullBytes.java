@@ -26,9 +26,9 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.io.data;
+package net.metanotionz.io.data;
 
-import net.metanotion.io.Serializer;
+import net.metanotionz.io.Serializer;
 
 public class NullBytes implements Serializer {
 	public byte[] getBytes(Object o) { return null; }

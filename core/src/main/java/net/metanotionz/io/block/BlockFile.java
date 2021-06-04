@@ -26,24 +26,23 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.io.block;
+package net.metanotionz.io.block;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import net.metanotion.io.RAIFile;
-import net.metanotion.io.RandomAccessInterface;
-import net.metanotion.io.Serializer;
-import net.metanotion.io.data.IntBytes;
-import net.metanotion.io.data.StringBytes;
-import net.metanotion.io.block.index.BSkipList;
-import net.metanotion.io.block.index.BSkipSpan;
-import net.metanotion.util.skiplist.SkipIterator;
+import net.metanotionz.io.RAIFile;
+import net.metanotionz.io.RandomAccessInterface;
+import net.metanotionz.io.Serializer;
+import net.metanotionz.io.data.IntBytes;
+import net.metanotionz.io.data.StringBytes;
+import net.metanotionz.io.block.index.BSkipList;
+import net.metanotionz.io.block.index.BSkipSpan;
+import net.metanotionz.util.skiplist.SkipIterator;
 
 /**
  * On-disk format:
