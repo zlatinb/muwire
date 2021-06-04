@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+@SuppressWarnings("unchecked")
 public abstract class SkipSpan {
 	public int nKeys = 0;
 	public Comparable[] keys;

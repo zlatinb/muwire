@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+@SuppressWarnings("unchecked")
 public class SkipLevels {
 	/*	"Next" pointers
 		The highest indexed level is the "highest" level in the list.

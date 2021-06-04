@@ -37,6 +37,7 @@ import net.metanotion.io.data.NullBytes;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipSpan;
 
+@SuppressWarnings("unchecked")
 public class BSkipSpan extends SkipSpan {
 
 	private final BSkipList bsl;
@@ -133,7 +134,7 @@ public class BSkipSpan extends SkipSpan {
 		bss.keySer = key;
 		bss.valSer = val;
 
-		bsl.spanHash.put(new Integer(spanPage), bss);
+		bsl.spanHash.put(spanPage, bss);
 
 		BlockFile.pageSeek(bf.file, spanPage);
 
@@ -196,7 +197,7 @@ public class BSkipSpan extends SkipSpan {
 		BSkipSpan temp;
 		int np = nextPage;
 		while(np != 0) {
-			temp = (BSkipSpan) bsl.spanHash.get(new Integer(np));
+			temp = (BSkipSpan) bsl.spanHash.get(np);
 			if(temp != null) {
 				bss.next = temp;
 				break;
@@ -213,7 +214,7 @@ public class BSkipSpan extends SkipSpan {
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
-			temp = (BSkipSpan) bsl.spanHash.get(new Integer(np));
+			temp = (BSkipSpan) bsl.spanHash.get(np);
 			if(temp != null) {
 				bss.next = temp;
 				break;

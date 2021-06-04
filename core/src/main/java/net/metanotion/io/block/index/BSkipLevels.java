@@ -35,7 +35,7 @@ import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipLevels;
 import net.metanotion.util.skiplist.SkipSpan;
-
+@SuppressWarnings("unchecked")
 public class BSkipLevels extends SkipLevels {
 	public int levelPage;
 	public int spanPage;
@@ -48,22 +48,22 @@ public class BSkipLevels extends SkipLevels {
 
 		BlockFile.pageSeek(bf.file, levelPage);
 
-		bsl.levelHash.put(new Integer(this.levelPage), this);
+		bsl.levelHash.put(this.levelPage, this);
 
 		int maxLen = bf.file.readShort();
 		int nonNull = bf.file.readShort();
 		spanPage = bf.file.readInt();
-		bottom = (BSkipSpan) bsl.spanHash.get(new Integer(spanPage));
+		bottom = (BSkipSpan) bsl.spanHash.get(spanPage);
 
 		this.levels = new BSkipLevels[maxLen];
 		int lp;
 		for(int i=0;i<nonNull;i++) {
 			lp = bf.file.readInt();
 			if(lp != 0) {
-				levels[i] = (BSkipLevels) bsl.levelHash.get(new Integer(lp));
+				levels[i] = (BSkipLevels) bsl.levelHash.get(lp);
 				if(levels[i] == null) {
 					levels[i] = new BSkipLevels(bf, lp, bsl);
-					bsl.levelHash.put(new Integer(lp), levels[i]);
+					bsl.levelHash.put(lp, levels[i]);
 				}
 			} else {
 				levels[i] = null;
