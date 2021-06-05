@@ -22,7 +22,7 @@ class FileManager {
 
     final EventBus eventBus
     final MuWireSettings settings
-    final Map<InfoHash, Set<SharedFile>> rootToFiles = Collections.synchronizedMap(new HashMap<>())
+    final Map<InfoHash, SharedFile[]> rootToFiles = Collections.synchronizedMap(new HashMap<>())
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
     final Map<String, Set<File>> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
@@ -80,13 +80,19 @@ class FileManager {
     private void addToIndex(SharedFile sf) {
         log.info("Adding shared file " + sf.getFile())
         InfoHash infoHash = new InfoHash(sf.getRoot())
-        Set<SharedFile> existing = rootToFiles.get(infoHash)
+        SharedFile[] existing = rootToFiles.get(infoHash)
         if (existing == null) {
             log.info("adding new root")
-            existing = new HashSet<>()
-            rootToFiles.put(infoHash, existing);
+            existing = new SharedFile[1]
+            existing[0] = sf
+        } else {
+            Set<SharedFile> unique = new HashSet<>()
+            existing.each {unique.add(it)}
+            unique.add(sf)
+            existing = unique.toArray(existing)
         }
-        existing.add(sf)
+        rootToFiles.put(infoHash, existing);
+            
         fileToSharedFile.put(sf.file, sf)
         positiveTree.add(sf.file, sf);
         
@@ -123,11 +129,16 @@ class FileManager {
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         SharedFile sf = e.unsharedFile
         InfoHash infoHash = new InfoHash(sf.getRoot())
-        Set<SharedFile> existing = rootToFiles.get(infoHash)
+        SharedFile[] existing = rootToFiles.get(infoHash)
         if (existing != null) {
-            existing.remove(sf)
-            if (existing.isEmpty()) {
+            Set<SharedFile> unique = new HashSet<>()
+            existing.each {unique.add(it)}
+            unique.remove(sf)
+            if (unique.isEmpty()) {
                 rootToFiles.remove(infoHash)
+            } else {
+                existing = unique.toArray(new SharedFile[0])
+                rootToFiles.put(infoHash, existing)
             }
         }
 
@@ -205,12 +216,11 @@ class FileManager {
         // hash takes precedence
         ResultsEvent re = null
         if (e.searchHash != null) {
-            Set<SharedFile> found
+            SharedFile[] found
             found = rootToFiles.get new InfoHash(e.searchHash)
-            found = filter(found, e.oobInfohash)
-            if (found != null && !found.isEmpty()) {
+            if (found != null && found.length > 0) {
                 found.each { it.hit(e.persona, e.timestamp, "Hash Search") }
-                re = new ResultsEvent(results: found.asList(), uuid: e.uuid, searchEvent: e)
+                re = new ResultsEvent(results: found, uuid: e.uuid, searchEvent: e)
             }
         } else {
             def names = index.search e.searchTerms
@@ -222,7 +232,6 @@ class FileManager {
             }
             Set<SharedFile> sharedFiles = new HashSet<>()
             files.each { sharedFiles.add fileToSharedFile[it] }
-            files = filter(sharedFiles, e.oobInfohash)
             
             if (!sharedFiles.isEmpty()) {
                 sharedFiles.each { it.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms)) }
@@ -233,17 +242,6 @@ class FileManager {
 
         if (re != null)
             eventBus.publish(re)
-    }
-
-    private static Set<SharedFile> filter(Set<SharedFile> files, boolean oob) {
-        if (!oob)
-            return files
-        Set<SharedFile> rv = new HashSet<>()
-        files.each {
-            if (it != null && it.getPieceSize() != 0)
-                rv.add(it)
-        }
-        rv
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {

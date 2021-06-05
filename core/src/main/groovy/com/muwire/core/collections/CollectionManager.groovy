@@ -308,8 +308,8 @@ class CollectionManager {
 
             List<SharedFile> sharedFiles = new ArrayList<>()
             collection.files.each { item ->
-                def sfs = fileManager.getRootToFiles().get(item.infoHash)
-                if (sfs == null || sfs.isEmpty())
+                SharedFile[] sfs = fileManager.getRootToFiles().get(item.infoHash)
+                if (sfs == null || sfs.length == 0)
                     return // hmm
                 sfs.each { sf -> sf.hit(e.persona, e.timestamp, "Collection Search")}
                 sharedFiles.addAll(sfs)
@@ -337,8 +337,8 @@ class CollectionManager {
             collections.each { c ->
                 c.hit(e.persona)
                 c.files.each { f-> 
-                    def sfs = fileManager.getRootToFiles().get(f.infoHash)
-                    if (sfs == null || sfs.isEmpty())
+                    SharedFile[] sfs = fileManager.getRootToFiles().get(f.infoHash)
+                    if (sfs == null || sfs.length == 0)
                         return
                     sfs.each { sf -> sf.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms))}
                     sharedFiles.addAll(sfs)

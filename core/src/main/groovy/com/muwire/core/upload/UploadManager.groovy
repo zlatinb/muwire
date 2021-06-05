@@ -74,9 +74,9 @@ public class UploadManager {
 
             byte [] infoHashRoot = Base64.decode(infoHashString)
             InfoHash infoHash = new InfoHash(infoHashRoot)
-            Set<SharedFile> sharedFiles = fileManager.getSharedFiles(infoHashRoot)
+            SharedFile[] sharedFiles = fileManager.getSharedFiles(infoHashRoot)
             Downloader downloader = downloadManager.downloaders.get(infoHash)
-            if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
+            if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
                 log.info "file not found"
                 e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
@@ -156,8 +156,8 @@ public class UploadManager {
         byte [] infoHashRoot = Base64.decode(infoHashString)
         InfoHash infoHash = new InfoHash(infoHashRoot)
         Downloader downloader = downloadManager.downloaders.get(infoHash)
-        Set<SharedFile> sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-        if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
+        SharedFile[] sharedFiles = fileManager.getSharedFiles(infoHashRoot)
+        if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
             log.info "file not found"
             e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
             e.getOutputStream().flush()
@@ -182,7 +182,7 @@ public class UploadManager {
 
         InfoHash fullInfoHash
         if (downloader == null) {
-            fullInfoHash = persisterService.loadInfoHash(sharedFiles.iterator().next())
+            fullInfoHash = persisterService.loadInfoHash(sharedFiles[0])
         } else {
             byte [] hashList = downloader.getInfoHash().getHashList()
             if (hashList != null && hashList.length > 0)
@@ -235,7 +235,7 @@ public class UploadManager {
             infoHash = new InfoHash(infoHashRoot)
             sharedFiles = fileManager.getSharedFiles(infoHashRoot)
             downloader = downloadManager.downloaders.get(infoHash)
-            if (downloader == null && (sharedFiles == null || sharedFiles.isEmpty())) {
+            if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
                 log.info "file not found"
                 e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
                 e.getOutputStream().flush()
@@ -273,7 +273,7 @@ public class UploadManager {
                 pieceSize = downloader.pieceSizePow2
             } else {
                 sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
-                SharedFile sharedFile = sharedFiles.iterator().next();
+                SharedFile sharedFile = sharedFiles[0];
                 mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
                 file = sharedFile.file
                 pieceSize = sharedFile.pieceSize

@@ -504,9 +504,9 @@ class MainFrameController {
         SharedFile sf = null
         if (uploader instanceof HashListUploader) {
             InfoHash infoHash = uploader.infoHash
-            Set<SharedFile> sfs = core.fileManager.rootToFiles.get(infoHash)
-            if (sfs != null  && !sfs.isEmpty())
-                sf = sfs.first()
+            SharedFile[] sfs = core.fileManager.rootToFiles.get(infoHash)
+            if (sfs != null  && sfs.length > 0)
+                sf = sfs[0]
         } else {
             File f = uploader.file
             sf = core.fileManager.fileToSharedFile.get(f)

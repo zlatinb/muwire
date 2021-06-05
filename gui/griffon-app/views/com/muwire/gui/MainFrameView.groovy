@@ -914,7 +914,7 @@ class MainFrameView {
 
             model.collectionFiles.clear()
             collection.files.each {
-                SharedFile sf = model.core.fileManager.getRootToFiles().get(it.infoHash).first()
+                SharedFile sf = model.core.fileManager.getRootToFiles().get(it.infoHash)[0]
                 model.collectionFiles.add(sf)
             }
             collectionFilesTable.model.fireTableDataChanged()
