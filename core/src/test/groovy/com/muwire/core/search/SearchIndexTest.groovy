@@ -158,4 +158,32 @@ class SearchIndexTest {
         
         assert index.search(["same"]).size() == 1
     }
+    
+    @Test
+    void testAddMany() {
+        initIndex([])
+        index.add("output-base.css")
+        index.add("amo-version.sh")
+        index.add("adding build1-5")
+        index.add("TODO")
+        index.add("ICENSE-EPL-v1.0.html")
+        index.add("jdk15.xml")
+        index.add("sud2zip")
+        index.with {
+            add("gradlew.bat")
+            add("osx launcher.jpeg")
+            add("get-m2.xml")
+            add("build.gradle")
+            add("adding README.md")
+            add("CONTRIBUTORS")
+            add("#i2p-notrelayed.html")
+            add("Docker.expt")
+            add("swt-debug.jar")
+            add("README.md")
+            add("gradlew")
+            add("nothing.o")
+            add("install.jar")
+            add("settings.gradle")
+        }
+    }
 }

@@ -162,7 +162,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 			byte[] valData;
 
 			for(int i=0;i<nKeys;i++) {
-				if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
+				if((pageCounter[0] + 6) > BlockFile.PAGESIZE) {
 					if(curNextPage[0] == 0) {
 						curNextPage[0] = bf.allocPage();
 						BlockFile.pageSeek(bf.file, curNextPage[0]);
@@ -193,7 +193,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 					i--;
 					continue;
 				}
-				pageCounter[0] += 4;
+				pageCounter[0] += 6;
 				bf.file.writeShort(keyData.length);
 				bf.file.writeInt(valData.length);
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
@@ -289,7 +289,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 //		System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
 		int fail = 0;
 		for(int i=0;i<this.nKeys;i++) {
-			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
+			if((pageCounter[0] + 6) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				int magic = bf.file.readInt();
 				if (magic != BlockFile.MAGIC_CONT) {
@@ -304,7 +304,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 			vsz = this.bf.file.readInt();
 			if (vsz > MAX_VALUE_SIZE)
 				throw new IOException("corrupt value");
-			pageCounter[0] +=4;
+			pageCounter[0] +=6;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
 			int lastGood = curPage;
