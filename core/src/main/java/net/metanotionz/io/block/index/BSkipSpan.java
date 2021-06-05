@@ -58,6 +58,7 @@ import net.metanotionz.util.skiplist.SkipSpan;
  *</pre>
  */
 public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V> {
+	private static final int MAX_VALUE_SIZE = 0x1 << 24;
 	protected static final int MAGIC = 0x5370616e;  // "Span"
 	protected static final int HEADER_LEN = 20;
 	public static final int CONT_HEADER_LEN = 8;
@@ -187,14 +188,14 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				valData = this.valSer.getBytes(vals[i]);
 				vals[i] = null;
 				// Drop bad entry without throwing exception
-				if (keyData.length > 65535 || valData.length > 65535) {
+				if (keyData.length > 65535 || valData.length > MAX_VALUE_SIZE) {
 					nKeys--;
 					i--;
 					continue;
 				}
 				pageCounter[0] += 4;
 				bf.file.writeShort(keyData.length);
-				bf.file.writeShort(valData.length);
+				bf.file.writeInt(valData.length);
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
@@ -300,7 +301,9 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				pageCounter[0] = CONT_HEADER_LEN;
 			}
 			ksz = this.bf.file.readUnsignedShort();
-			vsz = this.bf.file.readUnsignedShort();
+			vsz = this.bf.file.readInt();
+			if (vsz > MAX_VALUE_SIZE)
+				throw new IOException("corrupt value");
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
