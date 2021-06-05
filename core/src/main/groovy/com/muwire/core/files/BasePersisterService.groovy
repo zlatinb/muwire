@@ -138,7 +138,7 @@ abstract class BasePersisterService extends Service{
 
     protected static toJson(SharedFile sf) {
         def json = [:]
-        json.file = sf.getB64EncodedFileName()
+        json.file = Base64.encode(DataUtil.encodei18nString(sf.file.toString()))
         json.length = sf.getCachedLength()
         json.root = Base64.encode(sf.getRoot())
         json.pieceSize = sf.getPieceSize()

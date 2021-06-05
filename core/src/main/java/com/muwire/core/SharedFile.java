@@ -27,7 +27,6 @@ public class SharedFile {
     private final long cachedLength;
 
     private String b64PathHash;
-    private final String b64EncodedFileName;
     
     private volatile String comment;
     private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
@@ -42,7 +41,6 @@ public class SharedFile {
         this.pieceSize = pieceSize;
         this.cachedPath = file.getAbsolutePath();
         this.cachedLength = file.length();
-        this.b64EncodedFileName = Base64.encode(DataUtil.encodei18nString(file.toString()));
     }
 
     public File getFile() {
@@ -79,10 +77,6 @@ public class SharedFile {
         if (length % rawPieceSize != 0)
             rv++;
         return rv;
-    }
-    
-    public String getB64EncodedFileName() {
-        return b64EncodedFileName;
     }
     
     public String getCachedPath() {
