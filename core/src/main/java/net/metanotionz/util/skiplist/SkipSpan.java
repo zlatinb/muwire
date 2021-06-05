@@ -32,7 +32,7 @@ import java.io.Flushable;
 import java.io.IOException;
 
 //import net.metanotion.io.block.BlockFile;
-
+@SuppressWarnings("unchecked")
 public abstract class SkipSpan<K extends Comparable<? super K>, V> implements Flushable {
 	/** This is actually limited by BlockFile.spanSize which is much smaller */
 	public static final int MAX_SIZE = 256;
@@ -186,7 +186,7 @@ public abstract class SkipSpan<K extends Comparable<? super K>, V> implements Fl
 	public SkipSpan<K, V> put(K key, V val, SkipList<K, V> sl)	throws IOException {
 		if(nKeys == 0) {
 			sl.addItem();
-			loadVals();
+			vals = (V[]) (new Object[1]);
 			keys[0] = key;
 			vals[0] = val;
 			nKeys++;

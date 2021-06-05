@@ -142,4 +142,20 @@ class SearchIndexTest {
         assert index.search(['second first']).size() == 0
         assert index.search(['first second']).size() == 0
     }
+    
+    @Test
+    void testAddRemoveSame() {
+        initIndex([])
+        String s = "same comment"
+        String m1 = "MuWire-0.5.10.AppImage"
+        String m2 = "MuWire-0.6.0.AppImage"
+        index.add(s)
+        index.add(m1)
+        index.remove(s)
+        index.remove(m1)
+        index.add(s)
+        index.add(m2)
+        
+        assert index.search(["same"]).size() == 1
+    }
 }
