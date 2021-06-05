@@ -54,7 +54,7 @@ class SearchIndex {
         // first split by split pattern
         String sourceSplit = source.replaceAll(SplitPattern.SPLIT_PATTERN, " ").toLowerCase()
         String [] split = sourceSplit.split(" ")
-        def rv = []
+        def rv = new HashSet()
         split.each { if (it.length() > 0) rv << it }
         
         // then just by ' '
