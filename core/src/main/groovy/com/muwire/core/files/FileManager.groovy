@@ -24,7 +24,7 @@ class FileManager {
     final MuWireSettings settings
     final Map<InfoHash, SharedFile[]> rootToFiles = Collections.synchronizedMap(new HashMap<>())
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
-    final Map<String, Set<File>> nameToFiles = new HashMap<>()
+    final Map<String, File[]> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index
     final FileTree<Void> negativeTree = new FileTree<>()
@@ -104,12 +104,17 @@ class FileManager {
         saveNegativeTree()
 
         String name = sf.getFile().getName()
-        Set<File> existingFiles = nameToFiles.get(name)
+        File[] existingFiles = nameToFiles.get(name)
         if (existingFiles == null) {
-            existingFiles = new HashSet<>()
-            nameToFiles.put(name, existingFiles)
+            existingFiles = new File[1]
+            existingFiles[0] = sf.getFile()
+        } else {
+            Set<File> unique = new HashSet<>()
+            existingFiles.each {unique.add(it)}
+            unique.add(sf.getFile())
+            existingFiles = unique.toArray(existingFiles)
         }
-        existingFiles.add(sf.getFile())
+        nameToFiles.put(name, existingFiles)
 
         String comment = sf.getComment()
         if (comment != null) {
@@ -150,11 +155,16 @@ class FileManager {
         }
 
         String name = sf.getFile().getName()
-        Set<File> existingFiles = nameToFiles.get(name)
+        File[] existingFiles = nameToFiles.get(name)
         if (existingFiles != null) {
-            existingFiles.remove(sf.file)
-            if (existingFiles.isEmpty()) {
+            Set<File> unique = new HashSet<>()
+            unique.addAll(existingFiles)
+            unique.remove(sf.file)
+            if (unique.isEmpty()) {
                 nameToFiles.remove(name)
+            } else {
+                existingFiles = unique.toArray(new File[0])
+                nameToFiles.put(name, existingFiles)
             }
         }
         
