@@ -26,7 +26,7 @@ class FileTree<T> {
                 existing.isFile = element.isFile()
                 existing.parent = current
                 fileToNode.put(element, existing)
-                current.children.add(existing)
+                current.addChild(existing)
             }
             current = existing
         }
@@ -38,10 +38,11 @@ class FileTree<T> {
         if (node == null) {
             return false
         }
-        node.parent.children.remove(node)
-        if (node.parent.children.isEmpty() && node.parent != root)
+        node.parent.removeChild(node)
+        if (node.parent.children.length == 0 && node.parent != root)
             remove(node.parent.file)
-        def copy = new ArrayList(node.children)
+        def copy = new ArrayList()
+        copy.addAll node.children
         for (TreeNode child : copy)
             remove(child.file)
         true
@@ -98,8 +99,8 @@ class FileTree<T> {
     
     synchronized File commonAncestor() {
         TreeNode current = root
-        while(current.children.size() == 1)
-            current = current.children.first()
+        while(current.children.length == 1)
+            current = current.children[0]
         current.file
     }
     
@@ -108,7 +109,7 @@ class FileTree<T> {
         File file
         boolean isFile
         T value;
-        final Set<TreeNode> children = new HashSet<>()
+        TreeNode[] children = EMPTY_CHILDREN
         
         public int hashCode() {
             Objects.hash(file)
@@ -120,5 +121,24 @@ class FileTree<T> {
             TreeNode other = (TreeNode)o
             file == other.file
         }
+        
+        private void addChild(TreeNode child) {
+            Set<TreeNode> unique = new HashSet<>()
+            unique.addAll(children)
+            unique.add(child)
+            children = unique.toArray(children)
+        }
+        
+        private void removeChild(TreeNode child) {
+            Set<TreeNode> unique = new HashSet<>()
+            unique.addAll(children)
+            unique.remove(child)
+            if (unique.isEmpty())
+                children = EMPTY_CHILDREN
+            else
+                children = unique.toArray(new TreeNode[0])
+        }
     }
+    
+    private static final TreeNode[] EMPTY_CHILDREN = new TreeNode[0]
 }
