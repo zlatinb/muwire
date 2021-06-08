@@ -227,7 +227,8 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 	}
 	
 	protected void reload() throws IOException {
-		BSkipSpan.load(this, bf, bsl, page, keySer, valSer);
+		loadInit(this, bf, bsl, page, keySer, valSer);
+		loadData(true);
 	}
 
 	/**
@@ -265,7 +266,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 	 * Load the whole span's keys and values into memory
 	 */
 	protected void loadData() throws IOException {
-		loadData(true);
+		loadData(false);
 	}
 
 	/**
@@ -274,10 +275,11 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 	 * @param flushOnError set to false if you are going to flush anyway
 	 */
 	@SuppressWarnings("unchecked")
-	protected void loadData(boolean flushOnError) throws IOException {
+	protected void loadData(boolean valsOnly) throws IOException {
 		if (isKilled)
 			throw new IOException("Already killed!! " + this);
-		this.keys = (K[]) new Comparable[this.spanSize];
+		if (!valsOnly)
+			this.keys = (K[]) new Comparable[this.spanSize];
 		this.vals = (V[]) new Object[this.spanSize];
 
 		int ksz, vsz;
@@ -316,23 +318,13 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 				break;
 			}
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
-			this.keys[i] = this.keySer.construct(k);
+			if (!valsOnly)
+				this.keys[i] = this.keySer.construct(k);
 			this.vals[i] = this.valSer.construct(v);
 			// Drop bad entry without throwing exception
 			if (this.keys[i] == null || this.vals[i] == null) {
-				fail++;
-				nKeys--;
-				i--;
-				continue;
+				throw new IOException("deserialization failed for " + this + " value idx" + i);
 			}
-		}
-		// free any excess overflow pages?
-		if (fail > 0) {
-			if (flushOnError)
-				fflush();
-			// FIXME can't get there from here
-			//bsl.size -= fail;
-			//bsl.flush();
 		}
 	}
 
