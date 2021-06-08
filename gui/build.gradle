@@ -53,7 +53,7 @@ run {
 
 startScripts.doFirst {
     application.applicationDefaultJvmArgs = ["-Djava.util.logging.config.file=logging.properties",
-                                    "-Xmx256M",
+                                    "-Xms256M",
                                     "-XX:+HeapDumpOnOutOfMemoryError",
                                     "-XX:+ExitOnOutOfMemoryError",
                                     "--add-opens", "java.base/java.lang=ALL-UNNAMED",

@@ -39,7 +39,8 @@ class HasherService {
     private final BlockingQueue<Runnable> runnables = new LinkedBlockingQueue<>()
     Executor throttlerExecutor
     Executor executor
-    private int currentHashes 
+    private int currentHashes
+    private long totalHashes
 
     HasherService(EventBus eventBus, FileManager fileManager, MuWireSettings settings) {
         this.eventBus = eventBus
@@ -88,6 +89,8 @@ class HasherService {
         while(currentHashes >= settings.hashingCores)
             wait(10)
         currentHashes++
+        if (++totalHashes % TARGET_Q_SIZE == 0)
+            System.gc()
         executor.execute({processFile(f)} as Runnable)
     }
     
