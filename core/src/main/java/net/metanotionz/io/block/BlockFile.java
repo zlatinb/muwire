@@ -61,7 +61,7 @@ import net.metanotionz.util.skiplist.SkipIterator;
  */
 @SuppressWarnings("unchecked")
 public class BlockFile implements Closeable {
-	public static final int PAGESIZE = 1024;
+	public static final int PAGESIZE = 2048;
 	public static final long OFFSET_MOUNTED = 20;
 
 	public final RandomAccessInterface file;
