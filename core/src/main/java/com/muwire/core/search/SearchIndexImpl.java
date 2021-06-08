@@ -5,6 +5,8 @@ import net.metanotionz.io.block.BlockFile;
 import net.metanotionz.util.skiplist.SkipList;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -16,7 +18,7 @@ public class SearchIndexImpl {
     SearchIndexImpl(String name) throws IOException {
         BlockFile blockFile = new BlockFile(name, true);
         keywords = blockFile.makeIndex("keywords", new StringSerializer(), new HashArraySerializer());
-        hashes = blockFile.makeIndex("hashes", new HashSerializer(), new StringArraySerializer());
+        hashes = blockFile.makeIndex("hashes", new HashSerializer(), new StringArraySerializer2());
     }
 
     
@@ -52,8 +54,8 @@ public class SearchIndexImpl {
                     Set<String> unique = new HashSet<>();
                     for (String fileName : fileNames)
                         unique.add(fileName);
-                    unique.add(string);
-                    hashes.put(hash, unique.toArray(new String[0]));
+                    if (unique.add(string))
+                        hashes.put(hash, unique.toArray(new String[0]));
                 }
             }
         }
@@ -261,6 +263,50 @@ public class SearchIndexImpl {
             } catch (IOException impossible) {
                 throw new RuntimeException(impossible);
             }
+        }
+    }
+    
+    private static class StringArraySerializer2 implements Serializer<String[]> {
+
+        @Override
+        public byte[] getBytes(String[] o) {
+            int size = 0;
+            for (String s : o)
+                size += s.length() * 2;
+            size += o.length * 4;
+            size += 4;
+            if ((size & 0x1) == 1)
+                size++;
+            
+            byte[] rv = new byte[size];
+            ByteBuffer byteBuffer = ByteBuffer.wrap(rv);
+            CharBuffer charBuffer = byteBuffer.asCharBuffer();
+            
+            byteBuffer.putInt(o.length);
+            charBuffer.position(2);
+            for (String s : o) {
+                byteBuffer.putInt(s.length());
+                charBuffer.position(charBuffer.position() + 2);
+                charBuffer.put(s);
+                byteBuffer.position(byteBuffer.position() + s.length() * 2);
+            }
+            return rv;
+        }
+
+        @Override
+        public String[] construct(byte[] b) {
+            ByteBuffer byteBuffer = ByteBuffer.wrap(b);
+            int count = byteBuffer.getInt();
+            String[] rv = new String[count];
+            for (int i = 0; i < count; i ++) {
+                int length = byteBuffer.getInt();
+                byteBuffer.limit(byteBuffer.position() + length * 2);
+                CharBuffer charBuffer = byteBuffer.slice().asCharBuffer();
+                rv[i] = charBuffer.toString();
+                byteBuffer.limit(byteBuffer.capacity());
+                byteBuffer.position(byteBuffer.position() + length * 2);
+            }
+            return rv;
         }
     }
 }
