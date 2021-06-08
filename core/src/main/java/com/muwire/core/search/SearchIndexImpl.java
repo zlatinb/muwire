@@ -226,7 +226,10 @@ public class SearchIndexImpl {
         @Override
         public byte[] getBytes(String[] strings) {
             try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                int size = 0;
+                for (String it : strings)
+                    size += it.length();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(size * 2);
                 DataOutputStream daos = new DataOutputStream(baos);
                 daos.writeInt(strings.length);
                 for (String it : strings) {
@@ -234,7 +237,6 @@ public class SearchIndexImpl {
                     daos.writeInt(utf8.length);
                     daos.write(utf8);
                 }
-                daos.close();
                 return baos.toByteArray();
             } catch (IOException impossible) {
                 throw new RuntimeException(impossible);
