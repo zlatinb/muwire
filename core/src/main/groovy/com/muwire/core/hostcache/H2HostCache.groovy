@@ -266,6 +266,7 @@ class H2HostCache extends HostCache {
     private synchronized void recycleSQL() {
         sql?.close()
         initSQL()
+        System.gc()
     }
     
     @Override
