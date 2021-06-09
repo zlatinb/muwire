@@ -141,7 +141,7 @@ class PersisterFolderService extends BasePersisterService {
         stream = stream.filter({
             it.getFileName().toString().endsWith(".json")
         })
-        if (core.muOptions.plugin)
+        if (core.muOptions.plugin || !core.muOptions.throttleLoadingFiles)
             stream = stream.parallel()
         stream.forEach({
             log.fine("processing path $it")
@@ -158,7 +158,7 @@ class PersisterFolderService extends BasePersisterService {
                 
                 log.fine("loaded file $event.loadedFile.file")
                 listener.publish event
-                if (!core.muOptions.plugin) {
+                if (!core.muOptions.plugin && core.muOptions.throttleLoadingFiles) {
                     loaded++
                     if (loaded % 10 == 0)
                         Thread.sleep(20)

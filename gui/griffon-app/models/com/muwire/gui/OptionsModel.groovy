@@ -18,6 +18,7 @@ class OptionsModel {
     @Observable boolean shareDownloadedFiles
     @Observable boolean shareHiddenFiles
     @Observable int hashingCores
+    @Observable boolean throttleLoadingFiles
     @Observable String ignoredFileTypes
     @Observable String downloadLocation
     @Observable String incompleteLocation
@@ -98,6 +99,7 @@ class OptionsModel {
         shareDownloadedFiles = settings.shareDownloadedFiles
         shareHiddenFiles = settings.shareHiddenFiles
         hashingCores = settings.hashingCores
+        throttleLoadingFiles = settings.throttleLoadingFiles
         ignoredFileTypes = settings.ignoredFileTypes.join(",")
         downloadLocation = settings.downloadLocation.getAbsolutePath()
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
