@@ -80,7 +80,6 @@ abstract class BasePersisterService extends Service{
             throw new IllegalArgumentException()
             
         def file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
-        file = file.getCanonicalFile()
         if (!file.exists() || file.isDirectory() || file.length() == 0 || !file.canRead())
             return null
         long length = Long.valueOf(json.length)
