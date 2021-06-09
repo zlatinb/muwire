@@ -5,6 +5,7 @@ import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.util.DataUtil
 import groovy.json.JsonOutput
+import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 
@@ -137,16 +138,16 @@ class PersisterFolderService extends BasePersisterService {
         int loaded = 0
         AtomicInteger failed = new AtomicInteger()
         Stream<Path> stream = Files.walk(location.toPath())
-        if (core.muOptions.plugin)
-            stream = stream.parallel()
-        stream.filter({
+        stream = stream.filter({
             it.getFileName().toString().endsWith(".json")
         })
-        .forEach({
+        if (core.muOptions.plugin)
+            stream = stream.parallel()
+        stream.forEach({
             log.fine("processing path $it")
-            def slurper = new JsonSlurper()
+            def slurper = new JsonSlurper(type: JsonParserType.LAX)
             try {
-                def parsed = slurper.parse it.toFile()
+                def parsed = slurper.parse(it.toFile())
                 def event = fromJsonLite parsed
                 if (event == null) return
 
