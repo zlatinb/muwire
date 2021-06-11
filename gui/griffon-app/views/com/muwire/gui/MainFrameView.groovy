@@ -380,23 +380,7 @@ class MainFrameView {
                                 panel {
                                     label(trans("FILTER"))
                                     def textField = new JTextField(columns: 20)
-                                    DocumentListener dl = new DocumentListener() {
-                                        @Override
-                                        void insertUpdate(DocumentEvent e) {
-                                            controller.filterLibrary()
-                                        }
-
-                                        @Override
-                                        void removeUpdate(DocumentEvent e) {
-                                            controller.filterLibrary()
-                                        }
-
-                                        @Override
-                                        void changedUpdate(DocumentEvent e) {
-                                            controller.filterLibrary()
-                                        }
-                                    }
-                                    textField.getDocument().addDocumentListener(dl)
+                                    textField.addActionListener({controller.filterLibrary()})
                                     widget(id: "library-filter-textfield", textField)
                                 }
                                 panel {
