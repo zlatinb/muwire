@@ -2011,9 +2011,9 @@ class MainFrameView {
         public boolean importData(TransferHandler.TransferSupport support) {
             def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
             files.each {
-                File canonical = it.getCanonicalFile()
-                model.core.fileManager.negativeTree.remove(canonical)
-                model.core.eventBus.publish(new FileSharedEvent(file : canonical))
+                File absolute = it.getAbsoluteFile()
+                model.core.fileManager.negativeTree.remove(absolute)
+                model.core.eventBus.publish(new FileSharedEvent(file : absolute))
             }
             showUploadsWindow.call()
             true
