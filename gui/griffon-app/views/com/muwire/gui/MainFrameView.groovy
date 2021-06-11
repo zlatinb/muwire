@@ -355,6 +355,7 @@ class MainFrameView {
                                         borderLayout()
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
+                                            jtree.setRowHeight(rowHeight)
                                             jtree.setCellRenderer(new SharedTreeRenderer())
                                             jtree.setDragEnabled(true)
                                             jtree.setTransferHandler(transferHandler)
@@ -2031,8 +2032,10 @@ class MainFrameView {
     
     void fullTreeExpansion() {
         JTree sharedFilesTree = builder.getVariable("shared-files-tree")
+        sharedFilesTree.removeTreeExpansionListener(expansionListener)
         for (int i = 0; i < sharedFilesTree.rowCount; i ++)
             sharedFilesTree.expandRow(i)
+        sharedFilesTree.addTreeExpansionListener(expansionListener)
     }
     
     private static String formatSize(long size, String suffix) {
