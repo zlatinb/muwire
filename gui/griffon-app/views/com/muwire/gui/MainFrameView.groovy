@@ -10,6 +10,10 @@ import org.h2.value.Transfer
 
 import javax.swing.DropMode
 import javax.swing.JPanel
+import javax.swing.JTextField
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 
 import static com.muwire.gui.Translator.trans
@@ -360,7 +364,7 @@ class MainFrameView {
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                gridLayout(rows:1, cols:3)
+                                gridLayout(rows:1, cols:4)
                                 panel {
                                     buttonGroup(id : "sharedViewType")
                                     radioButton(text : trans("TREE"), selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
@@ -371,6 +375,28 @@ class MainFrameView {
                                     button(text : trans("ADD_COMMENT"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
                                     button(text : trans("CERTIFY"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
                                     button(text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
+                                }
+                                panel {
+                                    label(trans("FILTER"))
+                                    def textField = new JTextField(columns: 20)
+                                    DocumentListener dl = new DocumentListener() {
+                                        @Override
+                                        void insertUpdate(DocumentEvent e) {
+                                            controller.filterLibrary()
+                                        }
+
+                                        @Override
+                                        void removeUpdate(DocumentEvent e) {
+                                            controller.filterLibrary()
+                                        }
+
+                                        @Override
+                                        void changedUpdate(DocumentEvent e) {
+                                            controller.filterLibrary()
+                                        }
+                                    }
+                                    textField.getDocument().addDocumentListener(dl)
+                                    widget(id: "library-filter-textfield", textField)
                                 }
                                 panel {
                                     panel {
@@ -1773,6 +1799,13 @@ class MainFrameView {
         selectedRow
     }
     
+    void clearSelectedFiles() {
+        JTree tree = builder.getVariable("shared-files-tree")
+        tree.setSelectionPaths(new TreePath[0])
+        expansionListener.expandedPaths.clear()
+        JTable table = builder.getVariable("shared-files-table")
+        table.selectionModel.clearSelection()
+    }
     
     public void refreshSharedFiles() {
         def tree = builder.getVariable("shared-files-tree")
@@ -1995,7 +2028,13 @@ class MainFrameView {
             currentNode = currentNode.getChildAt(0)
         }
     }
-
+    
+    void fullTreeExpansion() {
+        JTree sharedFilesTree = builder.getVariable("shared-files-tree")
+        for (int i = 0; i < sharedFilesTree.rowCount; i ++)
+            sharedFilesTree.expandRow(i)
+    }
+    
     private static String formatSize(long size, String suffix) {
         StringBuffer sb = new StringBuffer(32)
         suffix = trans(suffix)

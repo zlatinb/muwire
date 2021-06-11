@@ -4,6 +4,7 @@ package com.muwire.gui
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 
 import javax.swing.DefaultListModel
+import javax.swing.SwingWorker
 import java.util.concurrent.ConcurrentHashMap
 
 import javax.annotation.Nonnull
@@ -40,7 +41,6 @@ import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
-import com.muwire.core.files.DirectoryWatchedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -66,8 +66,6 @@ import com.muwire.core.upload.UploadEvent
 import com.muwire.core.upload.UploadFinishedEvent
 import com.muwire.core.upload.Uploader
 import com.muwire.core.util.BandwidthCounter
-
-import static com.muwire.gui.Translator.trans
 
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonModel
@@ -100,11 +98,17 @@ class MainFrameModel {
     List<SharedFile> collectionFiles = new ArrayList<>()
     def downloads = []
     def uploads = []
+    
+    // Library model
+    volatile String filter
+    volatile Filterer filterer
     boolean treeVisible = true
+    private final List<SharedFile> allSharedFiles = Collections.synchronizedList(new ArrayList<>())
     def shared 
     TreeModel sharedTree 
-    def treeRoot
+    DefaultMutableTreeNode allFilesTreeRoot, treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
+    
     def connectionList = []
     def searches = new LinkedList()
     def contacts = []
@@ -207,6 +211,7 @@ class MainFrameModel {
         shared = []
         treeRoot = new DefaultMutableTreeNode()
         sharedTree = new DefaultTreeModel(treeRoot)
+        allFilesTreeRoot = new DefaultMutableTreeNode()
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -436,12 +441,15 @@ class MainFrameModel {
             hashingFiles--
             if (e.sharedFile.file == hashingFile)
                 hashingFile = null
-            shared << e.sharedFile
-            loadedFiles = shared.size()
-            JTable table = builder.getVariable("shared-files-table")
-            table.model.fireTableDataChanged()
-            insertIntoTree(e.sharedFile)
-            loadedFiles = fileToNode.size()
+            allSharedFiles << e.sharedFile
+            loadedFiles = allSharedFiles.size()
+            insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
+            if (filter(e.sharedFile)) {
+                shared << e.sharedFile
+                JTable table = builder.getVariable("shared-files-table")
+                table.model.fireTableDataChanged()
+                insertIntoTree(e.sharedFile, treeRoot, null)
+            }
         }
     }
 
@@ -449,19 +457,80 @@ class MainFrameModel {
         if (e.source == "PersisterService")
             return
         runInsideUIAsync {
-            shared << e.loadedFile
-            loadedFiles = shared.size()
-            JTable table = builder.getVariable("shared-files-table")
-            table.model.fireTableDataChanged()
-            insertIntoTree(e.loadedFile)
-            loadedFiles = fileToNode.size()
+            allSharedFiles << e.loadedFile
+            loadedFiles = allSharedFiles.size()
+            insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
+            if (filter(e.loadedFile)) {
+                shared << e.loadedFile
+                JTable table = builder.getVariable("shared-files-table")
+                table.model.fireTableDataChanged()
+                insertIntoTree(e.loadedFile, treeRoot, null)
+            }
+        }
+    }
+    
+    private boolean filter(SharedFile sharedFile) {
+        if (filter == null)
+            return true
+        sharedFile.getCachedPath().containsIgnoreCase(filter)
+    }
+    
+    void filterLibrary() {
+        view.clearSelectedFiles()
+        shared.clear()
+        treeRoot.clear()
+        filterer?.cancel()
+        filterer = new Filterer()
+        filterer.execute()
+    }
+    
+    private class Filterer extends SwingWorker<List<SharedFile>,SharedFile> {
+        
+        private volatile boolean cancelled
+        
+        void cancel() {
+            cancelled = true
+        }
+
+        @Override
+        protected List<SharedFile> doInBackground() throws Exception {
+            synchronized (allSharedFiles) {
+                for (SharedFile sf : allSharedFiles) {
+                    if (cancelled)
+                        break
+                    if (filter(sf))
+                        publish(sf)
+                }
+            }
+            []
+        }
+
+        @Override
+        protected void process(List<SharedFile> chunks) {
+            if (cancelled)
+                return
+            shared.addAll(chunks)
+            chunks.each {
+                insertIntoTree(it, treeRoot, null)
+            }
+        }
+
+        @Override
+        protected void done() {
+            if (cancelled)
+                return
+            view.refreshSharedFiles()
+            if (filter != null)
+                view.fullTreeExpansion()
+            else
+                view.magicTreeExpansion()
         }
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         runInsideUIAsync {
-            shared.remove(e.unsharedFile)
-            loadedFiles = shared.size()
+            allSharedFiles.remove(e.unsharedFile)
+            loadedFiles = allSharedFiles.size()
             
             def dmtn = fileToNode.remove(e.unsharedFile)
             if (dmtn != null) {
@@ -470,7 +539,7 @@ class MainFrameModel {
                 while (true) {
                     def parent = dmtn.getParent()
                     parent.remove(dmtn)
-                    if (parent == treeRoot)
+                    if (parent == allFilesTreeRoot)
                         break
                     if (parent.getChildCount() == 0) {
                         File file = parent.getUserObject().file
@@ -485,8 +554,8 @@ class MainFrameModel {
                     File unsharedRoot = unshared.get( unshared.size() -1 )
                     core.eventBus.publish(new DirectoryUnsharedEvent(directory : unsharedRoot))
                 }
-            } 
-            view.refreshSharedFiles()
+            }
+            filterLibrary()
         }
     }
 
@@ -652,11 +721,15 @@ class MainFrameModel {
         if (!core.muOptions.shareDownloadedFiles)
             return
         runInsideUIAsync {
-            shared << e.downloadedFile
-            JTable table = builder.getVariable("shared-files-table")
-            table.model.fireTableDataChanged()
-            insertIntoTree(e.downloadedFile)
-            loadedFiles = fileToNode.size()
+            allSharedFiles << e.downloadedFile
+            loadedFiles = allSharedFiles.size()
+            insertIntoTree(e.downloadedFile, allFilesTreeRoot, fileToNode)
+            if (filter(e.downloadedFile)) {
+                shared << e.downloadedFile
+                JTable table = builder.getVariable("shared-files-table")
+                table.model.fireTableDataChanged()
+                insertIntoTree(e.downloadedFile,treeRoot, null)
+            }
         }
     }
     
@@ -672,7 +745,7 @@ class MainFrameModel {
         }
     }
     
-    private void insertIntoTree(SharedFile file) {
+    private void insertIntoTree(SharedFile file, TreeNode root, Map<File,TreeNode> f2n) {
         List<File> parents = new ArrayList<>()
         File tmp = file.file.getParentFile()
         while(tmp.getParent() != null) {
@@ -680,7 +753,7 @@ class MainFrameModel {
             tmp = tmp.getParentFile()
         }
         Collections.reverse(parents)
-        TreeNode node = treeRoot
+        TreeNode node = root
         for(File path : parents) {
             boolean exists = false
             def children = node.children()
@@ -701,9 +774,8 @@ class MainFrameModel {
         }
         
         def dmtn = new DefaultMutableTreeNode(file)
-        fileToNode.put(file, dmtn)
+        f2n?.put(file, dmtn)
         node.add(dmtn)
-        view.refreshSharedFiles()
     }
 
     private static class UIConnection {

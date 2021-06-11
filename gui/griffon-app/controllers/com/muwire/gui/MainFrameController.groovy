@@ -3,6 +3,8 @@ package com.muwire.gui
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 
+import javax.swing.JTextField
+
 import static com.muwire.gui.Translator.trans
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
@@ -33,7 +35,6 @@ import com.muwire.core.SharedFile
 import com.muwire.core.SplitPattern
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionDeletedEvent
-import com.muwire.core.collections.UIDownloadCollectionEvent
 import com.muwire.core.download.Downloader
 import com.muwire.core.download.UIDownloadCancelledEvent
 import com.muwire.core.download.UIDownloadPausedEvent
@@ -570,6 +571,19 @@ class MainFrameController {
         try {
             Desktop.getDesktop().open(selected[0].file.getParentFile())
         } catch (Exception ignored) {}
+    }
+    
+    @ControllerAction
+    void filterLibrary() {
+        JTextField field = builder.getVariable("library-filter-textfield")
+        String filter = field.getText()
+        if (filter != null)
+            filter = filter.strip()
+        if (filter == null || filter.length() == 0)
+            model.filter = null
+        else
+            model.filter = filter
+        model.filterLibrary()
     }
     
     @ControllerAction
