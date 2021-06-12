@@ -25,6 +25,7 @@ public class SharedFile {
 
     private final String cachedPath;
     private final long cachedLength;
+    private final int hashCode;
 
     private String b64PathHash;
     
@@ -41,6 +42,7 @@ public class SharedFile {
         this.pieceSize = pieceSize;
         this.cachedPath = file.getAbsolutePath();
         this.cachedLength = file.length();
+        this.hashCode = Arrays.hashCode(root) ^ file.hashCode();
     }
 
     public File getFile() {
@@ -135,7 +137,7 @@ public class SharedFile {
 
     @Override
     public int hashCode() {
-        return file.hashCode() ^ Arrays.hashCode(root);
+        return hashCode;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class SharedFile {
         if (!(o instanceof SharedFile))
             return false;
         SharedFile other = (SharedFile)o;
-        return file.equals(other.file) && Arrays.equals(root, other.root);
+        return Arrays.equals(root, other.root) && file.equals(other.file);
     }
     
     public static class SearchEntry {
