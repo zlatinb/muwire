@@ -478,6 +478,7 @@ class MainFrameController {
             
             core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
         }
+        core.eventBus.publish(new RefreshLibraryEvent())
     }
     
     @ControllerAction

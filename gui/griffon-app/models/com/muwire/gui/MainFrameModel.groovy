@@ -299,6 +299,7 @@ class MainFrameModel {
             core.eventBus.register(UIMessageReadEvent.class, this)
             core.eventBus.register(MessageSentEvent.class, this)
             core.eventBus.register(MessageFolderLoadingEvent.class, this)
+            core.eventBus.register(RefreshLibraryEvent.class, this)
 
             
             core.muOptions.watchedKeywords.each {
@@ -478,8 +479,19 @@ class MainFrameModel {
         shared.clear()
         treeRoot.clear()
         filterer?.cancel()
-        filterer = new Filterer()
-        filterer.execute()
+        if (filter != null) {
+            filterer = new Filterer()
+            filterer.execute()
+        } else {
+            synchronized (allSharedFiles) {
+                shared.addAll(allSharedFiles)
+            }
+            shared.each {
+                insertIntoTree(it, treeRoot, null)
+            }
+            view.refreshSharedFiles()
+            view.magicTreeExpansion()
+        }
     }
     
     private class Filterer extends SwingWorker<List<SharedFile>,SharedFile> {
@@ -530,9 +542,30 @@ class MainFrameModel {
             allSharedFiles.remove(e.unsharedFile)
             loadedFiles = allSharedFiles.size()
             
-            def dmtn = fileToNode.remove(e.unsharedFile)
+            boolean wasVisible = shared.remove(e.unsharedFile)
+            
+            DefaultMutableTreeNode dmtn = fileToNode.remove(e.unsharedFile)
             if (dmtn != null) {
-                loadedFiles = fileToNode.size()
+                
+                if (wasVisible) {
+                    Object[] path = dmtn.getUserObjectPath()
+                    DefaultMutableTreeNode otherNode = treeRoot
+                    for (int i = 1; i < path.length; i ++) {
+                        Object o = path[i]
+                        DefaultMutableTreeNode next = null
+                        for (int j = 0; j < otherNode.childCount; j ++) {
+                            if (otherNode.getChildAt(j).getUserObject() == o) {
+                                next = otherNode.getChildAt(j)
+                                break
+                            }
+                        }
+                        if (next == null)
+                            throw new IllegalStateException()
+                        otherNode = next
+                    }
+                    otherNode.removeFromParent()
+                }
+                
                 List<File> unshared = new ArrayList<>()
                 while (true) {
                     def parent = dmtn.getParent()
@@ -553,7 +586,12 @@ class MainFrameModel {
                     core.eventBus.publish(new DirectoryUnsharedEvent(directory : unsharedRoot))
                 }
             }
-            filterLibrary()
+        }
+    }
+    
+    void onRefreshLibraryEvent(RefreshLibraryEvent e) {
+        runInsideUIAsync {
+            view.refreshSharedFiles()
         }
     }
 
