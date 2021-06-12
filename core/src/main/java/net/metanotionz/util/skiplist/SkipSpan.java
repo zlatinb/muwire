@@ -253,6 +253,7 @@ public abstract class SkipSpan<K extends Comparable<? super K>, V> implements Fl
 		sl.delItem();
 		if(nKeys == 1) {
 			if((this.prev == null) && (this.next != null)) {
+				this.next.loadVals();
 				res[1] = this.next;
 				// We're the first node in the list... copy the next node over and kill it. See also bottom of SkipLevels.java
 				for(int i=0;i<next.nKeys;i++) {
@@ -276,10 +277,12 @@ public abstract class SkipSpan<K extends Comparable<? super K>, V> implements Fl
 				//BlockFile.log.error("Killing this span " + this + ", prev " + this.prev + ", next " + this.next);
 				if(this.prev != null) {
 					this.prev.next = this.next;
+					this.prev.loadVals();
 					this.prev.flush();
 				}
 				if(this.next != null) {
 					this.next.prev = this.prev;
+					this.next.loadVals();
 					this.next.flush();
 					this.next = null;
 				}
