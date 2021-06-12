@@ -104,7 +104,7 @@ class MainFrameModel {
     volatile String filter
     volatile Filterer filterer
     boolean treeVisible = true
-    private final List<SharedFile> allSharedFiles = Collections.synchronizedList(new ArrayList<>())
+    private final Set<SharedFile> allSharedFiles = Collections.synchronizedSet(new LinkedHashSet<>())
     def shared 
     TreeModel sharedTree 
     DefaultMutableTreeNode allFilesTreeRoot, treeRoot
@@ -299,7 +299,6 @@ class MainFrameModel {
             core.eventBus.register(UIMessageReadEvent.class, this)
             core.eventBus.register(MessageSentEvent.class, this)
             core.eventBus.register(MessageFolderLoadingEvent.class, this)
-            core.eventBus.register(RefreshLibraryEvent.class, this)
 
             
             core.muOptions.watchedKeywords.each {
@@ -563,7 +562,14 @@ class MainFrameModel {
                             throw new IllegalStateException()
                         otherNode = next
                     }
-                    otherNode.removeFromParent()
+                    while(true) {
+                        def parent = otherNode.getParent()
+                        otherNode.removeFromParent()
+                        if (parent.getChildCount() == 0) {
+                            otherNode = parent
+                        } else
+                            break
+                    }
                 }
                 
                 List<File> unshared = new ArrayList<>()
@@ -585,16 +591,10 @@ class MainFrameModel {
                     File unsharedRoot = unshared.get( unshared.size() -1 )
                     core.eventBus.publish(new DirectoryUnsharedEvent(directory : unsharedRoot))
                 }
-            }
+            } 
         }
     }
     
-    void onRefreshLibraryEvent(RefreshLibraryEvent e) {
-        runInsideUIAsync {
-            view.refreshSharedFiles()
-        }
-    }
-
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
             UploaderWrapper wrapper = null
