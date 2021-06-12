@@ -277,8 +277,8 @@ class FileManager {
              def cb = new DirDeletionCallback()
              positiveTree.traverse(e.directory, cb)
              positiveTree.remove(e.directory)
-             eventBus.publish(new FileUnsharedEvent()unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]), 
-                deleted: true)
+             eventBus.publish(new FileUnsharedEvent(unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]), 
+                deleted: true))
              cb.subDirs.each {
                  eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted : true))
              }
