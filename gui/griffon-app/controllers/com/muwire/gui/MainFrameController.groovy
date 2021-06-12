@@ -583,7 +583,7 @@ class MainFrameController {
         if (filter == null || filter.length() == 0)
             model.filter = null
         else
-            model.filter = filter
+            model.filter = filter.toLowerCase()
         model.filterLibrary()
     }
     
