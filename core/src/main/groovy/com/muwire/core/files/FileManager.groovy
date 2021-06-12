@@ -1,5 +1,8 @@
 package com.muwire.core.files
 
+import java.nio.file.DirectoryStream
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -263,13 +266,16 @@ class FileManager {
         saveNegativeTree()
         if (!e.deleted) {
             List<SharedFile> unsharedFiles = new ArrayList<>()
-            e.directory.listFiles().each {
-                if (it.isDirectory())
-                    eventBus.publish(new DirectoryUnsharedEvent(directory : it))
-                else {
-                    SharedFile sf = fileToSharedFile.get(it)
-                    if (sf != null)
-                        unsharedFiles.add(sf)
+            try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(e.directory.toPath())) {
+                for (Path p : directoryStream) {
+                    File file = p.toFile()
+                    if (file.isDirectory())
+                        eventBus.publish(new DirectoryUnsharedEvent(directory : file))
+                    else {
+                        SharedFile sf = fileToSharedFile.get(file)
+                        if (sf != null)
+                            unsharedFiles.add(sf)
+                    }
                 }
             }
             eventBus.publish(new FileUnsharedEvent(unsharedFiles : unsharedFiles.toArray(new SharedFile[0])))
