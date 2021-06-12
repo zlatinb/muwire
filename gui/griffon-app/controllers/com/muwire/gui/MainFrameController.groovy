@@ -587,6 +587,12 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void clearLibraryFilter() {
+        model.filter = null
+        model.filterLibrary()
+    }
+    
+    @ControllerAction
     void startChatServer() {
         model.core.chatServer.start()
         model.chatServerRunning = true

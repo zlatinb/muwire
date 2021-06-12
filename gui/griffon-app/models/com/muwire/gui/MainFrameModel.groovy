@@ -100,6 +100,7 @@ class MainFrameModel {
     def uploads = []
     
     // Library model
+    @Observable boolean filteringEnabled
     volatile String filter
     volatile Filterer filterer
     boolean treeVisible = true
@@ -359,6 +360,7 @@ class MainFrameModel {
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
             view.magicTreeExpansion()
+            filteringEnabled = true
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
@@ -446,9 +448,8 @@ class MainFrameModel {
             insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.sharedFile)) {
                 shared << e.sharedFile
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
                 insertIntoTree(e.sharedFile, treeRoot, null)
+                view.refreshSharedFiles()
             }
         }
     }
@@ -460,12 +461,9 @@ class MainFrameModel {
             allSharedFiles << e.loadedFile
             loadedFiles = allSharedFiles.size()
             insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
-            if (filter(e.loadedFile)) {
-                shared << e.loadedFile
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
-                insertIntoTree(e.loadedFile, treeRoot, null)
-            }
+            shared << e.loadedFile
+            insertIntoTree(e.loadedFile, treeRoot, null)
+            view.refreshSharedFiles()
         }
     }
     

@@ -378,10 +378,11 @@ class MainFrameView {
                                     button(text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
-                                    label(trans("FILTER"))
-                                    def textField = new JTextField(columns: 20)
+                                    def textField = new JTextField(columns: 10)
                                     textField.addActionListener({controller.filterLibrary()})
-                                    widget(id: "library-filter-textfield", textField)
+                                    widget(id: "library-filter-textfield", enabled: bind{model.filteringEnabled}, textField)
+                                    button(text: trans("FILTER"), enabled : bind {model.filteringEnabled}, filterLibraryAction)
+                                    button(text: trans("CLEAR"), enabled : bind{model.filteringEnabled}, clearLibraryFilterAction)
                                 }
                                 panel {
                                     panel {
@@ -886,17 +887,6 @@ class MainFrameView {
             def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
             model.addCommentButtonEnabled = selectedNode != null
             model.publishButtonEnabled = selectedNode != null
-
-            def selectedFiles = selectedSharedFiles()
-            if (selectedFiles == null || selectedFiles.isEmpty()) {
-                return
-            }
-
-            boolean unpublish = true
-            selectedFiles.each {
-                unpublish &= it?.isPublished()
-            }
-            model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
 
         sharedFilesTree.addTreeExpansionListener(expansionListener)
