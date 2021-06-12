@@ -1778,6 +1778,7 @@ class MainFrameView {
         JTree tree = builder.getVariable("shared-files-tree")
         tree.setSelectionPaths(new TreePath[0])
         expansionListener.expandedPaths.clear()
+        expansionListener.manualExpansion = false
         JTable table = builder.getVariable("shared-files-table")
         table.selectionModel.clearSelection()
     }
@@ -2006,10 +2007,8 @@ class MainFrameView {
     
     void fullTreeExpansion() {
         JTree sharedFilesTree = builder.getVariable("shared-files-tree")
-        sharedFilesTree.removeTreeExpansionListener(expansionListener)
         for (int i = 0; i < sharedFilesTree.rowCount; i ++)
             sharedFilesTree.expandRow(i)
-        sharedFilesTree.addTreeExpansionListener(expansionListener)
     }
     
     private static String formatSize(long size, String suffix) {
