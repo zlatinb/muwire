@@ -135,7 +135,7 @@ class DirectoryWatcher {
         log.fine("deleted entry $f")
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
-            eventBus.publish(new FileUnsharedEvent(unsharedFile : sf, deleted : true))
+            eventBus.publish(new FileUnsharedEvent(unsharedFiles : new SharedFile[]{sf}, deleted : true))
         else if (watchedDirectoryManager.isWatched(f)) 
             eventBus.publish(new DirectoryUnsharedEvent(directory : f, deleted : true))
         else

@@ -82,7 +82,7 @@ class FilesView extends BasicWindow {
         contentPanel.setLayoutManager(new GridLayout(4))
         
         Button unshareButton = new Button("Unshare", {
-            core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+            core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : new SharedFile[]{sf}))
             MessageDialog.showMessageDialog(textGUI, "File Unshared", "Unshared "+sf.getFile().getName(), MessageDialogButton.OK)
         } )
         Button addCommentButton = new Button("Add Comment", {

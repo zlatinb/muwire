@@ -154,7 +154,7 @@ class FileManagerTest {
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf1)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile : sf2)
 
-        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFile: sf2)
+        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFiles: new SharedFile[]{sf2})
 
         manager.onSearchEvent new SearchEvent(searchHash : ih.getRoot())
         Thread.sleep(20)
@@ -175,7 +175,7 @@ class FileManagerTest {
         SharedFile sf2 = new SharedFile(f2, ih2.getRoot(), 0)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
 
-        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFile: sf2)
+        manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFiles: new SharedFile[]{sf2})
 
         // 1 match left
         manager.onSearchEvent new SearchEvent(searchTerms: ["c"])
@@ -202,7 +202,7 @@ class FileManagerTest {
         sf1.setComment(comment)
         
         manager.onFileLoadedEvent(new FileLoadedEvent(loadedFile : sf1))
-        manager.onFileUnsharedEvent(new FileUnsharedEvent(unsharedFile : sf1, deleted : true))
+        manager.onFileUnsharedEvent(new FileUnsharedEvent(unsharedFiles : new SharedFile[]{sf1}, deleted : true))
         
         File f2 = new File("MuWire-0.6.0.AppImage")
         InfoHash ih2 = InfoHash.fromHashList(new byte[64])

@@ -455,6 +455,7 @@ class MainFrameController {
         def sfs = view.selectedSharedFiles()
         if (sfs == null)
             return
+        List<SharedFile> toUnshare = new ArrayList<>()
         sfs.each { SharedFile sf ->
             
             if (view.settings.collectionWarning) {
@@ -475,9 +476,9 @@ class MainFrameController {
                         return
                 }
             }
-            
-            core.eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+            toUnshare.add(sf)
         }
+        core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : toUnshare.toArray(new SharedFile[0])))
     }
     
     @ControllerAction

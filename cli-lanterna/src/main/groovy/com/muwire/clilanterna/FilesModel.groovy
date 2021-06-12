@@ -52,7 +52,7 @@ class FilesModel {
     
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         guiThread.invokeLater {
-            sharedFiles.remove(e.unsharedFile)
+            sharedFiles.removeAll(e.unsharedFiles)
         }
     }
     

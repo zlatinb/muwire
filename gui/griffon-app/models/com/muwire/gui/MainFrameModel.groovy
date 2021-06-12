@@ -538,60 +538,66 @@ class MainFrameModel {
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         runInsideUIAsync {
-            allSharedFiles.remove(e.unsharedFile)
+            synchronized (allSharedFiles) {
+                allSharedFiles.removeAll(e.unsharedFiles)
+            }
             loadedFiles = allSharedFiles.size()
             
-            boolean wasVisible = shared.remove(e.unsharedFile)
-            
-            DefaultMutableTreeNode dmtn = fileToNode.remove(e.unsharedFile)
-            if (dmtn != null) {
-                
-                if (wasVisible) {
-                    Object[] path = dmtn.getUserObjectPath()
-                    DefaultMutableTreeNode otherNode = treeRoot
-                    for (int i = 1; i < path.length; i ++) {
-                        Object o = path[i]
-                        DefaultMutableTreeNode next = null
-                        for (int j = 0; j < otherNode.childCount; j ++) {
-                            if (otherNode.getChildAt(j).getUserObject() == o) {
-                                next = otherNode.getChildAt(j)
-                                break
+            for (SharedFile sharedFile : e.unsharedFiles) {
+                boolean wasVisible = shared.remove(sharedFile)
+
+                DefaultMutableTreeNode dmtn = fileToNode.remove(sharedFile)
+                if (dmtn != null) {
+
+                    if (wasVisible) {
+                        Object[] path = dmtn.getUserObjectPath()
+                        DefaultMutableTreeNode otherNode = treeRoot
+                        for (int i = 1; i < path.length; i++) {
+                            Object o = path[i]
+                            DefaultMutableTreeNode next = null
+                            for (int j = 0; j < otherNode.childCount; j++) {
+                                if (otherNode.getChildAt(j).getUserObject() == o) {
+                                    next = otherNode.getChildAt(j)
+                                    break
+                                }
                             }
+                            if (next == null)
+                                throw new IllegalStateException()
+                            otherNode = next
                         }
-                        if (next == null)
-                            throw new IllegalStateException()
-                        otherNode = next
+                        while (true) {
+                            def parent = otherNode.getParent()
+                            otherNode.removeFromParent()
+                            if (parent.getChildCount() == 0) {
+                                otherNode = parent
+                            } else
+                                break
+                        }
                     }
-                    while(true) {
-                        def parent = otherNode.getParent()
-                        otherNode.removeFromParent()
-                        if (parent.getChildCount() == 0) {
-                            otherNode = parent
-                        } else
+
+                    List<File> unshared = new ArrayList<>()
+                    while (true) {
+                        def parent = dmtn.getParent()
+                        parent.remove(dmtn)
+                        if (parent == allFilesTreeRoot)
                             break
-                    }
-                }
-                
-                List<File> unshared = new ArrayList<>()
-                while (true) {
-                    def parent = dmtn.getParent()
-                    parent.remove(dmtn)
-                    if (parent == allFilesTreeRoot)
+                        if (parent.getChildCount() == 0) {
+                            File file = parent.getUserObject().file
+                            if (core.watchedDirectoryManager.isWatched(file))
+                                unshared.add(file)
+                            dmtn = parent
+                            continue
+                        }
                         break
-                    if (parent.getChildCount() == 0) {
-                        File file = parent.getUserObject().file
-                        if (core.watchedDirectoryManager.isWatched(file))
-                            unshared.add(file)
-                        dmtn = parent
-                        continue
                     }
-                    break
+                    if (!unshared.isEmpty()) {
+                        File unsharedRoot = unshared.get(unshared.size() - 1)
+                        core.eventBus.publish(new DirectoryUnsharedEvent(directory: unsharedRoot))
+                    }
                 }
-                if (!unshared.isEmpty()) {
-                    File unsharedRoot = unshared.get( unshared.size() -1 )
-                    core.eventBus.publish(new DirectoryUnsharedEvent(directory : unsharedRoot))
-                }
-            } 
+            }
+            
+            view.refreshSharedFiles()
         }
     }
     

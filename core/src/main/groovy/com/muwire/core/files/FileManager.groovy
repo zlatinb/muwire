@@ -132,7 +132,11 @@ class FileManager {
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
-        SharedFile sf = e.unsharedFile
+        for(SharedFile sharedFile : e.unsharedFiles)
+            unshareFile(sharedFile, e.deleted)
+    }
+    
+    private void unshareFile(SharedFile sf, boolean deleted) {
         InfoHash infoHash = new InfoHash(sf.getRoot())
         SharedFile[] existing = rootToFiles.get(infoHash)
         if (existing != null) {
@@ -149,7 +153,7 @@ class FileManager {
 
         fileToSharedFile.remove(sf.file)
         positiveTree.remove(sf.file)
-        if (!e.deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
+        if (!deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
             negativeTree.add(sf.file,null)
             saveNegativeTree()
         }
@@ -258,22 +262,23 @@ class FileManager {
         negativeTree.remove(e.directory)
         saveNegativeTree()
         if (!e.deleted) {
+            List<SharedFile> unsharedFiles = new ArrayList<>()
             e.directory.listFiles().each {
                 if (it.isDirectory())
                     eventBus.publish(new DirectoryUnsharedEvent(directory : it))
                 else {
                     SharedFile sf = fileToSharedFile.get(it)
                     if (sf != null)
-                        eventBus.publish(new FileUnsharedEvent(unsharedFile : sf))
+                        unsharedFiles.add(sf)
                 }
             }
+            eventBus.publish(new FileUnsharedEvent(unsharedFiles : unsharedFiles.toArray(new SharedFile[0])))
         } else {
              def cb = new DirDeletionCallback()
              positiveTree.traverse(e.directory, cb)
              positiveTree.remove(e.directory)
-             cb.unsharedFiles.each { 
-                 eventBus.publish(new FileUnsharedEvent(unsharedFile : it, deleted: true))
-             }
+             eventBus.publish(new FileUnsharedEvent()unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]), 
+                deleted: true)
              cb.subDirs.each {
                  eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted : true))
              }

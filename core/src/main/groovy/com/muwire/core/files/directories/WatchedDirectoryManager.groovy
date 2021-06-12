@@ -195,9 +195,7 @@ class WatchedDirectoryManager {
         
         Set<File> deletedFiles = new HashSet<>(cb.files)
         deletedFiles.removeAll(filesOnFS)
-        deletedFiles.each {
-            eventBus.publish(new FileUnsharedEvent(unsharedFile : fileManager.getFileToSharedFile().get(it), deleted : true))
-        }
+        eventBus.publish(new FileUnsharedEvent(unsharedFiles: deletedFiles.toArray(new SharedFile[0]), deleted: true))
         Set<File> deletedDirs = new HashSet<>(cb.dirs)
         deletedDirs.removeAll(dirsOnFS)
         deletedDirs.each {

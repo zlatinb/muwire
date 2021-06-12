@@ -284,14 +284,16 @@ class CollectionManager {
     }
     
     synchronized void onFileUnsharedEvent(FileUnsharedEvent e) {
-        InfoHash infoHash = new InfoHash(e.unsharedFile.getRoot())
-        Set<FileCollection> affected = fileRootToCollections.get(infoHash)
-        if (affected == null || affected.isEmpty()) {
-            return
-        }
-        affected.each { c ->
-            diskIO.execute({delete(c)} as Runnable)
-            eventBus.publish(new CollectionUnsharedEvent(collection : c))
+        for (SharedFile sf : e.unsharedFiles) {
+            InfoHash infoHash = sf.getRootInfoHash()
+            Set<FileCollection> affected = fileRootToCollections.get(infoHash)
+            if (affected == null || affected.isEmpty()) {
+                continue
+            }
+            affected.each { c ->
+                diskIO.execute({ delete(c) } as Runnable)
+                eventBus.publish(new CollectionUnsharedEvent(collection: c))
+            }
         }
     }
     

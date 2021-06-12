@@ -80,12 +80,17 @@ class PersisterFolderService extends BasePersisterService {
      * @param unsharedEvent
      */
     void onFileUnsharedEvent(FileUnsharedEvent unsharedEvent) {
-        def jsonPath = getJsonPath(unsharedEvent.unsharedFile)
+        for(SharedFile sharedFile : unsharedEvent.unsharedFiles)
+            unshareFile(sharedFile)
+    }
+    
+    private void unshareFile(SharedFile sharedFile) {
+        def jsonPath = getJsonPath(sharedFile)
         def jsonFile = jsonPath.toFile()
         if(jsonFile.isFile()){
             jsonFile.delete()
         }
-        def hashListPath = getHashListPath(unsharedEvent.unsharedFile)
+        def hashListPath = getHashListPath(sharedFile)
         def hashListFile = hashListPath.toFile()
         if (hashListFile.isFile())
             hashListFile.delete()
