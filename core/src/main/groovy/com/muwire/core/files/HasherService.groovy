@@ -78,7 +78,8 @@ class HasherService {
     }
     
     void onFileUnsharedEvent(FileUnsharedEvent evt) {
-        hashed.removeAll(evt.unsharedFiles)
+        for (SharedFile sharedFile : evt.unsharedFiles)
+            hashed.remove(sharedFile.file)
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent evt) {
