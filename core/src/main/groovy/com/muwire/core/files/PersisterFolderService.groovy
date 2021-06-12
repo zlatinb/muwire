@@ -80,8 +80,10 @@ class PersisterFolderService extends BasePersisterService {
      * @param unsharedEvent
      */
     void onFileUnsharedEvent(FileUnsharedEvent unsharedEvent) {
-        for(SharedFile sharedFile : unsharedEvent.unsharedFiles)
-            unshareFile(sharedFile)
+        persisterExecutor.submit( {
+            for(SharedFile sharedFile : unsharedEvent.unsharedFiles)
+                unshareFile(sharedFile)
+        } as Runnable)
     }
     
     private void unshareFile(SharedFile sharedFile) {
