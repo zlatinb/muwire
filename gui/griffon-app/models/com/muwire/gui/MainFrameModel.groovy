@@ -476,7 +476,7 @@ class MainFrameModel {
     void filterLibrary() {
         view.clearSelectedFiles()
         shared.clear()
-        treeRoot.clear()
+        treeRoot.removeAllChildren()
         filterer?.cancel()
         if (filter != null) {
             filterer = new Filterer()
