@@ -232,6 +232,15 @@ class MainFrameController {
         params['downloader'] = downloader
         mvcGroup.createMVCGroup("download-preview", params)
     }
+    
+    @ControllerAction
+    void open() {
+        List<SharedFile> selected = view.selectedSharedFiles()
+        if (selected == null || selected.size() != 1)
+            return
+        SharedFile sf = selected[0]
+        Desktop.getDesktop().open(sf.file)
+    }
 
     @ControllerAction
     void clear() {

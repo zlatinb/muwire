@@ -847,12 +847,16 @@ class MainFrameView {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showSharedFilesPopupMenu(e)
+                else if (e.getClickCount() == 2)
+                    controller.open()
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
                     showSharedFilesPopupMenu(e)
+                else if (e.getClickCount() == 2)
+                    controller.open()
             }
         }
 
@@ -1527,6 +1531,13 @@ class MainFrameView {
         def selectedFiles = selectedSharedFiles()
         
         JPopupMenu sharedFilesMenu = new JPopupMenu()
+        
+        if (selectedFiles != null && selectedFiles.size() == 1) {
+            JMenuItem openFile = new JMenuItem(trans("OPEN"))
+            openFile.addActionListener({mvcGroup.controller.open()})
+            sharedFilesMenu.add(openFile)
+        }
+        
         JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
         sharedFilesMenu.add(copyHashToClipboard)
