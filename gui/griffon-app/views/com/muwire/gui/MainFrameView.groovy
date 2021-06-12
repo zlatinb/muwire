@@ -1467,9 +1467,26 @@ class MainFrameView {
             def node = model.fileToNode.get(sf)
             if (node == null)
                 return
-            def path = new TreePath(node.getPath())
-            tree.setSelectionPath(path)
-            tree.scrollPathToVisible(path)
+            
+            Object[] path = node.getUserObjectPath()
+            DefaultMutableTreeNode otherNode = model.treeRoot
+            for (int i = 1; i < path.length; i++) {
+                Object o = path[i]
+                DefaultMutableTreeNode next = null
+                for (int j = 0; j < otherNode.childCount; j++) {
+                    if (otherNode.getChildAt(j).getUserObject() == o) {
+                        next = otherNode.getChildAt(j)
+                        break
+                    }
+                }
+                if (next == null)
+                    return // probably filtered from view
+                otherNode = next
+            }
+            
+            def otherPath = new TreePath(otherNode.getPath())
+            tree.setSelectionPath(otherPath)
+            tree.scrollPathToVisible(otherPath)
         } else {
             def table = builder.getVariable("shared-files-table")
             int row = model.shared.indexOf(sf)
