@@ -149,9 +149,10 @@ class WatchedDirectoryManager {
             log.warning("unshared a directory that wasn't watched? ${e.directory}")
             return
         }
-        
-        File persistFile = new File(home, wd.getEncodedName() + ".json")
-        persistFile.delete()
+        diskIO.submit({
+            File persistFile = new File(home, wd.getEncodedName() + ".json")
+            persistFile.delete()
+        } as Runnable)
     }
     
     private void sync() {
