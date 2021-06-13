@@ -1,5 +1,6 @@
 package com.muwire.core
 
+import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
 import com.muwire.core.messenger.UIFolderCreateEvent
@@ -161,6 +162,7 @@ public class Core {
     private final FeedClient feedClient
     private final WatchedDirectoryConverter watchedDirectoryConverter
     final WatchedDirectoryManager watchedDirectoryManager
+    final NegativeFiles negativeFiles
     private final TrackerResponder trackerResponder
 
     private final Router router
@@ -298,7 +300,7 @@ public class Core {
 
 
         log.info "initializing file manager"
-        fileManager = new FileManager(eventBus, props)
+        fileManager = new FileManager(home, eventBus, props)
         eventBus.register(FileHashedEvent.class, fileManager)
         eventBus.register(FileLoadedEvent.class, fileManager)
         eventBus.register(FileDownloadedEvent.class, fileManager)
@@ -450,13 +452,6 @@ public class Core {
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer, collectionManager)
 
-
-        log.info("initializing hasher service")
-        hasherService = new HasherService(eventBus, fileManager, props)
-        eventBus.register(FileSharedEvent.class, hasherService)
-        eventBus.register(FileUnsharedEvent.class, hasherService)
-        eventBus.register(DirectoryUnsharedEvent.class, hasherService)
-
         log.info("initializing trust subscriber")
         trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
         eventBus.register(UILoadedEvent.class, trustSubscriber)
@@ -485,14 +480,28 @@ public class Core {
             register(UISyncDirectoryEvent.class, watchedDirectoryManager)
         }
         
+        
+        log.info("initializing negative files")
+        negativeFiles = new NegativeFiles(home, watchedDirectoryManager, props)
+        eventBus.with {
+            register(DirectoryUnsharedEvent.class, negativeFiles)
+            register(FileUnsharedEvent.class, negativeFiles)
+        }
+
         log.info("initializing directory watcher")
-        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, watchedDirectoryManager)
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, watchedDirectoryManager, negativeFiles)
         eventBus.with {
             register(DirectoryWatchedEvent.class, directoryWatcher)
             register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
             register(DirectoryUnsharedEvent.class, directoryWatcher)
             register(WatchedDirectoryConfigurationEvent.class, directoryWatcher)
         }
+        
+        log.info("initializing hasher service")
+        hasherService = new HasherService(eventBus, fileManager, negativeFiles, props)
+        eventBus.register(FileSharedEvent.class, hasherService)
+        eventBus.register(FileUnsharedEvent.class, hasherService)
+        eventBus.register(DirectoryUnsharedEvent.class, hasherService)
         
         log.info("initializing messenger")
         messenger = new Messenger(eventBus, home, i2pConnector, props)
@@ -581,6 +590,8 @@ public class Core {
         directoryWatcher.stop()
         log.info("shutting down watch directory manager")
         watchedDirectoryManager.shutdown()
+        log.info("shutting down negative files")
+        negativeFiles.shutdown()
         log.info("shutting down cache client")
         cacheClient.stop()
         log.info("shutting down chat server")

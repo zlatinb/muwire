@@ -1751,9 +1751,9 @@ class MainFrameView {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION) {
             chooser.getSelectedFiles().each {
-                File canonical = it.getCanonicalFile()
-                model.core.fileManager.negativeTree.remove(canonical)
-                model.core.eventBus.publish(new FileSharedEvent(file : canonical))
+                File absolute = it.getAbsoluteFile()
+                model.core.negativeFiles.negativeTree.remove(absolute)
+                model.core.eventBus.publish(new FileSharedEvent(file : absolute))
             }
         }
     }
@@ -2055,7 +2055,7 @@ class MainFrameView {
             def files = support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)
             files.each {
                 File absolute = it.getAbsoluteFile()
-                model.core.fileManager.negativeTree.remove(absolute)
+                model.core.negativeFiles.negativeTree.remove(absolute)
                 model.core.eventBus.publish(new FileSharedEvent(file : absolute))
             }
             showUploadsWindow.call()

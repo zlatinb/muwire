@@ -32,6 +32,7 @@ class HasherService {
 
     final EventBus eventBus
     final FileManager fileManager
+    private final NegativeFiles negativeFiles
     final Set<File> hashed = new HashSet<>()
     final MuWireSettings settings
     
@@ -42,9 +43,10 @@ class HasherService {
     private int currentHashes
     private long totalHashes
 
-    HasherService(EventBus eventBus, FileManager fileManager, MuWireSettings settings) {
+    HasherService(EventBus eventBus, FileManager fileManager, NegativeFiles negativeFiles, MuWireSettings settings) {
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.negativeFiles = negativeFiles
         this.settings = settings
     }
 
@@ -60,7 +62,7 @@ class HasherService {
             return
         if (fileManager.fileToSharedFile.containsKey(canonical)) 
             return
-        if (canonical.isFile() && fileManager.negativeTree.fileToNode.containsKey(canonical))
+        if (negativeFiles.negativeTree.get(canonical))
             return
         if (settings.ignoredFileTypes.contains(DataUtil.getFileExtension(canonical)))
             return

@@ -32,7 +32,7 @@ class FileManagerTest {
     void before() {
         eventBus = new EventBus()
         eventBus.register(ResultsEvent.class, listener)
-        manager = new FileManager(eventBus, new MuWireSettings())
+        manager = new FileManager(new File("testHome"), eventBus, new MuWireSettings())
         results = null
     }
 

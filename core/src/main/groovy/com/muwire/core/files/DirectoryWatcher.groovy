@@ -39,17 +39,20 @@ class DirectoryWatcher {
     private final EventBus eventBus
     private final FileManager fileManager
     private final WatchedDirectoryManager watchedDirectoryManager
+    private final NegativeFiles negativeFiles
     private final Thread watcherThread, publisherThread
     private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
     private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
 
-    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, WatchedDirectoryManager watchedDirectoryManager) {
+    DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, 
+                     WatchedDirectoryManager watchedDirectoryManager, NegativeFiles negativeFiles) {
         this.home = home
         this.eventBus = eventBus
         this.fileManager = fileManager
         this.watchedDirectoryManager = watchedDirectoryManager
+        this.negativeFiles = negativeFiles
         this.watcherThread = new Thread({watch() } as Runnable, "directory-watcher")
         watcherThread.setDaemon(true)
         this.publisherThread = new Thread({publish()} as Runnable, "watched-files-publisher")
@@ -126,7 +129,7 @@ class DirectoryWatcher {
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
         log.fine("modified entry $f")
-        if (!fileManager.getNegativeTree().fileToNode.containsKey(f))
+        if (!negativeFiles.negativeTree.get(f))
             waitingFiles.put(f, System.currentTimeMillis())
     }
 

@@ -48,6 +48,10 @@ class FileTree<T> {
         true
     }    
     
+    T get(File file) {
+        fileToNode.get(file)?.value
+    }
+    
     synchronized void traverse(FileTreeCallback<T> callback) {
         doTraverse(root, callback);
     }

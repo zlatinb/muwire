@@ -37,7 +37,7 @@ class AdvancedSharingModel {
         
         treeRoot = new DefaultMutableTreeNode()
         negativeTree = new DefaultTreeModel(treeRoot)
-        copyTree(treeRoot, core.fileManager.negativeTree.root)
+        copyTree(treeRoot, core.negativeFiles.negativeTree.root)
     }
     
     void mvcGroupDestroy() {

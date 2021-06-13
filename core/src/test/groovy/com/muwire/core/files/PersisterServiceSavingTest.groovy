@@ -34,7 +34,7 @@ class PersisterServiceSavingTest {
         f = new File("build.gradle")
         f = f.getCanonicalFile()
         ih = fh.hashFile(f)
-        fileSource = new FileManager(eventBus, new MuWireSettings()) {
+        fileSource = new FileManager(new File(), eventBus, new MuWireSettings()) {
                     Map<File, SharedFile> getSharedFiles() {
                         Map<File, SharedFile> rv = new HashMap<>()
                         rv.put(f, sf)

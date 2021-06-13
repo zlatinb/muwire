@@ -1,16 +1,17 @@
 package com.muwire.core.files
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 import java.nio.file.DirectoryStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
-import java.util.stream.Stream
 
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.MuWireSettings
 import com.muwire.core.SharedFile
-import com.muwire.core.UILoadedEvent
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.search.SearchIndex
@@ -23,6 +24,7 @@ import net.i2p.data.Base64
 class FileManager {
 
 
+    private final File home
     final EventBus eventBus
     final MuWireSettings settings
     final Map<InfoHash, SharedFile[]> rootToFiles = Collections.synchronizedMap(new HashMap<>())
@@ -30,17 +32,14 @@ class FileManager {
     final Map<String, File[]> nameToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
     final SearchIndex index
-    final FileTree<Void> negativeTree = new FileTree<>()
     final FileTree<SharedFile> positiveTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
 
-    FileManager(EventBus eventBus, MuWireSettings settings) {
+    FileManager(File home, EventBus eventBus, MuWireSettings settings) {
+        this.home = home
         this.settings = settings
         this.eventBus = eventBus
         this.index = new SearchIndex("fileManager")
-        for (String negative : settings.negativeFileTree) {
-            negativeTree.add(new File(negative), null)
-        }
     }
     
     void onFileHashedEvent(FileHashedEvent e) {
@@ -99,13 +98,6 @@ class FileManager {
         fileToSharedFile.put(sf.file, sf)
         positiveTree.add(sf.file, sf);
         
-        negativeTree.remove(sf.file)
-        String parent = sf.getFile().getParent()
-        if (parent != null && settings.watchedDirectories.contains(parent)) {
-            negativeTree.add(sf.file.getParentFile(),null)
-        }
-        saveNegativeTree()
-
         String name = sf.getFile().getName()
         File[] existingFiles = nameToFiles.get(name)
         if (existingFiles == null) {
@@ -156,10 +148,6 @@ class FileManager {
 
         fileToSharedFile.remove(sf.file)
         positiveTree.remove(sf.file)
-        if (!deleted && negativeTree.fileToNode.containsKey(sf.file.getParentFile())) {
-            negativeTree.add(sf.file,null)
-            saveNegativeTree()
-        }
 
         String name = sf.getFile().getName()
         File[] existingFiles = nameToFiles.get(name)
@@ -262,8 +250,6 @@ class FileManager {
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        negativeTree.remove(e.directory)
-        saveNegativeTree()
         if (!e.deleted) {
             List<SharedFile> unsharedFiles = new ArrayList<>()
             try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(e.directory.toPath())) {
@@ -289,11 +275,6 @@ class FileManager {
                  eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted : true))
              }
         }
-    }
-    
-    private void saveNegativeTree() {
-        settings.negativeFileTree.clear()
-        settings.negativeFileTree.addAll(negativeTree.fileToNode.keySet().collect { it.getAbsolutePath() })
     }
     
     public List<SharedFile> getPublishedSince(long timestamp) {
@@ -323,6 +304,5 @@ class FileManager {
         public void onFile(File file, SharedFile value) {
             unsharedFiles << value
         }
-        
     }
 }
