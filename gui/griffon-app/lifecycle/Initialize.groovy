@@ -178,6 +178,12 @@ class Initialize extends AbstractLifecycleHandler {
         }
     }
 
+    /**
+     * Selects home directory for MuWire using the following rules:
+     * 1. if $HOME/.MuWire already exists, use that
+     * 2. Otherwise if on Windows or Mac use OS-specific convention
+     * 3. Otherwise try to follow the XDG Base dir standard
+     */
     private static String selectHome() {
         def home = new File(System.properties["user.home"])
         def defaultHome = new File(home, ".MuWire")
@@ -195,7 +201,15 @@ class Initialize extends AbstractLifecycleHandler {
             def muwire = new File(roaming, "MuWire")
             return muwire.getAbsolutePath()
         }
-        defaultHome.getAbsolutePath()
+        // see if XDG standard can be followed
+        String xdgConfigVar = System.getenv("XDG_CONFIG_HOME")
+        File xdgConfigHome
+        if (xdgConfigVar == null || xdgConfigVar.length() == 0)
+            xdgConfigHome = new File(home, ".config")
+        else
+            xdgConfigHome = new File(xdgConfigVar)
+        File xdgMWHome = new File(xdgConfigHome, "MuWire")
+        xdgMWHome.getAbsolutePath()
     }
 
     private String showLanguageDialog() {
