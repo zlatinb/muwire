@@ -101,7 +101,7 @@ class MainFrameModel {
     
     // Library model
     @Observable boolean filteringEnabled
-    volatile String filter
+    volatile String[] filter
     volatile Filterer filterer
     boolean treeVisible = true
     private final Set<SharedFile> allSharedFiles = Collections.synchronizedSet(new LinkedHashSet<>())
@@ -470,7 +470,12 @@ class MainFrameModel {
     private boolean filter(SharedFile sharedFile) {
         if (filter == null)
             return true
-        sharedFile.getCachedPath().containsIgnoreCase(filter)
+        String path = sharedFile.getCachedPath()
+        boolean contains = true
+        for (String keyword : filter) {
+            contains &= path.contains(keyword)
+        }
+        contains
     }
     
     void filterLibrary() {

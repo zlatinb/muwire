@@ -587,12 +587,13 @@ class MainFrameController {
     void filterLibrary() {
         JTextField field = builder.getVariable("library-filter-textfield")
         String filter = field.getText()
-        if (filter != null)
-            filter = filter.strip()
-        if (filter == null || filter.length() == 0)
-            model.filter = null
-        else
-            model.filter = filter.toLowerCase()
+        if (filter == null)
+            return
+        filter = filter.strip().replaceAll(SplitPattern.SPLIT_PATTERN," ").toLowerCase()
+        String [] split = filter.split(" ")
+        def hs = new HashSet()
+        split.each {if (it.length() > 0) hs << it}
+        model.filter = hs.toArray(new String[0])
         model.filterLibrary()
     }
     
