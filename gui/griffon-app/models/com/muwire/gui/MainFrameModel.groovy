@@ -550,57 +550,63 @@ class MainFrameModel {
             loadedFiles = allSharedFiles.size()
             
             for (SharedFile sharedFile : e.unsharedFiles) {
-
-                DefaultMutableTreeNode dmtn = fileToNode.remove(sharedFile)
-                if (dmtn == null)
-                    continue
-
-                Object[] path = dmtn.getUserObjectPath()
-                DefaultMutableTreeNode otherNode = treeRoot
-                for (int i = 1; i < path.length; i++) {
-                    Object o = path[i]
-                    DefaultMutableTreeNode next = null
-                    for (int j = 0; j < otherNode.childCount; j++) {
-                        if (otherNode.getChildAt(j).getUserObject() == o) {
-                            next = otherNode.getChildAt(j)
-                            break
-                        }
-                    }
-                    if (next == null)
-                        throw new IllegalStateException()
-                    otherNode = next
-                }
-                while (true) {
-                    def parent = otherNode.getParent()
-                    otherNode.removeFromParent()
-                    if (parent.getChildCount() == 0) {
-                        otherNode = parent
-                    } else
-                        break
-                }
-
-                List<File> unshared = new ArrayList<>()
-                while (true) {
-                    def parent = dmtn.getParent()
-                    parent.remove(dmtn)
-                    if (parent == allFilesTreeRoot)
-                        break
-                    if (parent.getChildCount() == 0) {
-                        File file = parent.getUserObject().file
-                        if (core.watchedDirectoryManager.isWatched(file))
-                            unshared.add(file)
-                        dmtn = parent
-                        continue
-                    }
-                    break
-                }
-                if (!unshared.isEmpty()) {
-                    File unsharedRoot = unshared.get(unshared.size() - 1)
-                    core.eventBus.publish(new DirectoryUnsharedEvent(directory: unsharedRoot))
-                }
+                removeUnsharedFromTree(sharedFile, e.deleted)
             }
             
             view.refreshSharedFiles()
+        }
+    }
+    
+    private void removeUnsharedFromTree(SharedFile sharedFile, boolean deleted) {
+        DefaultMutableTreeNode dmtn = fileToNode.remove(sharedFile)
+        if (dmtn == null)
+            return
+        
+        Object[] path = dmtn.getUserObjectPath()
+        DefaultMutableTreeNode otherNode = treeRoot
+        for (int i = 1; i < path.length; i++) {
+            Object o = path[i]
+            DefaultMutableTreeNode next = null
+            for (int j = 0; j < otherNode.childCount; j++) {
+                if (otherNode.getChildAt(j).getUserObject() == o) {
+                    next = otherNode.getChildAt(j)
+                    break
+                }
+            }
+            if (next == null) {
+                if (deleted)
+                    return
+                throw new IllegalStateException()
+            }
+            otherNode = next
+        }
+        while (true) {
+            def parent = otherNode.getParent()
+            otherNode.removeFromParent()
+            if (parent.getChildCount() == 0) {
+                otherNode = parent
+            } else
+                break
+        }
+
+        List<File> unshared = new ArrayList<>()
+        while (true) {
+            def parent = dmtn.getParent()
+            parent.remove(dmtn)
+            if (parent == allFilesTreeRoot)
+                break
+            if (parent.getChildCount() == 0) {
+                File file = parent.getUserObject().file
+                if (core.watchedDirectoryManager.isWatched(file))
+                    unshared.add(file)
+                dmtn = parent
+                continue
+            }
+            break
+        }
+        if (!unshared.isEmpty()) {
+            File unsharedRoot = unshared.get(unshared.size() - 1)
+            core.eventBus.publish(new DirectoryUnsharedEvent(directory: unsharedRoot))
         }
     }
     
