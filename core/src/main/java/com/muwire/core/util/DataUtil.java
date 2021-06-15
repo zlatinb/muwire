@@ -5,13 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.muwire.core.Constants;
@@ -236,5 +230,25 @@ public class DataUtil {
             return "";
         }
         return name.substring(lastDot + 1);
+    }
+
+    /**
+     * Inserts an integer into an array if it's not already present
+     * @param array of sorted unique integers
+     * @param value to insert
+     * @return the same instance or a new instance with the element included
+     */
+    public static int[] insertIntoSortedArray(int [] array, int value) {
+        int pos = Arrays.binarySearch(array, value);
+        if (pos >= 0)
+            return array;
+        pos = - pos - 1;
+        int [] rv = new int[array.length + 1];
+        if (pos > 0)
+            System.arraycopy(array, 0, rv, 0, pos);
+        rv[pos] = value;
+        if (pos < rv.length - 1)
+            System.arraycopy(array, pos, rv, pos + 1, rv.length - pos - 1);
+        return rv;
     }
 }

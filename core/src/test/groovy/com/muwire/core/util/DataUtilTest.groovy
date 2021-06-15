@@ -64,4 +64,40 @@ class DataUtilTest {
         } catch (IllegalArgumentException expected) {}
         
     }
+    
+    @Test
+    void testSortedArrayAfter() {
+        int [] array = new int[]{1}
+        int [] rv = DataUtil.insertIntoSortedArray(array, 2)
+        assert rv.length == 2
+        assert rv[0] == 1
+        assert rv[1] == 2
+    }
+    
+    @Test
+    void testSortedArrayBefore() {
+        int [] array = new int[]{1}
+        int [] rv = DataUtil.insertIntoSortedArray(array, 0)
+        assert rv.length == 2
+        assert rv[0] == 0
+        assert rv[1] == 1
+    }
+    
+    @Test
+    void testSortedArrayExisting() {
+        int [] array = new int[]{1}
+        int [] rv = DataUtil.insertIntoSortedArray(array, 1)
+        assert System.identityHashCode(array) == System.identityHashCode(rv)
+        assert array == rv
+    }
+    
+    @Test
+    void testSortedArrayMiddle() {
+        int [] array = new int[] {0, 2}
+        int [] rv = DataUtil.insertIntoSortedArray(array, 1)
+        assert rv.length == 3
+        assert rv[0] == 0
+        assert rv[1] == 1
+        assert rv[2] == 2
+    }
 }

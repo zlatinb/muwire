@@ -1,5 +1,6 @@
 package com.muwire.core.search;
 
+import com.muwire.core.util.DataUtil;
 import net.metanotionz.io.Serializer;
 import net.metanotionz.io.block.BlockFile;
 import net.metanotionz.util.skiplist.SkipList;
@@ -32,17 +33,8 @@ public class SearchIndexImpl {
                 keywords.put(keyword, existingHashes);
                 hashes.put(hash, new String[] {string});
             } else {
-                boolean found = false;
-                for (int existingHash : existingHashes) {
-                    if (existingHash == hash) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    int [] newHashes = new int[existingHashes.length + 1];
-                    System.arraycopy(existingHashes, 0, newHashes, 0, existingHashes.length);
-                    newHashes[newHashes.length - 1] = hash;
+                int [] newHashes = DataUtil.insertIntoSortedArray(existingHashes, hash);
+                if (newHashes != existingHashes) {
                     keywords.put(keyword, newHashes);
                 }
 
