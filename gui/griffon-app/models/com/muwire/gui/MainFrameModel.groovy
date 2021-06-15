@@ -544,7 +544,8 @@ class MainFrameModel {
     void onFileUnsharedEvent(FileUnsharedEvent e) {
         runInsideUIAsync {
             synchronized (allSharedFiles) {
-                allSharedFiles.removeAll(e.unsharedFiles)
+                for (SharedFile sharedFile : e.unsharedFiles)
+                    allSharedFiles.removeAll(sharedFile)
                 shared.retainAll(allSharedFiles)
             }
             loadedFiles = allSharedFiles.size()
