@@ -26,30 +26,28 @@ public class SearchIndexImpl {
     void add(String string, String [] split) throws IOException {
         final int hash = string.hashCode();
         for (String keyword : split) {
-            int [] existingHashes = keywords.get(keyword);
+            int[] existingHashes = keywords.get(keyword);
             if (existingHashes == null) {
                 existingHashes = new int[1];
                 existingHashes[0] = hash;
                 keywords.put(keyword, existingHashes);
-                hashes.put(hash, new String[] {string});
             } else {
-                int [] newHashes = DataUtil.insertIntoSortedArray(existingHashes, hash);
-                if (newHashes != existingHashes) {
+                int[] newHashes = DataUtil.insertIntoSortedArray(existingHashes, hash);
+                if (newHashes != existingHashes) 
                     keywords.put(keyword, newHashes);
-                }
-
-                String[] fileNames = hashes.get(hash);
-                if (fileNames == null) {
-                    fileNames = new String[] {string};
-                    hashes.put(hash, fileNames);
-                } else {
-                    Set<String> unique = new HashSet<>();
-                    for (String fileName : fileNames)
-                        unique.add(fileName);
-                    if (unique.add(string))
-                        hashes.put(hash, unique.toArray(new String[0]));
-                }
             }
+        }
+        
+        String[] fileNames = hashes.get(hash);
+        if (fileNames == null) {
+            fileNames = new String[] {string};
+            hashes.put(hash, fileNames);
+        } else {
+            Set<String> unique = new HashSet<>();
+            for (String fileName : fileNames)
+                unique.add(fileName);
+            if (unique.add(string))
+                hashes.put(hash, unique.toArray(new String[0]));
         }
     }
     
@@ -72,24 +70,22 @@ public class SearchIndexImpl {
         if (idx == -1)
             return;
 
-        String [] newStrings = new String[strings.length - 1];
-        System.arraycopy(strings, 0, newStrings, 0, idx);
-        System.arraycopy(strings, idx + 1, newStrings, idx, newStrings.length - idx);
-
-        hashes.put(hash, newStrings);
+        if (strings.length == 1) {
+            hashes.remove(hash);
+        } else {
+            String[] newStrings = new String[strings.length - 1];
+            System.arraycopy(strings, 0, newStrings, 0, idx);
+            System.arraycopy(strings, idx + 1, newStrings, idx, newStrings.length - idx);
+            hashes.put(hash, newStrings);
+            return;
+        }
 
         for (String keyword : split) {
             int [] existingHashes = keywords.get(keyword);
             if (existingHashes == null)
                 throw new IllegalStateException();
-            idx = -1;
-            for (int i = 0; i < existingHashes.length; i ++) {
-                if (existingHashes[i] == hash) {
-                    idx = i;
-                    break;
-                }
-            }
-            if (idx == -1)
+            idx = Arrays.binarySearch(existingHashes, hash);
+            if (idx < 0)
                 throw new IllegalStateException();
 
             if (existingHashes.length == 1) {
@@ -100,6 +96,7 @@ public class SearchIndexImpl {
                 System.arraycopy(existingHashes, idx + 1, newHashes, idx, newHashes.length - idx);
                 keywords.put(keyword, newHashes);
             }
+
         }
     }
     

@@ -186,4 +186,18 @@ class SearchIndexTest {
             add("settings.gradle")
         }
     }
+    
+    @Test
+    void testHashCollision() {
+        /* k1.png and io.png have the same String::hashCode */
+        initIndex([])
+        index.add("io.png")
+        assert index.search(["png"]) == ['io.png']
+        index.add("k1.png")
+        assert index.search(["png"]) == ['io.png', 'k1.png']
+        index.remove("k1.png")
+        assert index.search(["png"]) == ["io.png"]
+        index.add("k1.png")
+        assert index.search(["png"]) == ['io.png', 'k1.png']
+    }
 }
