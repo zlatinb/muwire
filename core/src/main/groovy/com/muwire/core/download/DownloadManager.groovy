@@ -250,7 +250,7 @@ public class DownloadManager {
         persistDownloaders()
     }
 
-    private void persistDownloaders() {
+    void persistDownloaders() {
         File downloadsFile = new File(home,"downloads.json")
         downloadsFile.withPrintWriter { writer ->
             downloaders.values().each { downloader ->

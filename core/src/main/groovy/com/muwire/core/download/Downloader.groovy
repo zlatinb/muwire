@@ -402,6 +402,7 @@ public class Downloader {
                     HashListSession session = new HashListSession(me.toBase64(), infoHash, endpoint)
                     InfoHash received = session.request()
                     setInfoHash(received)
+                    downloadManager.persistDownloaders()
                 }
                 currentState = WorkerState.DOWNLOADING
                 
