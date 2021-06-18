@@ -51,7 +51,7 @@ abstract class Connection implements Closeable {
 
     protected final String name
 
-    long lastPingSentTime, lastPongReceivedTime
+    long lastPingSentTime
     
     private volatile UUID lastPingUUID
 
@@ -133,12 +133,14 @@ abstract class Connection implements Closeable {
 
     protected abstract void write(def message);
 
-    void sendPing() {
+    void sendPing(boolean expectResponse) {
         def ping = [:]
         ping.type = "Ping"
         ping.version = 2
-        lastPingUUID = UUID.randomUUID()
-        ping.uuid = lastPingUUID.toString()
+        if (expectResponse) {
+            lastPingUUID = UUID.randomUUID()
+            ping.uuid = lastPingUUID.toString()
+        }
         messages.put(ping)
         lastPingSentTime = System.currentTimeMillis()
     }
@@ -170,6 +172,10 @@ abstract class Connection implements Closeable {
 
     protected void handlePing(def ping) {
         log.fine("$name received ping version ${ping.version}")
+        if (ping.uuid == null) {
+            log.fine("Not responding as there was no UUID")
+            return
+        }
         if (ping.version < 2)
             handlePingV1(ping)
         else
@@ -180,15 +186,12 @@ abstract class Connection implements Closeable {
         def pong = [:]
         pong.type = "Pong"
         pong.version = 1
-        if (ping.uuid != null)
-            pong.uuid = ping.uuid
+        pong.uuid = ping.uuid
         pong.pongs = hostCache.getGoodHosts(MAX_PONGS_V1).collect { d -> d.toBase64() }
         messages.put(pong)
     }
     
     private void handlePingV2(def ping) {
-        if (ping.uuid == null)
-            throw new Exception("Ping V2 without an UUID")
         UUID uuid = UUID.fromString(ping.uuid)
         byte [] pongPayload = MessageUtil.createPongV2(uuid, hostCache.getGoodHosts(MAX_PONGS_V2))
         messages.put(pongPayload)
@@ -196,7 +199,6 @@ abstract class Connection implements Closeable {
 
     protected void handlePong(def pong) {
         log.fine("$name received pong version ${pong.version}")
-        lastPongReceivedTime = System.currentTimeMillis()
         if (pong.pongs == null)
             throw new Exception("Pong doesn't have pongs")
             

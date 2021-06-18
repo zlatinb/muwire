@@ -65,7 +65,7 @@ abstract class ConnectionManager {
         final long now = System.currentTimeMillis()
         getConnections().each {
             if (now - it.lastPingSentTime > PING_TIME)
-                it.sendPing()
+                it.sendPing(needsConnections())
         }
     }
 }
