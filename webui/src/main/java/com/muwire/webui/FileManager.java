@@ -70,7 +70,9 @@ public class FileManager {
     public void onFileUnsharedEvent(FileUnsharedEvent e) {
         if (!e.getDeleted())
             return;
-        fileTree.remove(e.getUnsharedFile().getFile());
+        for (SharedFile sf : e.getUnsharedFiles()) {
+            fileTree.remove(sf.getFile());
+        }
         revision++;
     }
     
@@ -127,7 +129,7 @@ public class FileManager {
             fileTree.remove(file);
             revision++;
             FileUnsharedEvent event = new FileUnsharedEvent();
-            event.setUnsharedFile(sf);
+            event.setUnsharedFiles(new SharedFile[]{sf});
             core.getEventBus().publish(event);
         } else {
             
@@ -139,7 +141,7 @@ public class FileManager {
             
             for (SharedFile found : cb.found) {
                 FileUnsharedEvent e = new FileUnsharedEvent();
-                e.setUnsharedFile(found);
+                e.setUnsharedFiles(new SharedFile[]{found});
                 core.getEventBus().publish(e);
             }
             

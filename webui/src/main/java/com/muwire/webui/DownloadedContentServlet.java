@@ -33,9 +33,9 @@ public class DownloadedContentServlet extends BasicServlet {
     public File getResource(String pathInContext) {
         String infoHashB64 = pathInContext.substring("/DownloadedContent/".length());
         InfoHash infoHash = new InfoHash(Base64.decode(infoHashB64));
-        Set<SharedFile> sharedFiles = core.getFileManager().getRootToFiles().get(infoHash);
-        if (sharedFiles == null || sharedFiles.isEmpty())
+        SharedFile[] sharedFiles = core.getFileManager().getRootToFiles().get(infoHash);
+        if (sharedFiles == null || sharedFiles.length == 0)
             return null;
-        return sharedFiles.iterator().next().getFile();
+        return sharedFiles[0].getFile();
     }
 }
