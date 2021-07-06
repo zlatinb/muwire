@@ -11,7 +11,7 @@ String helptext = Util._t("View details about the selected shared file here.");
 
 String path = request.getParameter("path");
 File file = Util.getFromPathElements(path);
-
+String filePath = Util.escapeHTMLinXML(file.getAbsolutePath());
 %>
 
 <html>
@@ -31,7 +31,7 @@ File file = Util.getFromPathElements(path);
 <%@include file="sidebar.jsi"%>    	
 	    </aside>
 	    <section class="main foldermain">
-	    	<h2><%=Util._t("Details for {0}", file.getAbsolutePath())%></h2>
+	    	<h2><%=Util._t("Details for {0}", filePath)%></h2>
 	    	<h3><%=Util._t("Search Hits")%></h3>
 		    <div id="table-wrapper">
 				<div id="table-scroll">
