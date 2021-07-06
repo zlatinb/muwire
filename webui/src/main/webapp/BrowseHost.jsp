@@ -14,7 +14,7 @@ String helptext = Util._t("Use this page to browse the files shared by other MuW
 String currentBrowse = null;
 if (request.getParameter("currentHost") != null) {
 	Persona host = new Persona(new ByteArrayInputStream(Base64.decode(request.getParameter("currentHost"))));
-	currentBrowse = host.getHumanReadableName();
+	currentBrowse = Util.escapeHTMLinXML(host.getHumanReadableName());
 } 
 
 %>
