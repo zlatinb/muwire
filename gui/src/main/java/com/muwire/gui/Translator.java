@@ -17,6 +17,7 @@ public class Translator {
         SUPPORTED_LOCALES.add(Locale.US);
         SUPPORTED_LOCALES.add(Locale.forLanguageTag("fr"));
         SUPPORTED_LOCALES.add(Locale.forLanguageTag("de"));
+        SUPPORTED_LOCALES.add(Locale.forLanguageTag("cs"));
         SUPPORTED_LOCALES.add(Locale.forLanguageTag("ja"));
         SUPPORTED_LOCALES.add(Locale.forLanguageTag("tr"));
         SUPPORTED_LOCALES.add(Locale.forLanguageTag("sq"));
