@@ -53,7 +53,7 @@ class SharedFileView {
                 searchersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.searchers) {
                         closureColumn(header : trans("SEARCHER"), type : String, read : {it.searcher?.getHumanReadableName()})
-                        closureColumn(header : trans("QUERY"), type : String, read : {it.query})
+                        closureColumn(header : trans("QUERY"), type : String, read : {HTMLSanitizer.sanitize(it.query)})
                         closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
                     }
                 }
@@ -77,7 +77,7 @@ class SharedFileView {
                 certificatesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
                         closureColumn(header : trans("ISSUER"), type:String, read : {it.issuer.getHumanReadableName()})
-                        closureColumn(header : trans("FILE_NAME"), type : String, read : {it.name.name})
+                        closureColumn(header : trans("FILE_NAME"), type : String, read : {HTMLSanitizer.sanitize(it.name.name)})
                         closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.comment != null})
                         closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
                     }

@@ -107,7 +107,7 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.results) {
-                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> row.name.replace('<','_')})
+                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> HTMLSanitizer.sanitize(row.name)})
                                             closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
                                             closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
                                             closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
@@ -140,7 +140,7 @@ class SearchTabView {
                                     resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.results2) {
                                             closureColumn(header : trans("NAME"), preferredWidth : 350, type : String, read : {
-                                                model.hashBucket[it].first().name.replace('<', '_')
+                                                HTMLSanitizer.sanitize(model.hashBucket[it].first().name)
                                             })
                                             closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
                                                 model.hashBucket[it].first().size

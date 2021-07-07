@@ -61,7 +61,7 @@ class CollectionTabView {
                 scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                     collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.collections) {
-                            closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {it.name})
+                            closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {HTMLSanitizer.sanitize(it.name)})
                             closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
                             closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
                             closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
@@ -104,7 +104,7 @@ class CollectionTabView {
                             itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                 tableModel(list : model.items) {
                                     closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
-                                        String.join(File.separator, it.pathElements)
+                                        HTMLSanitizer.sanitize(String.join(File.separator, it.pathElements))
                                     })
                                     closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {it.length})
                                     closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})

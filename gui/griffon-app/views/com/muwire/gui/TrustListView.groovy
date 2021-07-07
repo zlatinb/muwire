@@ -50,7 +50,7 @@ class TrustListView {
                         table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
                                 closureColumn(header: trans("TRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
-                                closureColumn(header: trans("REASON"), type : String, read : {it.reason})
+                                closureColumn(header: trans("REASON"), type : String, read : {HTMLSanitizer.sanitize(it.reason)})
                                 closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
                         }
@@ -67,7 +67,7 @@ class TrustListView {
                         table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
                                 closureColumn(header: trans("DISTRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
-                                closureColumn(header: trans("REASON"), type:String, read : {it.reason})
+                                closureColumn(header: trans("REASON"), type:String, read : {HTMLSanitizer.sanitize(it.reason)})
                                 closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
                         }

@@ -26,7 +26,7 @@ class PathTreeRenderer extends DefaultTreeCellRenderer {
         }
         
         FileCollectionItem item = (FileCollectionItem) userObject
-        String fileName = item.pathElements.get(item.pathElements.size() - 1)
+        String fileName = HTMLSanitizer.sanitize(item.pathElements.get(item.pathElements.size() - 1))
         setText(fileName)
         setEnabled(true)
         if (item.comment != "" && item.comment != null) {

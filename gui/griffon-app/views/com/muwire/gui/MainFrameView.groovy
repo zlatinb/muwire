@@ -249,7 +249,7 @@ class MainFrameView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.downloads) {
-                                            closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read : {row -> row.downloader.file.getName()})
+                                            closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read : {row -> HTMLSanitizer.sanitize(row.downloader.file.getName())})
                                             closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> trans(row.downloader.getCurrentState().name())})
                                             closureColumn(header: trans("PROGRESS"), preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
                                             closureColumn(header: trans("SPEED"), preferredWidth: 50, type:String, read :{row ->
@@ -289,7 +289,7 @@ class MainFrameView {
                                         panel(constraints : "download-selected") {
                                             gridBagLayout()
                                             label(text : trans("DOWNLOAD_LOCATION") + ":", constraints : gbc(gridx:0, gridy:0))
-                                            label(text : bind {model.downloader?.file?.getAbsolutePath()},
+                                            label(text : bind { HTMLSanitizer.sanitize(model.downloader?.file?.getAbsolutePath()) },
                                             constraints: gbc(gridx:1, gridy:0, gridwidth: 2, insets : [0,0,0,20]))
                                             label(text : trans("PIECE_SIZE") + ":", constraints : gbc(gridx: 0, gridy:1))
                                             label(text : bind {model.downloader?.pieceSize}, constraints : gbc(gridx:1, gridy:1))
@@ -448,7 +448,7 @@ class MainFrameView {
                                 table(id : "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight,
                                     dragEnabled : true, transferHandler : collectionsTransferHandler) {
                                     tableModel(list : model.localCollections) {
-                                        closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {it.name})
+                                        closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {HTMLSanitizer.sanitize(it.name)})
                                         closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
                                         closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
                                         closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
@@ -479,7 +479,7 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.collectionFiles) {
-                                        closureColumn(header : trans("NAME"), preferredWidth : 200, type : String, read : {it.getCachedPath()})
+                                        closureColumn(header : trans("NAME"), preferredWidth : 200, type : String, read : {HTMLSanitizer.sanitize(it.getCachedPath())})
                                         closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.getCachedLength()})
                                         closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.getComment() != null})
                                     }
@@ -520,8 +520,7 @@ class MainFrameView {
                                 table(id : "searches-table", rowHeight : rowHeight) {
                                     tableModel(list : model.searches) {
                                         closureColumn(header : trans("KEYWORDS"), type : String, read : {
-                                            sanitized = it.search.replace('<', ' ')
-                                            sanitized
+                                            HTMLSanitizer.sanitize(it.search)
                                         })
                                         closureColumn(header : trans("FROM"), type : String, read : {
                                             if (it.originator != null) {
@@ -574,7 +573,7 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feed-items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feedItems) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 350, type : String, read : {it.getName()})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 350, type : String, read : {HTMLSanitizer.sanitize(it.getName())})
                                         closureColumn(header : trans("SIZE"), preferredWidth: 10, type : Long, read : {it.getSize()})
                                         closureColumn(header : trans("COMMENT"), preferredWidth: 10, type : Boolean, read : {it.getComment() != null})
                                         closureColumn(header : trans("CERTIFICATES"), preferredWidth: 10, type : Integer, read : {it.getCertificates()})

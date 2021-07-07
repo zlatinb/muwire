@@ -60,7 +60,7 @@ class MessageFolderView {
                         if (!model.outgoing) {
                             tableModel(list: model.messageHeaders) {
                                 closureColumn(header: trans("SENDER"), preferredWidth: 200, type: String, read: { it.message.sender.getHumanReadableName() })
-                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
+                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { HTMLSanitizer.sanitize(it.message.subject) })
                                 closureColumn(header: trans("RECIPIENTS"), preferredWidth: 20, type: Integer, read: { it.message.recipients.size() })
                                 closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
                                 closureColumn(header: trans("UNREAD"), preferredWidth: 20, type: Boolean, read: { it.status })
@@ -97,7 +97,7 @@ class MessageFolderView {
                                 scrollPane(constraints: BorderLayout.CENTER) {
                                     table(id: "message-attachments-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                         tableModel(list: model.messageAttachments) {
-                                            closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read: { it.name })
+                                            closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read: { HTMLSanitizer.sanitize(it.name) })
                                             closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: {
                                                 if (it instanceof MWMessageAttachment)
                                                     return it.length
