@@ -45,6 +45,8 @@ import net.i2p.data.Base64
 
 @Log
 class ConnectionAcceptor {
+    
+    private static final int RESULT_BATCH_SIZE = 128
 
     final EventBus eventBus
     final UltrapeerConnectionManager manager
@@ -344,18 +346,25 @@ class ConnectionAcceptor {
                 throw new IOException("too many results $nResults")
                 
             dis = new DataInputStream(new GZIPInputStream(dis))
-            UIResultEvent[] results = new UIResultEvent[nResults]
+            UIResultEvent[] results = new UIResultEvent[Math.min(RESULT_BATCH_SIZE, nResults)]
+            int j = 0
             for (int i = 0; i < nResults; i++) {
                 int jsonSize = dis.readUnsignedShort()
                 byte [] payload = new byte[jsonSize]
                 dis.readFully(payload)
                 def json = slurper.parse(payload)
-                results[i] = ResultsParser.parse(sender, resultsUUID, json)
-                results[i].chat = chat
-                results[i].messages = messages
-                results[i].feed = feed
+                results[j] = ResultsParser.parse(sender, resultsUUID, json)
+                results[j].chat = chat
+                results[j].messages = messages
+                results[j].feed = feed
+                j++
+                
+                if (j == results.length) {
+                    eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
+                    j = 0
+                    results = new UIResultEvent[Math.min(nResults - i - 1, RESULT_BATCH_SIZE)]
+                }
             }
-            eventBus.publish(new UIResultBatchEvent(uuid: resultsUUID, results: results))
         } catch (IOException bad) {
             log.log(Level.WARNING, "failed to process RESULTS", bad)
         } finally {
