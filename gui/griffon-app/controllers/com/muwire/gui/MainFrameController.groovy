@@ -337,6 +337,13 @@ class MainFrameController {
         Thread.sleep(10)
         view.refreshFeeds()
     }
+    
+    @ControllerAction
+    void showMyFeed() {
+        def params = [:]
+        params['core'] = model.core
+        mvcGroup.createMVCGroup("my-feed", params)
+    }
 
     @ControllerAction
     void review() {

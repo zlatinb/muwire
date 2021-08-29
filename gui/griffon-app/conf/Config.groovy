@@ -181,4 +181,9 @@ mvcGroups {
         view = 'com.muwire.gui.MessageFolderView'
         controller = 'com.muwire.gui.MessageFolderController'
     }
+    'my-feed' {
+        model = 'com.muwire.gui.MyFeedModel'
+        view = 'com.muwire.gui.MyFeedView'
+        controller = 'com.muwire.gui.MyFeedController'
+    }
 }
