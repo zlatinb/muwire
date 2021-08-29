@@ -560,6 +560,7 @@ class MainFrameView {
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
+                                button(text : trans("SUBSCRIBE"), subscribeToFeedAction)
                                 button(text : trans("UPDATE"), enabled : bind {model.updateFileFeedButtonEnabled}, updateFileFeedAction)
                                 button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
                                 button(text : trans("CONFIGURE"), enabled : bind {model.configureFileFeedButtonEnabled}, configureFileFeedAction)

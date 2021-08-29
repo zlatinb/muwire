@@ -313,6 +313,30 @@ class MainFrameController {
         model.markDistrustedButtonEnabled = false
         model.removeContactButtonEnabled = false
     }
+    
+    @ControllerAction
+    void subscribeToFeed() {
+        String address = JOptionPane.showInputDialog(trans("COPY_PASTE_FEED_ID"))
+        if (address == null)
+            return
+        Persona p
+        try {
+            p = new Persona(new ByteArrayInputStream(Base64.decode(address)))
+        } catch (Exception bad) {
+            JOptionPane.showMessageDialog(null, trans("ADD_CONTACT_INVALID_ID_TITLE"), trans("ADD_CONTACT_INVALID_ID_TITLE"), JOptionPane.ERROR_MESSAGE)
+            return
+        }
+
+        Feed feed = new Feed(p)
+        feed.setAutoDownload(core.muOptions.defaultFeedAutoDownload)
+        feed.setSequential(core.muOptions.defaultFeedSequential)
+        feed.setItemsToKeep(core.muOptions.defaultFeedItemsToKeep)
+        feed.setUpdateInterval(core.muOptions.defaultFeedUpdateInterval)
+
+        core.eventBus.publish(new UIFeedConfigurationEvent(feed : feed, newFeed: true))
+        Thread.sleep(10)
+        view.refreshFeeds()
+    }
 
     @ControllerAction
     void review() {
