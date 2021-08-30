@@ -28,7 +28,6 @@ This is an idea to include a bloom filter in the ping payload.  Then the respond
 ### Chat
 * break up lines on CR/LF, send multiple messages
 * enforce # in room names or ignore it
-* auto-create/join channel on server start
 * jump from notification window to room with message
 
 ### Swing GUI
