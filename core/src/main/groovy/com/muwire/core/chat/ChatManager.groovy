@@ -35,8 +35,11 @@ class ChatManager {
     
     void onUIConnectChatEvent(UIConnectChatEvent e) {
         if (e.host == me) { 
+            String defaultChatRoom = null
+            if (settings.joinDefaultChatRoom && settings.defaultChatRoom.size() > 0)
+                defaultChatRoom = settings.defaultChatRoom
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, 
-                persona : me, connection : LocalChatLink.INSTANCE))
+                persona : me, connection : LocalChatLink.INSTANCE, defaultRoom: defaultChatRoom))
         } else {
             ChatClient client = new ChatClient(connector, eventBus, e.host, me, trustService, settings)
             clients.put(e.host, client)

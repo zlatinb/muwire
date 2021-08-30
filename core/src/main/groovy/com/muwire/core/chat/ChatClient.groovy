@@ -95,6 +95,10 @@ class ChatClient implements Closeable {
             if (version != Constants.CHAT_VERSION)
                 throw new Exception("Unknown chat version $version")
             
+            String defaultRoom = null
+            if (headers.containsKey("DefaultRoom"))
+                defaultRoom = headers['DefaultRoom']
+            
             synchronized(this) {
                 if (!connectInProgress)
                     return
@@ -102,7 +106,7 @@ class ChatClient implements Closeable {
                 connection.start()
             }
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 
-                connection : connection))
+                connection : connection, defaultRoom: defaultRoom))
         } catch (Exception e) {
             log.log(java.util.logging.Level.WARNING, "connect failed", e)
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.FAILED, persona : host))

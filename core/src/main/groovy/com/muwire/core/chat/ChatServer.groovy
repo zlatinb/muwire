@@ -114,6 +114,8 @@ class ChatServer {
         os.with { 
             write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
             write("Version:${Constants.CHAT_VERSION}\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (settings.defaultChatRoom.size() > 0)
+                write("DefaultRoom:${settings.defaultChatRoom}\r\n".getBytes(StandardCharsets.US_ASCII))
             write("\r\n".getBytes(StandardCharsets.US_ASCII))
             flush()
         }

@@ -82,6 +82,8 @@ class OptionsModel {
     @Observable boolean advertiseChat
     @Observable int maxChatLines
     @Observable String chatWelcomeFile
+    @Observable String defaultChatRoom
+    @Observable boolean joinDefaultChatRoom
     
     // messaging options
     @Observable boolean allowMessages
@@ -163,6 +165,8 @@ class OptionsModel {
         advertiseChat = settings.advertiseChat
         maxChatLines = uiSettings.maxChatLines
         chatWelcomeFile = settings.chatWelcomeFile?.getAbsolutePath()
+        defaultChatRoom = settings.defaultChatRoom
+        joinDefaultChatRoom = settings.joinDefaultChatRoom
         
         allowMessages = settings.allowMessages
         allowOnlyTrustedMessages = settings.allowOnlyTrustedMessages

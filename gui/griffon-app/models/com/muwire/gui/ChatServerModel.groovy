@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import griffon.core.GriffonApplication
+
 import java.util.logging.Level
 
 import javax.annotation.Nonnull
@@ -25,6 +27,8 @@ import griffon.metadata.ArtifactProviderFor
 class ChatServerModel {
     @MVCMember @Nonnull
     ChatServerView view
+    @MVCMember @Nonnull
+    ChatServerController controller
     
     Persona host
     Core core
@@ -91,6 +95,10 @@ class ChatServerModel {
 
             mvcGroup.childrenGroups.each {k,v ->
                 v.controller.rejoinRoom()
+            }
+            
+            if (e.defaultRoom != null && core.muOptions.joinDefaultChatRoom) {
+                controller.joinRoom(e.defaultRoom)
             }
         } else {
             stopPoller()

@@ -6,7 +6,6 @@ import com.muwire.core.hostcache.CrawlerResponse
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
-import net.i2p.util.ConcurrentHashSet
 
 class MuWireSettings {
 
@@ -58,6 +57,8 @@ class MuWireSettings {
     int maxChatConnections
     boolean advertiseChat
     File chatWelcomeFile
+    String defaultChatRoom
+    boolean joinDefaultChatRoom
     
     boolean allowMessages
     boolean allowOnlyTrustedMessages
@@ -151,6 +152,8 @@ class MuWireSettings {
         startChatServer = Boolean.valueOf(props.getProperty("startChatServer","false"))
         maxChatConnections = Integer.valueOf(props.getProperty("maxChatConnections", "-1"))
         advertiseChat = Boolean.valueOf(props.getProperty("advertiseChat","true"))
+        defaultChatRoom = props.getProperty("defaultChatRoom","#muwire")
+        joinDefaultChatRoom = Boolean.valueOf(props.getProperty("joinDefaultChatRoom","true"))
         String chatWelcomeProp = props.getProperty("chatWelcomeFile")
         if (chatWelcomeProp != null)
             chatWelcomeFile = new File(chatWelcomeProp)
@@ -245,6 +248,8 @@ class MuWireSettings {
         props.setProperty("startChatServer", String.valueOf(startChatServer))
         props.setProperty("maxChatConnectios", String.valueOf(maxChatConnections))
         props.setProperty("advertiseChat", String.valueOf(advertiseChat))
+        props.setProperty("defaultChatRoom", defaultChatRoom)
+        props.setProperty("joinDefaultChatRoom", String.valueOf(joinDefaultChatRoom))
         if (chatWelcomeFile != null)
             props.setProperty("chatWelcomeFile", chatWelcomeFile.getAbsolutePath())
             

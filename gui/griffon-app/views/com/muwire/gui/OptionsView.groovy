@@ -98,6 +98,8 @@ class OptionsView {
     def maxChatConnectionsField
     def advertiseChatCheckbox
     def maxChatLinesField
+    def joinDefaultChatRoomCheckbox
+    def defaultChatRoomField
     
     def allowMessagesCheckbox
     def allowOnlyTrustedMessagesCheckbox
@@ -390,10 +392,14 @@ class OptionsView {
                 advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END))
+                label(text: trans("OPTIONS_CHAT_JOIN_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                joinDefaultChatRoomCheckbox = checkBox(selected: bind{model.joinDefaultChatRoom}, constraints: gbc(gridx: 2, gridy: 4, anchor: GridBagConstraints.LINE_END))
+                label(text: trans("OPTIONS_CHAT_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END))
                 if (!isAqua()) {
-                    label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 4, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                    label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 4))
-                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 4, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
+                    label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 6, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 6))
+                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 6, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
                 }
             }
             panel (border : titledBorder(title : trans("OPTIONS_MESSAGING_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),

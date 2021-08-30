@@ -212,6 +212,14 @@ class OptionsController {
         model.maxChatLines = maxChatLines
         uiSettings.maxChatLines = maxChatLines
         
+        boolean joinDefaultChatRoom = view.joinDefaultChatRoomCheckbox.model.isSelected()
+        model.joinDefaultChatRoom = joinDefaultChatRoom
+        settings.joinDefaultChatRoom = joinDefaultChatRoom
+        
+        String defaultChatRoom = view.defaultChatRoomField.text
+        model.defaultChatRoom = defaultChatRoom
+        settings.defaultChatRoom = defaultChatRoom
+        
         if (model.chatWelcomeFile != null)
             settings.chatWelcomeFile = new File(model.chatWelcomeFile)
             
