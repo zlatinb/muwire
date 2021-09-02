@@ -51,7 +51,8 @@ class CollectionWizardView {
 
         window = builder.frame(visible: false, locationRelativeTo : null,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
-            iconImage : builder.imageIcon("/MuWire-48x48.png").image){
+            iconImage : builder.imageIcon("/MuWire-48x48.png").image,
+            preferredSize: [800,800]){
             mainPanel = panel {
                 cardLayout()
                 panel(constraints : "configuration") {

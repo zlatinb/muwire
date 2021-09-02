@@ -1,6 +1,9 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+
+import java.awt.Dimension
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -57,8 +60,8 @@ class AdvancedSharingView {
             scrollPane( constraints : BorderLayout.CENTER ) {
                 watchedDirsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.watchedDirectories) {
-                        closureColumn(header : trans("DIRECTORY"), preferredWidth: 350, type : String, read : {it.directory.toString()})
-                        closureColumn(header : trans("AUTO"), preferredWidth: 100, type : Boolean, read : {it.autoWatch})
+                        closureColumn(header : trans("DIRECTORY"), preferredWidth: 500, type : String, read : {it.directory.toString()})
+                        closureColumn(header : trans("AUTO"), preferredWidth: 50, type : Boolean, read : {it.autoWatch})
                         closureColumn(header : trans("INTERVAL"), preferredWidth : 100, type : Integer, read : {it.syncInterval})
                         closureColumn(header : trans("LAST_SYNC"), preferredWidth: 250, type : Long, read : {it.lastSync})
                     }
@@ -134,6 +137,7 @@ class AdvancedSharingView {
     
     void mvcGroupInit(Map<String,String> args) {
         def tabbedPane = new JTabbedPane()
+        tabbedPane.setPreferredSize(new Dimension(800,800))
         tabbedPane.addTab(trans("WATCHED_DIRECTORIES"), watchedDirsPanel)
         tabbedPane.addTab(trans("NEGATIVE_TREE"), negativeTreePanel)
         

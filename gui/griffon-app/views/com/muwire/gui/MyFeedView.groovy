@@ -44,7 +44,7 @@ class MyFeedView {
         dialog = new JDialog(mainFrame,trans("MY_FEED"),true)
         dialog.setResizable(true)
         
-        itemsPanel = builder.panel {
+        itemsPanel = builder.panel(preferredSize: [800,300]) {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
                 label(text : trans("PUBLISHED_FILES") + " ")
@@ -53,7 +53,7 @@ class MyFeedView {
             scrollPane( constraints : BorderLayout.CENTER ) {
                 itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.items) {
-                        closureColumn(header : trans("NAME"), preferredWidth: 350, type : String, read : { HTMLSanitizer.sanitize(it.getCachedPath())})
+                        closureColumn(header : trans("NAME"), preferredWidth: 500, type : String, read : { HTMLSanitizer.sanitize(it.getCachedPath())})
                         closureColumn(header : trans("SIZE"), preferredWidth: 100, type : Long, read : {it.getCachedLength()})
                         closureColumn(header : trans("DATE"), preferredWidth: 200, type : Long, read : {it.getPublishedTimestamp()})
                     }

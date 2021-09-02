@@ -30,7 +30,8 @@ class ChatMonitorView {
         
         window = builder.frame (visible : false, locationRelativeTo : null,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
-            iconImage : builder.imageIcon("/MuWire-48x48.png").image){
+            iconImage : builder.imageIcon("/MuWire-48x48.png").image,
+            preferredSize: [800,800]){
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 label(trans("CHAT_ROOMS_WITH_MESSAGES"))
@@ -38,9 +39,9 @@ class ChatMonitorView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 roomsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.rooms) {
-                        closureColumn(header : trans("SERVER"), type: String, read : {it.server})
-                        closureColumn(header : trans("ROOM"), type : String, read : {it.room})
-                        closureColumn(header : trans("MESSAGES"), type : Integer, read : {it.count})
+                        closureColumn(header : trans("SERVER"), preferredWidth: 350, type: String, read : {it.server})
+                        closureColumn(header : trans("ROOM"), preferredWidth: 350, type : String, read : {it.room})
+                        closureColumn(header : trans("MESSAGES"), preferredWidth: 100, type : Integer, read : {it.count})
                     }
                 }
             }
