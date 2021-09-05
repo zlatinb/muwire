@@ -126,9 +126,11 @@ class SearchTabModel {
             results2.clear()
             results2.addAll(hashBucket.keySet())
             JTable table = builder.getVariable("senders-table")
+            int selectedRow = table.getSelectedRow()
             table.model.fireTableDataChanged()
+            table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
             table = builder.getVariable("results-table2")
-            int selectedRow = table.getSelectedRow() 
+            selectedRow = table.getSelectedRow() 
             table.model.fireTableDataChanged()
             table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
         }
