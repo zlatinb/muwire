@@ -61,7 +61,8 @@ startScripts.doFirst {
                                     "--add-opens", "java.base/java.nio=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
-                                    "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED"]
+                                    "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"]
                                    
 }
 
