@@ -102,7 +102,7 @@ class NegativeFiles {
         for (SharedFile sharedFile : event.unsharedFiles) {
             if (watchedDirectoryManager.isWatched(sharedFile.file.getParentFile())) {
                 log.fine("adding to negative tree file ${sharedFile.file}")
-                negativeTree.add(sharedFile.file)
+                negativeTree.add(sharedFile.file, true)
                 save = true
             }
         }
