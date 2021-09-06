@@ -470,7 +470,7 @@ class MainFrameModel {
     private boolean filter(SharedFile sharedFile) {
         if (filter == null)
             return true
-        String path = sharedFile.getCachedPath()
+        String path = sharedFile.getCachedPath().toLowerCase()
         boolean contains = true
         for (String keyword : filter) {
             contains &= path.contains(keyword)
