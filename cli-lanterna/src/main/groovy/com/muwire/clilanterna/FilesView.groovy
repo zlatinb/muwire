@@ -131,7 +131,7 @@ class FilesView extends BasicWindow {
             return
         File directory = new File(directoryName)
         directory = directory.getCanonicalFile()
-        core.eventBus.publish(new DirectoryUnsharedEvent(directory : directory))
+        core.eventBus.publish(new DirectoryUnsharedEvent(directories : new File[] {directory}))
         MessageDialog.showMessageDialog(textGUI, "Directory Unshared", directory.getName()+" has been unshared", MessageDialogButton.OK)
     }
     

@@ -1,9 +1,11 @@
 package com.muwire.gui
 
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 
 import javax.swing.JTextField
+import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.GriffonApplication
@@ -493,13 +495,17 @@ class MainFrameController {
 
     void unshareSelectedFile() {
         def sfs = view.selectedSharedFiles()
-        if (sfs == null)
+        Set<File> folders = view.selectedFolders()
+        if (sfs == null && folders.isEmpty()) 
             return
+        if (sfs == null)
+            sfs = Collections.emptyList()
+        
         List<SharedFile> toUnshare = new ArrayList<>()
         sfs.each { SharedFile sf ->
             
             if (view.settings.collectionWarning) {
-                Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(new InfoHash(sf.root))
+                Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(sf.rootInfoHash)
                 if (!collectionsInfoHashes.isEmpty()) {
                     String[] affected = collectionsInfoHashes.collect({core.collectionManager.getByInfoHash(it)}).collect{it.name}.toArray(new String[0])
 
@@ -512,13 +518,25 @@ class MainFrameController {
                     props.home = core.home
                     def mvc = mvcGroup.createMVCGroup("collection-warning", props)
                     mvc.destroy()
-                    if (!answer[0])
+                    if (!answer[0]) {
+                        File f = sf.getFile()
+                        while(true) {
+                            File parent = f.getParentFile()
+                            if (parent == null)
+                                break
+                            folders.remove(parent)
+                            f = parent
+                        }
                         return
+                    }
                 }
             }
             toUnshare.add(sf)
         }
-        core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : toUnshare.toArray(new SharedFile[0])))
+        if (!folders.isEmpty())
+            core.eventBus.publish(new DirectoryUnsharedEvent(directories: folders.toArray(new File[0]), deleted: false))
+        if (!toUnshare.isEmpty())
+            core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : toUnshare.toArray(new SharedFile[0])))
     }
     
     @ControllerAction

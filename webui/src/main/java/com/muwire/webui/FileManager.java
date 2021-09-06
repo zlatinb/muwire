@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.muwire.core.Core;
 import com.muwire.core.InfoHash;
@@ -79,7 +80,8 @@ public class FileManager {
     public void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         if (!e.getDeleted())
             return;
-        fileTree.remove(e.getDirectory());
+        for (File dir : e.getDirectories())
+            fileTree.remove(dir);
         revision++;
     }
     
@@ -145,17 +147,17 @@ public class FileManager {
                 core.getEventBus().publish(e);
             }
             
-            for (File directory : cb.directories) {
-                if (core.getWatchedDirectoryManager().isWatched(directory)) {
-                    DirectoryUnsharedEvent e = new DirectoryUnsharedEvent();
-                    e.setDirectory(directory);
-                    core.getEventBus().publish(e);
-                }
+            List<File> toUnshare = cb.directories.stream().
+                    filter(dir -> core.getWatchedDirectoryManager().isWatched(dir)).
+                    collect(Collectors.toList());
+            if (!toUnshare.isEmpty()) {
+                DirectoryUnsharedEvent e = new DirectoryUnsharedEvent();
+                e.setDirectories(toUnshare.toArray(new File[0]));
+                core.getEventBus().publish(e);
             }
-            
             if (core.getWatchedDirectoryManager().isWatched(file)) {
                 DirectoryUnsharedEvent event = new DirectoryUnsharedEvent();
-                event.setDirectory(file);
+                event.setDirectories(new File[]{file});
                 core.getEventBus().publish(event);
             }
         }

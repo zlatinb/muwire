@@ -1298,6 +1298,23 @@ class MainFrameView {
         }
     }
     
+    Set<File> selectedFolders() {
+        if (!model.treeVisible) 
+            return Collections.emptySet()
+        
+        def sharedFilesTree = builder.getVariable("shared-files-tree")
+        TreePath[] selectedPaths = sharedFilesTree.getSelectionPaths()
+        Set<File> rv = new HashSet<>()
+        for (TreePath path : selectedPaths) {
+            DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent()
+            if (!(dmtn.getUserObject() instanceof InterimTreeNode))
+                continue
+            InterimTreeNode node = (InterimTreeNode) dmtn.getUserObject()
+            rv << node.getFile()
+        }
+        rv
+    }
+    
     def copyHashToClipboard() {
         def selectedFiles = selectedSharedFiles()
         if (selectedFiles == null)

@@ -144,15 +144,24 @@ class WatchedDirectoryManager {
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        def wd = watchedDirs.remove(e.directory)
-        if (wd == null) {
-            log.warning("unshared a directory that wasn't watched? ${e.directory}")
-            return
+        List<WatchedDirectory> toRemove = new ArrayList<>()
+        for (File dir : e.directories) {
+            def wd = watchedDirs.remove(dir)
+            if (wd == null) {
+                log.warning("unshared a directory that wasn't watched? ${dir}")
+                continue
+            } else log.fine("WDM: adding dir toRemove $dir")
+            toRemove << wd
         }
-        diskIO.submit({
-            File persistFile = new File(home, wd.getEncodedName() + ".json")
-            persistFile.delete()
-        } as Runnable)
+        log.fine "will un-watch ${toRemove.size()} directories"
+        if (!toRemove.isEmpty()) {
+            diskIO.submit({
+                for (WatchedDirectory wd : toRemove) {
+                    File persistFile = new File(home, wd.getEncodedName() + ".json")
+                    persistFile.delete()
+                }
+            } as Runnable)
+        }
     }
     
     private void sync() {

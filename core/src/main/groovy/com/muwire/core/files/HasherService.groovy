@@ -64,7 +64,8 @@ class HasherService {
             return
         if (negativeFiles.negativeTree.get(canonical))
             return
-        if (settings.ignoredFileTypes.contains(DataUtil.getFileExtension(canonical)))
+        String extension = DataUtil.getFileExtension(canonical)
+        if (extension != "" && settings.ignoredFileTypes.contains(extension))
             return
         if (canonical.getName().endsWith(".mwcollection"))
             return
@@ -85,7 +86,8 @@ class HasherService {
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent evt) {
-        hashed.remove(evt.directory)
+        for(File dir : evt.directories)
+            hashed.removeAll(dir)
     }
 
     private synchronized void throttle(File f) {

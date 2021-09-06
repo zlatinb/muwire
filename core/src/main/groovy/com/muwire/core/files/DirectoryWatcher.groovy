@@ -73,6 +73,7 @@ class DirectoryWatcher {
     }
 
     void onDirectoryWatchedEvent(DirectoryWatchedEvent e) {
+        log.fine("DW: onDirectoryWatchedEvent ${e.directory}")
         File canonical = e.directory.getCanonicalFile()
         Path path = canonical.toPath()
         WatchKey wk = path.register(watchService, kinds)
@@ -80,8 +81,11 @@ class DirectoryWatcher {
     }
 
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        WatchKey wk = watchedDirectories.remove(e.directory)
-        wk?.cancel()
+        for (File dir : e.directories) {
+            WatchKey wk = watchedDirectories.remove(dir)
+            wk?.cancel()
+            log.fine("DW: onDirectoryUnsharedEvent $dir")
+        }
     }
     
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
@@ -140,7 +144,7 @@ class DirectoryWatcher {
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFiles : new SharedFile[]{sf}, deleted : true))
         else if (watchedDirectoryManager.isWatched(f)) 
-            eventBus.publish(new DirectoryUnsharedEvent(directory : f, deleted : true))
+            eventBus.publish(new DirectoryUnsharedEvent(directories : new File[]{f}, deleted : true))
         else
             log.fine("Entry was not relevant");
     }

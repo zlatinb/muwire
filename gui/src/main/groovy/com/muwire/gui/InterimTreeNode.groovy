@@ -6,6 +6,10 @@ class InterimTreeNode {
         this.file = file
     }
     
+    public File getFile() {
+        return file;
+    }
+    
     public boolean equals(Object o) {
         if (!(o instanceof InterimTreeNode))
             return false

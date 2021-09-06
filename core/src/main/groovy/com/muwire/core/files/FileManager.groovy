@@ -250,31 +250,18 @@ class FileManager {
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        if (!e.deleted) {
-            List<SharedFile> unsharedFiles = new ArrayList<>()
-            try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(e.directory.toPath())) {
-                for (Path p : directoryStream) {
-                    File file = p.toFile()
-                    if (file.isDirectory())
-                        eventBus.publish(new DirectoryUnsharedEvent(directory : file))
-                    else {
-                        SharedFile sf = fileToSharedFile.get(file)
-                        if (sf != null)
-                            unsharedFiles.add(sf)
-                    }
-                }
-            }
-            if (!unsharedFiles.isEmpty())
-                eventBus.publish(new FileUnsharedEvent(unsharedFiles : unsharedFiles.toArray(new SharedFile[0])))
-        } else {
-             def cb = new DirDeletionCallback()
-             positiveTree.traverse(e.directory, cb)
-             positiveTree.remove(e.directory)
-             eventBus.publish(new FileUnsharedEvent(unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]), 
-                deleted: true))
-             cb.subDirs.each {
-                 eventBus.publish(new DirectoryUnsharedEvent(directory : it, deleted : true))
-             }
+        def cb = new DirDeletionCallback()
+        for (File dir : e.directories) {
+            log.fine("FM: traversing from $dir")
+            positiveTree.traverse(dir, cb)
+            positiveTree.remove(dir)
+        }
+        cb.subDirs.each {log.fine("FM: will remove dir $it")}
+        if (!cb.subDirs.isEmpty())
+            eventBus.publish(new DirectoryUnsharedEvent(directories: cb.subDirs.toArray(new File[0]), deleted: e.deleted))
+        if (!cb.unsharedFiles.isEmpty()) {
+            eventBus.publish(new FileUnsharedEvent(unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]),
+                    deleted: e.deleted))
         }
     }
     

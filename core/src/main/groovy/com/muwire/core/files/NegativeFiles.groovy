@@ -69,9 +69,6 @@ class NegativeFiles {
 
         log.info("saving negative tree size ${negativeTree.fileToNode.size()}, files $negativeFiles")
 
-        if (negativeFiles.isEmpty())
-            return
-        
         executorService.submit({
             negativeTreeFile.withPrintWriter { printer ->
                 negativeFiles.each {
@@ -85,17 +82,20 @@ class NegativeFiles {
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent event) {
-        boolean save = negativeTree.remove(event.directory)
-        if (!event.deleted && watchedDirectoryManager.isWatched(event.directory.getParentFile())) {
-            log.fine("adding to negative tree directory ${event.directory}")
-            negativeTree.add(event.directory, true)
-            save |= true
+        log.info("onDirectoryUnsharedEvent dirs:" + Arrays.toString(event.directories) + " deleted:" + event.deleted)
+        for (File dir : event.directories) {
+            negativeTree.remove(dir)
+            File parent = dir.getParentFile()
+            if (!event.deleted && parent != null && watchedDirectoryManager.isWatched(parent)) {
+                log.fine("adding to negative tree directory ${dir}")
+                negativeTree.add(dir, true)
+            }
         }
-        if (save)
-            saveNegativeTree()
+        saveNegativeTree()
     }
     
     void onFileUnsharedEvent(FileUnsharedEvent event) {
+        log.info("onFileUnsharedEvent files:" + Arrays.toString(event.unsharedFiles) + " deleted:" + event.deleted)
         if (event.deleted)
             return
         boolean save = false
