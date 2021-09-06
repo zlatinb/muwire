@@ -264,7 +264,8 @@ class FileManager {
                     }
                 }
             }
-            eventBus.publish(new FileUnsharedEvent(unsharedFiles : unsharedFiles.toArray(new SharedFile[0])))
+            if (!unsharedFiles.isEmpty())
+                eventBus.publish(new FileUnsharedEvent(unsharedFiles : unsharedFiles.toArray(new SharedFile[0])))
         } else {
              def cb = new DirDeletionCallback()
              positiveTree.traverse(e.directory, cb)
