@@ -140,6 +140,8 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 			return;
 		}
 		try {
+			if (vals == null)
+				reload();
 			BlockFile.pageSeek(bf.file, page);
 			bf.file.writeInt(MAGIC);
 			bf.file.writeInt(overflowPage);
