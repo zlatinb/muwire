@@ -232,6 +232,8 @@ public class Core {
             routerProps.setProperty("i2np.ntcp.port", i2pOptions["i2np.ntcp.port"])
             routerProps.setProperty("i2np.udp.port", i2pOptions["i2np.udp.port"])
             routerProps.setProperty("i2np.udp.internalPort", i2pOptions["i2np.udp.port"])
+            routerProps.setProperty("i2np.upnp.enable", i2pOptions["i2np.upnp.enable"])
+            routerProps.setProperty("i2np.upnp.ipv6.enable", i2pOptions["i2np.upnp.ipv6.enable"])
             router = new Router(routerProps)
             router.getContext().setLogManager(new MuWireLogManager())
             router.runRouter()

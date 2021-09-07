@@ -36,6 +36,7 @@ class OptionsModel {
     @Observable int tunnelQuantity
     @Observable String i2pUDPPort
     @Observable String i2pNTCPPort
+    @Observable boolean useUPNP
 
     // gui options
     @Observable boolean showMonitor
@@ -119,6 +120,7 @@ class OptionsModel {
         tunnelQuantity = Math.max(Integer.parseInt(core.i2pOptions["inbound.quantity"]), Integer.parseInt(core.i2pOptions['outbound.quantity']))
         i2pUDPPort = core.i2pOptions["i2np.udp.port"]
         i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
+        useUPNP = Boolean.parseBoolean(core.i2pOptions.getProperty("i2np.upnp.enable","true"))
 
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor

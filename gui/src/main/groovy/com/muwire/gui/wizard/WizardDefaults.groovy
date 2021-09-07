@@ -10,6 +10,7 @@ class WizardDefaults {
     int i2npUdpPort
     int inBw, outBw
     int tunnelLength, tunnelQuantity
+    boolean useUPNP
 
     WizardDefaults() {
         this(new Properties())
@@ -32,6 +33,8 @@ class WizardDefaults {
         
         tunnelLength = Integer.parseInt(props.getProperty("tunnelLength","3"))
         tunnelQuantity = Integer.parseInt(props.getProperty("tunnelQuantity","4"))
+        
+        useUPNP = Boolean.parseBoolean(props.getProperty("useUPNP", "true"))
     }
     
     private static String getDefaultPath(String pathName) {

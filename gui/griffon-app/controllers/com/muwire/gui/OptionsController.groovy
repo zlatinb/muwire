@@ -52,6 +52,11 @@ class OptionsController {
             text = view.i2pUDPPortField.text
             model.i2pUDPPort = text
             i2pProps["i2np.udp.port"] = text
+            
+            boolean useUPNP = view.useUPNPCheckbox.model.isSelected()
+            model.useUPNP = useUPNP
+            i2pProps["i2np.upnp.enable"] = String.valueOf(useUPNP)
+            i2pProps["i2np.upnp.ipv6.enable"] = String.valueOf(useUPNP)
         }
 
 

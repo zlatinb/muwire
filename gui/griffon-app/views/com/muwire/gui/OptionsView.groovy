@@ -64,6 +64,7 @@ class OptionsView {
     def tunnelQuantitySlider
     def i2pUDPPortField
     def i2pNTCPPortField
+    def useUPNPCheckbox
 
     def monitorCheckbox
     def fontField
@@ -240,6 +241,8 @@ class OptionsView {
                     i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                     label(text : trans("UDP_PORT"), constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                    label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                    useUPNPCheckbox = checkBox(selected: bind {model.useUPNP}, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                 }
             }
             panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))

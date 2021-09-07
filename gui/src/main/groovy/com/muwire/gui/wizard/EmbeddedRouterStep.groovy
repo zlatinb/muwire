@@ -12,6 +12,7 @@ class EmbeddedRouterStep extends WizardStep {
     
     def udpPortField
     def tcpPortField
+    def useUPNPCheckbox
     
     def inBwField
     def outBwField
@@ -31,6 +32,8 @@ class EmbeddedRouterStep extends WizardStep {
                 tcpPortField = textField(text : String.valueOf(defaults.i2npTcpPort), columns : 4, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("UDP_PORT"), constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 udpPortField = textField(text : String.valueOf(defaults.i2npUdpPort), columns : 4, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                label(text : trans("USE_UPNP"), constraints: gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                useUPNPCheckbox = checkBox(selected: defaults.useUPNP, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
             }
             panel( border : titledBorder(title : trans("BANDWIDTH_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
@@ -75,6 +78,11 @@ class EmbeddedRouterStep extends WizardStep {
     protected void apply(MuWireSettings muSettings, Properties i2pSettings) {
         i2pSettings['i2np.ntcp.port'] = tcpPortField.text
         i2pSettings['i2np.udp.port'] = udpPortField.text
+        
+        String upnp = String.valueOf(useUPNPCheckbox.model.isSelected())
+        i2pSettings['i2np.upnp.enable'] = upnp
+        i2pSettings['i2np.upnp.ipv6.enable'] = upnp
+        
         muSettings.outBw = Integer.parseInt(outBwField.text)
         muSettings.inBw = Integer.parseInt(inBwField.text)
     }
