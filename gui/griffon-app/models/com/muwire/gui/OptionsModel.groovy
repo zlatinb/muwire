@@ -73,6 +73,7 @@ class OptionsModel {
     // trust options
     @Observable boolean onlyTrusted
     @Observable boolean searchExtraHop
+    @Observable boolean searchExtraHopCheckboxEnabled
     @Observable boolean trustLists
     @Observable String trustListInterval
 
@@ -157,6 +158,7 @@ class OptionsModel {
 
         onlyTrusted = !settings.allowUntrusted()
         searchExtraHop = settings.searchExtraHop
+        searchExtraHopCheckboxEnabled = onlyTrusted
         trustLists = settings.allowTrustLists
         trustListInterval = String.valueOf(settings.trustListInterval)
         

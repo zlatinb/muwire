@@ -369,8 +369,10 @@ class OptionsView {
                 gridBagLayout()
                 label(text : trans("OPTIONS_ONLY_TRUSTED"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_SEARCH_EXTRA_HOP"), constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                label(text : trans("OPTIONS_SEARCH_EXTRA_HOP"), enabled: bind {model.searchExtraHopCheckboxEnabled},
+                        constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, enabled: bind {model.searchExtraHopCheckboxEnabled},
+                        constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_ALLOW_TRUST_LIST"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_TRUST_LIST_UPDATE_INTERVAL"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
@@ -425,6 +427,10 @@ class OptionsView {
             gridBagLayout()
             button(text : trans("SAVE"), constraints : gbc(gridx : 1, gridy: 2), saveAction)
             button(text : trans("CANCEL"), constraints : gbc(gridx : 2, gridy: 2), cancelAction)
+        }
+        
+        allowUntrustedCheckbox.addActionListener {
+            model.searchExtraHopCheckboxEnabled = allowUntrustedCheckbox.model.isSelected()
         }
     }
 
