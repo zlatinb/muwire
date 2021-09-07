@@ -72,7 +72,10 @@ class MuWireSettings {
     boolean embeddedRouter
     boolean plugin
     boolean disableUpdates
+    
     int inBw, outBw
+    int sharePercentage
+    
     Set<String> watchedKeywords
     Set<String> watchedRegexes
     Set<String> negativeFileTree
@@ -117,6 +120,7 @@ class MuWireSettings {
         disableUpdates = Boolean.valueOf(props.getProperty("disableUpdates","false"))
         inBw = Integer.valueOf(props.getProperty("inBw","256"))
         outBw = Integer.valueOf(props.getProperty("outBw","128"))
+        sharePercentage = Integer.valueOf(props.getProperty("sharePercentage","80"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         searchCollections = Boolean.valueOf(props.getProperty("searchCollections","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
@@ -213,6 +217,7 @@ class MuWireSettings {
         props.setProperty("disableUpdates", String.valueOf(disableUpdates))
         props.setProperty("inBw", String.valueOf(inBw))
         props.setProperty("outBw", String.valueOf(outBw))
+        props.setProperty("sharePercentage", String.valueOf(sharePercentage))
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("searchCollections", String.valueOf(searchCollections))
         props.setProperty("browseFiles", String.valueOf(browseFiles))

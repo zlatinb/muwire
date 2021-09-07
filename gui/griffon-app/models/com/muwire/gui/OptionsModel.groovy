@@ -61,6 +61,7 @@ class OptionsModel {
     // bw options
     @Observable String inBw
     @Observable String outBw
+    @Observable int sharePercentage
 
     // feed options
     @Observable boolean fileFeed
@@ -148,6 +149,7 @@ class OptionsModel {
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)
             outBw = String.valueOf(settings.outBw)
+            sharePercentage = settings.sharePercentage
         }
         
         fileFeed = settings.fileFeed

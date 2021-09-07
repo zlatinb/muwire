@@ -149,6 +149,9 @@ class OptionsController {
             text = view.outBwField.text
             model.outBw = text
             settings.outBw = Integer.valueOf(text)
+            int sharePercentage = view.sharePercentageSlider.value
+            model.sharePercentage = sharePercentage
+            settings.sharePercentage = sharePercentage
         }
         
         // feed saving

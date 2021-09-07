@@ -81,6 +81,7 @@ class OptionsView {
 
     def inBwField
     def outBwField
+    def sharePercentageSlider
     
     def fileFeedCheckbox
     def advertiseFeedCheckbox
@@ -336,6 +337,14 @@ class OptionsView {
                 inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OUTBOUND_BANDWIDTH"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                label(text : trans("SHARE_PERCENTAGE"), constraints: gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 50))
+                def quantityTable = new Hashtable()
+                quantityTable.put(0, new JLabel("0"))
+                quantityTable.put(50, new JLabel("50"))
+                quantityTable.put(100, new JLabel("100"))
+                sharePercentageSlider = slider(minimum : 0, maximum : 100, value : bind {model.sharePercentage},
+                        majorTickSpacing : 5, snapToTicks : true, paintTicks: true, labelTable : quantityTable,
+                        paintLabels : true, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END, weightx: 50))
             }
             panel(constraints : gbc(gridx: 0, gridy: 1, weighty: 100))
         }

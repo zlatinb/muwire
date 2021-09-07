@@ -225,6 +225,7 @@ public class Core {
             routerProps.setProperty("router.excludePeerCaps", i2pOptions["router.excludePeerCaps"])
             routerProps.setProperty("i2np.inboundKBytesPerSecond", String.valueOf(props.inBw))
             routerProps.setProperty("i2np.outboundKBytesPerSecond", String.valueOf(props.outBw))
+            routerProps.setProperty("router.sharePercentage", String.valueOf(props.sharePercentage))
             routerProps.setProperty("i2cp.disableInterface", "true")
             routerProps.setProperty("i2np.ntcp.nodelay", "true")
             routerProps.setProperty("router.encType","4")
