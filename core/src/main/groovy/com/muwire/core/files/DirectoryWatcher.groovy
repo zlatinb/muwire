@@ -37,6 +37,7 @@ class DirectoryWatcher {
 
     private final File home
     private final EventBus eventBus
+    private final MuWireSettings settings
     private final FileManager fileManager
     private final WatchedDirectoryManager watchedDirectoryManager
     private final NegativeFiles negativeFiles
@@ -47,9 +48,11 @@ class DirectoryWatcher {
     private volatile boolean shutdown
 
     DirectoryWatcher(EventBus eventBus, FileManager fileManager, File home, 
-                     WatchedDirectoryManager watchedDirectoryManager, NegativeFiles negativeFiles) {
+                     WatchedDirectoryManager watchedDirectoryManager, NegativeFiles negativeFiles,
+                     MuWireSettings settings) {
         this.home = home
         this.eventBus = eventBus
+        this.settings = settings
         this.fileManager = fileManager
         this.watchedDirectoryManager = watchedDirectoryManager
         this.negativeFiles = negativeFiles
@@ -122,7 +125,9 @@ class DirectoryWatcher {
 
 
     private void processCreated(Path parent, Path path) {
-        File f= join(parent, path)
+        File f = join(parent, path)
+        if (!settings.shareHiddenFiles && f.isHidden())
+            return
         log.fine("created entry $f")
         if (f.isDirectory())
             eventBus.publish(new FileSharedEvent(file : f, fromWatch : true))
@@ -133,6 +138,8 @@ class DirectoryWatcher {
     private void processModified(Path parent, Path path) {
         File f = join(parent, path)
         log.fine("modified entry $f")
+        if (!settings.shareHiddenFiles && f.isHidden())
+            return
         if (!negativeFiles.negativeTree.get(f))
             waitingFiles.put(f, System.currentTimeMillis())
     }

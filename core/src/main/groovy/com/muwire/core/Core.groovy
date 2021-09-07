@@ -472,7 +472,7 @@ public class Core {
         eventBus.register(AllFilesLoadedEvent.class, watchedDirectoryConverter)
         
         log.info("initializing watched directory manager")
-        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager)
+        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager, props)
         eventBus.with { 
             register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
             register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
@@ -490,7 +490,8 @@ public class Core {
         }
 
         log.info("initializing directory watcher")
-        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, watchedDirectoryManager, negativeFiles)
+        directoryWatcher = new DirectoryWatcher(eventBus, fileManager, home, 
+                watchedDirectoryManager, negativeFiles, props)
         eventBus.with {
             register(DirectoryWatchedEvent.class, directoryWatcher)
             register(WatchedDirectoryConvertedEvent.class, directoryWatcher)

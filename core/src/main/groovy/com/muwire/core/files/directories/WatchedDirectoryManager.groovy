@@ -1,5 +1,7 @@
 package com.muwire.core.files.directories
 
+import com.muwire.core.MuWireSettings
+
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
@@ -24,6 +26,7 @@ import groovy.util.logging.Log
 class WatchedDirectoryManager {
     
     private final File home
+    private final MuWireSettings settings
     private final EventBus eventBus
     private final FileManager fileManager
     
@@ -39,11 +42,12 @@ class WatchedDirectoryManager {
     
     private boolean converting = true
     
-    WatchedDirectoryManager(File home, EventBus eventBus, FileManager fileManager) {
+    WatchedDirectoryManager(File home, EventBus eventBus, FileManager fileManager, MuWireSettings settings) {
         this.home = new File(home, "directories")
         this.home.mkdir()
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.settings = settings
     }
     
     public boolean isWatched(File f) {
@@ -96,13 +100,15 @@ class WatchedDirectoryManager {
             forEach {
                 def parsed = slurper.parse(it.toFile())
                 WatchedDirectory wd = WatchedDirectory.fromJson(parsed)
-                if (wd.directory.exists() && wd.directory.isDirectory()) // check if directory disappeared
+                if (wd.directory.exists() && wd.directory.isDirectory() && // check if directory disappeared or hidden
+                        (settings.shareHiddenFiles || !wd.directory.isHidden()))
                     watchedDirs.put(wd.directory, wd)
                 else
                     it.toFile().delete()
             }
             
-            watchedDirs.values().stream().filter({it.autoWatch}).forEach {
+            watchedDirs.values().stream().filter({it.autoWatch}).
+                    forEach {
                 eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
                 eventBus.publish(new FileSharedEvent(file : it.directory))
             }
@@ -123,6 +129,8 @@ class WatchedDirectoryManager {
     void onFileSharedEvent(FileSharedEvent e) {
         if (e.file.isFile() || watchedDirs.containsKey(e.file))
             return
+        if (!settings.shareHiddenFiles && e.file.isHidden())
+            return
         
         def wd = new WatchedDirectory(e.file)
         if (e.fromWatch) {
@@ -137,9 +145,10 @@ class WatchedDirectoryManager {
         } else
             wd.autoWatch = true
         
+        
         watchedDirs.put(wd.directory, wd)
         persist(wd)
-        if (wd.autoWatch)
+        if (wd.autoWatch) 
             eventBus.publish(new DirectoryWatchedEvent(directory: wd.directory))
     }
     
