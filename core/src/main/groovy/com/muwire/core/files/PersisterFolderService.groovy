@@ -96,6 +96,9 @@ class PersisterFolderService extends BasePersisterService {
         def hashListFile = hashListPath.toFile()
         if (hashListFile.isFile())
             hashListFile.delete()
+        def parent = hashListFile.getParentFile()
+        if (parent.list().length == 0)
+            parent.delete()
     }
     
     void onFileLoadedEvent(FileLoadedEvent loadedEvent) {
