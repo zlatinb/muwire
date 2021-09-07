@@ -1,6 +1,10 @@
 package com.muwire.gui
 
+import com.muwire.core.search.BrowseStatus
 import griffon.core.artifact.GriffonView
+
+import javax.swing.JTextField
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -63,13 +67,25 @@ class BrowseView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
-                button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentActionEnabled}, viewCommentAction)
-                button(text : trans("VIEW_CERTIFICATES"), enabled : bind{model.viewCertificatesActionEnabled}, viewCertificatesAction)
-                button(text : trans("VIEW_COLLECTIONS"), enabled : bind{model.viewCollectionsActionEnabled}, viewCollectionsAction)
-                button(text : trans("CHAT"), enabled : bind {model.chatActionEnabled}, chatAction)
-                label(text : trans("DOWNLOAD_SEQUENTIALLY"))
-                sequentialDownloadCheckbox = checkBox()
+                gridLayout(rows: 1, cols: 3)
+                panel(border: etchedBorder()) {
+                    button(text: trans("DOWNLOAD"), enabled: bind { model.downloadActionEnabled }, downloadAction)
+                    label(text: trans("DOWNLOAD_SEQUENTIALLY"), enabled: bind {model.downloadActionEnabled})
+                    sequentialDownloadCheckbox = checkBox(enabled: bind {model.downloadActionEnabled})
+                }
+                panel(border: etchedBorder()) {
+                    button(text: trans("VIEW_COMMENT"), enabled: bind { model.viewCommentActionEnabled }, viewCommentAction)
+                    button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, viewCertificatesAction)
+                    button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, viewCollectionsAction)
+                    button(text: trans("CHAT"), enabled: bind { model.chatActionEnabled }, chatAction)
+                }
+                panel(border: etchedBorder()) {
+                    def textField = new JTextField(15)
+                    textField.addActionListener({ controller.filter() })
+                    widget(id: "filter-field", enabled: bind { model.filterEnabled }, textField)
+                    button(text: trans("FILTER"), enabled: bind { model.filterEnabled }, filterAction)
+                    button(text: trans("CLEAR"), enabled: bind { model.filterEnabled }, clearFilterAction)
+                }
             }
         }
         
@@ -217,6 +233,20 @@ class BrowseView {
         parent.setTabComponentAt(index, tabPanel)
     }
     
+    void refreshResults() {
+        int [] selectedRows = resultsTable.getSelectedRows()
+        if (lastSortEvent != null) {
+            for (int i = 0; i < selectedRows.length; i ++)
+                selectedRows[i] = resultsTable.rowSorter.convertRowIndexToModel(selectedRows[i])
+        }
+        resultsTable.model.fireTableDataChanged()
+        if (lastSortEvent != null) {
+            for (int i = 0; i < selectedRows.length; i ++)
+                selectedRows[i] = resultsTable.rowSorter.convertRowIndexToView(selectedRows[i])
+        }
+        for (int row : selectedRows)
+            resultsTable.selectionModel.addSelectionInterval(row, row)
+    }
     
     def selectedResults() {
         int [] rows = resultsTable.getSelectedRows()

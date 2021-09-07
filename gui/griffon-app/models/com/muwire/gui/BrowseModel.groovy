@@ -1,15 +1,22 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
-
+import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
+import griffon.inject.MVCMember
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
 import com.muwire.core.search.BrowseStatus
 
+import javax.annotation.Nonnull
+import javax.swing.SwingWorker
+
 @ArtifactProviderFor(GriffonModel)
 class BrowseModel {
+    @MVCMember @Nonnull
+    BrowseView view
+    
     Persona host
     @Observable BrowseStatus status
     @Observable boolean downloadActionEnabled
@@ -19,7 +26,71 @@ class BrowseModel {
     @Observable boolean chatActionEnabled
     @Observable int totalResults
     @Observable int resultCount
+    @Observable boolean filterEnabled
     volatile UUID uuid
     
     def results = []
+    List<UIResultEvent> allResults = []
+    
+    volatile String[] filter
+    volatile Filterer filterer
+    
+    private boolean filter(UIResultEvent result) {
+        if (filter == null)
+            return true
+        String name = result.getName().toLowerCase()
+        boolean contains = true
+        for (String keyword : filter) {
+            contains &= name.contains(keyword)
+        }
+        contains
+    }
+    
+    void filterResults() {
+        results.clear()
+        filterer?.cancel()
+        if (filter != null) {
+            filterer = new Filterer()
+            filterer.execute()
+        } else {
+            synchronized (allResults) {
+                results.addAll(allResults)
+            }
+            view.refreshResults()
+        }
+    }
+    
+    private class Filterer extends SwingWorker<List<UIResultEvent>, UIResultEvent> {
+        private volatile boolean cancelled;
+        
+        void cancel() {
+            cancelled = true
+        }
+        
+        @Override
+        protected List<UIResultEvent> doInBackground() throws Exception {
+            synchronized (allResults) {
+                for (UIResultEvent result : allResults) {
+                    if (cancelled)
+                        break
+                    if (filter(result))
+                        publish(result)
+                }
+            }
+        }
+        
+        @Override
+        protected void process(List<UIResultEvent> chunks) {
+            if (cancelled)
+                return
+            results.addAll(chunks)
+        }
+        
+        @Override
+        protected void done() {
+            if (cancelled)
+                return
+            view.refreshResults()
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.SplitPattern
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -9,7 +10,6 @@ import net.i2p.data.Base64
 import javax.annotation.Nonnull
 
 import com.muwire.core.Core
-import com.muwire.core.EventBus
 import com.muwire.core.download.UIDownloadEvent
 import com.muwire.core.search.BrowseStatus
 import com.muwire.core.search.BrowseStatusEvent
@@ -17,8 +17,12 @@ import com.muwire.core.search.UIBrowseEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 
+import javax.swing.JTextField
+
 @ArtifactProviderFor(GriffonController)
 class BrowseController {
+    @MVCMember @Nonnull
+    FactoryBuilderSupport builder
     @MVCMember @Nonnull
     BrowseModel model
     @MVCMember @Nonnull
@@ -44,6 +48,8 @@ class BrowseController {
             return
         runInsideUIAsync {
             model.status = e.status
+            model.filterEnabled = (e.status == BrowseStatus.FINISHED || e.status == BrowseStatus.FAILED) &&
+                    model.resultCount > 0
             if (e.status == BrowseStatus.FETCHING) 
                 model.totalResults = e.totalResults
         }
@@ -54,23 +60,35 @@ class BrowseController {
             if (e.uuid != model.uuid)
                 return
             model.chatActionEnabled = e.results[0].chat
-            model.results.addAll(e.results.toList())
+            List<UIResultEvent> results = e.results.toList()
+            model.results.addAll(results)
+            synchronized (model.allResults) {
+                model.allResults.addAll(results)
+            }
             model.resultCount = model.results.size()
             
-            int [] selectedRows = view.resultsTable.getSelectedRows()
-            if (view.lastSortEvent != null) {
-                for (int i = 0; i < selectedRows.length; i ++)
-                    selectedRows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(selectedRows[i])
-            }
-            view.resultsTable.model.fireTableDataChanged()
-            if (view.lastSortEvent != null) {
-                for (int i = 0; i < selectedRows.length; i ++)
-                    selectedRows[i] = view.resultsTable.rowSorter.convertRowIndexToView(selectedRows[i])
-            }
-            for (int row : selectedRows) 
-                view.resultsTable.selectionModel.addSelectionInterval(row, row)
-            
+            view.refreshResults()
         }
+    }
+    
+    @ControllerAction
+    void filter() {
+        JTextField field = builder.getVariable("filter-field")
+        String filter = field.getText()
+        if (filter == null)
+            return
+        filter = filter.strip().replaceAll(SplitPattern.SPLIT_PATTERN," ").toLowerCase()
+        String [] split = filter.split(" ")
+        def hs = new HashSet()
+        split.each {if (it.length() > 0) hs << it}
+        model.filter = hs.toArray(new String[0])
+        model.filterResults()
+    }
+    
+    @ControllerAction
+    void clearFilter() {
+        model.filter = null
+        model.filterResults()
     }
     
     @ControllerAction
