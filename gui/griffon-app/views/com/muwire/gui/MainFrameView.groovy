@@ -401,8 +401,8 @@ class MainFrameView {
                             scrollPane (constraints : BorderLayout.CENTER) {
                                 table(id : "uploads-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                     tableModel(list : model.uploads) {
-                                        closureColumn(header : trans("NAME"), type : String, read : {row -> HTMLSanitizer.sanitize(row.uploader.getName()) })
-                                        closureColumn(header : trans("PROGRESS"), type : String, read : { row ->
+                                        closureColumn(header : trans("NAME"), preferredWidth: 350,  type : String, read : {row -> HTMLSanitizer.sanitize(row.uploader.getName()) })
+                                        closureColumn(header : trans("PROGRESS"), preferredWidth: 50, type : String, read : { row ->
                                             int percent = row.uploader.getProgress()
                                             trans("PERCENT_OF_PIECE", percent)
                                         })
@@ -425,7 +425,7 @@ class MainFrameView {
                                             }
                                             "${totalSize} ($done/$pieces".toString() + trans("PIECES_SHORT")+ ")"
                                         })
-                                        closureColumn(header : trans("SPEED"), type : String, read : { row ->
+                                        closureColumn(header : trans("SPEED"), preferredWidth: 50,  type : String, read : { row ->
                                             int speed = row.speed()
                                             formatSize(speed, "B_SEC")
                                         })
