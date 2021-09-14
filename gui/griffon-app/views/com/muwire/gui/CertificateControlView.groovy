@@ -63,7 +63,7 @@ class CertificateControlView {
                 scrollPane {
                     certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.certificates) {
-                            closureColumn(header : trans("FILE_NAME"), type : String, read : {it.name.name})
+                            closureColumn(header : trans("FILE_NAME"), type : String, read : {HTMLSanitizer.sanitize(it.name.name)})
                             closureColumn(header : trans("HASH"), type : String, read : {Base64.encode(it.infoHash.getRoot())})
                             closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
                             closureColumn(header : trans("TIMESTAMP"), type : Long, read : { it.timestamp })

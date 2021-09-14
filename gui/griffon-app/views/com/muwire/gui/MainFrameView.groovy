@@ -401,7 +401,7 @@ class MainFrameView {
                             scrollPane (constraints : BorderLayout.CENTER) {
                                 table(id : "uploads-table", autoCreateRowSorter: true, rowHeight : rowHeight) {
                                     tableModel(list : model.uploads) {
-                                        closureColumn(header : trans("NAME"), type : String, read : {row -> row.uploader.getName() })
+                                        closureColumn(header : trans("NAME"), type : String, read : {row -> HTMLSanitizer.sanitize(row.uploader.getName()) })
                                         closureColumn(header : trans("PROGRESS"), type : String, read : { row ->
                                             int percent = row.uploader.getProgress()
                                             trans("PERCENT_OF_PIECE", percent)

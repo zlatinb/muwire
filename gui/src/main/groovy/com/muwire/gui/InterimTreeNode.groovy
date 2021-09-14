@@ -2,8 +2,10 @@ package com.muwire.gui
 
 class InterimTreeNode {
     private final File file
+    private final String toString
     InterimTreeNode(File file) {
         this.file = file
+        this.toString = HTMLSanitizer.sanitize(file.getName())
     }
     
     public File getFile() {
@@ -17,6 +19,6 @@ class InterimTreeNode {
     }
     
     public String toString() {
-        file.getName()
+        toString
     }
 }

@@ -37,7 +37,7 @@ class SharedTreeRenderer extends DefaultTreeCellRenderer {
         SizeFormatter.format(length,sb)
         sb.append(bShort)
         
-        setText("$name (${sb.toString()})")
+        setText(HTMLSanitizer.sanitize("$name (${sb.toString()})"))
         setEnabled(true)
         if (sf.comment != null) {
             setIcon(commentIcon)
