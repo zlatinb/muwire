@@ -454,7 +454,7 @@ public class Core {
 
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
-        connectionAcceptor = new ConnectionAcceptor(eventBus, connectionManager, props,
+        connectionAcceptor = new ConnectionAcceptor(eventBus, me, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer, collectionManager)
 

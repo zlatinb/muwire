@@ -1,5 +1,6 @@
 package com.muwire.core.connection
 
+import com.muwire.core.Personas
 import com.muwire.core.hostcache.SimpleHostCache
 
 import static org.junit.Assert.fail
@@ -96,7 +97,7 @@ class ConnectionAcceptorTest {
         uploadManager = uploadManagerMock.proxyInstance()
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
-        acceptor = new ConnectionAcceptor(eventBus, connectionManager, settings, i2pAcceptor,
+        acceptor = new ConnectionAcceptor(eventBus, null, connectionManager, settings, i2pAcceptor,
             hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null)
         acceptor.start()
         Thread.sleep(100)

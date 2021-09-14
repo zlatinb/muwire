@@ -49,6 +49,7 @@ class ConnectionAcceptor {
     private static final int RESULT_BATCH_SIZE = 128
 
     final EventBus eventBus
+    final Persona me
     final UltrapeerConnectionManager manager
     final MuWireSettings settings
     final I2PAcceptor acceptor
@@ -69,12 +70,13 @@ class ConnectionAcceptor {
     
     volatile int browsed
 
-    ConnectionAcceptor(EventBus eventBus, UltrapeerConnectionManager manager,
+    ConnectionAcceptor(EventBus eventBus, Persona me, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
         FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
         ChatServer chatServer, CollectionManager collectionManager) {
         this.eventBus = eventBus
+        this.me = me
         this.manager = manager
         this.settings = settings
         this.acceptor = acceptor
@@ -725,7 +727,8 @@ class ConnectionAcceptor {
             dis = new DataInputStream(new GZIPInputStream(dis))
             count.times { 
                 MWMessage m = new MWMessage(dis)
-                eventBus.publish(new MessageReceivedEvent(message : m))
+                if (m.sender.destination == e.destination && m.recipients.contains(me))
+                    eventBus.publish(new MessageReceivedEvent(message : m))
             }
         } catch (Exception bad) {
             log.log(Level.WARNING, "failed to process LETTER", bad)
