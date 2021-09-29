@@ -40,6 +40,11 @@ sourceSets {
             srcDir 'griffon-app/resources'
         }
     }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
 }
 
 application {
@@ -112,6 +117,9 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testCompileOnly "org.codehaus.groovy:groovy-all:${groovyVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testImplementation 'junit:junit:4.12'
 }
 
 tasks.withType(JavaCompile) {

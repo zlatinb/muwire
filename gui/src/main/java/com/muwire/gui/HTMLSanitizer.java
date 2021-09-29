@@ -1,9 +1,9 @@
 package com.muwire.gui;
 
 public class HTMLSanitizer {
-    private static final String escapeChars[] = {"&", "\"", "<", ">", "'"};
+    private static final String escapeChars[] = {"&", "\"", "<", ">"}; //, "'"}; // apostrophe not supported
     private static final String escapeCodes[] = {"&amp;amp;", "&amp;quot;", "&amp;lt;", "&amp;gt;", "&amp;apos;"};
-    private static final String escapedCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;", "&apos;"};
+    private static final String escapedCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;"}; //, "&apos;"}; apostrophe not supported
     
     public static String sanitize(String s) {
         if (s == null)
