@@ -260,7 +260,7 @@ class MainFrameView {
                                                 if (speed == 0)
                                                     return trans("UNKNOWN")
                                                 else {
-                                                    def remaining = (row.downloader.nPieces - row.downloader.donePieces()) * row.downloader.pieceSize / speed
+                                                    def remaining = (row.downloader.getNPieces() - row.downloader.donePieces()) * row.downloader.getPieceSize() / speed
                                                     return DataHelper.formatDuration(remaining.toLong() * 1000)
                                                 }
                                             })
@@ -296,13 +296,13 @@ class MainFrameView {
                                             label(text : trans("SEQUENTIAL") + ":", constraints : gbc(gridx: 0, gridy: 2))
                                             label(text : bind {model.downloader?.isSequential()}, constraints : gbc(gridx:1, gridy:2, insets : [0,0,0,20]))
                                             label(text : trans("KNOWN_SOURCES") + ":", constraints : gbc(gridx:3, gridy: 0))
-                                            label(text : bind {model.downloader?.activeWorkers?.size()}, constraints : gbc(gridx:4, gridy:0, insets : [0,0,0,20]))
+                                            label(text : bind {model.downloader?.activeWorkers()}, constraints : gbc(gridx:4, gridy:0, insets : [0,0,0,20]))
                                             label(text : trans("ACTIVE_SOURCES") + ":", constraints : gbc(gridx:3, gridy:1))
                                             label(text : bind {model.downloader?.activeWorkers()}, constraints : gbc(gridx:4, gridy:1, insets : [0,0,0,20]))
                                             label(text : trans("HOPELESS_SOURCES") + ":", constraints : gbc(gridx:3, gridy:2))
                                             label(text : bind {model.downloader?.countHopelessSources()}, constraints : gbc(gridx:4, gridy:2, insets : [0,0,0,20]))
                                             label(text : trans("TOTAL_PIECES") + ":", constraints : gbc(gridx:5, gridy: 0))
-                                            label(text : bind {model.downloader?.nPieces}, constraints : gbc(gridx:6, gridy:0, insets : [0,0,0,20]))
+                                            label(text : bind {model.downloader?.getNPieces()}, constraints : gbc(gridx:6, gridy:0, insets : [0,0,0,20]))
                                             label(text : trans("DONE_PIECES") + ":", constraints: gbc(gridx:5, gridy: 1))
                                             label(text : bind {model.downloader?.donePieces()}, constraints : gbc(gridx:6, gridy:1, insets : [0,0,0,20]))
                                         }

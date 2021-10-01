@@ -20,6 +20,7 @@ public class EnumStrings {
     static {
         DOWNLOAD_STATES.put(Downloader.DownloadState.CANCELLED, _x("Cancelled"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.CONNECTING, _x("Connecting"));
+        DOWNLOAD_STATES.put(Downloader.DownloadState.COPYING, _x("Copying"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.DOWNLOADING, _x("Downloading"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.FAILED, _x("Failed"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.FINISHED, _x("Finished"));

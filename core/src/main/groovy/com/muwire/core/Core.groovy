@@ -430,7 +430,8 @@ public class Core {
         }
         
         log.info("initializing download manager")
-        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, i2pConnector, home, me, chatServer)
+        downloadManager = new DownloadManager(eventBus, trustService, meshManager, props, 
+                i2pConnector, home, me, chatServer, fileManager)
         eventBus.register(UIDownloadEvent.class, downloadManager)
         eventBus.register(UIDownloadFeedItemEvent.class, downloadManager)
         eventBus.register(UILoadedEvent.class, downloadManager)

@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.download.CopyingDownloader
+
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JTable
@@ -17,12 +19,16 @@ class DownloadProgressRenderer extends DefaultTableCellRenderer {
     @Override
     JComponent getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
-        Downloader d = (Downloader) value
-        int pieces = d.nPieces
-        int done = d.donePieces()
         int percent = -1
-        if (pieces != 0)
-            percent = (int)(done * 100.0d / pieces)
+        Downloader d = (Downloader) value
+        if (d instanceof CopyingDownloader)
+            percent = 100
+        else {
+            int pieces = d.getNPieces()
+            int done = d.donePieces()
+            if (pieces != 0)
+                percent = (int) (done * 100.0d / pieces)
+        }
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(d.length, sb)
         String totalSize = sb.toString() + "B"

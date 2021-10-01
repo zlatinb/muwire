@@ -4,6 +4,7 @@ import com.muwire.core.connection.I2PConnector
 import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHasher
+import com.muwire.core.files.FileManager
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
@@ -47,11 +48,12 @@ public class DownloadManager {
     private final File home
     private final Persona me
     private final ChatServer chatServer
+    private final FileManager fileManager
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
     
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
-        I2PConnector connector, File home, Persona me, ChatServer chatServer) {
+        I2PConnector connector, File home, Persona me, ChatServer chatServer, FileManager fileManager) {
         this.eventBus = eventBus
         this.trustService = trustService
         this.meshManager = meshManager
@@ -60,6 +62,7 @@ public class DownloadManager {
         this.home = home
         this.me = me
         this.chatServer = chatServer
+        this.fileManager = fileManager
 
         this.executor = Executors.newCachedThreadPool({ r ->
             Thread rv = new Thread(r)
@@ -122,15 +125,23 @@ public class DownloadManager {
     
     private Downloader doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
         boolean sequential, Set<Destination> destinations, InfoHash collectionInfoHash) {
-        File incompletes = muSettings.incompleteLocation
-        if (incompletes == null)
-            incompletes = new File(home, "incompletes")
-        incompletes.mkdirs()
         
-        Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
-        def downloader = new Downloader(eventBus, this, chatServer, me, target, size,
-                infoHash, collectionInfoHash, pieceSize, connector, destinations,
-                incompletes, pieces, muSettings.downloadMaxFailures)
+        def downloader
+        if (fileManager.getRootToFiles().containsKey(infoHash)) {
+            def source = fileManager.getRootToFiles().get(infoHash)[0].getFile()
+            downloader = new CopyingDownloader(eventBus, this, target, size, infoHash, 
+                    collectionInfoHash, pieceSize, source)
+        } else {
+            File incompletes = muSettings.incompleteLocation
+            if (incompletes == null)
+                incompletes = new File(home, "incompletes")
+            incompletes.mkdirs()
+
+            Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
+            downloader = new NetworkDownloader(eventBus, this, chatServer, me, target, size,
+                    infoHash, collectionInfoHash, pieceSize, connector, destinations,
+                    incompletes, pieces, muSettings.downloadMaxFailures)
+        }
         downloaders.put(infoHash, downloader)
         persistDownloaders()
         executor.execute({downloader.download()} as Runnable)
@@ -167,10 +178,7 @@ public class DownloadManager {
         downloadsFile.eachLine {
             def json = slurper.parseText(it)
             File file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
-            def destinations = new HashSet<>()
-            json.destinations.each { destination ->
-                destinations.add new Destination(destination)
-            }
+            
             InfoHash infoHash
             if (json.hashList != null) {
                 byte[] hashList = Base64.decode(json.hashList)
@@ -187,29 +195,42 @@ public class DownloadManager {
             boolean sequential = false
             if (json.sequential != null)
                 sequential = json.sequential
-                
-            File incompletes
-            if (json.incompletes != null) 
-                incompletes = new File(DataUtil.readi18nString(Base64.decode(json.incompletes)))
-            else
-                incompletes = new File(home, "incompletes")
 
             if (json.pieceSizePow2 == null || json.pieceSizePow2 == 0) {
                 log.warning("Skipping $file because pieceSizePow2=$json.pieceSizePow2")
                 return // skip this download as it's corrupt anyway
             }
-                
-            Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
-            def downloader = new Downloader(eventBus, this, chatServer, me, file, (long)json.length,
-                infoHash, collectionInfoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
-            if (json.paused != null)
-                downloader.paused = json.paused
+            def downloader
+            if (json.copying == null) {
+                def destinations = new HashSet<>()
+                json.destinations.each { destination ->
+                    destinations.add new Destination(destination)
+                }
+
+                File incompletes
+                if (json.incompletes != null)
+                    incompletes = new File(DataUtil.readi18nString(Base64.decode(json.incompletes)))
+                else
+                    incompletes = new File(home, "incompletes")
+
                 
-            downloader.successfulDestinations.addAll(destinations) // if it was persisted, it was successful
+                Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
+
+                downloader = new NetworkDownloader(eventBus, this, chatServer, me, file, (long)json.length,
+                    infoHash, collectionInfoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
+                    downloader.successfulDestinations.addAll(destinations) // if it was persisted, it was successful
+                downloader.readPieces()
+                if (json.paused != null)
+                    downloader.paused = json.paused
+            } else {
+                File source = new File(DataUtil.readi18nString(Base64.decode(json.source)))
+                downloader = new CopyingDownloader(eventBus, this, file, (long)json.length,
+                        infoHash, collectionInfoHash, json.pieceSizePow2, source)
+            }
+                
                 
             try {
-                downloader.readPieces()
                 if (!downloader.paused)
                     downloader.download()
                 downloaders.put(infoHash, downloader)
@@ -259,11 +280,19 @@ public class DownloadManager {
                     json.file = Base64.encode(DataUtil.encodei18nString(downloader.file.getAbsolutePath()))
                     json.length = downloader.length
                     json.pieceSizePow2 = downloader.pieceSizePow2
-                    def destinations = []
-                    downloader.destinations.each {
-                        destinations << it.toBase64()
+                    
+                    if (downloader instanceof NetworkDownloader) {
+                        def destinations = []
+                        downloader.destinations.each {
+                            destinations << it.toBase64()
+                        }
+                        json.destinations = destinations
+                        json.incompletes = Base64.encode(DataUtil.encodei18nString(downloader.incompletes.getAbsolutePath()))
+                    } else if (downloader instanceof CopyingDownloader) {
+                        def cd = (CopyingDownloader) downloader
+                        json.copying = true
+                        json.source = Base64.encode(DataUtil.encodei18nString(cd.source.getAbsolutePath()))
                     }
-                    json.destinations = destinations
 
                     InfoHash infoHash = downloader.getInfoHash()
                     if (infoHash.hashList != null)
@@ -275,10 +304,7 @@ public class DownloadManager {
                         json.collectionInfoHash = Base64.encode(downloader.collectionInfoHash.getRoot())
                         
                     json.paused = downloader.paused
-                    
-                    json.sequential = downloader.pieces.ratio == 0f
-                    
-                    json.incompletes = Base64.encode(DataUtil.encodei18nString(downloader.incompletes.getAbsolutePath()))
+                    json.sequential = downloader.isSequential()
                     
                     writer.println(JsonOutput.toJson(json))
                 }
