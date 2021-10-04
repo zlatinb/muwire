@@ -136,7 +136,7 @@ class ResultsParser {
                 uuid: uuid,
                 certificates : certificates,
                 collections : collections,
-                path: path.toArray(new String[0]))
+                path: path.isEmpty() ? null : path.toArray(new String[0]))
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }

@@ -210,10 +210,14 @@ class ResultsSender {
         if (showPaths) {
             List<String> path = new ArrayList<>()
             if (sf.getPathToSharedParent() != null) {
-                for (Path element : sf.getPathToSharedParent())
-                    path << Base64.encode(DataUtil.encodei18nString(element.toString()))
+                for (Path element : sf.getPathToSharedParent()) {
+                    String toString = element.toString()
+                    if (!toString.isEmpty())
+                        path << Base64.encode(DataUtil.encodei18nString(toString))
+                }
             }
-            obj.path = path
+            if (!path.isEmpty())
+                obj.path = path
         }
             
         obj
