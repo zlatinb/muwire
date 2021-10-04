@@ -73,8 +73,13 @@ class BrowseController {
             }
             model.resultCount = model.results.size()
         }
-        if (!copy.isEmpty())
-            view.refreshResults()
+        if (model.visible) {
+            if (!copy.isEmpty() || model.dirty) {
+                view.refreshResults()
+                model.dirty = false
+            }
+        } else if (!copy.isEmpty())
+            model.dirty = true
         
         List<BrowseStatusEvent> statusCopy
         synchronized (model.pendingStatuses) {

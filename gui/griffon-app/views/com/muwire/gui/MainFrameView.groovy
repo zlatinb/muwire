@@ -10,7 +10,10 @@ import org.h2.value.Transfer
 
 import javax.swing.DropMode
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.event.ChangeEvent
+import javax.swing.event.ChangeListener
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.tree.DefaultMutableTreeNode
@@ -88,6 +91,7 @@ class MainFrameView {
     def lastContactsSortEvent
     def lastContactsSubscriptionSortEvent
     def expansionListener = new TreeExpansions()
+    ResultTabsChangeListener resultsTabListener
     def lastFeedsSortEvent
     def lastFeedItemsSortEvent
     
@@ -1261,6 +1265,11 @@ class MainFrameView {
         def chatTabbedPane = builder.getVariable("chat-tabs")
         chatTabbedPane.addChangeListener({e -> chatNotificator.serverTabChanged(e.getSource())})
         
+        // result tabs listener
+        def resultsTabbedPane = builder.getVariable("result-tabs")
+        resultsTabListener = new ResultTabsChangeListener(resultsTabbedPane)
+        resultsTabbedPane.addChangeListener(resultsTabListener)
+        
         // show tree by default
         showSharedFilesTree.call()
         
@@ -1633,6 +1642,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markSelectedVisible()
     }
 
     def showDownloadsWindow = {
@@ -1648,6 +1658,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
 
     def showUploadsWindow = {
@@ -1663,6 +1674,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
     
     def showCollectionsWindow = {
@@ -1678,6 +1690,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
 
     def showMonitorWindow = {
@@ -1693,6 +1706,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
     
     def showFeedsWindow = {
@@ -1708,6 +1722,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
 
     def showTrustWindow = {
@@ -1723,6 +1738,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
     
     def showMessagesWindow = {
@@ -1738,6 +1754,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = false
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
+        resultsTabListener.markAllTabsInvisible()
     }
     
     def showChatWindow = {
@@ -1753,6 +1770,7 @@ class MainFrameView {
         model.messagesPaneButtonEnabled = true
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()
+        resultsTabListener.markAllTabsInvisible()
     }
     
     def showSharedFilesTable = {
@@ -2019,6 +2037,34 @@ class MainFrameView {
             t.start()
             File uiPropsFile = new File(core.home, "gui.properties")
             uiPropsFile.withOutputStream { settings.write(it) }
+        }
+    }
+    
+    private class ResultTabsChangeListener implements ChangeListener {
+        
+        private final JTabbedPane resultTabs
+        ResultTabsChangeListener(JTabbedPane resultTabs) {
+            this.resultTabs = resultTabs
+        }
+
+        void markAllTabsInvisible() {
+            // first disable all tabs
+            final int count = resultTabs.getTabCount()
+            for (int i = 0; i < count; i++) {
+                JPanel panel = resultTabs.getComponentAt(i)
+                panel.getClientProperty("focusListener")?.onFocus(false)
+            }
+        }
+        
+        void markSelectedVisible() {
+            markAllTabsInvisible()
+            JPanel selected = resultTabs.getSelectedComponent()
+            selected?.getClientProperty("focusListener")?.onFocus(true)
+        }
+        
+        @Override
+        void stateChanged(ChangeEvent e) {
+            markSelectedVisible()
         }
     }
 

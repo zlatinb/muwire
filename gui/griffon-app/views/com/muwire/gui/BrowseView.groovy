@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.search.BrowseStatus
 import griffon.core.artifact.GriffonView
 
+import javax.swing.JPanel
 import javax.swing.JTextField
 
 import static com.muwire.gui.Translator.trans
@@ -40,7 +41,7 @@ class BrowseView {
     BrowseController controller
 
     def parent
-    def p
+    JPanel p
     def resultsTable
     def lastSortEvent
     def sequentialDownloadCheckbox
@@ -144,6 +145,8 @@ class BrowseView {
                     showMenu(e)
             }
         })
+        
+        p.putClientProperty("focusListener", new FocusListener())
     }
     
     private void showMenu(MouseEvent e) {
@@ -272,5 +275,11 @@ class BrowseView {
         parent.removeTabAt(index)
         model.downloadActionEnabled = false
         mvcGroup.destroy()
+    }
+    
+    private class FocusListener {
+        void onFocus(boolean focus) {
+            model.visible = focus
+        }
     }
 }
