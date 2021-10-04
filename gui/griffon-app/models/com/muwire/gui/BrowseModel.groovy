@@ -1,6 +1,8 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import com.muwire.core.search.BrowseStatusEvent
+import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
@@ -31,6 +33,9 @@ class BrowseModel {
     
     def results = []
     List<UIResultEvent> allResults = []
+    
+    List<UIResultBatchEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())
+    List<BrowseStatusEvent> pendingStatuses = Collections.synchronizedList(new ArrayList<>())
     
     volatile String[] filter
     volatile Filterer filterer

@@ -30,15 +30,18 @@ class BrowseController {
 
     Core core
     
+    javax.swing.Timer timer = new javax.swing.Timer(1000, {displayBatchedResults()})
     
     void register() {
         core.eventBus.register(BrowseStatusEvent.class, this)
         core.eventBus.register(UIResultBatchEvent.class, this)
         model.uuid = UUID.randomUUID()
+        timer.start()
         core.eventBus.publish(new UIBrowseEvent(host : model.host, uuid: model.uuid))
     }
     
     void mvcGroupDestroy() {
+        timer.stop()
         core.eventBus.unregister(BrowseStatusEvent.class, this)
         core.eventBus.unregister(UIResultBatchEvent.class, this)
     }
@@ -46,28 +49,44 @@ class BrowseController {
     void onBrowseStatusEvent(BrowseStatusEvent e) {
         if (e.uuid != model.uuid)
             return
-        runInsideUIAsync {
-            model.status = e.status
-            model.filterEnabled = (e.status == BrowseStatus.FINISHED || e.status == BrowseStatus.FAILED) &&
-                    model.resultCount > 0
-            if (e.status == BrowseStatus.FETCHING) 
-                model.totalResults = e.totalResults
-        }
+        model.pendingStatuses.add(e)
     }
     
     void onUIResultBatchEvent(UIResultBatchEvent e) {
-        runInsideUIAsync {
-            if (e.uuid != model.uuid)
-                return
-            model.chatActionEnabled = e.results[0].chat
-            List<UIResultEvent> results = e.results.toList()
+        if (e.uuid != model.uuid)
+            return
+        model.pendingResults.add(e)
+    }
+    
+    private void displayBatchedResults() {
+        List<UIResultBatchEvent> copy
+        synchronized(model.pendingResults) {
+            copy = new ArrayList<>(model.pendingResults)
+            model.pendingResults.clear()
+        }
+        for(UIResultBatchEvent event : copy) {
+            model.chatActionEnabled = event.results[0].chat
+            List<UIResultEvent> results = event.results.toList()
             model.results.addAll(results)
             synchronized (model.allResults) {
                 model.allResults.addAll(results)
             }
             model.resultCount = model.results.size()
-            
+        }
+        if (!copy.isEmpty())
             view.refreshResults()
+        
+        List<BrowseStatusEvent> statusCopy
+        synchronized (model.pendingStatuses) {
+            statusCopy = new ArrayList<>(model.pendingStatuses)
+            model.pendingStatuses.clear()
+        }
+        for(BrowseStatusEvent event : statusCopy) {
+            model.status = event.status
+            model.filterEnabled = (event.status == BrowseStatus.FINISHED || event.status == BrowseStatus.FAILED) &&
+                    model.resultCount > 0
+            if (event.status == BrowseStatus.FETCHING)
+                model.totalResults = event.totalResults
         }
     }
     
