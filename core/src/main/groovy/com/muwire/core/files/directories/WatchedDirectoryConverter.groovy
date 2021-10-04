@@ -14,7 +14,7 @@ class WatchedDirectoryConverter {
         this.core = core
     }
     
-    void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
+    void convert() {
         core.getMuOptions().getWatchedDirectories().each {
             File directory = new File(it)
             directory = directory.getCanonicalFile() 

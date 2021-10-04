@@ -1,6 +1,7 @@
 package com.muwire.core.files.directories
 
 import com.muwire.core.MuWireSettings
+import com.muwire.core.files.AllFilesLoadedEvent
 
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
@@ -106,14 +107,16 @@ class WatchedDirectoryManager {
                 else
                     it.toFile().delete()
             }
-            
-            watchedDirs.values().stream().filter({it.autoWatch}).
-                    forEach {
-                eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
-                eventBus.publish(new FileSharedEvent(file : it.directory))
-            }
-            timer.schedule({sync()} as TimerTask, 1000, 1000)
         } as Runnable)
+    }
+    
+    void onAllFilesLoadedEvent(AllFilesLoadedEvent event) {
+        watchedDirs.values().stream().filter({it.autoWatch}).
+                forEach {
+                    eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
+                    eventBus.publish(new FileSharedEvent(file : it.directory))
+                }
+        timer.schedule({sync()} as TimerTask, 1000, 1000)
     }
     
     private void persist(WatchedDirectory dir) {

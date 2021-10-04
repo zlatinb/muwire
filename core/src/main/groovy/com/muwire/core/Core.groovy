@@ -475,11 +475,11 @@ public class Core {
         
         log.info("initializing watched directory converter")
         watchedDirectoryConverter = new WatchedDirectoryConverter(this)
-        eventBus.register(AllFilesLoadedEvent.class, watchedDirectoryConverter)
         
         log.info("initializing watched directory manager")
         watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager, props)
         eventBus.with { 
+            register(AllFilesLoadedEvent.class, watchedDirectoryManager)
             register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
             register(WatchedDirectoryConvertedEvent.class, watchedDirectoryManager)
             register(FileSharedEvent.class, watchedDirectoryManager)
@@ -543,6 +543,7 @@ public class Core {
         }
 
         i2pSession.connect()
+        watchedDirectoryConverter.convert()
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()

@@ -2,6 +2,7 @@ package com.muwire.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class SharedFile {
     private final Set<SearchEntry> searches = Collections.synchronizedSet(new HashSet<>());
     private volatile boolean published;
     private volatile long publishedTimestamp;
+    
+    /** Path to the top-most parent File that is shared.  Null if no such exists */
+    private volatile Path pathToSharedParent;
 
     public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
@@ -135,6 +139,14 @@ public class SharedFile {
         return publishedTimestamp;
     }
 
+    public void setPathToSharedParent(Path path) {
+        this.pathToSharedParent = path;
+    }
+    
+    public Path getPathToSharedParent() {
+        return pathToSharedParent;
+    }
+    
     @Override
     public int hashCode() {
         return hashCode;

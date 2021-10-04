@@ -9,6 +9,8 @@ import com.muwire.core.util.DataUtil
 import net.i2p.data.Base64
 import net.i2p.data.Destination
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.stream.Collectors
 
 abstract class BasePersisterService extends Service{
@@ -110,8 +112,12 @@ abstract class BasePersisterService extends Service{
             return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
 
+        Path path = null
+        if (json.pathToSharedParent != null) 
+            path = Path.of(json.pathToSharedParent)
 
         SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
+        sf.setPathToSharedParent(path)
         sf.setComment(json.comment)
         if (published)
             sf.publish(publishedTimestamp)
@@ -144,6 +150,8 @@ abstract class BasePersisterService extends Service{
         json.comment = sf.getComment()
         json.hits = sf.getHits()
         json.downloaders = sf.getDownloaders()
+        if (sf.getPathToSharedParent() != null)
+            json.pathToSharedParent = sf.getPathToSharedParent().toString()
 
         if (!sf.searches.isEmpty()) {
             Set searchers = new HashSet<>()

@@ -3,6 +3,7 @@ package com.muwire.core.files
 import com.muwire.core.*
 import com.muwire.core.filefeeds.UIFilePublishedEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
+import com.muwire.core.files.directories.WatchedDirectoryManager
 import com.muwire.core.util.DataUtil
 import groovy.json.JsonOutput
 import groovy.json.JsonParserType
@@ -64,6 +65,10 @@ class PersisterFolderService extends BasePersisterService {
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
         if (core.getMuOptions().getAutoPublishSharedFiles() && hashedEvent.sharedFile != null) 
             hashedEvent.sharedFile.publish(System.currentTimeMillis())
+        
+        File file = hashedEvent.sharedFile.file
+        hashedEvent.sharedFile.setPathToSharedParent(findSharedParent(file))
+        
         persistFile(hashedEvent.sharedFile, hashedEvent.infoHash)
     }
 
@@ -71,6 +76,10 @@ class PersisterFolderService extends BasePersisterService {
         if (core.getMuOptions().getShareDownloadedFiles()) {
             if (core.getMuOptions().getAutoPublishSharedFiles())
                 downloadedEvent.downloadedFile.publish(System.currentTimeMillis())
+            
+            File file = downloadedEvent.downloadedFile.file
+            downloadedEvent.downloadedFile.setPathToSharedParent(findSharedParent(file))
+            
             persistFile(downloadedEvent.downloadedFile, downloadedEvent.infoHash)
         }
     }
@@ -167,7 +176,20 @@ class PersisterFolderService extends BasePersisterService {
                 }
                 
                 log.fine("loaded file $event.loadedFile.file")
+                
+                if (event.loadedFile.getPathToSharedParent() == null) {
+                    log.fine("trying to find shared parent for $event.loadedFile.file")
+                    Path path = findSharedParent(event.loadedFile.file)
+                    if (path != null) {
+                        log.fine("found path $path")
+                        event.loadedFile.setPathToSharedParent(path)
+                        _persistFile(event.loadedFile,null)
+                    }
+                } else
+                    log.fine("loaded shared parent from json ${event.loadedFile.getPathToSharedParent()}")
+                
                 listener.publish event
+                
                 if (!core.muOptions.plugin && core.muOptions.throttleLoadingFiles) {
                     loaded++
                     if (loaded % 10 == 0)
@@ -180,26 +202,57 @@ class PersisterFolderService extends BasePersisterService {
         })
         listener.publish(new AllFilesLoadedEvent(failed : failed.get()))
     }
+    
+    private Path findSharedParent(File file) {
+        File parent = file.getParentFile()
+        if (parent == null)
+            return Path.of("")
+        
+        WatchedDirectoryManager wdm = core.getWatchedDirectoryManager()
+        
+        File root = file
+        while(true) {
+            File parent2 = root.getParentFile()
+            if (parent2 == null)
+                break
+            if (!wdm.isWatched(parent2))
+                break
+            root = parent2
+        }
+        
+        if (root == file)
+            return Path.of("")
+        if (root == parent)
+            return Path.of(root.getName())
+        
+        Path toParent = root.toPath().relativize(parent.toPath())
+        Path.of(root.getName(), toParent.toString())
+    }
 
     private void persistFile(SharedFile sf, InfoHash ih) {
         persisterExecutor.submit({
-            def jsonPath = getJsonPath(sf)
-
-            def startTime = System.currentTimeMillis()
-            jsonPath.parent.toFile().mkdirs()
-            jsonPath.toFile().withPrintWriter { writer ->
-                def json = toJson sf
-                json = JsonOutput.toJson(json)
-                writer.println json
-            }
-            
-            if (ih != null) {
-                def hashListPath = getHashListPath(sf)
-                hashListPath.toFile().bytes = ih.hashList
-            }
-            log.fine("Time(ms) to write json+hashList: " + (System.currentTimeMillis() - startTime))
+            _persistFile(sf, ih)
         } as Runnable)
     }
+    
+    private void _persistFile(SharedFile sf, InfoHash ih) {
+        def jsonPath = getJsonPath(sf)
+
+        def startTime = System.currentTimeMillis()
+        jsonPath.parent.toFile().mkdirs()
+        jsonPath.toFile().withPrintWriter { writer ->
+            def json = toJson sf
+            json = JsonOutput.toJson(json)
+            writer.println json
+        }
+        
+        if (ih != null) {
+            def hashListPath = getHashListPath(sf)
+            hashListPath.toFile().bytes = ih.hashList
+        }
+        log.fine("Time(ms) to write json+hashList: " + (System.currentTimeMillis() - startTime))
+    }
+    
     private Path getJsonPath(SharedFile sf){
         def pathHash = sf.getB64PathHash()
         return Paths.get(
