@@ -13,6 +13,9 @@ import com.muwire.core.search.BrowseStatus
 
 import javax.annotation.Nonnull
 import javax.swing.SwingWorker
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.TreeModel
 
 @ArtifactProviderFor(GriffonModel)
 class BrowseModel {
@@ -38,9 +41,19 @@ class BrowseModel {
     boolean dirty
     List<UIResultBatchEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())
     List<BrowseStatusEvent> pendingStatuses = Collections.synchronizedList(new ArrayList<>())
+
+
+    TreeModel resultsTreeModel
+    DefaultMutableTreeNode root
+    boolean treeVisible = true
     
     volatile String[] filter
     volatile Filterer filterer
+    
+    void mvcGroupInit(Map<String,String> args) {
+        root = new DefaultMutableTreeNode()
+        resultsTreeModel = new DefaultTreeModel(root)
+    }
     
     private boolean filter(UIResultEvent result) {
         if (filter == null)
@@ -99,5 +112,35 @@ class BrowseModel {
                 return
             view.refreshResults()
         }
+    }
+    
+    void addToTree(UIResultEvent event) {
+        def node = root
+        if (event.path == null || event.path.length == 0) {
+            def child = new DefaultMutableTreeNode()
+            child.setUserObject(event.name)
+            node.add(child)
+            return
+        }
+        
+        for (String element : event.path) {
+            def elementNode = null
+            for(int i = 0; i < node.childCount; i++) {
+                if (node.getChildAt(i).getUserObject() == element) {
+                    elementNode = node.getChildAt(i)
+                    break
+                }
+            }
+            if (elementNode == null) {
+                elementNode = new DefaultMutableTreeNode()
+                elementNode.setUserObject(element)
+                node.add(elementNode)
+            }
+            node = elementNode
+        }
+     
+        def fileNode = new DefaultMutableTreeNode()
+        fileNode.setUserObject(event.name)
+        node.add(fileNode)
     }
 }

@@ -1,22 +1,20 @@
 package com.muwire.gui
 
-import com.muwire.core.search.BrowseStatus
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
 import javax.swing.JTextField
+import javax.swing.JTree
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
-import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.ListSelectionModel
-import javax.swing.SwingConstants
 import javax.swing.table.DefaultTableCellRenderer
 
 import com.muwire.core.search.UIResultEvent
@@ -26,8 +24,6 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 
 import javax.annotation.Nonnull
 
@@ -41,8 +37,9 @@ class BrowseView {
     BrowseController controller
 
     def parent
-    JPanel p
+    JPanel p, resultsPanel
     def resultsTable
+    JTree resultsTree
     def lastSortEvent
     def sequentialDownloadCheckbox
     
@@ -56,19 +53,39 @@ class BrowseView {
                 label(text: bind {trans(model.status.name())})
                 label(text : bind {model.totalResults == 0 ? "" : Math.round(model.resultCount * 100 / model.totalResults)+ "%"})
             }
-            scrollPane (constraints : BorderLayout.CENTER){
-                resultsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
-                    tableModel(list : model.results) {
-                        closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> HTMLSanitizer.sanitize(row.getFullPath())})
-                        closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
-                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
-                        closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
-                        closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read : {row -> row.collections.size()})
+            resultsPanel = panel(constraints: BorderLayout.CENTER) {
+                cardLayout()
+                panel(constraints: "table") {
+                    borderLayout()
+                    scrollPane(constraints: BorderLayout.CENTER) {
+                        resultsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                            tableModel(list: model.results) {
+                                closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read: { row -> HTMLSanitizer.sanitize(row.getFullPath()) })
+                                closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
+                                closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read: { row -> row.comment != null })
+                                closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: { row -> row.certificates })
+                                closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: { row -> row.collections.size() })
+                            }
+                        }
+                    }
+                }
+                panel(constraints: "tree") {
+                    borderLayout()
+                    scrollPane(constraints: BorderLayout.CENTER) {
+                        resultsTree = new JTree(model.resultsTreeModel)
+                        // TODO: custom renderer
+                        tree(rowHeight: rowHeight, rootVisible: false, expandsSelectedPaths: true, 
+                                largeModel: true, resultsTree)
                     }
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                gridLayout(rows: 1, cols: 3)
+                gridLayout(rows: 1, cols: 4)
+                panel(border: etchedBorder()) {
+                    buttonGroup(id: "viewType")
+                    radioButton(text: trans("TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
+                    radioButton(text: trans("TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
+                }
                 panel(border: etchedBorder()) {
                     button(text: trans("DOWNLOAD"), enabled: bind { model.downloadActionEnabled }, downloadAction)
                     label(text: trans("DOWNLOAD_SEQUENTIALLY"), enabled: bind {model.downloadActionEnabled})
@@ -78,7 +95,6 @@ class BrowseView {
                     button(text: trans("VIEW_COMMENT"), enabled: bind { model.viewCommentActionEnabled }, viewCommentAction)
                     button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, viewCertificatesAction)
                     button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, viewCollectionsAction)
-                    button(text: trans("CHAT"), enabled: bind { model.chatActionEnabled }, chatAction)
                 }
                 panel(border: etchedBorder()) {
                     def textField = new JTextField(15)
@@ -234,6 +250,8 @@ class BrowseView {
         }
 
         parent.setTabComponentAt(index, tabPanel)
+        
+        showTree.call()
     }
     
     void refreshResults() {
@@ -249,6 +267,8 @@ class BrowseView {
         }
         for (int row : selectedRows)
             resultsTable.selectionModel.addSelectionInterval(row, row)
+        
+        model.resultsTreeModel.nodeStructureChanged(model.root)
     }
     
     def selectedResults() {
@@ -265,6 +285,16 @@ class BrowseView {
         for (Integer i : rows)
             rv << model.results[i]
         rv
+    }
+    
+    def showTree = {
+        model.treeVisible = true
+        resultsPanel.getLayout().show(resultsPanel, "tree")
+    }
+    
+    def showTable = {
+        model.treeVisible = false
+        resultsPanel.getLayout().show(resultsPanel, "table")
     }
     
     def closeTab = {

@@ -68,6 +68,8 @@ class BrowseController {
             model.chatActionEnabled = event.results[0].chat
             List<UIResultEvent> results = event.results.toList()
             model.results.addAll(results)
+            for (UIResultEvent result : results)
+                model.addToTree(result)
             synchronized (model.allResults) {
                 model.allResults.addAll(results)
             }
