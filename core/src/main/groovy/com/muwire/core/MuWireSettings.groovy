@@ -34,6 +34,7 @@ class MuWireSettings {
     boolean searchComments
     boolean searchCollections
     boolean browseFiles
+    boolean showPaths
     boolean allowTracking
     
     boolean fileFeed
@@ -124,6 +125,7 @@ class MuWireSettings {
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         searchCollections = Boolean.valueOf(props.getProperty("searchCollections","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
+        showPaths = Boolean.valueOf(props.getProperty("showPaths", "true"))
         allowTracking = Boolean.valueOf(props.getProperty("allowTracking","true"))
         
         // feed settings
@@ -221,6 +223,7 @@ class MuWireSettings {
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("searchCollections", String.valueOf(searchCollections))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
+        props.setProperty("showPaths", String.valueOf(showPaths))
         props.setProperty("allowTracking", String.valueOf(allowTracking))
         
         // feed settings

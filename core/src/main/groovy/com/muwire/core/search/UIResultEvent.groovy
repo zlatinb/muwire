@@ -22,6 +22,19 @@ class UIResultEvent extends Event {
     boolean feed
     boolean messages
     Set<InfoHash> collections
+    String[] path
+    
+    
+    private String fullPath
+    String getFullPath() {
+        if (fullPath == null) { 
+            if (path != null && path.length > 0) 
+                fullPath = path.join(File.separator) + File.separator + name
+            else
+                fullPath = name
+        }
+        fullPath
+    }
     
     @Override
     public String toString() {

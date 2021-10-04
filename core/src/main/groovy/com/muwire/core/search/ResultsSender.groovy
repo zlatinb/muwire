@@ -11,6 +11,7 @@ import com.muwire.core.util.DataUtil
 import com.muwire.core.Persona
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
@@ -131,7 +132,7 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, false)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
                             os.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -160,7 +161,7 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, false)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -178,7 +179,8 @@ class ResultsSender {
         }
     }
     
-    public static def sharedFileToObj(SharedFile sf, boolean browseFiles, int certificates, Set<InfoHash> collections) {
+    public static def sharedFileToObj(SharedFile sf, boolean browseFiles, int certificates, 
+                                      Set<InfoHash> collections, boolean showPaths) {
         byte [] name = sf.getFile().getName().getBytes(StandardCharsets.UTF_8)
         def baos = new ByteArrayOutputStream()
         def daos = new DataOutputStream(baos)
@@ -204,6 +206,16 @@ class ResultsSender {
         obj.browseCollections = browseFiles
         obj.certificates = certificates
         obj.collections = collections.collect { Base64.encode(it.getRoot()) }
+        
+        if (showPaths) {
+            List<String> path = new ArrayList<>()
+            if (sf.getPathToSharedParent() != null) {
+                for (Path element : sf.getPathToSharedParent())
+                    path << Base64.encode(DataUtil.encodei18nString(element.toString()))
+            }
+            obj.path = path
+        }
+            
         obj
     }
 }

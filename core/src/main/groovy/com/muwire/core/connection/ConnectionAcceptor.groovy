@@ -402,6 +402,10 @@ class ConnectionAcceptor {
 
             browsed++
             
+            boolean showPaths = settings.showPaths && 
+                    headers.containsKey('Path') && 
+                    Boolean.parseBoolean(headers['Path'])
+            
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
 
             def sharedFiles = fileManager.getSharedFiles().values()
@@ -423,7 +427,7 @@ class ConnectionAcceptor {
                 InfoHash ih = new InfoHash(it.getRoot())
                 int certificates = certificateManager.getByInfoHash(ih).size()
                 Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections)
+                def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections, showPaths)
                 def json = jsonOutput.toJson(obj)
                 dos.writeShort((short)json.length())
                 dos.write(json.getBytes(StandardCharsets.US_ASCII))

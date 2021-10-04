@@ -42,6 +42,7 @@ class BrowseManager {
                 OutputStream os = endpoint.getOutputStream()
                 os.write("BROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("Path:true\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
              
                 InputStream is = endpoint.getInputStream()

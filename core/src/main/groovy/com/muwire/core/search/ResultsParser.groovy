@@ -114,6 +114,13 @@ class ResultsParser {
                 collections = new HashSet<>()
                 json.collections.collect(collections, { new InfoHash(Base64.decode(it)) })
             }
+            
+            List<String> path = new ArrayList<>()
+            if (json.path != null && json.path instanceof List) {
+                json.path.each {
+                    path << DataUtil.readi18nString(Base64.decode(it))
+                }
+            }
                 
             log.fine("Received result from ${p.getHumanReadableName()} name \"$name\" infoHash:\"${json.infohash}\"")
 
@@ -128,7 +135,8 @@ class ResultsParser {
                 browseCollections : browseCollections,
                 uuid: uuid,
                 certificates : certificates,
-                collections : collections)
+                collections : collections,
+                path: path.toArray(new String[0]))
         } catch (Exception e) {
             throw new InvalidSearchResultException("parsing search result failed",e)
         }
