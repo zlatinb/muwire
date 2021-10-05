@@ -111,10 +111,44 @@ class BrowseView {
             }
         }
         
+        // right-click menu
+        def mouseListener = new MouseAdapter() {
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger())
+                    showMenu(e)
+            }
+        }
+        
         // results tree
         JTree resultsTree = builder.getVariable("results-tree")
         resultsTree.addTreeExpansionListener(treeExpansions)
         resultsTree.setCellRenderer(new ResultTreeRenderer())
+        resultsTree.addMouseListener(mouseListener)
+        resultsTree.addTreeSelectionListener({
+            model.downloadActionEnabled = false
+            model.viewCertificatesActionEnabled = false
+            model.viewCommentActionEnabled = false
+            model.viewCollectionsActionEnabled = false
+            TreePath[] selected = resultsTree.selectionModel.getSelectionPaths()
+            if (selected == null || selected.length == 0) {
+                return
+            }
+            
+            model.downloadActionEnabled = true
+            if (selected.length == 1) {
+                def userObject = selected[0].getLastPathComponent().getUserObject()
+                if (userObject instanceof UIResultEvent) {
+                    UIResultEvent result = (UIResultEvent) userObject
+                    model.viewCommentActionEnabled = result.comment != null
+                    model.viewCollectionsActionEnabled = !result.collections.isEmpty()
+                    model.viewCertificatesActionEnabled = result.certificates > 0
+                }
+            }
+        })
         
         // results table
         def centerRenderer = new DefaultTableCellRenderer()
@@ -161,16 +195,7 @@ class BrowseView {
             model.downloadActionEnabled = downloadActionEnabled
             
         })
-        resultsTable.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showMenu(e)
-            }
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger())
-                    showMenu(e)
-            }
-        })
+        resultsTable.addMouseListener(mouseListener)
         
         p.putClientProperty("focusListener", new FocusListener())
     }
@@ -298,8 +323,8 @@ class BrowseView {
             List<UIResultEvent> rv = new ArrayList<>()
             for (TreePath path : tree.getSelectionPaths()) {
                 TreeUtil.getLeafs(path.getLastPathComponent(), rv)
-                return rv
             }
+            return rv
         } else {
             int[] rows = resultsTable.getSelectedRows()
             if (rows.length == 0)
