@@ -107,6 +107,7 @@ class WatchedDirectoryManager {
                 else
                     it.toFile().delete()
             }
+            eventBus.publish(new WatchedDirectoriesLoadedEvent())
         } as Runnable)
     }
     

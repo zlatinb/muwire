@@ -3,6 +3,7 @@ package com.muwire.core
 import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
+import com.muwire.core.files.directories.WatchedDirectoriesLoadedEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
@@ -336,6 +337,7 @@ public class Core {
         log.info "initializing persistence service"
         persisterService = new PersisterService(new File(home, "files.json"), eventBus, 60000, fileManager)
         eventBus.register(UILoadedEvent.class, persisterService)
+        eventBus.register(WatchedDirectoriesLoadedEvent.class, persisterService)
 
         log.info "initializing folder persistence service"
         persisterFolderService = new PersisterFolderService(this, new File(home, "files"), eventBus)

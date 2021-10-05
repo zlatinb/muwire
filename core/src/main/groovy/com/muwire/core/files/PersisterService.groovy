@@ -1,5 +1,6 @@
 package com.muwire.core.files
 
+import com.muwire.core.files.directories.WatchedDirectoriesLoadedEvent
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -19,6 +20,8 @@ class PersisterService extends BasePersisterService {
     final int interval
     final Timer timer
     final FileManager fileManager
+    
+    private boolean uiLoaded,watchedDirsLoaded
 
     PersisterService(File location, EventBus listener, int interval, FileManager fileManager) {
         this.location = location
@@ -33,7 +36,15 @@ class PersisterService extends BasePersisterService {
     }
 
     void onUILoadedEvent(UILoadedEvent e) {
-        timer.schedule({load()} as TimerTask, 1)
+        uiLoaded = true
+        if (watchedDirsLoaded)
+            timer.schedule({load()} as TimerTask, 1)
+    }
+    
+    void onWatchedDirectoriesLoadedEvent(WatchedDirectoriesLoadedEvent e) {
+        watchedDirsLoaded = true
+        if (uiLoaded)
+            timer.schedule({load()} as TimerTask, 1)
     }
 
     void load() {
