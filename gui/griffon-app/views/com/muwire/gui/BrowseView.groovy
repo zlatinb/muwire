@@ -114,6 +114,7 @@ class BrowseView {
         // results tree
         JTree resultsTree = builder.getVariable("results-tree")
         resultsTree.addTreeExpansionListener(treeExpansions)
+        resultsTree.setCellRenderer(new ResultTreeRenderer())
         
         // results table
         def centerRenderer = new DefaultTableCellRenderer()
@@ -292,19 +293,28 @@ class BrowseView {
     }
     
     def selectedResults() {
-        int [] rows = resultsTable.getSelectedRows()
-        if (rows.length == 0)
-            return null
-        if (lastSortEvent != null) {
-            for (int i = 0; i < rows.length; i ++) {
-                rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+        if (model.treeVisible) {
+            JTree tree = builder.getVariable("results-tree")
+            List<UIResultEvent> rv = new ArrayList<>()
+            for (TreePath path : tree.getSelectionPaths()) {
+                TreeUtil.getLeafs(path.getLastPathComponent(), rv)
+                return rv
             }
+        } else {
+            int[] rows = resultsTable.getSelectedRows()
+            if (rows.length == 0)
+                return null
+            if (lastSortEvent != null) {
+                for (int i = 0; i < rows.length; i++) {
+                    rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+                }
+            }
+
+            List<UIResultEvent> rv = new ArrayList<>()
+            for (Integer i : rows)
+                rv << model.results[i]
+            rv
         }
-        
-        List<UIResultEvent> rv = new ArrayList<>()
-        for (Integer i : rows)
-            rv << model.results[i]
-        rv
     }
     
     def showTree = {

@@ -140,7 +140,7 @@ class BrowseModel {
         }
      
         def fileNode = new DefaultMutableTreeNode()
-        fileNode.setUserObject(event.name)
+        fileNode.setUserObject(event)
         node.add(fileNode)
     }
 }
