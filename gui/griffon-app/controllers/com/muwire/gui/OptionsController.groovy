@@ -126,6 +126,10 @@ class OptionsController {
         model.browseFiles = browseFiles
         settings.browseFiles = browseFiles
         
+        boolean showPaths = view.showPathsCheckbox.model.isSelected()
+        model.showPaths = showPaths
+        settings.showPaths = showPaths
+        
         boolean allowTracking = view.allowTrackingCheckbox.model.isSelected()
         model.allowTracking = allowTracking
         settings.allowTracking = allowTracking
