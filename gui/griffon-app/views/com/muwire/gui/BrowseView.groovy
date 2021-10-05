@@ -5,6 +5,7 @@ import griffon.core.artifact.GriffonView
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.JTree
+import javax.swing.tree.TreePath
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -38,9 +39,13 @@ class BrowseView {
 
     def parent
     JPanel p, resultsPanel
-    def resultsTable
+    
     JTree resultsTree
+    def treeExpansions = new TreeExpansions()
+    
+    def resultsTable
     def lastSortEvent
+    
     def sequentialDownloadCheckbox
     
     void initUI() {
@@ -74,7 +79,7 @@ class BrowseView {
                     scrollPane(constraints: BorderLayout.CENTER) {
                         resultsTree = new JTree(model.resultsTreeModel)
                         // TODO: custom renderer
-                        tree(rowHeight: rowHeight, rootVisible: false, expandsSelectedPaths: true, 
+                        tree(id: "results-tree", rowHeight: rowHeight, rootVisible: false, expandsSelectedPaths: true, 
                                 largeModel: true, resultsTree)
                     }
                 }
@@ -106,7 +111,11 @@ class BrowseView {
             }
         }
         
+        // results tree
+        JTree resultsTree = builder.getVariable("results-tree")
+        resultsTree.addTreeExpansionListener(treeExpansions)
         
+        // results table
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
@@ -268,7 +277,18 @@ class BrowseView {
         for (int row : selectedRows)
             resultsTable.selectionModel.addSelectionInterval(row, row)
         
+        
+        JTree tree = builder.getVariable("results-tree")
+        TreePath[] selectedPaths = tree.getSelectionPaths()
+        Set<TreePath> expanded = new HashSet<>(treeExpansions.expandedPaths)
         model.resultsTreeModel.nodeStructureChanged(model.root)
+        
+        if (treeExpansions.manualExpansion)
+            expanded.each { tree.expandPath(it) }
+        else
+            TreeUtil.expand(tree)
+        tree.setSelectionPaths(selectedPaths)
+    
     }
     
     def selectedResults() {

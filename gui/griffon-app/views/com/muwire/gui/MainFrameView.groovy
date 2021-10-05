@@ -40,8 +40,6 @@ import javax.swing.JTable
 import javax.swing.JTree
 import javax.swing.ListSelectionModel
 import javax.swing.TransferHandler
-import javax.swing.event.TreeExpansionEvent
-import javax.swing.event.TreeExpansionListener
 import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
@@ -64,7 +62,6 @@ import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
-import java.awt.datatransfer.UnsupportedFlavorException
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
@@ -2068,24 +2065,6 @@ class MainFrameView {
         }
     }
 
-    private static class TreeExpansions implements TreeExpansionListener {
-        private boolean manualExpansion
-        private final Set<TreePath> expandedPaths = new HashSet<>()
-
-
-        @Override
-        public void treeExpanded(TreeExpansionEvent event) {
-            manualExpansion = true
-            expandedPaths.add(event.getPath())
-        }
-
-        @Override
-        public void treeCollapsed(TreeExpansionEvent event) {
-            manualExpansion = true
-            expandedPaths.remove(event.getPath())
-        }        
-    }
-    
     /**
      * Expands the tree until there is a path with more than one node
      * unless there has been manual expansion already.
