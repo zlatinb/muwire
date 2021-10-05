@@ -58,7 +58,7 @@ class BrowseModel {
     private boolean filter(UIResultEvent result) {
         if (filter == null)
             return true
-        String name = result.getName().toLowerCase()
+        String name = result.getFullPath().toLowerCase()
         boolean contains = true
         for (String keyword : filter) {
             contains &= name.contains(keyword)
@@ -68,6 +68,7 @@ class BrowseModel {
     
     void filterResults() {
         results.clear()
+        root.removeAllChildren()
         filterer?.cancel()
         if (filter != null) {
             filterer = new Filterer()
@@ -75,8 +76,11 @@ class BrowseModel {
         } else {
             synchronized (allResults) {
                 results.addAll(allResults)
+                for(UIResultEvent result : allResults)
+                    addToTree(result)
             }
             view.refreshResults()
+            view.expandUnconditionally()
         }
     }
     
@@ -104,6 +108,8 @@ class BrowseModel {
             if (cancelled)
                 return
             results.addAll(chunks)
+            for (UIResultEvent result : chunks)
+                addToTree(result)
         }
         
         @Override
@@ -111,6 +117,7 @@ class BrowseModel {
             if (cancelled)
                 return
             view.refreshResults()
+            view.expandUnconditionally()
         }
     }
     

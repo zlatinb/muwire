@@ -314,7 +314,11 @@ class BrowseView {
         else
             TreeUtil.expand(tree)
         tree.setSelectionPaths(selectedPaths)
+    }
     
+    void expandUnconditionally() {
+        JTree tree = builder.getVariable("results-tree")
+        TreeUtil.expand(tree)
     }
     
     def selectedResults() {
