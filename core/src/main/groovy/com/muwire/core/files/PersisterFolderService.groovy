@@ -63,11 +63,15 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
+        if (hashedEvent.sharedFile == null)
+            return
         if (core.getMuOptions().getAutoPublishSharedFiles() && hashedEvent.sharedFile != null) 
             hashedEvent.sharedFile.publish(System.currentTimeMillis())
         
         File file = hashedEvent.sharedFile.file
-        hashedEvent.sharedFile.setPathToSharedParent(findSharedParent(file))
+        Path root = findSharedParent(file)
+        log.fine("PFS: for $file found root $root")
+        hashedEvent.sharedFile.setPathToSharedParent(root)
         
         persistFile(hashedEvent.sharedFile, hashedEvent.infoHash)
     }

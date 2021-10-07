@@ -87,7 +87,7 @@ class HasherService {
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent evt) {
         for(File dir : evt.directories)
-            hashed.removeAll(dir)
+            hashed.remove(dir)
     }
 
     private synchronized void throttle(File f) {

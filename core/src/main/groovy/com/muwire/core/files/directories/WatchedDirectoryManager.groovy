@@ -131,17 +131,20 @@ class WatchedDirectoryManager {
     }
     
     void onFileSharedEvent(FileSharedEvent e) {
-        if (e.file.isFile() || watchedDirs.containsKey(e.file))
+        File canonical = e.file.getCanonicalFile()
+        if (canonical.isFile() || watchedDirs.containsKey(canonical))
             return
-        if (!settings.shareHiddenFiles && e.file.isHidden())
+        if (!settings.shareHiddenFiles && canonical.isHidden())
             return
         
-        def wd = new WatchedDirectory(e.file)
+        log.fine("WDM: watching directory $canonical")
+        
+        def wd = new WatchedDirectory(canonical)
         if (e.fromWatch) {
             // parent should be already watched, copy settings
-            def parent = watchedDirs.get(e.file.getParentFile())
+            def parent = watchedDirs.get(canonical.getParentFile())
             if (parent == null) {
-                log.severe("watching found a directory without a watched parent? ${e.file}")
+                log.severe("watching found a directory without a watched parent? ${canonical}")
                 return
             }
             wd.autoWatch = parent.autoWatch
