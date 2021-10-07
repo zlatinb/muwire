@@ -593,18 +593,19 @@ class MainFrameModel {
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
             UploaderWrapper wrapper = null
-            uploads.each {
-                if (it.uploader == e.uploader) {
-                    wrapper = it
-                    return
+            for(UploaderWrapper uw : uploads) {
+                if (uw.uploader == e.uploader) {
+                    wrapper = uw
+                    break
                 }
             }
             if (wrapper != null) 
                 wrapper.updateUploader(e.uploader)
-            else
-                uploads << new UploaderWrapper(uploader : e.uploader)
+            else {
+                uploads << new UploaderWrapper(uploader: e.uploader)
+                view.refreshSharedFilesTable()
+            }
             updateTablePreservingSelection("uploads-table")
-            view.refreshSharedFiles()
         }
     }
 

@@ -1852,6 +1852,11 @@ class MainFrameView {
     }
     
     public void refreshSharedFiles() {
+        refreshSharedFilesTree()
+        refreshSharedFilesTable()
+    }
+    
+    void refreshSharedFilesTree() {
         def tree = builder.getVariable("shared-files-tree")
         TreePath[] selectedPaths = tree.getSelectionPaths()
         Set<TreePath> expanded = new HashSet<>(expansionListener.expandedPaths)
@@ -1860,7 +1865,9 @@ class MainFrameView {
         
         expanded.each { tree.expandPath(it) }
         tree.setSelectionPaths(selectedPaths)
-
+    }
+    
+    void refreshSharedFilesTable() {
         def table = builder.getVariable("shared-files-table")
         int [] selectedRows = table.getSelectedRows()
         table.model.fireTableDataChanged()
