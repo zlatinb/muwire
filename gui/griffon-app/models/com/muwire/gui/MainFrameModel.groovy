@@ -654,7 +654,7 @@ class MainFrameModel {
     
     void onSearchEvent(SearchEvent e) {
         runInsideUIAsync {
-            view.refreshSharedFiles()
+            view.refreshSharedFilesTable()
         }
     }
 
