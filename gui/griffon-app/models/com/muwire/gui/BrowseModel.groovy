@@ -130,17 +130,23 @@ class BrowseModel {
             return
         }
         
-        for (String element : event.path) {
+        List<String> elements = new ArrayList<>()
+        for (String element : event.path)
+            elements << element
+        
+        String hiddenRoot = elements.remove(0)
+        for (String element : elements) {
+            def nodeData = new ResultTreeRenderer.ResultTreeNode(hiddenRoot, element) 
             def elementNode = null
             for(int i = 0; i < node.childCount; i++) {
-                if (node.getChildAt(i).getUserObject() == element) {
+                if (node.getChildAt(i).getUserObject() == nodeData) {
                     elementNode = node.getChildAt(i)
                     break
                 }
             }
             if (elementNode == null) {
                 elementNode = new DefaultMutableTreeNode()
-                elementNode.setUserObject(element)
+                elementNode.setUserObject(nodeData)
                 node.add(elementNode)
             }
             node = elementNode

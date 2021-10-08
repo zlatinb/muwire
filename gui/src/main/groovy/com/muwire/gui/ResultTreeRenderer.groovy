@@ -26,8 +26,8 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
          def userObject = value.getUserObject()
     
          def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) 
-         if (userObject == null || userObject instanceof String) {
-             userObject = HTMLSanitizer.sanitize(userObject)
+         if (userObject == null || userObject instanceof String || userObject instanceof ResultTreeNode) {
+             userObject = HTMLSanitizer.sanitize(userObject.toString())
              defaultRenderer.setText(userObject)
              return defaultRenderer
          }
@@ -42,5 +42,25 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
              setIcon(commentIcon)
     
          this
+    }
+    
+    public static class ResultTreeNode {
+        private final String hiddenRoot, element
+        ResultTreeNode(String hiddenRoot, String element) {
+            this.hiddenRoot = hiddenRoot
+            this.element = element
+        }
+        
+        public String toString() {
+            element
+        }
+        
+        public boolean equals(Object o) {
+            if (!(o instanceof ResultTreeNode))
+                return false
+            ResultTreeNode other = (ResultTreeNode)o
+            hiddenRoot == other.hiddenRoot && 
+                    element == other.element
+        }
     }
 }

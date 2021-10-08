@@ -28,9 +28,14 @@ class UIResultEvent extends Event {
     private String fullPath
     String getFullPath() {
         if (fullPath == null) { 
-            if (path != null && path.length > 0) 
-                fullPath = path.join(File.separator) + File.separator + name
-            else
+            if (path != null && path.length > 0) {
+                List<String> elements = new ArrayList<>()
+                for (String element : path)
+                    elements << element
+                elements.remove(0) // nix hidden root
+                elements << name
+                fullPath = elements.join(File.separator)
+            } else
                 fullPath = name
         }
         fullPath

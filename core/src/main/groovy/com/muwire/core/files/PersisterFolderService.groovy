@@ -9,10 +9,15 @@ import groovy.json.JsonOutput
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
+import net.i2p.data.Base64
+import net.i2p.data.DataHelper
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
@@ -35,6 +40,8 @@ class PersisterFolderService extends BasePersisterService {
 
     final static int CUT_LENGTH = 6
 
+    private final byte[] salt
+    private final String saltHash
     private final Core core;
     final File location
     final EventBus listener
@@ -50,6 +57,26 @@ class PersisterFolderService extends BasePersisterService {
         this.listener = listener
         this.interval = interval
         timer = new Timer("file-folder persister timer", true)
+        
+        File saltFile = new File(location, "salt.bin")
+        if (saltFile.exists()) {
+            log.info("loading salt from file")
+            salt = saltFile.bytes
+        } else {
+            log.info("generating new salt")
+            Random r = new SecureRandom()
+            salt = new byte[32]
+            r.nextBytes(salt)
+            saltFile.bytes = salt
+        }
+        
+        saltHash = Base64.encode(hash(salt))
+    }
+    
+    private static byte[] hash(byte[] src) {
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256")
+        sha256.update(src)
+        sha256.digest()
     }
 
     void stop() {
@@ -206,11 +233,16 @@ class PersisterFolderService extends BasePersisterService {
         })
         listener.publish(new AllFilesLoadedEvent(failed : failed.get()))
     }
-    
+
+    /**
+     * Finds the path to the file to send over the network.  The parts of the
+     * path that are before the topmost shared parent are obfuscated, the
+     * rest are visible so that the receiver can construct a tree.
+     */
     private Path findSharedParent(File file) {
         File parent = file.getParentFile()
         if (parent == null)
-            return Path.of("")
+            return Path.of(saltHash)
         
         WatchedDirectoryManager wdm = core.getWatchedDirectoryManager()
         
@@ -225,12 +257,14 @@ class PersisterFolderService extends BasePersisterService {
         }
         
         if (root == file)
-            return Path.of("")
-        if (root == parent)
-            return Path.of(root.getName())
+            return Path.of(saltHash)
         
         Path toParent = root.toPath().relativize(parent.toPath())
-        Path.of(root.getName(), toParent.toString())
+        Path visible = Path.of(root.getName(), toParent.toString())
+        Path invisible = root.getParentFile().toPath()
+        byte [] hash = hash(invisible.toString().getBytes(StandardCharsets.UTF_8))
+        byte [] salted = DataHelper.xor(salt, hash)
+        return Path.of(Base64.encode(salted), visible.toString())
     }
 
     private void persistFile(SharedFile sf, InfoHash ih) {
