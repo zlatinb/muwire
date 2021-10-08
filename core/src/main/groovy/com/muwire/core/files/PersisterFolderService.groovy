@@ -58,6 +58,7 @@ class PersisterFolderService extends BasePersisterService {
         this.interval = interval
         timer = new Timer("file-folder persister timer", true)
         
+        location.mkdirs()
         File saltFile = new File(location, "salt.bin")
         if (saltFile.exists()) {
             log.info("loading salt from file")
@@ -173,7 +174,6 @@ class PersisterFolderService extends BasePersisterService {
                 log.log(Level.WARNING, "couldn't load files", e)
             }
         } else {
-            location.mkdirs()
             listener.publish(new AllFilesLoadedEvent())
         }
         loaded = true
