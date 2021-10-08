@@ -98,6 +98,7 @@ class CopyingDownloader extends Downloader{
     private class CopyWorker implements Runnable {
         public void run() {
             workerThread = Thread.currentThread()
+            file.getParentFile().mkdirs()
             Files.copy(source.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
             done = true
             fireEvent(Collections.emptySet())

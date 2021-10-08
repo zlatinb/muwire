@@ -107,7 +107,6 @@ public class DownloadManager {
             for (String pathElement : it.pathElements) {
                 target = new File(target, pathElement)
             }
-            target.getParentFile().mkdirs()
 
             doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor, e.infoHash)
         }

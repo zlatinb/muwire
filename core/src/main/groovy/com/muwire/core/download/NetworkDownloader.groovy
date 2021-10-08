@@ -414,6 +414,8 @@ class NetworkDownloader extends Downloader {
                         if (it.destination != destination)
                             it.cancel()
                     }
+                    
+                    file.getParentFile().mkdirs()
                     try {
                         Files.move(incompleteFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
                     } catch (AtomicMoveNotSupportedException e) {
