@@ -3,6 +3,7 @@ package com.muwire.gui
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.MutableTreeNode
+import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
 import com.muwire.core.collections.PathTree
@@ -44,6 +45,24 @@ class TreeUtil {
         def children = node.children()
         while(children.hasMoreElements()) {
             getLeafs(children.nextElement(), dest)
+        }
+    }
+
+    /**
+     * @param path to start recursing from
+     * @param dest Set of all paths below this path
+     */
+    static void subPaths(TreePath path, Set<TreePath> dest) {
+        TreeNode node = path.getLastPathComponent()
+        if (node.isLeaf()) {
+            path = path.pathByAddingChild(node)
+            dest.add(path)
+            return
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                TreeNode child = node.getChildAt(i)
+                subPaths(path.pathByAddingChild(child), dest)
+            }
         }
     }
 }

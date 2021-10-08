@@ -129,8 +129,9 @@ class BrowseController {
             !group.model.canDownload(it.infohash)
         }
         
-        selectedResults.each { result ->
-            def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
+        Map<UIResultEvent, File> targets = view.decorateResults(selectedResults)
+        targets.each { result, target ->
+            def file = new File(application.context.get("muwire-settings").downloadLocation, target.toString())
             core.eventBus.publish(new UIDownloadEvent(
                 result : [result],
                 sources : [model.host.destination],

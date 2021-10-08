@@ -5,6 +5,8 @@ import griffon.core.artifact.GriffonView
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.JTree
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
 import static com.muwire.gui.Translator.trans
@@ -344,6 +346,49 @@ class BrowseView {
                 rv << model.results[i]
             rv
         }
+    }
+
+    /**
+     * If the tree is visible, return a mapping from an UIResultEvent object
+     * to a File object that should be it's target download based on the selected
+     * node in the tree.
+     */
+    Map<UIResultEvent, File> decorateResults(List<UIResultEvent> results) {
+        Map<UIResultEvent, File> rv = new HashMap<>()
+        if (!model.treeVisible) {
+            // flat
+            for(UIResultEvent event : results)
+                rv.put(event, new File(event.name))
+        } else {
+            TreePath[] paths = resultsTree.getSelectionPaths()
+            for (TreePath path : paths) {
+                def node = path.getLastPathComponent()
+                def userObject = node.getUserObject()
+                
+                if (userObject instanceof UIResultEvent) {
+                    // a leaf is selected
+                    rv.put(userObject, new File(userObject.name))
+                } else {
+                    Set<TreePath> subPaths = new HashSet<>()
+                    TreeUtil.subPaths(path, subPaths)
+                    final int start = path.getPathCount() - 1
+                    for (TreePath subPath : subPaths) {
+                        File target = new File("")
+                        for (int i = start; i < subPath.getPathCount() - 1; i ++) {
+                            def subNode = subPath.getPathComponent(i)
+                            if (subNode.isLeaf())
+                                target = new File(target, subNode.getUserObject().name)
+                            else
+                                target = new File(target, subNode.getUserObject().toString())
+                        }
+                        UIResultEvent event = subPath.getLastPathComponent().getUserObject()
+                        if (results.contains(event)) 
+                            rv.put(event, target)
+                    }
+                }
+            }
+        }
+        rv
     }
     
     def showTree = {
