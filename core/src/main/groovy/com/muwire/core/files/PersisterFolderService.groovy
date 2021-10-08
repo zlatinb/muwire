@@ -9,13 +9,15 @@ import groovy.json.JsonOutput
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
+import net.i2p.crypto.HMAC256Generator
 import net.i2p.data.Base64
-import net.i2p.data.DataHelper
 
+import javax.crypto.Mac
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.security.Key
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.concurrent.ExecutorService
@@ -262,9 +264,11 @@ class PersisterFolderService extends BasePersisterService {
         Path toParent = root.toPath().relativize(parent.toPath())
         Path visible = Path.of(root.getName(), toParent.toString())
         Path invisible = root.getParentFile().toPath()
-        byte [] hash = hash(invisible.toString().getBytes(StandardCharsets.UTF_8))
-        byte [] salted = DataHelper.xor(salt, hash)
-        return Path.of(Base64.encode(salted), visible.toString())
+        Mac mac = Mac.getInstance("HmacSHA256")
+        Key key = new HMAC256Generator.HMACKey(salt)
+        mac.init(key)
+        mac.update(invisible.toString().getBytes(StandardCharsets.UTF_8))
+        return Path.of(Base64.encode(mac.doFinal()), visible.toString())
     }
 
     private void persistFile(SharedFile sf, InfoHash ih) {
