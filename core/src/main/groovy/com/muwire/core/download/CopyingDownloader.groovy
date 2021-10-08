@@ -13,9 +13,9 @@ class CopyingDownloader extends Downloader{
     private volatile Thread workerThread
     private volatile boolean done
     
-    CopyingDownloader(EventBus eventBus, DownloadManager downloadManager, File file, long length,
+    CopyingDownloader(EventBus eventBus, DownloadManager downloadManager, File file, File toShare, long length,
                       InfoHash infoHash, InfoHash collectionInfoHash, int pieceSizePow2, File source) {
-        super(eventBus, downloadManager, file, length, infoHash, collectionInfoHash, pieceSizePow2 )
+        super(eventBus, downloadManager, file, toShare, length, infoHash, collectionInfoHash, pieceSizePow2 )
         this.source = source
     }
     @Override

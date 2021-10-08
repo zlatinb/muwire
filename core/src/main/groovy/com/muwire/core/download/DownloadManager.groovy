@@ -86,14 +86,14 @@ public class DownloadManager {
         destinations.addAll(e.sources)
         destinations.remove(me.destination)
 
-        doDownload(infohash, e.target, size, pieceSize, e.sequential, destinations, null)
+        doDownload(infohash, e.target, e.toShare, size, pieceSize, e.sequential, destinations, null)
 
     }
     
     public void onUIDownloadFeedItemEvent(UIDownloadFeedItemEvent e) {
         Set<Destination> singleSource = new HashSet<>()
         singleSource.add(e.item.getPublisher().getDestination())
-        doDownload(e.item.getInfoHash(), e.target, e.item.getSize(), e.item.getPieceSize(), 
+        doDownload(e.item.getInfoHash(), e.target, null, e.item.getSize(), e.item.getPieceSize(), 
             e.sequential, singleSource, null)
     }
     
@@ -108,7 +108,7 @@ public class DownloadManager {
                 target = new File(target, pathElement)
             }
 
-            doDownload(it.infoHash, target, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor, e.infoHash)
+            doDownload(it.infoHash, target, null, it.length, it.pieceSizePow2, e.sequential, senderAndAuthor, e.infoHash)
         }
     }
     
@@ -119,16 +119,16 @@ public class DownloadManager {
         File target = muSettings.downloadLocation
         target = new File(target, e.attachment.name)
         
-        doDownload(e.attachment.infoHash, target, e.attachment.length, e.attachment.pieceSizePow2, e.sequential, sender, null)
+        doDownload(e.attachment.infoHash, target, null, e.attachment.length, e.attachment.pieceSizePow2, e.sequential, sender, null)
     }
     
-    private Downloader doDownload(InfoHash infoHash, File target, long size, int pieceSize, 
+    private Downloader doDownload(InfoHash infoHash, File target, File toShare, long size, int pieceSize, 
         boolean sequential, Set<Destination> destinations, InfoHash collectionInfoHash) {
         
         def downloader
         if (fileManager.getRootToFiles().containsKey(infoHash)) {
             def source = fileManager.getRootToFiles().get(infoHash)[0].getFile()
-            downloader = new CopyingDownloader(eventBus, this, target, size, infoHash, 
+            downloader = new CopyingDownloader(eventBus, this, target, toShare, size, infoHash, 
                     collectionInfoHash, pieceSize, source)
         } else {
             File incompletes = muSettings.incompleteLocation
@@ -137,7 +137,7 @@ public class DownloadManager {
             incompletes.mkdirs()
 
             Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
-            downloader = new NetworkDownloader(eventBus, this, chatServer, me, target, size,
+            downloader = new NetworkDownloader(eventBus, this, chatServer, me, target, toShare, size,
                     infoHash, collectionInfoHash, pieceSize, connector, destinations,
                     incompletes, pieces, muSettings.downloadMaxFailures)
         }

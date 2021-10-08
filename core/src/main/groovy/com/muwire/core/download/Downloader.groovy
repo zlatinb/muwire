@@ -28,6 +28,7 @@ abstract class Downloader {
     protected final DownloadManager downloadManager
     
     protected final File file
+    private final File toShare
     protected final long length
     
     protected volatile InfoHash infoHash, collectionInfoHash
@@ -37,11 +38,13 @@ abstract class Downloader {
     protected volatile boolean cancelled, paused
     
 
-    protected Downloader(EventBus eventBus, DownloadManager downloadManager, File file, long length, InfoHash infoHash,
+    protected Downloader(EventBus eventBus, DownloadManager downloadManager, File file, File toShare, 
+                         long length, InfoHash infoHash,
                         InfoHash collectionInfoHash, int pieceSizePow2) {
         this.eventBus = eventBus
         this.downloadManager = downloadManager
         this.file = file
+        this.toShare = toShare
         this.infoHash = infoHash
         this.collectionInfoHash = collectionInfoHash
         this.length = length
@@ -131,6 +134,7 @@ abstract class Downloader {
         def event = new FileDownloadedEvent(
                 downloadedFile: new DownloadedFile(file.getCanonicalFile(), infoHash.getRoot(), 
                         pieceSizePow2, successfulDestinations),
+                parentToShare: toShare,
                 downloader: this,
                 infoHash: infoHash,
                 collectionInfoHash: collectionInfoHash)

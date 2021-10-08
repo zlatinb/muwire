@@ -9,10 +9,10 @@ import groovy.json.JsonOutput
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
-import net.i2p.crypto.HMAC256Generator
 import net.i2p.data.Base64
 
 import javax.crypto.Mac
+import javax.crypto.SecretKey
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -112,7 +112,13 @@ class PersisterFolderService extends BasePersisterService {
                 downloadedEvent.downloadedFile.publish(System.currentTimeMillis())
             
             File file = downloadedEvent.downloadedFile.file
-            downloadedEvent.downloadedFile.setPathToSharedParent(findSharedParent(file))
+            File parent = downloadedEvent.parentToShare
+            Path sharedParent
+            if (parent != null)
+                sharedParent = explicitSharedParent(file, parent)
+            else
+                sharedParent = findSharedParent(file)
+            downloadedEvent.downloadedFile.setPathToSharedParent(sharedParent)
             
             persistFile(downloadedEvent.downloadedFile, downloadedEvent.infoHash)
         }
@@ -265,7 +271,28 @@ class PersisterFolderService extends BasePersisterService {
         Path visible = Path.of(root.getName(), toParent.toString())
         Path invisible = root.getParentFile().toPath()
         Mac mac = Mac.getInstance("HmacSHA256")
-        Key key = new HMAC256Generator.HMACKey(salt)
+        Key key = new HMACKey(salt)
+        mac.init(key)
+        mac.update(invisible.toString().getBytes(StandardCharsets.UTF_8))
+        return Path.of(Base64.encode(mac.doFinal()), visible.toString())
+    }
+
+    /**
+     * Generates a path with explicit shared parent
+     * @param file that is being shared
+     * @param explicitParent explicit parent
+     * @return a Path from parent to file
+     */
+    private Path explicitSharedParent(File file, File explicitParent) {
+        File parent = file.getParentFile()
+        if (parent == explicitParent)
+            return Path.of(saltHash)
+        
+        Path toParent = explicitParent.toPath().relativize(parent.toPath())
+        Path visible = Path.of(explicitParent.getName(), toParent.toString())
+        Path invisible = explicitParent.getParentFile().toPath()
+        Mac mac = Mac.getInstance("HmacSHA256")
+        Key key = new HMACKey(salt)
         mac.init(key)
         mac.update(invisible.toString().getBytes(StandardCharsets.UTF_8))
         return Path.of(Base64.encode(mac.doFinal()), visible.toString())
@@ -316,5 +343,15 @@ class PersisterFolderService extends BasePersisterService {
     InfoHash loadInfoHash(SharedFile sf) {
         def path = getHashListPath(sf)
         InfoHash.fromHashList(path.toFile().bytes)
+    }
+
+    private static final class HMACKey implements SecretKey {
+        private final byte[] _data;
+
+        public HMACKey(byte[] data) { _data = data; }
+
+        public String getAlgorithm() { return "HmacSHA256"; }
+        public byte[] getEncoded() { return Arrays.copyOf(_data, 32); }
+        public String getFormat() { return "RAW"; }
     }
 }

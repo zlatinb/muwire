@@ -758,9 +758,8 @@ class MainFrameModel {
             insertIntoTree(e.downloadedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.downloadedFile)) {
                 shared << e.downloadedFile
-                JTable table = builder.getVariable("shared-files-table")
-                table.model.fireTableDataChanged()
                 insertIntoTree(e.downloadedFile,treeRoot, null)
+                view.refreshSharedFiles()
             }
         }
     }

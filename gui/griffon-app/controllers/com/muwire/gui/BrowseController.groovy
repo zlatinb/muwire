@@ -129,13 +129,18 @@ class BrowseController {
             !group.model.canDownload(it.infohash)
         }
         
-        Map<UIResultEvent, File> targets = view.decorateResults(selectedResults)
-        targets.each { result, target ->
-            def file = new File(application.context.get("muwire-settings").downloadLocation, target.toString())
+        File downloadsFolder = application.context.get("muwire-settings").downloadLocation
+        List<BrowseView.ResultAndTargets> targets = view.decorateResults(selectedResults)
+        targets.each { target ->
+            def file = new File(downloadsFolder,target.target.toString())
+            File parent = null
+            if (target.parent != null)
+                parent = new File(downloadsFolder, target.parent.toString())
             core.eventBus.publish(new UIDownloadEvent(
-                result : [result],
+                result : [target.resultEvent],
                 sources : [model.host.destination],
-                target : file,
+                target : file, 
+                toShare: parent,
                 sequential : view.sequentialDownloadCheckbox.model.isSelected()
                 ))
         }

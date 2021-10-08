@@ -53,10 +53,10 @@ class NetworkDownloader extends Downloader {
     
     
     NetworkDownloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
-                      Persona me, File file, long length, InfoHash infoHash, InfoHash collectionInfoHash,
+                      Persona me, File file, File toShare, long length, InfoHash infoHash, InfoHash collectionInfoHash,
                       int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
                       File incompletes, Pieces pieces, int maxFailures) {
-        super(eventBus, downloadManager, file, length, infoHash, collectionInfoHash, pieceSizePow2)
+        super(eventBus, downloadManager, file, toShare, length, infoHash, collectionInfoHash, pieceSizePow2)
         this.connector = connector
         this.chatServer = chatServer
         this.me = me

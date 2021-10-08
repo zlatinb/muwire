@@ -349,16 +349,14 @@ class BrowseView {
     }
 
     /**
-     * If the tree is visible, return a mapping from an UIResultEvent object
-     * to a File object that should be it's target download based on the selected
-     * node in the tree.
+     * If the tree is visible, return a list with tuple (result, targetFile, parentFile)
      */
-    Map<UIResultEvent, File> decorateResults(List<UIResultEvent> results) {
-        Map<UIResultEvent, File> rv = new HashMap<>()
+    List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {
+        List<ResultAndTargets> rv = new ArrayList<>()
         if (!model.treeVisible) {
             // flat
             for(UIResultEvent event : results)
-                rv.put(event, new File(event.name))
+                rv << new ResultAndTargets(event, new File(event.name), null)
         } else {
             TreePath[] paths = resultsTree.getSelectionPaths()
             for (TreePath path : paths) {
@@ -367,8 +365,10 @@ class BrowseView {
                 
                 if (userObject instanceof UIResultEvent) {
                     // a leaf is selected
-                    rv.put(userObject, new File(userObject.name))
+                    if (results.contains(userObject))
+                        rv << new ResultAndTargets(userObject, new File(userObject.name), null)
                 } else {
+                    File parent = new File(userObject.toString())
                     Set<TreePath> subPaths = new HashSet<>()
                     TreeUtil.subPaths(path, subPaths)
                     final int start = path.getPathCount() - 1
@@ -383,12 +383,22 @@ class BrowseView {
                         }
                         UIResultEvent event = subPath.getLastPathComponent().getUserObject()
                         if (results.contains(event)) 
-                            rv.put(event, target)
+                            rv << new ResultAndTargets(event, target, parent)
                     }
                 }
             }
         }
         rv
+    }
+    
+    static class ResultAndTargets {
+        final UIResultEvent resultEvent
+        final File target, parent
+        ResultAndTargets(UIResultEvent resultEvent, File target, File parent) {
+            this.resultEvent = resultEvent
+            this.target = target
+            this.parent = parent
+        }
     }
     
     def showTree = {

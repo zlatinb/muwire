@@ -9,6 +9,6 @@ class UIDownloadEvent extends Event {
 
     UIResultEvent[] result
     Set<Destination> sources
-    File target
+    File target, toShare
     boolean sequential
 }
