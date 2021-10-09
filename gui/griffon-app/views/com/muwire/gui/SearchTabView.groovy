@@ -1,6 +1,9 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+
+import javax.swing.JPanel
+
 import static com.muwire.gui.Translator.trans
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
@@ -49,8 +52,13 @@ class SearchTabView {
     def sendersTable, sendersTable2
     def lastSendersSortEvent
     def resultsTable, resultsTable2
+    private JPanel resultsPanel
+    private ResultTree resultTree
+    def treeExpansions = new TreeExpansions() 
+            
     def lastSortEvent
     def lastResults2SortEvent, lastSenders2SortEvent
+    
     def sequentialDownloadCheckbox
     def sequentialDownloadCheckbox2
 
@@ -60,6 +68,7 @@ class SearchTabView {
             def resultsTable, resultsTable2
             def sendersTable, sendersTable2
             def sequentialDownloadCheckbox, sequentialDownloadCheckbox2
+            JPanel resultsPanel
             def pane = panel {
                 borderLayout()
                 panel (id : "results-panel", constraints : BorderLayout.CENTER) {
@@ -104,22 +113,40 @@ class SearchTabView {
                             }
                             panel {
                                 borderLayout()
-                                scrollPane (constraints : BorderLayout.CENTER) {
-                                    resultsTable = table(id : "results-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                        tableModel(list: model.results) {
-                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read : {row -> HTMLSanitizer.sanitize(row.name)})
-                                            closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read : {row -> row.size})
-                                            closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type : Integer, read : { row -> model.hashBucket[row.infohash].size()})
-                                            closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth : 50, type : Integer, read : {row -> model.sourcesBucket[row.infohash].size()})
-                                            closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {row -> row.comment != null})
-                                            closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {row -> row.certificates})
-                                            closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read : {UIResultEvent row -> row.collections.size()})
+                                resultsPanel = panel(constraints: BorderLayout.CENTER) {
+                                    cardLayout()
+                                    panel(constraints: "table") {
+                                        borderLayout()
+                                        scrollPane(constraints: BorderLayout.CENTER) {
+                                            resultsTable = table(id: "results-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                                tableModel(list: model.results) {
+                                                    closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read: { row -> HTMLSanitizer.sanitize(row.name) })
+                                                    closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
+                                                    closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.hashBucket[row.infohash].size() })
+                                                    closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.sourcesBucket[row.infohash].size() })
+                                                    closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read: { row -> row.comment != null })
+                                                    closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: { row -> row.certificates })
+                                                    closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: { UIResultEvent row -> row.collections.size() })
+                                                }
+                                            }
+                                        }
+                                    }
+                                    panel(constraints: "tree") {
+                                        borderLayout()
+                                        scrollPane(constraints: BorderLayout.CENTER) {
+                                            resultTree = new ResultTree(model.treeModel)
+                                            tree(id: "results-tree", rowHeight: rowHeight, rootVisible: false, 
+                                                expandsSelectedPaths: true, largeModel: true, resultTree)
                                         }
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridBagLayout()
-                                    label(text : "", constraints : gbc(gridx : 0, gridy: 0, weightx : 100))
+                                    panel(constraints: gbc(gridx: 0, gridy:0, weightx: 100)) {
+                                        buttonGroup(id: "viewType")
+                                        radioButton(text: trans("TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
+                                        radioButton(text: trans("TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
+                                    }
                                     button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
                                     button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
                                     button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
@@ -273,6 +300,7 @@ class SearchTabView {
             this.sendersTable2 = sendersTable2
             this.sequentialDownloadCheckbox = sequentialDownloadCheckbox
             this.sequentialDownloadCheckbox2 = sequentialDownloadCheckbox2
+            this.resultsPanel = resultsPanel
 
             def selectionModel = resultsTable.getSelectionModel()
             selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
@@ -404,9 +432,15 @@ class SearchTabView {
                 model.subscribeActionEnabled = model.sendersBucket[sender].first().feed &&
                     model.core.feedManager.getFeed(sender) == null
                 model.trustButtonsEnabled = true
+                
                 model.results.clear()
                 model.results.addAll(model.sendersBucket[sender])
                 resultsTable.model.fireTableDataChanged()
+                
+                model.root.removeAllChildren()
+                for(UIResultEvent event : model.sendersBucket[sender])
+                    model.treeModel.addToTree(event)
+                model.treeModel.nodeStructureChanged(model.root)
             }
         })
         
@@ -483,9 +517,10 @@ class SearchTabView {
             model.viewCollectionsActionEnabled = !e.collections.isEmpty()
         })
        
-        if (settings.groupByFile)
+        if (settings.groupByFile) {
             showFileGrouping.call()
-        else
+            showTree.call()
+        } else
             showSenderGrouping.call()
     }
 
@@ -628,6 +663,16 @@ class SearchTabView {
         model.groupedByFile = true
         def cardsPanel = builder.getVariable("results-panel")
         cardsPanel.getLayout().show(cardsPanel, "grouped-by-file")
+    }
+    
+    def showTree = {
+        model.treeVisible = true
+        resultsPanel.getLayout().show(resultsPanel, "tree")
+    }
+    
+    def showTable = {
+        model.treeVisible = false
+        resultsPanel.getLayout().show(resultsPanel, "table")
     }
     
     boolean sequentialDownload() {

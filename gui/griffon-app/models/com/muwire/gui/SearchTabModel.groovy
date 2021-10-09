@@ -14,6 +14,9 @@ import griffon.inject.MVCMember
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreeNode
+
 @ArtifactProviderFor(GriffonModel)
 class SearchTabModel {
     @MVCMember @Nonnull
@@ -44,7 +47,13 @@ class SearchTabModel {
     def senders2 = []
     
 
+    ResultTreeModel treeModel
+    DefaultMutableTreeNode root
+    boolean treeVisible = true
+    
     void mvcGroupInit(Map<String, String> args) {
+        root = new DefaultMutableTreeNode()
+        treeModel = new ResultTreeModel(root)
         core = mvcGroup.parentGroup.model.core
         uiSettings = application.context.get("ui-settings")
         mvcGroup.parentGroup.model.results[UUID.fromString(uuid)] = mvcGroup
