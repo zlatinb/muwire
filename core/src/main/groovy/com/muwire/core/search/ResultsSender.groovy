@@ -84,21 +84,27 @@ class ResultsSender {
                 InfoHash ih = new InfoHash(it.getRoot())
                 int certificates = certificateManager.getByInfoHash(ih).size()
                 Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
+                
+                List<String> pathElements = new ArrayList<>()
+                for(String pathElement : it.getPathToSharedParent())
+                    pathElements << pathElement
+                
                 def uiResultEvent = new UIResultEvent( sender : me,
-                    name : it.getFile().getName(),
-                    size : length,
-                    infohash : ih,
-                    pieceSize : pieceSize,
-                    uuid : uuid,
-                    browse : settings.browseFiles,
-                    browseCollections : settings.browseFiles,
-                    sources : suggested,
-                    comment : comment,
-                    certificates : certificates,
-                    chat : chatServer.isRunning() && settings.advertiseChat,
-                    messages : settings.allowMessages,
-                    feed : settings.fileFeed && settings.advertiseFeed,
-                    collections : collections
+                        name : it.getFile().getName(),
+                        size : length,
+                        infohash : ih,
+                        pieceSize : pieceSize,
+                        uuid : uuid,
+                        browse : settings.browseFiles,
+                        browseCollections : settings.browseFiles,
+                        sources : suggested,
+                        comment : comment,
+                        certificates : certificates,
+                        chat : chatServer.isRunning() && settings.advertiseChat,
+                        messages : settings.allowMessages,
+                        feed : settings.fileFeed && settings.advertiseFeed,
+                        collections : collections, 
+                        path: pathElements.toArray(new String[0])
                     )
                 uiResultEvents << uiResultEvent
             }
@@ -132,7 +138,8 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, false)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections,
+                                    settings.showPaths)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
                             os.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -161,7 +168,7 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, false)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, settings.showPaths)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
