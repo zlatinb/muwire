@@ -1,11 +1,7 @@
 package com.muwire.core.files
 
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-
-import java.nio.file.DirectoryStream
-import java.nio.file.Files
 import java.nio.file.Path
+import java.util.function.Predicate
 import java.util.stream.Collectors
 
 import com.muwire.core.EventBus
@@ -30,16 +26,23 @@ class FileManager {
     final Map<InfoHash, SharedFile[]> rootToFiles = Collections.synchronizedMap(new HashMap<>())
     final Map<File, SharedFile> fileToSharedFile = Collections.synchronizedMap(new HashMap<>())
     final Map<String, File[]> nameToFiles = new HashMap<>()
+    final Map<String, File[]> pathToFiles = new HashMap<>()
     final Map<String, Set<File>> commentToFile = new HashMap<>()
-    final SearchIndex index
+    final SearchIndex index, pathIndex
     final FileTree<SharedFile> positiveTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
+    private Predicate<File> isWatched
 
     FileManager(File home, EventBus eventBus, MuWireSettings settings) {
         this.home = home
         this.settings = settings
         this.eventBus = eventBus
         this.index = new SearchIndex("fileManager")
+        this.pathIndex = new SearchIndex("fileManagerPaths")
+    }
+    
+    void setIsWatched(Predicate<File> isWatched) {
+        this.isWatched = isWatched
     }
     
     void onFileHashedEvent(FileHashedEvent e) {
@@ -124,6 +127,46 @@ class FileManager {
         }
         
         index.add(name)
+        
+        String path = getVisiblePath(sf.getFile())
+        if (path == null)
+            return
+        
+        log.fine("will index path $path")
+        pathIndex.add(path)
+        existingFiles = pathToFiles.get(path)
+        if (existingFiles == null) {
+            existingFiles = new File[] {sf.getFile()}
+        } else {
+            Set<File> unique = new HashSet<>()
+            existingFiles.each {unique.add(it)}
+            unique.add(sf.getFile())
+            existingFiles = unique.toArray(existingFiles)
+        }
+        pathToFiles.put(path, existingFiles)
+    }
+    
+    private String getVisiblePath(File file) {
+        File parent = file.getParentFile()
+        if (parent == null)
+            return null
+        
+        File root = file
+        while(true) {
+            File parent2 = root.getParentFile()
+            if (parent2 == null)
+                break
+            if (!isWatched.test(parent2))
+                break
+            root = parent2
+        }
+        
+        if (root == file)
+            return null
+        
+        Path path = root.toPath().relativize(file.toPath())
+        Path visible = Path.of(root.getName(), path.toString())
+        visible.toString()
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
@@ -132,6 +175,8 @@ class FileManager {
     }
     
     private void unshareFile(SharedFile sf, boolean deleted) {
+        log.fine("unsharing ${sf.getFile()} deleted:$deleted")
+        
         InfoHash infoHash = new InfoHash(sf.getRoot())
         SharedFile[] existing = rootToFiles.get(infoHash)
         if (existing != null) {
@@ -177,6 +222,23 @@ class FileManager {
         }
 
         index.remove(name)
+        
+        String path = getVisiblePath(sf.file)
+        if (path == null)
+            return
+        log.fine("un-indexing path $path")
+        existingFiles = pathToFiles.get(path)
+        if (existingFiles != null) {
+            Set<File> unique = new HashSet<>()
+            unique.addAll(existingFiles)
+            unique.remove(sf.file)
+            if (unique.isEmpty())
+                pathToFiles.remove(path)
+            else {
+                existingFiles = unique.toArray(new File[0])
+                pathToFiles.put(path, existingFiles)
+            }
+        }
     }
     
     void onUICommentEvent(UICommentEvent e) {
@@ -235,6 +297,14 @@ class FileManager {
                 if (e.searchComments)
                     files.addAll commentToFile.getOrDefault(it, [])
             }
+        
+            if (e.searchPaths) {
+                def paths = pathIndex.search e.searchTerms
+                paths.each {
+                    files.addAll pathToFiles.getOrDefault(it, [])
+                }
+            }
+            
             Set<SharedFile> sharedFiles = new HashSet<>()
             files.each { sharedFiles.add fileToSharedFile[it] }
             

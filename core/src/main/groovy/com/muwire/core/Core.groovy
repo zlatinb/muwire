@@ -488,6 +488,7 @@ public class Core {
             register(DirectoryUnsharedEvent.class, watchedDirectoryManager)
             register(UISyncDirectoryEvent.class, watchedDirectoryManager)
         }
+        fileManager.setIsWatched(watchedDirectoryManager::isWatched)
         
         
         log.info("initializing negative files")
