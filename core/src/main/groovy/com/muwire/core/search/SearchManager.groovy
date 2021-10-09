@@ -84,7 +84,9 @@ public class SearchManager {
             SharedFile[] results = it.results.toArray()
             resultsSender.sendResults(it.resultsEvent.uuid, results, it.target, 
                 it.resultsEvent.searchEvent.oobInfohash, 
-                it.resultsEvent.searchEvent.compressedResults)
+                it.resultsEvent.searchEvent.compressedResults,
+                it.resultsEvent.searchEvent.searchPaths
+            )
         }
     }
     

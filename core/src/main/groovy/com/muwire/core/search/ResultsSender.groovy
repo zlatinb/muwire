@@ -65,7 +65,8 @@ class ResultsSender {
         this.collectionManager = collectionManager
     }
 
-    void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults) {
+    void sendResults(UUID uuid, SharedFile[] results, Destination target, boolean oobInfohash, boolean compressedResults,
+        boolean searchPaths) {
         log.info("Sending $results.length results for uuid $uuid to ${target.toBase32()} oobInfohash : $oobInfohash")
         if (target.equals(me.destination)) {
             def uiResultEvents = []
@@ -85,9 +86,13 @@ class ResultsSender {
                 int certificates = certificateManager.getByInfoHash(ih).size()
                 Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
                 
-                List<String> pathElements = new ArrayList<>()
-                for(String pathElement : it.getPathToSharedParent())
-                    pathElements << pathElement
+                String [] path = null
+                if (settings.showPaths && searchPaths) {
+                    List<String> pathElements = new ArrayList<>()
+                    for (String pathElement : it.getPathToSharedParent())
+                        pathElements << pathElement
+                    path = pathElements.toArray(new String[0])
+                }
                 
                 def uiResultEvent = new UIResultEvent( sender : me,
                         name : it.getFile().getName(),
@@ -104,14 +109,15 @@ class ResultsSender {
                         messages : settings.allowMessages,
                         feed : settings.fileFeed && settings.advertiseFeed,
                         collections : collections, 
-                        path: pathElements.toArray(new String[0])
+                        path: path
                     )
                 uiResultEvents << uiResultEvent
             }
             eventBus.publish(new UIResultBatchEvent(uuid : uuid, results : uiResultEvents))
         } else {
             executor.execute(new ResultSendJob(uuid : uuid, results : results,
-                target: target, oobInfohash : oobInfohash, compressedResults : compressedResults))
+                target: target, oobInfohash : oobInfohash, compressedResults : compressedResults,
+                showPaths: searchPaths && settings.showPaths))
         }
     }
 
@@ -121,6 +127,7 @@ class ResultsSender {
         Destination target
         boolean oobInfohash
         boolean compressedResults
+        boolean showPaths
 
         @Override
         public void run() {
@@ -138,8 +145,7 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections,
-                                    settings.showPaths)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, showPaths)
                             def json = jsonOutput.toJson(obj)
                             os.writeShort((short)json.length())
                             os.write(json.getBytes(StandardCharsets.US_ASCII))
@@ -168,7 +174,7 @@ class ResultsSender {
                             InfoHash ih = new InfoHash(it.getRoot())
                             int certificates = certificateManager.getByInfoHash(ih).size()
                             Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, settings.showPaths)
+                            def obj = sharedFileToObj(it, settings.browseFiles, certificates, collections, showPaths)
                             def json = jsonOutput.toJson(obj)
                             dos.writeShort((short)json.length())
                             dos.write(json.getBytes(StandardCharsets.US_ASCII))
