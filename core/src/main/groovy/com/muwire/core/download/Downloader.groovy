@@ -28,7 +28,7 @@ abstract class Downloader {
     protected final DownloadManager downloadManager
     
     protected final File file
-    private final File toShare
+    protected final File toShare
     protected final long length
     
     protected volatile InfoHash infoHash, collectionInfoHash

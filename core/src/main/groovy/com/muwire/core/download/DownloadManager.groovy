@@ -177,6 +177,9 @@ public class DownloadManager {
         downloadsFile.eachLine {
             def json = slurper.parseText(it)
             File file = new File(DataUtil.readi18nString(Base64.decode(json.file)))
+            File toShare = null
+            if (json.toShare != null)
+                toShare = new File(DataUtil.readi18nString(Base64.decode(json.toShare)))
             
             InfoHash infoHash
             if (json.hashList != null) {
@@ -216,7 +219,7 @@ public class DownloadManager {
                 
                 Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
-                downloader = new NetworkDownloader(eventBus, this, chatServer, me, file, (long)json.length,
+                downloader = new NetworkDownloader(eventBus, this, chatServer, me, file, toShare, (long)json.length,
                     infoHash, collectionInfoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
                     downloader.successfulDestinations.addAll(destinations) // if it was persisted, it was successful
                 downloader.readPieces()
@@ -224,7 +227,7 @@ public class DownloadManager {
                     downloader.paused = json.paused
             } else {
                 File source = new File(DataUtil.readi18nString(Base64.decode(json.source)))
-                downloader = new CopyingDownloader(eventBus, this, file, (long)json.length,
+                downloader = new CopyingDownloader(eventBus, this, file, toShare, (long)json.length,
                         infoHash, collectionInfoHash, json.pieceSizePow2, source)
             }
                 
@@ -277,6 +280,9 @@ public class DownloadManager {
                 if (!downloader.cancelled) {
                     def json = [:]
                     json.file = Base64.encode(DataUtil.encodei18nString(downloader.file.getAbsolutePath()))
+                    if (downloader.toShare != null) {
+                        json.toShare = Base64.encode(DataUtil.encodei18nString(downloader.toShare.getAbsolutePath()))
+                    }
                     json.length = downloader.length
                     json.pieceSizePow2 = downloader.pieceSizePow2
                     
