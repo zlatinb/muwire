@@ -43,7 +43,7 @@ class BrowseModel {
     List<BrowseStatusEvent> pendingStatuses = Collections.synchronizedList(new ArrayList<>())
 
 
-    TreeModel resultsTreeModel
+    ResultTreeModel resultsTreeModel
     DefaultMutableTreeNode root
     boolean treeVisible = true
     
@@ -52,7 +52,7 @@ class BrowseModel {
     
     void mvcGroupInit(Map<String,String> args) {
         root = new DefaultMutableTreeNode()
-        resultsTreeModel = new DefaultTreeModel(root)
+        resultsTreeModel = new ResultTreeModel(root)
     }
     
     private boolean filter(UIResultEvent result) {
@@ -77,7 +77,7 @@ class BrowseModel {
             synchronized (allResults) {
                 results.addAll(allResults)
                 for(UIResultEvent result : allResults)
-                    addToTree(result)
+                    resultsTreeModel.addToTree(result)
             }
             view.refreshResults()
             view.expandUnconditionally()
@@ -109,7 +109,7 @@ class BrowseModel {
                 return
             results.addAll(chunks)
             for (UIResultEvent result : chunks)
-                addToTree(result)
+                resultsTreeModel.addToTree(result)
         }
         
         @Override
@@ -119,41 +119,5 @@ class BrowseModel {
             view.refreshResults()
             view.expandUnconditionally()
         }
-    }
-    
-    void addToTree(UIResultEvent event) {
-        def node = root
-        if (event.path == null || event.path.length == 0) {
-            def child = new DefaultMutableTreeNode()
-            child.setUserObject(event.name)
-            node.add(child)
-            return
-        }
-        
-        List<String> elements = new ArrayList<>()
-        for (String element : event.path)
-            elements << element
-        
-        String hiddenRoot = elements.remove(0)
-        for (String element : elements) {
-            def nodeData = new ResultTreeRenderer.ResultTreeNode(hiddenRoot, element) 
-            def elementNode = null
-            for(int i = 0; i < node.childCount; i++) {
-                if (node.getChildAt(i).getUserObject() == nodeData) {
-                    elementNode = node.getChildAt(i)
-                    break
-                }
-            }
-            if (elementNode == null) {
-                elementNode = new DefaultMutableTreeNode()
-                elementNode.setUserObject(nodeData)
-                node.add(elementNode)
-            }
-            node = elementNode
-        }
-     
-        def fileNode = new DefaultMutableTreeNode()
-        fileNode.setUserObject(event)
-        node.add(fileNode)
     }
 }

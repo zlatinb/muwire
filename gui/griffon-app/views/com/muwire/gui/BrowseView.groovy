@@ -5,8 +5,6 @@ import griffon.core.artifact.GriffonView
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.JTree
-import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
 import static com.muwire.gui.Translator.trans
@@ -42,7 +40,7 @@ class BrowseView {
     def parent
     JPanel p, resultsPanel
     
-    JTree resultsTree
+    ResultTree resultsTree
     def treeExpansions = new TreeExpansions()
     
     def resultsTable
@@ -79,8 +77,7 @@ class BrowseView {
                 panel(constraints: "tree") {
                     borderLayout()
                     scrollPane(constraints: BorderLayout.CENTER) {
-                        resultsTree = new JTree(model.resultsTreeModel)
-                        // TODO: custom renderer
+                        resultsTree = new ResultTree(model.resultsTreeModel)
                         tree(id: "results-tree", rowHeight: rowHeight, rootVisible: false, expandsSelectedPaths: true, 
                                 largeModel: true, resultsTree)
                     }
@@ -128,7 +125,6 @@ class BrowseView {
         // results tree
         JTree resultsTree = builder.getVariable("results-tree")
         resultsTree.addTreeExpansionListener(treeExpansions)
-        resultsTree.setCellRenderer(new ResultTreeRenderer())
         resultsTree.addMouseListener(mouseListener)
         resultsTree.addTreeSelectionListener({
             model.downloadActionEnabled = false
@@ -358,47 +354,9 @@ class BrowseView {
             for(UIResultEvent event : results)
                 rv << new ResultAndTargets(event, new File(event.name), null)
         } else {
-            TreePath[] paths = resultsTree.getSelectionPaths()
-            for (TreePath path : paths) {
-                def node = path.getLastPathComponent()
-                def userObject = node.getUserObject()
-                
-                if (userObject instanceof UIResultEvent) {
-                    // a leaf is selected
-                    if (results.contains(userObject))
-                        rv << new ResultAndTargets(userObject, new File(userObject.name), null)
-                } else {
-                    File parent = new File(userObject.toString())
-                    Set<TreePath> subPaths = new HashSet<>()
-                    TreeUtil.subPaths(path, subPaths)
-                    final int start = path.getPathCount() - 1
-                    for (TreePath subPath : subPaths) {
-                        File target = new File("")
-                        for (int i = start; i < subPath.getPathCount() - 1; i ++) {
-                            def subNode = subPath.getPathComponent(i)
-                            if (subNode.isLeaf())
-                                target = new File(target, subNode.getUserObject().name)
-                            else
-                                target = new File(target, subNode.getUserObject().toString())
-                        }
-                        UIResultEvent event = subPath.getLastPathComponent().getUserObject()
-                        if (results.contains(event)) 
-                            rv << new ResultAndTargets(event, target, parent)
-                    }
-                }
-            }
+           rv.addAll(resultsTree.decorateResults(results))
         }
         rv
-    }
-    
-    static class ResultAndTargets {
-        final UIResultEvent resultEvent
-        final File target, parent
-        ResultAndTargets(UIResultEvent resultEvent, File target, File parent) {
-            this.resultEvent = resultEvent
-            this.target = target
-            this.parent = parent
-        }
     }
     
     def showTree = {

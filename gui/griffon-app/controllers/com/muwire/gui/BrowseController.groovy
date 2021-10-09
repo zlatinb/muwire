@@ -69,7 +69,7 @@ class BrowseController {
             List<UIResultEvent> results = event.results.toList()
             model.results.addAll(results)
             for (UIResultEvent result : results)
-                model.addToTree(result)
+                model.resultsTreeModel.addToTree(result)
             synchronized (model.allResults) {
                 model.allResults.addAll(results)
             }
@@ -130,7 +130,7 @@ class BrowseController {
         }
         
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
-        List<BrowseView.ResultAndTargets> targets = view.decorateResults(selectedResults)
+        List<ResultAndTargets> targets = view.decorateResults(selectedResults)
         targets.each { target ->
             def file = new File(downloadsFolder,target.target.toString())
             File parent = null
