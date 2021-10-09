@@ -23,7 +23,7 @@ import java.util.logging.Level
 
 @Log
 class NetworkDownloader extends Downloader {
-    private enum WorkerState { CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
+    private enum WorkerState { NEW, CONNECTING, HASHLIST, DOWNLOADING, FINISHED}
 
     private final ChatServer chatServer
     private final Persona me
@@ -322,8 +322,9 @@ class NetworkDownloader extends Downloader {
 
     class DownloadWorker implements Runnable {
         private final Destination destination
-        private volatile WorkerState currentState
+        private volatile WorkerState currentState = WorkerState.NEW
         private volatile Thread downloadThread
+        private volatile boolean cancelled
         private final LinkedList<DownloadSession> sessionQueue = new LinkedList<>()
         private final Set<Integer> available = new HashSet<>()
 
@@ -332,6 +333,11 @@ class NetworkDownloader extends Downloader {
         }
 
         public void run() {
+            if (cancelled) {
+                currentState = WorkerState.FINISHED
+                return
+            }
+            
             downloadThread = Thread.currentThread()
             currentState = WorkerState.CONNECTING
             Endpoint endpoint = null
@@ -398,37 +404,46 @@ class NetworkDownloader extends Downloader {
                     headSession.performRequest()
                 }
             } catch (Exception bad) {
-                log.log(Level.WARNING,"Exception while downloading", DataUtil.findRoot(bad))
-                markFailed(destination)
-                if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true))
-                    eventBus.publish(new DownloadHopelessEvent(downloader : NetworkDownloader.this))
-            } finally {
-                writePieces()
-                currentState = WorkerState.FINISHED
-                if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
-                    synchronized(piecesFile) {
-                        piecesFileClosed = true
-                        piecesFile.delete()
-                    }
-                    activeWorkers.values().each {
-                        if (it.destination != destination)
-                            it.cancel()
-                    }
-                    
-                    file.getParentFile().mkdirs()
-                    try {
-                        Files.move(incompleteFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
-                    } catch (AtomicMoveNotSupportedException e) {
-                        Files.copy(incompleteFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                        incompleteFile.delete()
-                    }
-                    fireEvent(getSuccessfulDestinations())
+                if (!cancelled) {
+                    log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))
+                    markFailed(destination)
+                    if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true))
+                        eventBus.publish(new DownloadHopelessEvent(downloader: NetworkDownloader.this))
                 }
-                endpoint?.close()
+            } finally {
+                currentState = WorkerState.FINISHED
+                try {
+                    if (!cancelled) {
+                        writePieces()
+                        if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
+                            synchronized (piecesFile) {
+                                piecesFileClosed = true
+                                piecesFile.delete()
+                            }
+                            activeWorkers.values().each {
+                                if (it.destination != destination)
+                                    it.cancel()
+                            }
+
+                            file.getParentFile().mkdirs()
+                            try {
+                                Files.move(incompleteFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE)
+                            } catch (AtomicMoveNotSupportedException e) {
+                                Files.copy(incompleteFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                                incompleteFile.delete()
+                            }
+                            fireEvent(getSuccessfulDestinations())
+                        }
+                    }
+                } finally {
+                    endpoint?.close()
+                }
+                    
             }
         }
 
         void cancel() {
+            cancelled = true
             downloadThread?.interrupt()
         }
     }
