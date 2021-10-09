@@ -298,7 +298,7 @@ class FileManager {
                     files.addAll commentToFile.getOrDefault(it, [])
             }
         
-            if (e.searchPaths) {
+            if (e.searchPaths && settings.showPaths) {
                 def paths = pathIndex.search e.searchTerms
                 paths.each {
                     files.addAll pathToFiles.getOrDefault(it, [])

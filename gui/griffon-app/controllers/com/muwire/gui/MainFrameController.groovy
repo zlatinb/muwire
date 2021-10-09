@@ -139,7 +139,7 @@ class MainFrameController {
             payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
             searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true, persona : core.me,
-            collections : core.muOptions.searchCollections)
+            collections : core.muOptions.searchCollections, searchPaths: core.muOptions.searchPaths)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
 

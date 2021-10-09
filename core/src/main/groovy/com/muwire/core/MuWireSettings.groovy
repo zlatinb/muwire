@@ -33,6 +33,7 @@ class MuWireSettings {
     boolean throttleLoadingFiles
     boolean searchComments
     boolean searchCollections
+    boolean searchPaths
     boolean browseFiles
     boolean showPaths
     boolean allowTracking
@@ -124,6 +125,7 @@ class MuWireSettings {
         sharePercentage = Integer.valueOf(props.getProperty("sharePercentage","80"))
         searchComments = Boolean.valueOf(props.getProperty("searchComments","true"))
         searchCollections = Boolean.valueOf(props.getProperty("searchCollections","true"))
+        searchPaths = Boolean.valueOf(props.getProperty("searchPaths","true"))
         browseFiles = Boolean.valueOf(props.getProperty("browseFiles","true"))
         showPaths = Boolean.valueOf(props.getProperty("showPaths", "true"))
         allowTracking = Boolean.valueOf(props.getProperty("allowTracking","true"))
@@ -222,6 +224,7 @@ class MuWireSettings {
         props.setProperty("sharePercentage", String.valueOf(sharePercentage))
         props.setProperty("searchComments", String.valueOf(searchComments))
         props.setProperty("searchCollections", String.valueOf(searchCollections))
+        props.setProperty("searchPaths", String.valueOf(searchPaths))
         props.setProperty("browseFiles", String.valueOf(browseFiles))
         props.setProperty("showPaths", String.valueOf(showPaths))
         props.setProperty("allowTracking", String.valueOf(allowTracking))
