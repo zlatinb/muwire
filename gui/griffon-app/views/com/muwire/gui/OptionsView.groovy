@@ -138,9 +138,9 @@ class OptionsView {
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 3,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_SHOW_PATHS"), enabled: bind{model.showPathsCheckboxEnabled}, constraints: gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_SHOW_PATHS"), constraints: gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START,
                         fill : GridBagConstraints.HORIZONTAL, weightx: 100))
-                showPathsCheckbox = checkBox(selected : bind {model.showPaths}, enabled : bind{model.showPathsCheckboxEnabled}, constraints : gbc(gridx: 1, gridy : 4,
+                showPathsCheckbox = checkBox(selected : bind {model.showPaths}, constraints : gbc(gridx: 1, gridy : 4,
                         anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
                 label(text : trans("OPTIONS_ALLOW_TRACKING"), constraints : gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START,
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
@@ -453,10 +453,6 @@ class OptionsView {
         
         allowUntrustedCheckbox.addActionListener {
             model.searchExtraHopCheckboxEnabled = allowUntrustedCheckbox.model.isSelected()
-        }
-        
-        browseFilesCheckbox.addActionListener {
-            model.showPathsCheckboxEnabled = browseFilesCheckbox.model.isSelected()
         }
     }
 

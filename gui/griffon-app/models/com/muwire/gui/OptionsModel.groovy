@@ -27,7 +27,6 @@ class OptionsModel {
     @Observable boolean searchPaths
     @Observable boolean browseFiles
     @Observable boolean showPaths
-    @Observable boolean showPathsCheckboxEnabled
     @Observable boolean allowTracking
     @Observable int speedSmoothSeconds
     @Observable int totalUploadSlots
@@ -116,7 +115,6 @@ class OptionsModel {
         searchPaths = settings.searchPaths
         browseFiles = settings.browseFiles
         showPaths = settings.showPaths
-        setShowPathsCheckboxEnabled(browseFiles)
         allowTracking = settings.allowTracking
         speedSmoothSeconds = settings.speedSmoothSeconds
         totalUploadSlots = settings.totalUploadSlots
