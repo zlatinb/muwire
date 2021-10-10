@@ -100,6 +100,10 @@ class OptionsController {
         boolean searchCollections = view.searchCollectionsCheckbox.model.isSelected()
         model.searchCollections = searchCollections
         settings.searchCollections = searchCollections
+        
+        boolean searchPaths = view.searchPathsCheckbox.model.isSelected()
+        model.searchPaths = searchPaths
+        settings.searchPaths = searchPaths
 
         boolean shareDownloaded = view.shareDownloadedCheckbox.model.isSelected()
         model.shareDownloadedFiles = shareDownloaded

@@ -24,6 +24,7 @@ class OptionsModel {
     @Observable String incompleteLocation
     @Observable boolean searchComments
     @Observable boolean searchCollections
+    @Observable boolean searchPaths
     @Observable boolean browseFiles
     @Observable boolean showPaths
     @Observable boolean showPathsCheckboxEnabled
@@ -112,6 +113,7 @@ class OptionsModel {
         incompleteLocation = settings.incompleteLocation.getAbsolutePath()
         searchComments = settings.searchComments
         searchCollections = settings.searchCollections
+        searchPaths = settings.searchPaths
         browseFiles = settings.browseFiles
         showPaths = settings.showPaths
         setShowPathsCheckboxEnabled(browseFiles)
