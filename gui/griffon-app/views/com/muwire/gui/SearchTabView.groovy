@@ -119,7 +119,7 @@ class SearchTabView {
                                                 tableModel(list: model.results) {
                                                     closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read: { row -> HTMLSanitizer.sanitize(row.name) })
                                                     closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
-                                                    closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.hashBucket[row.infohash].size() })
+                                                    closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.hashBucket[row.infohash].sourceCount() })
                                                     closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.sourcesBucket[row.infohash].size() })
                                                     closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read: { row -> row.comment != null })
                                                     closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: { row -> row.certificates })
@@ -163,54 +163,31 @@ class SearchTabView {
                                     resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.results2) {
                                             closureColumn(header : trans("NAME"), preferredWidth : 350, type : String, read : {
-                                                HTMLSanitizer.sanitize(model.hashBucket[it].first().name)
+                                                HTMLSanitizer.sanitize(model.hashBucket[it].getName())
                                             })
                                             closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
-                                                model.hashBucket[it].first().size
+                                                model.hashBucket[it].getSize()
                                             })
                                             closureColumn(header : trans("DIRECT_SOURCES"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].size()
+                                                model.hashBucket[it].sourceCount()
                                             })
                                             closureColumn(header : trans("POSSIBLE_SOURCES"), preferredWidth : 20, type : Integer , read : {
                                                 model.sourcesBucket[it].size()
                                             })
                                             closureColumn(header : trans("COMMENTS"), preferredWidth : 20, type : Integer, read : {
-                                                int count = 0
-                                                model.hashBucket[it].each { 
-                                                    if (it.comment != null)
-                                                        count++
-                                                }
-                                                count
+                                                model.hashBucket[it].commentCount()
                                             })
                                             closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type : Integer, read : {
-                                                int count = 0
-                                                model.hashBucket[it].each { 
-                                                    count += it.certificates
-                                                }
-                                                count
+                                                model.hashBucket[it].certificateCount()
                                             })
                                             closureColumn(header : trans("FEEDS"), preferredWidth : 20, type : Integer, read : {
-                                                int count = 0
-                                                model.hashBucket[it].each { 
-                                                    if (it.feed)
-                                                        count++
-                                                }
-                                                count
+                                                model.hashBucket[it].feedCount()
                                             })
                                             closureColumn(header : trans("CHAT_HOSTS"), preferredWidth : 20, type : Integer, read : {
-                                                int count = 0
-                                                model.hashBucket[it].each { 
-                                                    if (it.chat)
-                                                        count++
-                                                }
-                                                count
+                                                model.hashBucket[it].chatCount()
                                             })
                                             closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type : Integer, read : {
-                                                int count = 0
-                                                model.hashBucket[it].each { UIResultEvent row ->
-                                                    count += row.collections.size()
-                                                }
-                                                count
+                                                model.hashBucket[it].collectionsCount()
                                             })
                                         }
                                     }
@@ -476,7 +453,7 @@ class SearchTabView {
                 return
             }
             model.downloadActionEnabled = true
-            def results = model.hashBucket[e.infohash]
+            def results = model.hashBucket[e.infohash].getResults()
             model.senders2.clear()
             model.senders2.addAll(results)
             int selectedRow = sendersTable2.getSelectedRow()
@@ -604,15 +581,15 @@ class SearchTabView {
             
             Persona sender = selectedSender()
             if (sender == null) // really shouldn't happen
-                return model.hashBucket[infohash].first()
+                return model.hashBucket[infohash].getResults().first()
             
-            for (UIResultEvent candidate : model.hashBucket[infohash]) {
+            for (UIResultEvent candidate : model.hashBucket[infohash].getResults()) {
                 if (candidate.sender == sender)
                     return candidate
             }
             
             // also shouldn't happen
-            return model.hashBucket[infohash].first()
+            return model.hashBucket[infohash].getResults().first()
         } else {
             int[] selectedRows = resultsTable.getSelectedRows()
             if (selectedRows.length != 1)

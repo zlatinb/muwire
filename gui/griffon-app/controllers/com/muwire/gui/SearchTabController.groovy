@@ -47,7 +47,7 @@ class SearchTabController {
             if (target.parent != null)
                 parent = new File(downloadsFolder, target.parent.toString())
 
-            def resultsBucket = model.hashBucket[target.resultEvent.infohash]
+            def resultsBucket = model.hashBucket[target.resultEvent.infohash].getResults()
             def sources = model.sourcesBucket[target.resultEvent.infohash]
 
             core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources,

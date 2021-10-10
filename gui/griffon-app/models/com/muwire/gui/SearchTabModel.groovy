@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.InfoHash
+
 import javax.annotation.Nonnull
 import javax.inject.Inject
 import javax.swing.JTable
@@ -39,7 +41,7 @@ class SearchTabModel {
     String uuid
     def senders = []
     def results = []
-    def hashBucket = [:]
+    def hashBucket = new HashMap<InfoHash, HashBucket>()
     def sourcesBucket = [:]
     def sendersBucket = new LinkedHashMap<>()
     
@@ -70,10 +72,10 @@ class SearchTabModel {
         runInsideUIAsync {
             def bucket = hashBucket.get(e.infohash)
             if (bucket == null) {
-                bucket = []
+                bucket = new HashBucket()
                 hashBucket[e.infohash] = bucket
             }
-            bucket << e
+            bucket.add(e)
 
             def senderBucket = sendersBucket.get(e.sender)
             if (senderBucket == null) {
@@ -109,7 +111,7 @@ class SearchTabModel {
                     return
                 def bucket = hashBucket.get(it.infohash)
                 if (bucket == null) {
-                    bucket = []
+                    bucket = new HashBucket()
                     hashBucket[it.infohash] = bucket
                 }
                 
@@ -128,7 +130,7 @@ class SearchTabModel {
                 }
                 sourceBucket.addAll(it.sources)
 
-                bucket << it
+                bucket.add it
                 senderBucket << it
                 
             }
@@ -142,6 +144,85 @@ class SearchTabModel {
             selectedRow = table.getSelectedRow() 
             table.model.fireTableDataChanged()
             table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        }
+    }
+    
+    private static class HashBucket {
+        private final Set<UIResultEvent> events = new HashSet<>()
+        private final Set<Persona> senders = new HashSet<>()
+        private String cachedName
+        private long cachedSize
+        private void add(UIResultEvent event) {
+            events.add(event)
+            senders.add(event.sender)
+        }
+        
+        Set<UIResultEvent> getResults() {
+            events
+        }
+        
+        Set<Persona> getSenders() {
+            senders
+        }
+        
+        String getName() {
+            if (cachedName == null) {
+                cachedName = events.first().name
+            }
+            cachedName
+        }
+        
+        long getSize() {
+            if (cachedSize == 0) {
+                cachedSize = events.first().size
+            }
+            cachedSize
+        }
+        
+        int sourceCount() {
+            senders.size()
+        }
+        
+        int commentCount() {
+            int count = 0
+            for (UIResultEvent event : events) {
+                if (event.comment != null)
+                    count++
+            }
+            count
+        }
+        
+        int certificateCount() {
+            int count = 0
+            for (UIResultEvent event : events)
+                count += event.certificates
+            count
+        }
+        
+        int chatCount() {
+            int count = 0
+            for (UIResultEvent event : events) {
+                if (event.chat)
+                    count++
+            }
+            count
+        }
+        
+        int feedCount() {
+            int count = 0
+            for (UIResultEvent event : events) {
+                if (event.feed)
+                    count++
+            }
+            count
+        }
+        
+        int collectionsCount() {
+            int count = 0
+            for (UIResultEvent event : events) {
+                count += event.collections.size()
+            }
+            count
         }
     }
 }
