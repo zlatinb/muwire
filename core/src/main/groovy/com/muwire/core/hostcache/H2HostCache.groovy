@@ -41,6 +41,8 @@ class H2HostCache extends HostCache {
     
     @Override
     protected synchronized void hostDiscovered(Destination d, boolean fromHostcache) {
+        if (!allowHost(d))
+            return
         // overwrite MC with optimistic values 
         if (fromHostcache) {
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${d.toBase64()}")
@@ -199,7 +201,7 @@ class H2HostCache extends HostCache {
         Iterator<Destination> verifyIter = toVerify.iterator()
         while((rv.size() < n) && (verifyIter.hasNext())) {
             def d = verifyIter.next()
-            if (filter.test(d))
+            if (filter.test(d) && allowHost(d))
                 rv.add(d)
             verifyIter.remove()
         }
@@ -210,7 +212,7 @@ class H2HostCache extends HostCache {
             return rv
 
         List<Destination> canTry = new ArrayList<>(allHosts)
-        canTry.retainAll { !profiles.get(it).isHopeless() && filter.test(it)}
+        canTry.retainAll { !profiles.get(it).isHopeless() && filter.test(it) && allowHost(it)}
         Set<Destination> wouldFail = new HashSet<>()             
         while(rv.size() < n && wouldFail.size() < canTry.size()) {
             Destination d = canTry.get((int)(Math.random() * canTry.size()))
@@ -234,7 +236,7 @@ class H2HostCache extends HostCache {
     @Override
     public synchronized List<Destination> getGoodHosts(int n) {
         List<Destination> rv = new ArrayList<>(allHosts)
-        rv.retainAll { profiles.get(it).shouldAdvertise() }
+        rv.retainAll { profiles.get(it).shouldAdvertise() && allowHost(it)}
         if (rv.size() <= n)
             return rv
         Collections.shuffle(rv)
@@ -326,6 +328,8 @@ class H2HostCache extends HostCache {
         log.info("loading hosts from db")
         sql.eachRow("select distinct DESTINATION from HOST_ATTEMPTS") { 
             Destination dest = new Destination(it.DESTINATION)
+            if (!allowHost(dest))
+                return
             if (uniqueHosts.add(dest)) {
                 def fromDB = sql.firstRow("select * from HOST_PROFILES where DESTINATION=${dest.toBase64()}")
                 def profile = new HostMCProfile()

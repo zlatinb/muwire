@@ -27,10 +27,10 @@ abstract class HostCache extends Service {
         this.myself = myself
     }
     
-    protected final boolean allowHost(Host host) {
-        if (host.destination == myself)
+    protected final boolean allowHost(Destination host) {
+        if (host == myself)
             return false
-        TrustLevel trust = trustService.getLevel(host.destination)
+        TrustLevel trust = trustService.getLevel(host)
         switch(trust) {
             case TrustLevel.DISTRUSTED :
                 return false

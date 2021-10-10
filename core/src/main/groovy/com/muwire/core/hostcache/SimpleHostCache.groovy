@@ -55,7 +55,7 @@ class SimpleHostCache extends HostCache {
         }
         Host host = new Host(destination, settings.hostClearInterval, settings.hostHopelessInterval, 
             settings.hostRejectInterval, settings.hostHopelessPurgeInterval)
-        if (allowHost(host)) {
+        if (allowHost(host.destination)) {
             hosts.put(destination, host)
         }
     }
@@ -89,7 +89,7 @@ class SimpleHostCache extends HostCache {
         
         synchronized(hosts) {
             rv = new ArrayList<>(hosts.keySet())
-            rv.retainAll {allowHost(hosts[it])}
+            rv.retainAll {allowHost(it)}
             final long now = System.currentTimeMillis()
             rv.removeAll {
                 def h = hosts[it];
@@ -108,7 +108,7 @@ class SimpleHostCache extends HostCache {
             rv = new ArrayList<>(hosts.keySet())
             rv.retainAll {
                 Host host = hosts[it]
-                allowHost(host) && host.hasSucceeded()
+                allowHost(it) && host.hasSucceeded()
             }
         }
         if (rv.size() <= n)
@@ -162,7 +162,7 @@ class SimpleHostCache extends HostCache {
                     host.lastSuccessfulAttempt = entry.lastSuccessfulAttempt
                 if (entry.lastRejection != null)
                     host.lastRejection = entry.lastRejection
-                if (allowHost(host)) 
+                if (allowHost(dest)) 
                     hosts.put(dest, host)
             }
         }
@@ -180,7 +180,7 @@ class SimpleHostCache extends HostCache {
         storage.delete()
         storage.withPrintWriter { writer ->
             copy.each { dest, host ->
-                if (allowHost(host) && !host.isHopeless(now)) {
+                if (allowHost(dest) && !host.isHopeless(now)) {
                     def map = [:]
                     map.destination = dest.toBase64()
                     map.failures = host.failures
