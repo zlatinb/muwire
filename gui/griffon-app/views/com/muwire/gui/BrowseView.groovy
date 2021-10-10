@@ -78,8 +78,7 @@ class BrowseView {
                     borderLayout()
                     scrollPane(constraints: BorderLayout.CENTER) {
                         resultsTree = new ResultTree(model.resultsTreeModel)
-                        tree(id: "results-tree", rowHeight: rowHeight, rootVisible: false, expandsSelectedPaths: true, 
-                                largeModel: true, resultsTree)
+                        tree(id: "results-tree", rowHeight: rowHeight, resultsTree)
                     }
                 }
             }
@@ -123,7 +122,6 @@ class BrowseView {
         }
         
         // results tree
-        JTree resultsTree = builder.getVariable("results-tree")
         resultsTree.addTreeExpansionListener(treeExpansions)
         resultsTree.addMouseListener(mouseListener)
         resultsTree.addTreeSelectionListener({
@@ -137,14 +135,11 @@ class BrowseView {
             }
             
             model.downloadActionEnabled = true
-            if (selected.length == 1) {
-                def userObject = selected[0].getLastPathComponent().getUserObject()
-                if (userObject instanceof UIResultEvent) {
-                    UIResultEvent result = (UIResultEvent) userObject
-                    model.viewCommentActionEnabled = result.comment != null
-                    model.viewCollectionsActionEnabled = !result.collections.isEmpty()
-                    model.viewCertificatesActionEnabled = result.certificates > 0
-                }
+            UIResultEvent result = resultsTree.singleResultSelected()
+            if (result != null) {
+                model.viewCommentActionEnabled = result.comment != null
+                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
+                model.viewCertificatesActionEnabled = result.certificates > 0
             }
         })
         
@@ -340,7 +335,7 @@ class BrowseView {
             List<UIResultEvent> rv = new ArrayList<>()
             for (Integer i : rows)
                 rv << model.results[i]
-            rv
+            return rv
         }
     }
 

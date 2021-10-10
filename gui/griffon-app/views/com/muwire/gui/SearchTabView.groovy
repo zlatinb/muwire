@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
+import javax.swing.tree.TreePath
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.mvc.MVCGroup
@@ -43,6 +44,8 @@ class SearchTabView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     SearchTabModel model
+    @MVCMember @Nonnull
+    SearchTabController controller
     
     UISettings settings
 
@@ -54,7 +57,6 @@ class SearchTabView {
     def resultsTable, resultsTable2
     private JPanel resultsPanel
     private ResultTree resultTree
-    def treeExpansions = new TreeExpansions() 
             
     def lastSortEvent
     def lastResults2SortEvent, lastSenders2SortEvent
@@ -64,12 +66,7 @@ class SearchTabView {
 
     void initUI() {
         int rowHeight = application.context.get("row-height")
-        builder.with {
-            def resultsTable, resultsTable2
-            def sendersTable, sendersTable2
-            def sequentialDownloadCheckbox, sequentialDownloadCheckbox2
-            JPanel resultsPanel
-            def pane = panel {
+        pane = builder.panel {
                 borderLayout()
                 panel (id : "results-panel", constraints : BorderLayout.CENTER) {
                     cardLayout()
@@ -135,8 +132,7 @@ class SearchTabView {
                                         borderLayout()
                                         scrollPane(constraints: BorderLayout.CENTER) {
                                             resultTree = new ResultTree(model.treeModel)
-                                            tree(id: "results-tree", rowHeight: rowHeight, rootVisible: false, 
-                                                expandsSelectedPaths: true, largeModel: true, resultTree)
+                                            tree(id: "results-tree", rowHeight: rowHeight, resultTree)
                                         }
                                     }
                                 }
@@ -290,38 +286,28 @@ class SearchTabView {
                 }
             }
 
-            this.pane = pane
-            this.pane.putClientProperty("mvc-group", mvcGroup)
-            this.pane.putClientProperty("results-table",resultsTable)
+        this.pane.putClientProperty("mvc-group", mvcGroup)
+        this.pane.putClientProperty("results-table",resultsTable)
 
-            this.resultsTable = resultsTable
-            this.sendersTable = sendersTable
-            this.resultsTable2 = resultsTable2
-            this.sendersTable2 = sendersTable2
-            this.sequentialDownloadCheckbox = sequentialDownloadCheckbox
-            this.sequentialDownloadCheckbox2 = sequentialDownloadCheckbox2
-            this.resultsPanel = resultsPanel
-
-            def selectionModel = resultsTable.getSelectionModel()
-            selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-            selectionModel.addListSelectionListener( {
-                int[] rows = resultsTable.getSelectedRows()
-                if (rows.length == 0) {
-                    model.downloadActionEnabled = false
-                    return
+        def selectionModel = resultsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener( {
+            int[] rows = resultsTable.getSelectedRows()
+            if (rows.length == 0) {
+                model.downloadActionEnabled = false
+                return
+            }
+            if (lastSortEvent != null) {
+                for (int i = 0; i < rows.length; i ++) {
+                    rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
                 }
-                if (lastSortEvent != null) {
-                    for (int i = 0; i < rows.length; i ++) {
-                        rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
-                    }
-                }
-                boolean downloadActionEnabled = true
-                rows.each { 
-                    downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
-                }
-                model.downloadActionEnabled = downloadActionEnabled
-            })
-        }
+            }
+            boolean downloadActionEnabled = true
+            rows.each { 
+                downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
+            }
+            model.downloadActionEnabled = downloadActionEnabled
+        })
     }
 
     void mvcGroupInit(Map<String, String> args) {
@@ -353,7 +339,7 @@ class SearchTabView {
         copyFullIDItem.addActionListener({mvcGroup.controller.copyFullID()})
         popupMenu.add(copyFullIDItem)
         
-        def mouseListener = new MouseAdapter() {
+        def sendersMouseListener = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
                     popupMenu.show(e.getComponent(), e.getX(), e.getY())
@@ -364,7 +350,43 @@ class SearchTabView {
             }
         }
         
+        // results table + tree mouse listener when grouped by sender
+        def resultsMouseListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+                else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
+                    controller.download()
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+            }
+        }
         
+        // results tree
+        resultTree.addMouseListener(resultsMouseListener)
+        resultTree.addTreeSelectionListener {
+            model.downloadActionEnabled = false
+            model.viewCommentActionEnabled = false
+            model.viewCollectionsActionEnabled = false
+            model.viewCertificatesActionEnabled = false
+            TreePath [] selected = resultTree.selectionModel.getSelectionPaths()
+            if (selected == null || selected.length == 0)
+                return
+            
+            model.downloadActionEnabled = true
+            UIResultEvent result = resultTree.singleResultSelected()
+            if (result != null) {
+                model.viewCommentActionEnabled = result.comment != null
+                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
+                model.viewCertificatesActionEnabled = result.certificates > 0
+            }
+        }
+        
+        // results table1
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
@@ -376,20 +398,7 @@ class SearchTabView {
         resultsTable.rowSorter.setSortsOnUpdates(true)
 
 
-        resultsTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(e)
-                else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
-                    mvcGroup.controller.download()
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.button == MouseEvent.BUTTON3)
-                    showPopupMenu(e)
-            }
-        })
+        resultsTable.addMouseListener(resultsMouseListener)
         
         resultsTable.getSelectionModel().addListSelectionListener({
             def result = getSelectedResult()
@@ -407,7 +416,7 @@ class SearchTabView {
         })
         
         // senders table
-        sendersTable.addMouseListener(mouseListener)
+        sendersTable.addMouseListener(sendersMouseListener)
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
@@ -441,6 +450,7 @@ class SearchTabView {
                 for(UIResultEvent event : model.sendersBucket[sender])
                     model.treeModel.addToTree(event)
                 model.treeModel.nodeStructureChanged(model.root)
+                TreeUtil.expand(resultTree)
             }
         })
         
@@ -485,7 +495,7 @@ class SearchTabView {
         // TODO: add download right-click action
         
         // senders table 2
-        sendersTable2.addMouseListener(mouseListener)
+        sendersTable2.addMouseListener(sendersMouseListener)
         sendersTable2.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
         sendersTable2.rowSorter.setSortsOnUpdates(true)
@@ -519,9 +529,10 @@ class SearchTabView {
        
         if (settings.groupByFile) {
             showFileGrouping.call()
-            showTree.call()
-        } else
+        } else {
             showSenderGrouping.call()
+            showTree.call()
+        }
     }
 
     def closeTab = {
@@ -541,7 +552,13 @@ class SearchTabView {
             menu.add(download)
             showMenu = true
         }
-        if (resultsTable.getSelectedRows().length == 1) {
+        
+        boolean singleSelected
+        if (model.treeVisible)
+            singleSelected = resultTree.singleResultSelected() != null
+        else
+            singleSelected = resultsTable.getSelectedRows().length == 1
+        if (singleSelected) {
             JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
             copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
             menu.add(copyHashToClipboard)
@@ -604,6 +621,41 @@ class SearchTabView {
                 selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
             return model.results[selected]
         }
+    }
+    
+    List<UIResultEvent> selectedResults() {
+        if (model.groupedByFile) {
+            return [getSelectedResult()]
+        } else {
+            List<UIResultEvent> results = new ArrayList<>()
+            if (model.treeVisible) {
+                for (TreePath path : resultTree.getSelectionPaths())
+                    TreeUtil.getLeafs(path.getLastPathComponent(), results)
+            } else {
+                int[] rows = view.resultsTable.getSelectedRows()
+                if (rows.length == 0)
+                    return null
+                def sortEvt = view.lastSortEvent
+                if (sortEvt != null) {
+                    for (int i = 0; i < rows.length; i++) {
+                        rows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+                    }
+                }
+                rows.each { results.add(model.results[it]) }
+            }
+            return results
+        }
+    }
+    
+    List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {
+        List<ResultAndTargets> rv = new ArrayList<>()
+        if (model.groupedByFile || !model.treeVisible) {
+            // flat
+            for(UIResultEvent event : results)
+                rv << new ResultAndTargets(event, new File(event.name), null)
+        } else
+            rv.addAll(resultTree.decorateResults(results))
+        rv
     }
 
     def copyHashToClipboard() {

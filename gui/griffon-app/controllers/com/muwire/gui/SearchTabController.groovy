@@ -28,43 +28,30 @@ class SearchTabController {
 
     Core core
 
-    private def selectedResults() {
-        if (model.groupedByFile) {
-             return [view.getSelectedResult()]   
-        } else {
-            int[] rows = view.resultsTable.getSelectedRows()
-            if (rows.length == 0)
-                return null
-            def sortEvt = view.lastSortEvent
-            if (sortEvt != null) {
-                for (int i = 0; i < rows.length; i++) {
-                    rows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(rows[i])
-                }
-            }
-            List<UIResultEvent> results = new ArrayList<>()
-            rows.each { results.add(model.results[it]) }
-            return results
-        }
-    }
-
     @ControllerAction
     void download() {
-        def results = selectedResults()
-        if (results == null)
+        def results = view.selectedResults()
+        if (results == null || results.isEmpty())
             return
 
         results.removeAll {
             !mvcGroup.parentGroup.model.canDownload(it.infohash)
         }
 
-        results.each { result ->
-            def file = new File(application.context.get("muwire-settings").downloadLocation, result.name)
+        File downloadsFolder = application.context.get("muwire-settings").downloadLocation
+        List<ResultAndTargets> targets = view.decorateResults(results)
+        
+        targets.each { target ->
+            File file = new File(downloadsFolder, target.target.toString())
+            File parent = null
+            if (target.parent != null)
+                parent = new File(downloadsFolder, target.parent.toString())
 
-            def resultsBucket = model.hashBucket[result.infohash]
-            def sources = model.sourcesBucket[result.infohash]
+            def resultsBucket = model.hashBucket[target.resultEvent.infohash]
+            def sources = model.sourcesBucket[target.resultEvent.infohash]
 
             core.eventBus.publish(new UIDownloadEvent(result : resultsBucket, sources: sources,
-            target : file, sequential : view.sequentialDownload()))
+            target : file, toShare: parent, sequential : view.sequentialDownload()))
         }
         mvcGroup.parentGroup.view.showDownloadsWindow.call()
     }

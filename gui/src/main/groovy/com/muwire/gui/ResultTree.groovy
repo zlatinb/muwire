@@ -11,6 +11,9 @@ class ResultTree extends JTree{
     ResultTree(TreeModel model) {
         super(model)
         setCellRenderer(new ResultTreeRenderer())
+        setRootVisible(false)
+        setLargeModel(true)
+        setExpandsSelectedPaths(true)
     }
     
     List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {
@@ -47,5 +50,17 @@ class ResultTree extends JTree{
         rv
     }
 
+    /**
+     * @return if and only if a single result is selected, return it.  Null otherwise.
+     */
+    UIResultEvent singleResultSelected() {
+        TreePath[] selected = getSelectionPaths()
+        if (selected == null || selected.length == 0)
+            return null
+        def obj = selected[0].getLastPathComponent().getUserObject()
+        if (obj instanceof UIResultEvent)
+            return obj
+        return null
+    }
    
 }
