@@ -184,7 +184,7 @@ class UpdateClient {
                         long timestamp = System.currentTimeMillis()
                         byte [] sig2 = DataUtil.signUUID(uuid, timestamp, spk)
                         def searchEvent = new SearchEvent(searchHash : updateInfoHash.getRoot(), uuid : uuid, oobInfohash : true, persona : me)
-                        def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, replyTo : me.destination,
+                        def queryEvent = new QueryEvent(searchEvent : searchEvent, firstHop : true, local: true,  replyTo : me.destination,
                             receivedOn : me.destination, originator : me, sig : sig.data, queryTime : timestamp, sig2 : sig2)
                         eventBus.publish(queryEvent)
                     }

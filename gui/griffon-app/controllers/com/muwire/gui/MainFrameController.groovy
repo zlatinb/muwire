@@ -146,7 +146,7 @@ class MainFrameController {
         Signature sig = DSAEngine.getInstance().sign(payload, core.spk)
 
         long timestamp = System.currentTimeMillis()
-        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop,
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : firstHop, local: true,
         replyTo: core.me.destination, receivedOn: core.me.destination,
         originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : DataUtil.signUUID(uuid, timestamp, core.spk)))
 
@@ -171,7 +171,7 @@ class MainFrameController {
         
         def searchEvent = new SearchEvent(searchHash : Base64.decode(infoHash), uuid:uuid,
             oobInfohash: true, persona : core.me)
-        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true,
+        core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, local: true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : sig2))
     }

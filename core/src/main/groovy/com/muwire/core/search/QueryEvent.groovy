@@ -8,7 +8,7 @@ import net.i2p.data.Destination
 class QueryEvent extends Event {
 
     SearchEvent searchEvent
-    boolean firstHop
+    boolean firstHop, local
     Destination replyTo
     Persona originator
     Destination receivedOn

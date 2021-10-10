@@ -46,7 +46,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
 
     void onQueryEvent(QueryEvent e) {
         forwardQueryToLeafs(e)
-        if (!e.firstHop)
+        if (!e.firstHop && !e.local)
             return
         if (e.replyTo != me.destination && e.receivedOn != me.destination &&
             !leafConnections.containsKey(e.receivedOn))
@@ -60,7 +60,7 @@ class UltrapeerConnectionManager extends ConnectionManager {
             // 2. if firstHop forward to everyone
             // 3. otherwise to everyone who has recently responded/transferred to us + randomized sqrt of neighbors
             if (e.getReceivedOn() != it.getEndpoint().getDestination() &&
-                (e.firstHop || 
+                (e.firstHop || e.local ||
                     responderCache.hasResponded(it.endpoint.destination) ||
                     random.nextInt(connCount) < treshold))
                 it.sendQuery(e)
