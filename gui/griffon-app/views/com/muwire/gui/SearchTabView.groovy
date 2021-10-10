@@ -117,7 +117,7 @@ class SearchTabView {
                                         scrollPane(constraints: BorderLayout.CENTER) {
                                             resultsTable = table(id: "results-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                                 tableModel(list: model.results) {
-                                                    closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read: { row -> HTMLSanitizer.sanitize(row.name) })
+                                                    closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { it })
                                                     closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
                                                     closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.hashBucket[row.infohash].sourceCount() })
                                                     closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.sourcesBucket[row.infohash].size() })
@@ -162,9 +162,7 @@ class SearchTabView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.results2) {
-                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : String, read : {
-                                                HTMLSanitizer.sanitize(model.hashBucket[it].getName())
-                                            })
+                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].getResults().first()})
                                             closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
                                                 model.hashBucket[it].getSize()
                                             })
@@ -211,7 +209,7 @@ class SearchTabView {
                                     sendersTable2 = table(id : "senders-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders2) {
                                             closureColumn(header : trans("SENDER"), preferredWidth : 250, type : String, read : {it.sender.getHumanReadableName()})
-                                            closureColumn(header : trans("NAME"), preferredWidth: 250, type: String, read : {HTMLSanitizer.sanitize(it.getFullPath())})
+                                            closureColumn(header : trans("NAME"), preferredWidth: 250, type: UIResultEvent, read : {it})
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 10, type : Boolean, read : {it.browse})
                                             closureColumn(header : trans("FEED"), preferredWidth : 10, type: Boolean, read : {it.feed})
                                             closureColumn(header : trans("MESSAGES"), preferredWidth : 10, type: Boolean, read : {it.messages})
@@ -369,6 +367,8 @@ class SearchTabView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
+        resultsTable.setDefaultRenderer(UIResultEvent.class,
+                new ResultNameTableCellRenderer(model.core.fileManager::isShared, false))
 
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
 
@@ -436,6 +436,8 @@ class SearchTabView {
         
         // results table 2
         resultsTable2.setDefaultRenderer(Integer.class,centerRenderer)
+        resultsTable2.setDefaultRenderer(UIResultEvent.class, 
+                new ResultNameTableCellRenderer(model.core.fileManager::isShared, false))
         resultsTable2.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         resultsTable2.rowSorter.addRowSorterListener({evt -> lastResults2SortEvent = evt})
         resultsTable2.rowSorter.setSortsOnUpdates(true)
@@ -476,6 +478,8 @@ class SearchTabView {
         // senders table 2
         sendersTable2.addMouseListener(sendersMouseListener)
         sendersTable2.setDefaultRenderer(Integer.class, centerRenderer)
+        sendersTable2.setDefaultRenderer(UIResultEvent.class, 
+                new ResultNameTableCellRenderer(model.core.fileManager::isShared, true))
         sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
         sendersTable2.rowSorter.setSortsOnUpdates(true)
         selectionModel = sendersTable2.getSelectionModel()

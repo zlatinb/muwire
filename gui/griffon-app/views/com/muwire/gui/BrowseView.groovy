@@ -65,7 +65,7 @@ class BrowseView {
                     scrollPane(constraints: BorderLayout.CENTER) {
                         resultsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
                             tableModel(list: model.results) {
-                                closureColumn(header: trans("NAME"), preferredWidth: 350, type: String, read: { row -> HTMLSanitizer.sanitize(row.getFullPath()) })
+                                closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { it })
                                 closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
                                 closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read: { row -> row.comment != null })
                                 closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: { row -> row.certificates })
@@ -151,6 +151,8 @@ class BrowseView {
 
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
+        resultsTable.setDefaultRenderer(UIResultEvent.class, 
+                new ResultNameTableCellRenderer(controller.core.fileManager::isShared, true))
         
         resultsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
