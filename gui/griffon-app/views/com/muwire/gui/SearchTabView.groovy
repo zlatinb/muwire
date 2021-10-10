@@ -233,14 +233,15 @@ class SearchTabView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     sendersTable2 = table(id : "senders-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders2) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 350, type : String, read : {it.sender.getHumanReadableName()})
-                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type : Boolean, read : {it.browse})
-                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type: Boolean, read : {it.feed})
-                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type: Boolean, read : {it.messages})
-                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {it.chat})
-                                            closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != null})
-                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type: Integer, read : {it.certificates})
-                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Integer, read : {UIResultEvent row -> row.collections.size()})
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 250, type : String, read : {it.sender.getHumanReadableName()})
+                                            closureColumn(header : trans("NAME"), preferredWidth: 250, type: String, read : {HTMLSanitizer.sanitize(it.getFullPath())})
+                                            closureColumn(header : trans("BROWSE"), preferredWidth : 10, type : Boolean, read : {it.browse})
+                                            closureColumn(header : trans("FEED"), preferredWidth : 10, type: Boolean, read : {it.feed})
+                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 10, type: Boolean, read : {it.messages})
+                                            closureColumn(header : trans("CHAT"), preferredWidth : 10, type : Boolean, read : {it.chat})
+                                            closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != null})
+                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 10, type: Integer, read : {it.certificates})
+                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 10, type: Integer, read : {UIResultEvent row -> row.collections.size()})
                                             closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type : String, read : {
                                                 trans(model.core.trustService.getLevel(it.sender.destination).name())
                                             })
