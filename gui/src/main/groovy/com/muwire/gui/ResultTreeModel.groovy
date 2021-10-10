@@ -16,7 +16,7 @@ class ResultTreeModel extends DefaultTreeModel {
         def node = root
         if (event.path == null || event.path.length == 0) {
             def child = new DefaultMutableTreeNode()
-            child.setUserObject(event.name)
+            child.setUserObject(event)
             node.add(child)
             return
         }
