@@ -527,11 +527,11 @@ class SearchTabView {
             model.viewCollectionsActionEnabled = !e.collections.isEmpty()
         })
        
+        showTree.call()
         if (settings.groupByFile) {
             showFileGrouping.call()
         } else {
             showSenderGrouping.call()
-            showTree.call()
         }
     }
 
