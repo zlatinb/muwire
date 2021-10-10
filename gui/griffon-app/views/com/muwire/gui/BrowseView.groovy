@@ -122,6 +122,7 @@ class BrowseView {
         }
         
         // results tree
+        resultsTree.setSharedPredicate(controller.core.fileManager::isShared)
         resultsTree.addTreeExpansionListener(treeExpansions)
         resultsTree.addMouseListener(mouseListener)
         resultsTree.addTreeSelectionListener({

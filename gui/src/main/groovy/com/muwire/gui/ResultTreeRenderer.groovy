@@ -1,7 +1,10 @@
 package com.muwire.gui
 
+import com.muwire.core.InfoHash
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.util.DataUtil
+
+import java.util.function.Predicate
 
 import static com.muwire.gui.Translator.trans
 
@@ -11,13 +14,16 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import java.awt.Component
 
 class ResultTreeRenderer extends DefaultTreeCellRenderer {
-    private final ImageIcon commentIcon
+    private final ImageIcon commentIcon, sharedIcon
     private final String bShort
     private final StringBuffer sb = new StringBuffer()
+    private final Predicate<InfoHash> sharedPredicate
     
-    ResultTreeRenderer() {
+    ResultTreeRenderer(Predicate<InfoHash> sharedPredicate) {
         commentIcon = new ImageIcon((URL) PathTreeRenderer.class.getResource("/comment.png"))
+        sharedIcon = new ImageIcon((URL) PathTreeRenderer.class.getResource("/yes.png"))
         bShort = trans("BYTES_SHORT")
+        this.sharedPredicate = sharedPredicate
     }
 
      Component getTreeCellRendererComponent(JTree tree, Object value, 
@@ -38,7 +44,9 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
          setText(HTMLSanitizer.sanitize("$result.name (${sb.toString()})"))
          setEnabled(true)
          
-         if (result.comment)
+         if (sharedPredicate.test(result.infohash))
+             setIcon(sharedIcon)
+         else if (result.comment)
              setIcon(commentIcon)
     
          this

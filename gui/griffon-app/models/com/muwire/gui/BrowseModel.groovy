@@ -14,8 +14,6 @@ import com.muwire.core.search.BrowseStatus
 import javax.annotation.Nonnull
 import javax.swing.SwingWorker
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreeModel
 
 @ArtifactProviderFor(GriffonModel)
 class BrowseModel {

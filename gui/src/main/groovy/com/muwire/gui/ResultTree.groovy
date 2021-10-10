@@ -1,19 +1,24 @@
 package com.muwire.gui
 
+import com.muwire.core.InfoHash
 import com.muwire.core.search.UIResultEvent
 
 import javax.swing.JTree
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreePath
+import java.util.function.Predicate
 
 class ResultTree extends JTree{
     
     ResultTree(TreeModel model) {
         super(model)
-        setCellRenderer(new ResultTreeRenderer())
         setRootVisible(false)
         setLargeModel(true)
         setExpandsSelectedPaths(true)
+    }
+    
+    void setSharedPredicate(Predicate<InfoHash> predicate) {
+        setCellRenderer(new ResultTreeRenderer(predicate))
     }
     
     List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {

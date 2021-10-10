@@ -345,6 +345,7 @@ class SearchTabView {
         }
         
         // results tree
+        resultTree.setSharedPredicate(model.core.fileManager::isShared)
         resultTree.addMouseListener(resultsMouseListener)
         resultTree.addTreeSelectionListener {
             model.downloadActionEnabled = false
