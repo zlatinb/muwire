@@ -332,8 +332,10 @@ class SearchTabView {
             public void mouseClicked(MouseEvent e) {
                 if (e.button == MouseEvent.BUTTON3)
                     showPopupMenu(e)
-                else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2)
-                    controller.download()
+                else if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
+                    if (model.groupedByFile || !model.treeVisible)
+                        controller.download()
+                }
             }
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -465,15 +467,7 @@ class SearchTabView {
                 sendersTable2.selectionModel.setSelectionInterval(selectedRow,selectedRow)
         })
         
-        resultsTable2.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() > 1 && e.button == MouseEvent.BUTTON1)
-                    mvcGroup.controller.download()
-            }
-        })
-        
-        // TODO: add download right-click action
+        resultsTable2.addMouseListener(resultsMouseListener)
         
         // senders table 2
         sendersTable2.addMouseListener(sendersMouseListener)
@@ -537,10 +531,14 @@ class SearchTabView {
         }
         
         boolean singleSelected
-        if (model.treeVisible)
-            singleSelected = resultTree.singleResultSelected() != null
-        else
-            singleSelected = resultsTable.getSelectedRows().length == 1
+        if (model.groupedByFile)
+            singleSelected = true
+        else {
+            if (model.treeVisible)
+                singleSelected = resultTree.singleResultSelected() != null
+            else
+                singleSelected = resultsTable.getSelectedRows().length == 1
+        }
         if (singleSelected) {
             JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
             copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
