@@ -87,4 +87,9 @@ class CollectionTabController {
         params['name'] = name
         mvcGroup.createMVCGroup("show-comment", params)
     }
+    
+    @ControllerAction
+    void copyId() {
+        CopyPasteSupport.copyToClipboard(model.host.toBase64())
+    }
 }

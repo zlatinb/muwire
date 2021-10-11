@@ -55,8 +55,14 @@ class CollectionTabView {
             panel {
                 borderLayout()
                 panel(constraints : BorderLayout.NORTH) {
-                    label(text : trans("STATUS") + ":")
-                    label(text : bind {trans(model.status.name())})
+                    borderLayout()
+                    panel(constraints: BorderLayout.CENTER) {
+                        label(text: trans("STATUS") + ":")
+                        label(text: bind { trans(model.status.name()) })
+                    }
+                    panel(constraints: BorderLayout.EAST) {
+                        button(text : trans("COPY_FULL_ID"), copyIdAction)
+                    }
                 }
                 scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                     collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
