@@ -54,9 +54,18 @@ class BrowseView {
         p = builder.panel {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
-                label(text: trans("STATUS") + ":")
-                label(text: bind {trans(model.status.name())})
-                label(text : bind {model.totalResults == 0 ? "" : Math.round(model.resultCount * 100 / model.totalResults)+ "%"})
+                borderLayout()
+                panel(constraints: BorderLayout.CENTER) {
+                    label(text: trans("STATUS") + ":")
+                    label(text: bind { trans(model.status.name()) })
+                    label(text: bind {
+                        model.totalResults == 0 ? "" :
+                                "$model.resultCount/$model.totalResults (" + Math.round(model.resultCount * 100 / model.totalResults)+ "%)"
+                    })
+                }
+                panel(constraints: BorderLayout.EAST) {
+                    button(text: trans("COPY_FULL_ID"), copyIdAction)
+                }
             }
             resultsPanel = panel(constraints: BorderLayout.CENTER) {
                 cardLayout()

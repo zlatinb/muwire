@@ -208,4 +208,9 @@ class BrowseController {
         params['host'] = event.sender
         mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
+    
+    @ControllerAction
+    void copyId() {
+        CopyPasteSupport.copyToClipboard(model.host.toBase64())
+    }
 }
