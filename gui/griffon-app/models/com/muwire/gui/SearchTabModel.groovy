@@ -3,26 +3,26 @@ package com.muwire.gui
 import com.muwire.core.InfoHash
 
 import javax.annotation.Nonnull
-import javax.inject.Inject
-import javax.swing.JTable
 
 import com.muwire.core.Core
 import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
 
 import griffon.core.artifact.GriffonModel
-import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.SwingWorker
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreeNode
+import java.util.concurrent.ConcurrentHashMap
 
 @ArtifactProviderFor(GriffonModel)
 class SearchTabModel {
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
+    @MVCMember @Nonnull
+    SearchTabView view
     
     @Observable boolean downloadActionEnabled
     @Observable boolean trustButtonsEnabled
@@ -41,12 +41,15 @@ class SearchTabModel {
     String uuid
     def senders = []
     def results = []
-    def hashBucket = new HashMap<InfoHash, HashBucket>()
+    def hashBucket = new ConcurrentHashMap<InfoHash, HashBucket>()
     def sourcesBucket = [:]
     def sendersBucket = new LinkedHashMap<>()
     
     def results2 = []
+    def allResults2 = new LinkedHashSet()
     def senders2 = []
+    volatile String[] filter
+    volatile Filterer filterer
     
 
     ResultTreeModel treeModel
@@ -64,42 +67,29 @@ class SearchTabModel {
     void mvcGroupDestroy() {
         mvcGroup.parentGroup.model.results.remove(uuid)
     }
-
-    void handleResult(UIResultEvent e) {
-        if (uiSettings.excludeLocalResult &&
-            core.fileManager.rootToFiles.containsKey(e.infohash))
-            return
-        runInsideUIAsync {
-            def bucket = hashBucket.get(e.infohash)
-            if (bucket == null) {
-                bucket = new HashBucket()
-                hashBucket[e.infohash] = bucket
+    
+    private boolean filter(InfoHash infoHash) {
+        if (filter == null)
+            return true
+        String name = hashBucket[infoHash].getName().toLowerCase()
+        boolean contains = true
+        for (String keyword : filter) {
+            contains &= name.contains(keyword)
+        }
+        contains
+    }
+    
+    void filterResults2() {
+        results2.clear()
+        filterer?.cancel()
+        if (filter != null) {
+            filterer = new Filterer()
+            filterer.execute()
+        } else {
+            synchronized (allResults2) {
+                results2.addAll(allResults2)
             }
-            bucket.add(e)
-
-            def senderBucket = sendersBucket.get(e.sender)
-            if (senderBucket == null) {
-                senderBucket = []
-                sendersBucket[e.sender] = senderBucket
-                senders.clear()
-                senders.addAll(sendersBucket.keySet())
-            }
-            senderBucket << e
-            
-            Set sourceBucket = sourcesBucket.get(e.infohash)
-            if (sourceBucket == null) {
-                sourceBucket = new HashSet()
-                sourcesBucket.put(e.infohash, sourceBucket)
-            }
-            sourceBucket.addAll(e.sources)
-            
-            results2.clear()
-            results2.addAll(hashBucket.keySet())
-
-            JTable table = builder.getVariable("senders-table")
-            table.model.fireTableDataChanged()
-            table = builder.getVariable("results-table2")
-            table.model.fireTableDataChanged()
+            view.refreshResults()
         }
     }
 
@@ -135,15 +125,11 @@ class SearchTabModel {
                 
             }
             results2.clear()
-            results2.addAll(hashBucket.keySet())
-            JTable table = builder.getVariable("senders-table")
-            int selectedRow = table.getSelectedRow()
-            table.model.fireTableDataChanged()
-            table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
-            table = builder.getVariable("results-table2")
-            selectedRow = table.getSelectedRow() 
-            table.model.fireTableDataChanged()
-            table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+            synchronized(allResults2) {
+                allResults2.addAll(hashBucket.keySet())
+                allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
+            }
+            view.refreshResults()
         }
     }
     
@@ -223,6 +209,40 @@ class SearchTabModel {
                 count += event.collections.size()
             }
             count
+        }
+    }
+    
+    private class Filterer extends SwingWorker<List<InfoHash>, InfoHash> {
+        private volatile boolean cancelled
+        
+        void cancel() {
+            cancelled = true
+        }
+        
+        @Override
+        protected List<InfoHash> doInBackground() {
+            synchronized(allResults2) {
+                for (InfoHash infoHash : allResults2) {
+                    if (cancelled)
+                        break
+                    if (filter(infoHash))
+                        publish(infoHash)
+                }
+            }
+        }
+        
+        @Override
+        protected void process(List<InfoHash> chunks) {
+            if (cancelled)
+                return
+            results2.addAll(chunks)
+        }
+        
+        @Override
+        protected void done() {
+            if (cancelled)
+                return
+            view.refreshResults()
         }
     }
 }

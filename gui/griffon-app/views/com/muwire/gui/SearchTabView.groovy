@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
+import javax.swing.JTextField
 import javax.swing.tree.TreePath
 
 import static com.muwire.gui.Translator.trans
@@ -191,15 +192,18 @@ class SearchTabView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows :1, cols : 3)
-                                    panel {}
-                                    panel {
+                                    gridLayout(rows :1, cols : 2)
+                                    panel (border: etchedBorder()) {
                                         button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                                        sequentialDownloadCheckbox2 = checkBox()
                                     }
-                                    panel {
-                                        gridBagLayout()
-                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx : 0, gridy : 0, weightx : 100, anchor : GridBagConstraints.LINE_END))
-                                        sequentialDownloadCheckbox2 = checkBox( constraints : gbc(gridx: 1, gridy:0, weightx: 0, anchor : GridBagConstraints.LINE_END))
+                                    panel (border: etchedBorder()) {
+                                        def textField = new JTextField(15)
+                                        textField.addActionListener({controller.filter()})
+                                        widget(id: "filter-field", textField)
+                                        button(text: trans("FILTER"), filterAction)
+                                        button(text: trans("CLEAR"), clearFilterAction)
                                     }
                                 }
                             }
@@ -713,5 +717,16 @@ class SearchTabView {
             return sequentialDownloadCheckbox2.model.isSelected()
         else
             return sequentialDownloadCheckbox.model.isSelected()
+    }
+    
+    void refreshResults() {
+        JTable table = builder.getVariable("senders-table")
+        int selectedRow = table.getSelectedRow()
+        table.model.fireTableDataChanged()
+        table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        table = builder.getVariable("results-table2")
+        selectedRow = table.getSelectedRow()
+        table.model.fireTableDataChanged()
+        table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
     }
 }

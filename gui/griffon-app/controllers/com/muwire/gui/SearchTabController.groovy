@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.SplitPattern
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -18,9 +19,13 @@ import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
+import javax.swing.JTextField
+
 @ArtifactProviderFor(GriffonController)
 class SearchTabController {
 
+    @MVCMember @Nonnull
+    FactoryBuilderSupport builder
     @MVCMember @Nonnull
     SearchTabModel model
     @MVCMember @Nonnull
@@ -201,5 +206,25 @@ class SearchTabController {
         if (sender == null)
             return
         CopyPasteSupport.copyToClipboard(sender.toBase64())
+    }
+    
+    @ControllerAction
+    void filter() {
+        JTextField field = builder.getVariable("filter-field")
+        String filter = field.getText()
+        if (filter == null)
+            return
+        filter = filter.strip().replaceAll(SplitPattern.SPLIT_PATTERN," ").toLowerCase()
+        String [] split = filter.split(" ")
+        def hs = new HashSet()
+        split.each {if (it.length() > 0) hs << it}
+        model.filter = hs.toArray(new String[0])
+        model.filterResults2()
+    }
+    
+    @ControllerAction
+    void clearFilter() {
+        model.filter = null
+        model.filterResults2()
     }
 }
