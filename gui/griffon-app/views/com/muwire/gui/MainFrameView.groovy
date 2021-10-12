@@ -6,7 +6,6 @@ import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
-import org.h2.value.Transfer
 
 import javax.swing.DropMode
 import javax.swing.JPanel
@@ -14,8 +13,6 @@ import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 
@@ -782,11 +779,11 @@ class MainFrameView {
         // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
         def selectionModel = downloadsTable.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
             def downloadDetailsPanel = builder.getVariable("download-details-panel")
-            int selectedRow = selectedDownloaderRow()
-            if (selectedRow < 0) {
+            int []selectedRows = selectedDownloaderRows()
+            if (selectedRows.length == 0) {
                 model.cancelButtonEnabled = false
                 model.retryButtonEnabled = false
                 model.pauseButtonEnabled = false
@@ -795,36 +792,79 @@ class MainFrameView {
                 downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "select-download")
                 return
             }
-            def downloader = model.downloads[selectedRow]?.downloader
-            if (downloader == null)
+            
+            // simple case, 1 selected download
+            if (selectedRows.length == 1) {
+                def downloader = model.downloads[selectedRows[0]]?.downloader
+                if (downloader == null)
+                    return
+                model.downloader = downloader
+                model.previewButtonEnabled = true
+                downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "download-selected")
+            
+            
+                switch (downloader.getCurrentState()) {
+                    case Downloader.DownloadState.CONNECTING:
+                    case Downloader.DownloadState.DOWNLOADING:
+                    case Downloader.DownloadState.HASHLIST:
+                        model.cancelButtonEnabled = true
+                        model.pauseButtonEnabled = true
+                        model.retryButtonEnabled = false
+                        break
+                    case Downloader.DownloadState.FAILED:
+                        model.cancelButtonEnabled = true
+                        model.retryButtonEnabled = true
+                        model.resumeButtonText = "RETRY"
+                        model.pauseButtonEnabled = false
+                        break
+                    case Downloader.DownloadState.PAUSED:
+                        model.cancelButtonEnabled = true
+                        model.retryButtonEnabled = true
+                        model.resumeButtonText = "RESUME"
+                        model.pauseButtonEnabled = false
+                        break
+                    default:
+                        model.cancelButtonEnabled = false
+                        model.retryButtonEnabled = false
+                        model.pauseButtonEnabled = false
+                }
                 return
-            model.downloader = downloader
-            model.previewButtonEnabled = true
-            downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "download-selected")
-            switch (downloader.getCurrentState()) {
-                case Downloader.DownloadState.CONNECTING:
-                case Downloader.DownloadState.DOWNLOADING:
-                case Downloader.DownloadState.HASHLIST:
-                    model.cancelButtonEnabled = true
-                    model.pauseButtonEnabled = true
-                    model.retryButtonEnabled = false
-                    break
-                case Downloader.DownloadState.FAILED:
-                    model.cancelButtonEnabled = true
-                    model.retryButtonEnabled = true
-                    model.resumeButtonText = "RETRY"
-                    model.pauseButtonEnabled = false
-                    break
-                case Downloader.DownloadState.PAUSED:
-                    model.cancelButtonEnabled = true
-                    model.retryButtonEnabled = true
-                    model.resumeButtonText = "RESUME"
-                    model.pauseButtonEnabled = false
-                    break
-                default:
-                    model.cancelButtonEnabled = false
-                    model.retryButtonEnabled = false
-                    model.pauseButtonEnabled = false
+            }
+            
+            // multiple selected downloads
+            downloadDetailsPanel.getLayout().show(downloadDetailsPanel, "select-download")
+            model.downloader = null
+            
+            List<Downloader> downloaders = []
+            for (int row : selectedRows)
+                downloaders << model.downloads[row].downloader
+            
+            // default is best guess
+            model.previewButtonEnabled = false
+            model.cancelButtonEnabled = true
+            model.pauseButtonEnabled = true
+            model.retryButtonEnabled = false
+            
+            boolean allPaused = true
+            downloaders.each { allPaused &= it.getCurrentState() == Downloader.DownloadState.PAUSED}
+            boolean allFailed = true
+            downloaders.each { allFailed &= it.getCurrentState() == Downloader.DownloadState.FAILED}
+            boolean allFinished = true
+            downloaders.each { allFinished &= it.getCurrentState() == Downloader.DownloadState.FINISHED}
+            
+            if (allPaused) {
+                model.pauseButtonEnabled = false
+                model.retryButtonEnabled = true
+                model.resumeButtonText = "RESUME"
+            }
+            if (allFailed) {
+                model.retryButtonEnabled = true
+                model.pauseButtonEnabled = false
+                model.resumeButtonText = "RETRY"
+            }
+            if (allFinished) {
+                model.retryButtonEnabled = false
+                model.pauseButtonEnabled = false
             }
         })
 
@@ -1348,54 +1388,92 @@ class MainFrameView {
         clipboard.setContents(selection, null)
     }
 
-    int selectedDownloaderRow() {
+    int[] selectedDownloaderRows() {
         def downloadsTable = builder.getVariable("downloads-table")
-        int selected = downloadsTable.getSelectedRow()
-        if (selected < 0)
+        int [] selected = downloadsTable.getSelectedRows()
+        if (selected == null)
+            return new int[0]
+        if (selected.length == 0)
             return selected
-        if (lastDownloadSortEvent != null)
-            selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
+        if (lastDownloadSortEvent != null) {
+            for (int i = 0; i < selected.length; i++)
+                selected[i] = downloadsTable.rowSorter.convertRowIndexToModel(selected[i])
+        }
+            
         selected
     }
 
     def showDownloadsMenu(MouseEvent e) {
-        int selected = selectedDownloaderRow()
-        if (selected < 0)
+        int[] selected = selectedDownloaderRows()
+        if (selected.length == 0)
             return
+        
         boolean pauseEnabled = false
         boolean cancelEnabled = false
         boolean retryEnabled = false
-        boolean openFolderEnabled = false
         String resumeText = "RETRY"
-        Downloader downloader = model.downloads[selected].downloader
-        switch(downloader.currentState) {
-            case Downloader.DownloadState.FINISHED:
-                openFolderEnabled = true
-                break
-            case Downloader.DownloadState.DOWNLOADING:
-            case Downloader.DownloadState.HASHLIST:
-            case Downloader.DownloadState.CONNECTING:
-                pauseEnabled = true
-                cancelEnabled = true
-                retryEnabled = false
-                break
-            case Downloader.DownloadState.FAILED:
-                pauseEnabled = false
-                cancelEnabled = true
-                retryEnabled = true
-                break
-            case Downloader.DownloadState.PAUSED:
-                pauseEnabled = false
-                cancelEnabled = true
-                retryEnabled = true
-                resumeText = "RESUME"
-                break
-            default :
-                pauseEnabled = false
-                cancelEnabled = false
-                retryEnabled = false
-        }
+        boolean openFolderEnabled = false
+        if (selected.length == 1) {
+            Downloader downloader = model.downloads[selected[0]].downloader
+            switch (downloader.currentState) {
+                case Downloader.DownloadState.FINISHED:
+                    openFolderEnabled = true
+                    break
+                case Downloader.DownloadState.DOWNLOADING:
+                case Downloader.DownloadState.HASHLIST:
+                case Downloader.DownloadState.CONNECTING:
+                    pauseEnabled = true
+                    cancelEnabled = true
+                    retryEnabled = false
+                    break
+                case Downloader.DownloadState.FAILED:
+                    pauseEnabled = false
+                    cancelEnabled = true
+                    retryEnabled = true
+                    break
+                case Downloader.DownloadState.PAUSED:
+                    pauseEnabled = false
+                    cancelEnabled = true
+                    retryEnabled = true
+                    resumeText = "RESUME"
+                    break
+                default:
+                    pauseEnabled = false
+                    cancelEnabled = false
+                    retryEnabled = false
+            }
+        } else {
+            List<Downloader> downloaders = []
+            for (int row : selected)
+                downloaders << model.downloads[row].downloader
+            
+            // default is best guess
+            pauseEnabled = true
+            cancelEnabled = true
+            retryEnabled = true
+            openFolderEnabled = false
+            resumeText = "RETRY"
 
+            boolean allPaused = true
+            downloaders.each { allPaused &= it.getCurrentState() == Downloader.DownloadState.PAUSED}
+            boolean allFailed = true
+            downloaders.each { allFailed &= it.getCurrentState() == Downloader.DownloadState.FAILED}
+            boolean allFinished = true
+            downloaders.each { allFinished &= it.getCurrentState() == Downloader.DownloadState.FINISHED}
+            
+            if (allPaused) {
+                pauseEnabled = false
+                resumeText = "RESUME"
+            }
+            if (allFailed) {
+                pauseEnabled = false
+            }
+            if (allFinished) {
+                pauseEnabled = false
+                retryEnabled = false
+            }
+        }
+        
         JPopupMenu menu = new JPopupMenu()
         JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHashToClipboard.addActionListener({

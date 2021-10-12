@@ -192,15 +192,20 @@ class MainFrameModel {
     UISettings uiSettings
 
     void updateTablePreservingSelection(String tableName) {
-        def downloadTable = builder.getVariable(tableName)
-        int selectedRow = downloadTable.getSelectedRow()
+        JTable table = builder.getVariable(tableName)
+        int[] selectedRows = table.getSelectedRows()
+        for (int i = 0; i < selectedRows.length; i ++)
+            selectedRows[i] = table.rowSorter.convertRowIndexToModel(selectedRows[i])
         while(true) {
             try {
-                downloadTable.model.fireTableDataChanged()
+                table.model.fireTableDataChanged()
                 break
             } catch (IllegalArgumentException iae) {} // caused by underlying model changing while table is sorted
         }
-        downloadTable.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+        for (int i = 0; i < selectedRows.length; i ++)
+            selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
+        for (int selectedRow : selectedRows)
+            table.selectionModel.addSelectionInterval(selectedRow,selectedRow)
     }
 
     void mvcGroupInit(Map<String, Object> args) {

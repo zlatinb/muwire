@@ -176,15 +176,16 @@ class MainFrameController {
             originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : sig2))
     }
     
-    private int selectedDownload() {
-        def downloadsTable = builder.getVariable("downloads-table")
-        def selected = downloadsTable.getSelectedRow()
-        def sortEvt = mvcGroup.view.lastDownloadSortEvent
-        if (sortEvt != null)
-            selected = downloadsTable.rowSorter.convertRowIndexToModel(selected)
-        selected
+    private List<Downloader> selectedDownloads() {
+        int [] rows = view.selectedDownloaderRows()
+        if (rows.length == 0)
+            return Collections.emptyList()
+        List<Downloader> rv = []
+        for (int row : rows)
+            rv << model.downloads[row].downloader
+        rv
     }
-
+    
     @ControllerAction
     void trustPersonaFromSearch() {
         int selected = builder.getVariable("searches-table").getSelectedRow()
@@ -207,29 +208,35 @@ class MainFrameController {
 
     @ControllerAction
     void cancel() {
-        def downloader = model.downloads[selectedDownload()].downloader
-        downloader.cancel()
-        model.downloadInfoHashes.remove(downloader.getInfoHash())
-        core.eventBus.publish(new UIDownloadCancelledEvent(downloader : downloader))
+        for (Downloader downloader : selectedDownloads()) {
+            downloader.cancel()
+            model.downloadInfoHashes.remove(downloader.getInfoHash())
+            core.eventBus.publish(new UIDownloadCancelledEvent(downloader: downloader))
+        }
     }
 
     @ControllerAction
     void resume() {
-        def downloader = model.downloads[selectedDownload()].downloader
-        downloader.resume()
-        core.eventBus.publish(new UIDownloadResumedEvent())
+        for (Downloader downloader : selectedDownloads()) {
+            downloader.resume()
+            core.eventBus.publish(new UIDownloadResumedEvent())
+        }
     }
 
     @ControllerAction
     void pause() {
-        def downloader = model.downloads[selectedDownload()].downloader
-        downloader.pause()
-        core.eventBus.publish(new UIDownloadPausedEvent())
+        for (Downloader downloader : selectedDownloads()) {
+            downloader.pause()
+            core.eventBus.publish(new UIDownloadPausedEvent())
+        }
     }
     
     @ControllerAction
     void preview() {
-        def downloader = model.downloads[selectedDownload()].downloader
+        def downloads = selectedDownloads()
+        if (downloads.size() != 1)
+            return
+        def downloader = downloads.get(0)
         def params = [:]
         params['downloader'] = downloader
         mvcGroup.createMVCGroup("download-preview", params)
@@ -259,7 +266,10 @@ class MainFrameController {
 
     @ControllerAction
     void openContainingFolderFromDownload() {
-        def downloader = model.downloads[selectedDownload()].downloader
+        def downloads = selectedDownloads()
+        if (downloads.size() != 1)
+            return
+        def downloader = downloads.get(0)
 
         try {
             Desktop.getDesktop().open(downloader.file.getParentFile())
