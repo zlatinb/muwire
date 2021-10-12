@@ -56,7 +56,7 @@ class SearchTabView {
     def sendersTable, sendersTable2
     def lastSendersSortEvent
     def resultsTable, resultsTable2
-    private JPanel resultsPanel
+    private JPanel resultsPanel, senders2Panel
     private ResultTree resultTree
             
     def lastSortEvent
@@ -207,51 +207,57 @@ class SearchTabView {
                                     }
                                 }
                             }
-                            panel {
-                                borderLayout()
-                                scrollPane(constraints : BorderLayout.CENTER) {
-                                    sendersTable2 = table(id : "senders-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                        tableModel(list : model.senders2) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 250, type : String, read : {it.sender.getHumanReadableName()})
-                                            closureColumn(header : trans("NAME"), preferredWidth: 250, type: UIResultEvent, read : {it})
-                                            closureColumn(header : trans("BROWSE"), preferredWidth : 10, type : Boolean, read : {it.browse})
-                                            closureColumn(header : trans("FEED"), preferredWidth : 10, type: Boolean, read : {it.feed})
-                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 10, type: Boolean, read : {it.messages})
-                                            closureColumn(header : trans("CHAT"), preferredWidth : 10, type : Boolean, read : {it.chat})
-                                            closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != null})
-                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 10, type: Integer, read : {it.certificates})
-                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 10, type: Integer, read : {UIResultEvent row -> row.collections.size()})
-                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type : String, read : {
-                                                trans(model.core.trustService.getLevel(it.sender.destination).name())
-                                            })
+                            senders2Panel = panel {
+                                cardLayout()
+                                panel (constraints: "select-single-result-message"){
+                                    label(text: trans("SELECT_SINGLE_RESULT"))
+                                }
+                                panel (constraints : "sender-details-table") {
+                                    borderLayout()
+                                    scrollPane(constraints: BorderLayout.CENTER) {
+                                        sendersTable2 = table(id: "senders-table2", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                            tableModel(list: model.senders2) {
+                                                closureColumn(header: trans("SENDER"), preferredWidth: 250, type: String, read: { it.sender.getHumanReadableName() })
+                                                closureColumn(header: trans("NAME"), preferredWidth: 250, type: UIResultEvent, read: { it })
+                                                closureColumn(header: trans("BROWSE"), preferredWidth: 10, type: Boolean, read: { it.browse })
+                                                closureColumn(header: trans("FEED"), preferredWidth: 10, type: Boolean, read: { it.feed })
+                                                closureColumn(header: trans("MESSAGES"), preferredWidth: 10, type: Boolean, read: { it.messages })
+                                                closureColumn(header: trans("CHAT"), preferredWidth: 10, type: Boolean, read: { it.chat })
+                                                closureColumn(header: trans("COMMENT"), preferredWidth: 10, type: Boolean, read: { it.comment != null })
+                                                closureColumn(header: trans("CERTIFICATES"), preferredWidth: 10, type: Integer, read: { it.certificates })
+                                                closureColumn(header: trans("COLLECTIONS"), preferredWidth: 10, type: Integer, read: { UIResultEvent row -> row.collections.size() })
+                                                closureColumn(header: trans("TRUST_NOUN"), preferredWidth: 50, type: String, read: {
+                                                    trans(model.core.trustService.getLevel(it.sender.destination).name())
+                                                })
+                                            }
                                         }
                                     }
-                                } 
-                                panel (constraints : BorderLayout.SOUTH) {
+                                    panel (constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows : 1, cols : 5)
                                     panel (border : etchedBorder()) {
                                         gridLayout()
-                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), showCommentAction)
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), subscribeAction)
+                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), showCommentAction)
+                                        button(text: trans("SUBSCRIBE"), enabled: bind { model.subscribeActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), subscribeAction)
                                     }
-                                    panel (border : etchedBorder()) {
-                                        gridBagLayout()
-                                        button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), viewCertificatesAction)
-                                        button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), viewCollectionsAction)
-                                    }
-                                    panel (border : etchedBorder()) {
-                                        gridBagLayout()
-                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, constraints : gbc(gridx : 0, gridy : 0), browseAction)
-                                        button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), browseCollectionsAction)
-                                    }
-                                    panel (border : etchedBorder()) {
-                                        gridBagLayout()
-                                        button(text : trans("MESSAGE_VERB"), enabled : bind {model.messageActionEnabled}, constraints : gbc(gridx : 0, gridy :0), messageAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, constraints : gbc(gridx : 1, gridy : 0), chatAction)
-                                    }
-                                    panel (border : etchedBorder()) {
-                                        button(text : trans("ADD_CONTACT"), enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                        panel(border: etchedBorder()) {
+                                            gridBagLayout()
+                                            button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), viewCertificatesAction)
+                                            button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), viewCollectionsAction)
+                                        }
+                                        panel(border: etchedBorder()) {
+                                            gridBagLayout()
+                                            button(text: trans("BROWSE_HOST"), enabled: bind { model.browseActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), browseAction)
+                                            button(text: trans("BROWSE_COLLECTIONS"), enabled: bind { model.browseCollectionsActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), browseCollectionsAction)
+                                        }
+                                        panel(border: etchedBorder()) {
+                                            gridBagLayout()
+                                            button(text: trans("MESSAGE_VERB"), enabled: bind { model.messageActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), messageAction)
+                                            button(text: trans("CHAT"), enabled: bind { model.chatActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), chatAction)
+                                        }
+                                        panel(border: etchedBorder()) {
+                                            button(text: trans("ADD_CONTACT"), enabled: bind { model.trustButtonsEnabled }, trustAction)
+                                            button(text: trans("DISTRUST"), enabled: bind { model.trustButtonsEnabled }, distrustAction)
+                                        }
                                     }
                                 }
                             }
@@ -448,10 +454,12 @@ class SearchTabView {
         resultsTable2.rowSorter.addRowSorterListener({evt -> lastResults2SortEvent = evt})
         resultsTable2.rowSorter.setSortsOnUpdates(true)
         selectionModel = resultsTable2.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
-            UIResultEvent e = getSelectedResult()
-            if (e == null) {
+            List<UIResultEvent> selectedResults = selectedResults()
+            if (selectedResults.isEmpty()) {
+                showSelectSingleResult.call()
+                model.downloadActionEnabled = false
                 model.trustButtonsEnabled = false
                 model.browseActionEnabled = false
                 model.browseCollectionsActionEnabled = false
@@ -461,7 +469,16 @@ class SearchTabView {
                 model.viewCollectionsActionEnabled = false
                 return
             }
+            
             model.downloadActionEnabled = true
+            
+            if (selectedResults.size() > 1) {
+                showSelectSingleResult.call()
+                return
+            }
+            
+            showSenderDetails.call()
+            UIResultEvent e = selectedResults.get(0)
             def results = model.hashBucket[e.infohash].getResults()
             model.senders2.clear()
             model.senders2.addAll(results)
@@ -536,7 +553,7 @@ class SearchTabView {
         
         boolean singleSelected
         if (model.groupedByFile)
-            singleSelected = true
+            singleSelected = resultsTable2.getSelectedRows().length == 1
         else {
             if (model.treeVisible)
                 singleSelected = resultTree.singleResultSelected() != null
@@ -610,20 +627,36 @@ class SearchTabView {
     
     List<UIResultEvent> selectedResults() {
         if (model.groupedByFile) {
-            return [getSelectedResult()]
+            int[] selectedRows = resultsTable2.getSelectedRows()
+            if (selectedRows == null || selectedRows.length == 0)
+                return Collections.emptyList()
+            if (selectedRows.length == 1)
+                return [getSelectedResult()]
+            
+            if (lastResults2SortEvent != null) {
+                for (int i = 0; i < selectedRows.length; i++)
+                    selectedRows[i] = resultsTable2.rowSorter.convertRowIndexToModel(selectedRows[i])
+            }
+            
+            List<UIResultEvent> rv = []
+            for (int row : selectedRows) {
+                def ih = model.results2[row]
+                rv.addAll model.hashBucket[ih].getResults()
+            }
+            return rv
         } else {
             List<UIResultEvent> results = new ArrayList<>()
             if (model.treeVisible) {
                 for (TreePath path : resultTree.getSelectionPaths())
                     TreeUtil.getLeafs(path.getLastPathComponent(), results)
             } else {
-                int[] rows = view.resultsTable.getSelectedRows()
+                int[] rows = resultsTable.getSelectedRows()
                 if (rows.length == 0)
                     return null
-                def sortEvt = view.lastSortEvent
+                def sortEvt = lastSortEvent
                 if (sortEvt != null) {
                     for (int i = 0; i < rows.length; i++) {
-                        rows[i] = view.resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+                        rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
                     }
                 }
                 rows.each { results.add(model.results[it]) }
@@ -710,6 +743,14 @@ class SearchTabView {
     def showTable = {
         model.treeVisible = false
         resultsPanel.getLayout().show(resultsPanel, "table")
+    }
+    
+    def showSelectSingleResult = {
+        senders2Panel.getLayout().show(senders2Panel, "select-single-result-message")
+    }
+    
+    def showSenderDetails = {
+        senders2Panel.getLayout().show(senders2Panel, "sender-details-table")
     }
     
     boolean sequentialDownload() {

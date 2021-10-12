@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -20,6 +21,7 @@ import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
 
 import javax.swing.JTextField
+import java.util.stream.Collectors
 
 @ArtifactProviderFor(GriffonController)
 class SearchTabController {
@@ -36,12 +38,15 @@ class SearchTabController {
     @ControllerAction
     void download() {
         def results = view.selectedResults()
-        if (results == null || results.isEmpty())
+        if (results.isEmpty())
             return
 
         results.removeAll {
             !mvcGroup.parentGroup.model.canDownload(it.infohash)
         }
+        
+        Set<InfoHash> uniqueHashes = results.stream().map({it.infohash}).collect(Collectors.toSet())
+        results = uniqueHashes.stream().map({model.hashBucket[it].getResults().first()}).collect(Collectors.toList())
 
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
         List<ResultAndTargets> targets = view.decorateResults(results)
