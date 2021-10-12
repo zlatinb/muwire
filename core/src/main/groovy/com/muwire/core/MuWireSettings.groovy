@@ -257,7 +257,7 @@ class MuWireSettings {
         
         // chat settings
         props.setProperty("startChatServer", String.valueOf(startChatServer))
-        props.setProperty("maxChatConnectios", String.valueOf(maxChatConnections))
+        props.setProperty("maxChatConnections", String.valueOf(maxChatConnections))
         props.setProperty("advertiseChat", String.valueOf(advertiseChat))
         props.setProperty("defaultChatRoom", defaultChatRoom)
         props.setProperty("joinDefaultChatRoom", String.valueOf(joinDefaultChatRoom))
