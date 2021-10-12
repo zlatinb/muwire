@@ -102,7 +102,7 @@ class MuWireSettings {
         downloadRetryInterval = Integer.parseInt(props.getProperty("downloadRetryInterval","60"))
         downloadMaxFailures = Integer.parseInt(props.getProperty("downloadMaxFailures","10"))
         updateCheckInterval = Integer.parseInt(props.getProperty("updateCheckInterval","24"))
-        lastUpdateCheck = Long.parseLong(props.getProperty("lastUpdateChec","0"))
+        lastUpdateCheck = Long.parseLong(props.getProperty("lastUpdateCheck","0"))
         autoDownloadUpdate = Boolean.parseBoolean(props.getProperty("autoDownloadUpdate","true"))
         updateType = props.getProperty("updateType","jar")
         shareDownloadedFiles = Boolean.parseBoolean(props.getProperty("shareDownloadedFiles","true"))
