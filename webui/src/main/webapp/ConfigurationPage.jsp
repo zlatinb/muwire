@@ -57,6 +57,22 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					</tr>
 					<tr>
 						<td>
+							<div class="tooltip"><%=Util._t("Search in collections")%>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search in collections?")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchCollections()) out.write("checked"); %> name="searchCollections" value="true"></p></td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip"><%=Util._t("Search in folder names")%>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search in the names of shared folders?")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchPaths()) out.write("checked"); %> name="searchPaths" value="true"></p></td>
+					</tr>
+					<tr>
+						<td>
 							<div class="tooltip"><%=Util._t("Allow browsing")%>
 								<span class="tooltiptext"><%=Util._t("Allow other users to browse your shared files")%></span>
 							</div>
@@ -70,6 +86,14 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 							</div>
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getAllowTracking()) out.write("checked"); %> name="allowTracking" value="true"></p></td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip"><%=Util._t("Show folder names")%>
+								<span class="tooltiptext"><%=Util._t("Should MuWire show the names of your shared folders?")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getShowPaths()) out.write("checked"); %> name="showPaths" value="true"></p></td>
 					</tr>
 				</table>
 			</div>
@@ -148,6 +172,13 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 							</div>
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getShareHiddenFiles()) out.write("checked"); %> name="shareHiddenFiles" value="true"></p></td>
+					</tr>
+					<tr>
+						<td><div class="tooltip"><%=Util._t("CPU cores to use when hashing files")%>
+							<span class="tooltiptext"><%=Util._t("How many CPU cores to use when hashing shared files")%></span>
+						</div>
+						</td>
+						<td><p align="right"><input type="text" size="1" name="hashingCores" class="right" value="<%= core.getMuOptions().getHashingCores() %>"></p></td>
 					</tr>
 				</table>
 			</div>

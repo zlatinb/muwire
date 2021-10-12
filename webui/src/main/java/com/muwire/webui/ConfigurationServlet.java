@@ -37,6 +37,7 @@ public class ConfigurationServlet extends HttpServlet {
         INPUT_VALIDATORS.put("outbound.quantity", new PositiveIntegerValidator("Outbound tunnel quantity"));
         INPUT_VALIDATORS.put("defaultFeedUpdateInterval", new PositiveIntegerValidator("Feed update frequency (minutes)"));
         INPUT_VALIDATORS.put("defaultFeedItemsToKeep", new IntegerValidator("Number of items to keep on disk (-1 means unlimited)"));
+        INPUT_VALIDATORS.put("hashingCores", new PositiveIntegerValidator("CPU cores to use when hashing files"));
     }
     
     private WebUISettings webSettings;
@@ -85,6 +86,8 @@ public class ConfigurationServlet extends HttpServlet {
         core.getMuOptions().setShareDownloadedFiles(false);
         core.getMuOptions().setShareHiddenFiles(false);
         core.getMuOptions().setSearchComments(false);
+        core.getMuOptions().setSearchPaths(false);
+        core.getMuOptions().setShowPaths(false);
         core.getMuOptions().setBrowseFiles(false);
         core.getMuOptions().setFileFeed(false);
         core.getMuOptions().setAdvertiseFeed(false);
@@ -92,6 +95,7 @@ public class ConfigurationServlet extends HttpServlet {
         core.getMuOptions().setDefaultFeedAutoDownload(false);
         core.getMuOptions().setDefaultFeedSequential(false);
         core.getMuOptions().setAllowTracking(false);
+        core.getMuOptions().setSearchCollections(false);
     }
     
     private void update(String name, String value) throws Exception {
@@ -110,6 +114,9 @@ public class ConfigurationServlet extends HttpServlet {
         case "shareDownloadedFiles" : core.getMuOptions().setShareDownloadedFiles(true); break;
         case "shareHiddenFiles" : core.getMuOptions().setShareHiddenFiles(true); break;
         case "searchComments" : core.getMuOptions().setSearchComments(true); break;
+        case "searchCollections" : core.getMuOptions().setSearchCollections(true); break;
+        case "searchPaths" : core.getMuOptions().setSearchPaths(true); break;
+        case "showPaths" : core.getMuOptions().setShowPaths(true); break;
         case "browseFiles" : core.getMuOptions().setBrowseFiles(true); break;
         case "allowTracking" : core.getMuOptions().setAllowTracking(true); break;
         case "speedSmoothSeconds" : core.getMuOptions().setSpeedSmoothSeconds(Integer.parseInt(value)); break;
@@ -124,7 +131,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "defaultFeedSequential" : core.getMuOptions().setDefaultFeedSequential(true); break;
         case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * Long.parseLong(value)); break;
         case "defaultFeedItemsToKeep" : core.getMuOptions().setDefaultFeedItemsToKeep(Integer.parseInt(value)); break;
-        
+        case "hashingCores" : core.getMuOptions().setHashingCores(Integer.parseInt(value)); break;
         }
     }
     

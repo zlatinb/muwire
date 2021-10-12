@@ -64,6 +64,8 @@ class SearchManager {
                 payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8);
                 searchEvent.setSearchTerms(Arrays.asList(nonEmpty));
                 searchEvent.setSearchComments(core.getMuOptions().getSearchComments());
+                searchEvent.setCollections(core.getMuOptions().getSearchCollections());
+                searchEvent.setSearchPaths(core.getMuOptions().getSearchPaths());
             }
             
             boolean firstHop = core.getMuOptions().allowUntrusted() || core.getMuOptions().getSearchExtraHop();
@@ -74,6 +76,7 @@ class SearchManager {
             QueryEvent queryEvent = new QueryEvent();
             queryEvent.setSearchEvent(searchEvent);
             queryEvent.setFirstHop(firstHop);
+            queryEvent.setLocal(true);
             queryEvent.setReplyTo(core.getMe().getDestination());
             queryEvent.setReceivedOn(core.getMe().getDestination());
             queryEvent.setOriginator(core.getMe());
