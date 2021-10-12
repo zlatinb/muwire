@@ -90,8 +90,6 @@ class UpdateClient {
             return
         updateDownloading = false
         eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, text : text))
-        if (!settings.shareDownloadedFiles)
-            eventBus.publish(new FileSharedEvent(file : e.downloadedFile))
     }
 
     private void checkUpdate() {
