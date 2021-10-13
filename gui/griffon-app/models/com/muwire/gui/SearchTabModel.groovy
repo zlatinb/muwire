@@ -267,8 +267,8 @@ class SearchTabModel {
         protected void done() {
             if (cancelled)
                 return
-            view.refreshResults()
             view.clearSelections()
+            view.refreshResults()
         }
     }
 }
