@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-12 13:35+0000\n"
+"POT-Creation-Date: 2021-10-13 09:22+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -567,8 +567,8 @@ msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:284
 msgid ""
-"When searching the network, should MuWire search only file names or in the "
-"comments too?"
+"When searching the network, should MuWire only search file names or comments "
+"too?"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:288
@@ -576,17 +576,15 @@ msgid "Search in collections"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:290
-msgid "When searching the network, should MuWire search in collections?"
+msgid "When searching the network, should MuWire search collections?"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:294
-msgid "Search in folder names"
+msgid "Search folder names"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:296
-msgid ""
-"When searching the network, should MuWire search in the names of shared "
-"folders?"
+msgid "When searching the network, should MuWire search shared folder names?"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:300

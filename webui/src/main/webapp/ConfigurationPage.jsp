@@ -50,7 +50,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					<tr>
 						<td>
 							<div class="tooltip"><%=Util._t("Search in comments")%>
-								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search only file names or in the comments too?")%></span>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire only search file names or comments too?")%></span>
 							</div>
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchComments()) out.write("checked"); %> name="searchComments" value="true"></p></td>
@@ -58,15 +58,15 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					<tr>
 						<td>
 							<div class="tooltip"><%=Util._t("Search in collections")%>
-								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search in collections?")%></span>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search collections?")%></span>
 							</div>
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchCollections()) out.write("checked"); %> name="searchCollections" value="true"></p></td>
 					</tr>
 					<tr>
 						<td>
-							<div class="tooltip"><%=Util._t("Search in folder names")%>
-								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search in the names of shared folders?")%></span>
+							<div class="tooltip"><%=Util._t("Search folder names")%>
+								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search shared folder names?")%></span>
 							</div>
 						</td>
 						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getSearchPaths()) out.write("checked"); %> name="searchPaths" value="true"></p></td>
