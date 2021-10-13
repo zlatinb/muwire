@@ -765,12 +765,24 @@ class SearchTabView {
     void refreshResults() {
         JTable table = builder.getVariable("senders-table")
         int selectedRow = table.getSelectedRow()
+        if (selectedRow >= 0)
+            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
         table.model.fireTableDataChanged()
-        table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        if (selectedRow >= 0) {
+            selectedRow = table.rowSorter.convertRowIndexToView(selectedRow)
+            table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        }
+        
+        
         table = builder.getVariable("results-table2")
-        selectedRow = table.getSelectedRow()
+        int [] selectedRows = table.getSelectedRows()
+        for (int i = 0; i < selectedRows.length; i++)
+            selectedRows[i] = table.rowSorter.convertRowIndexToModel(selectedRows[i])
         table.model.fireTableDataChanged()
-        table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        for (int i = 0; i < selectedRows.length; i++)
+            selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
+        for (int row : selectedRows)
+            table.selectionModel.addSelectionInterval(row, row)
     }
 
     private class FocusListener {
