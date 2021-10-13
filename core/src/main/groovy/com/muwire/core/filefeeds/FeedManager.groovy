@@ -1,5 +1,7 @@
 package com.muwire.core.filefeeds
 
+import com.muwire.core.UILoadedEvent
+
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
@@ -59,7 +61,7 @@ class FeedManager {
             .collect(Collectors.toList())
     }
     
-    void start() {
+    void onUILoadedEvent(UILoadedEvent event) {
         log.info("starting feed manager")
         persister.submit({loadFeeds()} as Runnable)
         persister.submit({loadItems()} as Runnable)

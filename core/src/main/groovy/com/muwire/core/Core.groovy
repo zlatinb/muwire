@@ -404,6 +404,7 @@ public class Core {
         log.info("initializing feed manager")
         feedManager = new FeedManager(eventBus, home)
         eventBus.with { 
+            register(UILoadedEvent.class, feedManager)
             register(FeedItemFetchedEvent.class, feedManager)
             register(FeedFetchEvent.class, feedManager)
             register(UIFeedConfigurationEvent.class, feedManager)
@@ -557,7 +558,6 @@ public class Core {
         connectionEstablisher.start()
         hostCache.waitForLoad()
         updateClient?.start()
-        feedManager.start()
         feedClient.start()
         trackerResponder.start()
 
