@@ -46,7 +46,7 @@ class SearchTabController {
         }
         
         Set<InfoHash> uniqueHashes = results.stream().map({it.infohash}).collect(Collectors.toSet())
-        results = uniqueHashes.stream().map({model.hashBucket[it].getResults().first()}).collect(Collectors.toList())
+        results = uniqueHashes.stream().map({model.hashBucket[it].firstEvent()}).collect(Collectors.toList())
 
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
         List<ResultAndTargets> targets = view.decorateResults(results)

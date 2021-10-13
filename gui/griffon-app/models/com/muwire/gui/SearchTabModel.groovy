@@ -16,6 +16,7 @@ import griffon.metadata.ArtifactProviderFor
 import javax.swing.SwingWorker
 import javax.swing.tree.DefaultMutableTreeNode
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicReference
 
 @ArtifactProviderFor(GriffonModel)
 class SearchTabModel {
@@ -134,13 +135,18 @@ class SearchTabModel {
     }
     
     private static class HashBucket {
+        private final AtomicReference<UIResultEvent> first = new AtomicReference<>()
         private final Set<UIResultEvent> events = new HashSet<>()
         private final Set<Persona> senders = new HashSet<>()
-        private String cachedName
-        private long cachedSize
+        
         private void add(UIResultEvent event) {
+            first.compareAndSet(null, event)
             events.add(event)
             senders.add(event.sender)
+        }
+        
+        UIResultEvent firstEvent() {
+            first.get()
         }
         
         Set<UIResultEvent> getResults() {
@@ -152,17 +158,11 @@ class SearchTabModel {
         }
         
         String getName() {
-            if (cachedName == null) {
-                cachedName = events.first().name
-            }
-            cachedName
+            first.get().name
         }
         
         long getSize() {
-            if (cachedSize == 0) {
-                cachedSize = events.first().size
-            }
-            cachedSize
+            first.get().size
         }
         
         int sourceCount() {

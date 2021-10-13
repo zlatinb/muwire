@@ -163,7 +163,7 @@ class SearchTabView {
                                 scrollPane(constraints : BorderLayout.CENTER) {
                                     resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.results2) {
-                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].getResults().first()})
+                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].firstEvent()})
                                             closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
                                                 model.hashBucket[it].getSize()
                                             })
@@ -605,7 +605,7 @@ class SearchTabView {
             
             Persona sender = selectedSender()
             if (sender == null) // really shouldn't happen
-                return model.hashBucket[infohash].getResults().first()
+                return model.hashBucket[infohash].firstEvent()
             
             for (UIResultEvent candidate : model.hashBucket[infohash].getResults()) {
                 if (candidate.sender == sender)
@@ -613,7 +613,7 @@ class SearchTabView {
             }
             
             // also shouldn't happen
-            return model.hashBucket[infohash].getResults().first()
+            return model.hashBucket[infohash].firstEvent()
         } else {
             int[] selectedRows = resultsTable.getSelectedRows()
             if (selectedRows.length != 1)
