@@ -389,7 +389,7 @@ class SearchTabView {
 
         resultsTable.rowSorter.addRowSorterListener({ evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
-
+        resultsTable.rowSorter.setComparator(0, new UIResultEventComparator(false))
 
         resultsTable.addMouseListener(resultsMouseListener)
         
@@ -455,6 +455,7 @@ class SearchTabView {
         resultsTable2.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         resultsTable2.rowSorter.addRowSorterListener({evt -> lastResults2SortEvent = evt})
         resultsTable2.rowSorter.setSortsOnUpdates(true)
+        resultsTable2.rowSorter.setComparator(0, new UIResultEventComparator(false))
         selectionModel = resultsTable2.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
@@ -499,6 +500,7 @@ class SearchTabView {
                 new ResultNameTableCellRenderer(model.core.fileManager::isShared, true))
         sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
         sendersTable2.rowSorter.setSortsOnUpdates(true)
+        sendersTable2.rowSorter.setComparator(1, new UIResultEventComparator(true))
         selectionModel = sendersTable2.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({

@@ -165,6 +165,8 @@ class BrowseView {
         
         resultsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
+        resultsTable.rowSorter.setComparator(0, new UIResultEventComparator(true))
+        
         def selectionModel = resultsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
