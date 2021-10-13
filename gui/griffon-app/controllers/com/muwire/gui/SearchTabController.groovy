@@ -151,7 +151,10 @@ class SearchTabController {
 
     @ControllerAction
     void showComment() {
-        UIResultEvent event = view.getSelectedResult()
+        def events = view.selectedResults()
+        if (events.size() != 1)
+            return
+        UIResultEvent event = events.first()
         if (event == null || event.comment == null)
             return
 
@@ -165,7 +168,10 @@ class SearchTabController {
 
     @ControllerAction
     void viewCertificates() {
-        UIResultEvent event = view.getSelectedResult()
+        def events = view.selectedResults()
+        if (events.size() != 1)
+            return
+        UIResultEvent event = events.first()
         if (event == null || event.certificates <= 0)
             return
 
@@ -179,7 +185,10 @@ class SearchTabController {
     
     @ControllerAction
     void viewCollections() {
-        UIResultEvent event = view.getSelectedResult()
+        def events = view.selectedResults()
+        if (events.size() != 1)
+            return
+        UIResultEvent event = events.first()
         if (event == null || event.collections.isEmpty())
             return
             

@@ -60,7 +60,7 @@ class ResultTree extends JTree{
      */
     UIResultEvent singleResultSelected() {
         TreePath[] selected = getSelectionPaths()
-        if (selected == null || selected.length == 0)
+        if (selected == null || selected.length != 1)
             return null
         def obj = selected[0].getLastPathComponent().getUserObject()
         if (obj instanceof UIResultEvent)

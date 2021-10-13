@@ -5,6 +5,7 @@ import griffon.core.artifact.GriffonView
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.tree.TreePath
+import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.mvc.MVCGroup
@@ -394,18 +395,21 @@ class SearchTabView {
         resultsTable.addMouseListener(resultsMouseListener)
         
         resultsTable.getSelectionModel().addListSelectionListener({
-            def result = getSelectedResult()
-            if (result == null) {
-                model.viewCommentActionEnabled = false
-                model.viewCertificatesActionEnabled = false
-                model.subscribeActionEnabled = false
-                model.viewCollectionsActionEnabled = false
+            model.viewCommentActionEnabled = false
+            model.viewCertificatesActionEnabled = false
+            model.subscribeActionEnabled = false
+            model.viewCollectionsActionEnabled = false
+            def results = selectedResults()
+            if (results.isEmpty())
                 return
-            } else {
+            
+            model.subscribeActionEnabled = true
+            if (results.size() == 1) {
+                def result = results.first()
                 model.viewCommentActionEnabled = result.comment != null
                 model.viewCertificatesActionEnabled = result.certificates > 0
                 model.viewCollectionsActionEnabled = !result.collections.isEmpty()
-            }
+            } 
         })
         
         // senders table
@@ -598,35 +602,25 @@ class SearchTabView {
             menu.show(e.getComponent(), e.getX(), e.getY())
     }
     
-    UIResultEvent getSelectedResult() {
-        if (model.groupedByFile) {
-            int selectedRow = resultsTable2.getSelectedRow()
-            if (selectedRow < 0)
-                return null
-            if (lastResults2SortEvent != null)
-                selectedRow = resultsTable2.rowSorter.convertRowIndexToModel(selectedRow)
-            InfoHash infohash = model.results2[selectedRow]
-            
-            Persona sender = selectedSender()
-            if (sender == null) // really shouldn't happen
-                return model.hashBucket[infohash].firstEvent()
-            
-            for (UIResultEvent candidate : model.hashBucket[infohash].getResults()) {
-                if (candidate.sender == sender)
-                    return candidate
-            }
-            
-            // also shouldn't happen
+    private UIResultEvent getSelectedResult() {
+        int selectedRow = resultsTable2.getSelectedRow()
+        if (selectedRow < 0)
+            return null
+        if (lastResults2SortEvent != null)
+            selectedRow = resultsTable2.rowSorter.convertRowIndexToModel(selectedRow)
+        InfoHash infohash = model.results2[selectedRow]
+        
+        Persona sender = selectedSender()
+        if (sender == null) // really shouldn't happen
             return model.hashBucket[infohash].firstEvent()
-        } else {
-            int[] selectedRows = resultsTable.getSelectedRows()
-            if (selectedRows.length != 1)
-                return null
-            int selected = selectedRows[0]
-            if (lastSortEvent != null)
-                selected = resultsTable.rowSorter.convertRowIndexToModel(selected)
-            return model.results[selected]
+        
+        for (UIResultEvent candidate : model.hashBucket[infohash].getResults()) {
+            if (candidate.sender == sender)
+                return candidate
         }
+        
+        // also shouldn't happen
+        return model.hashBucket[infohash].firstEvent()
     }
     
     List<UIResultEvent> selectedResults() {
@@ -690,22 +684,27 @@ class SearchTabView {
     }
 
     def copyHashToClipboard() {
-        def result = getSelectedResult()
-        if (result == null)
+        def results = selectedResults()
+        if (results.isEmpty())
             return
-        String hash = Base64.encode(result.infohash.getRoot())
-        StringSelection selection = new StringSelection(hash)
-        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-        clipboard.setContents(selection, null)
+        
+        String joined = results.stream().
+                map({Base64.encode(it.infohash.getRoot())}).
+                collect(Collectors.joining("\n"))
+        
+        CopyPasteSupport.copyToClipboard(joined)
     }
     
     def copyNameToClipboard() {
-        def result = getSelectedResult()
-        if (result == null)
+        def results = selectedResults()
+        if (results.isEmpty())
             return
-        StringSelection selection = new StringSelection(result.getName())
-        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-        clipboard.setContents(selection, null)
+        
+        String joined = results.stream().
+                map(UIResultEvent::getName).
+                collect(Collectors.joining("\n"))
+
+        CopyPasteSupport.copyToClipboard(joined)
     }
     
     int selectedSenderRow() {
