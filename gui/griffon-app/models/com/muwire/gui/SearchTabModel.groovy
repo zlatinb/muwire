@@ -268,6 +268,7 @@ class SearchTabModel {
             if (cancelled)
                 return
             view.refreshResults()
+            view.clearSelections()
         }
     }
 }

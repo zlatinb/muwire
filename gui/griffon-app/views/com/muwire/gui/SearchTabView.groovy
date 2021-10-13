@@ -53,9 +53,9 @@ class SearchTabView {
     def pane
     def parent
     def searchTerms
-    def sendersTable, sendersTable2
+    JTable sendersTable, sendersTable2
     def lastSendersSortEvent
-    def resultsTable, resultsTable2
+    JTable resultsTable, resultsTable2
     private JPanel resultsPanel, senders2Panel
     private ResultTree resultTree
             
@@ -665,6 +665,15 @@ class SearchTabView {
             }
             return results
         }
+    }
+    
+    void clearSelections() {
+        resultsTable2.clearSelection()
+        resultsTable.clearSelection()
+        sendersTable.clearSelection()
+        sendersTable2.clearSelection()
+        
+        showSelectSingleResult.call()
     }
     
     List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {

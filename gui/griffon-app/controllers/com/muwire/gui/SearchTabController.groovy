@@ -231,5 +231,6 @@ class SearchTabController {
     void clearFilter() {
         model.filter = null
         model.filterResults2()
+        view.clearSelections()
     }
 }
