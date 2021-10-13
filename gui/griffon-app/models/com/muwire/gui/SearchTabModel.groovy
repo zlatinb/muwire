@@ -40,6 +40,12 @@ class SearchTabModel {
     Core core
     UISettings uiSettings
     String uuid
+    
+    boolean visible
+    private boolean dirty
+    List<UIResultEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())
+    javax.swing.Timer timer = new javax.swing.Timer(500, {displayBatchedResults()})
+    
     def senders = []
     def results = []
     def hashBucket = new ConcurrentHashMap<InfoHash, HashBucket>()
@@ -62,10 +68,12 @@ class SearchTabModel {
         treeModel = new ResultTreeModel(root)
         core = mvcGroup.parentGroup.model.core
         uiSettings = application.context.get("ui-settings")
+        timer.start()
         mvcGroup.parentGroup.model.results[UUID.fromString(uuid)] = mvcGroup
     }
 
     void mvcGroupDestroy() {
+        timer.stop()
         mvcGroup.parentGroup.model.results.remove(uuid)
     }
     
@@ -95,43 +103,60 @@ class SearchTabModel {
     }
 
     void handleResultBatch(UIResultEvent[] batch) {
-        runInsideUIAsync {
-            batch.each {
-                if (uiSettings.excludeLocalResult &&
-                    core.fileManager.rootToFiles.containsKey(it.infohash))
-                    return
-                def bucket = hashBucket.get(it.infohash)
-                if (bucket == null) {
-                    bucket = new HashBucket()
-                    hashBucket[it.infohash] = bucket
-                }
-                
-                def senderBucket = sendersBucket.get(it.sender)
-                if (senderBucket == null) {
-                    senderBucket = []
-                    sendersBucket[it.sender] = senderBucket
-                    senders.clear()
-                    senders.addAll(sendersBucket.keySet())
-                }
-
-                Set sourceBucket = sourcesBucket.get(it.infohash)
-                if (sourceBucket == null) {
-                    sourceBucket = new HashSet()
-                    sourcesBucket.put(it.infohash, sourceBucket)
-                }
-                sourceBucket.addAll(it.sources)
-
-                bucket.add it
-                senderBucket << it
-                
-            }
-            results2.clear()
-            synchronized(allResults2) {
-                allResults2.addAll(hashBucket.keySet())
-                allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
-            }
-            view.refreshResults()
+        synchronized (pendingResults) {
+            for(UIResultEvent event : batch)
+                pendingResults << event
         }
+    }
+    
+    private void displayBatchedResults() {
+        List<UIResultEvent> copy
+        synchronized (pendingResults) {
+            copy = new ArrayList<>(pendingResults)
+            pendingResults.clear()
+        }
+        for(UIResultEvent event : copy) {
+            if (uiSettings.excludeLocalResult &&
+                    core.fileManager.rootToFiles.containsKey(event.infohash))
+                continue
+            def bucket = hashBucket.get(event.infohash)
+            if (bucket == null) {
+                bucket = new HashBucket()
+                hashBucket[event.infohash] = bucket
+            }
+
+            def senderBucket = sendersBucket.get(event.sender)
+            if (senderBucket == null) {
+                senderBucket = []
+                sendersBucket[event.sender] = senderBucket
+                senders.clear()
+                senders.addAll(sendersBucket.keySet())
+            }
+
+            Set sourceBucket = sourcesBucket.get(event.infohash)
+            if (sourceBucket == null) {
+                sourceBucket = new HashSet()
+                sourcesBucket.put(event.infohash, sourceBucket)
+            }
+            sourceBucket.addAll(event.sources)
+
+            bucket.add event
+            senderBucket << event
+        }
+        
+        
+        if (visible) {
+            if (!copy.isEmpty() || dirty) {
+                results2.clear()
+                synchronized (allResults2) {
+                    allResults2.addAll(hashBucket.keySet())
+                    allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
+                }
+                view.refreshResults()
+                dirty = false
+            }
+        } else if (!copy.isEmpty())
+            dirty = true
     }
     
     private static class HashBucket {

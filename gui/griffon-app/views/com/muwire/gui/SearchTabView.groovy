@@ -294,6 +294,8 @@ class SearchTabView {
             }
             model.downloadActionEnabled = downloadActionEnabled
         })
+        
+        pane.putClientProperty("focusListener", new FocusListener())
     }
 
     void mvcGroupInit(Map<String, String> args) {
@@ -769,5 +771,11 @@ class SearchTabView {
         selectedRow = table.getSelectedRow()
         table.model.fireTableDataChanged()
         table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+    }
+
+    private class FocusListener {
+        void onFocus(boolean focus) {
+            model.visible = focus
+        }
     }
 }
