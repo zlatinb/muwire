@@ -44,6 +44,7 @@ class PersisterFolderService extends BasePersisterService {
 
     private final byte[] salt
     private final String saltHash
+    private final Map<Path, String> cachedRoots = Collections.synchronizedMap(new HashMap<>())
     private final Core core;
     final File location
     final EventBus listener
@@ -270,11 +271,17 @@ class PersisterFolderService extends BasePersisterService {
         Path toParent = root.toPath().relativize(parent.toPath())
         Path visible = Path.of(root.getName(), toParent.toString())
         Path invisible = root.getParentFile().toPath()
+        
+        String invisbleRoot = cachedRoots.computeIfAbsent(invisible, {mac(it)})
+        return Path.of(invisbleRoot, visible.toString())
+    }
+    
+    private String mac(Path path) {
         Mac mac = Mac.getInstance("HmacSHA256")
         Key key = new HMACKey(salt)
         mac.init(key)
-        mac.update(invisible.toString().getBytes(StandardCharsets.UTF_8))
-        return Path.of(Base64.encode(mac.doFinal()), visible.toString())
+        mac.update(path.toString().getBytes(StandardCharsets.UTF_8))
+        Base64.encode(mac.doFinal())
     }
 
     /**
@@ -291,11 +298,8 @@ class PersisterFolderService extends BasePersisterService {
         Path toParent = explicitParent.toPath().relativize(parent.toPath())
         Path visible = Path.of(explicitParent.getName(), toParent.toString())
         Path invisible = explicitParent.getParentFile().toPath()
-        Mac mac = Mac.getInstance("HmacSHA256")
-        Key key = new HMACKey(salt)
-        mac.init(key)
-        mac.update(invisible.toString().getBytes(StandardCharsets.UTF_8))
-        return Path.of(Base64.encode(mac.doFinal()), visible.toString())
+        String invisibleRoot = cachedRoots.computeIfAbsent(invisible,{mac(it)})
+        return Path.of(invisibleRoot, visible.toString())
     }
 
     private void persistFile(SharedFile sf, InfoHash ih) {
