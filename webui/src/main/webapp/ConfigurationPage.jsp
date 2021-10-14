@@ -49,7 +49,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 				<table>
 					<tr>
 						<td>
-							<div class="tooltip"><%=Util._t("Search in comments")%>
+							<div class="tooltip"><%=Util._t("Search comments")%>
 								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire only search file names or comments too?")%></span>
 							</div>
 						</td>
@@ -57,7 +57,7 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					</tr>
 					<tr>
 						<td>
-							<div class="tooltip"><%=Util._t("Search in collections")%>
+							<div class="tooltip"><%=Util._t("Search collections")%>
 								<span class="tooltiptext"><%=Util._t("When searching the network, should MuWire search collections?")%></span>
 							</div>
 						</td>
