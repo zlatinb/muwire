@@ -122,10 +122,6 @@ class OptionsController {
         settings.ignoredFileTypes.clear()
         text.split(",").each {settings.ignoredFileTypes.add(it)}
       
-        boolean throttleLoadingFiles = view.throttleLoadingFilesCheckbox.model.isSelected()
-        model.throttleLoadingFiles = throttleLoadingFiles
-        settings.throttleLoadingFiles = throttleLoadingFiles
-        
         boolean browseFiles = view.browseFilesCheckbox.model.isSelected()
         model.browseFiles = browseFiles
         settings.browseFiles = browseFiles
