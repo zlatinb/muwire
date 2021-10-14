@@ -40,7 +40,6 @@ import com.muwire.core.filefeeds.FeedLoadedEvent
 import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.files.AllFilesLoadedEvent
-import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
 import com.muwire.core.files.FileHashingEvent
@@ -105,7 +104,9 @@ class MainFrameModel {
     volatile Filterer filterer
     boolean treeVisible = true
     private final Set<SharedFile> allSharedFiles = Collections.synchronizedSet(new LinkedHashSet<>())
-    def shared 
+    List<SharedFile> shared
+    private boolean libraryDirty
+    private final javax.swing.Timer libraryTimer = new javax.swing.Timer(1000, {refreshLibrary()})
     TreeModel sharedTree 
     DefaultMutableTreeNode allFilesTreeRoot, treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
@@ -313,6 +314,8 @@ class MainFrameModel {
                 core.eventBus.publish(new ContentControlEvent(term : it, regex: true, add: true))
             }
             
+            libraryTimer.start()
+            
             chatServerRunning = core.chatServer.isRunning()
             
             timer.schedule({
@@ -454,7 +457,7 @@ class MainFrameModel {
             if (filter(e.sharedFile)) {
                 shared << e.sharedFile
                 insertIntoTree(e.sharedFile, treeRoot, null)
-                view.refreshSharedFiles()
+                libraryDirty = true
             }
         }
     }
@@ -468,7 +471,7 @@ class MainFrameModel {
             insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
             shared << e.loadedFile
             insertIntoTree(e.loadedFile, treeRoot, null)
-            view.refreshSharedFiles()
+            libraryDirty = true
         }
     }
     
@@ -608,7 +611,7 @@ class MainFrameModel {
                 wrapper.updateUploader(e.uploader)
             else {
                 uploads << new UploaderWrapper(uploader: e.uploader)
-                view.refreshSharedFilesTable()
+                libraryDirty = true
             }
             updateTablePreservingSelection("uploads-table")
         }
@@ -659,7 +662,7 @@ class MainFrameModel {
     
     void onSearchEvent(SearchEvent e) {
         runInsideUIAsync {
-            view.refreshSharedFilesTable()
+            libraryDirty = true
         }
     }
 
@@ -764,7 +767,7 @@ class MainFrameModel {
             if (filter(e.downloadedFile)) {
                 shared << e.downloadedFile
                 insertIntoTree(e.downloadedFile,treeRoot, null)
-                view.refreshSharedFiles()
+                libraryDirty = true
             }
         }
     }
@@ -1012,5 +1015,12 @@ class MainFrameModel {
         props['name'] = e.name
         def folder = application.mvcGroupManager.createMVCGroup('message-folder', "folder-${e.name}", props)
         view.addUserMessageFolder(folder)
+    }
+    
+    private void refreshLibrary() {
+        if (libraryDirty) {
+            libraryDirty = false
+            view.refreshSharedFiles()
+        }
     }
 }

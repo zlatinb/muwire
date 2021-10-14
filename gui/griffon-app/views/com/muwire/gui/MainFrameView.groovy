@@ -910,11 +910,13 @@ class MainFrameView {
         }
 
         // shared files table and tree
-        def sharedFilesTable = builder.getVariable("shared-files-table")
+        JTable sharedFilesTable = builder.getVariable("shared-files-table")
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
-
+        
         sharedFilesTable.rowSorter.addRowSorterListener({ evt -> lastSharedSortEvent = evt })
         sharedFilesTable.rowSorter.setSortsOnUpdates(true)
+        // default collator comparator is very slow
+        sharedFilesTable.rowSorter.setComparator(0, String.CASE_INSENSITIVE_ORDER)
 
         sharedFilesTable.addMouseListener(sharedFilesMouseListener)
 
