@@ -422,7 +422,7 @@ class OptionsView {
                 label(text: trans("OPTIONS_CHAT_JOIN_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 joinDefaultChatRoomCheckbox = checkBox(selected: bind{model.joinDefaultChatRoom}, constraints: gbc(gridx: 2, gridy: 4, anchor: GridBagConstraints.LINE_END))
                 label(text: trans("OPTIONS_CHAT_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END), columns: COLUMNS)
+                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END), columns: COLUMNS * 2)
                 if (!isAqua()) {
                     label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 6, anchor : GridBagConstraints.LINE_START, weightx: 100))
                     label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 6))
