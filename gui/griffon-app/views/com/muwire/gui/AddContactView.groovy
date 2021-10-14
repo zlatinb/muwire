@@ -2,7 +2,11 @@ package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
 
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import java.awt.event.ActionListener
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 
 import static com.muwire.gui.Translator.trans
 
@@ -64,6 +68,39 @@ class AddContactView {
                 }
             }
         }
+        
+        idArea.addMouseListener(new MouseAdapter() {
+            @Override
+            void mousePressed(MouseEvent e) {
+                if (!CopyPasteSupport.canPasteString())
+                    return
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+            }
+
+            @Override
+            void mouseReleased(MouseEvent e) {
+                if (!CopyPasteSupport.canPasteString())
+                    return
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+            }
+        })
+    }
+    
+    private void showPopupMenu(MouseEvent event) {
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem paste = new JMenuItem(trans("PASTE"))
+        paste.addActionListener({doPaste()})
+        menu.add(paste)
+        menu.show(event.getComponent(), event.getX(), event.getY())
+    }
+    
+    private void doPaste() {
+        String contents = CopyPasteSupport.pasteFromClipboard()
+        if (contents == null)
+            return
+        idArea.setText(contents)
     }
     
     void mvcGroupInit(Map<String,String> args) {
