@@ -634,7 +634,7 @@ class MainFrameController {
     @ControllerAction
     void openContainingFolder() {
         def selected = view.selectedSharedFiles()
-        if (selected == null || selected.size() != 1) {
+        if (selected == null || selected.size() != 1 || !view.selectedFolders().isEmpty()) {
             JOptionPane.showMessageDialog(null, trans("PLEASE_SELECT_ONE_FILE_FOLDER"))
             return
         }
