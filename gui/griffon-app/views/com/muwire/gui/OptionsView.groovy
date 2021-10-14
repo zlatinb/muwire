@@ -29,6 +29,9 @@ import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonView)
 class OptionsView {
+    
+    private static final int COLUMNS = 5
+    
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
@@ -152,11 +155,11 @@ class OptionsView {
                 constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_RETRY_FAILED_DOWNLOADS"), constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                retryField = textField(text : bind { model.downloadRetryInterval }, columns : 2, 
+                retryField = textField(text : bind { model.downloadRetryInterval }, columns : COLUMNS, 
                     constraints : gbc(gridx: 2, gridy: 0, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
                 label(text : trans("OPTIONS_GIVE_UP_SOURCES"), constraints: gbc(gridx: 0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : 2, 
+                downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : COLUMNS, 
                     constraints : gbc(gridx: 2, gridy: 1, anchor : GridBagConstraints.LINE_END, weightx: 0))
 
                 if (!isAqua()) {
@@ -174,10 +177,10 @@ class OptionsView {
                 constraints : gbc(gridx : 0, gridy:2, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_TOTAL_UPLOAD_SLOTS"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                totalUploadSlotsField = textField(text : bind {model.totalUploadSlots}, columns: 2,
+                totalUploadSlotsField = textField(text : bind {model.totalUploadSlots}, columns: COLUMNS,
                     constraints : gbc(gridx : 1, gridy: 0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_UPLOAD_SLOTS_PER_USER"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                uploadSlotsPerUserField = textField(text : bind {model.uploadSlotsPerUser}, columns: 2,
+                uploadSlotsPerUserField = textField(text : bind {model.uploadSlotsPerUser}, columns: COLUMNS,
                     constraints : gbc(gridx : 1, gridy: 1, anchor : GridBagConstraints.LINE_END))
             }
             
@@ -191,7 +194,7 @@ class OptionsView {
                 shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0, anchor: GridBagConstraints.LINE_END))
                 
                 label(text : trans("OPTIONS_HASHING_CORES"), constraints : gbc(gridx: 0 , gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                hashingCoresTextField = textField(text : bind {model.hashingCores}, columns: 2, 
+                hashingCoresTextField = textField(text : bind {model.hashingCores}, columns: COLUMNS, 
                     constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                 
                 label(text : trans("OPTIONS_IGNORED_FILE_TYPES"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx : 100))
@@ -208,7 +211,7 @@ class OptionsView {
                 constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                     gridBagLayout()
                     label(text : trans("OPTIONS_CHECK_FOR_UPDATES"), constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                    updateField = textField(text : bind {model.updateCheckInterval }, columns : 2, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
+                    updateField = textField(text : bind {model.updateCheckInterval }, columns : COLUMNS, constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
 
                     label(text : trans("OPTIONS_DOWNLOAD_UPDATES"), constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                     autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate},
@@ -249,9 +252,9 @@ class OptionsView {
                 constraints : gbc(gridx: 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100))) {
                     gridBagLayout()
                     label(text : trans("TCP_PORT"), constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                    i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : 4, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                    i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : COLUMNS, constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                     label(text : trans("UDP_PORT"), constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                    i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : 4, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                    i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : COLUMNS, constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
                     label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
                     useUPNPCheckbox = checkBox(selected: bind {model.useUPNP}, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                 }
@@ -273,7 +276,7 @@ class OptionsView {
                 radioButton(text: "Metal", selected : bind {model.metalLnf}, buttonGroup : lnfGroup,
                         constraints: gbc(gridx: 3, gridy:0, anchor: GridBagConstraints.LINE_START), metalLnfAction)
                 label(text : trans("OPTIONS_FONT"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                fontField = textField(text : bind {model.font}, columns : 4, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
+                fontField = textField(text : bind {model.font}, columns : COLUMNS, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
 
                 label(text : trans("OPTIONS_FONT_SIZE"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 buttonGroup(id: "fontSizeGroup")
@@ -282,7 +285,7 @@ class OptionsView {
                 radioButton(text: trans("OPTIONS_CUSTOM"), selected : bind {!model.automaticFontSize}, buttonGroup : fontSizeGroup,
                 constraints : gbc(gridx : 2, gridy: 2, anchor : GridBagConstraints.LINE_START), customFontAction)
                 fontSizeField = textField(text : bind {model.customFontSize}, enabled : bind {!model.automaticFontSize}, 
-                    constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                    constraints : gbc(gridx : 3, gridy : 2, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
                 
                 label(text : trans("OPTIONS_FONT_STYLE"), constraints: gbc(gridx: 0, gridy: 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 panel(constraints : gbc(gridx: 2, gridy: 3, gridwidth: 2, anchor:GridBagConstraints.LINE_END)) {
@@ -319,7 +322,7 @@ class OptionsView {
                 constraints : gbc(gridx : 1, gridy:1, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_SMOOTH_DOWNLOAD_SPEED"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 speedSmoothSecondsField = textField(text : bind {model.speedSmoothSeconds},
-                constraints : gbc(gridx:1, gridy: 2, anchor : GridBagConstraints.LINE_END))
+                    constraints : gbc(gridx:1, gridy: 2, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
                 label(text : trans("OPTIONS_EXCLUDE_LOCAL_FILES"), constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 excludeLocalResultCheckbox = checkBox(selected : bind {model.excludeLocalResult},
                 constraints : gbc(gridx: 1, gridy : 3, anchor : GridBagConstraints.LINE_END))
@@ -344,9 +347,9 @@ class OptionsView {
             constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
                 label(text : trans("INBOUND_BANDWIDTH"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                inBwField = textField(text : bind {model.inBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
+                inBwField = textField(text : bind {model.inBw}, columns : COLUMNS, constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OUTBOUND_BANDWIDTH"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                outBwField = textField(text : bind {model.outBw}, columns : 3, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                outBwField = textField(text : bind {model.outBw}, columns : COLUMNS, constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("SHARE_PERCENTAGE"), constraints: gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 50))
                 def quantityTable = new Hashtable()
                 quantityTable.put(0, new JLabel("0"))
@@ -378,9 +381,9 @@ class OptionsView {
                 label(text : trans("OPTIONS_FEED_DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 defaultFeedSequentialCheckbox = checkBox(selected : bind {model.defaultFeedSequential}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_FEED_ITEMS_ON_DISK"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                defaultFeedItemsToKeepField = textField(text : bind {model.defaultFeedItemsToKeep}, constraints:gbc(gridx :1, gridy:2, anchor : GridBagConstraints.LINE_END))
+                defaultFeedItemsToKeepField = textField(text : bind {model.defaultFeedItemsToKeep}, constraints:gbc(gridx :1, gridy:2, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
                 label(text : trans("OPTIONS_FEED_REFRESH_FREQUENCY"), constraints : gbc(gridx: 0, gridy : 3, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                defaultFeedUpdateIntervalField = textField(text : bind {model.defaultFeedUpdateInterval}, constraints:gbc(gridx :1, gridy:3, anchor : GridBagConstraints.LINE_END))
+                defaultFeedUpdateIntervalField = textField(text : bind {model.defaultFeedUpdateInterval}, constraints:gbc(gridx :1, gridy:3, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
             }
             panel(constraints : gbc(gridx: 0, gridy : 2, weighty: 100))
         }
@@ -398,7 +401,7 @@ class OptionsView {
                 label(text : trans("OPTIONS_ALLOW_TRUST_LIST"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_TRUST_LIST_UPDATE_INTERVAL"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_END))
+                trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
             }
             panel(constraints : gbc(gridx: 0, gridy : 1, weighty: 100))
         }
@@ -411,15 +414,15 @@ class OptionsView {
                 label(text : trans("OPTIONS_START_CHAT_SERVER_STARTUP"), constraints : gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:2, gridy:0, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MAX_CHAT_CONNECTIONS"), constraints : gbc(gridx: 0, gridy:1, anchor:GridBagConstraints.LINE_START, weightx:100))
-                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 2, gridy : 1, anchor:GridBagConstraints.LINE_END))
+                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 2, gridy : 1, anchor:GridBagConstraints.LINE_END), columns: COLUMNS)
                 label(text : trans("OPTIONS_ADVERTISE_CHAT"), constraints : gbc(gridx: 0, gridy:2, anchor:GridBagConstraints.LINE_START, weightx:100))
                 advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END))
+                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END), columns: COLUMNS)
                 label(text: trans("OPTIONS_CHAT_JOIN_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 joinDefaultChatRoomCheckbox = checkBox(selected: bind{model.joinDefaultChatRoom}, constraints: gbc(gridx: 2, gridy: 4, anchor: GridBagConstraints.LINE_END))
                 label(text: trans("OPTIONS_CHAT_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END))
+                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END), columns: COLUMNS)
                 if (!isAqua()) {
                     label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 6, anchor : GridBagConstraints.LINE_START, weightx: 100))
                     label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 6))
@@ -434,7 +437,7 @@ class OptionsView {
                 label(text : trans("OPTIONS_ALLOW_TRUSTED_MESSAGES"), constraints : gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 allowOnlyTrustedMessagesCheckbox = checkBox(selected : bind{model.allowOnlyTrustedMessages}, constraints : gbc(gridx:2, gridy:1, anchor:GridBagConstraints.LINE_END))
                 label(text : trans("OPTIONS_MESSAGE_SEND_INTERVAL"), constraints : gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                messageSendIntervalField = textField(text : bind{model.messageSendInterval}, constraints : gbc(gridx : 2, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                messageSendIntervalField = textField(text : bind{model.messageSendInterval}, constraints : gbc(gridx : 2, gridy : 2, anchor : GridBagConstraints.LINE_END), columns: COLUMNS)
                 
                 if (Taskbar.isTaskbarSupported() || SystemTray.isSupported()) {
                     label(text : trans("OPTIONS_MESSAGE_NOTIFICATIONS"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx: 100))
