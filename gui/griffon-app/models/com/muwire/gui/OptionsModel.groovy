@@ -8,6 +8,7 @@ import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
 import java.awt.Font
+import java.awt.GraphicsEnvironment
 
 @ArtifactProviderFor(GriffonModel)
 class OptionsModel {
@@ -46,6 +47,7 @@ class OptionsModel {
     @Observable boolean darculaLnf
     @Observable boolean metalLnf
     @Observable String font
+    String [] availableFonts
     @Observable boolean automaticFontSize
     @Observable int customFontSize
     @Observable boolean fontStyleBold
@@ -136,6 +138,7 @@ class OptionsModel {
         else
             systemLnf = true
         font = uiSettings.font
+        availableFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()
         automaticFontSize = uiSettings.autoFontSize
         customFontSize = uiSettings.fontSize
         fontStyleBold = (uiSettings.fontStyle & Font.BOLD) == Font.BOLD

@@ -3,6 +3,8 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 import net.i2p.util.SystemVersion
 
+import javax.swing.JComboBox
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -72,7 +74,7 @@ class OptionsView {
     def useUPNPCheckbox
 
     def monitorCheckbox
-    def fontField
+    def fontComboBox
     def fontSizeField
     def fontStyleBoldCheckbox
     def fontStyleItalicCheckbox
@@ -120,6 +122,19 @@ class OptionsView {
         mainFrame = application.windowManager.findWindow("main-frame")
         d = new JDialog(mainFrame, "Options", true)
         d.setResizable(false)
+        
+        fontComboBox = new JComboBox<String>(model.availableFonts)
+        int fontIdx = -1
+        for (int i = 0; i < model.availableFonts.length; i++) {
+            if (model.font == model.availableFonts[i]) {
+                fontIdx = i
+                break
+            }
+        }
+        if (fontIdx < 0)
+            fontIdx = 0 // hmm
+        fontComboBox.setSelectedIndex(fontIdx)
+        
         p = builder.panel {
             gridBagLayout()
             panel (border : titledBorder(title : trans("OPTIONS_SEARCH_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
@@ -276,7 +291,7 @@ class OptionsView {
                 radioButton(text: "Metal", selected : bind {model.metalLnf}, buttonGroup : lnfGroup,
                         constraints: gbc(gridx: 3, gridy:0, anchor: GridBagConstraints.LINE_START), metalLnfAction)
                 label(text : trans("OPTIONS_FONT"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                fontField = textField(text : bind {model.font}, columns : COLUMNS, constraints : gbc(gridx : 3, gridy:1, anchor : GridBagConstraints.LINE_START))
+                widget(fontComboBox, constraints : gbc(gridx : 1, gridy:1, gridwidth: 3, anchor : GridBagConstraints.LINE_START))
 
                 label(text : trans("OPTIONS_FONT_SIZE"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 buttonGroup(id: "fontSizeGroup")

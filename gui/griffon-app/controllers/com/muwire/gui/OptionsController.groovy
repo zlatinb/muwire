@@ -272,7 +272,7 @@ class OptionsController {
             text = "metal"
         uiSettings.lnf = text
 
-        text = view.fontField.text
+        text = view.fontComboBox.getSelectedItem()
         model.font = text
         uiSettings.font = text
         
