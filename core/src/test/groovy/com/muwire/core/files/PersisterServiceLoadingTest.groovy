@@ -79,6 +79,7 @@ class PersisterServiceLoadingTest {
 
         PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
         ps.onUILoadedEvent(null)
+        ps.onWatchedDirectoriesLoadedEvent(null)
         Thread.sleep(2000)
 
         assert listener.publishedFiles.size() == 1
@@ -122,6 +123,7 @@ class PersisterServiceLoadingTest {
 
         PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
         ps.onUILoadedEvent(null)
+        ps.onWatchedDirectoriesLoadedEvent(null)
         Thread.sleep(2000)
 
         assert listener.publishedFiles.size() == 1
@@ -164,6 +166,7 @@ class PersisterServiceLoadingTest {
 
         PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
         ps.onUILoadedEvent(null)
+        ps.onWatchedDirectoriesLoadedEvent(null)
         Thread.sleep(2000)
 
         assert listener.publishedFiles.size() == 2
@@ -196,6 +199,7 @@ class PersisterServiceLoadingTest {
 
         PersisterService ps = new PersisterService(persisted, eventBus, 100, null)
         ps.onUILoadedEvent(null)
+        ps.onWatchedDirectoriesLoadedEvent(null)
         Thread.sleep(2000)
 
         assert listener.publishedFiles.size() == 1
