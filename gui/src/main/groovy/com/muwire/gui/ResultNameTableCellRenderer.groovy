@@ -32,6 +32,7 @@ class ResultNameTableCellRenderer extends DefaultTableCellRenderer {
             setIcon(sharedIcon)
         else
             setIcon(null)
+        setToolTipText(HTMLSanitizer.sanitize(event.getFullPath()))
         if (isSelected) {
             setForeground(table.getSelectionForeground())
             setBackground(table.getSelectionBackground())
