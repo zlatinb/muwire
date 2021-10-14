@@ -247,6 +247,8 @@ class MainFrameController {
         List<SharedFile> selected = view.selectedSharedFiles()
         if (selected == null || selected.size() != 1)
             return
+        if (!view.selectedFolders().isEmpty())
+            return
         SharedFile sf = selected[0]
         Desktop.getDesktop().open(sf.file)
     }
