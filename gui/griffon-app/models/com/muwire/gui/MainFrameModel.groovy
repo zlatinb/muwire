@@ -106,6 +106,7 @@ class MainFrameModel {
     private final Set<SharedFile> allSharedFiles = Collections.synchronizedSet(new LinkedHashSet<>())
     List<SharedFile> shared
     private boolean libraryDirty
+    boolean libraryTabVisible
     private final javax.swing.Timer libraryTimer = new javax.swing.Timer(1000, {refreshLibrary()})
     TreeModel sharedTree 
     DefaultMutableTreeNode allFilesTreeRoot, treeRoot
@@ -367,6 +368,8 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
+            view.refreshSharedFiles()
+            libraryDirty = false
             view.magicTreeExpansion()
             filteringEnabled = true
             core.muOptions.trustSubscriptions.each {
@@ -1018,6 +1021,8 @@ class MainFrameModel {
     }
     
     private void refreshLibrary() {
+        if (!libraryTabVisible)
+            return
         if (libraryDirty) {
             libraryDirty = false
             view.refreshSharedFiles()

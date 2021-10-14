@@ -1720,6 +1720,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markSelectedVisible()
+        model.libraryTabVisible = false
     }
 
     def showDownloadsWindow = {
@@ -1736,6 +1737,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
 
     def showUploadsWindow = {
@@ -1752,6 +1754,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = true
     }
     
     def showCollectionsWindow = {
@@ -1768,6 +1771,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
 
     def showMonitorWindow = {
@@ -1784,6 +1788,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
     
     def showFeedsWindow = {
@@ -1800,6 +1805,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
 
     def showTrustWindow = {
@@ -1816,6 +1822,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
     
     def showMessagesWindow = {
@@ -1832,6 +1839,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = true
         chatNotificator.mainWindowDeactivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
     
     def showChatWindow = {
@@ -1848,6 +1856,7 @@ class MainFrameView {
         model.chatPaneButtonEnabled = false
         chatNotificator.mainWindowActivated()
         resultsTabListener.markAllTabsInvisible()
+        model.libraryTabVisible = false
     }
     
     def showSharedFilesTable = {
