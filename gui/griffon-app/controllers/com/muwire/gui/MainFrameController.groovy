@@ -445,10 +445,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void browseFromUpload() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void browseFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
 
         String groupId = UUID.randomUUID().toString()
@@ -460,10 +457,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void browseCollectionsFromUpload() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void browseCollectionsFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
         
         UUID uuid = UUID.randomUUID()
@@ -479,10 +473,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void subscribeFromUpload() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void subscribeFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
         
         Feed feed = new Feed(p)
@@ -496,10 +487,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void chatFromUpload() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void chatFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
         startChat(p)
         view.showChatWindow.call()
@@ -569,10 +557,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void showInLibrary() {
-        Uploader uploader = view.selectedUploader()
-        if (uploader == null)
-            return
+    void showInLibrary(Uploader uploader) {
         SharedFile sf = null
         if (uploader instanceof HashListUploader) {
             InfoHash infoHash = uploader.infoHash
@@ -900,10 +885,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void messageComposeFromUpload() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void messageComposeFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
         
         def params = [:]
@@ -926,10 +908,7 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void copyIdFromUploads() {
-        Uploader u = view.selectedUploader()
-        if (u == null)
-            return
+    void copyIdFromUploads(Uploader u) {
         CopyPasteSupport.copyToClipboard(u.getDownloaderPersona().toBase64())
     }
     

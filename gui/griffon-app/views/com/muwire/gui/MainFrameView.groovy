@@ -1618,38 +1618,38 @@ class MainFrameView {
             
         JPopupMenu uploadsTableMenu = new JPopupMenu()
         JMenuItem showInLibrary = new JMenuItem(trans("SHOW_IN_LIBRARY"))
-        showInLibrary.addActionListener({mvcGroup.controller.showInLibrary()})
+        showInLibrary.addActionListener({mvcGroup.controller.showInLibrary(uploader)})
         uploadsTableMenu.add(showInLibrary)
         
         if (uploader.isBrowseEnabled()) {
             JMenuItem browseItem = new JMenuItem(trans("BROWSE_HOST"))
-            browseItem.addActionListener({mvcGroup.controller.browseFromUpload()})
+            browseItem.addActionListener({mvcGroup.controller.browseFromUpload(uploader)})
             uploadsTableMenu.add(browseItem)
             JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
-            browseCollectionsItem.addActionListener({mvcGroup.controller.browseCollectionsFromUpload()})
+            browseCollectionsItem.addActionListener({mvcGroup.controller.browseCollectionsFromUpload(uploader)})
             uploadsTableMenu.add(browseCollectionsItem)
         }
         
         if (uploader.isFeedEnabled() && mvcGroup.controller.core.feedManager.getFeed(uploader.getDownloaderPersona()) == null) {
             JMenuItem feedItem = new JMenuItem(trans("SUBSCRIBE"))
-            feedItem.addActionListener({mvcGroup.controller.subscribeFromUpload()})
+            feedItem.addActionListener({mvcGroup.controller.subscribeFromUpload(uploader)})
             uploadsTableMenu.add(feedItem)
         }
         
         if (uploader.isChatEnabled() && !mvcGroup.controller.core.chatManager.isConnected(uploader.getDownloaderPersona())) {
             JMenuItem chatItem = new JMenuItem(trans("CHAT"))
-            chatItem.addActionListener({mvcGroup.controller.chatFromUpload()})
+            chatItem.addActionListener({mvcGroup.controller.chatFromUpload(uploader)})
             uploadsTableMenu.add(chatItem)
         }
         
         if (uploader.isMessageEnabled()) {
             JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
-            messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload()})
+            messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload(uploader)})
             uploadsTableMenu.add(messageItem)
         }
         
         JMenuItem copyIDItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIDItem.addActionListener({mvcGroup.controller.copyIdFromUploads()})
+        copyIDItem.addActionListener({mvcGroup.controller.copyIdFromUploads(uploader)})
         uploadsTableMenu.add(copyIDItem)
         
         showPopupMenu(uploadsTableMenu, e)
