@@ -369,6 +369,7 @@ class MainFrameModel {
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
             view.refreshSharedFiles()
+            loadedFiles = allSharedFiles.size()
             libraryDirty = false
             view.magicTreeExpansion()
             filteringEnabled = true
@@ -455,7 +456,6 @@ class MainFrameModel {
             if (e.sharedFile.file == hashingFile)
                 hashingFile = null
             allSharedFiles << e.sharedFile
-            loadedFiles = allSharedFiles.size()
             insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.sharedFile)) {
                 shared << e.sharedFile
@@ -470,7 +470,6 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             allSharedFiles << e.loadedFile
-            loadedFiles = allSharedFiles.size()
             insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
             shared << e.loadedFile
             insertIntoTree(e.loadedFile, treeRoot, null)
@@ -765,7 +764,6 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             allSharedFiles << e.downloadedFile
-            loadedFiles = allSharedFiles.size()
             insertIntoTree(e.downloadedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.downloadedFile)) {
                 shared << e.downloadedFile
@@ -1025,6 +1023,7 @@ class MainFrameModel {
             return
         if (libraryDirty) {
             libraryDirty = false
+            setLoadedFiles(allSharedFiles.size())
             view.refreshSharedFiles()
         }
     }
