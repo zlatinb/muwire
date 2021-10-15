@@ -175,6 +175,7 @@ public class DownloadManager {
         downloaders.put(infoHash, downloader)
         persistDownloaders()
         pendingStart.offer(new DelayedStart(downloader, false))
+        return downloader
     }
 
     public void onUIDownloadCancelledEvent(UIDownloadCancelledEvent e) {
