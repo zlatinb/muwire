@@ -340,8 +340,8 @@ class MainFrameModel {
                                 if (state == Downloader.DownloadState.FAILED ||
                                     state == Downloader.DownloadState.DOWNLOADING)
                                     it.downloader.resume()
-                                updateTablePreservingSelection("downloads-table")
                             }
+                            updateTablePreservingSelection("downloads-table")
                         }
 
                     }
@@ -654,7 +654,7 @@ class MainFrameModel {
 
             results.values().each { MVCGroup group ->
                 if (group.alive) {
-                    group.view.pane.getClientProperty("results-table")?.model.fireTableDataChanged()
+                    group.view.refreshResults()
                 }
             }
         }

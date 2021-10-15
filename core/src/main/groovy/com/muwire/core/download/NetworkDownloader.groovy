@@ -220,22 +220,24 @@ class NetworkDownloader extends Downloader {
     }
     
     protected void doResume() {
-        readPieces()
-        destinations.stream().filter({!isHopeless(it)}).forEach { destination ->
-            log.fine("resuming source ${destination.toBase32()}")
-            def worker = activeWorkers.get(destination)
-            if (worker != null) {
-                if (worker.currentState == WorkerState.FINISHED) {
-                    def newWorker = new DownloadWorker(destination)
-                    activeWorkers.put(destination, newWorker)
-                    executorService.submit(newWorker)
+        executorService.submit {
+            readPieces()
+            destinations.stream().filter({ !isHopeless(it) }).forEach { destination ->
+                log.fine("resuming source ${destination.toBase32()}")
+                def worker = activeWorkers.get(destination)
+                if (worker != null) {
+                    if (worker.currentState == WorkerState.FINISHED) {
+                        def newWorker = new DownloadWorker(destination)
+                        activeWorkers.put(destination, newWorker)
+                        executorService.submit(newWorker)
+                    }
+                } else {
+                    worker = new DownloadWorker(destination)
+                    activeWorkers.put(destination, worker)
+                    executorService.submit(worker)
                 }
-            } else {
-                worker = new DownloadWorker(destination)
-                activeWorkers.put(destination, worker)
-                executorService.submit(worker)
             }
-        }
+        } as Runnable
     }
 
     void addSource(Destination d) {
