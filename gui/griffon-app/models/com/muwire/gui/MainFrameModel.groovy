@@ -204,10 +204,16 @@ class MainFrameModel {
                 break
             } catch (IllegalArgumentException iae) {} // caused by underlying model changing while table is sorted
         }
-        for (int i = 0; i < selectedRows.length; i ++)
-            selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
-        for (int selectedRow : selectedRows)
-            table.selectionModel.addSelectionInterval(selectedRow,selectedRow)
+        for (int i = 0; i < selectedRows.length; i ++) {
+            if (selectedRows[i] >= table.model.getRowCount())
+                selectedRows[i] = -1
+            else
+                selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
+        }
+        for (int selectedRow : selectedRows) {
+            if (selectedRow >= 0)
+                table.selectionModel.addSelectionInterval(selectedRow,selectedRow)
+        }
     }
 
     void mvcGroupInit(Map<String, Object> args) {
