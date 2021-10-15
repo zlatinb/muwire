@@ -225,7 +225,7 @@ class DownloadSession {
                 System.arraycopy(infoHash.getHashList(), piece * 32, expected, 0, 32)
                 if (hash != expected) {
                     pieces.markPartial(piece, 0)
-                    throw new BadHashException("bad hash on piece $piece for infoHash " + Base64.encode(infoHash.getRoot()))
+                    throw new BadHashException("bad hash on piece $piece")
                 }
                 
                 eventBus.publish(new SourceVerifiedEvent(infoHash : infoHash, source : endpoint.destination))

@@ -119,7 +119,7 @@ abstract class Downloader {
 
     public void resume() {
         paused = false
-        downloadManager.queueForResume(this)
+        doResume()
     }
     
     protected abstract void doResume();

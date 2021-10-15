@@ -31,11 +31,9 @@ import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.FileCollectionItem
 import com.muwire.core.collections.UIDownloadCollectionEvent
 
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.logging.Level
 
 @Log
@@ -53,10 +51,6 @@ public class DownloadManager {
     private final FileManager fileManager
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
-    
-    private final BlockingQueue<DelayedStart> pendingStart = new LinkedBlockingQueue<>()
-    private volatile boolean shutdown
-    private final Thread pendingProcessor
     
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
         I2PConnector connector, File home, Persona me, ChatServer chatServer, FileManager fileManager) {
@@ -76,31 +70,6 @@ public class DownloadManager {
             rv.setDaemon(true)
             rv
         })
-        
-        pendingProcessor = new Thread({processDelayed()} as Runnable)
-        pendingProcessor.setName("download-delayer")
-        pendingProcessor.setDaemon(true)
-        pendingProcessor.start()
-    }
-    
-    private void processDelayed() {
-        while(!shutdown) {
-            DelayedStart ds = pendingStart.poll()
-            if (ds != null) {
-                Downloader downloader = ds.downloader
-                if (!ds.resume) {
-                    if (!downloader.paused)
-                        executor.execute({ downloader.download() } as Runnable)
-                    eventBus.publish(new DownloadStartedEvent(downloader: downloader))
-                } else
-                    executor.execute({downloader.doResume() as Runnable})
-            }
-            Thread.sleep(100)
-        }
-    }
-    
-    void queueForResume(Downloader downloader) {
-        pendingStart.offer(new DelayedStart(downloader, true))
     }
 
 
@@ -174,7 +143,8 @@ public class DownloadManager {
         }
         downloaders.put(infoHash, downloader)
         persistDownloaders()
-        pendingStart.offer(new DelayedStart(downloader, false))
+        executor.execute({downloader.download()} as Runnable)
+        eventBus.publish(new DownloadStartedEvent(downloader: downloader))
         return downloader
     }
 
@@ -194,10 +164,6 @@ public class DownloadManager {
 
     public void onUIDownloadResumedEvent(UIDownloadResumedEvent e) {
         persistDownloaders()
-    }
-
-    void resume(Downloader downloader) {
-        executor.execute({downloader.download() as Runnable})
     }
 
     void onUILoadedEvent(UILoadedEvent e) {
@@ -263,8 +229,15 @@ public class DownloadManager {
             }
                 
                 
-            downloaders.put(infoHash, downloader)
-            pendingStart.offer(new DelayedStart(downloader, false))
+            try {
+                if (!downloader.paused)
+                    downloader.download()
+                downloaders.put(infoHash, downloader)
+                eventBus.publish(new DownloadStartedEvent(downloader : downloader))
+            } catch (IllegalArgumentException bad) {
+                log.log(Level.WARNING,"cannot start downloader, skipping", bad)
+                return
+            }
         }
     }
 
@@ -342,8 +315,6 @@ public class DownloadManager {
     }
 
     public void shutdown() {
-        shutdown = true
-        pendingProcessor.interrupt()
         downloaders.values().each { it.stop() }
         Downloader.executorService.shutdownNow()
     }
@@ -356,14 +327,5 @@ public class DownloadManager {
         int total = 0
         downloaders.values().each { total += it.speed() }
         total
-    }
-    
-    private static class DelayedStart {
-        final Downloader downloader
-        final boolean resume
-        DelayedStart(Downloader downloader, boolean resume) {
-            this.downloader = downloader
-            this.resume = resume
-        }
     }
 }
