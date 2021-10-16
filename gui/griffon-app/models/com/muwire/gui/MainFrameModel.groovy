@@ -501,9 +501,9 @@ class MainFrameModel {
         treeRoot.removeAllChildren()
         view.refreshSharedFiles()
         if (filter != null) {
+            setFilteringEnabled(false)
             filterer = new Filterer()
             filterer.execute()
-            setFilteringEnabled(false)
         } else {
             synchronized (allSharedFiles) {
                 shared.addAll(allSharedFiles)

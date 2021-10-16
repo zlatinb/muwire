@@ -71,9 +71,9 @@ class BrowseModel {
         view.clearForFilter()
         view.refreshResults() 
         if (filter != null) {
+            setFilterEnabled(false)
             filterer = new Filterer()
             filterer.execute()
-            setFilterEnabled(false)
         } else {
             synchronized (allResults) {
                 results.addAll(allResults)
