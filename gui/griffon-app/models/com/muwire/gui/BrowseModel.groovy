@@ -85,7 +85,7 @@ class BrowseModel {
         }
     }
     
-    private class Filterer extends SwingWorker<List<UIResultEvent>, UIResultEvent> {
+    private class Filterer extends SwingWorker<Void, UIResultEvent> {
         private volatile boolean cancelled;
         
         void cancel() {
@@ -93,15 +93,11 @@ class BrowseModel {
         }
         
         @Override
-        protected List<UIResultEvent> doInBackground() throws Exception {
-            synchronized (allResults) {
-                for (UIResultEvent result : allResults) {
-                    if (cancelled)
-                        break
-                    if (filter(result))
-                        publish(result)
-                }
-            }
+        protected Void doInBackground() throws Exception {
+            allResults.stream().parallel().
+                    filter({filter(it)}).
+                    forEach({publish(it)})
+            return null
         }
         
         @Override

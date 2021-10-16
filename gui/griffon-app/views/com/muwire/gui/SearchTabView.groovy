@@ -789,10 +789,16 @@ class SearchTabView {
         for (int i = 0; i < selectedRows.length; i++)
             selectedRows[i] = table.rowSorter.convertRowIndexToModel(selectedRows[i])
         table.model.fireTableDataChanged()
-        for (int i = 0; i < selectedRows.length; i++)
-            selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
-        for (int row : selectedRows)
-            table.selectionModel.addSelectionInterval(row, row)
+        for (int i = 0; i < selectedRows.length; i++) {
+            if (selectedRows[i] >= table.getRowCount())
+                selectedRows[i] = -1
+            else
+                selectedRows[i] = table.rowSorter.convertRowIndexToView(selectedRows[i])
+        }
+        for (int row : selectedRows) {
+            if (row >= 0)
+                table.selectionModel.addSelectionInterval(row, row)
+        }
     }
 
     private class FocusListener {

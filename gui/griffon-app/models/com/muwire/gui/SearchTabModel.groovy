@@ -90,6 +90,7 @@ class SearchTabModel {
     
     void filterResults2() {
         results2.clear()
+        view.refreshResults()
         filterer?.cancel()
         if (filter != null) {
             filterer = new Filterer()
@@ -237,7 +238,7 @@ class SearchTabModel {
         }
     }
     
-    private class Filterer extends SwingWorker<List<InfoHash>, InfoHash> {
+    private class Filterer extends SwingWorker<Void, InfoHash> {
         private volatile boolean cancelled
         
         void cancel() {
@@ -245,15 +246,11 @@ class SearchTabModel {
         }
         
         @Override
-        protected List<InfoHash> doInBackground() {
-            synchronized(allResults2) {
-                for (InfoHash infoHash : allResults2) {
-                    if (cancelled)
-                        break
-                    if (filter(infoHash))
-                        publish(infoHash)
-                }
-            }
+        protected Void doInBackground() {
+            allResults2.parallelStream().
+                    filter({filter(it)}).
+                    forEach({publish(it)})
+            return null
         }
         
         @Override

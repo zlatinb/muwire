@@ -516,7 +516,7 @@ class MainFrameModel {
         }
     }
     
-    private class Filterer extends SwingWorker<List<SharedFile>,SharedFile> {
+    private class Filterer extends SwingWorker<Void,SharedFile> {
         
         private volatile boolean cancelled
         
@@ -525,16 +525,11 @@ class MainFrameModel {
         }
 
         @Override
-        protected List<SharedFile> doInBackground() throws Exception {
-            synchronized (allSharedFiles) {
-                for (SharedFile sf : allSharedFiles) {
-                    if (cancelled)
-                        break
-                    if (filter(sf))
-                        publish(sf)
-                }
-            }
-            []
+        protected Void doInBackground() throws Exception {
+            allSharedFiles.stream().parallel().
+                    filter({filter(it)}).
+                    forEach({publish(it)})
+            null
         }
 
         @Override
