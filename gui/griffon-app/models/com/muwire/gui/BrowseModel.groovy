@@ -65,12 +65,15 @@ class BrowseModel {
     }
     
     void filterResults() {
+        filterer?.cancel()
         results.clear()
         root.removeAllChildren()
-        filterer?.cancel()
+        view.clearForFilter()
+        view.refreshResults() 
         if (filter != null) {
             filterer = new Filterer()
             filterer.execute()
+            setFilterEnabled(false)
         } else {
             synchronized (allResults) {
                 results.addAll(allResults)
@@ -103,11 +106,13 @@ class BrowseModel {
         
         @Override
         protected void process(List<UIResultEvent> chunks) {
-            if (cancelled)
+            if (cancelled || chunks.isEmpty())
                 return
             results.addAll(chunks)
             for (UIResultEvent result : chunks)
                 resultsTreeModel.addToTree(result)
+            view.refreshResults()
+            view.expandUnconditionally()
         }
         
         @Override
@@ -116,6 +121,7 @@ class BrowseModel {
                 return
             view.refreshResults()
             view.expandUnconditionally()
+            setFilterEnabled(true)
         }
     }
 }

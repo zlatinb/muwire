@@ -296,6 +296,12 @@ class BrowseView {
         showTree.call()
     }
     
+    void clearForFilter() {
+        resultsTable.clearSelection()
+        treeExpansions.manualExpansion = false
+        treeExpansions.expandedPaths.clear()
+    }
+    
     void refreshResults() {
         int [] selectedRows = resultsTable.getSelectedRows()
         if (lastSortEvent != null) {
