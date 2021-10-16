@@ -495,13 +495,15 @@ class MainFrameModel {
     }
     
     void filterLibrary() {
+        filterer?.cancel()
         view.clearSelectedFiles()
         shared.clear()
         treeRoot.removeAllChildren()
-        filterer?.cancel()
+        view.refreshSharedFiles()
         if (filter != null) {
             filterer = new Filterer()
             filterer.execute()
+            setFilteringEnabled(false)
         } else {
             synchronized (allSharedFiles) {
                 shared.addAll(allSharedFiles)
@@ -537,18 +539,20 @@ class MainFrameModel {
 
         @Override
         protected void process(List<SharedFile> chunks) {
-            if (cancelled)
+            if (cancelled || chunks.isEmpty())
                 return
             shared.addAll(chunks)
             chunks.each {
                 insertIntoTree(it, treeRoot, null)
             }
+            view.refreshSharedFiles()
         }
 
         @Override
         protected void done() {
             if (cancelled)
                 return
+            setFilteringEnabled(true)
             view.refreshSharedFiles()
             if (filter != null)
                 view.fullTreeExpansion()
