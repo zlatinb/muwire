@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.InfoHash
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.util.DataUtil
+import net.i2p.data.DataHelper
 
 import java.util.function.Predicate
 
@@ -32,9 +33,10 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
          def userObject = value.getUserObject()
     
          def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) 
-         if (userObject == null || userObject instanceof String || userObject instanceof ResultTreeNode) {
-             userObject = HTMLSanitizer.sanitize(userObject.toString())
-             defaultRenderer.setText(userObject)
+         if (userObject instanceof ResultTreeNode) {
+             String name = HTMLSanitizer.sanitize(userObject.toString())
+             defaultRenderer.setText(name)
+             defaultRenderer.setToolTipText(userObject.getToolTip())
              return defaultRenderer
          }
 
@@ -42,6 +44,7 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
          SizeFormatter.format(result.size, sb)
          sb.append(bShort)
          setText(HTMLSanitizer.sanitize("$result.name (${sb.toString()})"))
+         setToolTipText(null)
          setEnabled(true)
          
          if (sharedPredicate.test(result.infohash))
@@ -54,13 +57,25 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
     
     public static class ResultTreeNode {
         private final String hiddenRoot, element
+        private int files
+        private long size
         ResultTreeNode(String hiddenRoot, String element) {
             this.hiddenRoot = hiddenRoot
             this.element = element
         }
         
+        private String getToolTip() {
+            files + " " + trans("FILES") + " " +
+                    DataHelper.formatSize(size) + trans("BYTES_SHORT")
+        }
+        
         public String toString() {
             element
+        }
+        
+        void addResult(UIResultEvent event) {
+            files++
+            size += event.size
         }
         
         public boolean equals(Object o) {

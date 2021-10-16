@@ -4,6 +4,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.search.UIResultEvent
 
 import javax.swing.JTree
+import javax.swing.ToolTipManager
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreePath
 import java.util.function.Predicate
@@ -15,6 +16,7 @@ class ResultTree extends JTree{
         setRootVisible(false)
         setLargeModel(true)
         setExpandsSelectedPaths(true)
+        ToolTipManager.sharedInstance().registerComponent(this)
     }
     
     void setSharedPredicate(Predicate<InfoHash> predicate) {

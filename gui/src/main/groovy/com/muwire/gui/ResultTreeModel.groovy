@@ -40,6 +40,7 @@ class ResultTreeModel extends DefaultTreeModel {
                 elementNode.setUserObject(nodeData)
                 node.add(elementNode)
             }
+            elementNode.getUserObject().addResult(event)
             node = elementNode
         }
 
