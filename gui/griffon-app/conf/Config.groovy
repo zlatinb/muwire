@@ -5,6 +5,8 @@ application {
     autoShutdown = false
 }
 
+griffon.disable.threading.injection = true
+
 mvcGroups {
     'EventList' {
         model = 'com.muwire.gui.EventListModel'
