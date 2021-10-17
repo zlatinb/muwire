@@ -3,7 +3,6 @@ package com.muwire.core.connection
 import net.i2p.client.streaming.I2PSocketManager
 import net.i2p.data.Destination
 
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Semaphore
 
 class I2PConnector {
@@ -12,7 +11,7 @@ class I2PConnector {
     
     final I2PSocketManager socketManager
     
-    private final Map<Destination, Semaphore> limiter = new ConcurrentHashMap<>()
+    private final Map<Destination, Semaphore> limiter = Collections.synchronizedMap(new WeakHashMap<>())
 
     I2PConnector() {}
 
