@@ -90,10 +90,15 @@ class BrowseController {
         }
         for(BrowseStatusEvent event : statusCopy) {
             model.status = event.status
-            model.filterEnabled = (event.status == BrowseStatus.FINISHED || event.status == BrowseStatus.FAILED) &&
-                    model.resultCount > 0
             if (event.status == BrowseStatus.FETCHING)
                 model.totalResults = event.totalResults
+        }
+        if (!statusCopy.isEmpty()) {
+            if ((model.status == BrowseStatus.FINISHED || model.status == BrowseStatus.FAILED) &&
+                    model.resultCount > 0) {
+                model.filterEnabled = true
+                model.cacheTopTreeLevel()
+            }
         }
     }
     

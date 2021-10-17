@@ -14,6 +14,7 @@ import com.muwire.core.search.BrowseStatus
 import javax.annotation.Nonnull
 import javax.swing.SwingWorker
 import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreeNode
 
 @ArtifactProviderFor(GriffonModel)
 class BrowseModel {
@@ -47,10 +48,16 @@ class BrowseModel {
     
     volatile String[] filter
     volatile Filterer filterer
+    private final List<TreeNode> topLevelNodes = new ArrayList<>()
     
     void mvcGroupInit(Map<String,String> args) {
         root = new DefaultMutableTreeNode()
         resultsTreeModel = new ResultTreeModel(root)
+    }
+    
+    void cacheTopTreeLevel() {
+        for(int i = 0; i < root.getChildCount(); i ++)
+            topLevelNodes.add(root.getChildAt(i))
     }
     
     private boolean filter(UIResultEvent result) {
@@ -77,8 +84,9 @@ class BrowseModel {
         } else {
             synchronized (allResults) {
                 results.addAll(allResults)
-                for(UIResultEvent result : allResults)
-                    resultsTreeModel.addToTree(result)
+            }
+            for(TreeNode topLevel : topLevelNodes) {
+                root.add(topLevel)
             }
             view.refreshResults()
             view.expandUnconditionally()
