@@ -335,7 +335,7 @@ class MainFrameView {
                                             JTable table = table(id : "shared-files-table", autoCreateRowSorter: true, rowHeight : rowHeight, 
                                                 dragEnabled : true, transferHandler: transferHandler) {
                                                 tableModel(list : model.shared) {
-                                                    closureColumn(header : trans("NAME"), preferredWidth : 500, type : String, read : {row -> row.getCachedPath()})
+                                                    closureColumn(header : trans("NAME"), preferredWidth : 500, type : SharedFile, read : {it})
                                                     closureColumn(header : trans("SIZE"), preferredWidth : 50, type : Long, read : {row -> row.getCachedLength() })
                                                     closureColumn(header : trans("COMMENTS"), preferredWidth : 50, type : Boolean, read : {it.getComment() != null})
                                                     closureColumn(header : trans("CERTIFIED"), preferredWidth : 50, type : Boolean, read : {
@@ -911,12 +911,12 @@ class MainFrameView {
 
         // shared files table and tree
         JTable sharedFilesTable = builder.getVariable("shared-files-table")
+        sharedFilesTable.columnModel.getColumn(0).setCellRenderer(new SharedFileNameRenderer())
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
         sharedFilesTable.rowSorter.addRowSorterListener({ evt -> lastSharedSortEvent = evt })
         sharedFilesTable.rowSorter.setSortsOnUpdates(true)
-        // default collator comparator is very slow
-        sharedFilesTable.rowSorter.setComparator(0, String.CASE_INSENSITIVE_ORDER)
+        sharedFilesTable.rowSorter.setComparator(0, new SharedFileNameComparator())
 
         sharedFilesTable.addMouseListener(sharedFilesMouseListener)
 
