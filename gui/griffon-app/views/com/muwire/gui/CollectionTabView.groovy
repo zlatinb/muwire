@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import javax.swing.tree.DefaultMutableTreeNode
+
 import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
@@ -123,7 +125,7 @@ class CollectionTabView {
                         scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                             itemsTree = new JTree(model.fileTreeModel)
                             itemsTree.setCellRenderer(new PathTreeRenderer())
-                            tree(rowHeight : rowHeight, rootVisible : true, expandsSelectedPaths : true, itemsTree)
+                            tree(rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
                         }
                     }
                 }
@@ -206,7 +208,9 @@ class CollectionTabView {
             itemsTable.model.fireTableDataChanged()
             
             model.root.removeAllChildren()
-            TreeUtil.copy(model.root, selected.tree.root)
+            def newNode = new DefaultMutableTreeNode()
+            TreeUtil.copy(newNode, selected.tree.root)
+            model.root.add newNode
             itemsTree.model.nodeStructureChanged(model.root)
             TreeUtil.expand(itemsTree)
         })
