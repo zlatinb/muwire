@@ -380,7 +380,7 @@ class MainFrameView {
                                     textField.addActionListener({controller.filterLibrary()})
                                     widget(id: "library-filter-textfield", enabled: bind{model.filteringEnabled}, textField)
                                     button(text: trans("FILTER"), enabled : bind {model.filteringEnabled}, filterLibraryAction)
-                                    button(text: trans("CLEAR"), enabled : bind{model.filteringEnabled}, clearLibraryFilterAction)
+                                    button(text: trans("CLEAR"), enabled : bind{model.clearFilterActionEnabled}, clearLibraryFilterAction)
                                 }
                                 panel {
                                     panel {

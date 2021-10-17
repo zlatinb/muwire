@@ -119,6 +119,7 @@ class BrowseController {
     @ControllerAction
     void clearFilter() {
         model.filter = null
+        model.clearFilterEnabled = false
         model.filterResults()
     }
     

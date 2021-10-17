@@ -113,7 +113,7 @@ class BrowseView {
                     textField.addActionListener({ controller.filter() })
                     widget(id: "filter-field", enabled: bind { model.filterEnabled }, textField)
                     button(text: trans("FILTER"), enabled: bind { model.filterEnabled }, filterAction)
-                    button(text: trans("CLEAR"), enabled: bind { model.filterEnabled }, clearFilterAction)
+                    button(text: trans("CLEAR"), enabled: bind { model.clearFilterEnabled}, clearFilterAction)
                 }
             }
         }

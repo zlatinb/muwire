@@ -36,6 +36,7 @@ class SearchTabModel {
     @Observable boolean viewCollectionsActionEnabled
     @Observable boolean messageActionEnabled
     @Observable boolean groupedByFile
+    
 
     Core core
     UISettings uiSettings
@@ -57,6 +58,7 @@ class SearchTabModel {
     def senders2 = []
     volatile String[] filter
     volatile Filterer filterer
+    @Observable boolean clearFilterActionEnabled
     
 
     ResultTreeModel treeModel
@@ -93,6 +95,7 @@ class SearchTabModel {
         view.refreshResults()
         filterer?.cancel()
         if (filter != null) {
+            setClearFilterActionEnabled(false)
             filterer = new Filterer()
             filterer.execute()
         } else {
@@ -264,6 +267,7 @@ class SearchTabModel {
         protected void done() {
             if (cancelled)
                 return
+            setClearFilterActionEnabled(true)
             view.clearSelections()
             view.refreshResults()
         }

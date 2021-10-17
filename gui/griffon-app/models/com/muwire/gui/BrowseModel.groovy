@@ -31,6 +31,7 @@ class BrowseModel {
     @Observable int totalResults
     @Observable int resultCount
     @Observable boolean filterEnabled
+    @Observable boolean clearFilterEnabled
     volatile UUID uuid
     
     def results = []
@@ -79,6 +80,7 @@ class BrowseModel {
         view.refreshResults() 
         if (filter != null) {
             setFilterEnabled(false)
+            setClearFilterEnabled(false)
             filterer = new Filterer()
             filterer.execute()
         } else {
@@ -126,6 +128,7 @@ class BrowseModel {
             view.refreshResults()
             view.expandUnconditionally()
             setFilterEnabled(true)
+            setClearFilterEnabled(true)
         }
     }
 }

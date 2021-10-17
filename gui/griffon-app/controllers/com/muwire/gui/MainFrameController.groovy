@@ -645,6 +645,7 @@ class MainFrameController {
     
     @ControllerAction
     void clearLibraryFilter() {
+        model.clearFilterActionEnabled = false
         model.filter = null
         model.filterLibrary()
     }

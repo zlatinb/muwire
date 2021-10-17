@@ -100,6 +100,7 @@ class MainFrameModel {
     
     // Library model
     @Observable boolean filteringEnabled
+    @Observable boolean clearFilterActionEnabled
     volatile String[] filter
     volatile Filterer filterer
     boolean treeVisible = true
@@ -502,6 +503,7 @@ class MainFrameModel {
         view.refreshSharedFiles()
         if (filter != null) {
             setFilteringEnabled(false)
+            setClearFilterActionEnabled(false)
             filterer = new Filterer()
             filterer.execute()
         } else {
@@ -548,6 +550,7 @@ class MainFrameModel {
             if (cancelled)
                 return
             setFilteringEnabled(true)
+            setClearFilterActionEnabled(true)
             view.refreshSharedFiles()
             if (filter != null)
                 view.fullTreeExpansion()

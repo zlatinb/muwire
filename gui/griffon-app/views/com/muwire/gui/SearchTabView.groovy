@@ -204,7 +204,7 @@ class SearchTabView {
                                         textField.addActionListener({controller.filter()})
                                         widget(id: "filter-field", textField)
                                         button(text: trans("FILTER"), filterAction)
-                                        button(text: trans("CLEAR"), clearFilterAction)
+                                        button(text: trans("CLEAR"), enabled: bind{model.clearFilterActionEnabled}, clearFilterAction)
                                     }
                                 }
                             }

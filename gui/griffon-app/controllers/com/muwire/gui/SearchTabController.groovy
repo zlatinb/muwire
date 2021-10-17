@@ -238,6 +238,7 @@ class SearchTabController {
     
     @ControllerAction
     void clearFilter() {
+        model.clearFilterActionEnabled = false
         model.filter = null
         model.filterResults2()
         view.clearSelections()
