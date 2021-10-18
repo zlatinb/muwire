@@ -139,19 +139,24 @@ class SearchTabView {
                                     }
                                 }
                                 panel(constraints : BorderLayout.SOUTH) {
-                                    gridBagLayout()
-                                    panel(constraints: gbc(gridx: 0, gridy:0, weightx: 100)) {
+                                    gridLayout(rows: 1, cols: 3)
+                                    panel {
                                         buttonGroup(id: "viewType")
                                         radioButton(text: trans("TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
                                         radioButton(text: trans("TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
                                     }
-                                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
-                                    button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled}, constraints : gbc(gridx:2, gridy:0),  showCommentAction)
-                                    button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewCertificatesActionEnabled}, constraints : gbc(gridx:3, gridy:0), viewCertificatesAction)
-                                    button(text : trans("VIEW_COLLECTIONS"), enabled : bind {model.viewCollectionsActionEnabled}, constraints : gbc(gridx:4, gridy:0), viewCollectionsAction)
-                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 5, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END))
-                                    sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 6, gridy: 0, anchor : GridBagConstraints.LINE_END),
-                                    selected : false, enabled : bind {model.downloadActionEnabled})
+                                    panel {
+                                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
+                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 5, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END),
+                                            enabled: bind{model.downloadActionEnabled})
+                                        sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 6, gridy: 0, anchor : GridBagConstraints.LINE_END),
+                                            selected : false, enabled : bind {model.downloadActionEnabled})
+                                    }
+                                    panel {
+                                        button(text: trans("VIEW_COMMENT"), enabled: bind { model.viewCommentActionEnabled }, constraints: gbc(gridx: 2, gridy: 0), showCommentAction)
+                                        button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, constraints: gbc(gridx: 3, gridy: 0), viewCertificatesAction)
+                                        button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, constraints: gbc(gridx: 4, gridy: 0), viewCollectionsAction)
+                                    }
                                 }
                             }
                         }
