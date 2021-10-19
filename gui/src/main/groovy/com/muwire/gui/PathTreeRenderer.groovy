@@ -22,6 +22,7 @@ class PathTreeRenderer extends DefaultTreeCellRenderer {
         
         def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) 
         if (userObject == null || userObject instanceof String) {
+            defaultRenderer.setText(HTMLSanitizer.sanitize(userObject?.toString()))
             return defaultRenderer
         }
         
