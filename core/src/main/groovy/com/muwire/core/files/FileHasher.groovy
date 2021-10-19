@@ -8,6 +8,7 @@ import net.i2p.data.Base64
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode
+import java.nio.channels.FileLock
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -58,7 +59,8 @@ class FileHasher {
         def output = new ByteArrayOutputStream()
         RandomAccessFile raf = new RandomAccessFile(file, "r")
         MappedByteBuffer buf = null
-        try {
+        
+        try(FileLock lock = raf.getChannel().lock(0, Long.MAX_VALUE, true)) {
             for (int i = 0; i < numPieces - 1; i++) {
                 buf = raf.getChannel().map(MapMode.READ_ONLY, size * i, size.toInteger())
                 digest.update buf
