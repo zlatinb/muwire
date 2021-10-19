@@ -183,6 +183,8 @@ class DirectoryWatcher {
                             log.fine("publishing file $file")
                             eventBus.publish new FileSharedEvent(file: file, fromWatch: true)
                             published << file
+                        } catch (IOException cantOpen) {
+                            log.fine("couldn't open file $file for reading, will try again")
                         }
                     }
                 }
