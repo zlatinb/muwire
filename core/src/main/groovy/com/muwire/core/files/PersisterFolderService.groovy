@@ -189,7 +189,8 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     /**
-     * Loads every JSON into memory.
+     * Loads every JSON into memory.  If this is the plugin, load right away.
+     * If it's the standalone throttle and use a single thread if configured.
      */
     private void _load() {
         int loaded = 0
@@ -198,7 +199,8 @@ class PersisterFolderService extends BasePersisterService {
         stream = stream.filter({
             it.getFileName().toString().endsWith(".json")
         })
-        stream = stream.parallel()
+        if (core.muOptions.plugin || !core.muOptions.throttleLoadingFiles)
+            stream = stream.parallel()
         stream.forEach({
             log.fine("processing path $it")
             def slurper = new JsonSlurper(type: JsonParserType.LAX)
@@ -226,6 +228,12 @@ class PersisterFolderService extends BasePersisterService {
                     log.fine("loaded shared parent from json ${event.loadedFile.getPathToSharedParent()}")
                 
                 listener.publish event
+                
+                if (!core.muOptions.plugin && core.muOptions.throttleLoadingFiles) {
+                    loaded++
+                    if (loaded % 10 == 0)
+                        Thread.sleep(20)
+                }
             } catch (Exception e) {
                 log.log(Level.WARNING,"failed to load $it",e)
                 failed.incrementAndGet()

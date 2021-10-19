@@ -56,6 +56,7 @@ class OptionsView {
     def shareDownloadedCheckbox
     def shareHiddenCheckbox
     def hashingCoresTextField
+    def throttleLoadingFilesCheckbox
     def ignoredFileTypesTextField
     def searchCommentsCheckbox
     def searchCollectionsCheckbox
@@ -215,6 +216,10 @@ class OptionsView {
                 label(text : trans("OPTIONS_IGNORED_FILE_TYPES"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 ignoredFileTypesTextField = textField(text : bind {model.ignoredFileTypes}, columns: 25, horizontalAlignment: JTextField.RIGHT,
                         constraints: gbc(gridx: 1, gridy: 3, anchor: GridBagConstraints.LINE_END, fill: GridBagConstraints.HORIZONTAL))
+                
+                label(text : trans("OPTIONS_THROTTLE_LOADING_FILES"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                throttleLoadingFilesCheckbox = checkBox(selected: bind{model.throttleLoadingFiles}, constraints: gbc(gridx: 1, gridy: 4, anchor: GridBagConstraints.LINE_END,
+                        weightx: 0))
             }
             
             if (!model.disableUpdates) {
