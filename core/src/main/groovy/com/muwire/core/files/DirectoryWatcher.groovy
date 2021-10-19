@@ -1,9 +1,13 @@
 package com.muwire.core.files
 
+import java.nio.channels.FileChannel
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
+
 import static java.nio.file.StandardWatchEventKinds.*
 
 import java.nio.file.ClosedWatchServiceException
@@ -169,9 +173,17 @@ class DirectoryWatcher {
                 def published = []
                 waitingFiles.each { file, timestamp ->
                     if (now - timestamp > WAIT_TIME) {
-                        log.fine("publishing file $file")
-                        eventBus.publish new FileSharedEvent(file : file, fromWatch: true)
-                        published << file
+                        try (FileChannel fc = Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+                            def lock = fc.tryLock(0, Long.MAX_VALUE, true)
+                            if (lock == null) {
+                                log.fine("Couldn't acquire read lock on $file will try again")
+                                return
+                            }
+                            lock.release()
+                            log.fine("publishing file $file")
+                            eventBus.publish new FileSharedEvent(file: file, fromWatch: true)
+                            published << file
+                        }
                     }
                 }
                 published.each {
