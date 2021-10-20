@@ -98,6 +98,8 @@ class MainFrameModel {
     List<FileCollection> localCollections = Collections.synchronizedList(new ArrayList<>())
     List<SharedFile> collectionFiles = new ArrayList<>()
     def downloads = []
+    
+    // uploads table
     def uploads = []
     
     // Library model
@@ -619,42 +621,44 @@ class MainFrameModel {
     
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
-            UploaderWrapper wrapper = null
-            for(UploaderWrapper uw : uploads) {
-                if (uw.uploader == e.uploader) {
-                    wrapper = uw
+            int index = -1
+            for(int i = 0; i < uploads.size(); i++) {
+                if (uploads[i].uploader == e.uploader) {
+                    index = i
                     break
                 }
             }
-            if (wrapper != null) 
-                wrapper.updateUploader(e.uploader)
+            if (index >= 0) {
+                uploads[index].updateUploader(e.uploader)
+                view.refreshUploadsTableRow(index)
+            }
             else {
                 uploads << new UploaderWrapper(uploader: e.uploader)
+                view.addUploadsTableRow(uploads.size() - 1)
                 if (e.first) {
                     Set<SharedFile> sfs = core.fileManager.getSharedFiles(e.uploader.infoHash.getRoot())
                     sfs.stream().map({sharedFileIdx[it]}).
                         forEach{view.refreshSharedFilesTableRow(it)}
                 }
             }
-            updateTablePreservingSelection("uploads-table")
         }
     }
 
     void onUploadFinishedEvent(UploadFinishedEvent e) {
         runInsideUIAsync {
-            UploaderWrapper wrapper = null
-            uploads.each {
-                if (it.uploader == e.uploader) {
-                    wrapper = it
-                    return
+            int index = -1
+            for (int i = 0; i < uploads.size(); i++) {
+                if (uploads[i].uploader == e.uploader) {
+                    index = i
+                    break
                 }
             }
             if (uiSettings.clearUploads) {
-                uploads.remove(wrapper)
+                uploads.remove(index)
+                view.removeUploadsTableRow(index)
             } else {
-                wrapper.finished = true
+                uploads[index].finished = true
             }
-            updateTablePreservingSelection("uploads-table")
         }
     }
 

@@ -1969,6 +1969,21 @@ class MainFrameView {
         table.model.fireTableRowsUpdated(row, row)
     }
     
+    void refreshUploadsTableRow(int row) {
+        JTable table = builder.getVariable("uploads-table")
+        table.model.fireTableRowsUpdated(row, row)
+    }
+    
+    void addUploadsTableRow(int row) {
+        JTable table = builder.getVariable("uploads-table")
+        table.model.fireTableRowsInserted(row, row)
+    }
+    
+    void removeUploadsTableRow(int row) {
+        JTable table = builder.getVariable("uploads-table")
+        table.model.fireTableRowsDeleted(row, row)
+    }
+    
     public void refreshFeeds() {
         JTable feedsTable = builder.getVariable("feeds-table")
         int selectedFeed = feedsTable.getSelectedRow()
