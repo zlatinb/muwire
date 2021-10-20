@@ -52,10 +52,12 @@ public class UploadManager {
         DataInputStream dis = new DataInputStream(e.getInputStream())
         boolean first = true
         while(true) {
+            boolean wasFirst = false
             boolean head = false
-            if (first)
+            if (first) {
                 first = false
-            else {
+                wasFirst = true
+            } else {
                 byte[] get = new byte[4]
                 dis.readFully(get)
                 if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
@@ -134,7 +136,7 @@ public class UploadManager {
                 uploader = new HeadUploader(file, request, e, mesh)
             else
                 uploader = new ContentUploader(file, request, e, mesh, pieceSize)
-            eventBus.publish(new UploadEvent(uploader : uploader))
+            eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
             try {
                 uploader.respond()
                 if (!head)
@@ -205,92 +207,98 @@ public class UploadManager {
         }
 
         Uploader uploader = new HashListUploader(e, fullInfoHash, request)
-        eventBus.publish(new UploadEvent(uploader : uploader))
+        eventBus.publish(new UploadEvent(uploader : uploader, first: true)) // hash list is always a first
         try {
             uploader.respond()
-        } finally {
-            decrementUploads(request.downloader)
             eventBus.publish(new UploadFinishedEvent(uploader : uploader))
-        }
 
-        // proceed with content
-        while(true) {
-            byte[] get = new byte[4]
-            dis.readFully(get)
-            boolean head = false
-            if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
-                if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == (byte)32) {
-                    head = true
-                } else {
-                    log.warning("received a method other than GET or HEAD on subsequent call")
+            // proceed with content
+            boolean first = true
+            while(true) {
+                boolean wasFirst = false
+                if (first) {
+                    first = false
+                    wasFirst = true
+                }
+                byte[] get = new byte[4]
+                dis.readFully(get)
+                boolean head = false
+                if (get != "GET ".getBytes(StandardCharsets.US_ASCII)) {
+                    if (get == "HEAD".getBytes(StandardCharsets.US_ASCII) && dis.readByte() == (byte)32) {
+                        head = true
+                    } else {
+                        log.warning("received a method other than GET or HEAD on subsequent call")
+                        e.close()
+                        return
+                    }
+                }
+                dis.readFully(infoHashStringBytes)
+                infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
+                log.info("Responding to upload request for root $infoHashString")
+    
+                infoHashRoot = Base64.decode(infoHashString)
+                infoHash = new InfoHash(infoHashRoot)
+                sharedFiles = fileManager.getSharedFiles(infoHashRoot)
+                downloader = downloadManager.downloaders.get(infoHash)
+                if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
+                    log.info "file not found"
+                    e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                    e.getOutputStream().flush()
                     e.close()
                     return
                 }
+    
+                rn = new byte[2]
+                dis.readFully(rn)
+                if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
+                    log.warning("Malformed GET header")
+                    e.close()
+                    return
+                }
+    
+                if (head)
+                    request = Request.parseHeadRequest(new InfoHash(infoHashRoot), e.getInputStream())
+                else
+                    request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
+                if (request.downloader != null && request.downloader.destination != e.destination) {
+                    log.info("Downloader persona doesn't match their destination")
+                    e.close()
+                    return
+                }
+    
+                if (request.have > 0)
+                    eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
+    
+                Mesh mesh
+                File file
+                int pieceSize
+                if (downloader != null) {
+                    mesh = meshManager.get(infoHash)
+                    file = downloader.incompleteFile
+                    pieceSize = downloader.pieceSizePow2
+                } else {
+                    sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
+                    SharedFile sharedFile = sharedFiles[0];
+                    mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
+                    file = sharedFile.file
+                    pieceSize = sharedFile.pieceSize
+                }
+    
+                if (head)
+                    uploader = new HeadUploader(file, request, e, mesh)
+                else
+                    uploader = new ContentUploader(file, request, e, mesh, pieceSize)
+                eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
+                try {
+                    uploader.respond()
+                    if (!head)
+                        eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
+                } finally {
+                    eventBus.publish(new UploadFinishedEvent(uploader : uploader))
+                }
             }
-            dis.readFully(infoHashStringBytes)
-            infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
-            log.info("Responding to upload request for root $infoHashString")
-
-            infoHashRoot = Base64.decode(infoHashString)
-            infoHash = new InfoHash(infoHashRoot)
-            sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-            downloader = downloadManager.downloaders.get(infoHash)
-            if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
-                log.info "file not found"
-                e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                e.getOutputStream().flush()
-                e.close()
-                return
-            }
-
-            rn = new byte[2]
-            dis.readFully(rn)
-            if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
-                log.warning("Malformed GET header")
-                e.close()
-                return
-            }
-
-            if (head)
-                request = Request.parseHeadRequest(new InfoHash(infoHashRoot), e.getInputStream())
-            else
-                request = Request.parseContentRequest(new InfoHash(infoHashRoot), e.getInputStream())
-            if (request.downloader != null && request.downloader.destination != e.destination) {
-                log.info("Downloader persona doesn't match their destination")
-                e.close()
-                return
-            }
-
-            if (request.have > 0)
-                eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
-
-            Mesh mesh
-            File file
-            int pieceSize
-            if (downloader != null) {
-                mesh = meshManager.get(infoHash)
-                file = downloader.incompleteFile
-                pieceSize = downloader.pieceSizePow2
-            } else {
-                sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
-                SharedFile sharedFile = sharedFiles[0];
-                mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
-                file = sharedFile.file
-                pieceSize = sharedFile.pieceSize
-            }
-
-            if (head)
-                uploader = new HeadUploader(file, request, e, mesh)
-            else
-                uploader = new ContentUploader(file, request, e, mesh, pieceSize)
-            eventBus.publish(new UploadEvent(uploader : uploader))
-            try {
-                uploader.respond()
-                if (!head)
-                    eventBus.publish(new SourceVerifiedEvent(infoHash : request.infoHash, source : request.downloader.destination))
-            } finally {
-                eventBus.publish(new UploadFinishedEvent(uploader : uploader))
-            }
+        } finally {
+            decrementUploads(request.downloader)
         }
     }
     

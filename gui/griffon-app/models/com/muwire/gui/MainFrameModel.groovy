@@ -621,7 +621,8 @@ class MainFrameModel {
                 wrapper.updateUploader(e.uploader)
             else {
                 uploads << new UploaderWrapper(uploader: e.uploader)
-                libraryDirty = true
+                if (e.first)
+                    libraryDirty = true
             }
             updateTablePreservingSelection("uploads-table")
         }
