@@ -16,7 +16,7 @@ abstract class MeshUploader extends Uploader {
     private final HeadRequest request
 
     MeshUploader(File file, HeadRequest request, Endpoint endpoint, Mesh mesh) {
-        super(endpoint)
+        super(endpoint, mesh.infoHash)
         this.mesh = mesh
         this.file = file
         this.request = request

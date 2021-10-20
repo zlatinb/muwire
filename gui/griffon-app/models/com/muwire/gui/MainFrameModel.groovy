@@ -77,6 +77,8 @@ import net.i2p.data.Destination
 import net.i2p.util.ConcurrentHashSet
 import griffon.metadata.ArtifactProviderFor
 
+import java.util.stream.Collectors
+
 @ArtifactProviderFor(GriffonModel)
 class MainFrameModel {
     @Inject Metadata metadata
@@ -106,6 +108,7 @@ class MainFrameModel {
     boolean treeVisible = true
     private final Set<SharedFile> allSharedFiles = Collections.synchronizedSet(new LinkedHashSet<>())
     List<SharedFile> shared
+    final Map<SharedFile, Integer> sharedFileIdx = new HashMap<>()
     private boolean libraryDirty
     boolean libraryTabVisible
     private final javax.swing.Timer libraryTimer = new javax.swing.Timer(1000, {refreshLibrary()})
@@ -465,7 +468,7 @@ class MainFrameModel {
             allSharedFiles << e.sharedFile
             insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.sharedFile)) {
-                shared << e.sharedFile
+                insertIntoTable(e.sharedFile)
                 insertIntoTree(e.sharedFile, treeRoot, null)
                 libraryDirty = true
             }
@@ -478,7 +481,7 @@ class MainFrameModel {
         runInsideUIAsync {
             allSharedFiles << e.loadedFile
             insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
-            shared << e.loadedFile
+            insertIntoTable(e.loadedFile)
             insertIntoTree(e.loadedFile, treeRoot, null)
             libraryDirty = true
         }
@@ -499,6 +502,7 @@ class MainFrameModel {
         filterer?.cancel()
         view.clearSelectedFiles()
         shared.clear()
+        sharedFileIdx.clear()
         treeRoot.removeAllChildren()
         view.refreshSharedFiles()
         if (filter != null) {
@@ -508,7 +512,8 @@ class MainFrameModel {
             filterer.execute()
         } else {
             synchronized (allSharedFiles) {
-                shared.addAll(allSharedFiles)
+                for (SharedFile sf : allSharedFiles)
+                    insertIntoTable(sf)
             }
             shared.each {
                 insertIntoTree(it, treeRoot, null)
@@ -538,7 +543,8 @@ class MainFrameModel {
         protected void process(List<SharedFile> chunks) {
             if (cancelled || chunks.isEmpty())
                 return
-            shared.addAll(chunks)
+            for (SharedFile sf : chunks)
+                insertIntoTable(sf)
             chunks.each {
                 insertIntoTree(it, treeRoot, null)
             }
@@ -563,9 +569,12 @@ class MainFrameModel {
         runInsideUIAsync {
             synchronized (allSharedFiles) {
                 for (SharedFile sharedFile : e.unsharedFiles)
-                    allSharedFiles.removeAll(sharedFile)
+                    allSharedFiles.remove(sharedFile)
                 shared.retainAll(allSharedFiles)
             }
+            sharedFileIdx.clear()
+            for (int i = 0; i < shared.size(); i++)
+                sharedFileIdx.put(shared[i], i)
             loadedFiles = allSharedFiles.size()
             
             for (SharedFile sharedFile : e.unsharedFiles) {
@@ -621,8 +630,11 @@ class MainFrameModel {
                 wrapper.updateUploader(e.uploader)
             else {
                 uploads << new UploaderWrapper(uploader: e.uploader)
-                if (e.first)
-                    libraryDirty = true
+                if (e.first) {
+                    Set<SharedFile> sfs = core.fileManager.getSharedFiles(e.uploader.infoHash.getRoot())
+                    sfs.stream().map({sharedFileIdx[it]}).
+                        forEach{view.refreshSharedFilesTableRow(it)}
+                }
             }
             updateTablePreservingSelection("uploads-table")
         }
@@ -775,7 +787,7 @@ class MainFrameModel {
             allSharedFiles << e.downloadedFile
             insertIntoTree(e.downloadedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.downloadedFile)) {
-                shared << e.downloadedFile
+                insertIntoTable(e.downloadedFile)
                 insertIntoTree(e.downloadedFile,treeRoot, null)
                 libraryDirty = true
             }
@@ -825,6 +837,12 @@ class MainFrameModel {
         def dmtn = new DefaultMutableTreeNode(file)
         f2n?.put(file, dmtn)
         node.add(dmtn)
+    }
+    
+    private void insertIntoTable(SharedFile sharedFile) {
+        int idx = shared.size()
+        shared << sharedFile
+        sharedFileIdx.put(sharedFile, idx)
     }
 
     private static class UIConnection {

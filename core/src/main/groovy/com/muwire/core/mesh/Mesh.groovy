@@ -21,7 +21,7 @@ import net.i2p.util.ConcurrentHashSet
  * @author zab
  */
 class Mesh {
-    private final InfoHash infoHash
+    final InfoHash infoHash
     private final Map<Destination,Persona> sources = new HashMap<>()
     private final Set<Destination> verified = new HashSet<>()
     final Pieces pieces

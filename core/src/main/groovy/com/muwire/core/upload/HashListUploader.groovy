@@ -10,12 +10,10 @@ import com.muwire.core.connection.Endpoint
 import net.i2p.data.Base64
 
 class HashListUploader extends Uploader {
-    private final InfoHash infoHash
     private final HashListRequest request
 
     HashListUploader(Endpoint endpoint, InfoHash infoHash, HashListRequest request) {
-        super(endpoint)
-        this.infoHash = infoHash
+        super(endpoint, infoHash)
         mapped = ByteBuffer.wrap(infoHash.getHashList())
         this.request = request
     }

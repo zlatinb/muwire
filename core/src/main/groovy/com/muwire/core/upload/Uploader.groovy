@@ -1,5 +1,7 @@
 package com.muwire.core.upload
 
+import com.muwire.core.InfoHash
+
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
@@ -16,8 +18,11 @@ abstract class Uploader {
     
     protected final AtomicInteger dataSinceLastRead = new AtomicInteger()
 
-    Uploader(Endpoint endpoint) {
+    final InfoHash infoHash
+    
+    Uploader(Endpoint endpoint, InfoHash infoHash) {
         this.endpoint = endpoint
+        this.infoHash = infoHash
     }
 
     abstract void respond()

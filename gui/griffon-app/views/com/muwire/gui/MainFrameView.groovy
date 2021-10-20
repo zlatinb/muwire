@@ -1600,7 +1600,7 @@ class MainFrameView {
             tree.scrollPathToVisible(otherPath)
         } else {
             def table = builder.getVariable("shared-files-table")
-            int row = model.shared.indexOf(sf)
+            int row = model.sharedFileIdx[sf]
             if (row < 0)
                 return
             if (lastSharedSortEvent != null)
@@ -1962,6 +1962,11 @@ class MainFrameView {
         table.model.fireTableDataChanged()
         for (int row : selectedRows)
             table.selectionModel.addSelectionInterval(row, row)
+    }
+    
+    void refreshSharedFilesTableRow(int row) {
+        JTable table = builder.getVariable("shared-files-table")
+        table.model.fireTableRowsUpdated(row, row)
     }
     
     public void refreshFeeds() {
