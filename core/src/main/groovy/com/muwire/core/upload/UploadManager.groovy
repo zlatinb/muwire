@@ -209,8 +209,11 @@ public class UploadManager {
         Uploader uploader = new HashListUploader(e, fullInfoHash, request)
         eventBus.publish(new UploadEvent(uploader : uploader, first: true)) // hash list is always a first
         try {
-            uploader.respond()
-            eventBus.publish(new UploadFinishedEvent(uploader : uploader))
+            try {
+                uploader.respond()
+            } finally {
+                eventBus.publish(new UploadFinishedEvent(uploader: uploader))
+            }
 
             // proceed with content
             boolean first = true
