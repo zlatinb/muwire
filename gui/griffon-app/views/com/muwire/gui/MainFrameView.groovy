@@ -1600,8 +1600,8 @@ class MainFrameView {
             tree.scrollPathToVisible(otherPath)
         } else {
             def table = builder.getVariable("shared-files-table")
-            int row = model.sharedFileIdx[sf]
-            if (row < 0)
+            Integer row = model.sharedFileIdx[sf]
+            if (row == null)
                 return
             if (lastSharedSortEvent != null)
                 row = table.rowSorter.convertRowIndexToView(row)
