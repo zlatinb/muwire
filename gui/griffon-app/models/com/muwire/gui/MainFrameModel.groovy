@@ -2,6 +2,7 @@
 package com.muwire.gui
 
 import com.muwire.core.messenger.MessageFolderLoadingEvent
+import com.muwire.core.search.ResultsEvent
 
 import javax.swing.DefaultListModel
 import javax.swing.SwingWorker
@@ -303,7 +304,7 @@ class MainFrameModel {
             core.eventBus.register(AllFilesLoadedEvent.class, this)
             core.eventBus.register(UpdateDownloadedEvent.class, this)
             core.eventBus.register(TrustSubscriptionUpdatedEvent.class, this)
-            core.eventBus.register(SearchEvent.class, this)
+            core.eventBus.register(ResultsEvent.class, this)
             core.eventBus.register(CertificateCreatedEvent.class, this)
             core.eventBus.register(FeedLoadedEvent.class, this)
             core.eventBus.register(FeedFetchEvent.class, this)
@@ -688,9 +689,18 @@ class MainFrameModel {
         }
     }
     
-    void onSearchEvent(SearchEvent e) {
+    void onResultsEvent(ResultsEvent e) {
         runInsideUIAsync {
-            libraryDirty = true
+            boolean affected = false
+            for (SharedFile sf : e.results) {
+                Integer row = sharedFileIdx[sf]
+                if (row != null) {
+                    affected = true
+                    view.refreshSharedFilesTableRow(row)
+                }
+            }
+            if (affected)
+                view.fullUpdateIfColumnSorted("shared-files-table", 5)
         }
     }
 

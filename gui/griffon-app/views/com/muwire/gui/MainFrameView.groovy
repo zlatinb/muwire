@@ -11,6 +11,7 @@ import javax.swing.DropMode
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.RowSorter
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
@@ -1967,6 +1968,22 @@ class MainFrameView {
     void refreshSharedFilesTableRow(int row) {
         JTable table = builder.getVariable("shared-files-table")
         table.model.fireTableRowsUpdated(row, row)
+    }
+    
+    void fullUpdateIfColumnSorted(String tableName, int column) {
+        JTable table = builder.getVariable(tableName)
+        List<RowSorter.SortKey> keys = table.rowSorter.getSortKeys()
+        if (keys.isEmpty())
+            return
+        boolean shouldSort = false
+        for (RowSorter.SortKey key : keys){
+            if (key.column == column) {
+                shouldSort = true
+                break
+            }
+        }
+        if (shouldSort)
+            table.rowSorter.allRowsChanged()
     }
     
     void refreshUploadsTableRow(int row) {
