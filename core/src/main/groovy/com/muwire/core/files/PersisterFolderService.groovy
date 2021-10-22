@@ -92,6 +92,10 @@ class PersisterFolderService extends BasePersisterService {
         log.info("Old persister done")
         persisterExecutor.execute({load()} as Runnable)
     }
+    
+    void onInfoHashEvent(InfoHashEvent event) {
+        persistHashList(event.file, event.infoHash)
+    }
 
     void onFileHashedEvent(FileHashedEvent hashedEvent) {
         if (hashedEvent.sharedFile == null)
@@ -104,7 +108,7 @@ class PersisterFolderService extends BasePersisterService {
         log.fine("PFS: for $file found root $root")
         hashedEvent.sharedFile.setPathToSharedParent(root)
         
-        persistFile(hashedEvent.sharedFile, hashedEvent.infoHash)
+        persistFile(hashedEvent.sharedFile)
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
@@ -121,7 +125,8 @@ class PersisterFolderService extends BasePersisterService {
                 sharedParent = findSharedParent(file)
             downloadedEvent.downloadedFile.setPathToSharedParent(sharedParent)
             
-            persistFile(downloadedEvent.downloadedFile, downloadedEvent.infoHash)
+            persistHashList(downloadedEvent.downloadedFile.file.getCanonicalFile(), downloadedEvent.infoHash)
+            persistFile(downloadedEvent.downloadedFile)
         }
     }
 
@@ -155,20 +160,21 @@ class PersisterFolderService extends BasePersisterService {
         if(loadedEvent.source == "PersisterService"){
             log.info("Migrating persisted file from PersisterService: "
                     + loadedEvent.loadedFile.file.absolutePath.toString())
-            persistFile(loadedEvent.loadedFile, loadedEvent.infoHash)
+            persistHashList(loadedEvent.loadedFile.file.getCanonicalFile(), loadedEvent.infoHash)
+            persistFile(loadedEvent.loadedFile)
         }
     }
     
     void onUICommentEvent(UICommentEvent e) {
-        persistFile(e.sharedFile,null)
+        persistFile(e.sharedFile)
     }
     
     void onUIFilePublishedEvent(UIFilePublishedEvent e) {
-        persistFile(e.sf, null)
+        persistFile(e.sf)
     }
     
     void onUIFileUnpublishedEvent(UIFileUnpublishedEvent e) {
-        persistFile(e.sf, null)
+        persistFile(e.sf)
     }
 
     void load() {
@@ -301,13 +307,13 @@ class PersisterFolderService extends BasePersisterService {
         return Path.of(invisibleRoot, visible.toString())
     }
 
-    private void persistFile(SharedFile sf, InfoHash ih) {
+    private void persistFile(SharedFile sf) {
         persisterExecutor.submit({
-            _persistFile(sf, ih)
+            _persistFile(sf)
         } as Runnable)
     }
     
-    private void _persistFile(SharedFile sf, InfoHash ih) {
+    private void _persistFile(SharedFile sf) {
         def jsonPath = getJsonPath(sf)
 
         def startTime = System.currentTimeMillis()
@@ -318,11 +324,17 @@ class PersisterFolderService extends BasePersisterService {
             writer.println json
         }
         
-        if (ih != null) {
-            def hashListPath = getHashListPath(sf)
-            hashListPath.toFile().bytes = ih.hashList
-        }
-        log.fine("Time(ms) to write json+hashList: " + (System.currentTimeMillis() - startTime))
+        log.fine("Time(ms) to write json: " + (System.currentTimeMillis() - startTime))
+    }
+    
+    private void persistHashList(File canonical, InfoHash infoHash) {
+        persisterExecutor.submit({_persistHashList(canonical, infoHash)} as Runnable)
+    }
+    
+    private void _persistHashList(File canonical, InfoHash infoHash) {
+        File target = getHashListPath(canonical).toFile()
+        target.getParentFile().mkdirs()
+        target.bytes = infoHash.hashList
     }
     
     private Path getJsonPath(SharedFile sf){
@@ -336,18 +348,32 @@ class PersisterFolderService extends BasePersisterService {
     
     private Path getHashListPath(SharedFile sf) {
         def pathHash = sf.getB64PathHash()
+        getHashListPath(pathHash)
+    }
+
+    private Path getHashListPath(File file) {
+        MessageDigest digester = MessageDigest.getInstance("SHA-256")
+        digester.update(file.getCanonicalPath().getBytes())
+        String hashB64 = Base64.encode(digester.digest())
+        getHashListPath(hashB64)
+    }
+    
+    private Path getHashListPath(String prefix) {
         return Paths.get(
                 location.getAbsolutePath(),
-                pathHash.substring(0, CUT_LENGTH),
-                pathHash.substring(CUT_LENGTH) + ".hashlist"
+                prefix.substring(0, CUT_LENGTH),
+                prefix.substring(CUT_LENGTH) + ".hashlist"
         )
     }
     
-    InfoHash loadInfoHash(SharedFile sf) {
-        def path = getHashListPath(sf)
-        InfoHash.fromHashList(path.toFile().bytes)
+    InfoHash loadInfoHash(File canonical) {
+        def path = getHashListPath(canonical)
+        File file = path.toFile()
+        if (!file.exists() || !file.isFile())
+            return null
+        InfoHash.fromHashList(file.bytes)
     }
-
+    
     private static final class HMACKey implements SecretKey {
         private final byte[] _data;
 

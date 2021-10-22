@@ -184,7 +184,7 @@ public class UploadManager {
 
         InfoHash fullInfoHash
         if (downloader == null) {
-            fullInfoHash = persisterService.loadInfoHash(sharedFiles[0])
+            fullInfoHash = persisterService.loadInfoHash(sharedFiles[0].file.getCanonicalFile())
         } else {
             byte [] hashList = downloader.getInfoHash().getHashList()
             if (hashList != null && hashList.length > 0)

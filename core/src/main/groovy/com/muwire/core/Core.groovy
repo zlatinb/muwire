@@ -1,5 +1,6 @@
 package com.muwire.core
 
+import com.muwire.core.files.InfoHashEvent
 import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
@@ -349,6 +350,7 @@ public class Core {
         eventBus.register(UICommentEvent.class, persisterFolderService)
         eventBus.register(UIFilePublishedEvent.class, persisterFolderService)
         eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
+        eventBus.register(InfoHashEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         hostCache = new H2HostCache(home,trustService, props, i2pSession.getMyDestination())
@@ -510,7 +512,8 @@ public class Core {
         }
         
         log.info("initializing hasher service")
-        hasherService = new HasherService(eventBus, fileManager, negativeFiles, props)
+        hasherService = new HasherService(eventBus, fileManager, negativeFiles, 
+                persisterFolderService::loadInfoHash, props)
         eventBus.register(FileSharedEvent.class, hasherService)
         eventBus.register(FileUnsharedEvent.class, hasherService)
         eventBus.register(DirectoryUnsharedEvent.class, hasherService)

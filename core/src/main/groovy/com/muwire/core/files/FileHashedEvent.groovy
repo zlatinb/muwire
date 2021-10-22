@@ -7,7 +7,6 @@ import com.muwire.core.SharedFile
 class FileHashedEvent extends Event {
 
     SharedFile sharedFile
-    InfoHash infoHash
     String error
 
     @Override
