@@ -638,7 +638,8 @@ class MainFrameModel {
                 if (e.first) {
                     Set<SharedFile> sfs = core.fileManager.getSharedFiles(e.uploader.infoHash.getRoot())
                     sfs.stream().map({sharedFileIdx[it]}).
-                        forEach{view.refreshSharedFilesTableRow(it)}
+                            filter({it != null}).
+                            forEach{view.refreshSharedFilesTableRow(it)}
                 }
             }
         }
