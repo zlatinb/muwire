@@ -80,7 +80,7 @@ class HasherService {
         } else if (hashed.add(evt.file)) {
             File canonical = evt.file.getCanonicalFile()
             if (canonical.isDirectory())
-                executor.execute({processDirectory(canonical)} as Runnable)
+                executor.execute({processDirectory(evt.file)} as Runnable)
             else
                 throttlerExecutor.execute({ throttle(evt.file, canonical) } as Runnable)
         }
