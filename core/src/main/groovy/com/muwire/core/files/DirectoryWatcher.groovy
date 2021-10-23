@@ -80,21 +80,18 @@ class DirectoryWatcher {
     }
 
     void onDirectoryWatchedEvent(DirectoryWatchedEvent e) {
-        log.fine("DW: onDirectoryWatchedEvent ${e.directory}")
+        log.fine("DW: onDirectoryWatchedEvent $e")
         File canonical = e.directory.getCanonicalFile()
-        Path path = canonical.toPath()
-        WatchKey wk = path.register(watchService, kinds)
-        watchedDirectories.put(canonical, wk)
-    }
-
-    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
-        for (File dir : e.directories) {
-            WatchKey wk = watchedDirectories.remove(dir)
-            wk?.cancel()
-            log.fine("DW: onDirectoryUnsharedEvent $dir")
+        if (e.watch) {
+            watchedDirectories.computeIfAbsent(canonical, {
+                Path path = canonical.toPath()
+                path.register(watchService, kinds)
+            })
+        } else {
+            watchedDirectories.remove(canonical)?.cancel()
         }
     }
-    
+
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
         if (watchService == null)
             return // still converting
@@ -150,7 +147,7 @@ class DirectoryWatcher {
 
     private void processDeleted(Path parent, Path path) {
         File f = join(parent, path)
-        log.fine("deleted entry $f")
+        log.fine("deleted entry $f => ${f.getCanonicalFile()}")
         SharedFile sf = fileManager.fileToSharedFile.get(f)
         if (sf != null)
             eventBus.publish(new FileUnsharedEvent(unsharedFiles : new SharedFile[]{sf}, deleted : true))
@@ -161,8 +158,8 @@ class DirectoryWatcher {
     }
 
     private static File join(Path parent, Path path) {
-        File parentFile = parent.toFile().getCanonicalFile()
-        new File(parentFile, path.toFile().getName()).getCanonicalFile()
+        File parentFile = parent.toFile()
+        new File(parentFile, path.toFile().getName())
     }
 
     private void publish() {

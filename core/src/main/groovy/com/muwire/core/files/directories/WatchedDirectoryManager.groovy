@@ -31,7 +31,8 @@ class WatchedDirectoryManager {
     private final EventBus eventBus
     private final FileManager fileManager
     
-    private final Map<File, WatchedDirectory> watchedDirs = new ConcurrentHashMap<>()
+    private final Map<File, WatchedDirectory> watchedDirs = new HashMap<>()
+    private final Map<File, WatchedDirectory> aliasesMap = new HashMap<>()
     
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({r -> 
         Thread t = new Thread(r, "disk-io")
@@ -51,12 +52,8 @@ class WatchedDirectoryManager {
         this.settings = settings
     }
     
-    public boolean isWatched(File f) {
-        watchedDirs.containsKey(f)
-    }
-    
-    public Stream<WatchedDirectory> getWatchedDirsStream() {
-        watchedDirs.values().stream()
+    synchronized boolean isWatched(File f) {
+        watchedDirs.containsKey(f) || aliasesMap.containsKey(f)
     }
     
     public void shutdown() {
@@ -64,7 +61,7 @@ class WatchedDirectoryManager {
         timer.cancel()
     }
     
-    void onUISyncDirectoryEvent(UISyncDirectoryEvent e) {
+    synchronized void onUISyncDirectoryEvent(UISyncDirectoryEvent e) {
         def wd = watchedDirs.get(e.directory)
         if (wd == null) {
             log.warning("Got a sync event for non-watched dir ${e.directory}")
@@ -80,7 +77,10 @@ class WatchedDirectoryManager {
             newDir.autoWatch = e.autoWatch
             persist(newDir)
         } else {
-            def wd = watchedDirs.get(e.directory)
+            def wd
+            synchronized (this) {
+                wd = watchedDirs.get(e.directory)
+            }
             if (wd == null) {
                 log.severe("got a configuration event for a non-watched directory ${e.directory}")
                 return
@@ -98,12 +98,16 @@ class WatchedDirectoryManager {
             Files.walk(home.toPath()).filter({
                 it.getFileName().toString().endsWith(".json")
             }).
+            parallel().
             forEach {
                 def parsed = slurper.parse(it.toFile())
                 WatchedDirectory wd = WatchedDirectory.fromJson(parsed)
                 if (wd.directory.exists() && wd.directory.isDirectory() && // check if directory disappeared or hidden
-                        (settings.shareHiddenFiles || !wd.directory.isHidden()))
-                    watchedDirs.put(wd.directory, wd)
+                        (settings.shareHiddenFiles || !wd.directory.isHidden())) {
+                    synchronized (this) {
+                        watchedDirs.put(wd.canonical, wd)
+                    }
+                }
                 else
                     it.toFile().delete()
             }
@@ -111,11 +115,12 @@ class WatchedDirectoryManager {
         } as Runnable)
     }
     
-    void onAllFilesLoadedEvent(AllFilesLoadedEvent event) {
+    synchronized void onAllFilesLoadedEvent(AllFilesLoadedEvent event) {
         watchedDirs.values().stream().filter({it.autoWatch}).
+                flatMap({it.aliases.stream()}).
                 forEach {
-                    eventBus.publish(new DirectoryWatchedEvent(directory : it.directory))
-                    eventBus.publish(new FileSharedEvent(file : it.directory))
+                    eventBus.publish(new DirectoryWatchedEvent(directory : it, watch: true))
+                    eventBus.publish(new FileSharedEvent(file : it))
                 }
         timer.schedule({sync()} as TimerTask, 1000, 1000)
     }
@@ -131,46 +136,78 @@ class WatchedDirectoryManager {
     }
     
     void onFileSharedEvent(FileSharedEvent e) {
-        File canonical = e.file.getCanonicalFile()
-        if (canonical.isFile() || watchedDirs.containsKey(canonical))
+        if (e.file.isFile())
             return
-        if (!settings.shareHiddenFiles && canonical.isHidden())
+        if (!settings.shareHiddenFiles && e.file.isHidden())
             return
         
-        log.fine("WDM: watching directory $canonical")
         
-        def wd = new WatchedDirectory(canonical)
-        if (e.fromWatch) {
-            // parent should be already watched, copy settings
-            def parent = watchedDirs.get(canonical.getParentFile())
-            if (parent == null) {
-                log.severe("watching found a directory without a watched parent? ${canonical}")
+        def wd = new WatchedDirectory(e.file) // canonicalize outside of lock
+        log.fine("WDM: watching directory ${e.file} => ${wd.canonical}")
+        
+        synchronized (this) {
+            if (watchedDirs.containsKey(wd.canonical)) {
+                log.fine("WDM: ${wd.canonical} was already watched, adding alias ${e.file}")
+                watchedDirs[wd.canonical].aliases.add(e.file)
+                aliasesMap.put(e.file, watchedDirs[wd.canonical])
                 return
             }
-            wd.autoWatch = parent.autoWatch
-            wd.syncInterval = parent.syncInterval
-        } else
-            wd.autoWatch = true
+            if (e.fromWatch) {
+                // parent should be already watched, copy settings
+                def parent = watchedDirs.get(e.file.getParentFile())
+                if (parent == null) {
+                    log.severe("watching found a directory without a watched parent? ${e.file}")
+                    return
+                }
+                wd.autoWatch = parent.autoWatch
+                wd.syncInterval = parent.syncInterval
+            } else
+                wd.autoWatch = true
+            
+            watchedDirs.put(wd.canonical, wd)
+            aliasesMap.put(wd.directory, wd)
+        }
         
-        
-        watchedDirs.put(wd.directory, wd)
         persist(wd)
         if (wd.autoWatch) 
-            eventBus.publish(new DirectoryWatchedEvent(directory: wd.directory))
+            eventBus.publish(new DirectoryWatchedEvent(directory: wd.directory, watch: true))
     }
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent e) {
         List<WatchedDirectory> toRemove = new ArrayList<>()
-        for (File dir : e.directories) {
-            def wd = watchedDirs.remove(dir)
-            if (wd == null) {
-                log.warning("unshared a directory that wasn't watched? ${dir}")
-                continue
-            } else log.fine("WDM: adding dir toRemove $dir")
-            toRemove << wd
+        synchronized (this) {
+            for (File dir : e.directories) {
+                if (!isWatched(dir)) {
+                    log.warning("unshared a directory that wasn't watched? ${dir}")
+                    continue
+                }
+                
+                // 1. see if the canonical contains it
+                def wd = watchedDirs.remove(dir)
+                if (wd != null) {
+                    log.fine("WDM: will remove watched directory ${dir} and ${wd.aliases.size()} aliases")
+                    // remove all aliases
+                    aliasesMap.keySet().removeAll(wd.aliases)
+                    toRemove << wd
+                } else {
+                    wd = aliasesMap.remove(dir)
+                    log.fine("WDM: removing $dir from aliases of ${wd.canonical}")
+                    
+                    wd.aliases.remove(dir)
+                    if (!wd.aliases.isEmpty())
+                        continue
+                    
+                    log.fine("WDM: no more aliases for ${wd.canonical}")
+                    watchedDirs.remove(wd.canonical)
+                    toRemove << wd
+                }
+            }
         }
         log.fine "will un-watch ${toRemove.size()} directories"
         if (!toRemove.isEmpty()) {
+            for (WatchedDirectory wd : toRemove) {
+                eventBus.publish new DirectoryWatchedEvent(directory: wd.canonical, watch: false)
+            }
             diskIO.submit({
                 for (WatchedDirectory wd : toRemove) {
                     File persistFile = new File(home, wd.getEncodedName() + ".json")
@@ -180,7 +217,7 @@ class WatchedDirectoryManager {
         }
     }
     
-    private void sync() {
+    private synchronized void sync() {
         long now = System.currentTimeMillis()
         watchedDirs.values().stream().
             filter({!it.autoWatch}).
@@ -201,11 +238,10 @@ class WatchedDirectoryManager {
         Set<File> filesOnFS = new HashSet<>()
         Set<File> dirsOnFS = new HashSet<>()
         wd.directory.listFiles().each {
-            File canonical = it.getCanonicalFile() 
-            if (canonical.isFile())
-                filesOnFS.add(canonical)
+            if (it.isFile())
+                filesOnFS.add(it)
             else
-                dirsOnFS.add(canonical)
+                dirsOnFS.add(it)
         }
         
         Set<File> addedFiles = new HashSet<>(filesOnFS)

@@ -507,7 +507,6 @@ public class Core {
         eventBus.with {
             register(DirectoryWatchedEvent.class, directoryWatcher)
             register(WatchedDirectoryConvertedEvent.class, directoryWatcher)
-            register(DirectoryUnsharedEvent.class, directoryWatcher)
             register(WatchedDirectoryConfigurationEvent.class, directoryWatcher)
         }
         
