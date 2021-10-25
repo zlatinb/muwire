@@ -6,6 +6,7 @@ package com.muwire.gui
 class LNFs {
     static final Map<String, String> nameToClass = new HashMap<>()
     static final Map<String, String> classToName = new HashMap<>()
+    static final Set<String> SYSTEM_ALIASES = new HashSet<>()
     
     static final String[] availableLNFs
     
@@ -24,6 +25,10 @@ class LNFs {
     }
     
     static {
+        SYSTEM_ALIASES.add("GTK") // Linux
+        SYSTEM_ALIASES.add("Aqua") // Mac
+        SYSTEM_ALIASES.add("Windows") // Windows
+        
         register("System", "system")
         register("Metal","metal")
         register("Darcula","com.bulenkov.darcula.DarculaLaf")

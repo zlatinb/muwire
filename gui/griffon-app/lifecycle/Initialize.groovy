@@ -1,3 +1,4 @@
+import com.muwire.gui.LNFs
 import griffon.core.GriffonApplication
 import groovy.swing.SwingBuilder
 import groovy.util.logging.Log
@@ -118,6 +119,9 @@ class Initialize extends AbstractLifecycleHandler {
             LookAndFeel chosen = lookAndFeel('system', 'gtk', 'metal')
             uiSettings.lnf = chosen.getID()
             log.info("ended up applying $chosen.name")
+            if (LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf))
+                uiSettings.lnf = "system"
+                
 
             FontUIResource defaultFont = chosen.getDefaults().getFont("Label.font")
             uiSettings.font = defaultFont.getName()
