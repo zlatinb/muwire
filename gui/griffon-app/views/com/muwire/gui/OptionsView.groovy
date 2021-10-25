@@ -75,6 +75,7 @@ class OptionsView {
     def useUPNPCheckbox
 
     def monitorCheckbox
+    def lnfComboBox
     def fontComboBox
     def fontSizeField
     def fontStyleBoldCheckbox
@@ -135,6 +136,21 @@ class OptionsView {
         if (fontIdx < 0)
             fontIdx = 0 // hmm
         fontComboBox.setSelectedIndex(fontIdx)
+        
+        
+        lnfComboBox = new JComboBox<String>(LNFs.availableLNFs)
+        String lnfName = LNFs.classToName.get(model.lnfClassName)
+        int lnfIdx = -1
+        for (int i = 0; i < LNFs.availableLNFs.length; i++) {
+            if (lnfName == LNFs.availableLNFs[i]) {
+                lnfIdx = i 
+                break
+            }
+        }
+        
+        if (lnfIdx < 0)
+            lnfIdx = 0 // hmm
+        lnfComboBox.setSelectedIndex(lnfIdx)
         
         p = builder.panel {
             gridBagLayout()
@@ -287,13 +303,7 @@ class OptionsView {
             constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
                 label(text : trans("OPTIONS_LOOK_AND_FEEL"), constraints : gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                buttonGroup(id:"lnfGroup")
-                radioButton(text: "System", selected : bind {model.systemLnf}, buttonGroup : lnfGroup,
-                constraints: gbc(gridx: 1, gridy:0, anchor: GridBagConstraints.LINE_START), systemLnfAction)
-                radioButton(text: "Darcula", selected : bind {model.darculaLnf}, buttonGroup : lnfGroup,
-                        constraints: gbc(gridx: 2, gridy:0, anchor: GridBagConstraints.LINE_START), darculaLnfAction)
-                radioButton(text: "Metal", selected : bind {model.metalLnf}, buttonGroup : lnfGroup,
-                        constraints: gbc(gridx: 3, gridy:0, anchor: GridBagConstraints.LINE_START), metalLnfAction)
+                widget(lnfComboBox, constraints: gbc(gridx: 1, gridy: 0, gridwidth: 3, anchor: GridBagConstraints.LINE_START))
                 label(text : trans("OPTIONS_FONT"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 widget(fontComboBox, constraints : gbc(gridx : 1, gridy:1, gridwidth: 3, anchor : GridBagConstraints.LINE_START))
 
@@ -489,7 +499,7 @@ class OptionsView {
 
     boolean isAqua() {
         // this is a Java bug.  File choosers don't appear on Aqua L&F.
-        model.systemLnf && SystemVersion.isMac()
+        model.lnfClassName == "system" && SystemVersion.isMac()
     }
 
     void mvcGroupInit(Map<String,String> args) {

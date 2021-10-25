@@ -67,6 +67,7 @@ startScripts.doFirst {
                                     "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/javax.swing.text.html=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"]
                                    
 }
@@ -100,6 +101,7 @@ dependencies {
 
     implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
     implementation group: 'com.bulenkov', name: 'darcula', version: '2018.2' 
+    implementation 'com.jtattoo:JTattoo:1.6.13'
 
     // runtime "org.slf4j:slf4j-simple:${slf4jVersion}"
 

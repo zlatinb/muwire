@@ -264,13 +264,8 @@ class OptionsController {
 
         // UI Setttings
 
-        if (model.systemLnf)
-            text = "system"
-        else if (model.darculaLnf)
-            text = "com.bulenkov.darcula.DarculaLaf"
-        else
-            text = "metal"
-        uiSettings.lnf = text
+        text = view.lnfComboBox.getSelectedItem()
+        uiSettings.lnf = LNFs.nameToClass.get(text)
 
         text = view.fontComboBox.getSelectedItem()
         model.font = text
@@ -364,27 +359,6 @@ class OptionsController {
         int rv = chooser.showOpenDialog(null)
         if (rv == JFileChooser.APPROVE_OPTION)
             model.chatWelcomeFile = chooser.getSelectedFile().getAbsolutePath()
-    }
-
-    @ControllerAction
-    void systemLnf() {
-        model.systemLnf = true
-        model.darculaLnf = false
-        model.metalLnf = false
-    }
-
-    @ControllerAction
-    void darculaLnf() {
-        model.darculaLnf = true
-        model.systemLnf = false
-        model.metalLnf = false
-    }
-
-    @ControllerAction
-    void metalLnf() {
-        model.metalLnf = true
-        model.darculaLnf = false
-        model.systemLnf = false
     }
 
     @ControllerAction
