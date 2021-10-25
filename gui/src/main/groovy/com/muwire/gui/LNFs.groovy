@@ -33,13 +33,13 @@ class LNFs {
                 "bernstein",
                 "fast",
                 "graphite",
-                "hifi",
                 "luna",
-                "mcwin",
                 "mint",
                 "noire",
                 "smart",
                 "texture"].each {register(camel(it), deriveJTattooClass(it))}
+        register("HiFi","com.jtattoo.plaf.hifi.HiFiLookAndFeel")
+        register("McWin","com.jtattoo.plaf.mcwin.McWinLookAndFeel")
         availableLNFs = nameToClass.keySet().toArray(new String[0])
     }
     
