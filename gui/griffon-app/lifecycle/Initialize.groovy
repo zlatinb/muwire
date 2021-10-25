@@ -71,6 +71,11 @@ class Initialize extends AbstractLifecycleHandler {
             guiPropsFile.withInputStream { props.load(it) }
             uiSettings = new UISettings(props)
 
+            if (LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf)) {
+                log.info("converting user specified lnf from ${uiSettings.lnf} to system")
+                uiSettings.lnf = "system"
+            }
+            
             def lnf
             log.info("settting user-specified lnf $uiSettings.lnf")
             try {
@@ -79,6 +84,8 @@ class Initialize extends AbstractLifecycleHandler {
                 log.log(Level.WARNING,"couldn't set desired look and feel, switching to defaults", bad)
                 lnf = lookAndFeel("system","gtk","metal")
                 uiSettings.lnf = lnf.getID()
+                if(LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf))
+                    uiSettings.lnf = "system"
             }
 
             if (uiSettings.font != null || uiSettings.autoFontSize || uiSettings.fontSize > 0 ) {
