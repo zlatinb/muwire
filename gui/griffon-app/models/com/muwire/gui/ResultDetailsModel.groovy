@@ -22,7 +22,6 @@ import griffon.transform.Observable
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
-import javax.swing.table.DefaultTableModel
 import java.util.stream.Collectors
 
 @ArtifactProviderFor(GriffonModel)
@@ -42,6 +41,11 @@ class ResultDetailsModel {
     String key
     List<SharedFile> localFiles
     
+    List<UIResultEvent> resultsWithComments = []
+    List<UIResultEvent> resultsWithCertificates = []
+    List<UIResultEvent> resultsWithCollections = []
+    
+    
     Map<Persona, CertsModel> certificates
     Map<Persona, UUID> collectionFetches
     Map<UUID, CollectionsModel> collections
@@ -59,6 +63,15 @@ class ResultDetailsModel {
         certificates = new HashMap<>()
         collectionFetches = new HashMap<>()
         collections = new HashMap<>()
+        
+        for (UIResultEvent event : results) {
+            if (event.comment != null)
+                resultsWithComments << event
+            if (event.certificates > 0)
+                resultsWithCertificates << event
+            if (event.collections.size() > 0)
+                resultsWithCollections << event
+        }
     }
     
     void mvcGroupDestroy() {
@@ -168,5 +181,13 @@ class ResultDetailsModel {
         CollectionFetchStatus status
         int count
         final List<FileCollection> collections = new ArrayList<>()
+    }
+    
+    boolean hasComments() {
+        for (UIResultEvent event : results) {
+            if (event.comment != null)
+                return true
+        }
+        false
     }
 }

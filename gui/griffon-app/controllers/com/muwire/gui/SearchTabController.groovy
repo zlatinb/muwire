@@ -203,24 +203,6 @@ class SearchTabController {
     }
     
     @ControllerAction
-    void viewDetails() {
-        def events = view.selectedResults()
-        if (events.size() != 1)
-            return
-        
-        InfoHash infoHash = events.first().infohash
-        
-        
-        def params = [:]
-        params.core = core
-        params.fileName = events.first().getName()
-        params.infoHash = infoHash
-        params.results = new ArrayList<>(model.hashBucket[infoHash].results)
-        String key = events.first().getName() + Base64.encode(infoHash.getRoot())
-        mvcGroup.parentGroup.createMVCGroup("result-details", key, params)
-    }
-    
-    @ControllerAction
     void message() {
         Persona recipient = view.selectedSender()
         if (recipient == null)
@@ -260,5 +242,10 @@ class SearchTabController {
         model.filter = null
         model.filterResults2()
         view.clearSelections()
+    }
+    
+    @ControllerAction
+    void viewDetails() {
+        // TODO: implement
     }
 }

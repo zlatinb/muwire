@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.SharedFile
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
@@ -58,14 +59,17 @@ class SearchTabView {
     def lastSendersSortEvent
     JTable resultsTable, resultsTable2
     private JPanel resultsPanel
+    private JPanel detailsPanelBySender, detailsPanelByFile
     private ResultTree resultTree
             
     def lastSortEvent
-    def lastResults2SortEvent, lastSenders2SortEvent
+    def lastResults2SortEvent
     
     def sequentialDownloadCheckbox
     def sequentialDownloadCheckbox2
 
+    private Map<InfoHash, MVCGroup> resultDetails = [:]
+    
     void initUI() {
         int rowHeight = application.context.get("row-height")
         pane = builder.panel {
@@ -161,56 +165,58 @@ class SearchTabView {
                     }
                     panel (constraints : "grouped-by-file") {
                         gridLayout(rows : 1, cols : 1)
-                        panel {
-                            borderLayout()
-                            scrollPane(constraints : BorderLayout.CENTER) {
-                                resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                    tableModel(list : model.results2) {
-                                        closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].firstEvent()})
-                                        closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
-                                            model.hashBucket[it].getSize()
-                                        })
-                                        closureColumn(header : trans("DIRECT_SOURCES"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].sourceCount()
-                                        })
-                                        closureColumn(header : trans("POSSIBLE_SOURCES"), preferredWidth : 20, type : Integer , read : {
-                                            model.sourcesBucket[it].size()
-                                        })
-                                        closureColumn(header : trans("COMMENTS"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].commentCount()
-                                        })
-                                        closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].certificateCount()
-                                        })
-                                        closureColumn(header : trans("FEEDS"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].feedCount()
-                                        })
-                                        closureColumn(header : trans("CHAT_HOSTS"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].chatCount()
-                                        })
-                                        closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type : Integer, read : {
-                                            model.hashBucket[it].collectionsCount()
-                                        })
+                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT) {
+                            panel {
+                                borderLayout()
+                                scrollPane(constraints: BorderLayout.CENTER) {
+                                    resultsTable2 = table(id: "results-table2", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                        tableModel(list: model.results2) {
+                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { model.hashBucket[it].firstEvent() })
+                                            closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: {
+                                                model.hashBucket[it].getSize()
+                                            })
+                                            closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].sourceCount()
+                                            })
+                                            closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 20, type: Integer, read: {
+                                                model.sourcesBucket[it].size()
+                                            })
+                                            closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].commentCount()
+                                            })
+                                            closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].certificateCount()
+                                            })
+                                            closureColumn(header: trans("FEEDS"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].feedCount()
+                                            })
+                                            closureColumn(header: trans("CHAT_HOSTS"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].chatCount()
+                                            })
+                                            closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: {
+                                                model.hashBucket[it].collectionsCount()
+                                            })
+                                        }
+                                    }
+                                }
+                                panel(constraints: BorderLayout.SOUTH) {
+                                    gridLayout(rows: 1, cols: 2)
+                                    panel(border: etchedBorder()) {
+                                        button(text: trans("DOWNLOAD"), enabled: bind { model.downloadActionEnabled }, downloadAction)
+                                        label(text: trans("DOWNLOAD_SEQUENTIALLY"))
+                                        sequentialDownloadCheckbox2 = checkBox()
+                                    }
+                                    panel(border: etchedBorder()) {
+                                        def textField = new JTextField(15)
+                                        textField.addActionListener({ controller.filter() })
+                                        widget(id: "filter-field", textField)
+                                        button(text: trans("FILTER"), filterAction)
+                                        button(text: trans("CLEAR"), enabled: bind { model.clearFilterActionEnabled }, clearFilterAction)
                                     }
                                 }
                             }
-                            panel (constraints : BorderLayout.SOUTH) {
-                                gridLayout(rows :1, cols : 3)
-                                panel (border: etchedBorder()) {
-                                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
-                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"))
-                                    sequentialDownloadCheckbox2 = checkBox()
-                                }
-                                panel(border: etchedBorder()) {
-                                    button(text: trans("VIEW_DETAILS"), enabled: bind { model.viewDetailsActionEnabled }, viewDetailsAction)
-                                }
-                                panel (border: etchedBorder()) {
-                                    def textField = new JTextField(15)
-                                    textField.addActionListener({controller.filter()})
-                                    widget(id: "filter-field", textField)
-                                    button(text: trans("FILTER"), filterAction)
-                                    button(text: trans("CLEAR"), enabled: bind{model.clearFilterActionEnabled}, clearFilterAction)
-                                }
+                            detailsPanelByFile = panel {
+                                gridLayout(rows: 1, cols: 1)
                             }
                         }
                     }
@@ -395,22 +401,24 @@ class SearchTabView {
         selectionModel = resultsTable2.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
+            detailsPanelByFile.removeAll()
+            detailsPanelByFile.add(new JLabel(trans("SELECT_SINGLE_RESULT")))
             List<UIResultEvent> selectedResults = selectedResults()
             if (selectedResults.isEmpty()) {
-                showSelectSingleResult.call()
                 model.downloadActionEnabled = false
                 model.trustButtonsEnabled = false
                 model.browseActionEnabled = false
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
                 model.messageActionEnabled = false
-                model.viewDetailsActionEnabled = false
                 
                 return
             }
             
             model.downloadActionEnabled = true
-            model.viewDetailsActionEnabled = selectedResults.size() == 1
+            if (selectedResults.size() == 1) {
+                showResultDetailsByFile(selectedResults.first())
+            }
         })
         
         resultsTable2.addMouseListener(resultsMouseListener)
@@ -424,12 +432,38 @@ class SearchTabView {
             showSenderGrouping.call()
         }
     }
+    
+    private void showResultDetailsByFile(UIResultEvent event) {
+        detailsPanelByFile.removeAll()
+        InfoHash infoHash = event.infohash
+        
+        MVCGroup group = resultDetails[infoHash]
+        if (group == null) {
+            String mvcId = model.uuid + Base64.encode(infoHash.getRoot())
+            
+            List<UIResultEvent> allResults = new ArrayList<>(model.hashBucket[infoHash].getResults())
+            
+            def params = [:]
+            params.core = model.core
+            params.fileName = event.name
+            params.infoHash = infoHash
+            params.results = allResults
+            
+            group = mvcGroup.createMVCGroup("result-details", mvcId, params)
+            resultDetails[infoHash] = group
+        }
+        
+        detailsPanelByFile.add(group.view.p, null)
+        detailsPanelByFile.invalidate()
+        detailsPanelByFile.validate()
+    }
 
     def closeTab = {
         int index = parent.indexOfTab(searchTerms)
         parent.removeTabAt(index)
         model.trustButtonsEnabled = false
         model.downloadActionEnabled = false
+        resultDetails.values().each {it.destroy()}
         mvcGroup.destroy()
     }
 
@@ -606,14 +640,6 @@ class SearchTabView {
     def showTable = {
         model.treeVisible = false
         resultsPanel.getLayout().show(resultsPanel, "table")
-    }
-    
-    def showSelectSingleResult = {
-        senders2Panel.getLayout().show(senders2Panel, "select-single-result-message")
-    }
-    
-    def showSenderDetails = {
-        senders2Panel.getLayout().show(senders2Panel, "sender-details-table")
     }
     
     boolean sequentialDownload() {
