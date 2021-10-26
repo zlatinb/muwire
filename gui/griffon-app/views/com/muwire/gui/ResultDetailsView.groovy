@@ -1,11 +1,17 @@
 package com.muwire.gui
 
+import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
 
 import javax.annotation.Nonnull
+import javax.swing.JCheckBox
+import javax.swing.JPanel
+import javax.swing.JTabbedPane
+import javax.swing.JTable
+import javax.swing.ListSelectionModel
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 
@@ -21,7 +27,9 @@ class ResultDetailsView {
     
     def parent
     def p
-    
+    JTable sendersTable
+    JPanel senderDetailsPanel
+    JTabbedPane tabs
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -48,7 +56,7 @@ class ResultDetailsView {
                     borderLayout()
                     label(text: trans("RESULTS_CAME_FROM"), constraints: BorderLayout.NORTH)
                     scrollPane(constraints: BorderLayout.CENTER) {
-                        table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                        sendersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list: model.results) {
                                 closureColumn(header: trans("SENDER"), preferredWidth: 200, read : {it.sender.getHumanReadableName()})
                                 closureColumn(header: trans("NAME"), read : {HTMLSanitizer.sanitize(it.getFullPath())})
@@ -56,9 +64,13 @@ class ResultDetailsView {
                         }
                     }
                 }
-                
-                // fill up bottom space
-                panel(constraints: gbc(gridx: 0, gridy: gridy++, weighty: 100))
+                senderDetailsPanel = panel(constraints: gbc(gridx:0, gridy: gridy++, weightx: 100, weighty: 100, fill: GridBagConstraints.BOTH)) {
+                    cardLayout()
+                    panel(constraints: "select-sender"){
+                        label(text: trans("SELECT_SENDER"))
+                    }
+                    tabs = tabbedPane(constraints: "sender-details")
+                }
             }
         }
         
@@ -85,7 +97,41 @@ class ResultDetailsView {
         parent.setTabComponentAt(index, tabPanel)
         mainFrameGroup.view.showSearchWindow.call()
         
-        // TODO: other stuff.
+        def selectionModel = sendersTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int row = sendersTable.getSelectedRow()
+            if (row < 0) {
+                showSelectSender.call()
+                return
+            }
+            showTabbedPane.call()
+            tabs.removeAll()
+            row = sendersTable.rowSorter.convertRowIndexToModel(row)
+            UIResultEvent event = model.results[row]
+            
+            if (event.comment != null) {
+                def commentPanel = builder.panel {
+                    borderLayout()
+                    scrollPane(constraints: BorderLayout.CENTER) {
+                        textArea(text: event.comment, editable: false, lineWrap: true, wrapStyleWord : true)
+                    }
+                }
+                tabs.addTab(trans("COMMENT"),commentPanel)
+            }
+            if (event.certificates > 0) {
+                def certsPanel = builder.panel {
+                    label(text: "TODO fetch certs")
+                }
+                tabs.addTab(trans("CERTIFICATES"), certsPanel)
+            }
+            if (!event.collections.isEmpty()) {
+                def collectionsPanel = builder.panel {
+                    label(text: "TODO show collections")
+                }
+                tabs.addTab(trans("COLLECTIONS"), collectionsPanel)
+            }
+        })
     }
     
     def closeTab = {
@@ -95,5 +141,13 @@ class ResultDetailsView {
         int index = parent.indexOfTab(model.key)
         parent.removeTabAt(index)
         mvcGroup.destroy()
+    }
+    
+    def showTabbedPane = {
+        senderDetailsPanel.getLayout().show(senderDetailsPanel, "sender-details")
+    }
+    
+    def showSelectSender = {
+        senderDetailsPanel.getLayout().show(senderDetailsPanel, "select-sender")
     }
 }
