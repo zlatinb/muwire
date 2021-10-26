@@ -96,6 +96,8 @@ class MainFrameModel {
     def results = new ConcurrentHashMap<>()
     def browses = new ConcurrentHashSet<String>()
     def collections = new ConcurrentHashSet<String>()
+    def resultDetails = new ConcurrentHashSet<String>()
+    
     List<FileCollection> localCollections = Collections.synchronizedList(new ArrayList<>())
     List<SharedFile> collectionFiles = new ArrayList<>()
     def downloads = []

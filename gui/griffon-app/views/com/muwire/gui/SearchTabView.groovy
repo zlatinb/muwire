@@ -54,10 +54,10 @@ class SearchTabView {
     def pane
     def parent
     def searchTerms
-    JTable sendersTable, sendersTable2
+    JTable sendersTable
     def lastSendersSortEvent
     JTable resultsTable, resultsTable2
-    private JPanel resultsPanel, senders2Panel
+    private JPanel resultsPanel
     private ResultTree resultTree
             
     def lastSortEvent
@@ -153,9 +153,7 @@ class SearchTabView {
                                             selected : false, enabled : bind {model.downloadActionEnabled})
                                     }
                                     panel {
-                                        button(text: trans("VIEW_COMMENT"), enabled: bind { model.viewCommentActionEnabled }, constraints: gbc(gridx: 2, gridy: 0), showCommentAction)
-                                        button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, constraints: gbc(gridx: 3, gridy: 0), viewCertificatesAction)
-                                        button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, constraints: gbc(gridx: 4, gridy: 0), viewCollectionsAction)
+                                        button(text: trans("VIEW_DETAILS"), enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
                                     }
                                 }
                             }
@@ -163,108 +161,55 @@ class SearchTabView {
                     }
                     panel (constraints : "grouped-by-file") {
                         gridLayout(rows : 1, cols : 1)
-                        splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
-                            panel {
-                                borderLayout()
-                                scrollPane(constraints : BorderLayout.CENTER) {
-                                    resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                        tableModel(list : model.results2) {
-                                            closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].firstEvent()})
-                                            closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
-                                                model.hashBucket[it].getSize()
-                                            })
-                                            closureColumn(header : trans("DIRECT_SOURCES"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].sourceCount()
-                                            })
-                                            closureColumn(header : trans("POSSIBLE_SOURCES"), preferredWidth : 20, type : Integer , read : {
-                                                model.sourcesBucket[it].size()
-                                            })
-                                            closureColumn(header : trans("COMMENTS"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].commentCount()
-                                            })
-                                            closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].certificateCount()
-                                            })
-                                            closureColumn(header : trans("FEEDS"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].feedCount()
-                                            })
-                                            closureColumn(header : trans("CHAT_HOSTS"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].chatCount()
-                                            })
-                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type : Integer, read : {
-                                                model.hashBucket[it].collectionsCount()
-                                            })
-                                        }
-                                    }
-                                }
-                                panel (constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows :1, cols : 2)
-                                    panel (border: etchedBorder()) {
-                                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
-                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
-                                        sequentialDownloadCheckbox2 = checkBox()
-                                    }
-                                    panel (border: etchedBorder()) {
-                                        def textField = new JTextField(15)
-                                        textField.addActionListener({controller.filter()})
-                                        widget(id: "filter-field", textField)
-                                        button(text: trans("FILTER"), filterAction)
-                                        button(text: trans("CLEAR"), enabled: bind{model.clearFilterActionEnabled}, clearFilterAction)
+                        panel {
+                            borderLayout()
+                            scrollPane(constraints : BorderLayout.CENTER) {
+                                resultsTable2 = table(id : "results-table2", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                                    tableModel(list : model.results2) {
+                                        closureColumn(header : trans("NAME"), preferredWidth : 350, type : UIResultEvent, read : {model.hashBucket[it].firstEvent()})
+                                        closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {
+                                            model.hashBucket[it].getSize()
+                                        })
+                                        closureColumn(header : trans("DIRECT_SOURCES"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].sourceCount()
+                                        })
+                                        closureColumn(header : trans("POSSIBLE_SOURCES"), preferredWidth : 20, type : Integer , read : {
+                                            model.sourcesBucket[it].size()
+                                        })
+                                        closureColumn(header : trans("COMMENTS"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].commentCount()
+                                        })
+                                        closureColumn(header : trans("CERTIFICATES"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].certificateCount()
+                                        })
+                                        closureColumn(header : trans("FEEDS"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].feedCount()
+                                        })
+                                        closureColumn(header : trans("CHAT_HOSTS"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].chatCount()
+                                        })
+                                        closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type : Integer, read : {
+                                            model.hashBucket[it].collectionsCount()
+                                        })
                                     }
                                 }
                             }
-                            senders2Panel = panel {
-                                cardLayout()
-                                panel (constraints: "select-single-result-message"){
-                                    label(text: trans("SELECT_SINGLE_RESULT"))
+                            panel (constraints : BorderLayout.SOUTH) {
+                                gridLayout(rows :1, cols : 3)
+                                panel (border: etchedBorder()) {
+                                    button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, downloadAction)
+                                    label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                                    sequentialDownloadCheckbox2 = checkBox()
                                 }
-                                panel (constraints : "sender-details-table") {
-                                    borderLayout()
-                                    scrollPane(constraints: BorderLayout.CENTER) {
-                                        sendersTable2 = table(id: "senders-table2", autoCreateRowSorter: true, rowHeight: rowHeight) {
-                                            tableModel(list: model.senders2) {
-                                                closureColumn(header: trans("SENDER"), preferredWidth: 250, type: String, read: { it.sender.getHumanReadableName() })
-                                                closureColumn(header: trans("NAME"), preferredWidth: 250, type: UIResultEvent, read: { it })
-                                                closureColumn(header: trans("BROWSE"), preferredWidth: 10, type: Boolean, read: { it.browse })
-                                                closureColumn(header: trans("FEED"), preferredWidth: 10, type: Boolean, read: { it.feed })
-                                                closureColumn(header: trans("MESSAGES"), preferredWidth: 10, type: Boolean, read: { it.messages })
-                                                closureColumn(header: trans("CHAT"), preferredWidth: 10, type: Boolean, read: { it.chat })
-                                                closureColumn(header: trans("COMMENT"), preferredWidth: 10, type: Boolean, read: { it.comment != null })
-                                                closureColumn(header: trans("CERTIFICATES"), preferredWidth: 10, type: Integer, read: { it.certificates })
-                                                closureColumn(header: trans("COLLECTIONS"), preferredWidth: 10, type: Integer, read: { UIResultEvent row -> row.collections.size() })
-                                                closureColumn(header: trans("TRUST_NOUN"), preferredWidth: 50, type: String, read: {
-                                                    trans(model.core.trustService.getLevel(it.sender.destination).name())
-                                                })
-                                            }
-                                        }
-                                    }
-                                    panel (constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows : 1, cols : 5)
-                                    panel (border : etchedBorder()) {
-                                        gridLayout()
-                                        button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCommentActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), showCommentAction)
-                                        button(text: trans("SUBSCRIBE"), enabled: bind { model.subscribeActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), subscribeAction)
-                                    }
-                                        panel(border: etchedBorder()) {
-                                            gridBagLayout()
-                                            button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), viewCertificatesAction)
-                                            button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), viewCollectionsAction)
-                                        }
-                                        panel(border: etchedBorder()) {
-                                            gridBagLayout()
-                                            button(text: trans("BROWSE_HOST"), enabled: bind { model.browseActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), browseAction)
-                                            button(text: trans("BROWSE_COLLECTIONS"), enabled: bind { model.browseCollectionsActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), browseCollectionsAction)
-                                        }
-                                        panel(border: etchedBorder()) {
-                                            gridBagLayout()
-                                            button(text: trans("MESSAGE_VERB"), enabled: bind { model.messageActionEnabled }, constraints: gbc(gridx: 0, gridy: 0), messageAction)
-                                            button(text: trans("CHAT"), enabled: bind { model.chatActionEnabled }, constraints: gbc(gridx: 1, gridy: 0), chatAction)
-                                        }
-                                        panel(border: etchedBorder()) {
-                                            button(text: trans("ADD_CONTACT"), enabled: bind { model.trustButtonsEnabled }, trustAction)
-                                            button(text: trans("DISTRUST"), enabled: bind { model.trustButtonsEnabled }, distrustAction)
-                                        }
-                                    }
+                                panel(border: etchedBorder()) {
+                                    button(text: trans("VIEW_DETAILS"), enabled: bind { model.viewDetailsActionEnabled }, viewDetailsAction)
+                                }
+                                panel (border: etchedBorder()) {
+                                    def textField = new JTextField(15)
+                                    textField.addActionListener({controller.filter()})
+                                    widget(id: "filter-field", textField)
+                                    button(text: trans("FILTER"), filterAction)
+                                    button(text: trans("CLEAR"), enabled: bind{model.clearFilterActionEnabled}, clearFilterAction)
                                 }
                             }
                         }
@@ -281,26 +226,6 @@ class SearchTabView {
         this.pane.putClientProperty("mvc-group", mvcGroup)
         this.pane.putClientProperty("results-table",resultsTable)
 
-        def selectionModel = resultsTable.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-        selectionModel.addListSelectionListener( {
-            int[] rows = resultsTable.getSelectedRows()
-            if (rows.length == 0) {
-                model.downloadActionEnabled = false
-                return
-            }
-            if (lastSortEvent != null) {
-                for (int i = 0; i < rows.length; i ++) {
-                    rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
-                }
-            }
-            boolean downloadActionEnabled = true
-            rows.each { 
-                downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
-            }
-            model.downloadActionEnabled = downloadActionEnabled
-        })
-        
         pane.putClientProperty("focusListener", new FocusListener())
     }
 
@@ -367,9 +292,7 @@ class SearchTabView {
         resultTree.addMouseListener(resultsMouseListener)
         resultTree.addTreeSelectionListener {
             model.downloadActionEnabled = false
-            model.viewCommentActionEnabled = false
-            model.viewCollectionsActionEnabled = false
-            model.viewCertificatesActionEnabled = false
+            model.viewDetailsActionEnabled = false
             TreePath [] selected = resultTree.selectionModel.getSelectionPaths()
             if (selected == null || selected.length == 0)
                 return
@@ -377,9 +300,7 @@ class SearchTabView {
             model.downloadActionEnabled = true
             UIResultEvent result = resultTree.singleResultSelected()
             if (result != null) {
-                model.viewCommentActionEnabled = result.comment != null
-                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
-                model.viewCertificatesActionEnabled = result.certificates > 0
+                model.viewDetailsActionEnabled = true
             }
         }
         
@@ -398,23 +319,29 @@ class SearchTabView {
         resultsTable.rowSorter.setComparator(0, new UIResultEventComparator(false))
 
         resultsTable.addMouseListener(resultsMouseListener)
-        
-        resultsTable.getSelectionModel().addListSelectionListener({
-            model.viewCommentActionEnabled = false
-            model.viewCertificatesActionEnabled = false
-            model.subscribeActionEnabled = false
-            model.viewCollectionsActionEnabled = false
-            def results = selectedResults()
-            if (results.isEmpty())
+
+
+        def selectionModel = resultsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
+        selectionModel.addListSelectionListener( {
+            int[] rows = resultsTable.getSelectedRows()
+            if (rows.length == 0) {
+                model.downloadActionEnabled = false
+                model.viewDetailsActionEnabled = false
                 return
-            
-            model.subscribeActionEnabled = true
-            if (results.size() == 1) {
-                def result = results.first()
-                model.viewCommentActionEnabled = result.comment != null
-                model.viewCertificatesActionEnabled = result.certificates > 0
-                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
-            } 
+            }
+            model.viewDetailsActionEnabled = rows.length == 1
+
+            if (lastSortEvent != null) {
+                for (int i = 0; i < rows.length; i ++) {
+                    rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
+                }
+            }
+            boolean downloadActionEnabled = true
+            rows.each {
+                downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
+            }
+            model.downloadActionEnabled = downloadActionEnabled
         })
         
         // senders table
@@ -422,7 +349,7 @@ class SearchTabView {
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
-        def selectionModel = sendersTable.getSelectionModel()
+        selectionModel = sendersTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
             int row = selectedSenderRow()
@@ -477,66 +404,18 @@ class SearchTabView {
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
                 model.messageActionEnabled = false
-                model.viewCertificatesActionEnabled = false
-                model.viewCollectionsActionEnabled = false
+                model.viewDetailsActionEnabled = false
+                
                 return
             }
             
             model.downloadActionEnabled = true
-            
-            if (selectedResults.size() > 1) {
-                showSelectSingleResult.call()
-                return
-            }
-            
-            showSenderDetails.call()
-            UIResultEvent e = selectedResults.get(0)
-            def results = model.hashBucket[e.infohash].getResults()
-            model.senders2.clear()
-            model.senders2.addAll(results)
-            int selectedRow = sendersTable2.getSelectedRow()
-            sendersTable2.model.fireTableDataChanged()
-            if (selectedRow < results.size())
-                sendersTable2.selectionModel.setSelectionInterval(selectedRow,selectedRow)
+            model.viewDetailsActionEnabled = selectedResults.size() == 1
         })
         
         resultsTable2.addMouseListener(resultsMouseListener)
         
-        // senders table 2
-        sendersTable2.addMouseListener(sendersMouseListener)
-        sendersTable2.setDefaultRenderer(Integer.class, centerRenderer)
-        sendersTable2.setDefaultRenderer(UIResultEvent.class, 
-                new ResultNameTableCellRenderer(model.core.fileManager::isShared, true))
-        sendersTable2.rowSorter.addRowSorterListener({ evt -> lastSenders2SortEvent = evt})
-        sendersTable2.rowSorter.setSortsOnUpdates(true)
-        sendersTable2.rowSorter.setComparator(1, new UIResultEventComparator(true))
-        selectionModel = sendersTable2.getSelectionModel()
-        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-        selectionModel.addListSelectionListener({
-            int row = selectedSenderRow()
-            if (row < 0 || model.senders2[row] == null) {
-                model.browseActionEnabled = false
-                model.browseCollectionsActionEnabled = false
-                model.chatActionEnabled = false
-                model.messageActionEnabled = false
-                model.subscribeActionEnabled = false
-                model.viewCertificatesActionEnabled = false
-                model.viewCollectionsActionEnabled = false
-                model.trustButtonsEnabled = false
-                model.viewCommentActionEnabled = false
-                return
-            }
-            UIResultEvent e = model.senders2[row]
-            model.browseActionEnabled = e.browse
-            model.browseCollectionsActionEnabled = e.browseCollections
-            model.chatActionEnabled = e.chat
-            model.messageActionEnabled = e.messages
-            model.subscribeActionEnabled = e.feed && model.core.feedManager.getFeed(e.getSender()) == null 
-            model.trustButtonsEnabled = true
-            model.viewCommentActionEnabled = e.comment != null
-            model.viewCertificatesActionEnabled = e.certificates > 0
-            model.viewCollectionsActionEnabled = !e.collections.isEmpty()
-        })
+        
        
         showTree.call()
         if (settings.groupByFile) {
@@ -582,26 +461,9 @@ class SearchTabView {
             menu.add(copyNameToClipboard)
             showMenu = true
             
-            // show comment if any
-            if (model.viewCommentActionEnabled) {
-                JMenuItem showComment = new JMenuItem(trans("VIEW_COMMENT"))
-                showComment.addActionListener({mvcGroup.controller.showComment()})
-                menu.add(showComment)
-            }
-            
-            // view certificates if any
-            if (model.viewCertificatesActionEnabled) {
-                JMenuItem viewCerts = new JMenuItem(trans("VIEW_CERTIFICATES"))
-                viewCerts.addActionListener({mvcGroup.controller.viewCertificates()})
-                menu.add(viewCerts)
-            }
-            
-            // view collections if any
-            if (model.viewCollectionsActionEnabled) {
-                JMenuItem viewCols = new JMenuItem(trans("VIEW_COLLECTIONS"))
-                viewCols.addActionListener({mvcGroup.controller.viewCollections()})
-                menu.add(viewCols)
-            }
+            JMenuItem showDetails = new JMenuItem(trans("VIEW_DETAILS"))
+            showDetails.addActionListener({controller.viewDetails()})
+            menu.add(showDetails)
         }
         if (showMenu)
             menu.show(e.getComponent(), e.getX(), e.getY())
@@ -614,18 +476,7 @@ class SearchTabView {
         if (lastResults2SortEvent != null)
             selectedRow = resultsTable2.rowSorter.convertRowIndexToModel(selectedRow)
         InfoHash infohash = model.results2[selectedRow]
-        
-        Persona sender = selectedSender()
-        if (sender == null) // really shouldn't happen
-            return model.hashBucket[infohash].firstEvent()
-        
-        for (UIResultEvent candidate : model.hashBucket[infohash].getResults()) {
-            if (candidate.sender == sender)
-                return candidate
-        }
-        
-        // also shouldn't happen
-        return model.hashBucket[infohash].firstEvent()
+        model.hashBucket[infohash].firstEvent()
     }
     
     List<UIResultEvent> selectedResults() {
@@ -714,12 +565,7 @@ class SearchTabView {
     
     int selectedSenderRow() {
         if (model.groupedByFile) {
-            int row = sendersTable2.getSelectedRow()
-            if (row < 0)
-                return row
-            if (lastSenders2SortEvent != null) 
-                row = sendersTable2.rowSorter.convertRowIndexToModel(row)
-            return row
+            return -1
         } else {
             int row = sendersTable.getSelectedRow()
             if (row < 0)
