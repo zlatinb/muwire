@@ -35,6 +35,8 @@ class CollectionTabModel {
     UUID uuid
     boolean everything
     
+    List<FileCollection> preFetchedCollections
+    
     List<FileCollection> collections = new ArrayList<>()
     List<FileCollectionItem> items = new ArrayList<>()
     TreeModel fileTreeModel
@@ -53,15 +55,24 @@ class CollectionTabModel {
     void mvcGroupInit(Map<String,String> args) {
         root = new DefaultMutableTreeNode()
         fileTreeModel = new DefaultTreeModel(root)
-        eventBus.with {
-            register(CollectionFetchStatusEvent.class, this) 
-            register(CollectionFetchedEvent.class, this)
-            publish(new UICollectionFetchEvent(uuid : uuid, host : host, infoHashes : infoHashes, everything : everything))
+        if (preFetchedCollections == null) {
+            eventBus.with {
+                register(CollectionFetchStatusEvent.class, this)
+                register(CollectionFetchedEvent.class, this)
+                publish(new UICollectionFetchEvent(uuid : uuid, host : host, infoHashes : infoHashes, everything : everything))
+            }
+        } else {
+            collections.addAll(preFetchedCollections)
+            totalCollections = collections.size()
+            status = CollectionFetchStatus.FINISHED
         }
     }
     
     void mvcGroupDestroy() {
-        eventBus.unregister(CollectionFetchedEvent.class, this)
+        if (preFetchedCollections == null) {
+            eventBus.unregister(CollectionFetchedEvent.class, this)
+            eventBus.unregister(CollectionFetchStatusEvent.class)
+        }
     }
     
     void onCollectionFetchStatusEvent(CollectionFetchStatusEvent e) {

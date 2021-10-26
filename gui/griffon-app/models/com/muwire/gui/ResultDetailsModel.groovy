@@ -4,7 +4,11 @@ import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
+import com.muwire.core.collections.CollectionFetchStatus
+import com.muwire.core.collections.CollectionFetchStatusEvent
+import com.muwire.core.collections.CollectionFetchedEvent
 import com.muwire.core.collections.FileCollection
+import com.muwire.core.collections.UICollectionFetchEvent
 import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateFetchEvent
 import com.muwire.core.filecert.CertificateFetchStatus
@@ -19,6 +23,7 @@ import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 import javax.swing.table.DefaultTableModel
+import java.util.stream.Collectors
 
 @ArtifactProviderFor(GriffonModel)
 class ResultDetailsModel {
@@ -38,7 +43,8 @@ class ResultDetailsModel {
     List<SharedFile> localFiles
     
     Map<Persona, CertsModel> certificates
-    Map<Persona, List<FileCollection>> collections
+    Map<Persona, UUID> collectionFetches
+    Map<UUID, CollectionsModel> collections
     
     private boolean registeredForCertificates, registeredForCollections
     
@@ -51,6 +57,7 @@ class ResultDetailsModel {
             localFiles = Arrays.asList(locals)
         
         certificates = new HashMap<>()
+        collectionFetches = new HashMap<>()
         collections = new HashMap<>()
     }
     
@@ -59,13 +66,54 @@ class ResultDetailsModel {
             core.eventBus.unregister(CertificateFetchEvent.class, this)
             core.eventBus.unregister(CertificateFetchedEvent.class, this)
         }
+        if (registeredForCollections) {
+            core.eventBus.unregister(CollectionFetchedEvent.class, this)
+            core.eventBus.unregister(CollectionFetchStatusEvent.class, this)
+        }
     }
     
-    void registerForCollections(Persona sender) {
-        if (registeredForCollections)
-            return
-        registeredForCollections = true
-        // TODO: finish
+    CollectionsModel registerForCollections(Persona sender) {
+        if (collections.containsKey(sender))
+            return null
+        if (!registeredForCollections) {
+            registeredForCollections = true
+            core.eventBus.with {
+                register(CollectionFetchStatusEvent.class, this)
+                register(CollectionFetchedEvent.class, this)
+            }
+        }
+        UUID uuid = UUID.randomUUID()
+        collectionFetches.put(sender, uuid)
+        def rv = new CollectionsModel()
+        collections.put(uuid, rv)
+        
+        Set<InfoHash> infoHashes = results.stream().filter({it.sender == sender}).
+            flatMap({it.collections.stream()}).collect(Collectors.toSet())
+        UICollectionFetchEvent event = new UICollectionFetchEvent(uuid: uuid, host: sender, infoHashes: infoHashes)
+        core.eventBus.publish(event)
+        rv
+    }
+    
+    void onCollectionFetchStatusEvent(CollectionFetchStatusEvent event) {
+        runInsideUIAsync {
+            def model = collections[event.uuid]
+            if (model == null)
+                return
+            model.status = event.status
+            if (event.status == CollectionFetchStatus.FETCHING)
+                model.count = event.count
+            view.refreshCollections()
+        }
+    }
+    
+    void onCollectionFetchedEvent(CollectionFetchedEvent event) {
+        runInsideUIAsync {
+            def model = collections[event.uuid]
+            if (model == null)
+                return
+            model.collections << event.collection
+            view.refreshCollections()
+        }
     }
     
     CertsModel registerForCertificates(Persona persona) {
@@ -114,5 +162,11 @@ class ResultDetailsModel {
         CertificateFetchStatus status
         int count
         final List<Certificate> certificates = new ArrayList<>()
+    }
+    
+    static class CollectionsModel {
+        CollectionFetchStatus status
+        int count
+        final List<FileCollection> collections = new ArrayList<>()
     }
 }
