@@ -1,14 +1,18 @@
 package com.muwire.gui
 
+import com.muwire.core.filecert.Certificate
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.ResultDetailsModel.CertsModel
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.DataHelper
 
 import javax.annotation.Nonnull
-import javax.swing.JCheckBox
+import javax.swing.JButton
+import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
@@ -30,6 +34,8 @@ class ResultDetailsView {
     JTable sendersTable
     JPanel senderDetailsPanel
     JTabbedPane tabs
+    
+    List<CertsPanel> certsPanelList = []
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -120,8 +126,28 @@ class ResultDetailsView {
                 tabs.addTab(trans("COMMENT"),commentPanel)
             }
             if (event.certificates > 0) {
-                def certsPanel = builder.panel {
-                    label(text: "TODO fetch certs")
+                def certsPanel
+                if (model.certificates.containsKey(event.sender)) {
+                    certsPanel = new CertsPanel(model.certificates[event.sender])
+                    certsPanel.setPreferredSize(tabs.getPreferredSize())
+                    certsPanel.refresh()
+                } else {
+                    certsPanel = builder.panel {
+                        cardLayout()
+                        panel(constraints: "fetch-certificates") {
+                            label(text: trans("SENDER_HAS_CERTIFICATES", event.certificates))
+                            JButton fetchButton = button(text : trans("VIEW_CERTIFICATES"))
+                            fetchButton.addActionListener( {
+                                def certsModel = model.registerForCertificates(event.sender)
+                                def newCertsPanel = new CertsPanel(certsModel)
+                                certsPanelList << newCertsPanel
+                                newCertsPanel.setPreferredSize(certsPanel.getPreferredSize())
+                                certsPanel.add(newCertsPanel, "view-certificates")
+                                certsPanel.getLayout().last(certsPanel)
+                                newCertsPanel.refresh()
+                            })
+                        }
+                    }
                 }
                 tabs.addTab(trans("CERTIFICATES"), certsPanel)
             }
@@ -149,5 +175,37 @@ class ResultDetailsView {
     
     def showSelectSender = {
         senderDetailsPanel.getLayout().show(senderDetailsPanel, "select-sender")
+    }
+    
+    void refreshCertificates() {
+        certsPanelList.each {it.refresh()}
+    }
+    
+    private class CertsPanel extends JPanel {
+        private final ResultDetailsModel.CertsModel model
+        private final JLabel statusLabel
+        private JTable certsTable
+        CertsPanel(ResultDetailsModel.CertsModel model) {
+            this.model = model
+            setLayout(new BorderLayout())
+            statusLabel = new JLabel()
+            add(statusLabel, BorderLayout.NORTH)
+
+            JScrollPane scrollPane = builder.scrollPane {
+                certsTable = builder.table {
+                    tableModel(list: model.certificates) {
+                        closureColumn(header: trans("NAME"), read: { Certificate c -> c.name.name })
+                    }
+                }
+            }
+            
+            add(scrollPane, BorderLayout.CENTER)
+        }
+        
+        void refresh() {
+            if (model.status != null)
+                statusLabel.setText(trans(model.status.name()))
+            certsTable.model.fireTableDataChanged()
+        }
     }
 }

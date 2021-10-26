@@ -5,5 +5,5 @@ import griffon.metadata.ArtifactProviderFor
 
 @ArtifactProviderFor(GriffonController)
 class ResultDetailsController {
-    
+ 
 }
