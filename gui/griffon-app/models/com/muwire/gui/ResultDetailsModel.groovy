@@ -14,6 +14,7 @@ import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import griffon.transform.Observable
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
@@ -24,6 +25,9 @@ class ResultDetailsModel {
     
     @MVCMember @Nonnull
     ResultDetailsView view
+    
+    @Observable boolean browseActionEnabled
+    @Observable boolean copyIdActionEnabled
 
     Core core
     String fileName
