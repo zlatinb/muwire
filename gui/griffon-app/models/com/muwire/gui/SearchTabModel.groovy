@@ -32,6 +32,7 @@ class SearchTabModel {
     @Observable boolean chatActionEnabled
     @Observable boolean subscribeActionEnabled
     @Observable boolean messageActionEnabled
+    @Observable boolean viewDetailsActionEnabled
     @Observable boolean groupedByFile
     
 

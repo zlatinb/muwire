@@ -503,9 +503,11 @@ class SearchTabView {
             menu.add(copyNameToClipboard)
             showMenu = true
             
-            JMenuItem showDetails = new JMenuItem(trans("VIEW_DETAILS"))
-            showDetails.addActionListener({controller.viewDetails()})
-            menu.add(showDetails)
+            if (!model.groupedByFile) {
+                JMenuItem showDetails = new JMenuItem(trans("VIEW_DETAILS"))
+                showDetails.addActionListener({ controller.viewDetails() })
+                menu.add(showDetails)
+            }
         }
         if (showMenu)
             menu.show(e.getComponent(), e.getX(), e.getY())
