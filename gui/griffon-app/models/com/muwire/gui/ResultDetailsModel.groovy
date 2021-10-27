@@ -39,7 +39,6 @@ class ResultDetailsModel {
     List<UIResultEvent> results
 
     String key
-    List<SharedFile> localFiles
     
     private final Set<UIResultEvent> uniqueResults = new HashSet<>()
     List<UIResultEvent> resultsWithComments = []
@@ -55,11 +54,6 @@ class ResultDetailsModel {
     
     void mvcGroupInit(Map<String,String> args) {
         key = fileName + Base64.encode(infoHash.getRoot())
-        SharedFile[] locals = core.fileManager.getSharedFiles(infoHash.getRoot())
-        if (locals == null)
-            localFiles = Collections.emptyList()
-        else
-            localFiles = Arrays.asList(locals)
         
         certificates = new HashMap<>()
         collectionFetches = new HashMap<>()
@@ -85,6 +79,13 @@ class ResultDetailsModel {
             core.eventBus.unregister(CollectionFetchedEvent.class, this)
             core.eventBus.unregister(CollectionFetchStatusEvent.class, this)
         }
+    }
+ 
+    List<String> getLocalCopies() {
+        SharedFile[] sharedFiles = core.fileManager.getSharedFiles(infoHash.getRoot())
+        if (sharedFiles == null || sharedFiles.length == 0)
+            return null
+        sharedFiles.collect {it.getCachedPath()}
     }
     
     void addResult(UIResultEvent event) {
@@ -196,13 +197,5 @@ class ResultDetailsModel {
         CollectionFetchStatus status
         int count
         final List<FileCollection> collections = new ArrayList<>()
-    }
-    
-    boolean hasComments() {
-        for (UIResultEvent event : results) {
-            if (event.comment != null)
-                return true
-        }
-        false
     }
 }

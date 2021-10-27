@@ -457,6 +457,7 @@ class SearchTabView {
             resultDetails[infoHash] = group
         }
         
+        group.view.buildTabs()
         detailsPanelByFile.add(group.view.p, null)
         detailsPanelByFile.updateUI()
     }

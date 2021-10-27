@@ -42,8 +42,10 @@ class ResultDetailsView {
     int rowHeight
     
     JTabbedPane tabs
+    
+    JPanel sendersPanel
     JTable sendersTable
-
+    
     JPanel commentsPanel
     JList<UIResultEvent> commentsList
     JTextArea commentTextArea
@@ -59,7 +61,7 @@ class ResultDetailsView {
             tabs = tabbedPane(constraints: BorderLayout.CENTER)
         }
         
-        JPanel sendersPanel = builder.panel {
+        sendersPanel = builder.panel {
             borderLayout()
             panel(constraints: BorderLayout.NORTH) {
                 label(text: trans("RESULTS_CAME_FROM"))
@@ -83,20 +85,6 @@ class ResultDetailsView {
                 button(text: trans("COPY_FULL_ID"), enabled: bind {model.copyIdActionEnabled}, copyIdAction)
             }
         }
-        tabs.addTab(trans("SENDERS"), sendersPanel)
-        
-        if (!model.localFiles.isEmpty()) {
-            JPanel localCopies = builder.panel {
-                borderLayout()
-                panel(constraints: BorderLayout.NORTH) {
-                    label(text: trans("YOU_ALREADY_HAVE_FILE", model.localFiles.size()))
-                }
-                scrollPane(constraints: BorderLayout.CENTER) {
-                    list(items : model.localFiles.collect {it.getCachedPath()})
-                }
-            }
-            tabs.addTab(trans("LOCAL_COPIES"), localCopies)
-        }
         
         commentsPanel = builder.panel {
             cardLayout()
@@ -115,7 +103,31 @@ class ResultDetailsView {
                 }
             }
         }
-        tabs.addTab(trans("COMMENTS"), commentsPanel)
+    }
+    
+    private JPanel buildLocalCopies() {
+        List<String> localCopies = model.getLocalCopies()
+        if (localCopies == null)
+            return null
+        builder.panel {
+            borderLayout()
+            panel(constraints: BorderLayout.NORTH) {
+                label(text: trans("YOU_ALREADY_HAVE_FILE", localCopies.size()))
+            }
+            scrollPane(constraints: BorderLayout.CENTER) {
+                list(items : localCopies)
+            }
+        }
+    }
+    
+    void buildTabs() {
+        tabs.removeAll()
+        tabs.addTab(trans("SENDERS"), sendersPanel)
+        JPanel localCopies = buildLocalCopies()
+        if (localCopies != null)
+            tabs.addTab(trans("LOCAL_COPIES"), localCopies)
+        if (!model.resultsWithComments.isEmpty())
+            tabs.addTab(trans("COMMENTS"), commentsPanel)
     }
     
     void mvcGroupInit(Map<String,String> args) {
@@ -165,6 +177,9 @@ class ResultDetailsView {
             commentsPanel.getLayout().show(commentsPanel,"yes-comments")
             commentsList.setListData(model.resultsWithComments.toArray(new UIResultEvent[0]))
         }
+        
+        buildTabs()
+        p.updateUI()
     }
     
     void refreshCertificates() {
