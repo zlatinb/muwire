@@ -9,11 +9,8 @@ import com.muwire.core.collections.CollectionFetchStatusEvent
 import com.muwire.core.collections.CollectionFetchedEvent
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.UICollectionFetchEvent
-import com.muwire.core.filecert.Certificate
 import com.muwire.core.filecert.CertificateFetchEvent
-import com.muwire.core.filecert.CertificateFetchStatus
 import com.muwire.core.filecert.CertificateFetchedEvent
-import com.muwire.core.filecert.UIFetchCertificatesEvent
 import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
@@ -46,7 +43,6 @@ class ResultDetailsModel {
     List<UIResultEvent> resultsWithCollections = []
     
     
-    Map<Persona, CertsModel> certificates
     Map<Persona, UUID> collectionFetches
     Map<UUID, CollectionsModel> collections
     
@@ -55,7 +51,6 @@ class ResultDetailsModel {
     void mvcGroupInit(Map<String,String> args) {
         key = fileName + Base64.encode(infoHash.getRoot())
         
-        certificates = new HashMap<>()
         collectionFetches = new HashMap<>()
         collections = new HashMap<>()
         
@@ -98,6 +93,7 @@ class ResultDetailsModel {
             resultsWithCertificates << event
         if (event.collections.size() > 0)
             resultsWithCollections << event
+        view.addResultToListGroups(event)
         view.refreshAll()
     }
     
@@ -143,54 +139,6 @@ class ResultDetailsModel {
             model.collections << event.collection
             view.refreshCollections()
         }
-    }
-    
-    CertsModel registerForCertificates(Persona persona) {
-        if (certificates.containsKey(persona))
-            return null
-        if (!registeredForCertificates) {
-            registeredForCertificates = true
-            core.eventBus.with {
-                register(CertificateFetchEvent.class, this)
-                register(CertificateFetchedEvent.class, this)
-            }
-        }
-        def rv = new CertsModel()
-        certificates.put(persona, rv)
-        core.eventBus.publish(new UIFetchCertificatesEvent(host: persona, infoHash: infoHash))
-        return rv
-    }
-    
-    void onCertificateFetchEvent(CertificateFetchEvent event) {
-        if (event.infoHash != infoHash)
-            return
-        runInsideUIAsync {
-            CertsModel model = certificates.get(event.user)
-            if (model == null)
-                return
-            model.status = event.status
-            if (event.status == CertificateFetchStatus.FETCHING)
-                model.count = event.count
-            view.refreshCertificates()
-        }
-    }
-    
-    void onCertificateFetchedEvent(CertificateFetchedEvent event) {
-        if (event.infoHash != infoHash)
-            return
-        runInsideUIAsync {
-            CertsModel model = certificates.get(event.user)
-            if (model == null)
-                return
-            model.certificates << event.certificate
-            view.refreshCertificates()
-        }
-    }
-    
-    static class CertsModel {
-        CertificateFetchStatus status
-        int count
-        final List<Certificate> certificates = new ArrayList<>()
     }
     
     static class CollectionsModel {

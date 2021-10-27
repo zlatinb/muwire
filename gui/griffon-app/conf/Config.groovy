@@ -193,4 +193,14 @@ mvcGroups {
         view = 'com.muwire.gui.ResultDetailsView'
         controller = 'com.muwire.gui.ResultDetailsController'
     }
+    'certificate-tab' {
+        model = 'com.muwire.gui.resultdetails.CertificateTabModel'
+        view = 'com.muwire.gui.resultdetails.CertificateTabView'
+        controller = 'com.muwire.gui.resultdetails.CertificateTabController'
+    }
+    'certificate-list' {
+        model = 'com.muwire.gui.resultdetails.CertificateListModel'
+        view = 'com.muwire.gui.resultdetails.CertificateListView'
+        controller = 'com.muwire.gui.resultdetails.CertificateListController'
+    }
 }

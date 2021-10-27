@@ -2,31 +2,26 @@ package com.muwire.gui
 
 import com.muwire.core.Persona
 import com.muwire.core.collections.FileCollection
-import com.muwire.core.filecert.Certificate
-import com.muwire.core.filecert.UIImportCertificateEvent
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.resultdetails.ResultListCellRenderer
 import griffon.core.artifact.GriffonView
+import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import net.i2p.data.DataHelper
+import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JList
-import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
 import javax.swing.JTextArea
-import javax.swing.ListCellRenderer
 import javax.swing.ListSelectionModel
-import javax.swing.border.Border
 import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.GridBagConstraints
 
 import static com.muwire.gui.Translator.trans
 
@@ -49,8 +44,9 @@ class ResultDetailsView {
     JPanel commentsPanel
     JList<UIResultEvent> commentsList
     JTextArea commentTextArea
+
+    private MVCGroup certificateListGroup
     
-    Map<Persona, CertsPanel> certsPanelMap = [:]
     Map<Persona, CollectionsPanel> collectionsPanelMap = [:]
     
     void initUI() {
@@ -123,7 +119,19 @@ class ResultDetailsView {
         }
     }
     
-    void buildTabs() {
+    private JPanel buildCertificates() {
+        if (certificateListGroup == null) {
+            String mvcId = model.fileName + "_" + Base64.encode(model.infoHash.getRoot())
+            def params = [:]
+            params.core = model.core
+            params.results = new ArrayList<>(model.resultsWithCertificates)
+            certificateListGroup = mvcGroup.createMVCGroup("certificate-list", mvcId, params)
+        }
+        certificateListGroup.view.p
+    }
+    
+    private void buildTabs() {
+        def selected = tabs.getSelectedComponent()
         tabs.removeAll()
         tabs.addTab(trans("SENDERS"), sendersPanel)
         JPanel localCopies = buildLocalCopies()
@@ -131,6 +139,11 @@ class ResultDetailsView {
             tabs.addTab(trans("LOCAL_COPIES"), localCopies)
         if (!model.resultsWithComments.isEmpty())
             tabs.addTab(trans("COMMENTS"), commentsPanel)
+        if (!model.resultsWithCertificates.isEmpty())
+            tabs.addTab(trans("CERTIFICATES"), buildCertificates())
+        
+        if (selected != null)
+            tabs.setSelectedComponent(selected)
     }
     
     void mvcGroupInit(Map<String,String> args) {
@@ -156,7 +169,7 @@ class ResultDetailsView {
         // comments tab
         if (!model.resultsWithComments.isEmpty())
             commentsPanel.getLayout().show(commentsPanel, "yes-comments")
-        commentsList.setCellRenderer(new ResultCellRenderer())
+        commentsList.setCellRenderer(new ResultListCellRenderer())
         selectionModel = commentsList.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
@@ -166,12 +179,20 @@ class ResultDetailsView {
         })
     }
     
+    void mvcGroupDestroy() {
+        certificateListGroup?.destroy()
+    }
+    
     Persona selectedSender() {
         int row = sendersTable.getSelectedRow()
         if (row < 0)
             return null
         row = sendersTable.rowSorter.convertRowIndexToModel(row)
         model.results[row].sender
+    }
+    
+    void addResultToListGroups(UIResultEvent event) {
+        certificateListGroup?.model?.addResult(event)
     }
     
     void refreshAll() {
@@ -185,111 +206,8 @@ class ResultDetailsView {
         p.updateUI()
     }
     
-    void refreshCertificates() {
-        certsPanelMap[selectedSender()]?.refresh()
-    }
-    
     void refreshCollections() {
         collectionsPanelMap[selectedSender()]?.refresh()
-    }
-    
-    private class CertsPanel extends JPanel {
-        private final ResultDetailsModel.CertsModel certsModel
-        private final JLabel statusLabel, countLabel
-        private JTable certsTable
-        private JButton importButton, viewCommentButton
-        CertsPanel(ResultDetailsModel.CertsModel certsModel) {
-            this.certsModel = certsModel
-            setLayout(new BorderLayout())
-            def labelPanel = new JPanel()
-            statusLabel = new JLabel()
-            countLabel = new JLabel()
-            labelPanel.add(statusLabel)
-            labelPanel.add(countLabel)
-            add(labelPanel, BorderLayout.NORTH)
-
-            JScrollPane scrollPane = builder.scrollPane {
-                certsTable = builder.table(autoCreateRowSorter: true, rowHeight: rowHeight) {
-                    tableModel(list: certsModel.certificates) {
-                        closureColumn(header: trans("ISSUER"), preferredWidth: 150, type:String, 
-                                read:{it.issuer.getHumanReadableName()})
-                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, 
-                                read:{trans(model.core.trustService.getLevel(it.issuer.destination).name())})
-                        closureColumn(header: trans("NAME"), preferredWidth: 450, 
-                                read: { Certificate c -> HTMLSanitizer.sanitize(c.name.name) })
-                        closureColumn(header: trans("ISSUED"), preferredWidth: 50, type: Long, 
-                                read : {it.timestamp})
-                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, 
-                                read: {it.comment != null})
-                    }
-                }
-            }
-            add(scrollPane, BorderLayout.CENTER)
-            
-            JPanel buttonPanel = builder.panel {
-                importButton = button(text: trans("IMPORT"))
-                viewCommentButton = button(text : trans("VIEW_COMMENT"))
-            }
-            add(buttonPanel, BorderLayout.SOUTH)
-            
-            certsTable.setDefaultRenderer(Long.class, new DateRenderer())
-            certsTable.rowSorter.setSortsOnUpdates(true)
-            def selectionModel = certsTable.getSelectionModel()
-            selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-            selectionModel.addListSelectionListener({
-                int [] rows = certsTable.getSelectedRows()
-                importButton.setEnabled(rows.length > 0)
-                viewCommentButton.setEnabled(false)
-                if (rows.length == 1) {
-                    rows[0] = certsTable.rowSorter.convertRowIndexToModel(rows[0])
-                    viewCommentButton.setEnabled(certsModel.certificates[rows[0]].comment != null)
-                }
-            })
-            
-            importButton.addActionListener({importCerts()})
-            viewCommentButton.addActionListener({showComment()})
-        }
-        
-        void refresh() {
-            if (certsModel.status != null) {
-                statusLabel.setText(trans(certsModel.status.name()))
-                if (certsModel.count > 0)
-                    countLabel.setText("${certsModel.certificates.size()}/${certsModel.count}")
-            }
-            certsTable.model.fireTableDataChanged()
-        }
-        
-        private List<Certificate> selectedCertificates() {
-            int[] rows = certsTable.getSelectedRows()
-            if (rows.length == 0)
-                return Collections.emptyList()
-            for (int i = 0; i < rows.length; i++) {
-                rows[i] = certsTable.rowSorter.convertRowIndexToModel(rows[i])
-            }
-            List<Certificate> rv = []
-            for (int i : rows)
-                rv << certsModel.certificates[i]
-            rv
-        }
-        
-        void showComment() {
-            List<Certificate> selected = selectedCertificates()
-            if (selected.size() != 1)
-                return
-            String comment = selected[0].comment.name
-            def params = [:]
-            params['text'] = comment
-            params['name'] = trans("CERTIFICATE_COMMENT")
-            mvcGroup.createMVCGroup("show-comment", params)
-        }
-        
-        void importCerts() {
-            List<Certificate> selected = selectedCertificates()
-            selected.each {
-                model.core.eventBus.publish(new UIImportCertificateEvent(certificate : it))
-            }
-            JOptionPane.showMessageDialog(null, trans("CERTIFICATES_IMPORTED"))
-        }
     }
     
     private class CollectionsPanel extends JPanel {
@@ -390,24 +308,6 @@ class ResultDetailsView {
             params['preFetchedCollections'] = selected
             params['host'] = selectedSender()
             mvcGroup.createMVCGroup("collection-tab", params)
-        }
-    }
-    
-    private static class ResultCellRenderer implements ListCellRenderer<UIResultEvent> {
-        @Override
-        Component getListCellRendererComponent(JList<? extends UIResultEvent> list, 
-                                               UIResultEvent value, int index, 
-                                               boolean isSelected, boolean cellHasFocus) {
-            JLabel rv = new JLabel()
-            rv.setText(value.sender.getHumanReadableName())
-            if (!isSelected) {
-                rv.setForeground(list.getForeground())
-                rv.setBackground(list.getSelectionBackground())
-            } else {
-                rv.setForeground(list.getSelectionForeground())
-                rv.setBackground(list.getSelectionBackground())
-            }
-            rv
         }
     }
 }
