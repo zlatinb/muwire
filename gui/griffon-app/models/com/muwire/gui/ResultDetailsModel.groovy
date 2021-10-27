@@ -41,6 +41,7 @@ class ResultDetailsModel {
     String key
     List<SharedFile> localFiles
     
+    private final Set<UIResultEvent> uniqueResults = new HashSet<>()
     List<UIResultEvent> resultsWithComments = []
     List<UIResultEvent> resultsWithCertificates = []
     List<UIResultEvent> resultsWithCollections = []
@@ -64,6 +65,7 @@ class ResultDetailsModel {
         collectionFetches = new HashMap<>()
         collections = new HashMap<>()
         
+        uniqueResults.addAll(results)
         for (UIResultEvent event : results) {
             if (event.comment != null)
                 resultsWithComments << event
@@ -83,6 +85,19 @@ class ResultDetailsModel {
             core.eventBus.unregister(CollectionFetchedEvent.class, this)
             core.eventBus.unregister(CollectionFetchStatusEvent.class, this)
         }
+    }
+    
+    void addResult(UIResultEvent event) {
+        if (!uniqueResults.add(event))
+            return
+        results << event
+        if (event.comment != null)
+            resultsWithComments << event
+        if (event.certificates > 0)
+            resultsWithCertificates << event
+        if (event.collections.size() > 0)
+            resultsWithCollections << event
+        view.refreshAll()
     }
     
     CollectionsModel registerForCollections(Persona sender) {

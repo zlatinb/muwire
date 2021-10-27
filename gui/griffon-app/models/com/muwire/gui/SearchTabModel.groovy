@@ -150,6 +150,10 @@ class SearchTabModel {
             if (!copy.isEmpty() || dirty) {
                 results2.clear()
                 synchronized (allResults2) {
+                    for (InfoHash ih : hashBucket.keySet()) {
+                        for (UIResultEvent event : hashBucket[ih].getResults())
+                            view.addResultToDetailMaps(event)
+                    }
                     allResults2.addAll(hashBucket.keySet())
                     allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
                 }

@@ -22,6 +22,8 @@ import javax.swing.JTable
 import javax.swing.JTextArea
 import javax.swing.ListCellRenderer
 import javax.swing.ListSelectionModel
+import javax.swing.border.Border
+import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.GridBagConstraints
@@ -42,6 +44,7 @@ class ResultDetailsView {
     JTabbedPane tabs
     JTable sendersTable
 
+    JPanel commentsPanel
     JList<UIResultEvent> commentsList
     JTextArea commentTextArea
     
@@ -95,10 +98,22 @@ class ResultDetailsView {
             tabs.addTab(trans("LOCAL_COPIES"), localCopies)
         }
         
-        JPanel commentsPanel = builder.panel {
-            borderLayout()
-            commentsList = list(items: model.resultsWithComments, constraints: BorderLayout.WEST)
-            commentTextArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true, constraints: BorderLayout.CENTER)
+        commentsPanel = builder.panel {
+            cardLayout()
+            panel(constraints: "no-comments") {
+                label(text: trans("NO_COMMENTS_FOR_FILE"))
+            }
+            panel(constraints: "yes-comments") {
+                borderLayout()
+                panel(constraints: BorderLayout.WEST, border: titledBorder(title: trans("SENDER"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                    borderLayout()
+                    commentsList = list(items: model.resultsWithComments, constraints: BorderLayout.CENTER)
+                }
+                panel(constraints: BorderLayout.CENTER, border: titledBorder(title: trans("COMMENT"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                    borderLayout()
+                    commentTextArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true, constraints: BorderLayout.CENTER)
+                }
+            }
         }
         tabs.addTab(trans("COMMENTS"), commentsPanel)
     }
@@ -124,6 +139,8 @@ class ResultDetailsView {
         
         
         // comments tab
+        if (!model.resultsWithComments.isEmpty())
+            commentsPanel.getLayout().show(commentsPanel, "yes-comments")
         commentsList.setCellRenderer(new ResultCellRenderer())
         selectionModel = commentsList.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -140,6 +157,14 @@ class ResultDetailsView {
             return null
         row = sendersTable.rowSorter.convertRowIndexToModel(row)
         model.results[row].sender
+    }
+    
+    void refreshAll() {
+        sendersTable.model.fireTableDataChanged()
+        if (!model.resultsWithComments.isEmpty()) {
+            commentsPanel.getLayout().show(commentsPanel,"yes-comments")
+            commentsList.setListData(model.resultsWithComments.toArray(new UIResultEvent[0]))
+        }
     }
     
     void refreshCertificates() {

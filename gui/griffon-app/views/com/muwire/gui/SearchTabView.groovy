@@ -402,7 +402,11 @@ class SearchTabView {
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
             detailsPanelByFile.removeAll()
-            detailsPanelByFile.add(new JLabel(trans("SELECT_SINGLE_RESULT")))
+            def p = new JPanel()
+            p.add(new JLabel(trans("SELECT_SINGLE_RESULT")))
+            detailsPanelByFile.add(p)
+            detailsPanelByFile.updateUI()
+            
             List<UIResultEvent> selectedResults = selectedResults()
             if (selectedResults.isEmpty()) {
                 model.downloadActionEnabled = false
@@ -454,8 +458,11 @@ class SearchTabView {
         }
         
         detailsPanelByFile.add(group.view.p, null)
-        detailsPanelByFile.invalidate()
-        detailsPanelByFile.validate()
+        detailsPanelByFile.updateUI()
+    }
+
+    void addResultToDetailMaps(UIResultEvent event) {
+        resultDetails[event.infohash]?.model?.addResult(event)
     }
 
     def closeTab = {
@@ -557,9 +564,6 @@ class SearchTabView {
         resultsTable2.clearSelection()
         resultsTable.clearSelection()
         sendersTable.clearSelection()
-        sendersTable2.clearSelection()
-        
-        showSelectSingleResult.call()
     }
     
     List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {
