@@ -93,6 +93,9 @@ class ResultDetailsView {
             }
             panel(constraints: "yes-comments") {
                 borderLayout()
+                panel(constraints: BorderLayout.NORTH) {
+                    label(text: trans("SELECT_SENDER_COMMENT"))
+                }
                 panel(constraints: BorderLayout.WEST, border: titledBorder(title: trans("SENDER"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                     borderLayout()
                     commentsList = list(items: model.resultsWithComments, constraints: BorderLayout.CENTER)
