@@ -2,15 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
-import com.muwire.core.Persona
 import com.muwire.core.SharedFile
-import com.muwire.core.collections.CollectionFetchStatus
-import com.muwire.core.collections.CollectionFetchStatusEvent
-import com.muwire.core.collections.CollectionFetchedEvent
-import com.muwire.core.collections.FileCollection
-import com.muwire.core.collections.UICollectionFetchEvent
-import com.muwire.core.filecert.CertificateFetchEvent
-import com.muwire.core.filecert.CertificateFetchedEvent
 import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
@@ -19,7 +11,6 @@ import griffon.transform.Observable
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
-import java.util.stream.Collectors
 
 @ArtifactProviderFor(GriffonModel)
 class ResultDetailsModel {
@@ -42,17 +33,8 @@ class ResultDetailsModel {
     List<UIResultEvent> resultsWithCertificates = []
     List<UIResultEvent> resultsWithCollections = []
     
-    
-    Map<Persona, UUID> collectionFetches
-    Map<UUID, CollectionsModel> collections
-    
-    private boolean registeredForCertificates, registeredForCollections
-    
     void mvcGroupInit(Map<String,String> args) {
         key = fileName + Base64.encode(infoHash.getRoot())
-        
-        collectionFetches = new HashMap<>()
-        collections = new HashMap<>()
         
         uniqueResults.addAll(results)
         for (UIResultEvent event : results) {
@@ -65,17 +47,6 @@ class ResultDetailsModel {
         }
     }
     
-    void mvcGroupDestroy() {
-        if (registeredForCertificates) {
-            core.eventBus.unregister(CertificateFetchEvent.class, this)
-            core.eventBus.unregister(CertificateFetchedEvent.class, this)
-        }
-        if (registeredForCollections) {
-            core.eventBus.unregister(CollectionFetchedEvent.class, this)
-            core.eventBus.unregister(CollectionFetchStatusEvent.class, this)
-        }
-    }
- 
     List<String> getLocalCopies() {
         SharedFile[] sharedFiles = core.fileManager.getSharedFiles(infoHash.getRoot())
         if (sharedFiles == null || sharedFiles.length == 0)
@@ -95,55 +66,5 @@ class ResultDetailsModel {
             resultsWithCollections << event
         view.addResultToListGroups(event)
         view.refreshAll()
-    }
-    
-    CollectionsModel registerForCollections(Persona sender) {
-        if (collections.containsKey(sender))
-            return null
-        if (!registeredForCollections) {
-            registeredForCollections = true
-            core.eventBus.with {
-                register(CollectionFetchStatusEvent.class, this)
-                register(CollectionFetchedEvent.class, this)
-            }
-        }
-        UUID uuid = UUID.randomUUID()
-        collectionFetches.put(sender, uuid)
-        def rv = new CollectionsModel()
-        collections.put(uuid, rv)
-        
-        Set<InfoHash> infoHashes = results.stream().filter({it.sender == sender}).
-            flatMap({it.collections.stream()}).collect(Collectors.toSet())
-        UICollectionFetchEvent event = new UICollectionFetchEvent(uuid: uuid, host: sender, infoHashes: infoHashes)
-        core.eventBus.publish(event)
-        rv
-    }
-    
-    void onCollectionFetchStatusEvent(CollectionFetchStatusEvent event) {
-        runInsideUIAsync {
-            def model = collections[event.uuid]
-            if (model == null)
-                return
-            model.status = event.status
-            if (event.status == CollectionFetchStatus.FETCHING)
-                model.count = event.count
-            view.refreshCollections()
-        }
-    }
-    
-    void onCollectionFetchedEvent(CollectionFetchedEvent event) {
-        runInsideUIAsync {
-            def model = collections[event.uuid]
-            if (model == null)
-                return
-            model.collections << event.collection
-            view.refreshCollections()
-        }
-    }
-    
-    static class CollectionsModel {
-        CollectionFetchStatus status
-        int count
-        final List<FileCollection> collections = new ArrayList<>()
     }
 }

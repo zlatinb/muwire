@@ -203,4 +203,14 @@ mvcGroups {
         view = 'com.muwire.gui.resultdetails.CertificateListView'
         controller = 'com.muwire.gui.resultdetails.CertificateListController'
     }
+    'mini-collection-tab' {
+        model = 'com.muwire.gui.resultdetails.MiniCollectionTabModel'
+        view = 'com.muwire.gui.resultdetails.MiniCollectionTabView'
+        controller = 'com.muwire.gui.resultdetails.MiniCollectionTabController'
+    }
+    'collection-list' {
+        model = 'com.muwire.gui.resultdetails.CollectionListModel'
+        view = 'com.muwire.gui.resultdetails.CollectionListView'
+        controller = 'com.muwire.gui.resultdetails.CollectionListController'
+    }
 }

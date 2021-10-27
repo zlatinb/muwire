@@ -12,28 +12,28 @@ import net.i2p.data.Base64
 import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonModel)
-class CertificateListModel {
+class CollectionListModel {
     
     @MVCMember @Nonnull
-    CertificateListView view
+    CollectionListView view
     
     Core core
     List<UIResultEvent> results
     
     Map<Persona, MVCGroup> tabGroups = new HashMap<>()
-    
+
     void mvcGroupInit(Map<String,String> args) {
         for(UIResultEvent event : results) {
             tabGroups.put(event.sender, createTabGroup(event))
         }
     }
-    
+
     void mvcGroupDestroy() {
         tabGroups.values().each {it.destroy()}
     }
     
     void addResult(UIResultEvent event) {
-        if (event.certificates == 0)
+        if (event.collections.isEmpty())
             return
         if (tabGroups.containsKey(event.sender))
             return
@@ -41,12 +41,12 @@ class CertificateListModel {
         results << event
         view.refresh()
     }
-    
+
     private MVCGroup createTabGroup(UIResultEvent event) {
-        String mvcId = "certs_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
+        String mvcId = "collections_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
         def params = [:]
         params.core = core
         params.resultEvent = event
-        mvcGroup.createMVCGroup("certificate-tab", mvcId, params)
+        mvcGroup.createMVCGroup("mini-collection-tab", mvcId, params)
     }
 }
