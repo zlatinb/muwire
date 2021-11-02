@@ -1,7 +1,8 @@
-package com.muwire.gui
+package com.muwire.gui.resultdetails
 
 import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.resultdetails.ResultListCellRenderer
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
@@ -22,11 +23,11 @@ import java.awt.BorderLayout
 import static com.muwire.gui.Translator.trans
 
 @ArtifactProviderFor(GriffonView)
-class ResultDetailsView {
+class ResultDetailsTabsView {
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
-    ResultDetailsModel model
+    ResultDetailsTabsModel model
     
     
     JPanel p
@@ -64,7 +65,7 @@ class ResultDetailsView {
                         closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : {
                             model.core.trustService.getLevel(it.sender.destination).name()
                         })
-                        closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : {HTMLSanitizer.sanitize(it.getFullPath())})
+                        closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : { HTMLSanitizer.sanitize(it.getFullPath())})
                         closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {it.comment != null})
                         closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {it.certificates})
                         closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: {it.collections.size()})

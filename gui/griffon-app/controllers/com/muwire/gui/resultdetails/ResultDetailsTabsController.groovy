@@ -1,4 +1,4 @@
-package com.muwire.gui
+package com.muwire.gui.resultdetails
 
 import com.muwire.core.Persona
 import griffon.core.artifact.GriffonController
@@ -9,12 +9,12 @@ import griffon.metadata.ArtifactProviderFor
 import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonController)
-class ResultDetailsController {
+class ResultDetailsTabsController {
  
     @MVCMember @Nonnull
-    ResultDetailsView view
+    ResultDetailsTabsView view
     @MVCMember @Nonnull
-    ResultDetailsModel model
+    ResultDetailsTabsModel model
     
     @ControllerAction
     void browse() {

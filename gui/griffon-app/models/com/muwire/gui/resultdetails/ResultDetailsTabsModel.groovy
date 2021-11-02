@@ -1,4 +1,4 @@
-package com.muwire.gui
+package com.muwire.gui.resultdetails
 
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
@@ -13,10 +13,10 @@ import net.i2p.data.Base64
 import javax.annotation.Nonnull
 
 @ArtifactProviderFor(GriffonModel)
-class ResultDetailsModel {
+class ResultDetailsTabsModel {
     
     @MVCMember @Nonnull
-    ResultDetailsView view
+    ResultDetailsTabsView view
     
     @Observable boolean browseActionEnabled
     @Observable boolean copyIdActionEnabled

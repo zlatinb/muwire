@@ -453,7 +453,7 @@ class SearchTabView {
             params.infoHash = infoHash
             params.results = allResults
             
-            group = mvcGroup.createMVCGroup("result-details", mvcId, params)
+            group = mvcGroup.createMVCGroup("result-details-tabs", mvcId, params)
             resultDetails[infoHash] = group
         }
         

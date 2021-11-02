@@ -188,10 +188,10 @@ mvcGroups {
         view = 'com.muwire.gui.MyFeedView'
         controller = 'com.muwire.gui.MyFeedController'
     }
-    'result-details' {
-        model = 'com.muwire.gui.ResultDetailsModel'
-        view = 'com.muwire.gui.ResultDetailsView'
-        controller = 'com.muwire.gui.ResultDetailsController'
+    'result-details-tabs' {
+        model = 'com.muwire.gui.resultdetails.ResultDetailsTabsModel'
+        view = 'com.muwire.gui.resultdetails.ResultDetailsTabsView'
+        controller = 'com.muwire.gui.resultdetails.ResultDetailsTabsController'
     }
     'certificate-tab' {
         model = 'com.muwire.gui.resultdetails.CertificateTabModel'
