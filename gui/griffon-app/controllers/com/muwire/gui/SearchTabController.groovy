@@ -150,59 +150,6 @@ class SearchTabController {
     }
 
     @ControllerAction
-    void showComment() {
-        def events = view.selectedResults()
-        if (events.size() != 1)
-            return
-        UIResultEvent event = events.first()
-        if (event == null || event.comment == null)
-            return
-
-        String groupId = Base64.encode(event.infohash.getRoot())
-        Map<String,Object> params = new HashMap<>()
-        params['text'] = event.comment
-        params['name'] = event.name
-
-        mvcGroup.createMVCGroup("show-comment", groupId, params)
-    }
-
-    @ControllerAction
-    void viewCertificates() {
-        def events = view.selectedResults()
-        if (events.size() != 1)
-            return
-        UIResultEvent event = events.first()
-        if (event == null || event.certificates <= 0)
-            return
-
-        def params = [:]
-        params['host'] = event.getSender()
-        params['infoHash'] = event.getInfohash()
-        params['name'] = event.getName()
-        params['core'] = core
-        mvcGroup.createMVCGroup("fetch-certificates", params)
-    }
-    
-    @ControllerAction
-    void viewCollections() {
-        def events = view.selectedResults()
-        if (events.size() != 1)
-            return
-        UIResultEvent event = events.first()
-        if (event == null || event.collections.isEmpty())
-            return
-            
-        UUID uuid = UUID.randomUUID()
-        def params = [:]
-        params['fileName'] = event.name
-        params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
-        params['infoHashes'] = event.collections.collect()
-        params['uuid'] = uuid
-        params['host'] = event.sender
-        mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
-    }
-    
-    @ControllerAction
     void message() {
         Persona recipient = view.selectedSender()
         if (recipient == null)
@@ -246,6 +193,17 @@ class SearchTabController {
     
     @ControllerAction
     void viewDetails() {
-        // TODO: implement
+        def events = view.selectedResults()
+        if (events.size() != 1)
+            return
+        UIResultEvent event = events.first()
+        Set<Persona> senders = new HashSet<>(model.hashBucket[event.infohash].senders)
+        
+        String mvcId = "resultdetails_" + event.sender.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
+        def params = [:]
+        params.core = model.core
+        params.resultEvent = event
+        params.senders = senders
+        mvcGroup.createMVCGroup("result-details-frame", mvcId, params)
     }
 }

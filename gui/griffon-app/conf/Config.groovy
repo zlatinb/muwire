@@ -193,6 +193,11 @@ mvcGroups {
         view = 'com.muwire.gui.resultdetails.ResultDetailsTabsView'
         controller = 'com.muwire.gui.resultdetails.ResultDetailsTabsController'
     }
+    'result-details-frame' {
+        model = 'com.muwire.gui.resultdetails.ResultDetailsFrameModel'
+        view = 'com.muwire.gui.resultdetails.ResultDetailsFrameView'
+        controller = 'com.muwire.gui.resultdetails.ResultDetailsFrameController'
+    }
     'certificate-tab' {
         model = 'com.muwire.gui.resultdetails.CertificateTabModel'
         view = 'com.muwire.gui.resultdetails.CertificateTabView'
