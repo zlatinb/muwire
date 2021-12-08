@@ -12,7 +12,7 @@ You can find technical documentation in the [doc] folder.  Also check out the [W
 
 ## Building
 
-You need JDK 11 (newer versions may not work).  After installing that and setting up the appropriate paths, just type
+You need a JDK version between 11 and 17 inclusive.  Nnewer versions may not work.  After installing that and setting up the appropriate paths, just type
 
 ```
 ./gradlew clean assemble
