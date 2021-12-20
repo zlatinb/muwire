@@ -159,7 +159,9 @@ class HostMCProfile {
      * @return if the host should be advertised in pongs
      */
     boolean shouldAdvertise() {
-        (hasHistory || successfulAttempt) && nextState() != ConnectionAttemptStatus.FAILED
+        (hasHistory || successfulAttempt) && 
+                (nextState() != ConnectionAttemptStatus.FAILED) &&
+                !isHopeless()
     }   
     
     /**

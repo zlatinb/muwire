@@ -394,8 +394,12 @@ class H2HostCache extends HostCache {
                 log.fine("considering hopeless host ${d.toBase32()}")
                 def row = sql.firstRow("select TSTAMP from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and STATUS='SUCCESSFUL' order by TSTAMP DESC LIMIT 1")
                 if (row == null) {
-                    log.fine("no successful attempts")
-                    candidates.add(d)
+                    log.fine("no successful attempts, counting failures..")
+                    row = sql.firstRow("select count(*) as COUNT from HOST_ATTEMPTS where DESTINATION=${d.toBase64()} and STATUS='FAILED'")
+                    if (row.COUNT > settings.hostMaxFailAttempts) {
+                        log.fine("too many failures, purging")
+                        candidates.add(d)
+                    }
                 } else {
                     if (now - row.TSTAMP.getTime() > settings.hostHopelessPurgeInterval * 60 * 1000) {
                         log.fine("last successful attempt was at $row.TSTAMP , purging")
@@ -409,6 +413,7 @@ class H2HostCache extends HostCache {
         for (Destination hopeless : candidates) {
             allHosts.remove(hopeless)
             uniqueHosts.remove(hopeless)
+            toVerify.remove(hopeless)
             sql.execute("delete from HOST_ATTEMPTS where DESTINATION=${hopeless.toBase64()}")
             sql.execute("delete from HOST_PROFILES where DESTINATION=${hopeless.toBase64()}")
         }

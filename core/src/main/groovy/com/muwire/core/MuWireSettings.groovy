@@ -68,6 +68,7 @@ class MuWireSettings {
     Set<String> watchedDirectories
     float downloadSequentialRatio
     int hostClearInterval, hostHopelessInterval, hostRejectInterval, hostHopelessPurgeInterval
+    int hostMaxFailAttempts
     int hostProfileHistory, minHostProfileHistory
     int meshExpiration
     int speedSmoothSeconds
@@ -114,6 +115,7 @@ class MuWireSettings {
         hostHopelessInterval = Integer.valueOf(props.getProperty("hostHopelessInterval", "60"))
         hostRejectInterval = Integer.valueOf(props.getProperty("hostRejectInterval", "1"))
         hostHopelessPurgeInterval = Integer.valueOf(props.getProperty("hostHopelessPurgeInterval","1440"))
+        hostMaxFailAttempts = Integer.valueOf(props.getProperty("hostMaxFailAttempts", "5"))
         hostProfileHistory = Integer.valueOf(props.getProperty("hostProfileHistory","100"))
         minHostProfileHistory = Integer.valueOf(props.getProperty("minHostProfileHistory","5"))
         meshExpiration = Integer.valueOf(props.getProperty("meshExpiration","60"))
@@ -213,6 +215,7 @@ class MuWireSettings {
         props.setProperty("hostHopelessInterval", String.valueOf(hostHopelessInterval))
         props.setProperty("hostRejectInterval", String.valueOf(hostRejectInterval))
         props.setProperty("hostHopelessPurgeInterval", String.valueOf(hostHopelessPurgeInterval))
+        props.setProperty("hostMaxFailAttempts", String.valueOf(hostMaxFailAttempts))
         props.setProperty("hostProfileHistory", String.valueOf(hostProfileHistory))
         props.setProperty("minHostProfileHistory", String.valueOf(minHostProfileHistory))
         props.setProperty("meshExpiration", String.valueOf(meshExpiration))
