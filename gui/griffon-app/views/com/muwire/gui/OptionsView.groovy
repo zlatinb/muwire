@@ -5,6 +5,7 @@ import net.i2p.util.SystemVersion
 
 import javax.swing.JComboBox
 import javax.swing.JTextField
+import javax.swing.UIManager
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -139,7 +140,11 @@ class OptionsView {
         
         
         lnfComboBox = new JComboBox<String>(LNFs.availableLNFs)
-        String lnfName = LNFs.classToName.get(model.lnfClassName)
+        String lnfName
+        if (model.lnfClassName == UIManager.getSystemLookAndFeelClassName())
+            lnfName = "System"
+        else
+            lnfName = LNFs.classToName.get(model.lnfClassName)
         int lnfIdx = -1
         for (int i = 0; i < LNFs.availableLNFs.length; i++) {
             if (lnfName == LNFs.availableLNFs[i]) {
@@ -148,8 +153,9 @@ class OptionsView {
             }
         }
         
-        if (lnfIdx < 0)
+        if (lnfIdx < 0) 
             lnfIdx = 0 // hmm
+        
         lnfComboBox.setSelectedIndex(lnfIdx)
         
         p = builder.panel {

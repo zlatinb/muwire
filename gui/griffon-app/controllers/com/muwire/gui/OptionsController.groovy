@@ -1,11 +1,16 @@
 package com.muwire.gui
 
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import groovy.util.logging.Log
 
+import javax.inject.Inject
+import javax.swing.SwingUtilities
+import javax.swing.UIManager
+import javax.swing.plaf.FontUIResource
 import java.util.logging.Level
 
 import javax.annotation.Nonnull
@@ -21,6 +26,8 @@ import static com.muwire.gui.Translator.trans
 
 @ArtifactProviderFor(GriffonController)
 class OptionsController {
+    @Inject @Nonnull
+    GriffonApplication application
     @MVCMember @Nonnull
     OptionsModel model
     @MVCMember @Nonnull
@@ -264,21 +271,29 @@ class OptionsController {
 
         // UI Setttings
 
+        boolean applyLNF = false
         text = view.lnfComboBox.getSelectedItem()
-        uiSettings.lnf = LNFs.nameToClass.get(text)
+        uiSettings.lnf = LNFs.getLNFClassName(text)
+        applyLNF |= (model.lnfClassName != uiSettings.lnf)
 
         text = view.fontComboBox.getSelectedItem()
-        model.font = text
         uiSettings.font = text
+        applyLNF |= (model.font != text)
         
+        applyLNF |= (uiSettings.autoFontSize != model.automaticFontSize)
         uiSettings.autoFontSize = model.automaticFontSize
-        uiSettings.fontSize = Integer.parseInt(view.fontSizeField.text)
         
-        uiSettings.fontStyle = Font.PLAIN
+        int newFontSize = Integer.parseInt(view.fontSizeField.text)
+        applyLNF |= (newFontSize != uiSettings.fontSize)
+        uiSettings.fontSize = newFontSize
+        
+        int newFontStyle = Font.PLAIN
         if (view.fontStyleBoldCheckbox.model.isSelected())
-            uiSettings.fontStyle |= Font.BOLD
+            newFontStyle |= Font.BOLD
         if (view.fontStyleItalicCheckbox.model.isSelected())
-            uiSettings.fontStyle |= Font.ITALIC
+            newFontStyle |= Font.ITALIC
+        applyLNF |= (newFontStyle != uiSettings.fontStyle)
+        uiSettings.fontStyle = newFontStyle
 
         uiSettings.groupByFile = model.groupByFile
         
@@ -310,6 +325,8 @@ class OptionsController {
             
         saveUISettings()
 
+        if (applyLNF)
+            updateLNF()
         cancel()
     }
     
@@ -399,5 +416,26 @@ class OptionsController {
         uiSettings.searchHistory.clear()
         saveUISettings()
         JOptionPane.showMessageDialog(null, trans("OPTIONS_SEARCH_HISTORY_CLEARED"))
+    }
+    
+    private void updateLNF() {
+        
+        UIManager.setLookAndFeel(uiSettings.lnf)
+        def lnf = UIManager.getLookAndFeel()
+        
+        FontUIResource font = new FontUIResource(uiSettings.font, uiSettings.fontStyle, uiSettings.fontSize)
+        def keys = lnf.getDefaults().keys()
+        while(keys.hasMoreElements()) {
+            def key = keys.nextElement()
+            def value = lnf.getDefaults().get(key)
+            if (value instanceof FontUIResource) {
+                lnf.getDefaults().put(key, font)
+                UIManager.put(key, font)
+            }
+        }
+        
+        def mainWindow = application.getWindowManager().findWindow("main-frame")
+        SwingUtilities.updateComponentTreeUI(mainWindow)
+        
     }
 }
