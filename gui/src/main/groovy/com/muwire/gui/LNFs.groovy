@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import javax.swing.UIManager
+
 /**
  * looks and feels
  */
@@ -48,5 +50,9 @@ class LNFs {
         availableLNFs = nameToClass.keySet().toArray(new String[0])
     }
     
-    
+    public static String getLNFClassName(String alias) {
+        if (alias.toLowerCase() == "system")
+            return UIManager.getSystemLookAndFeelClassName()
+        nameToClass[alias]
+    }
 }
