@@ -73,7 +73,7 @@ class Initialize extends AbstractLifecycleHandler {
 
             if (LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf)) {
                 log.info("converting user specified lnf from ${uiSettings.lnf} to system")
-                uiSettings.lnf = "system"
+                uiSettings.lnf = UIManager.getSystemLookAndFeelClassName()
             }
             
             def lnf
@@ -83,9 +83,8 @@ class Initialize extends AbstractLifecycleHandler {
             } catch (Throwable bad) {
                 log.log(Level.WARNING,"couldn't set desired look and feel, switching to defaults", bad)
                 lnf = lookAndFeel("system","gtk","metal")
-                uiSettings.lnf = lnf.getID()
-                if(LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf))
-                    uiSettings.lnf = "system"
+                uiSettings.lnf = lnf.getClass().getCanonicalName()
+                log.info("ended up applying ${uiSettings.lnf}")
             }
 
             if (uiSettings.font != null || uiSettings.autoFontSize || uiSettings.fontSize > 0 ) {
@@ -98,7 +97,7 @@ class Initialize extends AbstractLifecycleHandler {
                 else
                     fontName = defaultFont.getName()
                 
-                int fontSize = defaultFont.getSize()
+                int fontSize
                 if (uiSettings.autoFontSize) {
                     int resolution = Toolkit.getDefaultToolkit().getScreenResolution()
                     fontSize = resolution / 9;
@@ -124,11 +123,8 @@ class Initialize extends AbstractLifecycleHandler {
             log.info "will try default lnfs"
             
             LookAndFeel chosen = lookAndFeel('system', 'gtk', 'metal')
-            uiSettings.lnf = chosen.getID()
-            log.info("ended up applying $chosen.name")
-            if (LNFs.SYSTEM_ALIASES.contains(uiSettings.lnf))
-                uiSettings.lnf = "system"
-                
+            uiSettings.lnf = chosen.getClass().getCanonicalName()
+            log.info("ended up applying $uiSettings.lnf")
 
             FontUIResource defaultFont = chosen.getDefaults().getFont("Label.font")
             uiSettings.font = defaultFont.getName()
