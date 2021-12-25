@@ -104,9 +104,7 @@ class BrowseView {
                     sequentialDownloadCheckbox = checkBox(enabled: bind {model.downloadActionEnabled})
                 }
                 panel(border: etchedBorder()) {
-                    button(text: trans("VIEW_COMMENT"), enabled: bind { model.viewCommentActionEnabled }, viewCommentAction)
-                    button(text: trans("VIEW_CERTIFICATES"), enabled: bind { model.viewCertificatesActionEnabled }, viewCertificatesAction)
-                    button(text: trans("VIEW_COLLECTIONS"), enabled: bind { model.viewCollectionsActionEnabled }, viewCollectionsAction)
+                    button(text: trans("VIEW_DETAILS"), enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
                 }
                 panel(border: etchedBorder()) {
                     def textField = new JTextField(15)
@@ -136,9 +134,7 @@ class BrowseView {
         resultsTree.addMouseListener(mouseListener)
         resultsTree.addTreeSelectionListener({
             model.downloadActionEnabled = false
-            model.viewCertificatesActionEnabled = false
-            model.viewCommentActionEnabled = false
-            model.viewCollectionsActionEnabled = false
+            model.viewDetailsActionEnabled = false
             TreePath[] selected = resultsTree.selectionModel.getSelectionPaths()
             if (selected == null || selected.length == 0) {
                 return
@@ -147,9 +143,7 @@ class BrowseView {
             model.downloadActionEnabled = true
             UIResultEvent result = resultsTree.singleResultSelected()
             if (result != null) {
-                model.viewCommentActionEnabled = result.comment != null
-                model.viewCollectionsActionEnabled = !result.collections.isEmpty()
-                model.viewCertificatesActionEnabled = result.certificates > 0
+                model.viewDetailsActionEnabled = true
             }
         })
         
@@ -173,9 +167,7 @@ class BrowseView {
             int[] rows = resultsTable.getSelectedRows()
             if (rows.length == 0) {
                 model.downloadActionEnabled = false
-                model.viewCommentActionEnabled = false
-                model.viewCertificatesActionEnabled = false
-                model.viewCollectionsActionEnabled = false
+                model.viewDetailsActionEnabled = false
                 return
             }
             
@@ -187,13 +179,7 @@ class BrowseView {
             
             boolean downloadActionEnabled = true
             
-            model.viewCertificatesActionEnabled = (rows.length == 1 && model.results[rows[0]].certificates > 0)
-            model.viewCollectionsActionEnabled = rows.length == 1 && model.results[rows[0]].collections.size() > 0
-            
-            if (rows.length == 1 && model.results[rows[0]].comment != null) 
-                model.viewCommentActionEnabled = true
-            else
-                model.viewCommentActionEnabled = false
+            model.viewDetailsActionEnabled = rows.length == 1
              
             def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
             rows.each {
@@ -214,20 +200,10 @@ class BrowseView {
             download.addActionListener({controller.download()})
             menu.add(download)
         }
-        if (model.viewCommentActionEnabled) {
-            JMenuItem viewComment = new JMenuItem(trans("VIEW_COMMENT"))
-            viewComment.addActionListener({controller.viewComment()})
-            menu.add(viewComment)
-        }
-        if (model.viewCollectionsActionEnabled) {
-            JMenuItem viewCollections = new JMenuItem(trans("VIEW_COLLECTIONS"))
-            viewCollections.addActionListener({controller.viewCollections()})
-            menu.add(viewCollections)
-        }
-        if (model.viewCertificatesActionEnabled) {
-            JMenuItem viewCertificates = new JMenuItem(trans("VIEW_CERTIFICATES"))
-            viewCertificates.addActionListener({controller.viewCertificates()})
-            menu.add(viewCertificates)
+        if (model.viewDetailsActionEnabled) {
+            JMenuItem viewDetails = new JMenuItem(trans("VIEW_DETAILS"))
+            viewDetails.addActionListener({controller.viewDetails()})
+            menu.add(viewDetails)
         }
         
         JMenuItem copyHash = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))

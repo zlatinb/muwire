@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import com.muwire.core.SplitPattern
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -65,7 +66,6 @@ class BrowseController {
             model.pendingResults.clear()
         }
         for(UIResultBatchEvent event : copy) {
-            model.chatActionEnabled = event.results[0].chat
             List<UIResultEvent> results = event.results.toList()
             model.results.addAll(results)
             for (UIResultEvent result : results)
@@ -155,68 +155,24 @@ class BrowseController {
     }
     
     @ControllerAction
-    void viewComment() {
-        def selectedResults = view.selectedResults()
-        if (selectedResults == null || selectedResults.size() != 1)
-            return
-        def result = selectedResults[0]
-        if (result.comment == null)
-            return
-        
-        String groupId = Base64.encode(result.infohash.getRoot())
-        Map<String,Object> params = new HashMap<>()
-        params['text'] = result.comment
-        params['name'] = result.name
-        
-        mvcGroup.createMVCGroup("show-comment", groupId, params)
+    void copyId() {
+        CopyPasteSupport.copyToClipboard(model.host.toBase64())
     }
     
     @ControllerAction
-    void viewCertificates() {
-        def selectedResults = view.selectedResults()
-        if (selectedResults == null || selectedResults.size() != 1)
-            return
-        def result = selectedResults[0]
-        if (result.certificates <= 0)
-            return
-        
-        def params = [:]
-        params['host'] = result.getSender()
-        params['infoHash'] = result.getInfohash()
-        params['name'] = result.getName()
-        params['core'] = core
-        mvcGroup.createMVCGroup("fetch-certificates", params)
-    }
-    
-    @ControllerAction
-    void chat() {
-        def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
-        
-        mainFrameGroup.controller.startChat(model.host)
-        mainFrameGroup.view.showChatWindow.call()
-    }
-    
-    @ControllerAction
-    void viewCollections() {
+    void viewDetails() {
         def selectedResults = view.selectedResults()
         if (selectedResults == null || selectedResults.size() != 1)
             return
         def event = selectedResults[0]
-        if (event.collections == null || event.collections.isEmpty())
-            return
+        Set<Persona> senders = new HashSet<>()
+        senders.add(model.host)
         
-        UUID uuid = UUID.randomUUID()
+        String mvcId = "resultdetails_" + model.host.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
         def params = [:]
-        params['fileName'] = event.name
-        params['eventBus'] = mvcGroup.parentGroup.model.core.eventBus
-        params['infoHashes'] = event.collections.collect()
-        params['uuid'] = uuid
-        params['host'] = event.sender
-        mvcGroup.parentGroup.createMVCGroup("collection-tab", uuid.toString(), params)
-    }
-    
-    @ControllerAction
-    void copyId() {
-        CopyPasteSupport.copyToClipboard(model.host.toBase64())
+        params.core = core
+        params.resultEvent = event
+        params.senders = senders
+        mvcGroup.createMVCGroup("result-details-frame", mvcId, params)
     }
 }
