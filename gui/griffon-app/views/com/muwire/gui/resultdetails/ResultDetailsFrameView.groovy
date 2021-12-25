@@ -37,7 +37,7 @@ class ResultDetailsFrameView {
     void initUI() {
         int rowHeight = application.context.get("row-height")
         
-        int frameHeight = 200
+        int frameHeight = 150
         window = builder.frame(visible : false, locationRelativeTo: application.windowManager.findWindow("main-frame"),
             defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
             iconImage: builder.imageIcon("/MuWire-48x48.png").image,
@@ -48,11 +48,15 @@ class ResultDetailsFrameView {
                 int gridy = 0
                 panel(border: titledBorder(title: trans("BASIC_DETAILS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
                         constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100)) {
-                    gridBagLayout()
-                    label(text: trans("SIZE"), constraints: gbc(gridx: 0, gridy: 0))
-                    label(text: String.valueOf(model.resultEvent.size), constraints: gbc(gridx: 1, gridy: 0))
-                    label(text: trans("PIECE_SIZE"), constraints: gbc(gridx: 0, gridy: 1))
-                    label(text: String.valueOf(0x1 << model.resultEvent.pieceSize), constraints: gbc(gridx: 1, gridy: 1))
+                    gridLayout(rows: 1, cols: 2)
+                    panel {
+                        label(text: trans("SIZE"))
+                        label(text: String.valueOf(model.resultEvent.size))
+                    }
+                    panel {
+                        label(text: trans("PIECE_SIZE"))
+                        label(text: String.valueOf(0x1 << model.resultEvent.pieceSize))
+                    }
                 }
                 if (model.resultEvent.comment != null) {
                     frameHeight += 200
