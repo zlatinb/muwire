@@ -68,7 +68,10 @@ startScripts.doFirst {
                                     "--add-opens", "java.desktop/javax.swing=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/javax.swing.text.html=ALL-UNNAMED",
-                                    "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED"]
+                                    "--add-opens", "java.desktop/com.sun.java.swing.plaf.gtk=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED",
+                                    "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
+                                    "--add-exports", "java.desktop/com.apple.laf=ALL-UNNAMED"]
                                    
 }
 
