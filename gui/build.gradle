@@ -52,11 +52,15 @@ application {
     applicationName = 'MuWire'
 }
 
-run {
-    applicationDefaultJvmArgs=[]
+run.doFirst {
+    setDefaultArgs()
 }
 
 startScripts.doFirst {
+    setDefaultArgs()
+}
+
+private void setDefaultArgs() {
     application.applicationDefaultJvmArgs = ["-Djava.util.logging.config.file=logging.properties",
                                     "-Xms256M",
                                     "-XX:+HeapDumpOnOutOfMemoryError",
@@ -72,10 +76,8 @@ startScripts.doFirst {
                                     "--add-opens", "java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED",
                                     "--add-opens", "java.desktop/sun.swing=ALL-UNNAMED",
                                     "--add-exports", "java.desktop/com.apple.laf=ALL-UNNAMED"]
-                                   
+                                    
 }
-
-
 
 configurations.all {
         exclude group:'org.codehaus.groovy', module:'groovy-test'
