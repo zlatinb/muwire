@@ -3,6 +3,8 @@ package com.muwire.gui.resultdetails
 import net.i2p.data.Destination
 
 import javax.swing.JPanel
+import javax.swing.border.Border
+import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -35,62 +37,68 @@ class ResultDetailsFrameView {
     void initUI() {
         int rowHeight = application.context.get("row-height")
         
-        int frameHeight = 100
+        int frameHeight = 200
         window = builder.frame(visible : false, locationRelativeTo: application.windowManager.findWindow("main-frame"),
             defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
             iconImage: builder.imageIcon("/MuWire-48x48.png").image,
             title: trans("DETAILS_FOR", model.resultEvent.name)) {
-            gridBagLayout()
-            int gridy = 0
-            panel(border: titledBorder(title : trans("BASIC_DETAILS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
-                constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100)) {
+            borderLayout()
+            panel(constraints: BorderLayout.CENTER) {
                 gridBagLayout()
-                label(text : trans("SIZE"), constraints: gbc(gridx: 0, gridy: 0))
-                label(text : String.valueOf(model.resultEvent.size), constraints: gbc(gridx: 1, gridy: 0))
-                label(text : trans("PIECE_SIZE"), constraints: gbc(gridx: 0, gridy : 1))
-                label(text : String.valueOf(0x1 << model.resultEvent.pieceSize), constraints: gbc(gridx: 1, gridy: 1))
-            }
-            if (model.resultEvent.comment != null) {
-                frameHeight += 200
-                panel(border: titledBorder(title: trans("COMMENT"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
-                        constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
-                    gridLayout(rows: 1, cols: 1)
-                    scrollPane {
-                        textArea(text: model.resultEvent.comment, editable: false, lineWrap: true, wrapStyleWord: true)
+                int gridy = 0
+                panel(border: titledBorder(title: trans("BASIC_DETAILS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                        constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100)) {
+                    gridBagLayout()
+                    label(text: trans("SIZE"), constraints: gbc(gridx: 0, gridy: 0))
+                    label(text: String.valueOf(model.resultEvent.size), constraints: gbc(gridx: 1, gridy: 0))
+                    label(text: trans("PIECE_SIZE"), constraints: gbc(gridx: 0, gridy: 1))
+                    label(text: String.valueOf(0x1 << model.resultEvent.pieceSize), constraints: gbc(gridx: 1, gridy: 1))
+                }
+                if (model.resultEvent.comment != null) {
+                    frameHeight += 200
+                    panel(border: titledBorder(title: trans("COMMENT"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                            constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
+                        gridLayout(rows: 1, cols: 1)
+                        scrollPane {
+                            textArea(text: model.resultEvent.comment, editable: false, lineWrap: true, wrapStyleWord: true)
+                        }
                     }
                 }
-            }
-            if (model.senders.size() > 1) {
-                frameHeight += 200
-                panel(border: titledBorder(title : trans("SENDERS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
-                        constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
-                    gridLayout(rows: 1, cols: 1)
-                    scrollPane {
-                        table(autoCreateRowSorter : true, rowHeight: rowHeight) {
-                            tableModel(list : model.senders.toList()) {
-                                closureColumn(header : trans("SENDER"), read : {it.getHumanReadableName()})
-                                closureColumn(header : trans("TRUST_NOUN"), read :{
-                                    Destination destination = it.destination
-                                    trans(model.core.trustService.getLevel(destination).name())
-                                })
+                if (model.senders.size() > 1) {
+                    frameHeight += 200
+                    panel(border: titledBorder(title: trans("SENDERS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                            constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
+                        gridLayout(rows: 1, cols: 1)
+                        scrollPane {
+                            table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                tableModel(list: model.senders.toList()) {
+                                    closureColumn(header: trans("SENDER"), read: { it.getHumanReadableName() })
+                                    closureColumn(header: trans("TRUST_NOUN"), read: {
+                                        Destination destination = it.destination
+                                        trans(model.core.trustService.getLevel(destination).name())
+                                    })
+                                }
                             }
                         }
                     }
                 }
-            }
-            if (model.resultEvent.certificates > 0) {
-                frameHeight += 300
-                certificatesPanel = panel(border: titledBorder(title : trans("CERTIFICATES"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
-                        constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
-                    gridLayout(rows: 1, cols: 1)
+                if (model.resultEvent.certificates > 0) {
+                    frameHeight += 300
+                    certificatesPanel = panel(border: titledBorder(title: trans("CERTIFICATES"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                            constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
+                        gridLayout(rows: 1, cols: 1)
+                    }
+                }
+                if (model.resultEvent.collections.size() > 0) {
+                    frameHeight += 300
+                    collectionsPanel = panel(border: titledBorder(title: trans("COLLECTIONS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                            constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
+                        gridLayout(rows: 1, cols: 1)
+                    }
                 }
             }
-            if (model.resultEvent.collections.size() > 0) {
-                frameHeight += 300
-                collectionsPanel = panel(border: titledBorder(title : trans("COLLECTIONS"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
-                        constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
-                    gridLayout(rows: 1, cols: 1)
-                }
+            panel(constraints: BorderLayout.SOUTH) {
+                button(text : trans("CLOSE"), closeAction)
             }
         }
         
