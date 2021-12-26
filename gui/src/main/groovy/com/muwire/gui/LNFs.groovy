@@ -13,8 +13,11 @@ class LNFs {
     static final String[] availableLNFs
     
     private static register(String name, String clazz) {
-        nameToClass.put(name, clazz)
-        classToName.put(clazz, name)
+        try {
+            Class cls = Class.forName(clazz)
+            nameToClass.put(name, cls.getCanonicalName())
+            classToName.put(cls.getCanonicalName(), name)
+        } catch (Exception notThere) {} // just not available
     }
     
     private static String camel(String s) {
@@ -31,12 +34,17 @@ class LNFs {
         SYSTEM_ALIASES.add("Aqua") // Mac
         SYSTEM_ALIASES.add("Windows") // Windows
         
-        register("System", "system")
-        register("Metal","metal")
+        register("System", UIManager.getSystemLookAndFeelClassName())
+        register("Metal","javax.swing.plaf.metal.MetalLookAndFeel")
+        register("Motif", "com.sun.java.swing.plaf.motif.MotifLookAndFeel")
+        register("GTK", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+        register("Windows", "com.sun.java.swing.plaf.windows.WindowsLookAndFeel")
+        register("Aqua", "com.apple.laf.AquaLookAndFeel")
+        register("Nimbus", "javax.swing.plaf.nimbus.NimbusLookAndFeel")
         register("Darcula","com.bulenkov.darcula.DarculaLaf")
         ["acryl",
                 "aero",
-                "aluminum",
+                "aluminium",
                 "bernstein",
                 "fast",
                 "graphite",
@@ -48,6 +56,7 @@ class LNFs {
         register("HiFi","com.jtattoo.plaf.hifi.HiFiLookAndFeel")
         register("McWin","com.jtattoo.plaf.mcwin.McWinLookAndFeel")
         availableLNFs = nameToClass.keySet().toArray(new String[0])
+        Arrays.sort(availableLNFs)
     }
     
     public static String getLNFClassName(String alias) {
