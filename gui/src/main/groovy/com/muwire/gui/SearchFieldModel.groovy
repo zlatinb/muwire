@@ -43,7 +43,7 @@ class SearchFieldModel extends AbstractListModel implements MutableComboBoxModel
         objects.clear()
 
         Set<String> matching = new HashSet<>(uiSettings.searchHistory)
-        matching.retainAll { it.contains(selected) }
+        matching.retainAll { it.containsIgnoreCase(selected) }
         
         matching.each {
             objects.add(it)
