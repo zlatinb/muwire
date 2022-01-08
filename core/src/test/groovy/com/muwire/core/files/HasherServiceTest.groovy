@@ -10,6 +10,8 @@ import org.junit.Test
 import com.muwire.core.EventBus
 import com.muwire.core.MuWireSettings
 
+import java.util.function.Function
+
 class HasherServiceTest {
 
     HasherService service
@@ -27,7 +29,7 @@ class HasherServiceTest {
         def home = new File("testHome")
         service = new HasherService(eventBus, new FileManager(home, eventBus, props),
                 new NegativeFiles(home, null, props), 
-                props)
+                {null} as Function, props)
         eventBus.register(FileHashedEvent.class, listener)
         eventBus.register(FileSharedEvent.class, service)
         service.start()
@@ -45,14 +47,13 @@ class HasherServiceTest {
         Thread.sleep(100)
         def hashed = listener.poll()
         assert hashed instanceof FileHashedEvent
-        assert hashed.sharedFile.file == f.getCanonicalFile()
         assert hashed.sharedFile.root != null
         assert listener.isEmpty()
     }
 
     @Test
     void testDirectory() {
-        File f = new File(".")
+        File f = (new File("build.gradle")).getCanonicalFile().getParentFile()
         service.onFileSharedEvent new FileSharedEvent(file: f)
         Set<String> fileNames = new HashSet<>()
         while (true) {
