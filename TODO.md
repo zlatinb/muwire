@@ -58,6 +58,5 @@
 |Redesign the Browse Collections tab | 92 | GUI | Medium |
 |Automatically search for more sources | 75 | Core | Medium |
 |Notify user collections loaded after files | 69 | GUI | Low |
-|Longer retention of hopeless hosts | N/A | Core | High |
 |Rewrite H2HostCache to not use H2| N/A | Core | Optional|
-
+|I18n - convert all pluralizable strings to a pattern | N/A | GUI | Medium |
