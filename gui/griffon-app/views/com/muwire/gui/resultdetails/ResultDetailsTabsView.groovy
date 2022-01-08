@@ -90,11 +90,15 @@ class ResultDetailsTabsView {
                 }
                 panel(constraints: BorderLayout.WEST, border: titledBorder(title: trans("SENDER"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                     borderLayout()
-                    commentsList = list(items: model.resultsWithComments, constraints: BorderLayout.CENTER)
+                    scrollPane (constraints: BorderLayout.CENTER) {
+                        commentsList = list(items: model.resultsWithComments)
+                    }
                 }
                 panel(constraints: BorderLayout.CENTER, border: titledBorder(title: trans("COMMENT"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                     borderLayout()
-                    commentTextArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true, constraints: BorderLayout.CENTER)
+                    scrollPane (constraints: BorderLayout.CENTER){
+                        commentTextArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true)
+                    }
                 }
             }
         }

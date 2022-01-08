@@ -35,7 +35,9 @@ class CertificateListView {
             }
             panel(constraints: BorderLayout.WEST, border: titledBorder(title: trans("SENDER"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                 gridLayout(rows : 1, cols: 1)
-                senders = list(items : model.results)
+                scrollPane {
+                    senders = list(items: model.results)
+                }
             }
             detailsPanel = panel(constraints: BorderLayout.CENTER){
                 borderLayout()
