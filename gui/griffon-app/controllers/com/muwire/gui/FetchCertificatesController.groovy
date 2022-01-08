@@ -75,12 +75,11 @@ class FetchCertificatesController {
         def params = [:]
         params['text'] = comment
         params['name'] = trans("CERTIFICATE_COMMENT")
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction
     void dismiss() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

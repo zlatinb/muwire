@@ -49,6 +49,5 @@ class AddCommentController {
     @ControllerAction
     void cancel() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

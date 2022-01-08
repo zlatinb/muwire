@@ -45,6 +45,5 @@ class SignController {
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

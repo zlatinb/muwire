@@ -146,11 +146,6 @@ class AdvancedSharingView {
             pack()
             setLocationRelativeTo(mainFrame)
             setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-            addWindowListener(new WindowAdapter() {
-                public void windowClosed(WindowEvent e) {
-                    mvcGroup.destroy()
-                }
-            })
             show()
         }
     }

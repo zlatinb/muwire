@@ -33,7 +33,7 @@ class MiniCollectionTabController {
         def params = [:]
         params['text'] = comment
         params['name'] = trans("COLLECTION_COMMENT")
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction

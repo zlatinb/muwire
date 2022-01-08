@@ -23,6 +23,6 @@ class SharedFileController {
         
         def params = [:]
         params['text'] = cert.comment.name
-        mvcGroup.createMVCGroup('show-comment',params)
+        mvcGroup.createMVCGroup('show-comment',params).destroy()
     }
 }

@@ -161,7 +161,7 @@ class Initialize extends AbstractLifecycleHandler {
                     tray.remove(trayIcon)
                 })
                 
-                def showMW = {e ->
+                def showMW = {
                     def mainFrame = application.getWindowManager().findWindow("main-frame")
                     if (mainFrame != null) {
                         Core core = application.getContext().get("core")

@@ -32,7 +32,6 @@ class CloseWarningController {
         
         view.dialog.setVisible(false)
         view.mainFrame.setVisible(false)
-        mvcGroup.destroy()
     }
     
     @ControllerAction

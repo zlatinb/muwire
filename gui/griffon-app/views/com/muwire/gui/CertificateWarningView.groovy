@@ -49,7 +49,6 @@ class CertificateWarningView {
         dialog.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 dialog.setVisible(false)
-                mvcGroup.destroy()
             }
         })
     }

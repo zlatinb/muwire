@@ -22,6 +22,5 @@ class CertificateWarningController {
             propsFile.withOutputStream { settings.write(it) }
         }
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

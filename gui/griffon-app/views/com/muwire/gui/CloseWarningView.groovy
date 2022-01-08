@@ -49,7 +49,6 @@ class CloseWarningView {
         dialog.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 mainFrame.setVisible(false)
-                mvcGroup.destroy()
             }
         })
     }

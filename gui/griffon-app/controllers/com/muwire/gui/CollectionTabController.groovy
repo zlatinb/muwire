@@ -85,7 +85,7 @@ class CollectionTabController {
         def params = [:]
         params['text'] = text
         params['name'] = name
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction

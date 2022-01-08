@@ -548,7 +548,7 @@ class MainFrameController {
         Map<String, Object> params = new HashMap<>()
         params['selectedFiles'] = selectedFiles
         params['core'] = core
-        mvcGroup.createMVCGroup("add-comment", "Add Comment", params)
+        mvcGroup.createMVCGroup("add-comment", "Add Comment", params).destroy()
     }
     
     @ControllerAction
@@ -589,7 +589,7 @@ class MainFrameController {
             def params = [:]
             params['settings'] = view.settings
             params['home'] = core.home
-            mvcGroup.createMVCGroup("certificate-warning", params)
+            mvcGroup.createMVCGroup("certificate-warning", params).destroy()
         } else {
             int count = 0
             view.selectedSharedFiles().each {
@@ -783,7 +783,7 @@ class MainFrameController {
         params['text'] = DataUtil.readi18nString(Base64.decode(item.getComment()))
         params['name'] = item.getName()
         
-        mvcGroup.createMVCGroup("show-comment", groupId, params)
+        mvcGroup.createMVCGroup("show-comment", groupId, params).destroy()
     }
     
     @ControllerAction
@@ -830,7 +830,7 @@ class MainFrameController {
 
         def params = [:]
         params['text'] = collection.comment
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction
@@ -870,7 +870,7 @@ class MainFrameController {
         
         def params = [:]
         params['text'] = DataUtil.readi18nString(Base64.decode(sf.getComment()))
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction

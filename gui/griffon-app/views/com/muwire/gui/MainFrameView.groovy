@@ -143,30 +143,30 @@ class MainFrameView {
                             params['core'] = application.context.get("core")
                             params['settings'] = params['core'].muOptions
                             params['uiSettings'] = settings 
-                            mvcGroup.createMVCGroup("Options", params)
+                            mvcGroup.createMVCGroup("Options", params).destroy()
                         })
                     }
                     menu (text : trans("STATUS")) {
-                        menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status")})
+                        menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status").destroy()})
                         MuWireSettings muSettings = application.context.get("muwire-settings")
-                        menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status")})
-                        menuItem(trans("SYSTEM"), actionPerformed : {mvcGroup.createMVCGroup("system-status")})
+                        menuItem("I2P", enabled : bind {model.routerPresent}, actionPerformed: {mvcGroup.createMVCGroup("i-2-p-status").destroy()})
+                        menuItem(trans("SYSTEM"), actionPerformed : {mvcGroup.createMVCGroup("system-status").destroy()})
                     }
                     menu (text : trans("TOOLS")) {
                         menuItem(trans("CONTENT_CONTROL"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core
-                            mvcGroup.createMVCGroup("content-panel", env)
+                            mvcGroup.createMVCGroup("content-panel", env).destroy()
                         })
                         menuItem(trans("ADVANCED_SHARING"), actionPerformed : {
                             def env = [:]
                             env["core"] = model.core
-                            mvcGroup.createMVCGroup("advanced-sharing",env)  
+                            mvcGroup.createMVCGroup("advanced-sharing",env).destroy()  
                         })
                         menuItem(trans("CERTIFICATES"), actionPerformed : {
                             def env = [:]
                             env['core'] = model.core
-                            mvcGroup.createMVCGroup("certificate-control",env)
+                            mvcGroup.createMVCGroup("certificate-control",env).destroy()
                         })
                         menuItem(trans("CHAT_ROOM_MONITOR"), actionPerformed : {
                             if (!mvcGroup.getChildrenGroups().containsKey("chat-monitor")) {
@@ -178,7 +178,7 @@ class MainFrameView {
                         menuItem(trans("SIGN_TOOL"), actionPerformed : {
                             def env = [:]
                             env['core'] = model.core
-                            mvcGroup.createMVCGroup("sign",env)
+                            mvcGroup.createMVCGroup("sign",env).destroy()
                         })
                     }
                 }
@@ -755,7 +755,7 @@ class MainFrameView {
                             Map<String, Object> args2 = new HashMap<>()
                             args2.put("settings", settings)
                             args2.put("home", model.core.home)
-                            mvcGroup.createMVCGroup("close-warning", "Close Warning", args2)
+                            mvcGroup.createMVCGroup("close-warning", "Close Warning", args2).destroy()
                         }
                     } else if (settings.exitOnClose)
                         closeApplication()

@@ -102,7 +102,6 @@ class ContentPanelController {
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
     
     void saveMuWireSettings() {

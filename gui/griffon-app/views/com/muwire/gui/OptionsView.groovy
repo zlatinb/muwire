@@ -530,11 +530,6 @@ class OptionsView {
         d.pack()
         d.setLocationRelativeTo(mainFrame)
         d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        d.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                mvcGroup.destroy()
-            }
-        })
         d.show()
     }
 }

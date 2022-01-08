@@ -38,6 +38,5 @@ class I2PStatusController {
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

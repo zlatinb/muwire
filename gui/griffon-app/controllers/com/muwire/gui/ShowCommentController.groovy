@@ -14,6 +14,5 @@ class ShowCommentController {
     @ControllerAction
     void dismiss() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

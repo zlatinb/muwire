@@ -340,7 +340,6 @@ class OptionsController {
     @ControllerAction
     void cancel() {
         view.d.setVisible(false)
-        mvcGroup.destroy()
     }
 
     @ControllerAction

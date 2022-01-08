@@ -23,12 +23,11 @@ class CertificateControlController {
         
         def params = [:]
         params['text'] = cert.comment.name
-        mvcGroup.createMVCGroup("show-comment", params)
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
     }
     
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }
