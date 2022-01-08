@@ -29,6 +29,12 @@ configurations.testImplementation {
         exclude group:'org.codehaus.groovy', module:'groovy-testng'
 }
 
+test.doFirst {
+    jvmArgs=["--add-opens","java.base/java.lang=ALL-UNNAMED",
+            "--add-opens","java.base/sun.nio.fs=ALL-UNNAMED",
+            "--add-opens","java.base/java.nio=ALL-UNNAMED"]
+}
+
 // publish core to local maven repo for sister projects
 publishing {
     publications {
