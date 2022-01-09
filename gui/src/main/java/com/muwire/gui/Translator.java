@@ -31,12 +31,12 @@ public class Translator {
     }
     
     private static Locale locale = Locale.US;
-    private static ResourceBundle usBundle = ResourceBundle.getBundle("messages");
+    private static ResourceBundle usBundle = ResourceBundle.getBundle("messages", Locale.US, new Control());
     private static ResourceBundle localeBundle;
     
     public synchronized static void setLocale(String code) {
         locale = Locale.forLanguageTag(code);
-        localeBundle = ResourceBundle.getBundle("messages", locale);
+        localeBundle = ResourceBundle.getBundle("messages", locale, new Control());
     }
     
     public synchronized static String trans(String key) {
@@ -69,6 +69,12 @@ public class Translator {
         
         public String toString() {
             return locale.getDisplayLanguage(locale).toUpperCase(locale);
+        }
+    }
+    
+    private static class Control extends ResourceBundle.Control {
+        public Locale getFallbackLocale(String baseName, Locale locale) {
+            return null;
         }
     }
 
