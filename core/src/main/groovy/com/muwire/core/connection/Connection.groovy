@@ -157,6 +157,7 @@ abstract class Connection implements Closeable {
         query.compressedResults = e.searchEvent.compressedResults
         query.collections = e.searchEvent.collections
         query.searchPaths = e.searchEvent.searchPaths
+        query.regex = e.searchEvent.regex
         if (e.searchEvent.searchHash != null)
             query.infohash = Base64.encode(e.searchEvent.searchHash)
         query.replyTo = e.replyTo.toBase64()
@@ -286,6 +287,9 @@ abstract class Connection implements Closeable {
         boolean searchPaths = false
         if (search.searchPaths != null)
             searchPaths = search.searchPaths
+        boolean regex = false
+        if (search.regex != null)
+            regex = search.regex
         
         byte[] sig = null
         if (search.sig != null) {
@@ -342,6 +346,7 @@ abstract class Connection implements Closeable {
                                             compressedResults : compressedResults,
                                             collections : collections,
                                             searchPaths: searchPaths,
+                                            regex: regex,
                                             persona : originator)
         QueryEvent event = new QueryEvent ( searchEvent : searchEvent,
                                             replyTo : replyTo,

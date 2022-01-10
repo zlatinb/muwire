@@ -15,11 +15,14 @@ class SearchEvent extends Event {
     Persona persona
     boolean collections
     boolean searchPaths
+    boolean regex
 
     String toString() {
         def infoHash = null
         if (searchHash != null)
             infoHash = new InfoHash(searchHash)
-        "searchTerms: $searchTerms searchHash:$infoHash, uuid:$uuid oobInfohash:$oobInfohash searchComments:$searchComments compressedResults:$compressedResults"
+        "searchTerms: $searchTerms searchHash:$infoHash, uuid:$uuid " +
+                "oobInfohash:$oobInfohash searchComments:$searchComments " +
+                "compressedResults:$compressedResults regex:$regex"
     }
 }
