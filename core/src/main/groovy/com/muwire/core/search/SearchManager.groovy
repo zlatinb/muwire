@@ -40,6 +40,12 @@ public class SearchManager {
             return
         }
         responderAddress.put(event.searchEvent.uuid, event)
+        
+        if (event.searchEvent.regex) {
+            log.info("dropping regex query")
+            return
+        }
+        
         eventBus.publish(event.searchEvent)
     }
 
