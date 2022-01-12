@@ -60,3 +60,4 @@
 |Notify user collections loaded after files | 69 | GUI | Low |
 |Rewrite H2HostCache to not use H2| N/A | Core | Optional|
 |I18n - convert all pluralizable strings to a pattern | N/A | GUI | Medium |
+|Regex queries| N/A | Core, Network, GUI, Plugin | High |
