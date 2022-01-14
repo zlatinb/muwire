@@ -2,7 +2,7 @@ package com.muwire.core
 
 class SplitPattern {
     
-    public static final String SPLIT_PATTERN = "[\\*\\+\\-,\\.:;\\(\\)=_/\\\\\\!\\\"\\\'\\\$%\\|\\[\\]\\{\\}\\?\r\n]";
+    public static final String SPLIT_PATTERN = "[‚‘„“\\*\\+\\-,\\.:;\\(\\)=_/\\\\\\!\\\"\\\'\\\$%\\|\\[\\]\\{\\}\\?\r\n]";
  
     private static final Set<Character> SPLIT_CHARS = new HashSet<>()
     static {
@@ -31,6 +31,10 @@ class SplitPattern {
             add('{'.toCharacter())
             add('}'.toCharacter())
             add('?'.toCharacter())
+            add('„'.toCharacter())
+            add('“'.toCharacter())
+            add('‚'.toCharacter())
+            add('‘'.toCharacter())
         }
     }
     
