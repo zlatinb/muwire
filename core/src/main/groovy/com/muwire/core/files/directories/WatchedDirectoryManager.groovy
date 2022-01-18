@@ -51,6 +51,13 @@ class WatchedDirectoryManager {
         this.fileManager = fileManager
         this.settings = settings
     }
+    /**
+     * Used by the plugin only
+     * TODO: fix to work with symlinks and locking
+     */
+    synchronized Stream<WatchedDirectory> getWatchedDirsStream() {
+        watchedDirs.values().stream()
+    }
     
     synchronized boolean isWatched(File f) {
         watchedDirs.containsKey(f) || aliasesMap.containsKey(f)
