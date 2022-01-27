@@ -63,7 +63,7 @@ class ResultDetailsTabsView {
                     tableModel(list: model.results) {
                         closureColumn(header: trans("SENDER"), preferredWidth: 150, type: String, read : {it.sender.getHumanReadableName()})
                         closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : {
-                            model.core.trustService.getLevel(it.sender.destination).name()
+                            trans(model.core.trustService.getLevel(it.sender.destination).name())
                         })
                         closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : { HTMLSanitizer.sanitize(it.getFullPath())})
                         closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {it.comment != null})
