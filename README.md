@@ -63,7 +63,6 @@ MuCats is a project to create a website for hosting hashes of files shared on th
 471B 9FD4 5517 A5ED 101F  C57D A728 3207 2D52 5E41
 ```
 
-You can find the full key at https://keybase.io/zlatinb
 
 
 [Default I2CP port]: https://geti2p.net/en/docs/ports
