@@ -228,7 +228,7 @@ class PersisterFolderService extends BasePersisterService {
                     if (path != null) {
                         log.fine("found path $path")
                         event.loadedFile.setPathToSharedParent(path)
-                        _persistFile(event.loadedFile,null)
+                        _persistFile(event.loadedFile)
                     }
                 } else
                     log.fine("loaded shared parent from json ${event.loadedFile.getPathToSharedParent()}")
