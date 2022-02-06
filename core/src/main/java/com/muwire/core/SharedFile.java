@@ -38,6 +38,7 @@ public class SharedFile {
     
     /** Path to the top-most parent File that is shared.  Null if no such exists */
     private volatile Path pathToSharedParent;
+    private volatile String cachedVisiblePath;
 
     public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
@@ -139,12 +140,30 @@ public class SharedFile {
         return publishedTimestamp;
     }
 
+    /**
+     * Sets the path to the shared parent and computes
+     * the cached visible path.
+     */
     public void setPathToSharedParent(Path path) {
         this.pathToSharedParent = path;
+        
+        String shortPath;
+        if (pathToSharedParent.getNameCount() > 1) {
+            Path tmp = pathToSharedParent.subpath(1, pathToSharedParent.getNameCount());
+            shortPath = "..." + File.separator + tmp;
+        } else {
+            shortPath = "...";
+        }
+        shortPath += File.separator + getFile().getName();
+        this.cachedVisiblePath = shortPath;
     }
     
     public Path getPathToSharedParent() {
         return pathToSharedParent;
+    }
+    
+    public String getCachedVisiblePath() {
+        return cachedVisiblePath;
     }
     
     @Override

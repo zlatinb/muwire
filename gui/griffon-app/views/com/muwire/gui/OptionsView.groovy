@@ -86,6 +86,7 @@ class OptionsView {
     def excludeLocalResultCheckbox
     def showSearchHashesCheckbox
     def clearUploadsCheckbox
+    def showUnsharedPathsCheckbox
     def storeSearchHistoryCheckbox
     def messageNotificationsCheckbox
 
@@ -364,10 +365,13 @@ class OptionsView {
                 label(text : trans("OPTIONS_CLEAR_FINISHED_UPLOADS"), constraints:gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 clearUploadsCheckbox = checkBox(selected : bind {model.clearUploads},
                 constraints : gbc(gridx:1, gridy: 4, anchor:GridBagConstraints.LINE_END))
+                label(text : trans("OPTIONS_SHOW_UNSHARED_PATHS"), constraints: gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                showUnsharedPathsCheckbox = checkBox(selected: bind{model.showUnsharedPaths},
+                        constraints: gbc(gridx: 1, gridy: 5, anchor: GridBagConstraints.LINE_END))
 
                 if (SystemTray.isSupported()) {
-                    label(text : trans("OPTIONS_WHEN_CLOSING_MUWIRE"), constraints : gbc(gridx: 0, gridy : 5, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                    panel (constraints : gbc(gridx:1, gridy: 5, anchor : GridBagConstraints.LINE_END)) {
+                    label(text : trans("OPTIONS_WHEN_CLOSING_MUWIRE"), constraints : gbc(gridx: 0, gridy : 6, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    panel (constraints : gbc(gridx:1, gridy: 6, anchor : GridBagConstraints.LINE_END)) {
                         buttonGroup(id : "closeBehaviorGroup")
                         radioButton(text : trans("OPTIONS_MINIMIZE_TO_TRAY"), selected : bind {!model.exitOnClose}, buttonGroup: closeBehaviorGroup, minimizeOnCloseAction)
                         radioButton(text : trans("EXIT"), selected : bind {model.exitOnClose}, buttonGroup : closeBehaviorGroup, exitOnCloseAction)

@@ -57,7 +57,8 @@ class OptionsModel {
     @Observable boolean clearUploads
     @Observable boolean groupByFile
     @Observable boolean exitOnClose
-    @Observable boolean closeDecisionMade 
+    @Observable boolean closeDecisionMade
+    @Observable boolean showUnsharedPaths
     @Observable boolean messageNotifications
 
     // bw options
@@ -145,6 +146,7 @@ class OptionsModel {
         storeSearchHistory = uiSettings.storeSearchHistory
         groupByFile = uiSettings.groupByFile
         messageNotifications = uiSettings.messageNotifications
+        showUnsharedPaths = uiSettings.showUnsharedPaths
 
         if (core.router != null) {
             inBw = String.valueOf(settings.inBw)

@@ -313,6 +313,10 @@ class OptionsController {
         model.clearUploads = clearUploads
         uiSettings.clearUploads = clearUploads
         
+        boolean showUnsharedPaths = view.showUnsharedPathsCheckbox.model.isSelected()
+        model.showUnsharedPaths = showUnsharedPaths
+        uiSettings.showUnsharedPaths = showUnsharedPaths
+        
         boolean storeSearchHistory = view.storeSearchHistoryCheckbox.model.isSelected()
         model.storeSearchHistory = storeSearchHistory
         uiSettings.storeSearchHistory = storeSearchHistory

@@ -13,6 +13,7 @@ class UISettings {
     boolean autoFontSize
     int fontSize, fontStyle
     int mainFrameX, mainFrameY
+    boolean showUnsharedPaths
     boolean clearCancelledDownloads
     boolean clearFinishedDownloads
     boolean excludeLocalResult
@@ -57,6 +58,8 @@ class UISettings {
         openTabs = DataUtil.readEncodedSet(props, "openTabs")
         
         messageNotifications = Boolean.parseBoolean(props.getProperty("messageNotifications","true"))
+        
+        showUnsharedPaths = Boolean.parseBoolean(props.getProperty("showUnsharedPaths","false"))
     }
 
     void write(OutputStream out) throws IOException {
@@ -89,6 +92,8 @@ class UISettings {
         DataUtil.writeEncodedSet(openTabs, "openTabs", props)
         
         props.setProperty("messageNotifications", String.valueOf(messageNotifications))
+        
+        props.setProperty("showUnsharedPaths", String.valueOf(showUnsharedPaths))
 
         props.store(out, "UI Properties")
     }

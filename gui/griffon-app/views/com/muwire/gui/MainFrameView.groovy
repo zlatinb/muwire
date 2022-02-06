@@ -912,7 +912,7 @@ class MainFrameView {
 
         // shared files table and tree
         JTable sharedFilesTable = builder.getVariable("shared-files-table")
-        sharedFilesTable.columnModel.getColumn(0).setCellRenderer(new SharedFileNameRenderer())
+        sharedFilesTable.columnModel.getColumn(0).setCellRenderer(new SharedFileNameRenderer(settings))
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
         sharedFilesTable.rowSorter.addRowSorterListener({ evt -> lastSharedSortEvent = evt })
