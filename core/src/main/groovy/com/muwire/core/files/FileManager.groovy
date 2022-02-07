@@ -2,6 +2,9 @@ package com.muwire.core.files
 
 import java.nio.file.Path
 import java.util.function.Predicate
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 import java.util.stream.Collectors
 
 import com.muwire.core.EventBus
@@ -288,6 +291,34 @@ class FileManager {
             if (found != null && found.length > 0) {
                 found.each { it.hit(e.persona, e.timestamp, "Hash Search") }
                 re = new ResultsEvent(results: found, uuid: e.uuid, searchEvent: e)
+            }
+        } else if (e.regex) {
+            // check if valid regex
+            try {
+                Pattern pattern = Pattern.compile(e.searchTerms[0])
+                Set<SharedFile> results
+                synchronized (fileToSharedFile) {
+                    results = fileToSharedFile.values().stream().filter{
+                        Matcher matcher = pattern.matcher(it.getFile().getName())
+                        if (matcher.matches())
+                            return true
+                        if (e.searchComments && it.getComment() != null) {
+                            matcher = pattern.matcher(DataUtil.readi18nString(Base64.decode(it.getComment())))
+                            if (matcher.matches())
+                                return true
+                        }
+                        if (e.searchPaths && settings.showPaths) {
+                            matcher = pattern.matcher(it.getCachedVisiblePath())
+                            if (matcher.matches())
+                                return true
+                        }
+                        return false
+                    }.collect(Collectors.toSet())
+                }
+                results.each {it.hit(e.persona, e.timestamp, "/${e.searchTerms[0]}/")}
+                re = new ResultsEvent(results: results.asList(), uuid: e.uuid, searchEvent: e)
+            } catch (PatternSyntaxException bad) {
+                log.info("invalid regex received $e")
             }
         } else {
             def names = index.search e.searchTerms
