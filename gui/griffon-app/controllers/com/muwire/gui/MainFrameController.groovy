@@ -5,6 +5,8 @@ import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 
 import javax.swing.JTextField
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
@@ -108,14 +110,6 @@ class MainFrameController {
                 search = search.substring(0,128)
             }
         }
-        def uuid = UUID.randomUUID()
-        Map<String, Object> params = new HashMap<>()
-        params["search-terms"] = search
-        params["uuid"] = uuid.toString()
-        params["core"] = core
-        params["settings"] = view.settings
-        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
-        model.results[uuid.toString()] = group
 
         boolean hashSearch = false
         byte [] root = null
@@ -127,6 +121,29 @@ class MainFrameController {
                 // not a hash search
             }
         }
+        
+        boolean regexSearch = false
+        if (search.length() > 1 && search.startsWith("/") && search.endsWith("/")) {
+            search = search.substring(1, search.length() - 1)
+            try {
+                Pattern.compile(search)
+                regexSearch = true
+            } catch (Exception e) {
+                // not a regex search
+                JOptionPane.showMessageDialog(null, trans("NOT_A_REGEX", search),
+                    trans("NOT_A_REGEX_TITLE"), JOptionPane.WARNING_MESSAGE);
+                return
+            }
+        }
+        
+        def uuid = UUID.randomUUID()
+        Map<String, Object> params = new HashMap<>()
+        params["search-terms"] = search
+        params["uuid"] = uuid.toString()
+        params["core"] = core
+        params["settings"] = view.settings
+        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
+        model.results[uuid.toString()] = group
 
         def searchEvent
         byte [] payload
@@ -135,11 +152,17 @@ class MainFrameController {
                 compressedResults : true, persona : core.me, collections : core.muOptions.searchCollections)
             payload = root
         } else {
-            def nonEmpty = SplitPattern.termify(search)
-            payload = String.join(" ",nonEmpty).getBytes(StandardCharsets.UTF_8)
-            searchEvent = new SearchEvent(searchTerms : nonEmpty, uuid : uuid, oobInfohash: true,
+            String [] terms
+            if (regexSearch) {
+                terms = new String[] {search}
+                payload = search.getBytes(StandardCharsets.UTF_8)
+            } else {
+                terms = SplitPattern.termify(search)
+                payload = String.join(" ", terms).getBytes(StandardCharsets.UTF_8)
+            }
+            searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid, oobInfohash: true,
             searchComments : core.muOptions.searchComments, compressedResults : true, persona : core.me,
-            collections : core.muOptions.searchCollections, searchPaths: core.muOptions.searchPaths)
+            collections : core.muOptions.searchCollections, searchPaths: core.muOptions.searchPaths, regex: regexSearch)
         }
         boolean firstHop = core.muOptions.allowUntrusted || core.muOptions.searchExtraHop
 
