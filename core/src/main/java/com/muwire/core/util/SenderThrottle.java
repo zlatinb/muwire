@@ -1,7 +1,6 @@
 package com.muwire.core.util;
 
 import com.muwire.core.Persona;
-import net.i2p.util.UIMessages;
 
 import java.util.HashMap;
 import java.util.Iterator;
