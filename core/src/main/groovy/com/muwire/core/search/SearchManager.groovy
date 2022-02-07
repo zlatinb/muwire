@@ -1,11 +1,11 @@
 package com.muwire.core.search
 
-import java.util.concurrent.ConcurrentHashMap
+import com.muwire.core.util.MessageThrottle
 
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
 import com.muwire.core.SharedFile
-
+import com.muwire.core.util.SenderThrottle
 import groovy.util.logging.Log
 import net.i2p.data.Destination
 
@@ -15,6 +15,10 @@ public class SearchManager {
     private static final int EXPIRE_TIME = 60 * 1000 * 1000
     private static final int CHECK_INTERVAL = 60 * 1000
     private static final int RESULT_DELAY = 100
+    
+    private static final long REGEX_INTERVAL = 1000
+    private static final int TOTAL_ALLOWED_REGEX = 5
+    private static final int SENDER_ALLOWED_REGEX = 2
 
     private final EventBus eventBus
     private final Persona me
@@ -22,6 +26,10 @@ public class SearchManager {
     private final Map<UUID, QueryEvent> responderAddress = Collections.synchronizedMap(new HashMap<>())
     
     private final Map<UUID, ResultBatch> pendingResults = new HashMap<>()
+    
+    private final Object throttleLock = new Object()
+    private final MessageThrottle globalRegexThrottle = new MessageThrottle(REGEX_INTERVAL, TOTAL_ALLOWED_REGEX)
+    private final SenderThrottle senderRegexThrottle = new SenderThrottle(REGEX_INTERVAL, SENDER_ALLOWED_REGEX)
 
     SearchManager(){}
 
@@ -39,13 +47,22 @@ public class SearchManager {
             log.info("Dropping duplicate search uuid $event.searchEvent.uuid")
             return
         }
-        responderAddress.put(event.searchEvent.uuid, event)
         
         if (event.searchEvent.regex) {
-            log.info("dropping regex query")
-            return
+            final long now = System.currentTimeMillis()
+            synchronized (throttleLock) {
+                if (!globalRegexThrottle.allow(now)) {
+                    log.info("regex query over global limit $event")
+                    return
+                }
+                if (!senderRegexThrottle.allow(now, event.getOriginator())) {
+                    log.info("regex query over sender limi $event")
+                    return
+                }
+            }
         }
         
+        responderAddress.put(event.searchEvent.uuid, event)
         eventBus.publish(event.searchEvent)
     }
 
@@ -76,6 +93,9 @@ public class SearchManager {
                 if (event.timestamp < now - EXPIRE_TIME)
                     iter.remove()
             }
+        }
+        synchronized (throttleLock) {
+            senderRegexThrottle.clear(now)
         }
     }
     
