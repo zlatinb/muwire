@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-14 16:54+0000\n"
+"POT-Creation-Date: 2022-02-07 01:30+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -207,8 +207,8 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/TrustUsers_jsp.java:200
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:219
 #: build/tmp_jsp/com/muwire/webui/Uploads_jsp.java:221
-#: src/main/java//com/muwire/webui/SearchServlet.java:265
-#: src/main/java//com/muwire/webui/SearchServlet.java:266
+#: src/main/java//com/muwire/webui/SearchServlet.java:267
+#: src/main/java//com/muwire/webui/SearchServlet.java:268
 msgid "B/sec"
 msgstr ""
 
@@ -1239,18 +1239,22 @@ msgid "MuWire is initializing, please wait"
 msgstr ""
 
 #: src/main/java//com/muwire/webui/SearchServlet.java:43
-#: src/main/java//com/muwire/webui/SearchServlet.java:75
-#: src/main/java//com/muwire/webui/SearchServlet.java:94
-#: src/main/java//com/muwire/webui/SearchServlet.java:130
-#: src/main/java//com/muwire/webui/SearchServlet.java:172
-#: src/main/java//com/muwire/webui/SearchServlet.java:211
-#: src/main/java//com/muwire/webui/SearchServlet.java:260
+#: src/main/java//com/muwire/webui/SearchServlet.java:77
+#: src/main/java//com/muwire/webui/SearchServlet.java:96
+#: src/main/java//com/muwire/webui/SearchServlet.java:132
+#: src/main/java//com/muwire/webui/SearchServlet.java:174
+#: src/main/java//com/muwire/webui/SearchServlet.java:213
+#: src/main/java//com/muwire/webui/SearchServlet.java:262
 msgid ""
 "MuWire failed to initialize.  Please close the browser window and restart "
 "the plugin"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/SearchServlet.java:54
+#: src/main/java//com/muwire/webui/SearchServlet.java:52
+msgid "Invalid regular expression"
+msgstr ""
+
+#: src/main/java//com/muwire/webui/SearchServlet.java:56
 msgid "Please enter a search keyword or file hash"
 msgstr ""
 

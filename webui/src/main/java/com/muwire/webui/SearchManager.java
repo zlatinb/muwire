@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.muwire.core.Core;
 import com.muwire.core.SplitPattern;
@@ -21,6 +22,7 @@ import net.i2p.data.Signature;
 
 class SearchManager {
     
+    static final UUID INVALID_REGEX_UUID = UUID.randomUUID();
     
     private final Core core;
     
@@ -37,8 +39,6 @@ class SearchManager {
         else {
             UUID uuid = UUID.randomUUID();
             
-            SearchResults searchResults = new SearchResults(uuid, search);
-            results.put(uuid, searchResults);
             
             boolean hashSearch = false;
             byte [] root = null;
@@ -50,18 +50,40 @@ class SearchManager {
                     // not a hash search
                 }
             }
+            
+            boolean regexSearch = false;
+            if (search.length() > 1 && search.startsWith("/") && search.endsWith("/")) {
+                search = search.substring(1, search.length() - 1);
+                try {
+                    Pattern.compile(search);
+                    regexSearch = true;
+                } catch (Exception e) {
+                    // not a valid regex
+                    return INVALID_REGEX_UUID;
+                }
+            }
+            
+            SearchResults searchResults = new SearchResults(uuid, search);
+            results.put(uuid, searchResults);
             SearchEvent searchEvent = new SearchEvent();
             searchEvent.setOobInfohash(true);
             searchEvent.setCompressedResults(true);
             searchEvent.setPersona(core.getMe());
             searchEvent.setUuid(uuid);
+            searchEvent.setRegex(regexSearch);
             byte[] payload;
             if (hashSearch) {
                 searchEvent.setSearchHash(root);
                 payload = root;
             } else {
-                String[] nonEmpty = SplitPattern.termify(search);
-                payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8);
+                String[] nonEmpty;
+                if (regexSearch) {
+                    nonEmpty = new String[] { search };
+                    payload = search.getBytes(StandardCharsets.UTF_8);
+                } else {
+                    nonEmpty = SplitPattern.termify(search);
+                    payload = String.join(" ", nonEmpty).getBytes(StandardCharsets.UTF_8);
+                }
                 searchEvent.setSearchTerms(Arrays.asList(nonEmpty));
                 searchEvent.setSearchComments(core.getMuOptions().getSearchComments());
                 searchEvent.setCollections(core.getMuOptions().getSearchCollections());

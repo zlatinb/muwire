@@ -48,7 +48,9 @@ public class SearchServlet extends HttpServlet {
         if (action.equals("start")) {
             String search = req.getParameter("search");
             UUID newUUID = searchManager.newSearch(search);
-            if (newUUID != null)
+            if (newUUID == SearchManager.INVALID_REGEX_UUID)
+                resp.sendError(403, _t("Invalid regular expression"));
+            else if (newUUID != null)
                 resp.sendRedirect("/MuWire/Home?uuid=" + newUUID.toString());
             else
                 resp.sendError(403, _t("Please enter a search keyword or file hash"));
