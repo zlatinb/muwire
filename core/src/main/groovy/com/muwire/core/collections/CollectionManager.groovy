@@ -1,21 +1,16 @@
 package com.muwire.core.collections
 
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.security.MessageDigest
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.function.Predicate
 import java.util.logging.Level
 
 import com.muwire.core.EventBus
 import com.muwire.core.SharedFile
 import com.muwire.core.InfoHash
-import com.muwire.core.MuWireSettings
 import com.muwire.core.files.AllFilesLoadedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileManager
@@ -27,6 +22,10 @@ import com.muwire.core.search.SearchIndex
 import groovy.transform.CompileStatic
 import groovy.util.logging.Log
 import net.i2p.data.Base64
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 @CompileStatic
 @Log
@@ -300,6 +299,9 @@ class CollectionManager {
     synchronized void onSearchEvent(SearchEvent e) {
         if (!e.collections)
             return
+
+        Set<FileCollection> collections = new HashSet<>()
+        String hitString = ""
         
         if (e.searchHash != null) {   
             InfoHash ih = new InfoHash(e.searchHash)
@@ -318,10 +320,34 @@ class CollectionManager {
             }
             def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
             eventBus.publish(resultEvent)
+        } else if (e.regex) {
+            Pattern pattern
+            try {
+                pattern = Pattern.compile(e.searchTerms[0])
+            } catch (PatternSyntaxException badPattern) {
+                log.info("bad regex $e")
+                return
+            }
+            
+            Predicate<FileCollection> predicate = { FileCollection it ->
+                Matcher matcher = pattern.matcher(it.getName())
+                if (matcher.matches())
+                    return true
+                if (e.searchComments && it.getComment() != null) {
+                    matcher = pattern.matcher(it.getComment())
+                    if (matcher.matches())
+                        return true
+                }
+                return false
+            }
+            
+            rootToCollection.values().stream().filter(predicate).forEach{collections.add(it)}
+            rootToCollectionRemote.values().stream().filter(predicate).forEach{collections.add(it)}
+            
+            hitString = "/${e.searchTerms[0]}/"
         } else {
-            String[]names = index.search(e.searchTerms)
-            Set<FileCollection> collections = new HashSet<>()
-            for(String name : names) {
+            String[] names = index.search(e.searchTerms)
+            for (String name : names) {
                 Set<FileCollection> match = nameToCollection.get(name)
                 if (match != null)
                     collections.addAll(match)
@@ -331,25 +357,27 @@ class CollectionManager {
                         collections.addAll(match)
                 }
             }
-            
-            if (collections.isEmpty())
-                return
-                
-            List<SharedFile> sharedFiles = new ArrayList<>()
-            collections.each { c ->
-                c.hit(e.persona)
-                c.files.each { f-> 
-                    SharedFile[] sfs = fileManager.getRootToFiles().get(f.infoHash)
-                    if (sfs == null || sfs.length == 0)
-                        return
-                    sfs.each { sf -> sf.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms))}
-                    sharedFiles.addAll(sfs)
-                }
-            }
-            if (sharedFiles.isEmpty())
-                return
-            def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
-            eventBus.publish(resultEvent)
+            hitString = String.join(" ", e.searchTerms)
         }
+        
+        if (collections.isEmpty())
+            return
+            
+        List<SharedFile> sharedFiles = new ArrayList<>()
+        collections.each { c ->
+            c.hit(e.persona)
+            c.files.each { f-> 
+                SharedFile[] sfs = fileManager.getRootToFiles().get(f.infoHash)
+                if (sfs == null || sfs.length == 0)
+                    return
+                sfs.each { sf -> sf.hit(e.persona, e.timestamp, hitString)}
+                sharedFiles.addAll(sfs)
+            }
+        }
+        if (sharedFiles.isEmpty())
+            return
+        def resultEvent = new ResultsEvent(results : sharedFiles.toArray(new SharedFile[0]), uuid : e.uuid, searchEvent : e)
+        eventBus.publish(resultEvent)
+        
     }
 }
