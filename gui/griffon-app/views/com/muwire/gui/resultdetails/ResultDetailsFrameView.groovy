@@ -115,6 +115,7 @@ class ResultDetailsFrameView {
             def params = [:]
             params.core = model.core
             params.resultEvent = model.resultEvent
+            params.uuid = model.uuid
             certificatesGroup = mvcGroup.createMVCGroup("certificate-tab", mvcId, params)
             certificatesPanel.add(certificatesGroup.view.p, null)
         }
@@ -123,6 +124,7 @@ class ResultDetailsFrameView {
             def params = [:]
             params.core = model.core
             params.resultEvent = model.resultEvent
+            params.uuid = model.uuid
             collectionsGroup = mvcGroup.createMVCGroup("mini-collection-tab", mvcId, params)
             collectionsPanel.add(collectionsGroup.view.p, null)
         }

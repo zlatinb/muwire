@@ -12,4 +12,5 @@ class ResultDetailsFrameModel {
     Core core
     UIResultEvent resultEvent
     Set<Persona> senders
+    String uuid
 }

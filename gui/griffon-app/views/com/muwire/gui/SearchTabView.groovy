@@ -452,6 +452,7 @@ class SearchTabView {
             params.fileName = event.name
             params.infoHash = infoHash
             params.results = allResults
+            params.uuid = model.uuid
             
             group = mvcGroup.createMVCGroup("result-details-tabs", mvcId, params)
             resultDetails[infoHash] = group

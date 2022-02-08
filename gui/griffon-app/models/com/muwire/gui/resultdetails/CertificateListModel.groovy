@@ -19,6 +19,7 @@ class CertificateListModel {
     
     Core core
     List<UIResultEvent> results
+    String uuid
     
     Map<Persona, MVCGroup> tabGroups = new HashMap<>()
     
@@ -43,10 +44,11 @@ class CertificateListModel {
     }
     
     private MVCGroup createTabGroup(UIResultEvent event) {
-        String mvcId = "certs_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
+        String mvcId = "certs_" + uuid + "_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
         def params = [:]
         params.core = core
         params.resultEvent = event
+        params.uuid = uuid
         mvcGroup.createMVCGroup("certificate-tab", mvcId, params)
     }
 }

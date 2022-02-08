@@ -19,6 +19,7 @@ class CollectionListModel {
     
     Core core
     List<UIResultEvent> results
+    String uuid
     
     Map<Persona, MVCGroup> tabGroups = new HashMap<>()
 
@@ -43,7 +44,7 @@ class CollectionListModel {
     }
 
     private MVCGroup createTabGroup(UIResultEvent event) {
-        String mvcId = "collections_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
+        String mvcId = "collections_" + uuid + "_" + event.sender.toBase64() + "_" + Base64.encode(event.infohash.getRoot())
         def params = [:]
         params.core = core
         params.resultEvent = event

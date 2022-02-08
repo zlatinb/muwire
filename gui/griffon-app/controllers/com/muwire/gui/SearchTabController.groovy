@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -9,6 +10,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.JOptionPane
 
 import com.muwire.core.Core
@@ -32,6 +34,8 @@ class SearchTabController {
     SearchTabModel model
     @MVCMember @Nonnull
     SearchTabView view
+    @Inject
+    GriffonApplication application
 
     Core core
 
@@ -199,11 +203,15 @@ class SearchTabController {
         UIResultEvent event = events.first()
         Set<Persona> senders = new HashSet<>(model.hashBucket[event.infohash].senders)
         
-        String mvcId = "resultdetails_" + event.sender.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
+        String mvcId = "resultdetails_" + model.uuid + "_" + event.sender.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
+        if (application.getMvcGroupManager().findGroup(mvcId) != null)
+            return
+        
         def params = [:]
         params.core = model.core
         params.resultEvent = event
         params.senders = senders
+        params.uuid = model.uuid
         mvcGroup.createMVCGroup("result-details-frame", mvcId, params)
     }
 }

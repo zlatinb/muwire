@@ -41,11 +41,13 @@ class MiniCollectionTabController {
         List<FileCollection> selected = view.selectedCollections()
         if (selected.isEmpty())
             return
+        UUID uuid = UUID.randomUUID()
         def params = [:]
         params['fileName'] = selected.first().name
         params['eventBus'] = model.core.eventBus
         params['preFetchedCollections'] = selected
         params['host'] = model.resultEvent.sender
-        mvcGroup.createMVCGroup("collection-tab", params)
+        params['uuid'] = uuid
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
 }

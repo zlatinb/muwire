@@ -22,6 +22,7 @@ class CertificateTabModel {
     
     Core core
     UIResultEvent resultEvent
+    String uuid
     
     
     final List<Certificate> certificates = new ArrayList<>()

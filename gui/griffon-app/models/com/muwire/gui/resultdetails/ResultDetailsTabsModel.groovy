@@ -25,6 +25,7 @@ class ResultDetailsTabsModel {
     String fileName
     InfoHash infoHash
     List<UIResultEvent> results
+    String uuid
 
     String key
     

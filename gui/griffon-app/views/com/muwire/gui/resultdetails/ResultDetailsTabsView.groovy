@@ -121,10 +121,11 @@ class ResultDetailsTabsView {
     
     private JPanel buildCertificates() {
         if (certificateListGroup == null) {
-            String mvcId = "certs_" + model.fileName + "_" + Base64.encode(model.infoHash.getRoot())
+            String mvcId = "certs_" + model.uuid + "_" + model.fileName + "_" + Base64.encode(model.infoHash.getRoot())
             def params = [:]
             params.core = model.core
             params.results = new ArrayList<>(model.resultsWithCertificates)
+            params.uuid = model.uuid
             certificateListGroup = mvcGroup.createMVCGroup("certificate-list", mvcId, params)
         }
         certificateListGroup.view.p
@@ -132,10 +133,11 @@ class ResultDetailsTabsView {
     
     private JPanel buildCollections() {
         if (collectionListGroup == null) {
-            String mvcId = "collections_" + model.fileName + "_" + Base64.encode(model.infoHash.getRoot())
+            String mvcId = "collections_" + model.uuid + "_" + model.fileName + "_" + Base64.encode(model.infoHash.getRoot())
             def params = [:]
             params.core = model.core
             params.results = new ArrayList<>(model.resultsWithCollections)
+            params.uuid = model.uuid
             collectionListGroup = mvcGroup.createMVCGroup("collection-list", mvcId, params)
         }
         collectionListGroup.view.p
@@ -155,7 +157,7 @@ class ResultDetailsTabsView {
         if (!model.resultsWithCollections.isEmpty())
             tabs.addTab(trans("COLLECTIONS"), buildCollections())
         
-        if (selected != null)
+        if (selected != null && tabs)
             tabs.setSelectedComponent(selected)
     }
     
