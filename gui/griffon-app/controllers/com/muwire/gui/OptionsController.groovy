@@ -145,6 +145,10 @@ class OptionsController {
         model.allowTracking = allowTracking
         settings.allowTracking = allowTracking
         
+        boolean regexQueries = view.regexQueriesCheckbox.model.isSelected()
+        model.regexQueries = regexQueries
+        settings.regexQueries = regexQueries
+        
         text = view.speedSmoothSecondsField.text
         model.speedSmoothSeconds = Integer.valueOf(text)
         settings.speedSmoothSeconds = Integer.valueOf(text)

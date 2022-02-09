@@ -96,6 +96,7 @@ public class ConfigurationServlet extends HttpServlet {
         core.getMuOptions().setDefaultFeedSequential(false);
         core.getMuOptions().setAllowTracking(false);
         core.getMuOptions().setSearchCollections(false);
+        core.getMuOptions().setRegexQueries(false);
     }
     
     private void update(String name, String value) throws Exception {
@@ -132,6 +133,7 @@ public class ConfigurationServlet extends HttpServlet {
         case "defaultFeedUpdateInterval" : core.getMuOptions().setDefaultFeedUpdateInterval(60000 * Long.parseLong(value)); break;
         case "defaultFeedItemsToKeep" : core.getMuOptions().setDefaultFeedItemsToKeep(Integer.parseInt(value)); break;
         case "hashingCores" : core.getMuOptions().setHashingCores(Integer.parseInt(value)); break;
+        case "regexQueries" : core.getMuOptions().setRegexQueries(true); break;
         }
     }
     

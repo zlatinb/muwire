@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P MuWire\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 01:30+0000\n"
+"POT-Creation-Date: 2022-02-09 13:43+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -232,7 +232,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:207
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:234
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:235
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:318
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:324
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:149
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:225
 #: build/tmp_jsp/com/muwire/webui/Feeds_jsp.java:218
@@ -323,7 +323,7 @@ msgstr ""
 #: build/tmp_jsp/com/muwire/webui/AdvancedSharing_jsp.java:219
 #: build/tmp_jsp/com/muwire/webui/BrowseHost_jsp.java:246
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:247
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:430
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:436
 #: build/tmp_jsp/com/muwire/webui/Downloads_jsp.java:237
 #: build/tmp_jsp/com/muwire/webui/Feeds_jsp.java:230
 #: build/tmp_jsp/com/muwire/webui/FileDetails_jsp.java:227
@@ -604,245 +604,253 @@ msgid "Allow trackers to track your shared files"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:312
-msgid "Show folder names"
+msgid "Allow regular expression queries"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:314
-msgid "Should MuWire show the names of your shared folders?"
+msgid "Respond to queries which contain a regular expression"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:318
+msgid "Show folder names"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:320
+msgid "Should MuWire show the names of your shared folders?"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:326
 msgid "Download retry frequency (seconds)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:322
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:328
 msgid ""
 "MuWire retries failed downloads automatically.  This value controls how "
 "often to retry."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:326
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:332
 msgid "Give up on sources after this many failures (-1 means never)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:328
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:334
 msgid ""
 "After how many download attempts MuWire should give up on the download "
 "source."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:332
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:338
 msgid "Folder for downloaded files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:334
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:340
 msgid ""
 "Where to save downloaded files. MuWire must be able to write to this "
 "location."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:338
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:344
 msgid "Folder for incomplete files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:340
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:346
 msgid ""
 "Where to store partial data of files which are currently being downloaded."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:344
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:350
 #: src/main/java//com/muwire/webui/Util.java:143
 msgid "Upload"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:346
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:352
 msgid "Total upload slots (-1 means unlimited)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:348
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:354
 msgid "Maximum files to upload at once"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:352
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:358
 msgid "Upload slots per user (-1 means unlimited)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:354
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:360
 msgid "Maximum files to upload to a single user at once"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:358
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:364
 #: src/main/java//com/muwire/webui/Util.java:121
 msgid "Sharing"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:360
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:366
 msgid "Drop Box folder"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:362
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:368
 msgid "Where to store files you share with drag and drop"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:366
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:372
 msgid "Share downloaded files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:368
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:374
 msgid "Automatically share files you have downloaded with MuWire"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:372
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:378
 msgid "Share hidden files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:374
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:380
 msgid "Share files marked as hidden by the operating system"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:378
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:384
 msgid "CPU cores to use when hashing files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:380
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:386
 msgid "How many CPU cores to use when hashing shared files"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:384
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:390
 #: src/main/java//com/muwire/webui/Util.java:103
 msgid "Publishing"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:386
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:392
 msgid "Enable my feed"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:388
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:394
 msgid "Enable your personal file feed"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:392
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:398
 msgid "Advertise my feed in search results"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:394
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:400
 msgid "Allow other users to find your personal file feed"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:398
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:404
 #: src/main/java//com/muwire/webui/Util.java:100
 msgid "Publish shared files automatically"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:400
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:406
 msgid ""
 "All files you share in the future will be published to your feed "
 "automatically."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:404
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:410
 #: src/main/java//com/muwire/webui/Util.java:46
 msgid "Default settings for new feeds"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:406
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:412
 #: src/main/java//com/muwire/webui/Util.java:54
 msgid "Download published files automatically"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:408
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:414
 msgid "Download every file published to the given feed"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:412
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:418
 #: src/main/java//com/muwire/webui/Util.java:52
 msgid "Download each file sequentially"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:414
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:420
 msgid ""
 "Download files from this feed sequentially. This helps with previewing media "
 "files, but may reduce availability of the file for others."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:418
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:424
 #: src/main/java//com/muwire/webui/Util.java:65
 msgid "Feed update frequency (minutes)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:420
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:426
 msgid "How often to check for updates to this feed"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:424
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:430
 #: src/main/java//com/muwire/webui/Util.java:93
 msgid "Number of items to keep on disk (-1 means unlimited)"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:426
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:432
 msgid ""
 "Only remember this many published items across restarts, unless you set the "
 "value to -1"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:432
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:438
 msgid "Allow only trusted connections"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:434
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:440
 msgid "Only connect to users you have marked as Trusted"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:438
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:444
 msgid "Search extra hop"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:440
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:446
 msgid ""
 "If only trusted connections are allowed, search only users that are directly "
 "connected to you. Use this setting to enable searches of additional users. "
 "It has no effect if untrusted connections are allowed."
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:444
-msgid "Allow others to view my trust list"
-msgstr ""
-
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:446
-msgid ""
-"Allow other MuWire users to see who you have marked as Trusted and Distrusted"
-msgstr ""
-
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:450
-msgid "Trust list update frequency (hours)"
+msgid "Allow others to view my trust list"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:452
 msgid ""
-"How often to check for updates to the trust lists you are subscribed to."
+"Allow other MuWire users to see who you have marked as Trusted and Distrusted"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:456
-msgid "I2P Tunnels - Changes Require Plugin Restart"
+msgid "Trust list update frequency (hours)"
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:458
-msgid "Inbound tunnel length"
+msgid ""
+"How often to check for updates to the trust lists you are subscribed to."
 msgstr ""
 
 #: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:462
+msgid "I2P Tunnels - Changes Require Plugin Restart"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:464
+msgid "Inbound tunnel length"
+msgstr ""
+
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:468
 msgid "Inbound tunnel quantity"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:466
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:472
 msgid "Outbound tunnel length"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:470
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:476
 msgid "Outbound tunnel quantity"
 msgstr ""
 
-#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:474
+#: build/tmp_jsp/com/muwire/webui/ConfigurationPage_jsp.java:480
 #: src/main/java//com/muwire/webui/Util.java:114
 msgid "Save"
 msgstr ""
@@ -1103,31 +1111,31 @@ msgstr ""
 msgid "Please enter a full MuWire ID"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:152
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:167
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:154
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:169
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:179
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:171
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:181
 #: src/main/java//com/muwire/webui/ConfigurationServlet.java:183
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:185
 msgid "Bad input"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:167
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:169
 #: src/main/java//com/muwire/webui/Util.java:90
 msgid "must be greater than zero"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:179
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:181
 #, java-format
 msgid "{0} does not exist"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:181
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:183
 #, java-format
 msgid "{0} is not a folder"
 msgstr ""
 
-#: src/main/java//com/muwire/webui/ConfigurationServlet.java:183
+#: src/main/java//com/muwire/webui/ConfigurationServlet.java:185
 #, java-format
 msgid "{0} not writeable"
 msgstr ""

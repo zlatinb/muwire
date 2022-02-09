@@ -421,7 +421,7 @@ public class Core {
         ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, props, certificateManager, chatServer, collectionManager)
 
         log.info "initializing search manager"
-        SearchManager searchManager = new SearchManager(eventBus, me, resultsSender)
+        SearchManager searchManager = new SearchManager(eventBus, me, resultsSender, props)
         eventBus.register(QueryEvent.class, searchManager)
         eventBus.register(ResultsEvent.class, searchManager)
 

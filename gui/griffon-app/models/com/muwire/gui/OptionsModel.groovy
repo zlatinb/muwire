@@ -29,6 +29,7 @@ class OptionsModel {
     @Observable boolean browseFiles
     @Observable boolean showPaths
     @Observable boolean allowTracking
+    @Observable boolean regexQueries
     @Observable int speedSmoothSeconds
     @Observable int totalUploadSlots
     @Observable int uploadSlotsPerUser
@@ -117,6 +118,7 @@ class OptionsModel {
         browseFiles = settings.browseFiles
         showPaths = settings.showPaths
         allowTracking = settings.allowTracking
+        regexQueries = settings.regexQueries
         speedSmoothSeconds = settings.speedSmoothSeconds
         totalUploadSlots = settings.totalUploadSlots
         uploadSlotsPerUser = settings.uploadSlotsPerUser

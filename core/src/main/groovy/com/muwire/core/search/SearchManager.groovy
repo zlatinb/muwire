@@ -1,5 +1,6 @@
 package com.muwire.core.search
 
+import com.muwire.core.MuWireSettings
 import com.muwire.core.util.MessageThrottle
 
 import com.muwire.core.EventBus
@@ -23,6 +24,7 @@ public class SearchManager {
     private final EventBus eventBus
     private final Persona me
     private final ResultsSender resultsSender
+    private final MuWireSettings settings
     private final Map<UUID, QueryEvent> responderAddress = Collections.synchronizedMap(new HashMap<>())
     
     private final Map<UUID, ResultBatch> pendingResults = new HashMap<>()
@@ -33,10 +35,11 @@ public class SearchManager {
 
     SearchManager(){}
 
-    SearchManager(EventBus eventBus, Persona me, ResultsSender resultsSender) {
+    SearchManager(EventBus eventBus, Persona me, ResultsSender resultsSender, MuWireSettings settings) {
         this.eventBus = eventBus
         this.me = me
         this.resultsSender = resultsSender
+        this.settings = settings
         Timer timer = new Timer("query-expirer", true)
         timer.schedule({cleanup()} as TimerTask, CHECK_INTERVAL, CHECK_INTERVAL)
         timer.schedule({sendBatched()}, RESULT_DELAY, RESULT_DELAY)
@@ -49,6 +52,8 @@ public class SearchManager {
         }
         
         if (event.searchEvent.regex) {
+            if (!settings.regexQueries)
+                return
             final long now = System.currentTimeMillis()
             synchronized (throttleLock) {
                 if (!globalRegexThrottle.allow(now)) {

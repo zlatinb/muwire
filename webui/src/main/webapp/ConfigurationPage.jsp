@@ -89,6 +89,14 @@ Exception error = (Exception) application.getAttribute("MWConfigError");
 					</tr>
 					<tr>
 						<td>
+							<div class="tooltip"><%=Util._t("Allow regular expression queries")%>
+								<span class="tooltiptext"><%=Util._t("Respond to queries which contain a regular expression")%></span>
+							</div>
+						</td>
+						<td><p align="right"><input type="checkbox" <% if (core.getMuOptions().getRegexQueries()) out.write("checked"); %> name="allowTracking" value="true"></p></td>
+					</tr>
+					<tr>
+						<td>
 							<div class="tooltip"><%=Util._t("Show folder names")%>
 								<span class="tooltiptext"><%=Util._t("Should MuWire show the names of your shared folders?")%></span>
 							</div>

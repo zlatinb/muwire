@@ -65,6 +65,7 @@ class OptionsView {
     def browseFilesCheckbox
     def showPathsCheckbox
     def allowTrackingCheckbox
+    def regexQueriesCheckbox
     def speedSmoothSecondsField
     def totalUploadSlotsField
     def uploadSlotsPerUserField
@@ -188,6 +189,10 @@ class OptionsView {
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 5,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
+                label(text: trans("OPTIONS_REGEX_QUERIES"), constraints: gbc(gridx: 0, gridy: 6, anchor: GridBagConstraints.LINE_START,
+                    fill : GridBagConstraints.HORIZONTAL, weightx: 100))
+                regexQueriesCheckbox = checkBox(selected: bind {model.regexQueries}, constraints : gbc(gridx: 1, gridy: 6,
+                        anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
             }
             
             panel (border : titledBorder(title : trans("OPTIONS_DOWNLOAD_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
