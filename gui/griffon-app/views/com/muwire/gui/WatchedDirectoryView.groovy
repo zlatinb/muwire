@@ -30,6 +30,7 @@ class WatchedDirectoryView {
     
     def autoWatchCheckbox
     def syncIntervalField
+    def applySubCheckbox
 
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -50,8 +51,16 @@ class WatchedDirectoryView {
                     constraints: gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END, insets : [0,10,0,0]))
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : trans("SAVE"), saveAction)
-                button(text : trans("CANCEL"), cancelAction)
+                gridLayout(rows: 1, cols: 3)
+                panel()
+                panel() {
+                    button(text: trans("SAVE"), saveAction)
+                    button(text: trans("CANCEL"), cancelAction)
+                } 
+                panel() {
+                    label(text : trans("WATCHED_DIRECTORY_APPLY_SUB"))
+                    applySubCheckbox = checkBox(selected: false)
+                }
             }
         }
     }

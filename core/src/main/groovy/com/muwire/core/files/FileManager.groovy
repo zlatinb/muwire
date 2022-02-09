@@ -1,5 +1,7 @@
 package com.muwire.core.files
 
+import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
+
 import java.nio.file.Path
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -366,6 +368,17 @@ class FileManager {
         }
     }
     
+    void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
+        // just enriches the event with subdirectories.
+        if (!e.subfolders) {
+            e.toApply = new File[] {e.directory}
+        } else {
+            def cb = new SubDirCallback()
+            positiveTree.traverse(e.directory, cb)
+            e.toApply = cb.subDirs.toArray(new File[0])
+        }
+    }
+    
     public List<SharedFile> getPublishedSince(long timestamp) {
         synchronized(fileToSharedFile) {
             fileToSharedFile.values().stream().
@@ -393,5 +406,19 @@ class FileManager {
         public void onFile(File file, SharedFile value) {
             unsharedFiles << value
         }
+    }
+    
+    private static class SubDirCallback implements FileTreeCallback<SharedFile> {
+        final List<File> subDirs = new ArrayList<>()
+        
+        @Override
+        public void onDirectoryEnter(File file) {
+            subDirs << file
+        }
+        
+        @Override
+        public void onDirectoryLeave(){}
+        @Override
+        public void onFile(File file, SharedFile ignored){}
     }
 }

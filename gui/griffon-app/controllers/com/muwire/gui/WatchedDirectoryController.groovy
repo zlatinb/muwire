@@ -20,7 +20,8 @@ class WatchedDirectoryController {
         def event = new WatchedDirectoryConfigurationEvent(
             directory : model.directory.directory,
             autoWatch : view.autoWatchCheckbox.model.isSelected(),
-            syncInterval : Integer.parseInt(view.syncIntervalField.text))
+            syncInterval : Integer.parseInt(view.syncIntervalField.text),
+            subfolders: view.applySubCheckbox.model.isSelected())
         model.core.eventBus.publish(event)
         cancel()
     }

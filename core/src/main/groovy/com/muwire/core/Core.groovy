@@ -317,6 +317,7 @@ public class Core {
         eventBus.register(DirectoryUnsharedEvent.class, fileManager)
         eventBus.register(UICommentEvent.class, fileManager)
         eventBus.register(SideCarFileEvent.class, fileManager)
+        eventBus.register(WatchedDirectoryConfigurationEvent.class, fileManager)
         
         log.info("initializing collection manager")
         collectionManager = new CollectionManager(eventBus, fileManager, home)

@@ -95,14 +95,16 @@ class DirectoryWatcher {
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
         if (watchService == null)
             return // still converting
-        if (!e.autoWatch) {
-            WatchKey wk = watchedDirectories.remove(e.directory)
-            wk?.cancel()
-        } else if (!watchedDirectories.containsKey(e.directory)) {
-            Path path = e.directory.toPath()
-            def wk = path.register(watchService, kinds)
-            watchedDirectories.put(e.directory, wk)
-        } // else it was already watched
+        e.toApply.each {
+            if (!e.autoWatch) {
+                WatchKey wk = watchedDirectories.remove(it)
+                wk?.cancel()
+            } else if (!watchedDirectories.containsKey(it)) {
+                Path path = it.toPath()
+                def wk = path.register(watchService, kinds)
+                watchedDirectories.put(it, wk)
+            } // else it was already watched
+        }
     }
     
     private void watch() {
