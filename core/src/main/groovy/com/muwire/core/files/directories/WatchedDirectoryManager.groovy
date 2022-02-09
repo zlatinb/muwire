@@ -63,6 +63,12 @@ class WatchedDirectoryManager {
         watchedDirs.containsKey(f) || aliasesMap.containsKey(f)
     }
     
+    synchronized WatchedDirectory getDirectory(File file) {
+        if (watchedDirs.containsKey(file))
+            return watchedDirs[file]
+        return aliasesMap[file]
+    }
+    
     public void shutdown() {
         diskIO.shutdown()
         timer.cancel()

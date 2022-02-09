@@ -1347,6 +1347,29 @@ class MainFrameView {
             return rv
         }
     }
+
+    /**
+     * @return if a single file is selected, return it.
+     */
+    SharedFile singleSelectedFile() {
+        if (model.treeVisible) {
+            def sharedFilesTree = builder.getVariable("shared-files-tree")
+            TreePath[] selected = sharedFilesTree.getSelectionPaths()
+            if (selected.length != 1)
+                return null
+            Object o = selected[0].getLastPathComponent().getUserObject()
+            if (o instanceof SharedFile)
+                return (SharedFile)o
+            return null
+        } else {
+            def sharedFilesTable = builder.getVariable("shared-files-table")
+            int[] selected = sharedFilesTable.getSelectedRows()
+            if (selected.length != 1)
+                return null
+            selected[0] = sharedFilesTable.rowSorter.convertRowIndexToModel(selected[0])
+            return model.shared[selected[0]]
+        }
+    }
     
     Set<File> selectedFolders() {
         if (!model.treeVisible) 
@@ -1658,11 +1681,12 @@ class MainFrameView {
     }
     
     void showSharedFilesPopupMenu(MouseEvent e) {
-        def selectedFiles = selectedSharedFiles()
+        Set<File> selectedFolders = selectedFolders()
+        SharedFile singleSelectedFile = singleSelectedFile()
         
         JPopupMenu sharedFilesMenu = new JPopupMenu()
         
-        if (selectedFiles != null && selectedFiles.size() == 1) {
+        if (singleSelectedFile != null) {
             JMenuItem openFile = new JMenuItem(trans("OPEN"))
             openFile.addActionListener({mvcGroup.controller.open()})
             sharedFilesMenu.add(openFile)
@@ -1688,9 +1712,15 @@ class MainFrameView {
         JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
         openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
         sharedFilesMenu.add(openContainingFolder)
-        JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
-        showFileDetails.addActionListener({mvcGroup.controller.showFileDetails()})
-        sharedFilesMenu.add(showFileDetails)
+        if (singleSelectedFile != null) {
+            JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
+            showFileDetails.addActionListener({ mvcGroup.controller.showFileDetails() })
+            sharedFilesMenu.add(showFileDetails)
+        } else if (selectedFolders.size() == 1 && model.core.getWatchedDirectoryManager().isWatched(selectedFolders.first())) {
+            JMenuItem configure = new JMenuItem(trans("CONFIGURE"))
+            configure.addActionListener({mvcGroup.controller.configureFolder()})
+            sharedFilesMenu.add(configure)
+        }
         
         showPopupMenu(sharedFilesMenu, e)
     }

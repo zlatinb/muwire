@@ -1,13 +1,12 @@
 package com.muwire.gui
 
 import com.muwire.core.files.DirectoryUnsharedEvent
+import com.muwire.core.files.directories.WatchedDirectory
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 
 import javax.swing.JTextField
-import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.GriffonApplication
@@ -18,7 +17,6 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Base64
 import net.i2p.data.Signature
-import net.i2p.data.i2cp.MessageStatusMessage
 
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -637,6 +635,25 @@ class MainFrameController {
         params['sf'] = selected[0]
         params['core'] = core
         mvcGroup.createMVCGroup("shared-file", params)
+    }
+    
+    @ControllerAction
+    void configureFolder() {
+        Set<File> selectedFolders = view.selectedFolders()
+        if (selectedFolders.size() != 1)
+            return
+        def file = selectedFolders.first()
+        def wdm = model.core.getWatchedDirectoryManager()
+        if (!wdm.isWatched(file))
+            return
+
+        WatchedDirectory wd = wdm.getDirectory(file)
+        
+        def props = [:]
+        props.core = model.core
+        props.directory = wd
+        mvcGroup.createMVCGroup("watched-directory", props).destroy()
+        
     }
     
     @ControllerAction

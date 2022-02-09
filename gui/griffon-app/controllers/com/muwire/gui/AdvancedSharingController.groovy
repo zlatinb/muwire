@@ -25,7 +25,7 @@ class AdvancedSharingController {
         def params = [:]
         params['core'] = model.core
         params['directory'] = wd
-        mvcGroup.createMVCGroup("watched-directory",params)
+        mvcGroup.createMVCGroup("watched-directory",params).destroy()
     }
     
     @ControllerAction
