@@ -4,13 +4,13 @@ The MuWire protocol operates over a TCP-like streaming layer offered by the I2P 
 
 ## Handshake
 
-A connection begins with the word "MuWire" followed by a space and one of the following words: "leaf" o "peer", depending on whether Alice is in a leaf or ultrapeer.  This allows Bob to immediately drop the connection without allocating any more resources.
+A connection begins with the word "MuWire" followed by a space and one of the following words: `leaf` o `peer`.  Currently only `peer` is supported.
 
-If Bob is an ultrapeer he responds to the handshake by either accepting it or rejecting it and optionally suggesting other ultrapeers to connect to.
+Bob responds to the handshake by either accepting it or rejecting it and optionally suggesting other nodes to connect to.
 
 Accepting the handshake is done by responding with a single word "OK".
 
-Rejecting the handshake is done by responding with the word "REJECT", optionally followed JSON payload prefixed by two unsigned bytes indicating the length of the JSON document.  In that document, Bob can suggest ultrapeers to connect to in b64 format:
+Rejecting the handshake is done by responding with the word "REJECT", optionally followed JSON payload prefixed by two unsigned bytes indicating the length of the JSON document.  In that document, Bob can suggest nodes to connect to in I2P b64 format:
 
 ```
 {
@@ -42,9 +42,9 @@ A persona is represented as a blob with the following format:
 byte 0: unsigned version number of the format.  Currently fixed at 1.
 bytes 1 to N: nickname of the persona in internationalized format
 bytes N+1 to M: the I2P destination of the persona
-bytes M+1 to O: signature of bytes 0 to M (length TBD)
+bytes M+1 to M+33: signature of bytes 0 to M
 ```
-## Certificate wire format
+## Certificate wire format (not implemented)
 (See the "web-of-trust" document for the definition of a MuWire certificate)
 
 A certificate is represented as a blob with the following format:
@@ -57,11 +57,11 @@ bytes M+1 to O: signature of bytes 0 to M, signed by Alice (length TBD)
 ```
 ## Messages
 
-After the handhsake follows a stream of messages.  Messages can arrive in any order.  Every 10 seconds a "Ping" message is sent on each connection which serves as a keep-alive.  The response to that message is a "Pong" which carries b64 destinations of ultrapeers the remote side has been able to connect to.  This keeps the host pool in each node fresh.
+After the handhsake follows a stream of messages.  Messages can arrive in any order.  Every 40 seconds a `Ping` message is sent on each connection which serves as a keep-alive.  The response to that message is a `Pong` which carries b64 destinations of ultrapeers the remote side has been able to connect to.  This keeps the host pool in each node fresh.
 
-Between ultrapeers, each message consists of 3 bytes - the most significant bit of the first byte indicates if the payload is binary or JSON.  The remaining 23 bits indicate the length of the message.
 
-Between leaf and ultrapeer, each message consists of 2 bytes unsigned payload length followed by the JSON payload.
+Each message begins with 3 bytes - the most significant bit of the first byte indicates if the payload is binary or JSON.  The remaining 23 bits indicate the length of the message.
+
 
 The JSON structure has two mandatory top-level fields - type and version:
 
@@ -73,15 +73,15 @@ The JSON structure has two mandatory top-level fields - type and version:
 }
 ```
 
-Binary messages can be two types: full bloom filter or a patch message to be applied to a previously sent bloom filter.  Binary messages travel only between ultrapeers.  There is a single byte after the payload indicating the type of the binary message.  That byte is counted in the total payload length.
+### "Ping"
 
-#### "Ping"
+Sent periodically as a keep-alive.
 
-Sent periodically as a keep-alive on every type of connection.  Other than the header this message has no payload.
+To prevent replay attacks, each `Ping` carries a randomly generated UUID which serves as a nonce and is echoed in the `Pong`.  If the `Ping` does not have such an UUID, it is an indication that a `Pong` is not being solicited, for example when the node has reached it's desired number of connections.
 
-#### Pong
+### Pong
 
-A message containing addresses of other ultrapeers that the sender has successfully connected to.
+A message containing addresses of other ultrapeers that the sender has successfully connected to.  See `binary-pongs.md` for updates to this format.
 ```
 {
     type: "Pong",
@@ -90,80 +90,47 @@ A message containing addresses of other ultrapeers that the sender has successfu
 }
 ```
 
-### Leaf to ultrapeer
+### "Search"
 
-#### "Upsert"
-
-This message is sent from a leaf to ultrapeer to indicating that the leaf is sharing a given file:
-
-```
-{
-    type : "Upsert",
-    version : 1,
-    infoshash : "asdfasf...",
-    names : [ "file name 1", "file name 2"...]
-}
-```
-
-Multiple file names per infohash are allowed.  In future versions this message may be extended to carry metadata such as artist, album and so on.
-
-#### "Delete"
-
-The opposite of Upsert - the leaf is no longer sharing the specified file.  The file is identified only by the infohash.
-
-```
-{
-    type: "Delete",
-    version: 1,
-    infohash "asdfasdf..."
-}
-```
-
-#### "Search"
-
-Sent by a leaf or ultrapeer when performing a search.  Contains the reply-to persona of the originator (base64-encoded).
+Sent by a nodewhen performing a search.  Contains the reply-to persona of the originator (base64-encoded).
 
 ```
 {
     type : "Search",
     version: 1,
     uuid: "asdf-1234..."
-    firstHop: false,
+    firstHop: boolean,
     keywords : ["keyword1","keyword2"...]
     infohash: "asdfasdf...",
     replyTo : "asdfasf...b64",
     originator : "asfasdf...",
-    "oobHashlist" : true
+    oobHashlist : boolean,
+    searchComments : boolean,
+    compressedResults : boolean,
+    collections : boolean,
+    searchPaths : boolean,
+    regex : boolean,
+    sig : base64-encoded byte array,
+    sig2 : base64-encoded byte array
 }
 ```
 
 A search can contain either the query entered by the user in the UI or the infohash if the user is looking for a specific file.  If both are present, the infohash takes precedence and the keyword query is ignored.
 
-The "originator" field contains the Base64-encoded persona of the originator of the query.  It is used for display purposes only.  The I2P destination in that persona must match the one in the "replyTo" field.
+* `originator` field contains the Base64-encoded persona of the originator of the query.  It is used for display purposes only.  The I2P destination in that persona must match the one in the `replyTo` field.  Since MuWire 0.8.12 that destination is also checked against the address of the streaming connection if the `firstHop` flag is set.
+* `oobHashlist` flag indicates support for out-of-band hashlist delivery
+* `searchComments` flag indicated whether the responding node should also search in the comments associated with shared files as opposed to just their names.
+* `compressedResults` flag indicates support for receiving compressed results
+* `collections` flag indicates whether the responding node should also search in any collection names.  See `collections.md` for more information.  If combined with `searchComments` flag then comments of collections are searched too.
+* `searchPaths` flag indicates whether the responding node should search in the fully-shared parts of the paths to its shared files
+* `regex` flag indicates that the first entry in the `keywords` array is to be treated as a regular expression.
+* `sig` is a Base64-encoded signature of the search terms (TODO: document properly)
+* `sig2` is a Base64-encoded signature of the UUID and timestamp of the query (TODO: document properly)
 
-The oobHashlist flag indicates support for out-of-band hashlist delivery, which is not yet implemented.  Nevertheless, this flag gets propagated through the network for future-proofing.
 
-### Ultrapeer to leaf
+### Search results
 
-The "Search" message is also sent from an ultrapeer to a leaf.
-
-### Between Ultrapeers
-
-The only JSON message other than "Ping" and "Pong" that can travel between ultrapeers is the "Search" message which is identical to the one sent from a leaf.
-
-There are two types of binary messages that can travel between ultrapeers - Bloom filter and Patch.  Bloom filter should be the first message that is sent after establishing the connection, but that is not enforced.  If any Patch messages arrive before any Bloom filter has been received, they are ignored.  In the unlikely case that the size of a Patch message would exceed that of a complete Bloom filter the ultrapeer may choose to send a new Bloom filter which replaces the old one.
-
-#### Bloom filter
-
-This message starts with a single byte which indicates the size of the bloom filter in bits in power of 2, maximum being 22 -> 512kb.  The rest of the payload is the bloom filter itself.
-
-#### Patch
-
-This message starts with two unsigned bytes indicating the number of patches included in the message.  Each patch consists of 3 bytes, where the most significant bit indicates whether the corresponding bit should be set or cleared and the remaining 23 contain the position within the Bloom filter that is to be patched.
-
-### Search results - any node to any node
-
-Search results are sent through and HTTP POST method from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response.  This connection is uncompressed.  The first thing sent on it is the persona of the responder in binary.  That is followed by two unsigned bytes containing the number of search results.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
+Search results are sent through `POST`(uncompressed, pending deprecation) or `RESULTS`(compressed, preferred) methods from the responder to the originator of the query.  The URL is the UUID of the search that prompted ther response.  The first thing sent on it is the persona of the responder in binary.  That is followed by two unsigned bytes containing the number of search results.  After that follows a stream containing JSON messages prefixed by two unsigned bytes indicating the length of each message.  The format is the following:
 
 ```
 {
@@ -181,35 +148,36 @@ Search results are sent through and HTTP POST method from the responder to the o
 * The "altlocs" list contains list of alternate personas that the responder thinks may also have the file.
 * The "pieceSize" field is the size of the each individual file piece (except possibly the last) in powers of 2
 
-Results version 1 contain the full hashlist, version 2 does not contain that list.  See the "infohash-upgrade" document for more information.
+Results version 1 contain the full hashlist, version 2 does not contain that list.  See the `infohash-upgrade.md` document for more information.
 
-### "Who do you trust" query - any node to any node
+### "Who do you trust" query 
 (See the "web-of-trust" document for more info on this query)
 
-This is a GET request with the URL "/who-do-you-trust".  The response is a binary stream of persona details.
+This is a `TRUST` request.
 
-### "Who trusts you" query - any node to any node
+### "Who trusts you" (not implemented)
 (See the "web-of-trust" document for more info on this query)
 
 This is a GET request with the URL "/who-trusts-you".  The response is a binary stream of certificate details.
 
-### "Browse host" query - any node to any node
+### "Browse host"
 
-This is a GET request with the URL "/browse".  The response is a stream with the same format as the body of the search results POST method above.
+This is a `BROWSE` request. TODO: document better
 
 # HostCache protocol
 
 ### Node to HostCache
 
-Nodes send a "Ping" message to the hostcache, enriched with a boolean "leaf" field indicating whether the node is a leaf or not:
+Nodes send a `Ping` message to the hostcache
 
 ```
 {
     type: "Ping",
     version: 1,
-    leaf: true
+    leaf: boolean
 }
 ```
+The `leaf` field is ignored.
 
 ### HostCache to Node
 

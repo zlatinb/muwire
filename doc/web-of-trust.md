@@ -22,13 +22,13 @@ Users are encouraged to only trust after successfully downloading a file and ver
 
 ### Sharing trust lists
 
-In order to enable users to make better choices whom to trust, the protocol allows for exchange of trust lists.  Users can query the trust lists of other personas through an UI action.  There are two types of queries - "who do you trust" and "who trusts you" which are executed as GET requests to the I2P address of the persona being queried
+In order to enable users to make better choices whom to trust, the protocol allows for exchange of trust lists.  Users can query the trust lists of other personas through an UI action.  There are two types of queries - "who do you trust" and "who trusts you" which are executed as `TRUST` requests to the I2P address of the persona being queried
 
 ##### "Who do you trust" query
 
 The response is a list of full persona details that the responder currently trusts.
 
-##### "Who trusts you" query and certificates
+##### "Who trusts you" query and certificates (not implemented yet)
 
 This query is more informative when making the decision whether to trust, so it is important for it to be more difficult to abuse.  To provide such protection, the response body contains trust "certificates" instead of raw personas.
 

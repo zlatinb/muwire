@@ -13,43 +13,41 @@ MuWire operates a Web-Of-Trust layer on top of a Gnutella-like topology on top o
 
 ### Initial Bootstrap
 
-Initial bootstrap into the MuWire network is done in a similar fashion to Gnutella.  Dedicated bootstrap servers ("HostCaches") listen for incoming I2P Datagrams which contain requests for addresses of ultrapeers.  The incoming signed datagram has a flag whether the requesting node is an ultrapeer or a leaf; if the node claims to be an ultrapeer it may be added to the list of known ultrapeers by the HostCache.  Implementors of HostCaches are free to choose other discovery strategies such as crawling, active polling and so on.
+Initial bootstrap into the MuWire network is done in a similar fashion to Gnutella.  Dedicated bootstrap servers ("HostCaches") listen for incoming I2P Datagrams which contain requests for addresses of MuWire nodes.  The incoming signed datagram has a flag whether the requesting node wishes to be added to the list of known hosts by the HostCache.  Implementors of HostCaches are free to choose other discovery strategies such as crawling, active polling and so on.
 
-In response to the request, the HostCache sends back an I2P datagram containing Destinations of chosen ultrapeers.  For ease of implementation, the response datagram is also signed and it's payload is JSON.
+In response to the request, the HostCache sends back an I2P datagram containing Destinations of chosen nodes.  For ease of implementation, the response datagram is also signed and it's payload is JSON.
 
 ### Connectivity to peers
 
-Each MuWire node will create a single unique I2P Destination.  Traffic to and from that destination can either be over the I2P streaming or I2P signed datagram protocols.  At the moment the signed datagram protocol is only used during the bootstrap phase.
+Each MuWire node will create a single unique I2P Destination.  Traffic to and from that destination can either be over the I2P streaming or I2P signed datagram protocols.  At the moment the signed datagram protocol is only used during the bootstrap phase and when checking for updates.
 
-Going one level up the stack, traffic to and from the node's Destination can be either the MuWire network protocol or HTTP1.1 protocols, depending on the use case.  MuWire's network protocol is documented in the "wire-protocol" document.
+Going one level up the stack, traffic to and from the node's Destination can be either the MuWire network protocol or a protocol similar to HTTP1.1 depending on the use case.  MuWire's network protocol is documented in the `wire-protocol.md` document.
 
-Similar to Gnutella, MuWire nodes can be either leafs or ultrapeers.
+Unlike Gnutella 0.6, MuWire nodes are only ultrapeers.  This is similar to Gnutella 0.4.
 
-##### Leaf connectivity
+##### Connectivity
 
-If the node is a leaf, it will only establish outgoing connections to a small number of ultrapeers.  In Gnutella that number was between 2 and 5.  The node will not accept any incoming connections over the MuWire protocol.
+Nodes will establish outgoing connections to other nodes as well as listen to incoming connections.  There exists a "quota" of allowed connections which is further divided into quotas for outgoing connections and one for incoming connections.  Whenever any of the quotas is exhausted, the node will reject further connection attempts.
 
-##### Ultrapeer connectivity
-
-Ultrapeer nodes will establish outgoing connections to other ultrapeers as well as listen to incoming connections from leafs and ultrapeers.  Ultrapeers have a "quota" of allowed leaf and ultrapeer connections.  The quota for ultrapeer connections is further divided into quotas for outgoing connections and one for incoming connections.  Whenever any of the quotas is exhausted, the node will reject further connection attempts
+Upon rejecting connection attempts the node may optionally provide a suggested list of other nodes to try.
 
 ### Search request propagation
 
-Leafs send search requests to all ultrapeers they are connected to.  Ultrapeers in turn forward those queries, as well as any queries made by the local user to ALL neighboring ultrapeers, setting a flag "firstHop" to "true".  When an ultrapeer receives a query with that flag set to true, it will clear the flag and forward it only to those neighboring ultrapeers that have a keyword hit in their Bloom filter, as well as to any local leafs that match the keyword search.  When an ultrapeer receives a query with the "firstHop" flag set o false, it will only return local search results or forward the query to those leaves that have a keyword match.
+Nodes forward queries made by the local user to ALL neighbors setting a flag "firstHop" to "true".  When receiving a query with that flag set to true, the node clears the flag and forward the modified query to a random subset of it's own neighbors.  Currently, the size of the subset is set to 2*SQRT(numConnections).  When a nodes receives a query with the "firstHop" flag set to false, it will not forward the query further. 
 
 This is similar but not equivalent to setting the maximum TTL in Gnutella to 1.
 
-### Search result verification
+### Search result delivery
 
-Unlike Gnutella, MuWire nodes send search results over a streaming I2P connection.  This is to ensure that the persona carried in the search result cannot be spoofed, and to make blacklisting of personas that return undesired results effective.  To make spamming less efficient, the UI will show up to 3 search results by default from each persona, but will give the option to display all of them.  After the results have been delivered, the streaming connection is closed.
+Unlike Gnutella, MuWire nodes send search results over a streaming I2P connection.  This is to ensure that the origin of the search result cannot be spoofed, and to make blacklisting of personas that return undesired results effective. 
 
 ### File transfer
 
-Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a GET request which includes the infohash of the file in the URL.
+Files are transferred over HTTP1.1 protocol with some custom headers added for download mesh management.  Files are requested with a `GET` request which includes the infohash of the file in the URL.  See the `infohash-upgrade.md` document for information on the delivery of the hash list.
 
 ### Mesh management
 
-Download mesh management is a simplified version of Gnutella's "Alternate Location" system.  For more information see the "download-mesh" document.
+Download mesh management is a simplified version of Gnutella's "Alternate Location" system.  For more information see the `download-mesh.md` document.
 
 ### In-Network updates
 

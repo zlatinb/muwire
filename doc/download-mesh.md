@@ -10,6 +10,7 @@ With every request a downloader makes it sends an "X-Have" header containing the
 
 The uploader can recommend other uploaders to the downloader via the "X-Alt" header.  The format of this header is a comma-separated list of Base64-encoded Personas that have previously reported having at least one piece of the file to the uploader via the "X-Have" header.
 
+
 ### Differences from Gnutella
 
 Unlike Gnutella the uploader is the sole repository where possible sources of the file are tracked.  There is no negative "X-Nalt" header to prevent attacking the download mesh by mass downvoting of sources.
