@@ -21,7 +21,6 @@
 |---|---|---|---|
 |"Edit File Details" frame|N/A|GUI|High|
 |Right-click resync from watched folders table|N/A|GUI|Medium|
-|Persist known hosts|N/A|HostCache, infrastructure|High|
 |Fix reproducible build on Windows| N/A| Build scripts | Low|
 |Option to disable saving of search tabs| N/A | GUI | Medium |
 |Progress bar while collection preview is generated | 70 | GUI | Low |

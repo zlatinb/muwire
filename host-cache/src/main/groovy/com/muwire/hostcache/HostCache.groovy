@@ -73,6 +73,7 @@ public class HostCache {
         File unverified = new File("unverified")
         verified.mkdir()
         unverified.mkdir()
+        hostPool.load(verified)
         timer.schedule({hostPool.serialize(verified, unverified)} as TimerTask, 10000, 60 * 60 * 1000)
 
         session.addMuxedSessionListener(new Listener(hostPool: hostPool, toReturn: 3, crawler: crawler),

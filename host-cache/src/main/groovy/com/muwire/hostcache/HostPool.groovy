@@ -1,10 +1,15 @@
 package com.muwire.hostcache
 
+import groovy.json.JsonSlurper
+import groovy.util.logging.Log
+import net.i2p.data.Destination
+
 import java.text.SimpleDateFormat
 import java.util.stream.Collectors
 
 import groovy.json.JsonOutput
 
+@Log
 class HostPool {
 
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd-HH")
@@ -101,5 +106,41 @@ class HostPool {
                 writer.println(str)
             }
         }
+    }
+    
+    synchronized void load(File path) {
+        File [] serialized = path.listFiles(new FileFilter() {
+            @Override
+            boolean accept(File pathname) {
+                return pathname.length() > 0
+            }
+        })
+        if (serialized == null || serialized.length == 0) {
+            log.info("couldn't find any files to load from.")
+            return
+        }
+        Arrays.sort(serialized, new Comparator<File>() {
+            @Override
+            int compare(File o1, File o2) {
+                return Long.compare(o2.lastModified(), o1.lastModified())
+            }
+        })
+        
+        File toLoad = serialized[0]
+        log.info("loading from $toLoad")
+        int loaded = 0
+        def slurper = new JsonSlurper()
+        toLoad.eachLine {
+            def parsed = slurper.parseText(it)
+            def host = new Host()
+            host.destination = new Destination(parsed.destination)
+            host.verifyTime = parsed.verifyTime
+            host.leafSlots = parsed.leafSlots
+            host.peerSlots = parsed.peerSlots
+            host.verificationFailures = parsed.verificationFailures
+            addUnverified(host)
+            loaded++
+        }
+        log.info("loaded ${unverified.size()}/$loaded hosts")
     }
 }
