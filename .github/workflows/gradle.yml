@@ -29,4 +29,8 @@ jobs:
       uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
       with:
         arguments: build
-
+    - name: Upload .zip
+      uses: actions/upload-artifact@v2
+      with:
+        name: MuWire CI zip
+        path: gui/build/distributions/MuWire-*.zip$
