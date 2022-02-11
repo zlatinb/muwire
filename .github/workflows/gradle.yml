@@ -35,5 +35,5 @@ jobs:
     - name: Upload .zip
       uses: actions/upload-artifact@v2
       with:
-        name: MuWire-${{ env.MW_VERSION }}.zip
+        name: MuWire-${{ env.MW_VERSION }}-${{ env.GITHUB_SHA }}.zip
         path: gui/build/distributions/MuWire-${{ env.MW_VERSION }}.zip
