@@ -29,8 +29,11 @@ jobs:
       uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
       with:
         arguments: build
+    - run: |
+       MW_VERSION=$(grep "^version" gradle.properties | sed "s/.*=//" | sed "s/ //g")
+       echo "MW_VERSION=${MW_VERSION}" >> $GITHUB_ENV
     - name: Upload .zip
       uses: actions/upload-artifact@v2
       with:
         name: MuWire CI
-        path: gui/build/distributions/
+        path: gui/build/distributions/MuWire-${{ env.MW_VERSION }}.zip
