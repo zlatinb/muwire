@@ -2,11 +2,11 @@ The GitHub repo is mirrored from the I2P GitLab repo.  Please open PRs and issue
 
 # MuWire - Easy Anonymous File-Sharing
 
-MuWire is a file publishing and networking tool that protects the identity of its users by using I2P technology. Anyone with a desktop computer and an internet connection can create a unique anonymous online persona and publish information of any kind without fear of censorship or persecution.
+MuWire is a file publishing and networking tool that protects the identity of its users by using I2P technology. Anyone with a desktop computer and an internet connection can create a unique anonymous online persona and publish information of any kind without fear of censorship or persecution.  MuWire works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi. 
 
 Users can then use their MuWire identities to publish files, search for files published by others, subscribe to each other’s publications and communicate through chat and messaging. Furthermore, users can establish trust-based relationship with each other where they assign a “trust level” to their contacts. 
 
-The current stable release is available for download at https://muwire.com.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  MuWire works on any platform Java works on, including Windows, MacOS, Linux, Rapsberry Pi. 
+The current stable release is available for download at https://muwire.com.  `.zip` bundles built from the latest source code are available on the [continuous integration] page.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
@@ -79,3 +79,4 @@ MuCats is a project to create a website for hosting hashes of files shared on th
 [Tracker]: https://github.com/zlatinb/muwire/wiki/Tracker-Daemon
 [MuCats]: https://github.com/zlatinb/mucats
 [reproducible build]: https://github.com/zlatinb/muwire/wiki/Reproducible-build
+[continuous integration]: https://github.com/zlatinb/muwire/actions/workflows/gradle.yml
