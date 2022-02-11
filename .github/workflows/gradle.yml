@@ -32,5 +32,5 @@ jobs:
     - name: Upload .zip
       uses: actions/upload-artifact@v2
       with:
-        name: MuWire CI zip
-        path: gui/build/distributions/MuWire-*.zip$
+        name: MuWire CI
+        path: gui/build/distributions/
