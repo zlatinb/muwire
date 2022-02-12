@@ -2,6 +2,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'jacoco'
 }
 
 dependencies {
@@ -29,10 +30,20 @@ configurations.testImplementation {
         exclude group:'org.codehaus.groovy', module:'groovy-testng'
 }
 
-test.doFirst {
-    jvmArgs=["--add-opens","java.base/java.lang=ALL-UNNAMED",
+test {
+    doFirst {
+        jvmArgs=["--add-opens","java.base/java.lang=ALL-UNNAMED",
             "--add-opens","java.base/sun.nio.fs=ALL-UNNAMED",
             "--add-opens","java.base/java.nio=ALL-UNNAMED"]
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
 }
 
 // publish core to local maven repo for sister projects
