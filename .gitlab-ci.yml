@@ -43,13 +43,16 @@ test:
     paths:
       - build
       - .gradle
+  artifacts:
+    paths:
+      - core/build/reports/jacoco/test/jacocoTestReport.xml
 
 coverage:
   stage: visualize
   image: haynes/jacoco2cobertura:1.0.7
   script:
-    - 'python /opt/cover2cover.py core/build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/core/src > core/build/reports/coberturaTesTReport.xml'
+    - 'python /opt/cover2cover.py core/build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/core/src > coberturaTestReport.xml'
   needs: ["test"]
   artifacts:
     reports:
-      cobertura: core/build/reports/coberturaTesTReport.xml
+      cobertura: coberturaTestReport.xml
