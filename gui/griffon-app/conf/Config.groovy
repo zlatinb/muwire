@@ -218,4 +218,9 @@ mvcGroups {
         view = 'com.muwire.gui.resultdetails.CollectionListView'
         controller = 'com.muwire.gui.resultdetails.CollectionListController'
     }
+    'publish-preview' {
+        model = 'com.muwire.gui.PublishPreviewModel'
+        view = 'com.muwire.gui.PublishPreviewView'
+        controller = 'com.muwire.gui.PublishPreviewController'
+    }
 }

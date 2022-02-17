@@ -748,11 +748,10 @@ class MainFrameController {
         if (selectedFiles == null || selectedFiles.isEmpty())
             return
         
-        long now = System.currentTimeMillis()
-        selectedFiles.stream().filter({!it.isPublished()}).forEach({
-            it.publish(now)
-            model.core.eventBus.publish(new UIFilePublishedEvent(sf : it))
-        })
+        def params = [:]
+        params.core = model.core
+        params.requested = selectedFiles
+        mvcGroup.createMVCGroup("publish-preview",params).destroy()
         
         view.refreshSharedFiles()
     }
