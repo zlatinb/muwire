@@ -1314,7 +1314,7 @@ class MainFrameView {
             if (model.core.muOptions.fileFeed) {
                 myFeedButton.setEnabled(true)
                 myFeedButton.setToolTipText(trans("TOOLTIP_VIEW_FILE_FEED"))
-                publishButton.setEnabled(true)
+                publishButton.setEnabled(model.publishButtonEnabled)
                 publishButton.setToolTipText(trans("TOOLTIP_PUBLISH_FILE_FEED"))
             } else {
                 myFeedButton.setEnabled(false)
