@@ -343,6 +343,7 @@ class OptionsController {
         uiSettingsFile.withOutputStream {
             uiSettings.write(it)
         }
+        uiSettings.notifyListeners()
     }
 
     @ControllerAction

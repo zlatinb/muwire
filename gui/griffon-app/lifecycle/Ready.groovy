@@ -99,7 +99,8 @@ class Ready extends AbstractLifecycleHandler {
                 props.write(it)
             })
         }
-
+        application.context.put("muwire-settings", props)
+        
         Core core
         try {
             core = new Core(props, home, metadata["application.version"])
@@ -107,7 +108,6 @@ class Ready extends AbstractLifecycleHandler {
                 core.shutdown()
             })
             core.startServices()
-            application.context.put("muwire-settings", props)
             application.context.put("core",core)
             application.getPropertyChangeListeners("core").each {
                 it.propertyChange(new PropertyChangeEvent(this, "core", null, core))

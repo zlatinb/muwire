@@ -3,8 +3,11 @@ package com.muwire.gui
 import com.muwire.core.util.DataUtil
 
 import java.awt.Font
+import java.util.concurrent.CopyOnWriteArrayList
 
 class UISettings {
+    
+    private final List<Listener> listeners = new CopyOnWriteArrayList<>()
 
     String lnf
     String locale
@@ -96,5 +99,17 @@ class UISettings {
         props.setProperty("showUnsharedPaths", String.valueOf(showUnsharedPaths))
 
         props.store(out, "UI Properties")
+    }
+    
+    static interface Listener {
+        void settingsUpdated()
+    }
+    
+    void addListener(Listener listener) {
+        listeners << listener
+    }
+    
+    void notifyListeners() {
+        listeners.each { it.settingsUpdated()}
     }
 }

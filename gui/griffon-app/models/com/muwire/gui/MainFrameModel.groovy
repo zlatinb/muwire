@@ -376,6 +376,9 @@ class MainFrameModel {
                 
                 if (core.muOptions.startChatServer)
                     controller.startChatServer()
+                
+                // notify any listeners
+                uiSettings.notifyListeners()
             }
         })
 

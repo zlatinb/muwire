@@ -8,6 +8,7 @@ import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
 
 import javax.swing.DropMode
+import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
@@ -375,7 +376,7 @@ class MainFrameView {
                                     gridBagLayout()
                                     button(text : trans("ADD_COMMENT"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
                                     button(text : trans("CERTIFY"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
-                                    button(text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
+                                    button(id: "publish-button", text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     def textField = new JTextField(columns: 10)
@@ -570,7 +571,7 @@ class MainFrameView {
                                     button(text: trans("CONFIGURE"), enabled: bind { model.configureFileFeedButtonEnabled }, configureFileFeedAction)
                                 }
                                 panel(border: etchedBorder()) {
-                                    button(text: trans("MY_FEED"), showMyFeedAction)
+                                    button(id: "my-feed-button", text: trans("MY_FEED"), showMyFeedAction)
                                 }
                             }
                         }
@@ -929,7 +930,7 @@ class MainFrameView {
                 return
             }
             model.addCommentButtonEnabled = true
-            model.publishButtonEnabled = true
+            model.publishButtonEnabled = model.core.muOptions.fileFeed
             boolean unpublish = true
             selectedFiles.each {
                 unpublish &= it?.isPublished()
@@ -943,7 +944,7 @@ class MainFrameView {
         sharedFilesTree.addTreeSelectionListener({
             def selectedNode = sharedFilesTree.getLastSelectedPathComponent()
             model.addCommentButtonEnabled = selectedNode != null
-            model.publishButtonEnabled = selectedNode != null
+            model.publishButtonEnabled = selectedNode != null && model.core.muOptions.fileFeed
         })
 
         sharedFilesTree.addTreeExpansionListener(expansionListener)
@@ -1310,6 +1311,23 @@ class MainFrameView {
         def resultsTabbedPane = builder.getVariable("result-tabs")
         resultsTabListener = new ResultTabsChangeListener(resultsTabbedPane)
         resultsTabbedPane.addChangeListener(resultsTabListener)
+        
+        // my feed and publish buttons
+        settings.addListener {
+            JButton myFeedButton = builder.getVariable("my-feed-button")
+            JButton publishButton = builder.getVariable("publish-button")
+            if (model.core.muOptions.fileFeed) {
+                myFeedButton.setEnabled(true)
+                myFeedButton.setToolTipText(trans("TOOLTIP_VIEW_FILE_FEED"))
+                publishButton.setEnabled(true)
+                publishButton.setToolTipText(trans("TOOLTIP_PUBLISH_FILE_FEED"))
+            } else {
+                myFeedButton.setEnabled(false)
+                myFeedButton.setToolTipText(trans("TOOLTIP_FILE_FEED_DISABLED"))
+                publishButton.setEnabled(false)
+                publishButton.setToolTipText(trans("TOOLTIP_FILE_FEED_DISABLED"))
+            }
+        } as UISettings.Listener
         
         // show tree by default
         showSharedFilesTree.call()
