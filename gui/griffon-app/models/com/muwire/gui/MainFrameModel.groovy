@@ -152,7 +152,6 @@ class MainFrameModel {
     @Observable String resumeButtonText
     @Observable boolean addCommentButtonEnabled
     @Observable boolean publishButtonEnabled
-    @Observable String publishButtonText
     @Observable boolean updateFileFeedButtonEnabled
     @Observable boolean unsubscribeFileFeedButtonEnabled
     @Observable boolean configureFileFeedButtonEnabled
@@ -362,7 +361,6 @@ class MainFrameModel {
                 contacts.addAll(core.trustService.bad.values())
 
                 resumeButtonText = "RETRY"
-                publishButtonText = "PUBLISH"
                 
                 searchesPaneButtonEnabled = false
                 downloadsPaneButtonEnabled = true

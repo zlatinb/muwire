@@ -748,18 +748,12 @@ class MainFrameController {
         if (selectedFiles == null || selectedFiles.isEmpty())
             return
         
-        if (model.publishButtonText == "UNPUBLISH") {
-            selectedFiles.each { 
-                it.unpublish()
-                model.core.eventBus.publish(new UIFileUnpublishedEvent(sf : it))
-            }
-        } else {
-            long now = System.currentTimeMillis()
-            selectedFiles.stream().filter({!it.isPublished()}).forEach({
-                it.publish(now)
-                model.core.eventBus.publish(new UIFilePublishedEvent(sf : it))
-            })
-        }
+        long now = System.currentTimeMillis()
+        selectedFiles.stream().filter({!it.isPublished()}).forEach({
+            it.publish(now)
+            model.core.eventBus.publish(new UIFilePublishedEvent(sf : it))
+        })
+        
         view.refreshSharedFiles()
     }
     

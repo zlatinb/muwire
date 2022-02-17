@@ -376,7 +376,7 @@ class MainFrameView {
                                     gridBagLayout()
                                     button(text : trans("ADD_COMMENT"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
                                     button(text : trans("CERTIFY"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
-                                    button(id: "publish-button", text : bind {trans(model.publishButtonText)}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
+                                    button(id: "publish-button", text : bind {trans("PUBLISH")}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     def textField = new JTextField(columns: 10)
@@ -931,11 +931,6 @@ class MainFrameView {
             }
             model.addCommentButtonEnabled = true
             model.publishButtonEnabled = model.core.muOptions.fileFeed
-            boolean unpublish = true
-            selectedFiles.each {
-                unpublish &= it?.isPublished()
-            }
-            model.publishButtonText = unpublish ? "UNPUBLISH" : "PUBLISH"
         })
 
         JTree sharedFilesTree = builder.getVariable("shared-files-tree")
