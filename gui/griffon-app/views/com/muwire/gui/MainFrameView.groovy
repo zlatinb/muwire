@@ -213,6 +213,7 @@ class MainFrameView {
                                 def searchFieldModel = new SearchFieldModel(settings, new File(application.context.get("muwire-home")))
                                 JComboBox myComboBox = new SearchField(searchFieldModel)
                                 myComboBox.setAction(searchAction)
+                                myComboBox.setToolTipText(trans("TOOLTIP_SEARCH_BOX"))
                                 widget(id: "search-field", constraints: BorderLayout.CENTER, myComboBox)
 
                             }
@@ -269,11 +270,15 @@ class MainFrameView {
                                     }
                                 }
                                 panel (constraints : BorderLayout.SOUTH) {
-                                    button(text: trans("PAUSE"), enabled : bind {model.pauseButtonEnabled}, pauseAction)
+                                    button(text: trans("PAUSE"), toolTipText: trans("TOOLTIP_DOWNLOAD_PAUSE"),
+                                            enabled : bind {model.pauseButtonEnabled}, pauseAction)
                                     button(text: bind { trans(model.resumeButtonText) }, enabled : bind {model.retryButtonEnabled}, resumeAction)
-                                    button(text: trans("CANCEL"), enabled : bind {model.cancelButtonEnabled }, cancelAction)
-                                    button(text: trans("PREVIEW"), enabled : bind {model.previewButtonEnabled}, previewAction)
-                                    button(text: trans("CLEAR_DONE"), enabled : bind {model.clearButtonEnabled}, clearAction)
+                                    button(text: trans("CANCEL"), toolTipText: trans("TOOLTIP_DOWNLOAD_CANCEL"),
+                                            enabled : bind {model.cancelButtonEnabled }, cancelAction)
+                                    button(text: trans("PREVIEW"), toolTipText: trans("TOOLTIP_DOWNLOAD_PREVIEW"),
+                                            enabled : bind {model.previewButtonEnabled}, previewAction)
+                                    button(text: trans("CLEAR_DONE"), toolTipText: trans("TOOLTIP_DOWNLOAD_CLEAR_DONE"),
+                                            enabled : bind {model.clearButtonEnabled}, clearAction)
                                 }
                             }
                             panel {
@@ -369,28 +374,36 @@ class MainFrameView {
                                 gridLayout(rows:1, cols:4)
                                 panel {
                                     buttonGroup(id : "sharedViewType")
-                                    radioButton(text : trans("TREE"), selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
-                                    radioButton(text : trans("TABLE"), selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
+                                    radioButton(text : trans("TREE"), toolTipText: trans("TOOLTIP_LIBRARY_TREE"),
+                                            selected : true, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTree)
+                                    radioButton(text : trans("TABLE"), toolTipText: trans("TOOLTIP_LIBRARY_TABLE"),
+                                            selected : false, buttonGroup : sharedViewType, actionPerformed : showSharedFilesTable)
                                 }
                                 panel {
                                     gridBagLayout()
-                                    button(text : trans("ADD_COMMENT"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
-                                    button(text : trans("CERTIFY"), enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
-                                    button(id: "publish-button", text : bind {trans("PUBLISH")}, enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
+                                    button(text : trans("ADD_COMMENT"), toolTipText: trans("TOOLTIP_LIBRARY_ADD_COMMENT"),
+                                            enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 0), addCommentAction)
+                                    button(text : trans("CERTIFY"), toolTipText: trans("TOOLTIP_LIBRARY_CERTIFY"), 
+                                            enabled : bind {model.addCommentButtonEnabled}, constraints : gbc(gridx: 1), issueCertificateAction)
+                                    button(id: "publish-button", text : trans("PUBLISH"),
+                                            enabled : bind {model.publishButtonEnabled}, constraints : gbc(gridx:2), publishAction)
                                 }
                                 panel {
                                     def textField = new JTextField(columns: 10)
                                     textField.addActionListener({controller.filterLibrary()})
                                     widget(id: "library-filter-textfield", enabled: bind{model.filteringEnabled}, textField)
-                                    button(text: trans("FILTER"), enabled : bind {model.filteringEnabled}, filterLibraryAction)
-                                    button(text: trans("CLEAR"), enabled : bind{model.clearFilterActionEnabled}, clearLibraryFilterAction)
+                                    button(text: trans("FILTER"), toolTipText: trans("TOOLTIP_LIBRARY_FILTER"),
+                                            enabled : bind {model.filteringEnabled}, filterLibraryAction)
+                                    button(text: trans("CLEAR"), toolTipText: trans("TOOLTIP_FILTER_CLEAR"),
+                                            enabled : bind{model.clearFilterActionEnabled}, clearLibraryFilterAction)
                                 }
                                 panel {
                                     panel {
                                         label(trans("SHARED") + ":")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
-                                    button(text : trans("SHARE"), actionPerformed : shareFiles)
+                                    button(text : trans("SHARE"), toolTipText: trans("TOOLTIP_LIBRARY_SHARE"), 
+                                            actionPerformed : shareFiles)
                                 }
                             }
                         }
@@ -434,7 +447,7 @@ class MainFrameView {
                                 }
                             }
                             panel (constraints : BorderLayout.SOUTH) {
-                                button(text : trans("CLEAR_FINISHED_UPLOADS"), clearUploadsAction)
+                                button(text : trans("CLEAR_FINISHED_UPLOADS"), toolTipText: trans("TOOLTIP_LIBRARY_CLEAR_UPLOADS"), clearUploadsAction)
                             }
                         }
                     }
@@ -462,13 +475,17 @@ class MainFrameView {
                             panel(constraints : BorderLayout.SOUTH) {
                                 gridLayout(rows : 1, cols : 2)
                                 panel {
-                                    button(text : trans("CREATE_COLLECTION"), collectionAction)
-                                    button(text : trans("DELETE"), enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
+                                    button(text : trans("CREATE_COLLECTION"), toolTipText: trans("TOOLTIP_COLLECTIONS_CREATE"), collectionAction)
+                                    button(text : trans("DELETE"), toolTipText: trans("TOOLTIP_COLLECTIONS_DELETE"),
+                                            enabled : bind {model.deleteCollectionButtonEnabled}, deleteCollectionAction)
                                 }
                                 panel {
-                                    button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
-                                    button(text : trans("COLLECTION_SHOW_HITS"), enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
-                                    button(text : trans("COPY_HASH_TO_CLIPBOARD"), enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
+                                    button(text : trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_COLLECTIONS_VIEW_COMMENT_COLLECTION"),
+                                            enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
+                                    button(text : trans("COLLECTION_SHOW_HITS"), toolTipText: trans("TOOLTIP_COLLECTIONS_SHOW_HITS"),
+                                            enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
+                                    button(text : trans("COPY_HASH_TO_CLIPBOARD"), toolTipText: trans("TOOLTIP_COLLECTIONS_COPY_HASH"),
+                                            enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
                                 }
                             }
                         }
@@ -487,7 +504,8 @@ class MainFrameView {
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewItemCommentButtonEnabled}, viewItemCommentAction)
+                                button(text : trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_COLLECTIONS_VIEW_COMMENT_FILE"),
+                                        enabled : bind{model.viewItemCommentButtonEnabled}, viewItemCommentAction)
                             }
                         }
                     }
@@ -563,12 +581,15 @@ class MainFrameView {
                             panel (constraints : BorderLayout.SOUTH) {
                                 gridLayout(rows: 1, cols: 3)
                                 panel(border: etchedBorder()) {
-                                    button(text: trans("SUBSCRIBE"), subscribeToFeedAction)
-                                    button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
+                                    button(text: trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_FEEDS_SUBSCRIBE"), subscribeToFeedAction)
+                                    button(text : trans("UNSUBSCRIBE"), toolTipText: trans("TOOLTIP_FEEDS_UNSUBSCRIBE"),
+                                            enabled : bind {model.unsubscribeFileFeedButtonEnabled}, unsubscribeFileFeedAction)
                                 }
                                 panel(border: etchedBorder()) {
-                                    button(text: trans("UPDATE"), enabled: bind { model.updateFileFeedButtonEnabled }, updateFileFeedAction)
-                                    button(text: trans("CONFIGURE"), enabled: bind { model.configureFileFeedButtonEnabled }, configureFileFeedAction)
+                                    button(text: trans("UPDATE"), toolTipText: trans("TOOLTIP_FEEDS_UPDATE"),
+                                            enabled: bind { model.updateFileFeedButtonEnabled }, updateFileFeedAction)
+                                    button(text: trans("CONFIGURE"), toolTipText: trans("TOOLTIP_FEEDS_CONFIGURE"),
+                                            enabled: bind { model.configureFileFeedButtonEnabled }, configureFileFeedAction)
                                 }
                                 panel(border: etchedBorder()) {
                                     button(id: "my-feed-button", text: trans("MY_FEED"), showMyFeedAction)
@@ -596,9 +617,12 @@ class MainFrameView {
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : trans("DOWNLOAD"), enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
-                                button(text : trans("VIEW_COMMENT"), enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
-                                button(text : trans("VIEW_CERTIFICATES"), enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
+                                button(text : trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"),
+                                        enabled : bind {model.downloadFeedItemButtonEnabled}, downloadFeedItemAction)
+                                button(text : trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_FEEDS_VIEW_COMMENT"),
+                                        enabled : bind {model.viewFeedItemCommentButtonEnabled}, viewFeedItemCommentAction)
+                                button(text : trans("VIEW_CERTIFICATES"), toolTipText: trans("TOOLTIP_FEEDS_VIEW_CERTIFICATES"),
+                                        enabled : bind {model.viewFeedItemCertificatesButtonEnabled}, viewFeedItemCertificatesAction )
                             }
                         }
                     }
@@ -623,17 +647,25 @@ class MainFrameView {
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows : 1, cols : 2)
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("ADD_CONTACT"), addContactAction)
-                                        button(text : trans("REMOVE_CONTACT"), enabled : bind {model.removeContactButtonEnabled}, removeContactAction)
-                                        button(text : trans("MARK_TRUSTED"), enabled : bind {model.markTrustedButtonEnabled}, markTrustedAction)
-                                        button(text : trans("MARK_DISTRUSTED"), enabled : bind {model.markDistrustedButtonEnabled}, markDistrustedAction)
+                                        button(text : trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_ADD_CONTACT"), addContactAction)
+                                        button(text : trans("REMOVE_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_REMOVE_CONTACT"),
+                                                enabled : bind {model.removeContactButtonEnabled}, removeContactAction)
+                                        button(text : trans("MARK_TRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_TRUSTED"),
+                                                enabled : bind {model.markTrustedButtonEnabled}, markTrustedAction)
+                                        button(text : trans("MARK_DISTRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_DISTRUSTED"),
+                                                enabled : bind {model.markDistrustedButtonEnabled}, markDistrustedAction)
                                     }
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("BROWSE"), enabled: bind {model.browseFromTrustedButtonEnabled}, browseFromTrustedAction)
-                                        button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseFromTrustedButtonEnabled}, browseCollectionsFromTrustedAction)
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeButtonEnabled}, subscribeAction)
-                                        button(text : trans("MESSAGE_VERB"), enabled : bind {model.messageFromTrustedButtonEnabled}, messageFromTrustedAction)
-                                        button(text : trans("CHAT"), enabled : bind {model.chatFromTrustedButtonEnabled}, chatFromTrustedAction)
+                                        button(text : trans("BROWSE"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_FILES"),
+                                                enabled: bind {model.browseFromTrustedButtonEnabled}, browseFromTrustedAction)
+                                        button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_COLLECTIONS"),
+                                                enabled : bind {model.browseFromTrustedButtonEnabled}, browseCollectionsFromTrustedAction)
+                                        button(text : trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_CONTACTS_SUBSCRIBE"),
+                                                enabled : bind {model.subscribeButtonEnabled}, subscribeAction)
+                                        button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_CONTACTS_MESSAGE"),
+                                                enabled : bind {model.messageFromTrustedButtonEnabled}, messageFromTrustedAction)
+                                        button(text : trans("CHAT"), toolTipText: trans("TOOLTIP_CONTACTS_CHAT"),
+                                                enabled : bind {model.chatFromTrustedButtonEnabled}, chatFromTrustedAction)
                                     }
                                 }
                             }
@@ -655,9 +687,12 @@ class MainFrameView {
                                 }
                             }
                             panel(constraints : BorderLayout.SOUTH) {
-                                button(text : trans("REVIEW"), enabled : bind {model.reviewButtonEnabled}, reviewAction)
-                                button(text : trans("UPDATE"), enabled : bind {model.updateButtonEnabled}, updateAction)
-                                button(text : trans("UNSUBSCRIBE"), enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
+                                button(text : trans("REVIEW"), toolTipText: trans("TOOLTIP_CONTACTS_REVIEW"),
+                                        enabled : bind {model.reviewButtonEnabled}, reviewAction)
+                                button(text : trans("UPDATE"), toolTipText: trans("TOOLTIP_CONTACTS_UPDATE"),
+                                        enabled : bind {model.updateButtonEnabled}, updateAction)
+                                button(text : trans("UNSUBSCRIBE"), toolTipText: trans("TOOLTIP_CONTACTS_UNSUBSCRIBE"),
+                                        enabled : bind {model.unsubscribeButtonEnabled}, unsubscribeAction)
                             }
                         }
                     }
@@ -676,9 +711,11 @@ class MainFrameView {
                                         weightx:0, weighty: 0)) {
                                     gridBagLayout()
                                     label(text : trans("FOLDERS"), constraints : gbc(gridx:0, gridy: 0))
-                                    button(text : trans("CREATE_FOLDER"), constraints : gbc(gridx:0, gridy: 1, weightx: 100, fill:GridBagConstraints.HORIZONTAL),
+                                    button(text : trans("CREATE_FOLDER"), toolTipText: trans("TOOLTIP_MESSAEGS_NEW_FOLDER"),
+                                            constraints : gbc(gridx:0, gridy: 1, weightx: 100, fill:GridBagConstraints.HORIZONTAL),
                                             createMessageFolderAction)
-                                    button(text : trans("DELETE_FOLDER"), enabled : bind {model.deleteMessageFolderButtonEnabled}, 
+                                    button(text : trans("DELETE_FOLDER"), toolTipText: trans("TOOLTIP_MESSAGES_DELETE_FOLDER"),
+                                            enabled : bind {model.deleteMessageFolderButtonEnabled}, 
                                             constraints : gbc(gridx:0, gridy: 2, weightx: 100, fill: GridBagConstraints.HORIZONTAL), deleteMessageFolderAction)
                                 }
                                 panel(border: etchedBorder(), constraints : gbc(gridx:0, gridy:2, fill: GridBagConstraints.BOTH, 
@@ -698,9 +735,12 @@ class MainFrameView {
                         borderLayout()
                         tabbedPane(id : "chat-tabs", constraints : BorderLayout.CENTER)
                         panel(constraints : BorderLayout.SOUTH) {
-                            button(text : trans("START_CHAT_SERVER"), enabled : bind {!model.chatServerRunning}, startChatServerAction)
-                            button(text : trans("STOP_CHAT_SERVER"), enabled : bind {model.chatServerRunning}, stopChatServerAction)
-                            button(text : trans("CONNECT_TO_REMOTE_SERVER"), connectChatServerAction)
+                            button(text : trans("START_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_START_CHAT_SERVER"),
+                                    enabled : bind {!model.chatServerRunning}, startChatServerAction)
+                            button(text : trans("STOP_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_STOP_CHAT_SERVER"),
+                                    enabled : bind {model.chatServerRunning}, stopChatServerAction)
+                            button(text : trans("CONNECT_TO_REMOTE_SERVER"), toolTipText: trans("TOOLTIP_CHAT_CONNECT"),
+                                    connectChatServerAction)
                         }
                     }
                 }
@@ -708,27 +748,29 @@ class MainFrameView {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
                         gridBagLayout()
-                        label(text : bind {model.me}, constraints : gbc(gridx:0, gridy:0))
-                        button(text : trans("COPY_SHORT"), constraints : gbc(gridx:1, gridy:0), copyShortAction)
-                        button(text : trans("COPY_FULL"), constraints : gbc(gridx:2, gridy:0), copyFullAction)
+                        label(text : bind {model.me}, toolTipText: trans("TOOLTIP_SHORT_ID"), constraints : gbc(gridx:0, gridy:0))
+                        button(text : trans("COPY_SHORT"), toolTipText: trans("TOOLTIP_COPY_SHORT_ID"),
+                                constraints : gbc(gridx:1, gridy:0), copyShortAction)
+                        button(text : trans("COPY_FULL"), toolTipText: trans("TOOLTIP_COPY_FULL_ID"),
+                                constraints : gbc(gridx:2, gridy:0), copyFullAction)
                     }
                     panel (constraints : BorderLayout.CENTER) {
                         gridBagLayout()
                         panel (constraints : gbc(gridx : 0, gridy : 0)){
                             borderLayout()
-                            label(icon : imageIcon('/down_arrow.png'), constraints : BorderLayout.CENTER)
+                            label(icon : imageIcon('/down_arrow.png'), toolTipText: trans("TOOLTIP_TOTAL_DOWN_SPEED"), constraints : BorderLayout.CENTER)
                             label(text : bind { formatSize(model.downSpeed, "B_SEC") }, constraints : BorderLayout.EAST)
                         }
                         panel (constraints : gbc(gridx: 1, gridy : 0)){
                             borderLayout()
-                            label(icon : imageIcon('/up_arrow.png'), constraints : BorderLayout.CENTER)
+                            label(icon : imageIcon('/up_arrow.png'), toolTipText: trans("TOOLTIP_TOTAL_UP_SPEED"), constraints : BorderLayout.CENTER)
                             label(text : bind { formatSize(model.upSpeed, "B_SEC") }, constraints : BorderLayout.EAST)
                         }
                     }
                     panel (constraints : BorderLayout.EAST) {
-                        label(icon : imageIcon("/email.png"))
+                        label(icon : imageIcon("/email.png"), toolTipText: trans("TOOLTIP_UNREAD_MESSAEGS"))
                         label(text : bind {model.messages})
-                        label("   " + trans("CONNECTIONS") + ":")
+                        label("   " + trans("CONNECTIONS") + ":", toolTipText: trans("TOOLTIP_CONNECTIONS"))
                         label(text : bind {model.connections})
                     }
                 }

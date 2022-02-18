@@ -64,7 +64,7 @@ class BrowseView {
                     })
                 }
                 panel(constraints: BorderLayout.EAST) {
-                    button(text: trans("COPY_FULL_ID"), copyIdAction)
+                    button(text: trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_COPY_SENDER_FULL_ID"), copyIdAction)
                 }
             }
             resultsPanel = panel(constraints: BorderLayout.CENTER) {
@@ -95,23 +95,30 @@ class BrowseView {
                 gridLayout(rows: 1, cols: 4)
                 panel(border: etchedBorder()) {
                     buttonGroup(id: "viewType")
-                    radioButton(text: trans("TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
-                    radioButton(text: trans("TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
+                    radioButton(text: trans("TREE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TREE"),
+                            selected: true, buttonGroup: viewType, actionPerformed: showTree)
+                    radioButton(text: trans("TABLE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TABLE"),
+                            selected: false, buttonGroup: viewType, actionPerformed: showTable)
                 }
                 panel(border: etchedBorder()) {
-                    button(text: trans("DOWNLOAD"), enabled: bind { model.downloadActionEnabled }, downloadAction)
-                    label(text: trans("DOWNLOAD_SEQUENTIALLY"), enabled: bind {model.downloadActionEnabled})
+                    button(text: trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"),
+                            enabled: bind { model.downloadActionEnabled }, downloadAction)
+                    label(text: trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"),
+                            enabled: bind {model.downloadActionEnabled})
                     sequentialDownloadCheckbox = checkBox(enabled: bind {model.downloadActionEnabled})
                 }
                 panel(border: etchedBorder()) {
-                    button(text: trans("VIEW_DETAILS"), enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
+                    button(text: trans("VIEW_DETAILS"), toolTipText: trans("TOOLTIP_VIEW_DETAILS_RESULT"),
+                            enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
                 }
                 panel(border: etchedBorder()) {
                     def textField = new JTextField(15)
                     textField.addActionListener({ controller.filter() })
                     widget(id: "filter-field", enabled: bind { model.filterEnabled }, textField)
-                    button(text: trans("FILTER"), enabled: bind { model.filterEnabled }, filterAction)
-                    button(text: trans("CLEAR"), enabled: bind { model.clearFilterEnabled}, clearFilterAction)
+                    button(text: trans("FILTER"), toolTipText: trans("TOOLTIP_FILTER_RESULTS"),
+                            enabled: bind { model.filterEnabled }, filterAction)
+                    button(text: trans("CLEAR"), toolTipText: trans("TOOLTIP_FILTER_CLEAR"),
+                            enabled: bind { model.clearFilterEnabled}, clearFilterAction)
                 }
             }
         }

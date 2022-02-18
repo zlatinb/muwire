@@ -63,7 +63,7 @@ class CollectionTabView {
                         label(text: bind { trans(model.status.name()) })
                     }
                     panel(constraints: BorderLayout.EAST) {
-                        button(text : trans("COPY_FULL_ID"), copyIdAction)
+                        button(text : trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_COPY_SENDER_FULL_ID"), copyIdAction)
                     }
                 }
                 scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
@@ -82,10 +82,11 @@ class CollectionTabView {
                     gridLayout(rows : 1, cols : 3)
                     panel{}
                     panel {
-                        button(text : trans("COLLECTION_DOWNLOAD"), enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
+                        button(text : trans("COLLECTION_DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FULL_COLLECTION"),
+                                enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
                     }
                     panel {
-                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
                         downloadSequentiallyCollectionCheckbox = checkBox(selected : bind {model.downloadSequentiallyCollection}, 
                             enabled : bind {model.downloadCollectionButtonEnabled})
                     }
@@ -133,15 +134,19 @@ class CollectionTabView {
                     gridLayout(rows : 1, cols : 3)
                     panel {
                         buttonGroup(id : "viewType")
-                        radioButton(text : trans("TREE"), selected : true, buttonGroup : viewType, actionPerformed : showTree)
-                        radioButton(text : trans("TABLE"), selected : false, buttonGroup : viewType, actionPerformed : showTable)
+                        radioButton(text : trans("TREE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TREE"),
+                                selected : true, buttonGroup : viewType, actionPerformed : showTree)
+                        radioButton(text : trans("TABLE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TABLE"),
+                                selected : false, buttonGroup : viewType, actionPerformed : showTable)
                     }
                     panel {
-                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
-                        button(text : trans("VIEW_COMMENT"), enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
+                        button(text : trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"),
+                                enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
+                        button(text : trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_VIEW_RESULT_COMMENT"),
+                                enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
                     }
                     panel {
-                        label(text : trans("DOWNLOAD_SEQUENTIALLY"))
+                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
                         downloadSequentiallyItemCheckbox = checkBox(selected : bind {model.downloadSequentiallyItem},
                         enabled : bind {model.downloadItemButtonEnabled})
                     }

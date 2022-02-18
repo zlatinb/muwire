@@ -100,17 +100,17 @@ class SearchTabView {
                                 panel(constraints : BorderLayout.SOUTH) {
                                     gridLayout(rows: 1, cols : 3)
                                     panel (border : etchedBorder()){
-                                        button(text : trans("SUBSCRIBE"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : trans("MESSAGE_VERB"), enabled : bind{model.messageActionEnabled}, messageAction)
-                                        button(text : trans("CHAT"), enabled : bind{model.chatActionEnabled}, chatAction)
+                                        button(text : trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_SUBSCRIBE_FILE_FEED"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
+                                        button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_MESSAGE_SENDER"), enabled : bind{model.messageActionEnabled}, messageAction)
+                                        button(text : trans("CHAT"), toolTipText: trans("TOOLTIP_CHAT_SENDER"), enabled : bind{model.chatActionEnabled}, chatAction)
                                     }
                                     panel (border : etchedBorder()) {
-                                        button(text : trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
-                                        button(text : trans("BROWSE_COLLECTIONS"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
+                                        button(text : trans("BROWSE_HOST"), toolTipText: trans("TOOLTIP_BROWSE_FILES_SENDER"), enabled : bind {model.browseActionEnabled}, browseAction)
+                                        button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_BROWSE_COLLECTIONS_SENDER"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
                                     }
                                     panel (border : etchedBorder()){
-                                        button(text : trans("ADD_CONTACT"), enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : trans("DISTRUST"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                        button(text : trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_ADD_CONTACT_SENDER"), enabled: bind {model.trustButtonsEnabled }, trustAction)
+                                        button(text : trans("DISTRUST"), toolTipText: trans("TOOLTIP_DISTRUST_SENDER"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                     }
                                 }
                             }
@@ -146,18 +146,18 @@ class SearchTabView {
                                     gridLayout(rows: 1, cols: 3)
                                     panel {
                                         buttonGroup(id: "viewType")
-                                        radioButton(text: trans("TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
-                                        radioButton(text: trans("TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
+                                        radioButton(text: trans("TREE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TREE"), selected: true, buttonGroup: viewType, actionPerformed: showTree)
+                                        radioButton(text: trans("TABLE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TABLE"), selected: false, buttonGroup: viewType, actionPerformed: showTable)
                                     }
                                     panel {
-                                        button(text : trans("DOWNLOAD"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
-                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 5, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END),
+                                        button(text : trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"), enabled : bind {model.downloadActionEnabled}, constraints : gbc(gridx : 1, gridy:0), downloadAction)
+                                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"), constraints : gbc(gridx: 5, gridy: 0, weightx : 80, anchor : GridBagConstraints.LINE_END),
                                             enabled: bind{model.downloadActionEnabled})
                                         sequentialDownloadCheckbox = checkBox(constraints : gbc(gridx : 6, gridy: 0, anchor : GridBagConstraints.LINE_END),
                                             selected : false, enabled : bind {model.downloadActionEnabled})
                                     }
                                     panel {
-                                        button(text: trans("VIEW_DETAILS"), enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
+                                        button(text: trans("VIEW_DETAILS"), toolTipText: trans("TOOLTIP_VIEW_DETAILS_RESULT"), enabled: bind {model.viewDetailsActionEnabled}, viewDetailsAction)
                                     }
                                 }
                             }
@@ -202,16 +202,16 @@ class SearchTabView {
                                 panel(constraints: BorderLayout.SOUTH) {
                                     gridLayout(rows: 1, cols: 2)
                                     panel(border: etchedBorder()) {
-                                        button(text: trans("DOWNLOAD"), enabled: bind { model.downloadActionEnabled }, downloadAction)
-                                        label(text: trans("DOWNLOAD_SEQUENTIALLY"))
+                                        button(text: trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"), enabled: bind { model.downloadActionEnabled }, downloadAction)
+                                        label(text: trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
                                         sequentialDownloadCheckbox2 = checkBox()
                                     }
                                     panel(border: etchedBorder()) {
                                         def textField = new JTextField(15)
                                         textField.addActionListener({ controller.filter() })
                                         widget(id: "filter-field", textField)
-                                        button(text: trans("FILTER"), filterAction)
-                                        button(text: trans("CLEAR"), enabled: bind { model.clearFilterActionEnabled }, clearFilterAction)
+                                        button(text: trans("FILTER"), toolTipText: trans("TOOLTIP_FILTER_RESULTS"), filterAction)
+                                        button(text: trans("CLEAR"), toolTipText: trans("TOOLTIP_FILTER_CLEAR"), enabled: bind { model.clearFilterActionEnabled }, clearFilterAction)
                                     }
                                 }
                             }
@@ -224,8 +224,10 @@ class SearchTabView {
                 panel (constraints : BorderLayout.SOUTH) {
                     label(text : trans("GROUP_BY"))
                     buttonGroup(id : "groupBy")
-                    radioButton(text : trans("SENDER"), selected : bind  {!model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showSenderGrouping)
-                    radioButton(text : trans("FILE"), selected : bind {model.groupedByFile}, buttonGroup : groupBy, actionPerformed: showFileGrouping)
+                    radioButton(text : trans("SENDER"), toolTipText: trans("TOOLTIP_GROUP_SENDER"), selected : bind  {!model.groupedByFile}, 
+                            buttonGroup : groupBy, actionPerformed: showSenderGrouping)
+                    radioButton(text : trans("FILE"), toolTipText: trans("TOOLTIP_GROUP_FILE"), selected : bind {model.groupedByFile}, 
+                            buttonGroup : groupBy, actionPerformed: showFileGrouping)
                 }
             }
 

@@ -73,8 +73,10 @@ class ResultDetailsTabsView {
                 }
             }
             panel(constraints: BorderLayout.SOUTH) {
-                button(text: trans("BROWSE_HOST"), enabled : bind {model.browseActionEnabled}, browseAction)
-                button(text: trans("COPY_FULL_ID"), enabled: bind {model.copyIdActionEnabled}, copyIdAction)
+                button(text: trans("BROWSE_HOST"), toolTipText: trans("TOOLTIP_BROWSE_FILES_SENDER"), 
+                        enabled : bind {model.browseActionEnabled}, browseAction)
+                button(text: trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_SENDER_COPY_FULL"),
+                        enabled: bind {model.copyIdActionEnabled}, copyIdAction)
             }
         }
         

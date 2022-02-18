@@ -165,31 +165,38 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_SEARCH_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx: 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_SEARCH_IN_COMMENTS"), constraints:gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, 
+                label(text : trans("OPTIONS_SEARCH_IN_COMMENTS"), toolTipText: trans("TOOLTIP_OPTIONS_SEARCH_COMMENTS"), 
+                        constraints:gbc(gridx: 0, gridy:0, anchor : GridBagConstraints.LINE_START, 
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 searchCommentsCheckbox = checkBox(selected : bind {model.searchComments}, constraints : gbc(gridx:1, gridy:0,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_SEARCH_IN_COLLECTIONS"), constraints:gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_SEARCH_IN_COLLECTIONS"), toolTipText: trans("TOOLTIP_OPTIONS_SEARCH_COLLECTIONS"),
+                        constraints:gbc(gridx: 0, gridy:1, anchor : GridBagConstraints.LINE_START,
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 searchCollectionsCheckbox = checkBox(selected : bind {model.searchCollections}, constraints : gbc(gridx:1, gridy:1,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_SEARCH_IN_FOLDERS"), constraints:gbc(gridx: 0, gridy:2, anchor : GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_SEARCH_IN_FOLDERS"), toolTipText: trans("TOOLTIP_OPTIONS_SEARCH_FOLDERS"),
+                        constraints:gbc(gridx: 0, gridy:2, anchor : GridBagConstraints.LINE_START,
                         fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 searchPathsCheckbox = checkBox(selected : bind {model.searchPaths}, constraints : gbc(gridx:1, gridy:2,
                         anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_ALLOW_BROWSING"), constraints : gbc(gridx : 0, gridy : 3, anchor : GridBagConstraints.LINE_START, 
+                label(text : trans("OPTIONS_ALLOW_BROWSING"), toolTipText: trans("TOOLTIP_OPTIONS_ALLOW_BROWSING"),
+                        constraints : gbc(gridx : 0, gridy : 3, anchor : GridBagConstraints.LINE_START, 
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 browseFilesCheckbox = checkBox(selected : bind {model.browseFiles}, constraints : gbc(gridx : 1, gridy : 3,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx: 0))
-                label(text : trans("OPTIONS_SHOW_PATHS"), constraints: gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_SHOW_PATHS"), toolTipText: trans("TOOLTIP_OPTIONS_SHOW_PATHS"),
+                        constraints: gbc(gridx:0, gridy:4, anchor: GridBagConstraints.LINE_START,
                         fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 showPathsCheckbox = checkBox(selected : bind {model.showPaths}, constraints : gbc(gridx: 1, gridy : 4,
                         anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
-                label(text : trans("OPTIONS_ALLOW_TRACKING"), constraints : gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START,
+                label(text : trans("OPTIONS_ALLOW_TRACKING"), toolTipText: trans("TOOLTIP_OPTIONS_ALLOW_TRACKING"),
+                        constraints : gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START,
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 allowTrackingCheckbox = checkBox(selected : bind {model.allowTracking}, constraints : gbc(gridx: 1, gridy : 5,
                     anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
-                label(text: trans("OPTIONS_REGEX_QUERIES"), constraints: gbc(gridx: 0, gridy: 6, anchor: GridBagConstraints.LINE_START,
+                label(text: trans("OPTIONS_REGEX_QUERIES"), toolTipText: trans("TOOLTIP_OPTIONS_ALLOW_REGEX"),
+                        constraints: gbc(gridx: 0, gridy: 6, anchor: GridBagConstraints.LINE_START,
                     fill : GridBagConstraints.HORIZONTAL, weightx: 100))
                 regexQueriesCheckbox = checkBox(selected: bind {model.regexQueries}, constraints : gbc(gridx: 1, gridy: 6,
                         anchor : GridBagConstraints.LINE_END, fill : GridBagConstraints.HORIZONTAL, weightx : 0))
@@ -198,20 +205,24 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_DOWNLOAD_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 1, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_RETRY_FAILED_DOWNLOADS"), constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_RETRY_FAILED_DOWNLOADS"), toolTipText: trans("TOOLTIP_OPTIONS_RETRY_FAILED"),
+                        constraints : gbc(gridx: 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 retryField = textField(text : bind { model.downloadRetryInterval }, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT,
                     constraints : gbc(gridx: 2, gridy: 0, anchor : GridBagConstraints.LINE_END, weightx: 0))
                 
-                label(text : trans("OPTIONS_GIVE_UP_SOURCES"), constraints: gbc(gridx: 0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_GIVE_UP_SOURCES"), toolTipText: trans("TOOLTIP_OPTIONS_GIVE_UP_SOURCES"),
+                        constraints: gbc(gridx: 0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 downloadMaxFailuresField = textField(text : bind { model.downloadMaxFailures }, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT,
                     constraints : gbc(gridx: 2, gridy: 1, anchor : GridBagConstraints.LINE_END, weightx: 0))
 
                 if (!isAqua()) {
-                    label(text : trans("OPTIONS_SAVE_DOWNLOADED_FILES") + ":", constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
+                    label(text : trans("OPTIONS_SAVE_DOWNLOADED_FILES") + ":", toolTipText: trans("TOOLTIP_OPTIONS_SAVE_DOWNLOADED"),
+                            constraints: gbc(gridx:0, gridy:2, anchor : GridBagConstraints.LINE_START))
                     label(text : bind {model.downloadLocation}, constraints: gbc(gridx:1, gridy:2, anchor : GridBagConstraints.LINE_START))
                     button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:2), downloadLocationAction)
 
-                    label(text : trans("OPTIONS_STORE_INCOMPLETE_FILES") + ":", constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
+                    label(text : trans("OPTIONS_STORE_INCOMPLETE_FILES") + ":", toolTipText: trans("TOOLTIP_OPTIONS_INCOMPLETE"),
+                            constraints: gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START))
                     label(text : bind {model.incompleteLocation}, constraints: gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_START))
                     button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy:3), incompleteLocationAction)
                 }
@@ -220,10 +231,12 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_UPLOAD_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy:2, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_TOTAL_UPLOAD_SLOTS"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_TOTAL_UPLOAD_SLOTS"), toolTipText: trans("TOOLTIP_OPTIONS_TOTAL_UPLOAD_SLOTS"),
+                        constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 totalUploadSlotsField = textField(text : bind {model.totalUploadSlots}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
                     constraints : gbc(gridx : 1, gridy: 0, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_UPLOAD_SLOTS_PER_USER"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_UPLOAD_SLOTS_PER_USER"), toolTipText: trans("TOOLTIP_OPTIONS_USER_UPLOAD_SLOTS"),
+                        constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 uploadSlotsPerUserField = textField(text : bind {model.uploadSlotsPerUser}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
                     constraints : gbc(gridx : 1, gridy: 1, anchor : GridBagConstraints.LINE_END))
             }
@@ -231,21 +244,26 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_SHARING_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_SHARE_DOWNLOADED_FILES"), constraints : gbc(gridx : 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OPTIONS_SHARE_DOWNLOADED_FILES"), toolTipText: trans("TOOLTIP_OPTIONS_SHARE_DOWNLOADED"),
+                        constraints : gbc(gridx : 0, gridy:0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 shareDownloadedCheckbox = checkBox(selected : bind {model.shareDownloadedFiles}, constraints : gbc(gridx :1, gridy:0, weightx : 0, anchor: GridBagConstraints.LINE_END))
                 
-                label(text : trans("OPTIONS_SHARE_HIDDEN_FILES"), constraints : gbc(gridx : 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OPTIONS_SHARE_HIDDEN_FILES"), toolTipText: trans("TOOLTIP_OPTIONS_SHARE_HIDDEN"),
+                        constraints : gbc(gridx : 0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 shareHiddenCheckbox = checkBox(selected : bind {model.shareHiddenFiles}, constraints : gbc(gridx :1, gridy:1, weightx : 0, anchor: GridBagConstraints.LINE_END))
                 
-                label(text : trans("OPTIONS_HASHING_CORES"), constraints : gbc(gridx: 0 , gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OPTIONS_HASHING_CORES"), toolTipText: trans("TOOLTIP_OPTIONS_HASHING_CORES"),
+                        constraints : gbc(gridx: 0 , gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 hashingCoresTextField = textField(text : bind {model.hashingCores}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                     constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                 
-                label(text : trans("OPTIONS_IGNORED_FILE_TYPES"), constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("OPTIONS_IGNORED_FILE_TYPES"), toolTipText: trans("TOOLTIP_OPTIONS_TYPES_NOT_SHARED"),
+                        constraints : gbc(gridx: 0, gridy: 3, anchor: GridBagConstraints.LINE_START, weightx : 100))
                 ignoredFileTypesTextField = textField(text : bind {model.ignoredFileTypes}, columns: 25, horizontalAlignment: JTextField.RIGHT,
                         constraints: gbc(gridx: 1, gridy: 3, anchor: GridBagConstraints.LINE_END, fill: GridBagConstraints.HORIZONTAL))
                 
-                label(text : trans("OPTIONS_THROTTLE_LOADING_FILES"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_THROTTLE_LOADING_FILES"), toolTipText: trans("TOOLTIP_OPTIONS_THROTTLE_LOADING"),
+                        constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
                 throttleLoadingFilesCheckbox = checkBox(selected: bind{model.throttleLoadingFiles}, constraints: gbc(gridx: 1, gridy: 4, anchor: GridBagConstraints.LINE_END,
                         weightx: 0))
             }
@@ -254,11 +272,13 @@ class OptionsView {
                 panel (border : titledBorder(title : trans("OPTIONS_UPDATE_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx : 0, gridy : 4, fill : GridBagConstraints.HORIZONTAL, weightx : 100))) {
                     gridBagLayout()
-                    label(text : trans("OPTIONS_CHECK_FOR_UPDATES"), constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    label(text : trans("OPTIONS_CHECK_FOR_UPDATES"), toolTipText: trans("TOOLTIP_OPTIONS_UPDATE_CHECK"),
+                            constraints : gbc(gridx : 0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     updateField = textField(text : bind {model.updateCheckInterval }, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                             constraints : gbc(gridx : 1, gridy: 0, weightx: 0))
 
-                    label(text : trans("OPTIONS_DOWNLOAD_UPDATES"), constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    label(text : trans("OPTIONS_DOWNLOAD_UPDATES"), toolTipText: trans("TOOLTIP_OPTIONS_UPDATE_DOWNLOAD"),
+                            constraints: gbc(gridx :0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                     autoDownloadUpdateCheckbox = checkBox(selected : bind {model.autoDownloadUpdate},
                     constraints : gbc(gridx:1, gridy : 1, anchor : GridBagConstraints.LINE_END))
 
@@ -296,12 +316,16 @@ class OptionsView {
                 panel(border : titledBorder(title : trans("PORT_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
                 constraints : gbc(gridx: 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100))) {
                     gridBagLayout()
-                    label(text : trans("TCP_PORT"), constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    label(text : trans("TCP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_TCP_PORT"),
+                            constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                             constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                    label(text : trans("UDP_PORT"), constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                    
+                    label(text : trans("UDP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_UDP_PORT"),
+                            constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                     i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                             constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                    
                     label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
                     useUPNPCheckbox = checkBox(selected: bind {model.useUPNP}, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                 }
@@ -390,13 +414,18 @@ class OptionsView {
             panel( border : titledBorder(title : trans("OPTIONS_BANDWIDTH_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
                 gridBagLayout()
-                label(text : trans("INBOUND_BANDWIDTH"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                label(text : trans("INBOUND_BANDWIDTH"), toolTipText: trans("TOOLTIP_OPTIONS_INBOUND_BANDWIDTH"),
+                        constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 inBwField = textField(text : bind {model.inBw}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                         constraints : gbc(gridx : 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OUTBOUND_BANDWIDTH"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
+                
+                label(text : trans("OUTBOUND_BANDWIDTH"), toolTipText: trans("TOOLTIP_OPTIONS_OUTBOUND_BANDWIDTH"),
+                        constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 outBwField = textField(text : bind {model.outBw}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
                         constraints : gbc(gridx : 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("SHARE_PERCENTAGE"), constraints: gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 50))
+                
+                label(text : trans("SHARE_PERCENTAGE"), toolTipText: trans("TOOLTIP_OPTIONS_SHARE_PERCENTAGE"),
+                        constraints: gbc(gridx: 0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 50))
                 def quantityTable = new Hashtable()
                 quantityTable.put(0, new JLabel("0"))
                 quantityTable.put(50, new JLabel("50"))
@@ -412,11 +441,16 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_FEED_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
                 constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_ENABLE_FEED"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                label(text : trans("OPTIONS_ENABLE_FEED"), toolTipText: trans("TOOLTIP_OPTIONS_ENABLE_FEED"),
+                        constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 fileFeedCheckbox = checkBox(selected : bind {model.fileFeed}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_ADVERTISE_FEED"), constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                
+                label(text : trans("OPTIONS_ADVERTISE_FEED"), toolTipText: trans("TOOLTIP_OPTIONS_ADVERTISE_FEED"),
+                        constraints : gbc(gridx: 0, gridy : 1, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 advertiseFeedCheckbox = checkBox(selected : bind {model.advertiseFeed}, constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_PUBLISH_SHARED"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                
+                label(text : trans("OPTIONS_PUBLISH_SHARED"), toolTipText: trans("TOOLTIP_OPTIONS_PUBLISH_SHARED"),
+                        constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 autoPublishSharedFilesCheckbox = checkBox(selected : bind {model.autoPublishSharedFiles}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
             }
             panel (border : titledBorder(title : trans("OPTIONS_NEW_FEED_DEFAULTS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
@@ -440,14 +474,20 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_TRUST_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
             constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_ONLY_TRUSTED"), constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                
+                label(text : trans("OPTIONS_ONLY_TRUSTED"), toolTipText: trans("TOOLTIP_OPTIONS_ONLY_TRUSTED"),
+                        constraints : gbc(gridx: 0, gridy : 0, anchor : GridBagConstraints.LINE_START, weightx: 100))
                 allowUntrustedCheckbox = checkBox(selected : bind {model.onlyTrusted}, constraints : gbc(gridx: 1, gridy : 0, anchor : GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_SEARCH_EXTRA_HOP"), enabled: bind {model.searchExtraHopCheckboxEnabled},
+                
+                label(text : trans("OPTIONS_SEARCH_EXTRA_HOP"), toolTipText: trans("TOOLTIP_OPTIONS_SEARCH_EXTRA_HOP"),
+                        enabled: bind {model.searchExtraHopCheckboxEnabled},
                         constraints : gbc(gridx:0, gridy:1, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 searchExtraHopCheckbox = checkBox(selected : bind {model.searchExtraHop}, enabled: bind {model.searchExtraHopCheckboxEnabled},
                         constraints : gbc(gridx: 1, gridy : 1, anchor : GridBagConstraints.LINE_END))
+                
                 label(text : trans("OPTIONS_ALLOW_TRUST_LIST"), constraints : gbc(gridx: 0, gridy : 2, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 allowTrustListsCheckbox = checkBox(selected : bind {model.trustLists}, constraints : gbc(gridx: 1, gridy : 2, anchor : GridBagConstraints.LINE_END))
+                
                 label(text : trans("OPTIONS_TRUST_LIST_UPDATE_INTERVAL"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx : 100))
                 trustListIntervalField = textField(text : bind {model.trustListInterval}, constraints:gbc(gridx:1, gridy:3, anchor : GridBagConstraints.LINE_END), 
                         columns: COLUMNS, horizontalAlignment: JTextField.RIGHT)

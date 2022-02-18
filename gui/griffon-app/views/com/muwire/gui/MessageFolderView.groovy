@@ -112,19 +112,25 @@ class MessageFolderView {
                                 }
                                 panel(constraints: BorderLayout.EAST) {
                                     gridBagLayout()
-                                    button(text: trans("DOWNLOAD"), enabled: bind { model.messageAttachmentsButtonEnabled },
+                                    button(text: trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_MESSAGES_DOWNLOAD_ATTACHMENT"), 
+                                            enabled: bind { model.messageAttachmentsButtonEnabled },
                                             constraints: gbc(gridx: 0, gridy: 0), downloadAttachmentAction)
-                                    button(text: trans("DOWNLOAD_ALL"), enabled: bind { model.messageAttachmentsButtonEnabled },
+                                    button(text: trans("DOWNLOAD_ALL"), toolTipText: trans("TOOLTIP_MESSAGES_DOWNLOAD_ALL"),
+                                            enabled: bind { model.messageAttachmentsButtonEnabled },
                                             constraints: gbc(gridx: 0, gridy: 1), downloadAllAttachmentsAction)
                                 }
                             }
                         }
                     }
                     panel(constraints: BorderLayout.SOUTH) {
-                        button(text: trans("COMPOSE"), messageComposeAction)
-                        button(text: trans("REPLY"), enabled: bind { model.messageButtonsEnabled }, messageReplyAction)
-                        button(text: trans("REPLY_ALL"), enabled: bind { model.messageButtonsEnabled }, messageReplyAllAction)
-                        button(text: trans("DELETE"), enabled: bind { model.messageButtonsEnabled }, messageDeleteAction)
+                        button(text: trans("COMPOSE"), toolTipText: trans("TOOLTIP_MESSAGES_COMPOSE"),
+                                messageComposeAction)
+                        button(text: trans("REPLY"), toolTipText: trans("TOOLTIP_MESSAGES_REPLY"),
+                                enabled: bind { model.messageButtonsEnabled }, messageReplyAction)
+                        button(text: trans("REPLY_ALL"), toolTipText: trans("TOOLTIP_MESSAGES_REPLY_ALL"),
+                                enabled: bind { model.messageButtonsEnabled }, messageReplyAllAction)
+                        button(text: trans("DELETE"), toolTipText: trans("TOOLTIP_MESSAGES_DELETE_MESSAGE"),
+                                enabled: bind { model.messageButtonsEnabled }, messageDeleteAction)
                     }
                 }
             }
