@@ -377,7 +377,7 @@ class MainFrameController {
     void showMyFeed() {
         def params = [:]
         params['core'] = model.core
-        mvcGroup.createMVCGroup("my-feed", params)
+        mvcGroup.createMVCGroup("my-feed", params).destroy()
     }
 
     @ControllerAction
