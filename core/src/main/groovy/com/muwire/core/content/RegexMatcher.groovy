@@ -5,7 +5,8 @@ import java.util.stream.Collectors
 
 class RegexMatcher extends Matcher {
     private final Pattern pattern
-    RegexMatcher(String pattern) {
+    RegexMatcher(String pattern, MatchAction action, String name) {
+        super(action, name)
         this.pattern = Pattern.compile(pattern)
     }
     

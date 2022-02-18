@@ -2,7 +2,8 @@ package com.muwire.core.content
 
 class KeywordMatcher extends Matcher {
     private final String keyword
-    KeywordMatcher(String keyword) {
+    KeywordMatcher(String keyword, MatchAction action, String name) {
+        super(action, name)
         this.keyword = keyword
     }
     

@@ -321,14 +321,6 @@ class MainFrameModel {
             core.eventBus.register(MessageSentEvent.class, this)
             core.eventBus.register(MessageFolderLoadingEvent.class, this)
 
-            
-            core.muOptions.watchedKeywords.each {
-                core.eventBus.publish(new ContentControlEvent(term : it, regex: false, add: true))
-            }
-            core.muOptions.watchedRegexes.each {
-                core.eventBus.publish(new ContentControlEvent(term : it, regex: true, add: true))
-            }
-            
             libraryTimer.start()
             
             chatServerRunning = core.chatServer.isRunning()

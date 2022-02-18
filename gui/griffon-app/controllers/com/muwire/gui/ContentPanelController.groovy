@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.content.MatchAction
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -27,15 +28,9 @@ class ContentPanelController {
 
     @ControllerAction
     void addRule() {
-        def term = view.ruleTextField.text
-        
-        if (model.regex)
-            core.muOptions.watchedRegexes.add(term)
-        else
-            core.muOptions.watchedKeywords.add(term)
-        saveMuWireSettings()
-           
-        core.eventBus.publish(new ContentControlEvent(term : term, regex : model.regex, add:true))
+        def props = [:]
+        props.core = core
+        mvcGroup.createMVCGroup("rule-wizard",props).destroy()
     }
     
     @ControllerAction
@@ -44,24 +39,8 @@ class ContentPanelController {
         if (rule < 0)
             return
         Matcher matcher = model.rules[rule]
-        String term = matcher.getTerm()
-        if (matcher instanceof RegexMatcher) 
-            core.muOptions.watchedRegexes.remove(term)
-        else
-            core.muOptions.watchedKeywords.remove(term)
-        saveMuWireSettings()
         
-        core.eventBus.publish(new ContentControlEvent(term : term, regex : (matcher instanceof RegexMatcher), add: false))
-    }
-    
-    @ControllerAction
-    void keyword() {
-        model.regex = false
-    }
-    
-    @ControllerAction
-    void regex() {
-        model.regex = true
+        core.eventBus.publish(new ContentControlEvent(matcher: matcher, add: false))
     }
     
     @ControllerAction
@@ -102,9 +81,5 @@ class ContentPanelController {
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-    }
-    
-    void saveMuWireSettings() {
-        core.saveMuSettings()
     }
 }

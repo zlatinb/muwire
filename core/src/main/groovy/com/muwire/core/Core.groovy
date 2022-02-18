@@ -306,6 +306,10 @@ public class Core {
         trustService = new TrustService(goodTrust, badTrust, 5000)
         eventBus.register(TrustEvent.class, trustService)
 
+        log.info("initializing content manager")
+        contentManager = new ContentManager(eventBus, home, props)
+        eventBus.register(ContentControlEvent.class, contentManager)
+        eventBus.register(QueryEvent.class, contentManager)
 
         log.info "initializing file manager"
         fileManager = new FileManager(home, eventBus, props)
@@ -470,11 +474,6 @@ public class Core {
         eventBus.register(UILoadedEvent.class, trustSubscriber)
         eventBus.register(TrustSubscriptionEvent.class, trustSubscriber)
         
-        log.info("initializing content manager")
-        contentManager = new ContentManager()
-        eventBus.register(ContentControlEvent.class, contentManager)
-        eventBus.register(QueryEvent.class, contentManager)
-        
         log.info("initializing browse manager")
         BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
         eventBus.register(UIBrowseEvent.class, browseManager)
@@ -554,6 +553,7 @@ public class Core {
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
+        contentManager.start()
         hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)
         connectionManager.start()
         cacheClient.start()

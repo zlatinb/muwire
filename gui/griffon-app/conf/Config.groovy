@@ -223,4 +223,9 @@ mvcGroups {
         view = 'com.muwire.gui.PublishPreviewView'
         controller = 'com.muwire.gui.PublishPreviewController'
     }
+    'rule-wizard' {
+        model = 'com.muwire.gui.tools.RuleWizardModel'
+        view = 'com.muwire.gui.tools.RuleWizardView'
+        controller = 'com.muwire.gui.tools.RuleWizardController'
+    }
 }

@@ -52,23 +52,15 @@ class ContentPanelView {
                 scrollPane (constraints : BorderLayout.CENTER) {
                     rulesTable = table(id : "rules-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.rules) {
-                            closureColumn(header: trans("TERM"), type:String, read: {row -> row.getTerm()})
-                            closureColumn(header: trans("REGEX") + "?", type:Boolean, read: {row -> row instanceof RegexMatcher})
+                            closureColumn(header: trans("NAME"), type:String, read: {row -> row.name})
                             closureColumn(header: trans("HITS"), type:Integer, read : {row -> row.matches.size()})
                         }
                     }
                 }
                 panel (constraints : BorderLayout.SOUTH) {
-                    borderLayout()
-                    ruleTextField = textField(constraints: BorderLayout.CENTER, columns : 20, action: addRuleAction)
-                    panel (constraints: BorderLayout.EAST) {
-                        buttonGroup(id : "ruleType")
-                        radioButton(text: trans("KEYWORD"), selected : true, buttonGroup: ruleType, keywordAction)
-                        radioButton(text: trans("REGEX"), selected : false, buttonGroup: ruleType, regexAction)
-                        button(text : trans("ADD_RULE"), addRuleAction)
-                        button(text : trans("DELETE_RULE"), enabled : bind {model.deleteButtonEnabled}, deleteRuleAction)
-                        button(text : trans("CLOSE"), closeAction)
-                    }
+                    button(text : trans("ADD_RULE"), addRuleAction)
+                    button(text : trans("DELETE_RULE"), enabled : bind {model.deleteButtonEnabled}, deleteRuleAction)
+                    button(text : trans("CLOSE"), closeAction)
                 }
             }
             panel (border : etchedBorder()){
@@ -130,8 +122,10 @@ class ContentPanelView {
                 model.deleteButtonEnabled = true
                 model.hits.clear()
                 Matcher matcher = model.rules[selectedRow]
-                model.hits.addAll(matcher.matches)
-                hitsTable.model.fireTableDataChanged()
+                if (matcher != null) {
+                    model.hits.addAll(matcher.matches)
+                    hitsTable.model.fireTableDataChanged()
+                }
             }
         })
         
