@@ -71,7 +71,7 @@ class CollectionTabModel {
     void mvcGroupDestroy() {
         if (preFetchedCollections == null) {
             eventBus.unregister(CollectionFetchedEvent.class, this)
-            eventBus.unregister(CollectionFetchStatusEvent.class)
+            eventBus.unregister(CollectionFetchStatusEvent.class, this)
         }
     }
     
