@@ -31,9 +31,11 @@ class EventBus {
         synchronized(this) {
             currentHandlers = handlers.getOrDefault(clazz, [])
         }
-        currentHandlers.each {
+        for(def handler : currentHandlers) {
+            if (e.vetoed)
+                break
             try {
-                it."on${clazz.getSimpleName()}"(e)
+                handler."on${clazz.getSimpleName()}"(e)
             } catch (Exception bad) {
                 log.log(Level.SEVERE, "exception dispatching event",bad)
             }
