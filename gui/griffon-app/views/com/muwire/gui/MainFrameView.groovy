@@ -123,12 +123,15 @@ class MainFrameView {
         def transferHandler = new MWTransferHandler()
         def collectionsTransferHandler = new FileCollectionTransferHandler()
             
+        String version = metadata["application.version"]
+        String beta = metadata["application.beta"]
+        if (beta != null && beta != "0")
+            version += "-beta$beta"
         builder.with {
             application(size : [mainFrameX,mainFrameY], id: 'main-frame',
             locationRelativeTo : null,
             defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
-            title: application.configuration['application.title'] + " " +
-            metadata["application.version"],
+            title: application.configuration['application.title'] + " " + version,
             iconImage:   imageIcon('/MuWire-48x48.png').image,
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
