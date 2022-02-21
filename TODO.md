@@ -20,7 +20,6 @@
 |Name|GitHub issue|Component(s)|Priority|
 |---|---|---|---|
 |"Edit File Details" frame|N/A|GUI|High|
-|Right-click resync from watched folders table|N/A|GUI|Medium|
 |Fix reproducible build on Windows| N/A| Build scripts | Low|
 |Option to disable saving of search tabs| N/A | GUI | Medium |
 |Progress bar while collection preview is generated | 70 | GUI | Low |
@@ -36,7 +35,6 @@
 |Rewrite of javascript to enable strictest CSP policy | N/A | Plugin | Blocker |
 |Metadata parsing and search | N/A | Core, Network? | Optional |
 |Automatic adjustment of I2P tunnels | N/A | Core | Optional |
-|Persist contact list immediately | N/A | Core | Medium |
 |Option to share contact list only with trusted users | N/A | Core, GUI|, Low |
 |Per-file access list aka confidential files | 29 | Core, GUI | Low |
 |Downloads queue with priorities | N/A | Core, GUI | Medium |

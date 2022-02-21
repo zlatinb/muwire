@@ -1,6 +1,8 @@
 package com.muwire.core.trust
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import java.util.logging.Level
 
 import com.muwire.core.Persona
@@ -17,91 +19,75 @@ import net.i2p.util.ConcurrentHashSet
 class TrustService extends Service {
 
     final File persistGood, persistBad
-    final long persistInterval
 
     final Map<Destination, TrustEntry> good = new ConcurrentHashMap<>()
     final Map<Destination, TrustEntry> bad = new ConcurrentHashMap<>()
 
-    final Timer timer
+    final Executor diskIO = Executors.newSingleThreadExecutor()
 
     TrustService() {}
 
-    TrustService(File persistGood, File persistBad, long persistInterval) {
+    TrustService(File persistGood, File persistBad) {
         this.persistBad = persistBad
         this.persistGood = persistGood
-        this.persistInterval = persistInterval
-        this.timer = new Timer("trust-persister",true)
     }
 
     void start() {
-        timer.schedule({load()} as TimerTask, 1)
+        diskIO.submit ( {load()} as Runnable)
     }
 
     void stop() {
-        timer.cancel()
+        diskIO.shutdown()
     }
 
     void load() {
         JsonSlurper slurper = new JsonSlurper()
         if (persistGood.exists()) {
-            persistGood.eachLine {
+            persistGood.eachLine("UTF-8", {
                 try {
-                    byte [] decoded = Base64.decode(it)
+                    def json = slurper.parseText(it)
+                    byte [] decoded = Base64.decode(json.persona)
                     Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                    good.put(persona.destination, new TrustEntry(persona, null))
-                } catch (Exception e) {
-                    try {
-                        def json = slurper.parseText(it)
-                        byte [] decoded = Base64.decode(json.persona)
-                        Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                        good.put(persona.destination, new TrustEntry(persona, json.reason))
-                    } catch (Exception bad) {
-                        log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
-                    }
+                    good.put(persona.destination, new TrustEntry(persona, json.reason))
+                } catch (Exception bad) {
+                    log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
                 }
-            }
+            })
         }
         if (persistBad.exists()) {
-            persistBad.eachLine {
-                 try {
-                    byte [] decoded = Base64.decode(it)
+            persistBad.eachLine("UTF-8", {
+                try {
+                    def json = slurper.parseText(it)
+                    byte [] decoded = Base64.decode(json.persona)
                     Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                    bad.put(persona.destination, new TrustEntry(persona, null))
-                } catch (Exception e) {
-                    try {
-                        def json = slurper.parseText(it)
-                        byte [] decoded = Base64.decode(json.persona)
-                        Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                        bad.put(persona.destination, new TrustEntry(persona, json.reason))
-                    } catch (Exception bad) {
-                        log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
-                    }
+                    bad.put(persona.destination, new TrustEntry(persona, json.reason))
+                } catch (Exception bad) {
+                    log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
                 }
-            }
+            })
         }
-        timer.schedule({persist()} as TimerTask, persistInterval, persistInterval)
         loaded = true
     }
 
     private void persist() {
         persistGood.delete()
-        persistGood.withPrintWriter { writer ->
+        persistGood.withPrintWriter("UTF-8", { writer ->
             good.each {k,v ->
                 def json = [:]
                 json.persona = v.persona.toBase64()
                 json.reason = v.reason
                 writer.println JsonOutput.toJson(json)
             }
-        }
+        })
         persistBad.delete()
-        persistBad.withPrintWriter { writer ->
+        persistBad.withPrintWriter("UTF-8", { writer ->
             bad.each { k,v ->
                 def json = [:]
                 json.persona = v.persona.toBase64()
                 json.reason = v.reason
                 writer.println JsonOutput.toJson(json)
             }
-        }
+        })
     }
 
     TrustLevel getLevel(Destination dest) {
@@ -127,6 +113,7 @@ class TrustService extends Service {
                 bad.remove(e.persona.destination)
                 break
         }
+        diskIO.submit({persist()} as Runnable)
     }
     
     public static class TrustEntry {
@@ -147,5 +134,4 @@ class TrustService extends Service {
             persona == o.persona
         }
     }
-    
 }
