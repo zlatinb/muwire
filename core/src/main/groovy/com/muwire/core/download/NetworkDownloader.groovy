@@ -114,6 +114,15 @@ class NetworkDownloader extends Downloader {
             }
         }
     }
+    
+    private void closePiecesFile() {
+        synchronized (piecesFile) {
+            if (piecesFileClosed)
+                return
+            piecesFileClosed = true
+            piecesFile.delete()
+        }
+    }
 
     long donePieces() {
         pieces.donePieces()
@@ -409,8 +418,12 @@ class NetworkDownloader extends Downloader {
                 if (!cancelled) {
                     log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))
                     markFailed(destination)
-                    if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true))
+                    if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true)) {
+                        log.info("Download hopeless, removing incomplete file")
+                        incompleteFile.delete()
+                        closePiecesFile()
                         eventBus.publish(new DownloadHopelessEvent(downloader: NetworkDownloader.this))
+                    }
                 }
             } finally {
                 currentState = WorkerState.FINISHED
@@ -418,10 +431,7 @@ class NetworkDownloader extends Downloader {
                     if (!cancelled) {
                         writePieces()
                         if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
-                            synchronized (piecesFile) {
-                                piecesFileClosed = true
-                                piecesFile.delete()
-                            }
+                            closePiecesFile()
                             activeWorkers.values().each {
                                 if (it.destination != destination)
                                     it.cancel()
