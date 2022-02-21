@@ -107,7 +107,7 @@ class Ready extends AbstractLifecycleHandler {
         
         Core core
         try {
-            core = new Core(props, home, metadata["application.coreVversion"])
+            core = new Core(props, home, metadata["application.coreVersion"])
             Runtime.getRuntime().addShutdownHook({
                 core.shutdown()
             })
