@@ -26,7 +26,7 @@ class TrustServiceTest {
         persistBad.delete()
         persistGood.deleteOnExit()
         persistBad.deleteOnExit()
-        service = new TrustService(persistGood, persistBad, 100)
+        service = new TrustService(persistGood, persistBad)
         service.start()
     }
 
@@ -77,9 +77,9 @@ class TrustServiceTest {
     @Test
     void testLoad() {
         service.stop()
-        persistGood.append("${personas.persona1.toBase64()}\n")
-        persistBad.append("${personas.persona2.toBase64()}\n")
-        service = new TrustService(persistGood, persistBad, 100)
+        persistGood.append("{ \"persona\" : \"${personas.persona1.toBase64()}\", \"reason\":\"good\"}\n")
+        persistBad.append("{ \"persona\" : \"${personas.persona2.toBase64()}\", \"reason\",\"bad\"}\n")
+        service = new TrustService(persistGood, persistBad)
         service.start()
         Thread.sleep(50)
 
