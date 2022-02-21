@@ -1,10 +1,16 @@
 package com.muwire.gui
 
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.plaf.basic.BasicComboBoxEditor
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+
+import static com.muwire.gui.Translator.trans
 
 class SearchFieldEditor extends BasicComboBoxEditor {
 
@@ -43,5 +49,38 @@ class SearchFieldEditor extends BasicComboBoxEditor {
                     }
 
                 })
+        
+        editor.addMouseListener(new MouseAdapter() {
+            @Override
+            void mousePressed(MouseEvent e) {
+                if (!CopyPasteSupport.canPasteString())
+                    return
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+            }
+
+            @Override
+            void mouseReleased(MouseEvent e) {
+                if (!CopyPasteSupport.canPasteString())
+                    return
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showPopupMenu(e)
+            }
+        })
+    }
+    
+    private void showPopupMenu(MouseEvent event) {
+        JPopupMenu menu = new JPopupMenu()
+        JMenuItem paste = new JMenuItem(trans("PASTE"))
+        paste.addActionListener({doPaste()})
+        menu.add(paste)
+        menu.show(event.getComponent(), event.getX(), event.getY())
+    }
+    
+    private void doPaste() {
+        String contents = CopyPasteSupport.pasteFromClipboard()
+        if (contents == null)
+            return
+        editor.setText(contents)
     }
 }
