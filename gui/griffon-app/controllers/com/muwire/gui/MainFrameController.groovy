@@ -228,6 +228,15 @@ class MainFrameController {
     }
 
     @ControllerAction
+    void copyDownloadHash() {
+        List<Downloader> downloaders = selectedDownloads()
+        if (downloaders.size() != 1)
+            return
+        def download = downloaders.first()
+        CopyPasteSupport.copyToClipboard(Base64.encode(download.getInfoHash().getRoot()))
+    }
+    
+    @ControllerAction
     void cancel() {
         for (Downloader downloader : selectedDownloads()) {
             downloader.cancel()

@@ -1556,14 +1556,12 @@ class MainFrameView {
         }
         
         JPopupMenu menu = new JPopupMenu()
-        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
-        copyHashToClipboard.addActionListener({
-            String hash = Base64.encode(downloader.infoHash.getRoot())
-            StringSelection selection = new StringSelection(hash)
-            def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-            clipboard.setContents(selection, null)
-        })
-        menu.add(copyHashToClipboard)
+        
+        if (selected.length == 1) {
+            JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
+            copyHashToClipboard.addActionListener({ mvcGroup.controller.copyDownloadHash() })
+            menu.add(copyHashToClipboard)
+        }
 
         if (pauseEnabled) {
             JMenuItem pause = new JMenuItem(trans("PAUSE"))
