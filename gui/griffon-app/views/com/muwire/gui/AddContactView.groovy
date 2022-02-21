@@ -108,11 +108,6 @@ class AddContactView {
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.addWindowListener( new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                mvcGroup.destroy()
-            }
-        })
         dialog.show()
     }
     

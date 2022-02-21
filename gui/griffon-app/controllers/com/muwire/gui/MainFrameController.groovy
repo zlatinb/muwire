@@ -312,7 +312,7 @@ class MainFrameController {
     void addContact() {
         def params = [:]
         params.core = core
-        mvcGroup.createMVCGroup("add-contact", params)
+        mvcGroup.createMVCGroup("add-contact", params).destroy()
     }
     
     @ControllerAction

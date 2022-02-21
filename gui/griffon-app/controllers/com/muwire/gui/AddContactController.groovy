@@ -41,6 +41,5 @@ class AddContactController {
     @ControllerAction
     void cancel() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }
