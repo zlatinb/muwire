@@ -1,6 +1,7 @@
 package com.muwire.gui;
 
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -26,22 +27,36 @@ public class CopyPasteSupport {
     }
 
     /**
-     * @return what's in the clipboard if it can be represented as a string.  This does not handle multi-byte characters. 
+     * @return what's in the clipboard if it can be represented as a string.  
+     * This does not handle multi-byte characters unless copied from MuWire itself. 
      */
     public static String pasteFromClipboard() {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        InputStream is;
         try {
-            InputStream is = (InputStream)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.getTextPlainUnicodeFlavor());
+            return (String) clipboard.getData(DataFlavor.stringFlavor);
+        } catch ( UnsupportedFlavorException|IOException notJavaString) {
+            try {
+                is = (InputStream) clipboard.getData(DataFlavor.getTextPlainUnicodeFlavor());
+            } catch (UnsupportedFlavorException|IOException notPlainText) {
+                return null;
+            }
+        }
+        try {
             StringBuilder sb = new StringBuilder();
             int b;
             while ((b = is.read()) >= 0)
                 sb.append((char)b);
             return sb.toString();
-        } catch (UnsupportedFlavorException| IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }
     
     public static boolean canPasteString() {
-        return Toolkit.getDefaultToolkit().getSystemClipboard().isDataFlavorAvailable(DataFlavor.getTextPlainUnicodeFlavor());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        return clipboard.isDataFlavorAvailable(DataFlavor.getTextPlainUnicodeFlavor()) ||
+                clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
+                
     }
 }
