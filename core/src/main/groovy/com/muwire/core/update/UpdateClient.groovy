@@ -152,8 +152,31 @@ class UpdateClient {
                 }
 
                 if (VersionComparator.comp(myVersion, payload.version) >= 0) {
-                    log.info("no new version available")
-                    return
+                    
+                    String beta = System.getProperty("beta")
+                    
+                    if (beta == null) {
+                        log.info("no new version available")
+                        return
+                    }
+                    
+                    if (payload.beta == null) {
+                        log.warning("no beta field in update payload")
+                        return
+                    }
+                    
+                    payload = payload.beta
+                    
+                    if (payload.version == null) {
+                        log.warning("version missing in beta payload")
+                    }
+                    
+                    int myBeta = Integer.parseInt(beta)
+                    int updateBeta = Integer.parseInt(payload.version)
+                    if (myBeta >= updateBeta) {
+                        log.info("no new beta version available")
+                        return
+                    }
                 }
 
                 String infoHash

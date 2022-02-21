@@ -39,6 +39,10 @@ class Ready extends AbstractLifecycleHandler {
     @Override
     void execute() {
         log.info "starting core services"
+        
+        String beta = metadata["application.beta"]
+        if (beta != null && beta != "0")
+            System.setProperty("beta", beta)
 
         def home = new File(application.getContext().getAsString("muwire-home"))
         def props = new Properties()
@@ -103,7 +107,7 @@ class Ready extends AbstractLifecycleHandler {
         
         Core core
         try {
-            core = new Core(props, home, metadata["application.version"])
+            core = new Core(props, home, metadata["application.coreVversion"])
             Runtime.getRuntime().addShutdownHook({
                 core.shutdown()
             })
