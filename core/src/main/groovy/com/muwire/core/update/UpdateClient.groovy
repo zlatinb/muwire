@@ -198,7 +198,7 @@ class UpdateClient {
                         updateDownloading = false
                         version = payload.version
                         signer = payload.signer
-                        log.info("starting search for new version hash $payload.infoHash")
+                        log.info("starting search for new version hash $infoHash")
                         Signature sig = DSAEngine.getInstance().sign(updateInfoHash.getRoot(), spk)
                         UUID uuid = UUID.randomUUID()
                         long timestamp = System.currentTimeMillis()
