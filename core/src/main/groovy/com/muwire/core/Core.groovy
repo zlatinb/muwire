@@ -532,7 +532,7 @@ public class Core {
             register(UIMessageMovedEvent.class, messenger)
         }
 
-        if (System.hasProperty("auto.updater.class")) {
+        if (System.getProperty("auto.updater.class") != null) {
             String className = System.getProperty("auto.updater.class")
             log.info("initializing auto-updater $className")
             Class<?> clazz = Class.forName(className)
