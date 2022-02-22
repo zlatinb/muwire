@@ -89,7 +89,8 @@ class UpdateClient {
         if (e.infoHash != updateInfoHash)
             return
         updateDownloading = false
-        eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, text : text))
+        eventBus.publish(new UpdateDownloadedEvent(version : version, signer : signer, 
+                text : text, updateFile: e.downloadedFile.file))
     }
 
     private void checkUpdate() {
@@ -192,9 +193,11 @@ class UpdateClient {
                 } else {
                     log.info("new version $payload.version available")
                     updateInfoHash = new InfoHash(Base64.decode(infoHash))
-                    if (fileManager.rootToFiles.containsKey(updateInfoHash))
-                        eventBus.publish(new UpdateDownloadedEvent(version : payload.version, signer : payload.signer, text : text))
-                    else {
+                    if (fileManager.rootToFiles.containsKey(updateInfoHash)) {
+                        File updateFile = fileManager.rootToFiles.get(updateInfoHash).first().file
+                        eventBus.publish(new UpdateDownloadedEvent(version: payload.version, signer: payload.signer,
+                                text : text, updateFile: updateFile))
+                    } else {
                         updateDownloading = false
                         version = payload.version
                         signer = payload.signer

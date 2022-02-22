@@ -8,6 +8,8 @@ import com.muwire.core.files.directories.WatchedDirectoriesLoadedEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
+import com.muwire.core.update.AutoUpdater
+import com.muwire.core.update.UpdateDownloadedEvent
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
@@ -530,6 +532,14 @@ public class Core {
             register(UIMessageMovedEvent.class, messenger)
         }
 
+        if (System.hasProperty("auto.updater.class")) {
+            String className = System.getProperty("auto.updater.class")
+            log.info("initializing auto-updater $className")
+            Class<?> clazz = Class.forName(className))
+            AutoUpdater autoUpdater = (AutoUpdater) clazz.newInstance()
+            autoUpdater.init(this)
+        }
+        
         File modulesProps = new File(home, "mwmodules.list")
         if (modulesProps.exists()) {
             log.info("loading modules")
@@ -539,6 +549,13 @@ public class Core {
                 modules.add(module)
             }
         }
+        
+        eventBus.register(RestartEvent.class, this)
+    }
+    
+    void onRestartEvent(RestartEvent event) {
+        shutdown()
+        System.exit(0)
     }
 
     public void startServices() {

@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.RestartEvent
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -16,7 +17,11 @@ class UpdateController {
     @ControllerAction
     void close() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
+    }
+    
+    @ControllerAction
+    void restart() {
+        model.core.eventBus.publish(new RestartEvent())
     }
     
     @ControllerAction

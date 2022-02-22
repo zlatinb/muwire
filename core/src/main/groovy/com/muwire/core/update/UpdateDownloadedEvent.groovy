@@ -6,4 +6,5 @@ class UpdateDownloadedEvent extends Event {
     String version
     String signer
     String text
+    File updateFile
 }

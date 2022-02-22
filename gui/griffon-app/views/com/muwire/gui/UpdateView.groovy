@@ -41,7 +41,9 @@ class UpdateView {
             }
             panel (constraints : BorderLayout.SOUTH) {
                 if (model.available != null)
-                    button(text : trans("FIND"), searchAction)
+                    button(text : trans("FIND"), toolTipText: trans("TOOLTIP_FIND"), searchAction)
+                else if (model.downloaded != null)
+                    button(text : trans("RESTART"), toolTipText: trans("TOOLTIP_RESTART"), restartAction)
                 button(text : trans("CLOSE"), closeAction)
             }
         }
@@ -52,11 +54,6 @@ class UpdateView {
         dialog.pack()
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.addWindowListener( new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                mvcGroup.destroy()
-            }
-        })
         dialog.show()
     }
 }
