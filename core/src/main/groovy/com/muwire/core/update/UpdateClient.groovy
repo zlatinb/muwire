@@ -173,7 +173,8 @@ class UpdateClient {
                     }
                     
                     int myBeta = Integer.parseInt(beta)
-                    if (myBeta >= payload.version) {
+                    int newBeta = Integer.parseInt(payload.version)
+                    if (myBeta >= newBeta) {
                         log.info("no new beta version available")
                         return
                     }
