@@ -535,7 +535,7 @@ public class Core {
         if (System.hasProperty("auto.updater.class")) {
             String className = System.getProperty("auto.updater.class")
             log.info("initializing auto-updater $className")
-            Class<?> clazz = Class.forName(className))
+            Class<?> clazz = Class.forName(className)
             AutoUpdater autoUpdater = (AutoUpdater) clazz.newInstance()
             autoUpdater.init(this)
         }
