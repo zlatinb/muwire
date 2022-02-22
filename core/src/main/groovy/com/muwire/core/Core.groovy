@@ -135,7 +135,7 @@ public class Core {
     final EventBus eventBus
     final Persona me
     final String version;
-    final File home
+    public final File home
     final Properties i2pOptions
     final MuWireSettings muOptions
 
