@@ -168,6 +168,7 @@ public class Core {
     final WatchedDirectoryManager watchedDirectoryManager
     final NegativeFiles negativeFiles
     private final TrackerResponder trackerResponder
+    final AutoUpdater autoUpdater
 
     private final Router router
 
@@ -536,9 +537,10 @@ public class Core {
             String className = System.getProperty("auto.updater.class")
             log.info("initializing auto-updater $className")
             Class<?> clazz = Class.forName(className)
-            AutoUpdater autoUpdater = (AutoUpdater) clazz.newInstance()
+            autoUpdater = (AutoUpdater) clazz.newInstance()
             autoUpdater.init(this)
-        }
+        } else
+            autoUpdater = null
         
         File modulesProps = new File(home, "mwmodules.list")
         if (modulesProps.exists()) {

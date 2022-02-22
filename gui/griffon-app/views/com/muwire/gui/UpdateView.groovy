@@ -42,7 +42,7 @@ class UpdateView {
             panel (constraints : BorderLayout.SOUTH) {
                 if (model.available != null)
                     button(text : trans("FIND"), toolTipText: trans("TOOLTIP_FIND"), searchAction)
-                else if (model.downloaded != null)
+                else if (model.downloaded != null && model.core.autoUpdater != null)
                     button(text : trans("RESTART"), toolTipText: trans("TOOLTIP_RESTART"), restartAction)
                 button(text : trans("CLOSE"), closeAction)
             }
