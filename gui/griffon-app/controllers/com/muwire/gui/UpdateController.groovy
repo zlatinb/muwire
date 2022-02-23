@@ -22,6 +22,7 @@ class UpdateController {
     @ControllerAction
     void restart() {
         model.core.eventBus.publish(new RestartEvent())
+        close()
     }
     
     @ControllerAction
