@@ -17,6 +17,8 @@ import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
+import java.awt.Image
+import java.awt.Window
 import java.util.function.Predicate
 
 import static com.muwire.gui.Translator.trans
@@ -105,7 +107,7 @@ class MainFrameView {
     JPanel messageFolderContents
     
     void initUI() {
-        chatNotificator = new ChatNotificator(application.getMvcGroupManager())
+        
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         
@@ -780,6 +782,10 @@ class MainFrameView {
 
             }
         }
+
+        chatNotificator = new ChatNotificator(application.getMvcGroupManager(),
+                (Window)application.getWindowManager().findWindow("main-frame"),
+                (Image) builder.imageIcon("/comment.png").image)
         
         collectionsTable = builder.getVariable("collections-table")
         collectionFilesTable = builder.getVariable("items-table")

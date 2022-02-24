@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import java.awt.Image
 import java.awt.Taskbar
 import java.awt.Taskbar.Feature
 
@@ -8,6 +9,8 @@ import javax.swing.JTabbedPane
 
 import griffon.core.mvc.MVCGroupManager
 
+import java.awt.Window
+
 class ChatNotificator {
     
     public static interface Listener {
@@ -15,6 +18,8 @@ class ChatNotificator {
     }
     
     private final MVCGroupManager groupManager
+    private final Window window
+    private final Image image
     
     private boolean chatInFocus
     private String currentServerTab
@@ -24,8 +29,10 @@ class ChatNotificator {
     
     private Listener listener
     
-    ChatNotificator(MVCGroupManager groupManager) {
+    ChatNotificator(MVCGroupManager groupManager, Window window, Image image) {
         this.groupManager = groupManager
+        this.window = window
+        this.image = image
     }
     
     void serverTabChanged(JTabbedPane source) {
@@ -92,17 +99,24 @@ class ChatNotificator {
         listener?.update()
         if (!Taskbar.isTaskbarSupported())
             return
+
+        int total = 0
+        roomsWithMessages.values().each {
+            total += it
+        }
+
         def taskBar = Taskbar.getTaskbar()
-        if (!taskBar.isSupported(Feature.ICON_BADGE_NUMBER))
-            return
-        if (roomsWithMessages.isEmpty())
-            taskBar.setIconBadge("")
-        else {
-            int total = 0
-            roomsWithMessages.values().each { 
-                total += it
+        if (taskBar.isSupported(Feature.ICON_BADGE_NUMBER)) {
+            if (total == 0)
+                taskBar.setIconBadge("")
+            else {
+                taskBar.setIconBadge(String.valueOf(total))
             }
-            taskBar.setIconBadge(String.valueOf(total))
+        } else if (taskBar.isSupported(Feature.ICON_BADGE_IMAGE_WINDOW)) {
+            if (total > 0)
+                taskBar.setWindowIconBadge(window, image)
+            else
+                taskBar.setWindowIconBadge(window, null)
         }
     }
 }
