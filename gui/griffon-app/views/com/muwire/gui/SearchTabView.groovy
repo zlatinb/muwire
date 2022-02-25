@@ -296,7 +296,7 @@ class SearchTabView {
         }
         
         // results tree
-        resultTree.setSharedPredicate(model.core.fileManager::isShared)
+        resultTree.setSharedPredicate(model.core.fileManager::isShared, model.core.downloadManager::isDownloading)
         resultTree.addMouseListener(resultsMouseListener)
         resultTree.addTreeSelectionListener {
             model.downloadActionEnabled = false
@@ -317,7 +317,9 @@ class SearchTabView {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         resultsTable.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable.setDefaultRenderer(UIResultEvent.class,
-                new ResultNameTableCellRenderer(model.core.fileManager::isShared, false))
+                new ResultNameTableCellRenderer(model.core.fileManager::isShared,
+                        model.core.downloadManager::isDownloading,
+                        false))
 
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
 
@@ -395,7 +397,9 @@ class SearchTabView {
         // results table 2
         resultsTable2.setDefaultRenderer(Integer.class,centerRenderer)
         resultsTable2.setDefaultRenderer(UIResultEvent.class, 
-                new ResultNameTableCellRenderer(model.core.fileManager::isShared, false))
+                new ResultNameTableCellRenderer(model.core.fileManager::isShared, 
+                        model.core.downloadManager::isDownloading,
+                        false))
         resultsTable2.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         resultsTable2.rowSorter.addRowSorterListener({evt -> lastResults2SortEvent = evt})
         resultsTable2.rowSorter.setSortsOnUpdates(true)
@@ -686,6 +690,12 @@ class SearchTabView {
             if (row >= 0)
                 table.selectionModel.addSelectionInterval(row, row)
         }
+    }
+    
+    void updateUIs() {
+        JTable table = builder.getVariable("results-table")
+        table.updateUI()
+        resultTree.updateUI()
     }
 
     private class FocusListener {

@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.Persona
 import com.muwire.core.SplitPattern
+import com.muwire.core.download.DownloadStartedEvent
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -36,6 +37,7 @@ class BrowseController {
     void register() {
         core.eventBus.register(BrowseStatusEvent.class, this)
         core.eventBus.register(UIResultBatchEvent.class, this)
+        core.eventBus.register(DownloadStartedEvent.class, this)
         model.uuid = UUID.randomUUID()
         timer.start()
         core.eventBus.publish(new UIBrowseEvent(host : model.host, uuid: model.uuid))
@@ -45,6 +47,13 @@ class BrowseController {
         timer.stop()
         core.eventBus.unregister(BrowseStatusEvent.class, this)
         core.eventBus.unregister(UIResultBatchEvent.class, this)
+        core.eventBus.unregister(DownloadStartedEvent.class, this)
+    }
+    
+    void onDownloadStartedEvent(DownloadStartedEvent event) {
+        runInsideUIAsync {
+            view.updateUIs()
+        }
     }
     
     void onBrowseStatusEvent(BrowseStatusEvent e) {

@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
+import com.muwire.core.download.DownloadStartedEvent
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -39,6 +40,20 @@ class SearchTabController {
 
     Core core
 
+    void mvcGroupInit(Map<String,String> args) {
+        core.eventBus.register(DownloadStartedEvent.class, this)
+    }
+    
+    void mvcGroupDestroy() {
+        core.eventBus.unregister(DownloadStartedEvent.class, this)
+    }
+    
+    void onDownloadStartedEvent(DownloadStartedEvent event) {
+        runInsideUIAsync {
+            view.updateUIs()
+        }
+    }
+    
     @ControllerAction
     void download() {
         def results = view.selectedResults()

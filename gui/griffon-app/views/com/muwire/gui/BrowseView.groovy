@@ -3,6 +3,7 @@ package com.muwire.gui
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
+import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTree
 import javax.swing.tree.TreePath
@@ -42,8 +43,8 @@ class BrowseView {
     
     ResultTree resultsTree
     def treeExpansions = new TreeExpansions()
-    
-    def resultsTable
+
+    JTable resultsTable
     def lastSortEvent
     
     def sequentialDownloadCheckbox
@@ -136,7 +137,7 @@ class BrowseView {
         }
         
         // results tree
-        resultsTree.setSharedPredicate(controller.core.fileManager::isShared)
+        resultsTree.setSharedPredicate(controller.core.fileManager::isShared, controller.core.downloadManager::isDownloading)
         resultsTree.addTreeExpansionListener(treeExpansions)
         resultsTree.addMouseListener(mouseListener)
         resultsTree.addTreeSelectionListener({
@@ -162,7 +163,9 @@ class BrowseView {
         resultsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
         resultsTable.setDefaultRenderer(UIResultEvent.class, 
-                new ResultNameTableCellRenderer(controller.core.fileManager::isShared, true))
+                new ResultNameTableCellRenderer(controller.core.fileManager::isShared,
+                        controller.core.downloadManager::isDownloading,
+                        true))
         
         resultsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})
         resultsTable.rowSorter.setSortsOnUpdates(true)
@@ -310,6 +313,11 @@ class BrowseView {
         else
             TreeUtil.expand(tree)
         tree.setSelectionPaths(selectedPaths)
+    }
+    
+    void updateUIs() {
+        resultsTable.updateUI()
+        resultsTree.updateUI()
     }
     
     void expandUnconditionally() {
