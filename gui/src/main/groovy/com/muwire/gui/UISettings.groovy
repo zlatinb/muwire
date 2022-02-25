@@ -40,7 +40,7 @@ class UISettings {
         font = props.getProperty("font",null)
         clearCancelledDownloads = Boolean.parseBoolean(props.getProperty("clearCancelledDownloads","true"))
         clearFinishedDownloads = Boolean.parseBoolean(props.getProperty("clearFinishedDownloads","false"))
-        excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","true"))
+        excludeLocalResult = Boolean.parseBoolean(props.getProperty("excludeLocalResult","false"))
         showSearchHashes = Boolean.parseBoolean(props.getProperty("showSearchHashes","true"))
         autoFontSize = Boolean.parseBoolean(props.getProperty("autoFontSize","false"))
         fontSize = Integer.parseInt(props.getProperty("fontSize","12"))

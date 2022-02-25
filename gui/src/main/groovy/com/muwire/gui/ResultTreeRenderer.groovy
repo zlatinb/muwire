@@ -15,16 +15,18 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import java.awt.Component
 
 class ResultTreeRenderer extends DefaultTreeCellRenderer {
-    private final ImageIcon commentIcon, sharedIcon
+    private final ImageIcon commentIcon, sharedIcon, downloadingIcon
     private final String bShort
     private final StringBuffer sb = new StringBuffer()
-    private final Predicate<InfoHash> sharedPredicate
+    private final Predicate<InfoHash> sharedPredicate, downloadingPredicate
     
-    ResultTreeRenderer(Predicate<InfoHash> sharedPredicate) {
+    ResultTreeRenderer(Predicate<InfoHash> sharedPredicate, Predicate<InfoHash> downloadingPredicate) {
         commentIcon = new ImageIcon((URL) PathTreeRenderer.class.getResource("/comment.png"))
         sharedIcon = new ImageIcon((URL) PathTreeRenderer.class.getResource("/yes.png"))
+        downloadingIcon = new ImageIcon((URL) PathTreeRenderer.class.getResource("/down_arrow.png"))
         bShort = trans("BYTES_SHORT")
         this.sharedPredicate = sharedPredicate
+        this.downloadingPredicate = downloadingPredicate
     }
 
      Component getTreeCellRendererComponent(JTree tree, Object value, 
@@ -49,6 +51,8 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
          
          if (sharedPredicate.test(result.infohash))
              setIcon(sharedIcon)
+         else if (downloadingPredicate.test(result.infohash))
+             setIcon(downloadingIcon)
          else if (result.comment)
              setIcon(commentIcon)
     

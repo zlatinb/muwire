@@ -19,8 +19,8 @@ class ResultTree extends JTree{
         ToolTipManager.sharedInstance().registerComponent(this)
     }
     
-    void setSharedPredicate(Predicate<InfoHash> predicate) {
-        setCellRenderer(new ResultTreeRenderer(predicate))
+    void setSharedPredicate(Predicate<InfoHash> sharedPredicate, Predicate<InfoHash> downloadingPredicate) {
+        setCellRenderer(new ResultTreeRenderer(sharedPredicate, downloadingPredicate))
     }
     
     List<ResultAndTargets> decorateResults(List<UIResultEvent> results) {

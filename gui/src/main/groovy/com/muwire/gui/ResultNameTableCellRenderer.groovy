@@ -11,13 +11,17 @@ import java.util.function.Predicate
 
 class ResultNameTableCellRenderer extends DefaultTableCellRenderer {
     
-    private final ImageIcon sharedIcon
-    private final Predicate<InfoHash> sharedPredicate
+    private final ImageIcon sharedIcon, downloadingIcon
+    private final Predicate<InfoHash> sharedPredicate, downloadingPredicate;
     private final boolean fullPath
     
-    ResultNameTableCellRenderer(Predicate<InfoHash> sharedPredicate, boolean fullPath) {
+    ResultNameTableCellRenderer(Predicate<InfoHash> sharedPredicate, 
+                                Predicate<InfoHash> downloadingPredicate,
+                                boolean fullPath) {
         this.sharedPredicate = sharedPredicate
+        this.downloadingPredicate = downloadingPredicate
         sharedIcon = new ImageIcon((URL) ResultNameTableCellRenderer.class.getResource("/yes.png"))
+        downloadingIcon = new ImageIcon((URL) ResultNameTableCellRenderer.class.getResource("/down_arrow.png"))
         this.fullPath = fullPath
     }
 
@@ -30,6 +34,8 @@ class ResultNameTableCellRenderer extends DefaultTableCellRenderer {
         setText(HTMLSanitizer.sanitize(fullPath ? event.getFullPath() : event.name))
         if (sharedPredicate.test(event.infohash))
             setIcon(sharedIcon)
+        else if (downloadingPredicate.test(event.infohash))
+            setIcon(downloadingIcon)
         else
             setIcon(null)
         setToolTipText(HTMLSanitizer.sanitize(event.getFullPath()))
