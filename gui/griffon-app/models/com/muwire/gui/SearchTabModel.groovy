@@ -40,6 +40,7 @@ class SearchTabModel {
     UISettings uiSettings
     String uuid
     Integer tab
+    Boolean regex
     
     boolean visible
     private boolean dirty

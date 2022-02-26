@@ -88,7 +88,9 @@ class MainFrameController {
         performSearch(search, null)
     }
     
-    void repeatSearch(String terms, Integer tab) {
+    void repeatSearch(String terms, Integer tab, Boolean regex) {
+        if (regex)
+            terms = "/$terms/"
         performSearch(terms, tab)
     }
     
@@ -145,6 +147,7 @@ class MainFrameController {
         params["core"] = core
         params["settings"] = view.settings
         params["tab"] = tab
+        params["regex"] = regexSearch
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 

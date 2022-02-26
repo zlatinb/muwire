@@ -492,9 +492,10 @@ class SearchTabView {
     
     def repeatSearch = {
         int tab = parent.indexOfComponent(pane)
+        Boolean regex = model.regex
         def parentGroup = mvcGroup.parentGroup
         closeTab.call()
-        parentGroup.controller.repeatSearch(searchTerms, tab)
+        parentGroup.controller.repeatSearch(searchTerms, tab, regex)
     }
 
     def showPopupMenu(MouseEvent e) {
