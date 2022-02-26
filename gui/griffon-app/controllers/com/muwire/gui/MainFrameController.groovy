@@ -85,10 +85,14 @@ class MainFrameController {
         def searchField = builder.getVariable("search-field") 
         def search = searchField.getSelectedItem()
         searchField.model.addElement(search)
-        performSearch(search)
+        performSearch(search, null)
     }
     
-    private void performSearch(String search) {
+    void repeatSearch(String terms, Integer tab) {
+        performSearch(terms, tab)
+    }
+    
+    private void performSearch(String search, Integer tab) {
         
         model.sessionRestored = true
         
@@ -140,6 +144,7 @@ class MainFrameController {
         params["uuid"] = uuid.toString()
         params["core"] = core
         params["settings"] = view.settings
+        params["tab"] = tab
         def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
         model.results[uuid.toString()] = group
 
@@ -609,7 +614,7 @@ class MainFrameController {
     void restoreSession() {
         model.sessionRestored = true
         view.settings.openTabs.each { 
-            performSearch(it)
+            performSearch(it, null)
         }
     }
     

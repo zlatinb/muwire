@@ -39,6 +39,7 @@ class SearchTabModel {
     Core core
     UISettings uiSettings
     String uuid
+    Integer tab
     
     boolean visible
     private boolean dirty

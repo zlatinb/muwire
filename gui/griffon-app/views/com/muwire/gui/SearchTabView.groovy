@@ -4,8 +4,10 @@ import com.muwire.core.SharedFile
 import griffon.core.artifact.GriffonView
 
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.tree.TreePath
+import java.awt.Component
 import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
@@ -52,9 +54,9 @@ class SearchTabView {
     
     UISettings settings
 
-    def pane
-    def parent
-    def searchTerms
+    Component pane
+    JTabbedPane parent
+    String searchTerms
     JTable sendersTable
     def lastSendersSortEvent
     JTable resultsTable, resultsTable2
@@ -240,23 +242,29 @@ class SearchTabView {
     void mvcGroupInit(Map<String, String> args) {
         searchTerms = args["search-terms"]
         parent = mvcGroup.parentGroup.view.builder.getVariable("result-tabs")
-        parent.addTab(searchTerms, pane)
-        int index = parent.indexOfComponent(pane)
-        parent.setSelectedIndex(index)
+        if (model.tab == null) {
+            parent.addTab(searchTerms, pane)
+            model.tab = parent.indexOfComponent(pane)
+        } else 
+            parent.insertTab(searchTerms, null, pane,null, model.tab)
+        parent.setSelectedIndex(model.tab)
 
-        def tabPanel
-        builder.with {
-            tabPanel = panel {
-                borderLayout()
-                panel {
-                    label(text : searchTerms, constraints : BorderLayout.CENTER)
-                }
-                button(icon : imageIcon("/close_tab.png"), preferredSize : [20,20], constraints : BorderLayout.EAST, // TODO: in osx is probably WEST
-                    actionPerformed : closeTab )
+        JPanel tabPanel = builder.panel {
+            borderLayout()
+            panel {
+                label(text: searchTerms, constraints: BorderLayout.CENTER)
+            }
+            panel(constraints: BorderLayout.EAST) {
+                button(icon: imageIcon("/restart.png"), preferredSize: [20, 20],
+                        toolTipText: trans("TOOLTIP_REPEAT_SEARCH"),
+                        actionPerformed: repeatSearch)
+                button(icon: imageIcon("/close_tab.png"), preferredSize: [20, 20],
+                        toolTipText: trans("TOOLTIP_CLOSE_TAB"),
+                        actionPerformed: closeTab)
             }
         }
 
-        parent.setTabComponentAt(index, tabPanel)
+        parent.setTabComponentAt(model.tab, tabPanel)
         mvcGroup.parentGroup.view.showSearchWindow.call()
 
         
@@ -474,12 +482,19 @@ class SearchTabView {
     }
 
     def closeTab = {
-        int index = parent.indexOfTab(searchTerms)
-        parent.removeTabAt(index)
+        model.tab = parent.indexOfComponent(pane)
+        parent.removeTabAt(model.tab)
         model.trustButtonsEnabled = false
         model.downloadActionEnabled = false
         resultDetails.values().each {it.destroy()}
         mvcGroup.destroy()
+    }
+    
+    def repeatSearch = {
+        int tab = parent.indexOfComponent(pane)
+        def parentGroup = mvcGroup.parentGroup
+        closeTab.call()
+        parentGroup.controller.repeatSearch(searchTerms, tab)
     }
 
     def showPopupMenu(MouseEvent e) {
