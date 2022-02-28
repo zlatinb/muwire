@@ -4,6 +4,7 @@ import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.gui.chat.ChatFavorites
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
 
@@ -97,6 +98,7 @@ class MainFrameView {
 
     UISettings settings
     ChatNotificator chatNotificator
+    ChatFavorites chatFavorites
     
     JTable collectionsTable
     def lastCollectionSortEvent
@@ -740,12 +742,19 @@ class MainFrameView {
                         borderLayout()
                         tabbedPane(id : "chat-tabs", constraints : BorderLayout.CENTER)
                         panel(constraints : BorderLayout.SOUTH) {
-                            button(text : trans("START_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_START_CHAT_SERVER"),
-                                    enabled : bind {!model.chatServerRunning}, startChatServerAction)
-                            button(text : trans("STOP_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_STOP_CHAT_SERVER"),
-                                    enabled : bind {model.chatServerRunning}, stopChatServerAction)
-                            button(text : trans("CONNECT_TO_REMOTE_SERVER"), toolTipText: trans("TOOLTIP_CHAT_CONNECT"),
-                                    connectChatServerAction)
+                            gridLayout(rows : 1, cols : 2)
+                            panel (border: etchedBorder()) {
+                                button(text: trans("START_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_START_CHAT_SERVER"),
+                                        enabled: bind { !model.chatServerRunning }, startChatServerAction)
+                                button(text: trans("STOP_CHAT_SERVER"), toolTipText: trans("TOOLTIP_CHAT_STOP_CHAT_SERVER"),
+                                        enabled: bind { model.chatServerRunning }, stopChatServerAction)
+                            }
+                            panel (border: etchedBorder()) {
+                                button(text: trans("CONNECT_TO_REMOTE_SERVER"), toolTipText: trans("TOOLTIP_CHAT_CONNECT"),
+                                        connectChatServerAction)
+                                button(text : trans("FAVORITE_SERVERS"), toolTipText: trans("TOOLTIP_CHAT_FAVORITE_SERVERS"), 
+                                        chatFavoritesAction)
+                            }
                         }
                     }
                 }
@@ -786,6 +795,7 @@ class MainFrameView {
         chatNotificator = new ChatNotificator(application.getMvcGroupManager(),
                 (Window)application.getWindowManager().findWindow("main-frame"),
                 (Image) builder.imageIcon("/comment.png").image)
+        chatFavorites = new ChatFavorites(application)
         
         collectionsTable = builder.getVariable("collections-table")
         collectionFilesTable = builder.getVariable("items-table")

@@ -1043,6 +1043,16 @@ class MainFrameController {
         } else 
             mvcGroup.getChildrenGroups().get(p.getHumanReadableName()).model.connect()
     }
+    
+    @ControllerAction
+    void chatFavorites() {
+        if (application.getMvcGroupManager().findGroup("chat-favorites") != null)
+            return
+        
+        def params = [:]
+        params.chatFavorites = view.chatFavorites
+        mvcGroup.createMVCGroup("chat-favorites", params)
+    }
 
     void saveMuWireSettings() {
         core.saveMuSettings()

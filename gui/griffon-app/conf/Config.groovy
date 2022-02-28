@@ -228,4 +228,9 @@ mvcGroups {
         view = 'com.muwire.gui.tools.RuleWizardView'
         controller = 'com.muwire.gui.tools.RuleWizardController'
     }
+    'chat-favorites' {
+        model = 'com.muwire.gui.chat.ChatFavoritesModel'
+        view = 'com.muwire.gui.chat.ChatFavoritesView'
+        controller = 'com.muwire.gui.chat.ChatFavoritesController'
+    }
 }
