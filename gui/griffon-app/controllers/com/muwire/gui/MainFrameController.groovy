@@ -472,17 +472,6 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void chatFromTrusted() {
-        int row = view.getSelectedContactsTableRow()
-        if (row < 0)
-            return
-        Persona p = model.contacts[row].persona
-        
-        startChat(p)
-        view.showChatWindow.call()
-    }
-    
-    @ControllerAction
     void browseFromUpload(Uploader u) {
         Persona p = u.getDownloaderPersona()
 

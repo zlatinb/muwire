@@ -671,8 +671,6 @@ class MainFrameView {
                                                 enabled : bind {model.subscribeButtonEnabled}, subscribeAction)
                                         button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_CONTACTS_MESSAGE"),
                                                 enabled : bind {model.messageFromTrustedButtonEnabled}, messageFromTrustedAction)
-                                        button(text : trans("CHAT"), toolTipText: trans("TOOLTIP_CONTACTS_CHAT"),
-                                                enabled : bind {model.chatFromTrustedButtonEnabled}, chatFromTrustedAction)
                                     }
                                 }
                             }
@@ -2224,11 +2222,6 @@ class MainFrameView {
             JMenuItem browseCollectionsItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
             browseCollectionsItem.addActionListener({ mvcGroup.controller.browseCollectionsFromTrusted() })
             trustMenu.add(browseCollectionsItem)
-        }
-        if (model.chatFromTrustedButtonEnabled) {
-            JMenuItem chatItem = new JMenuItem(trans("CHAT"))
-            chatItem.addActionListener({ mvcGroup.controller.chatFromTrusted() })
-            trustMenu.add(chatItem)
         }
         if (model.messageFromTrustedButtonEnabled) {
             JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
