@@ -44,10 +44,8 @@
 |Chat - enforce # in room names | N/A | GUI | Low |
 |Chat - jump from notification window to room | N/A | GUI | Optional |
 |Chat - emoji support | 113 | GUI | Low |
-|Chat - auto connect server list | 105 | GUI | Low |
 |I2P Status panel for external router | N/A | GUI | Low |
 |Option to disable switching of tabs on actions | N/A | GUI | Low |
-|Right-click paste in various text fields | N/A | GUI | Medium |
 |HTML 5 media players | N/A | Plugin | Optional |
 |Ability to change language after install| 109 | GUI | Medium |
 |On-demand browse host|104|Network, Core, GUI | Low |
