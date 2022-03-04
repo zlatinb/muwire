@@ -234,7 +234,7 @@ class MainFrameModel {
         messageNotificator = new MessageNotificator(uiSettings,
                 (TrayIcon) application.context.get("tray-icon"),
                 (Window) application.getWindowManager().findWindow("main-frame"),
-                (Image) view.builder.imageIcon("/comment.png").image)
+                (Image) view.builder.imageIcon("/email.png").image)
         
         shared = []
         treeRoot = new DefaultMutableTreeNode()
