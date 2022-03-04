@@ -1,5 +1,8 @@
 package com.muwire.gui
 
+import java.awt.Image
+import java.awt.Window
+
 import static com.muwire.gui.Translator.trans
 import java.awt.Taskbar
 import java.awt.Taskbar.Feature
@@ -9,9 +12,13 @@ class MessageNotificator {
     
     private final UISettings settings
     private final TrayIcon trayIcon
-    MessageNotificator(UISettings settings, TrayIcon trayIcon) {
+    private final Window window
+    private final Image image
+    MessageNotificator(UISettings settings, TrayIcon trayIcon, Window window, Image image) {
         this.settings = settings
         this.trayIcon = trayIcon
+        this.window = window
+        this.image = image
     }
     
     void newMessage(String from) {
@@ -38,6 +45,11 @@ class MessageNotificator {
                 taskBar.setIconBadge(String.valueOf(count))
             else
                 taskBar.setIconBadge("")
+        } else if (taskBar.isSupported(Feature.ICON_BADGE_IMAGE_WINDOW)) {
+            if (count == 0)
+                taskBar.setWindowIconBadge(window, null)
+            else
+                taskBar.setWindowIconBadge(window, image)
         }
     }
 }

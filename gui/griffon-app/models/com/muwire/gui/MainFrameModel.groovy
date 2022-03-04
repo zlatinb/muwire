@@ -6,6 +6,9 @@ import com.muwire.core.search.ResultsEvent
 
 import javax.swing.DefaultListModel
 import javax.swing.SwingWorker
+import java.awt.Image
+import java.awt.TrayIcon
+import java.awt.Window
 import java.util.concurrent.ConcurrentHashMap
 
 import javax.annotation.Nonnull
@@ -228,7 +231,10 @@ class MainFrameModel {
 
         uiSettings = application.context.get("ui-settings")
         
-        messageNotificator = new MessageNotificator(uiSettings, application.context.get("tray-icon"))
+        messageNotificator = new MessageNotificator(uiSettings,
+                (TrayIcon) application.context.get("tray-icon"),
+                (Window) application.getWindowManager().findWindow("main-frame"),
+                (Image) view.builder.imageIcon("/comment.png").image)
         
         shared = []
         treeRoot = new DefaultMutableTreeNode()
