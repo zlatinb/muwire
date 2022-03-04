@@ -265,7 +265,7 @@ public class Core {
             i2pSocketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
         }
         i2pSocketManager.getDefaultOptions().setReadTimeout(60000)
-        i2pSocketManager.getDefaultOptions().setConnectTimeout(30000)
+        i2pSocketManager.getDefaultOptions().setConnectTimeout(15000)
         i2pSocketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
         i2pSession = i2pSocketManager.getSession()
 
