@@ -47,14 +47,12 @@ class Ready extends AbstractLifecycleHandler {
         def home = new File(application.getContext().getAsString("muwire-home"))
         def props = new Properties()
         def propsFile = new File(home, "MuWire.properties")
-        if (propsFile.exists()) {
+        if (propsFile.exists() && propsFile.length() > 0) {
             log.info("loading existing props file")
             propsFile.withReader("UTF-8", {
                 props.load(it)
             })
             props = new MuWireSettings(props)
-            if (props.incompleteLocation == null)
-                props.incompleteLocation = new File(home, "incompletes")
                 
             if (System.getProperties().containsKey("disableUpdates"))
                 props.disableUpdates = Boolean.valueOf(System.getProperty("disableUpdates"))
@@ -125,7 +123,7 @@ class Ready extends AbstractLifecycleHandler {
             
             JOptionPane.showMessageDialog(null, trans(key),
                     trans("CORE_INIT_ERROR_HEADER"), JOptionPane.WARNING_MESSAGE)
-            System.exit(0)
+            application.shutdown()
         }
     }
 }

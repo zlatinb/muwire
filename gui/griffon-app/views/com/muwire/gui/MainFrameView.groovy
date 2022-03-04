@@ -2236,7 +2236,20 @@ class MainFrameView {
     }
     
     void closeApplication() {
+        application.getWindowManager().findWindow("shutdown-window")?.setVisible(true)
+        JFrame mainFrame = builder.getVariable("main-frame")
+        mainFrame.setVisible(false)
+        
         Core core = application.getContext().get("core")
+        if (core == null) {
+            // save UI settings so language dialog does not appear again
+            if (settings != null) {
+                File uiPropsFile = new File(application.context.getAsString("muwire-home"), "gui.properties")
+                uiPropsFile.withOutputStream {settings.write(it)}
+            }
+            application.shutdown()
+            return
+        }
         
         def tabbedPane = builder.getVariable("result-tabs")
         settings.openTabs.clear()
@@ -2246,20 +2259,16 @@ class MainFrameView {
         settings.openTabs.removeAll(model.browses)
         settings.openTabs.removeAll(model.collections)
             
-        JFrame mainFrame = builder.getVariable("main-frame")
         settings.mainFrameX = mainFrame.getSize().width
         settings.mainFrameY = mainFrame.getSize().height
-        mainFrame.setVisible(false)
-        application.getWindowManager().findWindow("shutdown-window")?.setVisible(true)
-        if (core != null) {
-            Thread t = new Thread({
-                core.shutdown()
-                application.shutdown()
-            }as Runnable)
-            t.start()
-            File uiPropsFile = new File(core.home, "gui.properties")
-            uiPropsFile.withOutputStream { settings.write(it) }
-        }
+        File uiPropsFile = new File(core.home, "gui.properties")
+        uiPropsFile.withOutputStream { settings.write(it) }
+        
+        Thread t = new Thread({
+            core.shutdown()
+            application.shutdown()
+        }as Runnable)
+        t.start()
     }
     
     private class ResultTabsChangeListener implements ChangeListener {
