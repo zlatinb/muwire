@@ -794,7 +794,7 @@ class MainFrameModel {
         runInsideUIAsync {
             JOptionPane.showMessageDialog(null, "MuWire lost connection to the I2P router and will now exit.",
                 "Connection to I2P router lost", JOptionPane.WARNING_MESSAGE)
-            System.exit(0)
+            view.closeApplication()
         }
     }
 

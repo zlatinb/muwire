@@ -26,7 +26,6 @@
 |Mark collections as inconsistent if file missing/unshared | 70? | GUI | Low|
 |Magic tree expansion + expand fully in collection view | 70 | GUI | Low |
 |Text on collections wizard is squished in GTK | N/A | GUI | Medium |
-|Proper shutdown when disconnected from router | N/A | Core, GUI | High |
 |Make sure file exists on server before sharing | N/A | Plugin | Low |
 |Create shortcuts optional in windows installer | N/A | Installers | Medium |
 |Bloom filters| N/A | Network, Core | Optional |
