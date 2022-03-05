@@ -55,6 +55,7 @@ class I2PConnector {
                 session.connect()
                 this.socketManager = socketManager
                 eventBus.publish(new RouterConnectedEvent(session: session))
+                break
             } catch (Exception e) {
                 Thread.sleep(1000)
             }
