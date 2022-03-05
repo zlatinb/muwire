@@ -36,21 +36,29 @@ class I2PConnector {
     synchronized void connect() {
         if (socketManager != null)
             return
-        keyDat.withInputStream {
-            socketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2cpHost, i2cpPort, i2pProperties)
-        }
-        socketManager.getDefaultOptions().with {
-            setReadTimeout(60000)
-            setConnectTimeout(15000)
-        }
-        socketManager.addDisconnectListener {
-            socketManager = null
-            eventBus.publish(new RouterDisconnectedEvent()) 
-        }
+        while(true) {
+            I2PSocketManager socketManager
+            keyDat.withInputStream {
+                socketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2cpHost, i2cpPort, i2pProperties)
+            }
+            socketManager.getDefaultOptions().with {
+                setReadTimeout(60000)
+                setConnectTimeout(15000)
+            }
+            socketManager.addDisconnectListener({
+                this.socketManager = null
+                eventBus.publish(new RouterDisconnectedEvent())
+            } as I2PSocketManager.DisconnectListener)
         
-        def session = socketManager.getSession()
-        session.connect()
-        eventBus.publish(new RouterConnectedEvent(session: session))
+            def session = socketManager.getSession()
+            try {
+                session.connect()
+                this.socketManager = socketManager
+                eventBus.publish(new RouterConnectedEvent(session: session))
+            } catch (Exception e) {
+                Thread.sleep(1000)
+            }
+        }
     }
     
     synchronized void shutdown() {
