@@ -75,6 +75,8 @@ class OptionsView {
     def i2pUDPPortField
     def i2pNTCPPortField
     def useUPNPCheckbox
+    def i2cpHostField
+    def i2cpPortField
 
     def monitorCheckbox
     def lnfComboBox
@@ -311,23 +313,56 @@ class OptionsView {
                     paintLabels : true)
             }
 
-            Core core = application.context.get("core")
-            if (core.router != null) {
-                panel(border : titledBorder(title : trans("PORT_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP,
-                constraints : gbc(gridx: 0, gridy : 2, fill : GridBagConstraints.HORIZONTAL, weightx: 100))) {
+            if ("true" != System.getProperty("embeddedRouter")) {
+                panel(border: titledBorder(title: trans("EXTERNAL_ROUTER_I2CP_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP,
+                        constraints: gbc(gridx: 0, gridy: 2, fill: GridBagConstraints.HORIZONTAL, weightx: 100))) {
                     gridBagLayout()
-                    label(text : trans("TCP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_TCP_PORT"),
-                            constraints : gbc(gridx :0, gridy: 0, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                    i2pNTCPPortField = textField(text : bind {model.i2pNTCPPort}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
+                    label(text: trans("HOST"),
+                        constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                    i2cpHostField = textField(text : bind {model.i2cpHost}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
                             constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
-                    
-                    label(text : trans("UDP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_UDP_PORT"),
-                            constraints : gbc(gridx :0, gridy: 1, anchor : GridBagConstraints.LINE_START, weightx : 100))
-                    i2pUDPPortField = textField(text : bind {model.i2pUDPPort}, columns : COLUMNS, horizontalAlignment: JTextField.RIGHT, 
+                    label(text : trans("PORT"),
+                            constraints: gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                    i2cpPortField = textField(text : bind {model.i2cpPort}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
                             constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                }
+            } else {
+                panel(border: titledBorder(title: trans("OPTIONS_ROUTER_TYPE"), border: etchedBorder(), titlePosition: TitledBorder.TOP,
+                        constraints: gbc(gridx: 0, gridy: 2, fill: GridBagConstraints.HORIZONTAL, weightx: 100))) {
+                    buttonGroup(id: "routerType")
+                    radioButton(text : trans("OPTIONS_EMBEDDED"), toolTipText: trans("TOOLTIP_OPTIONS_EMBEDDED"),
+                        selected: bind {model.embeddedRouter}, actionPerformed : switchToEmbedded)
+                    radioButton(text : trans("OPTIONS_EXTERNAL"), toolTipText: trans("TOOLTIP_OPTIONS_EXTERNAL"),
+                            selected: bind {!model.embeddedRouter}, actionPerformed : switchToExternal)
+                }
+                panel(id : "router-props", constraints: gbc(gridx: 0, gridy: 3, fill: GridBagConstraints.HORIZONTAL, weightx: 100)) {
+                    cardLayout()
+                    panel(id : "router-props-embedded", border: titledBorder(title: trans("PORT_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                        gridBagLayout()
+                        label(text: trans("TCP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_TCP_PORT"),
+                                constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                        i2pNTCPPortField = textField(text: bind { model.i2pNTCPPort }, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
+                                constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
                     
-                    label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                    useUPNPCheckbox = checkBox(selected: bind {model.useUPNP}, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
+                        label(text : trans("UDP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_UDP_PORT"),
+                                constraints : gbc(gridx:0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                        i2pUDPPortField = textField(text: bind { model.i2pUDPPort }, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
+                                constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                        
+                        label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                        useUPNPCheckbox = checkBox(selected: bind {model.useUPNP }, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
+                    }
+                    panel(id : "router-props-external", border: titledBorder(title: trans("EXTERNAL_ROUTER_I2CP_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                        gridBagLayout()
+                        label(text: trans("HOST"),
+                                constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                        i2cpHostField = textField(text : bind {model.i2cpHost}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
+                                constraints : gbc(gridx:1, gridy:0, anchor : GridBagConstraints.LINE_END))
+                        label(text : trans("PORT"),
+                                constraints: gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                        i2cpPortField = textField(text : bind {model.i2cpPort}, columns: COLUMNS, horizontalAlignment: JTextField.RIGHT,
+                                constraints : gbc(gridx:1, gridy:1, anchor : GridBagConstraints.LINE_END))
+                    }
                 }
             }
             panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
@@ -552,6 +587,18 @@ class OptionsView {
         }
     }
 
+    def switchToEmbedded = {
+        model.embeddedRouter = true
+        def cardsPanel = builder.getVariable("router-props")
+        cardsPanel.getLayout().show(cardsPanel, "router-props-embedded")
+    }
+    
+    def switchToExternal = {
+        model.embeddedRouter = false
+        def cardsPanel = builder.getVariable("router-props")
+        cardsPanel.getLayout().show(cardsPanel, "router-props-external")
+    }
+    
     boolean isAqua() {
         // this is a Java bug.  File choosers don't appear on Aqua L&F.
         model.lnfClassName == "system" && SystemVersion.isMac()
@@ -562,10 +609,15 @@ class OptionsView {
         tabbedPane.addTab("MuWire", p)
         tabbedPane.addTab("I2P", i)
         tabbedPane.addTab(trans("GUI"), u)
-        Core core = application.context.get("core")
-        if (core.router != null) {
+        
+        if (System.getProperty("embeddedRouter") == "true") {
             tabbedPane.addTab(trans("BANDWIDTH"), bandwidth)
+            if (model.embeddedRouter)
+                switchToEmbedded.call()
+            else
+                switchToExternal.call()
         }
+        
         tabbedPane.addTab(trans("FEED"), feed)
         tabbedPane.addTab(trans("TRUST_NOUN"), trust)
         tabbedPane.addTab(trans("COMMUNICATIONS"), chat)
@@ -575,6 +627,7 @@ class OptionsView {
         panel.add(tabbedPane, BorderLayout.CENTER)
         panel.add(buttonsPanel, BorderLayout.SOUTH)
 
+        
         d.getContentPane().add(panel)
         d.pack()
         d.setLocationRelativeTo(mainFrame)

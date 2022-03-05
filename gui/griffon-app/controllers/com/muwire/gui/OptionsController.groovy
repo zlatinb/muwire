@@ -51,7 +51,10 @@ class OptionsController {
         i2pProps["inbound.quantity"] = String.valueOf(tunnelQuantity)
         i2pProps["outbound.quantity"] = String.valueOf(tunnelQuantity)
         
-        if (settings.embeddedRouter) {
+        final boolean embeddedAvailable = System.getProperty("embeddedRouter") == "true"
+        if (embeddedAvailable) {
+            settings.embeddedRouter = model.embeddedRouter
+            
             text = view.i2pNTCPPortField.text
             model.i2pNTCPPort = text
             i2pProps["i2np.ntcp.port"] = text
@@ -65,6 +68,14 @@ class OptionsController {
             i2pProps["i2np.upnp.enable"] = String.valueOf(useUPNP)
             i2pProps["i2np.upnp.ipv6.enable"] = String.valueOf(useUPNP)
         }
+        
+        text = view.i2cpHostField.text
+        model.i2cpHost = text
+        i2pProps['i2cp.tcp.host'] = text
+        
+        text = view.i2cpPortField.text
+        model.i2cpPort = text
+        i2pProps['i2cp.tcp.port'] = text
 
 
         File i2pSettingsFile = new File(core.home, "i2p.properties")
@@ -161,7 +172,7 @@ class OptionsController {
             settings.incompleteLocation = new File(incompleteLocation)
         }
 
-        if (settings.embeddedRouter) {
+        if (embeddedAvailable) {
             text = view.inBwField.text
             model.inBw = text
             settings.inBw = Integer.valueOf(text)

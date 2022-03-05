@@ -41,6 +41,9 @@ class OptionsModel {
     @Observable String i2pUDPPort
     @Observable String i2pNTCPPort
     @Observable boolean useUPNP
+    @Observable String i2cpHost
+    @Observable String i2cpPort
+    @Observable boolean embeddedRouter
 
     // gui options
     @Observable boolean showMonitor
@@ -129,6 +132,9 @@ class OptionsModel {
         i2pUDPPort = core.i2pOptions["i2np.udp.port"]
         i2pNTCPPort = core.i2pOptions["i2np.ntcp.port"]
         useUPNP = Boolean.parseBoolean(core.i2pOptions.getProperty("i2np.upnp.enable","true"))
+        i2cpHost = core.i2pOptions["i2cp.tcp.host"]
+        i2cpPort = core.i2pOptions["i2cp.tcp.port"]
+        embeddedRouter = core.muOptions.embeddedRouter
 
         UISettings uiSettings = application.context.get("ui-settings")
         showMonitor = uiSettings.showMonitor
