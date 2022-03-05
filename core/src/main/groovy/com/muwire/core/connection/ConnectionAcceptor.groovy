@@ -1,5 +1,7 @@
 package com.muwire.core.connection
 
+import net.i2p.I2PException
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.DosFileAttributes
 import java.util.concurrent.ExecutorService
@@ -118,7 +120,14 @@ class ConnectionAcceptor {
     private void acceptLoop() {
         try {
         while(true) {
-            def incoming = acceptor.accept()
+            def incoming
+            try {
+                incoming = acceptor.accept()
+            } catch (I2PException i2PException) {
+                log.log(Level.WARNING, "I2P exception, maybe router disconnected?", i2PException)
+                Thread.sleep(10)
+                continue
+            }
             log.info("accepted connection from ${incoming.destination.toBase32()}")
             switch(trustService.getLevel(incoming.destination)) {
                 case TrustLevel.TRUSTED : break
