@@ -156,7 +156,7 @@ class OptionsModel {
         messageNotifications = uiSettings.messageNotifications
         showUnsharedPaths = uiSettings.showUnsharedPaths
 
-        if (core.router != null) {
+        if (System.getProperty("embeddedRouter") == "true") {
             inBw = String.valueOf(settings.inBw)
             outBw = String.valueOf(settings.outBw)
             sharePercentage = settings.sharePercentage

@@ -331,13 +331,13 @@ class OptionsView {
                         constraints: gbc(gridx: 0, gridy: 2, fill: GridBagConstraints.HORIZONTAL, weightx: 100))) {
                     buttonGroup(id: "routerType")
                     radioButton(text : trans("OPTIONS_EMBEDDED"), toolTipText: trans("TOOLTIP_OPTIONS_EMBEDDED"),
-                        selected: bind {model.embeddedRouter}, actionPerformed : switchToEmbedded)
+                        selected: bind {model.embeddedRouter}, buttonGroup: routerType, actionPerformed : switchToEmbedded)
                     radioButton(text : trans("OPTIONS_EXTERNAL"), toolTipText: trans("TOOLTIP_OPTIONS_EXTERNAL"),
-                            selected: bind {!model.embeddedRouter}, actionPerformed : switchToExternal)
+                            selected: bind {!model.embeddedRouter}, buttonGroup: routerType, actionPerformed : switchToExternal)
                 }
                 panel(id : "router-props", constraints: gbc(gridx: 0, gridy: 3, fill: GridBagConstraints.HORIZONTAL, weightx: 100)) {
                     cardLayout()
-                    panel(id : "router-props-embedded", border: titledBorder(title: trans("PORT_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                    panel(constraints : "router-props-embedded", border: titledBorder(title: trans("PORT_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                         gridBagLayout()
                         label(text: trans("TCP_PORT"), toolTipText: trans("TOOLTIP_OPTIONS_TCP_PORT"),
                                 constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
@@ -352,7 +352,7 @@ class OptionsView {
                         label(text : trans("USE_UPNP"), constraints: gbc(gridx:0, gridy: 2, anchor: GridBagConstraints.LINE_START, weightx: 100))
                         useUPNPCheckbox = checkBox(selected: bind {model.useUPNP }, constraints: gbc(gridx: 1, gridy: 2, anchor: GridBagConstraints.LINE_END))
                     }
-                    panel(id : "router-props-external", border: titledBorder(title: trans("EXTERNAL_ROUTER_I2CP_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                    panel(constraints : "router-props-external", border: titledBorder(title: trans("EXTERNAL_ROUTER_I2CP_SETTINGS"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
                         gridBagLayout()
                         label(text: trans("HOST"),
                                 constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
@@ -365,7 +365,7 @@ class OptionsView {
                     }
                 }
             }
-            panel(constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
+            panel(constraints : gbc(gridx: 0, gridy: 4, weighty: 100))
 
         }
         u = builder.panel {
