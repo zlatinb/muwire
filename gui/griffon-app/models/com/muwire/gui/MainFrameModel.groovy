@@ -796,7 +796,6 @@ class MainFrameModel {
         runInsideUIAsync {
             JOptionPane.showMessageDialog(null, trans("LOST_ROUTER_BODY"),
                 trans("LOST_ROUTER_TITLE"), JOptionPane.WARNING_MESSAGE)
-            view.closeApplication()
         }
     }
 

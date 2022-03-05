@@ -1,5 +1,8 @@
 package com.muwire.core.hostcache
 
+import com.muwire.core.RouterConnectedEvent
+import com.muwire.core.RouterDisconnectedEvent
+
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Predicate
 
@@ -26,26 +29,24 @@ class CacheClient {
     final EventBus eventBus
     final HostCache cache
     final ConnectionManager manager
-    final I2PSession session
     final long interval
     final MuWireSettings settings
     final Timer timer
+    private volatile I2PSession session
     private final AtomicBoolean stopped = new AtomicBoolean();
 
     public CacheClient(EventBus eventBus, HostCache cache,
-        ConnectionManager manager, I2PSession session,
+        ConnectionManager manager, 
         MuWireSettings settings, long interval) {
         this.eventBus = eventBus
         this.cache = cache
         this.manager = manager
-        this.session = session
         this.settings = settings
         this.interval = interval
         this.timer = new Timer("hostcache-client",true)
     }
 
     void start() {
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
         timer.schedule({queryIfNeeded()} as TimerTask, 1, interval)
     }
 
@@ -53,9 +54,21 @@ class CacheClient {
         timer.cancel()
         stopped.set(true)
     }
+    
+    void onRouterConnectedEvent(RouterConnectedEvent event) {
+        session = event.session
+        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
+    }
+    
+    void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
+        session = null
+    }
 
     private void queryIfNeeded() {
         if (stopped.get())
+            return
+        I2PSession session = this.session
+        if (session == null)
             return
         if (!manager.getConnections().isEmpty())
             return
@@ -150,6 +163,10 @@ class CacheClient {
             return
         }
 
+        I2PSession session = this.session
+        if (session == null)
+            return
+        
         pong.pongs.asList().each {
             Destination dest = new Destination(it)
             if (!session.getMyDestination().equals(dest))

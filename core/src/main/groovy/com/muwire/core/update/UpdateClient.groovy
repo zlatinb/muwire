@@ -1,5 +1,8 @@
 package com.muwire.core.update
 
+import com.muwire.core.RouterConnectedEvent
+import com.muwire.core.RouterDisconnectedEvent
+
 import java.util.logging.Level
 
 import com.muwire.core.Constants
@@ -33,7 +36,6 @@ import net.i2p.util.VersionComparator
 @Log
 class UpdateClient {
     final EventBus eventBus
-    final I2PSession session
     final String myVersion
     final MuWireSettings settings
     final FileManager fileManager
@@ -44,6 +46,8 @@ class UpdateClient {
 
     private long lastUpdateCheckTime
 
+    private volatile I2PSession session
+    
     private volatile InfoHash updateInfoHash
     private volatile String version, signer
     private volatile boolean updateDownloading
@@ -51,10 +55,9 @@ class UpdateClient {
     private volatile String text
     private volatile boolean shutdown
 
-    UpdateClient(EventBus eventBus, I2PSession session, String myVersion, MuWireSettings settings, 
+    UpdateClient(EventBus eventBus, String myVersion, MuWireSettings settings, 
         FileManager fileManager, Persona me, SigningPrivateKey spk) {
         this.eventBus = eventBus
-        this.session = session
         this.myVersion = myVersion
         this.settings = settings
         this.fileManager = fileManager
@@ -65,13 +68,21 @@ class UpdateClient {
     }
 
     void start() {
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
         timer.schedule({checkUpdate()} as TimerTask, 2 * 60000, 60 * 60 * 1000)
     }
 
     void stop() {
         shutdown = true
         timer.cancel()
+    }
+    
+    void onRouterConnectedEvent(RouterConnectedEvent event) {
+        this.session = event.session
+        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
+    }
+    
+    void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
+        session = null
     }
 
     void onUIResultBatchEvent(UIResultBatchEvent results) {
@@ -94,6 +105,10 @@ class UpdateClient {
     }
 
     private void checkUpdate() {
+        I2PSession session = this.session
+        if (session == null)
+            return
+        
         final long now = System.currentTimeMillis()
         if (lastUpdateCheckTime > 0) {
             if (now - lastUpdateCheckTime < settings.updateCheckInterval * 60 * 60 * 1000)
@@ -101,7 +116,7 @@ class UpdateClient {
         }
         lastUpdateCheckTime = now
         settings.lastUpdateCheck = now
-
+        
         log.info("checking for update")
 
         def ping = [version : 1, myVersion : myVersion]

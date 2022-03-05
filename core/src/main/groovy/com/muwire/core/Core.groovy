@@ -9,7 +9,6 @@ import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.update.AutoUpdater
-import com.muwire.core.update.UpdateDownloadedEvent
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
@@ -63,7 +62,6 @@ import com.muwire.core.filefeeds.UIFeedUpdateEvent
 import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileDownloadedEvent
 import com.muwire.core.files.FileHashedEvent
-import com.muwire.core.files.FileHasher
 import com.muwire.core.files.FileLoadedEvent
 import com.muwire.core.files.FileManager
 import com.muwire.core.files.FileSharedEvent
@@ -85,7 +83,6 @@ import com.muwire.core.hostcache.CacheClient
 import com.muwire.core.hostcache.H2HostCache
 import com.muwire.core.hostcache.HostCache
 import com.muwire.core.hostcache.HostDiscoveredEvent
-import com.muwire.core.hostcache.SimpleHostCache
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.messenger.MessageReceivedEvent
 import com.muwire.core.messenger.Messenger
@@ -116,10 +113,6 @@ import com.muwire.core.tracker.TrackerResponder
 import groovy.util.logging.Log
 import net.i2p.I2PAppContext
 import net.i2p.client.I2PClientFactory
-import net.i2p.client.I2PSession
-import net.i2p.client.streaming.I2PSocketManager
-import net.i2p.client.streaming.I2PSocketManagerFactory
-import net.i2p.client.streaming.I2PSocketManager.DisconnectListener
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Destination
 import net.i2p.data.PrivateKey
@@ -139,8 +132,7 @@ public class Core {
     final Properties i2pOptions
     final MuWireSettings muOptions
 
-    final I2PSession i2pSession;
-    private I2PSocketManager i2pSocketManager
+    final I2PConnector i2pConnector
     final TrustService trustService
     final TrustSubscriber trustSubscriber
     private final PersisterService persisterService
@@ -260,15 +252,6 @@ public class Core {
         }
 
 
-        // options like tunnel length and quantity
-        keyDat.withInputStream {
-            i2pSocketManager = new I2PSocketManagerFactory().createDisconnectedManager(it, i2pOptions["i2cp.tcp.host"], i2pOptions["i2cp.tcp.port"].toInteger(), i2pOptions)
-        }
-        i2pSocketManager.getDefaultOptions().setReadTimeout(60000)
-        i2pSocketManager.getDefaultOptions().setConnectTimeout(15000)
-        i2pSocketManager.addDisconnectListener({eventBus.publish(new RouterDisconnectedEvent())} as DisconnectListener)
-        i2pSession = i2pSocketManager.getSession()
-
         def destination = new Destination()
         spk = new SigningPrivateKey(Constants.SIG_TYPE)
         keyDat.withInputStream {
@@ -296,6 +279,10 @@ public class Core {
         log.info("Loaded myself as "+me.getHumanReadableName())
 
         eventBus = new EventBus()
+        
+        log.info("initializing i2p connector")
+        i2pConnector = new I2PConnector(eventBus, keyDat, (String)i2pOptions["i2cp.tcp.host"],
+            Integer.parseInt((String)i2pOptions["i2cp.tcp.port"]), i2pOptions)
 
         log.info("initializing certificate manager")
         certificateManager = new CertificateManager(eventBus, home, me, spk)
@@ -361,7 +348,7 @@ public class Core {
         eventBus.register(InfoHashEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
-        hostCache = new H2HostCache(home,trustService, props, i2pSession.getMyDestination())
+        hostCache = new H2HostCache(home,trustService, props, me.destination)
         eventBus.register(HostDiscoveredEvent.class, hostCache)
         eventBus.register(ConnectionEvent.class, hostCache)
 
@@ -382,19 +369,20 @@ public class Core {
         eventBus.register(QueryEvent.class, connectionManager)
 
         log.info("initializing cache client")
-        cacheClient = new CacheClient(eventBus,hostCache, connectionManager, i2pSession, props, 10000)
+        cacheClient = new CacheClient(eventBus,hostCache, connectionManager, props, 10000)
+        eventBus.register(RouterConnectedEvent.class, cacheClient)
+        eventBus.register(RouterDisconnectedEvent.class, cacheClient)
 
         if (!(props.plugin || props.disableUpdates)) {
         log.info("initializing update client")
-            updateClient = new UpdateClient(eventBus, i2pSession, myVersion, props, fileManager, me, spk)
+            updateClient = new UpdateClient(eventBus, myVersion, props, fileManager, me, spk)
             eventBus.register(FileDownloadedEvent.class, updateClient)
             eventBus.register(UIResultBatchEvent.class, updateClient)
+            eventBus.register(RouterConnectedEvent.class, updateClient)
+            eventBus.register(RouterDisconnectedEvent.class, updateClient)
         } else
             log.info("running as plugin or updates disabled, not initializing update client")
 
-        log.info("initializing connector")
-        I2PConnector i2pConnector = new I2PConnector(i2pSocketManager)
-        
         log.info("initializing collections client")
         CollectionsClient collectionsClient = new CollectionsClient(i2pConnector, eventBus, me)
         eventBus.register(UICollectionFetchEvent.class, collectionsClient)
@@ -461,13 +449,17 @@ public class Core {
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)
         
         log.info("initializing tracker responder")
-        trackerResponder = new TrackerResponder(i2pSession, props, fileManager, downloadManager, meshManager, trustService, me)
+        trackerResponder = new TrackerResponder(props, fileManager, downloadManager, meshManager, trustService, me)
+        eventBus.register(RouterConnectedEvent.class, trackerResponder)
+        eventBus.register(RouterDisconnectedEvent.class, trackerResponder)
 
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
         log.info("initializing acceptor")
-        I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pSocketManager)
+        I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pConnector::getSocketManager)
+        eventBus.register(RouterConnectedEvent.class, i2pAcceptor)
+        eventBus.register(RouterDisconnectedEvent.class, i2pAcceptor)
         connectionAcceptor = new ConnectionAcceptor(eventBus, me, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer, collectionManager)
@@ -567,7 +559,7 @@ public class Core {
             it.init(this)
         }
 
-        i2pSession.connect()
+        i2pConnector.connect()
         watchedDirectoryConverter.convert()
         hasherService.start()
         trustService.start()
@@ -646,8 +638,8 @@ public class Core {
         }
         log.info("shutting down messenger")
         messenger.stop()
-        log.info("killing socket manager")
-        i2pSocketManager.destroySocketManager()
+        log.info("killing i2p connector")
+        i2pConnector.shutdown()
         if (router != null) {
             log.info("shutting down embedded router")
             router.shutdown(0)

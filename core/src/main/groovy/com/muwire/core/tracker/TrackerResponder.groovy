@@ -1,5 +1,8 @@
 package com.muwire.core.tracker
 
+import com.muwire.core.RouterConnectedEvent
+import com.muwire.core.RouterDisconnectedEvent
+
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 import java.util.stream.Collectors
@@ -29,7 +32,6 @@ import net.i2p.data.Base64
 
 @Log
 class TrackerResponder {
-    private final I2PSession i2pSession
     private final MuWireSettings muSettings
     private final FileManager fileManager
     private final DownloadManager downloadManager
@@ -44,11 +46,12 @@ class TrackerResponder {
     
     private volatile boolean shutdown
     
-    TrackerResponder(I2PSession i2pSession, MuWireSettings muSettings,
+    private volatile I2PSession i2pSession
+    
+    TrackerResponder(MuWireSettings muSettings,
         FileManager fileManager, DownloadManager downloadManager,
         MeshManager meshManager, TrustService trustService,
         Persona me) {
-        this.i2pSession = i2pSession
         this.muSettings = muSettings
         this.fileManager = fileManager
         this.downloadManager = downloadManager
@@ -58,13 +61,21 @@ class TrackerResponder {
     }
     
     void start() {
-        i2pSession.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.TRACKER_PORT)
         expireTimer.schedule({expireUUIDs()} as TimerTask, UUID_LIFETIME, UUID_LIFETIME)
     }
     
     void stop() {
         shutdown = true
         expireTimer.cancel()
+    }
+    
+    void onRouterConnectedEvent(RouterConnectedEvent event) {
+        i2pSession = event.session
+        i2pSession.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.TRACKER_PORT)
+    }
+    
+    void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
+        i2pSession = null
     }
     
     private void expireUUIDs() {
@@ -80,6 +91,9 @@ class TrackerResponder {
     }
     
     private void respond(host, json) {
+        I2PSession i2pSession = this.i2pSession
+        if (i2pSession == null)
+            return
         log.info("responding to host $host with json $json")
         
         def message = JsonOutput.toJson(json)
