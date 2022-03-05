@@ -120,16 +120,7 @@ class ConnectionAcceptor {
     private void acceptLoop() {
         try {
         while(true) {
-            def incoming
-            try {
-                incoming = acceptor.accept()
-            } catch (I2PException|ConnectException i2PException) {
-                if (shutdown)
-                    throw i2PException
-                log.log(Level.WARNING, "I2P exception, maybe router disconnected?", i2PException)
-                Thread.sleep(10)
-                continue
-            }
+            def incoming = acceptor.accept()
             log.info("accepted connection from ${incoming.destination.toBase32()}")
             switch(trustService.getLevel(incoming.destination)) {
                 case TrustLevel.TRUSTED : break
