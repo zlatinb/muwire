@@ -20,6 +20,8 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreeNode
 
+import static com.muwire.gui.Translator.trans
+
 import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
@@ -792,8 +794,8 @@ class MainFrameModel {
         if (core.getShutdown().get())
             return
         runInsideUIAsync {
-            JOptionPane.showMessageDialog(null, "MuWire lost connection to the I2P router and will now exit.",
-                "Connection to I2P router lost", JOptionPane.WARNING_MESSAGE)
+            JOptionPane.showMessageDialog(null, trans("LOST_ROUTER_BODY"),
+                trans("LOST_ROUTER_TITLE"), JOptionPane.WARNING_MESSAGE)
             view.closeApplication()
         }
     }
