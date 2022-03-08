@@ -874,6 +874,7 @@ class MainFrameView {
                         model.retryButtonEnabled = false
                         break
                     case Downloader.DownloadState.FAILED:
+                    case Downloader.DownloadState.REJECTED:
                         model.cancelButtonEnabled = true
                         model.retryButtonEnabled = true
                         model.resumeButtonText = "RETRY"
@@ -911,6 +912,8 @@ class MainFrameView {
             downloaders.each { allPaused &= it.getCurrentState() == Downloader.DownloadState.PAUSED}
             boolean allFailed = true
             downloaders.each { allFailed &= it.getCurrentState() == Downloader.DownloadState.FAILED}
+            boolean allRejected = true
+            downloaders.each { allRejected &= it.getCurrentState() == Downloader.DownloadState.REJECTED}
             boolean allFinished = true
             downloaders.each { allFinished &= it.getCurrentState() == Downloader.DownloadState.FINISHED}
             
@@ -919,7 +922,7 @@ class MainFrameView {
                 model.retryButtonEnabled = true
                 model.resumeButtonText = "RESUME"
             }
-            if (allFailed) {
+            if (allFailed || allRejected) {
                 model.retryButtonEnabled = true
                 model.pauseButtonEnabled = false
                 model.resumeButtonText = "RETRY"

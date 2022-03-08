@@ -27,7 +27,7 @@ class HashListSession {
         this.endpoint = endpoint
     }
 
-    InfoHash request() throws IOException {
+    InfoHash request() throws IOException, DownloadRejectedException {
         InputStream is = endpoint.getInputStream()
         OutputStream os = endpoint.getOutputStream()
 
@@ -37,6 +37,8 @@ class HashListSession {
         os.flush()
 
         String code = readTillRN(is)
+        if (code.startsWith("429"))
+            throw new DownloadRejectedException()
         if (!code.startsWith("200"))
             throw new IOException("unknown code $code")
 

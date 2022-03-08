@@ -143,12 +143,16 @@ class NetworkDownloader extends Downloader {
     
     protected DownloadState getSpecificState() {
         boolean allFinished = true
+        boolean allRejected = true
         activeWorkers.values().each {
             allFinished &= it.currentState == WorkerState.FINISHED
+            allRejected &= it.rejected
         }
         if (allFinished) {
             if (pieces.isComplete())
                 return DownloadState.FINISHED
+            if (allRejected)
+                return DownloadState.REJECTED
             if (!hasLiveSources())
                 return DownloadState.HOPELESS
             return DownloadState.FAILED
@@ -335,7 +339,7 @@ class NetworkDownloader extends Downloader {
         private final Destination destination
         private volatile WorkerState currentState = WorkerState.NEW
         private volatile Thread downloadThread
-        private volatile boolean cancelled
+        private volatile boolean cancelled, rejected
         private final LinkedList<DownloadSession> sessionQueue = new LinkedList<>()
         private final Set<Integer> available = new HashSet<>()
 
@@ -414,6 +418,8 @@ class NetworkDownloader extends Downloader {
                             endpoint, browse, feed, chat, message)
                     headSession.performRequest()
                 }
+            } catch (DownloadRejectedException rejected) {
+                this.rejected = true  
             } catch (Exception bad) {
                 if (!cancelled) {
                     log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))

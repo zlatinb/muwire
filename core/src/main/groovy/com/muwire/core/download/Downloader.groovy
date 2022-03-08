@@ -15,7 +15,7 @@ import net.i2p.data.Destination
 @Log
 abstract class Downloader {
     
-    enum DownloadState { COPYING, CONNECTING, HASHLIST, DOWNLOADING, FAILED, HOPELESS, CANCELLED, PAUSED, FINISHED }
+    enum DownloadState { COPYING, CONNECTING, HASHLIST, DOWNLOADING, REJECTED, FAILED, HOPELESS, CANCELLED, PAUSED, FINISHED }
 
     protected static final ExecutorService executorService = Executors.newCachedThreadPool({r ->
         Thread rv = new Thread(r)

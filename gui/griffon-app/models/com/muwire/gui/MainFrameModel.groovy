@@ -348,7 +348,8 @@ class MainFrameModel {
                             downloads.each {
                                 def state = it.downloader.currentState
                                 if (state == Downloader.DownloadState.FAILED ||
-                                    state == Downloader.DownloadState.DOWNLOADING)
+                                    state == Downloader.DownloadState.DOWNLOADING ||
+                                    state == Downloader.DownloadState.REJECTED)
                                     it.downloader.resume()
                             }
                             updateTablePreservingSelection("downloads-table")

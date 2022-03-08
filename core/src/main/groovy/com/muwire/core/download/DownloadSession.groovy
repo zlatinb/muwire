@@ -121,7 +121,7 @@ class DownloadSession {
      * @return true if the response was consumed, false if it cannot be satisfied.
      * @throws IOException
      */
-    public boolean consumeResponse() throws IOException {
+    public boolean consumeResponse() throws IOException, DownloadRejectedException {
         OutputStream os = endpoint.getOutputStream()
         InputStream is = endpoint.getInputStream()
 
@@ -138,8 +138,14 @@ class DownloadSession {
                 endpoint.close()
                 return false
             }
+            
+            if (code == 429) {
+                log.warning("rejected")
+                endpoint.close()
+                throw new DownloadRejectedException()
+            }
 
-            if (!(code == 200 || code == 416)) {
+            if (!(code == 200 || code == 416 )) {
                 log.warning("unknown code $code")
                 endpoint.close()
                 return false
