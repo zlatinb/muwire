@@ -1,6 +1,7 @@
 
 package com.muwire.gui
 
+import com.muwire.core.download.DownloadHopelessEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 import com.muwire.core.search.ResultsEvent
 
@@ -296,6 +297,7 @@ class MainFrameModel {
             me = core.me.getHumanReadableName()
             core.eventBus.register(UIResultBatchEvent.class, this)
             core.eventBus.register(DownloadStartedEvent.class, this)
+            core.eventBus.register(DownloadHopelessEvent.class, this)
             core.eventBus.register(ConnectionEvent.class, this)
             core.eventBus.register(DisconnectionEvent.class, this)
             core.eventBus.register(FileHashedEvent.class, this)
@@ -419,6 +421,12 @@ class MainFrameModel {
         runInsideUIAsync {
             downloads << e
             downloadInfoHashes.add(e.downloader.infoHash)
+        }
+    }
+    
+    void onDownloadHopelessEvent(DownloadHopelessEvent event) {
+        runInsideUIAsync {
+            downloadInfoHashes.remove(event.downloader.getInfoHash())
         }
     }
 
