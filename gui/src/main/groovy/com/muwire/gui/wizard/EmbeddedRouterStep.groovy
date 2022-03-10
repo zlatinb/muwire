@@ -37,9 +37,9 @@ class EmbeddedRouterStep extends WizardStep {
                     constraints: gbc(gridx: 0, gridy: 0, fill: GridBagConstraints.HORIZONTAL, weightx: 100))) {
                 buttonGroup(id: "routerType")
                 radioButton(text : trans("OPTIONS_EMBEDDED"), toolTipText: trans("TOOLTIP_OPTIONS_EMBEDDED"),
-                        selected: bind {defaults.embeddedRouter}, buttonGroup: routerType, actionPerformed : switchToEmbedded)
+                        selected: defaults.embeddedRouter, buttonGroup: routerType, actionPerformed : switchToEmbedded)
                 radioButton(text : trans("OPTIONS_EXTERNAL"), toolTipText: trans("TOOLTIP_OPTIONS_EXTERNAL"),
-                        selected: bind {!defaults.embeddedRouter}, buttonGroup: routerType, actionPerformed : switchToExternal)
+                        selected: !defaults.embeddedRouter, buttonGroup: routerType, actionPerformed : switchToExternal)
             }
             panel(id : "router-props", constraints: gbc(gridx: 0, gridy: 1, fill: GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 cardLayout()
@@ -86,13 +86,13 @@ class EmbeddedRouterStep extends WizardStep {
     
     def switchToEmbedded = {
         embeddedRouter = true
-        def cardsPanel = builder.getVarialbe("router-props")
+        def cardsPanel = builder.getVariable("router-props")
         cardsPanel.getLayout().show(cardsPanel, "router-props-embedded")
     }
     
     def switchToExternal = {
         embeddedRouter = false
-        def cardsPanel = builder.getVarialbe("router-props")
+        def cardsPanel = builder.getVariable("router-props")
         cardsPanel.getLayout().show(cardsPanel, "router-props-external")
     }
 
