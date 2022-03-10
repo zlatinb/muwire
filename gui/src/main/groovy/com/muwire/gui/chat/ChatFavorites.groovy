@@ -14,7 +14,10 @@ class ChatFavorites {
     
     ChatFavorites(GriffonApplication application) {
         application.addPropertyChangeListener("core", {
-            favoritesFile = new File(it.getNewValue().home, "chat.json")
+            File home = it.getNewValue().home
+            File chat = new File(home, "chat")
+            chat.mkdirs()
+            favoritesFile = new File(chat, "favorites.json")
             load()
             controller = application.mvcGroupManager.findGroup("MainFrame").getController()
             favorites.stream().filter({it.autoConnect}).forEach {
