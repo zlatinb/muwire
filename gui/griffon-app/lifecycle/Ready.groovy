@@ -92,7 +92,6 @@ class Ready extends AbstractLifecycleHandler {
             File i2pPropsFile = new File(home, "i2p.properties")
             i2pPropsFile.withPrintWriter { i2pProps.store(it, "") }     
             
-            props.embeddedRouter = embeddedRouterAvailable
             props.updateType = System.getProperty("updateType","jar")
             props.disableUpdates = Boolean.parseBoolean(System.getProperty("disableUpdates", "false"))
                    

@@ -11,6 +11,7 @@ class WizardDefaults {
     int inBw, outBw
     int tunnelLength, tunnelQuantity
     boolean useUPNP
+    boolean embeddedRouter
 
     WizardDefaults() {
         this(new Properties())
@@ -35,6 +36,7 @@ class WizardDefaults {
         tunnelQuantity = Integer.parseInt(props.getProperty("tunnelQuantity","4"))
         
         useUPNP = Boolean.parseBoolean(props.getProperty("useUPNP", "true"))
+        embeddedRouter = Boolean.parseBoolean(props.getProperty("embeddedRouter", "true"))
     }
     
     private static String getDefaultPath(String pathName) {
