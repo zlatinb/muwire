@@ -348,7 +348,7 @@ class NetworkDownloader extends Downloader {
         }
 
         public void run() {
-            if (cancelled) {
+            if (this.cancelled) {
                 currentState = WorkerState.FINISHED
                 return
             }
@@ -421,7 +421,7 @@ class NetworkDownloader extends Downloader {
             } catch (DownloadRejectedException rejected) {
                 this.rejected = true  
             } catch (Exception bad) {
-                if (!cancelled) {
+                if (!this.cancelled) {
                     log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))
                     markFailed(destination)
                     if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true)) {
@@ -434,7 +434,7 @@ class NetworkDownloader extends Downloader {
             } finally {
                 currentState = WorkerState.FINISHED
                 try {
-                    if (!cancelled) {
+                    if (!this.cancelled) {
                         writePieces()
                         if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
                             closePiecesFile()
@@ -461,7 +461,7 @@ class NetworkDownloader extends Downloader {
         }
 
         void cancel() {
-            cancelled = true
+            this.cancelled = true
             downloadThread?.interrupt()
         }
     }

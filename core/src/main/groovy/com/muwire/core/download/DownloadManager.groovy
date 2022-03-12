@@ -270,7 +270,7 @@ public class DownloadManager {
         persistDownloaders()
     }
 
-    void persistDownloaders() {
+    synchronized void persistDownloaders() {
         File downloadsFile = new File(home,"downloads.json")
         downloadsFile.withPrintWriter { writer ->
             downloaders.values().each { downloader ->
