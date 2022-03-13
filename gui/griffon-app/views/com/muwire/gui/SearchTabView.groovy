@@ -3,12 +3,15 @@ package com.muwire.gui
 import com.muwire.core.SharedFile
 import griffon.core.artifact.GriffonView
 
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.tree.TreePath
 import java.awt.Component
+import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.util.stream.Collectors
 
@@ -247,6 +250,19 @@ class SearchTabView {
             registerKeyboardAction(repeatSearch,
                     KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK),
                     WHEN_IN_FOCUSED_WINDOW)
+        }
+        
+        Action downloadAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                controller.download()
+            }
+        }
+        ["results-tree", "results-table", "results-table2"].each {
+            JComponent resultsComponent = builder.getVariable(it)
+            resultsComponent.registerKeyboardAction(downloadAction,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                JComponent.WHEN_FOCUSED)
         }
     }
 

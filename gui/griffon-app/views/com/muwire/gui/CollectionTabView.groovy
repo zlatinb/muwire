@@ -1,8 +1,11 @@
 package com.muwire.gui
 
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 import javax.swing.tree.DefaultMutableTreeNode
+import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 
 import static com.muwire.gui.Translator.trans
@@ -70,7 +73,7 @@ class CollectionTabView {
                     }
                 }
                 scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                    collectionsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                    collectionsTable = table(id: "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.collections) {
                             closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {HTMLSanitizer.sanitize(it.name)})
                             closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
@@ -113,7 +116,7 @@ class CollectionTabView {
                     panel(constraints : "table") {
                         borderLayout()
                         scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                            itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
+                            itemsTable = table(id: "items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                 tableModel(list : model.items) {
                                     closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
                                         HTMLSanitizer.sanitize(String.join(File.separator, it.pathElements))
@@ -129,7 +132,7 @@ class CollectionTabView {
                         scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                             itemsTree = new JTree(model.fileTreeModel)
                             itemsTree.setCellRenderer(new PathTreeRenderer())
-                            tree(rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
+                            tree(id: "items-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
                         }
                     }
                 }
@@ -160,7 +163,29 @@ class CollectionTabView {
         p.registerKeyboardAction(closeTab,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK),
                 JComponent.WHEN_IN_FOCUSED_WINDOW)
+
+        Action downloadAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                controller.download()
+            }
+        }
+        ["items-tree", "items-table"].each {
+            JComponent resultsComponent = builder.getVariable(it)
+            resultsComponent.registerKeyboardAction(downloadAction,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                    JComponent.WHEN_FOCUSED)
+        }
         
+        Action downloadCollectionAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                controller.downloadCollection()
+            }
+        }
+        collectionsTable.registerKeyboardAction(downloadCollectionAction,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                JComponent.WHEN_FOCUSED)
     }
     
     boolean isSequentialCollection() {

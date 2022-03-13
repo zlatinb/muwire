@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
 
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
@@ -9,6 +11,7 @@ import javax.swing.JTextField
 import javax.swing.JTree
 import javax.swing.KeyStroke
 import javax.swing.tree.TreePath
+import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 
 import static com.muwire.gui.Translator.trans
@@ -76,7 +79,7 @@ class BrowseView {
                 panel(constraints: "table") {
                     borderLayout()
                     scrollPane(constraints: BorderLayout.CENTER) {
-                        resultsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                        resultsTable = table(id: "results-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                             tableModel(list: model.results) {
                                 closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { it })
                                 closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
@@ -130,6 +133,19 @@ class BrowseView {
         p.registerKeyboardAction(closeTab,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK),
                 JComponent.WHEN_IN_FOCUSED_WINDOW)
+
+        Action downloadAction = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                controller.download()
+            }
+        }
+        ["results-tree", "results-table"].each {
+            JComponent resultsComponent = builder.getVariable(it)
+            resultsComponent.registerKeyboardAction(downloadAction,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                    JComponent.WHEN_FOCUSED)
+        }
         
         // right-click menu
         def mouseListener = new MouseAdapter() {
