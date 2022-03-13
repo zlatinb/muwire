@@ -1,6 +1,9 @@
 package com.muwire.gui
 
+import javax.swing.JComponent
+import javax.swing.KeyStroke
 import javax.swing.tree.DefaultMutableTreeNode
+import java.awt.event.KeyEvent
 
 import static com.muwire.gui.Translator.trans
 import griffon.core.artifact.GriffonView
@@ -38,7 +41,7 @@ class CollectionTabView {
     CollectionTabController controller
 
     def parent
-    def p
+    JComponent p
     
     JTable collectionsTable
     def lastCollectionsTableSortEvent
@@ -153,6 +156,11 @@ class CollectionTabView {
                 }
             }
         }
+        
+        p.registerKeyboardAction(closeTab,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK),
+                JComponent.WHEN_IN_FOCUSED_WINDOW)
+        
     }
     
     boolean isSequentialCollection() {

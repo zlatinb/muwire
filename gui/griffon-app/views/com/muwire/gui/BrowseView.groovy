@@ -2,11 +2,14 @@ package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
 
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTree
+import javax.swing.KeyStroke
 import javax.swing.tree.TreePath
+import java.awt.event.KeyEvent
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -123,6 +126,10 @@ class BrowseView {
                 }
             }
         }
+        
+        p.registerKeyboardAction(closeTab,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK),
+                JComponent.WHEN_IN_FOCUSED_WINDOW)
         
         // right-click menu
         def mouseListener = new MouseAdapter() {

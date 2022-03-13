@@ -6,8 +6,10 @@ import griffon.core.artifact.GriffonView
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.KeyStroke
 import javax.swing.tree.TreePath
 import java.awt.Component
+import java.awt.event.KeyEvent
 import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
@@ -54,7 +56,7 @@ class SearchTabView {
     
     UISettings settings
 
-    Component pane
+    JComponent pane
     JTabbedPane parent
     String searchTerms
     JTable sendersTable
@@ -237,6 +239,15 @@ class SearchTabView {
         this.pane.putClientProperty("results-table",resultsTable)
 
         pane.putClientProperty("focusListener", new FocusListener())
+        
+        pane.with {
+            registerKeyboardAction(closeTab,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(repeatSearch,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+        }
     }
 
     void mvcGroupInit(Map<String, String> args) {
