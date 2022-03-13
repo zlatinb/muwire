@@ -8,18 +8,24 @@ import com.muwire.gui.chat.ChatFavorites
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
 
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.DropMode
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
+import javax.swing.KeyStroke
 import javax.swing.RowSorter
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 import java.awt.Image
+import java.awt.KeyboardFocusManager
 import java.awt.Window
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
 import java.util.function.Predicate
 
 import static com.muwire.gui.Translator.trans
@@ -836,7 +842,44 @@ class MainFrameView {
         })
 
         // search field
-        def searchField = builder.getVariable("search-field")
+        JComponent searchField = builder.getVariable("search-field")
+        Action focusOnSearch = new AbstractAction() {
+            @Override
+            void actionPerformed(ActionEvent e) {
+                searchField.requestFocus()
+            }
+        }
+        JComponent rootPane = mainFrame.getRootPane()
+        rootPane.with {
+            registerKeyboardAction(focusOnSearch,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), 
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showSearchWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showDownloadsWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showUploadsWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_3, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showCollectionsWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_4, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showFeedsWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_5, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showMessagesWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showChatWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_7, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+            registerKeyboardAction(showTrustWindow,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_8, KeyEvent.ALT_DOWN_MASK),
+                    WHEN_IN_FOCUSED_WINDOW)
+        }
+        
 
         // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
