@@ -3,7 +3,6 @@ package com.muwire.gui.chat
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import org.intellij.lang.annotations.JdkConstants
 
 import javax.annotation.Nonnull
 import javax.swing.DefaultCellEditor
