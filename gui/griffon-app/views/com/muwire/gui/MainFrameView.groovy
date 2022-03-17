@@ -5,8 +5,10 @@ import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatFavorites
+import com.muwire.gui.win.PrioritySetter
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
+import net.i2p.util.SystemVersion
 
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -838,6 +840,21 @@ class MainFrameView {
             public void windowActivated(WindowEvent e) {
                 if (!model.chatPaneButtonEnabled)
                     chatNotificator.mainWindowActivated()
+            }
+            
+            public void windowClosed(WindowEvent e) {
+                if (SystemVersion.isWindows())
+                    PrioritySetter.enterBackgroundMode()
+            }
+            
+            public void windowIconified(WindowEvent e) {
+                if (SystemVersion.isWindows())
+                    PrioritySetter.enterBackgroundMode()
+            }
+            
+            public void windowDeiconified(WindowEvent e) {
+                if(SystemVersion.isWindows())
+                    PrioritySetter.exitBackgroundMode()
             }
         })
 

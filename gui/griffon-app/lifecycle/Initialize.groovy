@@ -1,4 +1,5 @@
 import com.muwire.gui.LNFs
+import com.muwire.gui.win.PrioritySetter
 import griffon.core.GriffonApplication
 import groovy.swing.SwingBuilder
 import groovy.util.logging.Log
@@ -165,8 +166,11 @@ class Initialize extends AbstractLifecycleHandler {
                     def mainFrame = application.getWindowManager().findWindow("main-frame")
                     if (mainFrame != null) {
                         Core core = application.getContext().get("core")
-                        if (core != null)
+                        if (core != null) {
+                            if (SystemVersion.isWindows())
+                                PrioritySetter.exitBackgroundMode()
                             mainFrame.setVisible(true)
+                        }
                     }
                 }
 
