@@ -819,6 +819,8 @@ class MainFrameView {
             public void windowClosing(WindowEvent e) {
                 chatNotificator.mainWindowDeactivated()
                 if (application.getContext().get("tray-icon") != null) {
+                    if (SystemVersion.isWindows())
+                        PrioritySetter.enterBackgroundMode()
                     if (settings.closeWarning) {
                         runInsideUIAsync {
                             Map<String, Object> args2 = new HashMap<>()
@@ -840,11 +842,6 @@ class MainFrameView {
             public void windowActivated(WindowEvent e) {
                 if (!model.chatPaneButtonEnabled)
                     chatNotificator.mainWindowActivated()
-            }
-            
-            public void windowClosed(WindowEvent e) {
-                if (SystemVersion.isWindows())
-                    PrioritySetter.enterBackgroundMode()
             }
             
             public void windowIconified(WindowEvent e) {
