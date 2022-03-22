@@ -1,6 +1,7 @@
 package com.muwire.gui.resultdetails
 
 import com.muwire.core.Persona
+import com.muwire.gui.CopyPasteSupport
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
