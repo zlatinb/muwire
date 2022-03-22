@@ -688,7 +688,7 @@ class MainFrameModel {
 
             results.values().each { MVCGroup group ->
                 if (group.alive) {
-                    group.view.refreshResults()
+                    group.view.onTrustChanged(e.persona)
                 }
             }
         }

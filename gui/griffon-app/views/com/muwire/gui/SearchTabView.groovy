@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.SharedFile
 import griffon.core.artifact.GriffonView
+import net.i2p.data.Destination
 
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -9,6 +10,7 @@ import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.KeyStroke
+import javax.swing.RowSorter
 import javax.swing.tree.TreePath
 import java.awt.Component
 import java.awt.event.ActionEvent
@@ -733,6 +735,43 @@ class SearchTabView {
             if (row >= 0)
                 table.selectionModel.addSelectionInterval(row, row)
         }
+    }
+    
+    void onTrustChanged(Persona persona) {
+        // 1. check Senders table in group-by-sender mode.
+        // there should be exactly 1 entry if at all.
+        if (!model.sendersBucket.containsKey(persona))
+            return
+        int index = model.senders.indexOf(persona)
+        if (index < 0)
+            return // should not happen!
+        
+        // 2. it exists in the senders table, update the row
+        JTable table = builder.getVariable("senders-table")
+        table.model.fireTableRowsUpdated(index, index)
+        
+        // 3. if the senders table was sorted by trust status, re-sort
+        List<RowSorter.SortKey> keys = table.rowSorter.getSortKeys()
+        if (!keys.isEmpty()) {
+            boolean shouldSort = false
+            for (RowSorter.SortKey key : keys) {
+                if (key.column == 7) {
+                    shouldSort = true
+                    break
+                }
+            }
+            if (shouldSort)
+                table.rowSorter.allRowsChanged()
+        }
+        
+        // 4. for the group-by-file view, only update if a single result is selected
+        table = builder.getVariable("results-table2")
+        int[] selectedRows = table.getSelectedRows()
+        if (selectedRows.length != 1)
+            return
+        
+        // cheat - it's too expensive to figure out if the result was relevant
+        detailsPanelByFile.updateUI()
     }
     
     void updateUIs() {
