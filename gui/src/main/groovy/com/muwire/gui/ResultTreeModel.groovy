@@ -30,7 +30,7 @@ class ResultTreeModel extends DefaultTreeModel {
             def nodeData = new ResultTreeRenderer.ResultTreeNode(hiddenRoot, element)
             def elementNode = null
             for(int i = 0; i < node.childCount; i++) {
-                if (node.getChildAt(i).getUserObject() == nodeData) {
+                if (Objects.equals(node.getChildAt(i).getUserObject(), nodeData)) {
                     elementNode = node.getChildAt(i)
                     break
                 }

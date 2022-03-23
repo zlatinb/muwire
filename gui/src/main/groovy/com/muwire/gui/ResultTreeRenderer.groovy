@@ -86,8 +86,8 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
             if (!(o instanceof ResultTreeNode))
                 return false
             ResultTreeNode other = (ResultTreeNode)o
-            hiddenRoot == other.hiddenRoot && 
-                    element == other.element
+            Objects.equals(hiddenRoot, other.hiddenRoot) &&
+                    Objects.equals(element, other.element)
         }
     }
 }
