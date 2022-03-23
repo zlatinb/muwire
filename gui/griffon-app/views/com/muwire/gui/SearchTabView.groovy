@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.SharedFile
+import com.muwire.gui.SearchTabModel.SenderBucket
 import griffon.core.artifact.GriffonView
 import net.i2p.data.Destination
 
@@ -11,6 +12,7 @@ import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.RowSorter
+import javax.swing.table.DefaultTableModel
 import javax.swing.tree.TreePath
 import java.awt.Component
 import java.awt.event.ActionEvent
@@ -93,15 +95,15 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: String, read : {row -> row.getHumanReadableName()})
-                                            closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {row -> model.sendersBucket[row].size()})
-                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browse})
-                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {row -> model.sendersBucket[row].first().browseCollections})
-                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().feed})
-                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().messages})
-                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {row -> model.sendersBucket[row].first().chat})
-                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { row ->
-                                                trans(model.core.trustService.getLevel(row.destination).name())
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: String, read : { SenderBucket row -> row.sender.getHumanReadableName()})
+                                            closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {SenderBucket row -> row.results.size()})
+                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browse})
+                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
+                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].feed})
+                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].messages})
+                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].chat})
+                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { SenderBucket row ->
+                                                trans(model.core.trustService.getLevel(row.sender.destination).name())
                                             })
                                         }
                                     }
@@ -409,21 +411,22 @@ class SearchTabView {
                 model.messageActionEnabled = false
                 return
             } else {
-                Persona sender = model.senders[row]
-                model.browseActionEnabled = model.sendersBucket[sender].first().browse
-                model.browseCollectionsActionEnabled = model.sendersBucket[sender].first().browseCollections
-                model.chatActionEnabled = model.sendersBucket[sender].first().chat
-                model.messageActionEnabled = model.sendersBucket[sender].first().messages
-                model.subscribeActionEnabled = model.sendersBucket[sender].first().feed &&
+                SenderBucket bucket = model.senders[row]
+                Persona sender = bucket.sender
+                model.browseActionEnabled = bucket.results[0].browse
+                model.browseCollectionsActionEnabled = bucket.results[0].browseCollections
+                model.chatActionEnabled = bucket.results[0].chat
+                model.messageActionEnabled = bucket.results[0].messages
+                model.subscribeActionEnabled = bucket.results[0].feed &&
                     model.core.feedManager.getFeed(sender) == null
                 model.trustButtonsEnabled = true
                 
                 model.results.clear()
-                model.results.addAll(model.sendersBucket[sender])
+                model.results.addAll(bucket.results)
                 resultsTable.model.fireTableDataChanged()
                 
                 model.root.removeAllChildren()
-                for(UIResultEvent event : model.sendersBucket[sender])
+                for(UIResultEvent event : bucket.results)
                     model.treeModel.addToTree(event)
                 model.treeModel.nodeStructureChanged(model.root)
                 TreeUtil.expand(resultTree)
@@ -676,7 +679,7 @@ class SearchTabView {
         if (model.groupedByFile)
             return model.senders2[row]?.sender
         else
-            return model.senders[row]
+            return model.senders[row]?.sender
     }
     
     def showSenderGrouping = {
@@ -708,6 +711,58 @@ class SearchTabView {
             return sequentialDownloadCheckbox.model.isSelected()
     }
     
+    void addPendingResults() {
+        JTable table = builder.getVariable("senders-table")
+        int selectedRow = table.getSelectedRow()
+
+        int newRowsStart = -1
+        int newRowsEnd = -1
+        for (int row = 0; row < model.senders.size(); row++) {
+            SenderBucket sb = model.senders[row]
+            List<UIResultEvent> pending = sb.getPendingResults()
+            if (pending.isEmpty())
+                continue
+            if (pending.size() == sb.results.size()) {
+                if (newRowsStart == -1)
+                    newRowsStart = row
+                newRowsEnd = row
+            } else {
+                table.model.fireTableRowsUpdated(row, row)
+            }
+            if (row == selectedRow)
+                displayPendingResults(pending)
+        }
+
+        if (newRowsStart >= 0 && newRowsEnd >= 0) {
+            table.model.fireTableRowsInserted(newRowsStart, newRowsEnd)
+        } else {
+            boolean shouldSort = false
+            for (RowSorter.SortKey key : table.rowSorter.getSortKeys()) {
+                if (key.column == 1) {
+                    shouldSort = true
+                    break
+                }
+            }
+
+            if (shouldSort) {
+                table.model.fireTableDataChanged()
+            }
+        }
+    }
+    
+    private void displayPendingResults(List<UIResultEvent> pending) {
+        int rowCount = model.results.size()
+        model.results.addAll(pending)
+        resultsTable.model.fireTableRowsInserted(rowCount - 1, model.results.size() - 1)
+        if (!resultsTable.rowSorter.getSortKeys().isEmpty())
+            resultsTable.model.fireTableDataChanged()
+        
+        for (UIResultEvent event : pending) 
+            model.treeModel.addToTree(event)
+        model.treeModel.nodeStructureChanged(model.root)
+        // TODO: decide whether to expand
+    }
+    
     void refreshResults() {
         JTable table = builder.getVariable("senders-table")
         int selectedRow = table.getSelectedRow()
@@ -719,8 +774,11 @@ class SearchTabView {
             table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
         }
         
-        
-        table = builder.getVariable("results-table2")
+        updateResultsTable2()
+    }
+    
+    void updateResultsTable2() {
+        JTable table = builder.getVariable("results-table2")
         int [] selectedRows = table.getSelectedRows()
         for (int i = 0; i < selectedRows.length; i++)
             selectedRows[i] = table.rowSorter.convertRowIndexToModel(selectedRows[i])
@@ -742,9 +800,7 @@ class SearchTabView {
         // there should be exactly 1 entry if at all.
         if (!model.sendersBucket.containsKey(persona))
             return
-        int index = model.senders.indexOf(persona)
-        if (index < 0)
-            return // should not happen!
+        int index = model.sendersBucket[persona].rowIdx
         
         // 2. it exists in the senders table, update the row
         JTable table = builder.getVariable("senders-table")

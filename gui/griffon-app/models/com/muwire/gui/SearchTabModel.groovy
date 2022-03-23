@@ -129,12 +129,11 @@ class SearchTabModel {
                 hashBucket[event.infohash] = bucket
             }
 
-            def senderBucket = sendersBucket.get(event.sender)
+            SenderBucket senderBucket = sendersBucket.get(event.sender)
             if (senderBucket == null) {
-                senderBucket = []
+                senderBucket = new SenderBucket(event.sender, senders.size())
                 sendersBucket[event.sender] = senderBucket
-                senders.clear()
-                senders.addAll(sendersBucket.keySet())
+                senders << senderBucket
             }
 
             Set sourceBucket = sourcesBucket.get(event.infohash)
@@ -145,7 +144,7 @@ class SearchTabModel {
             sourceBucket.addAll(event.sources)
 
             bucket.add event
-            senderBucket << event
+            senderBucket.results << event
         }
         
         
@@ -160,7 +159,8 @@ class SearchTabModel {
                     allResults2.addAll(hashBucket.keySet())
                     allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
                 }
-                view.refreshResults()
+                view.addPendingResults()
+                view.updateResultsTable2()
                 dirty = false
             }
         } else if (!copy.isEmpty())
@@ -242,6 +242,26 @@ class SearchTabModel {
                 count += event.collections.size()
             }
             count
+        }
+    }
+    
+    static class SenderBucket {
+        final Persona sender
+        private final int rowIdx
+        final List<UIResultEvent> results = []
+        private int lastUpdatedIdx
+        
+        SenderBucket(Persona sender, int rowIdx) {
+            this.sender = sender
+            this.rowIdx = rowIdx
+        }
+        
+        List<UIResultEvent> getPendingResults() {
+            if (lastUpdatedIdx == results.size())
+                return Collections.emptyList()
+            def rv = results.subList(lastUpdatedIdx, results.size())
+            lastUpdatedIdx = results.size()
+            return rv
         }
     }
     
