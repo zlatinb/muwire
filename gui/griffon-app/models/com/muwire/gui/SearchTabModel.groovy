@@ -66,7 +66,7 @@ class SearchTabModel {
     boolean treeVisible = true
     
     void mvcGroupInit(Map<String, String> args) {
-        root = new DefaultMutableTreeNode()
+        root = new ResultTreeModel.MutableResultNode()
         treeModel = new ResultTreeModel(root)
         core = mvcGroup.parentGroup.model.core
         uiSettings = application.context.get("ui-settings")

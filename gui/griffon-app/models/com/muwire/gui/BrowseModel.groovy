@@ -49,7 +49,7 @@ class BrowseModel {
     private final List<TreeNode> topLevelNodes = new ArrayList<>()
     
     void mvcGroupInit(Map<String,String> args) {
-        root = new DefaultMutableTreeNode()
+        root = new ResultTreeModel.MutableResultNode()
         resultsTreeModel = new ResultTreeModel(root)
     }
     

@@ -5,6 +5,7 @@ import com.muwire.core.search.UIResultEvent
 import com.muwire.core.util.DataUtil
 import net.i2p.data.DataHelper
 
+import javax.swing.tree.DefaultMutableTreeNode
 import java.util.function.Predicate
 
 import static com.muwire.gui.Translator.trans
@@ -61,11 +62,13 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
     
     public static class ResultTreeNode {
         private final String hiddenRoot, element
+        private final int hashCode
         private int files
         private long size
         ResultTreeNode(String hiddenRoot, String element) {
             this.hiddenRoot = hiddenRoot
             this.element = element
+            this.hashCode = Objects.hash(hiddenRoot, element)
         }
         
         private String getToolTip() {
@@ -80,6 +83,10 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
         void addResult(UIResultEvent event) {
             files++
             size += event.size
+        }
+        
+        public int hashCode() {
+            hashCode
         }
         
         public boolean equals(Object o) {
