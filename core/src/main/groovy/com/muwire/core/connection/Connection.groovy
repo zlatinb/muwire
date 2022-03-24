@@ -29,6 +29,7 @@ import net.i2p.data.Signature
 abstract class Connection implements Closeable {
     
     private static final int SEARCHES = 10
+    private static final int FIRST_HOP_SEARCHES = 5
     private static final long INTERVAL = 1000
     
     private static final MAX_PONGS_V1 = 2
@@ -45,6 +46,7 @@ abstract class Connection implements Closeable {
     private final BlockingQueue messages = new LinkedBlockingQueue()
     private final Thread reader, writer
     private final MessageThrottle queryThrottle = new MessageThrottle(INTERVAL, SEARCHES)
+    private final MessageThrottle firstHopQueryThrottle = new MessageThrottle(INTERVAL, FIRST_HOP_SEARCHES)
 
     protected final String name
 
@@ -224,8 +226,9 @@ abstract class Connection implements Closeable {
     }
 
     protected void handleSearch(def search) {
-        if (!queryThrottle.allow(System.currentTimeMillis())) {
-            log.info("dropping excessive search")
+        final long now = System.currentTimeMillis()
+        if (!queryThrottle.allow(now)) {
+            log.info("dropping excessive search in generic throttle")
             return
         }
         UUID uuid = UUID.fromString(search.uuid)
@@ -253,9 +256,15 @@ abstract class Connection implements Closeable {
                 log.info("originator doesn't match destination")
                 return
             }
-            if (search.firstHop && originator.destination != endpoint.getDestination()) {
-                log.info("first hop query originator does not match endpoint address")
-                return
+            if (search.firstHop) { 
+                if (originator.destination != endpoint.getDestination()) {
+                    log.info("first hop query originator does not match endpoint address")
+                    return
+                }
+                if (!firstHopQueryThrottle.allow(now)) {
+                    log.info("dropping excessive search in first hop throttle")
+                    return
+                }
             }
         } else {
             log.info("dropping search without originator")
