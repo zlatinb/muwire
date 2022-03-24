@@ -1,7 +1,9 @@
 package com.muwire.gui.resultdetails
 
+import griffon.core.GriffonApplication
 import net.i2p.data.Destination
 
+import javax.inject.Inject
 import javax.swing.JPanel
 import javax.swing.border.Border
 import java.awt.BorderLayout
@@ -22,6 +24,8 @@ import java.awt.GridBagConstraints
 
 @ArtifactProviderFor(GriffonView)
 class ResultDetailsFrameView {
+    @Inject
+    GriffonApplication application
     @MVCMember @Nonnull
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
@@ -35,10 +39,11 @@ class ResultDetailsFrameView {
     def certificatesGroup, collectionsGroup
     
     void initUI() {
+        def mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
         
         int frameHeight = 150
-        window = builder.frame(visible : false, locationRelativeTo: application.windowManager.findWindow("main-frame"),
+        window = builder.frame(visible : false, locationRelativeTo: mainFrame,
             defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
             iconImage: builder.imageIcon("/MuWire-48x48.png").image,
             title: trans("DETAILS_FOR", model.resultEvent.name)) {
