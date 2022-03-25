@@ -400,11 +400,13 @@ class MainFrameModel {
 
     void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
         runInsideUIAsync {
-            Map<String, Object> args = new HashMap<>()
-            args['core'] = core
-            args['available'] = null
-            args['downloaded'] = e
-            mvcGroup.createMVCGroup("update", "update", args)
+            if (application.mvcGroupManager.findGroup("update") == null) {
+                Map<String, Object> args = new HashMap<>()
+                args['core'] = core
+                args['available'] = null
+                args['downloaded'] = e
+                mvcGroup.createMVCGroup("update", "update", args)
+            }
         }
     }
 
@@ -791,11 +793,13 @@ class MainFrameModel {
 
     void onUpdateAvailableEvent(UpdateAvailableEvent e) {
         runInsideUIAsync {
-            Map<String, Object> args = new HashMap<>()
-            args['core'] = core
-            args['available'] = e
-            args['downloaded'] = null
-            mvcGroup.createMVCGroup("update", "update", args)
+            if (application.mvcGroupManager.findGroup("update") == null) {
+                Map<String, Object> args = new HashMap<>()
+                args['core'] = core
+                args['available'] = e
+                args['downloaded'] = null
+                mvcGroup.createMVCGroup("update", "update", args)
+            }
         }
     }
 
