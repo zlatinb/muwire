@@ -405,7 +405,7 @@ class MainFrameModel {
                 args['core'] = core
                 args['available'] = null
                 args['downloaded'] = e
-                mvcGroup.createMVCGroup("update", "update", args)
+                mvcGroup.createMVCGroup("update", "update", args).destroy()
             }
         }
     }
@@ -798,7 +798,7 @@ class MainFrameModel {
                 args['core'] = core
                 args['available'] = e
                 args['downloaded'] = null
-                mvcGroup.createMVCGroup("update", "update", args)
+                mvcGroup.createMVCGroup("update", "update", args).destroy()
             }
         }
     }
