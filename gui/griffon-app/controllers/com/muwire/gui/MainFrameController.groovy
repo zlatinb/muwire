@@ -104,7 +104,7 @@ class MainFrameController {
         if (search.length() > 128) {
             try {
                 Persona p = new Persona(new ByteArrayInputStream(Base64.decode(search)))
-                String groupId = p.getHumanReadableName() + "-browse"
+                String groupId = UUID.randomUUID().toString()
                 def params = [:]
                 params['host'] = p
                 params['core'] = model.core

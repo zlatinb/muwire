@@ -153,7 +153,7 @@ class ChatRoomController {
         Persona p = view.getSelectedPersona()
         if (p == null)
             return
-        String groupId = p.getHumanReadableName() + "-browse"
+        String groupId = UUID.randomUUID().toString()
         def params = [:]
         params['host'] = p
         params['core'] = model.core
