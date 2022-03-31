@@ -27,6 +27,7 @@ public class EnumStrings {
         DOWNLOAD_STATES.put(Downloader.DownloadState.HASHLIST, _x("Hash List"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.HOPELESS, _x("Hopeless"));
         DOWNLOAD_STATES.put(Downloader.DownloadState.PAUSED, _x("Paused"));
+        DOWNLOAD_STATES.put(Downloader.DownloadState.REJECTED, _x("Rejected"));
     }
     
     public static final Map<BrowseStatus, String> BROWSE_STATES =
