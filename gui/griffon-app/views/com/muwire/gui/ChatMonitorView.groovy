@@ -22,13 +22,15 @@ class ChatMonitorView {
     @MVCMember @Nonnull
     ChatMonitorModel model
 
-    def window
+    JFrame window
     def roomsTable
+    def mainFrame
     
     void initUI() {
         int rowHeight = application.context.getAsInt("row-height")
+        mainFrame = application.windowManager.findWindow("main-frame")
         
-        window = builder.frame (visible : false, locationRelativeTo : null,
+        window = builder.frame (visible : false, locationRelativeTo : mainFrame,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
             iconImage : builder.imageIcon("/MuWire-48x48.png").image,
             preferredSize: [800,800]){
@@ -62,6 +64,7 @@ class ChatMonitorView {
             }
         })
         window.pack()
+        window.setLocationRelativeTo(mainFrame)
         window.setVisible(true)
     }
 }

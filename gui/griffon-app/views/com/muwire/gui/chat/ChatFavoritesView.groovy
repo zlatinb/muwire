@@ -28,8 +28,10 @@ class ChatFavoritesView {
     JFrame window
     private JTable favoritesTable
     
+    def mainFrame
+    
     void initUI() {
-        def mainFrame = application.windowManager.findWindow("main-frame")
+        mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
         
         window = builder.frame(visible : false, locationRelativeTo: mainFrame,
@@ -89,6 +91,7 @@ class ChatFavoritesView {
             }
         })
         window.pack()
+        window.setLocationRelativeTo(mainFrame)
         window.setVisible(true)
     }
     

@@ -38,8 +38,10 @@ class ResultDetailsFrameView {
     
     def certificatesGroup, collectionsGroup
     
+    def mainFrame
+    
     void initUI() {
-        def mainFrame = application.windowManager.findWindow("main-frame")
+        mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
         
         int frameHeight = 150
@@ -140,6 +142,7 @@ class ResultDetailsFrameView {
             }
         })
         window.pack()
+        window.setLocationRelativeTo(mainFrame)
         window.setVisible(true)
     }
     

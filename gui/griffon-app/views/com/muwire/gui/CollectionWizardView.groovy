@@ -36,7 +36,7 @@ class CollectionWizardView {
     @MVCMember @Nonnull
     CollectionWizardModel model
 
-    def window
+    JFrame window
     JPanel mainPanel
     
     def nameTextField 
@@ -45,11 +45,13 @@ class CollectionWizardView {
     def lastFilesTableSortEvent
     JTree jTree
     
+    def mainFrame
+    
     void initUI() {
-        
+        mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
 
-        window = builder.frame(visible: false, locationRelativeTo : null,
+        window = builder.frame(visible: false, locationRelativeTo : mainFrame,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
             iconImage : builder.imageIcon("/MuWire-48x48.png").image,
             preferredSize: [800,800]){
@@ -163,6 +165,7 @@ class CollectionWizardView {
             }
         })
         window.pack()
+        window.setLocationRelativeTo(mainFrame)
         window.setVisible(true)
     }
     
