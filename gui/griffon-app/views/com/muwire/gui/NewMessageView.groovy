@@ -65,11 +65,12 @@ class NewMessageView {
             recipientsModel.addElement(new Recipient(it))
         }
         recipientsList = new JList(recipientsModel)
+        recipientsList.setVisibleRowCount(2)
         
         window = builder.frame(visible : false, locationRelativeTo : mainFrame,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
             iconImage : builder.imageIcon("/MuWire-48x48.png").image, 
-                preferredSize: [800, 800]){
+                preferredSize: [800, 600]){
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
