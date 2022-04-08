@@ -270,7 +270,7 @@ class NewMessageView {
         }
         
         public String toString() {
-            persona.getHumanReadableName()
+            "<html>" + PersonaCellRenderer.htmlize(persona) + "</html>"
         }
     }
 }

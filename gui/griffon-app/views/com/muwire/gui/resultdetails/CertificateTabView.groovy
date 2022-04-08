@@ -1,8 +1,11 @@
 package com.muwire.gui.resultdetails
 
+import com.muwire.core.Persona
 import com.muwire.core.filecert.Certificate
 import com.muwire.gui.DateRenderer
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.PersonaComparator
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -43,8 +46,8 @@ class CertificateTabView {
                 scrollPane(constraints: BorderLayout.CENTER) {
                     certsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
                         tableModel(list: model.certificates) {
-                            closureColumn(header: trans("ISSUER"), preferredWidth: 150, type:String,
-                                    read:{it.issuer.getHumanReadableName()})
+                            closureColumn(header: trans("ISSUER"), preferredWidth: 150, type: Persona,
+                                    read:{it.issuer})
                             closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String,
                                     read:{trans(model.core.trustService.getLevel(it.issuer.destination).name())})
                             closureColumn(header: trans("NAME"), preferredWidth: 450,
@@ -65,7 +68,9 @@ class CertificateTabView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
         certsTable.setDefaultRenderer(Long.class, new DateRenderer())
+        certsTable.rowSorter.setComparator(0, new PersonaComparator())
         certsTable.rowSorter.setSortsOnUpdates(true)
 
         def selectionModel = certsTable.getSelectionModel()

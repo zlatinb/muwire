@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -52,7 +53,7 @@ class FetchCertificatesView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
-                        closureColumn(header : trans("ISSUER"), preferredWidth : 200, type : String, read : {it.issuer.getHumanReadableName()})
+                        closureColumn(header : trans("ISSUER"), preferredWidth : 200, type : Persona, read : {it.issuer})
                         closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 50, type : String, read : {trans(controller.core.trustService.getLevel(it.issuer.destination).name())})
                         closureColumn(header : trans("NAME"), preferredWidth : 200, type: String, read : {HTMLSanitizer.sanitize(it.name.name.toString())})
                         closureColumn(header : trans("ISSUED"), preferredWidth : 100, type : String, read : {
@@ -70,6 +71,8 @@ class FetchCertificatesView {
             }
         }
         
+        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        certsTable.rowSorter.setComparator(0, new PersonaComparator())
         certsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})
         certsTable.rowSorter.setSortsOnUpdates(true)
         

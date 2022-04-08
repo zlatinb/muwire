@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
@@ -59,7 +60,7 @@ class MessageFolderView {
                         dragEnabled: true, transferHandler: new MessageExportTransferHandler()) {
                         if (!model.outgoing) {
                             tableModel(list: model.messageHeaders) {
-                                closureColumn(header: trans("SENDER"), preferredWidth: 200, type: String, read: { it.message.sender.getHumanReadableName() })
+                                closureColumn(header: trans("SENDER"), preferredWidth: 200, type: Persona, read: { it.message.sender })
                                 closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { HTMLSanitizer.sanitize(it.message.subject) })
                                 closureColumn(header: trans("RECIPIENTS"), preferredWidth: 20, type: Integer, read: { it.message.recipients.size() })
                                 closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
@@ -68,7 +69,14 @@ class MessageFolderView {
                         } else {
                             tableModel(list : model.messageHeaders) {
                                 closureColumn(header: trans("RECIPIENTS"), preferredWidth: 400, type: String, read : {
-                                    it.message.recipients.stream().map({it.getHumanReadableName()}).collect(Collectors.joining(","))
+                                    StringBuilder sb = new StringBuilder()
+                                    sb.append("<html>")
+                                    String collected = it.message.recipients.stream().
+                                            map(PersonaCellRenderer::htmlize).
+                                            collect(Collectors.joining(","))
+                                    sb.append(collected)
+                                    sb.append("</html>")
+                                    return sb.toString()
                                 })
                                 closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
                                 closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
@@ -182,9 +190,12 @@ class MessageFolderView {
     void mvcGroupInit(Map<String, String> args) {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
-        
+
+        messageHeaderTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
         messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
+        if (!model.outgoing)
+            messageHeaderTable.rowSorter.setComparator(0, new PersonaComparator())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
         def sortKey = new RowSorter.SortKey(model.outgoing ? 2 : 3, SortOrder.ASCENDING)

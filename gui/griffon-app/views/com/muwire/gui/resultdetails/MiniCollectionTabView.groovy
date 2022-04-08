@@ -1,8 +1,11 @@
 package com.muwire.gui.resultdetails
 
+import com.muwire.core.Persona
 import com.muwire.core.collections.FileCollection
 import com.muwire.gui.DateRenderer
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.PersonaComparator
 import com.muwire.gui.SizeRenderer
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
@@ -44,7 +47,7 @@ class MiniCollectionTabView {
                     collectionsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
                         tableModel(list : model.collections) {
                             closureColumn(header: trans("NAME"), preferredWidth: 300, type : String, read : { HTMLSanitizer.sanitize(it.name)})
-                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
+                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : Persona, read : {it.author})
                             closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
                             closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
                             closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
@@ -61,8 +64,10 @@ class MiniCollectionTabView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
+        collectionsTable.rowSorter.setComparator(1, new PersonaComparator())
         collectionsTable.rowSorter.setSortsOnUpdates(true)
         def selectionModel = collectionsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)

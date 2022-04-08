@@ -3,6 +3,8 @@ package com.muwire.gui.resultdetails
 import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.PersonaComparator
 import com.muwire.gui.resultdetails.ResultListCellRenderer
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
@@ -61,7 +63,7 @@ class ResultDetailsTabsView {
             scrollPane(constraints: BorderLayout.CENTER) {
                 sendersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list: model.results) {
-                        closureColumn(header: trans("SENDER"), preferredWidth: 150, type: String, read : {it.sender.getHumanReadableName()})
+                        closureColumn(header: trans("SENDER"), preferredWidth: 150, type: Persona, read : {it.sender})
                         closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : {
                             trans(model.core.trustService.getLevel(it.sender.destination).name())
                         })
@@ -166,6 +168,8 @@ class ResultDetailsTabsView {
     void mvcGroupInit(Map<String,String> args) {
         
         // all senders table
+        sendersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        sendersTable.rowSorter.setComparator(0, new PersonaComparator())
         def selectionModel = sendersTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({

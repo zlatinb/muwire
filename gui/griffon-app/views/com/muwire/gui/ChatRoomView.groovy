@@ -77,7 +77,7 @@ class ChatRoomView {
                             scrollPane {
                                 membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: String, read : {it.getHumanReadableName()})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: Persona, read : {it})
                                         closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, read : {trans(model.core.trustService.getLevel(it.destination).name())})
                                     }
                                 }
@@ -124,6 +124,8 @@ class ChatRoomView {
             
         if (membersTable != null) {
             
+            membersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+            membersTable.rowSorter.setComparator(0, new PersonaComparator())
             membersTable.rowSorter.addRowSorterListener({evt -> lastMembersTableSortEvent = evt})
             membersTable.rowSorter.setSortsOnUpdates(true)
             membersTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

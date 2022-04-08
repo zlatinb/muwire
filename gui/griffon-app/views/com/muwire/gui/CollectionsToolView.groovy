@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
+
 import static com.muwire.gui.Translator.trans
 
 import java.awt.BorderLayout
@@ -56,7 +58,7 @@ class CollectionsToolView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 hitsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.hits) {
-                        closureColumn(header : trans("SEARCHER"), preferredWidth : 100, type : String, read : {it.searcher.getHumanReadableName()})
+                        closureColumn(header : trans("SEARCHER"), preferredWidth : 100, type : Persona, read : {it.searcher})
                         closureColumn(header : trans("TIMESTAMP"), preferredWidth : 100, type : Long, read : {it.timestamp})
                     }
                 }
@@ -70,6 +72,8 @@ class CollectionsToolView {
     void mvcGroupInit(Map<String,String> args) {
         // hits table
         hitsTable.setDefaultRenderer(Long.class, new DateRenderer())
+        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        hitsTable.rowSorter.setComparator(0, new PersonaComparator())
         
         dialog.getContentPane().add(mainPanel)
         dialog.pack()

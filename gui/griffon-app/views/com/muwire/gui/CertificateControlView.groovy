@@ -56,7 +56,7 @@ class CertificateControlView {
                 scrollPane {
                     usersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.users) {
-                            closureColumn(header : trans("ISSUER"), type : String, read : {it.getHumanReadableName()})
+                            closureColumn(header : trans("ISSUER"), type : Persona, read : {it})
                         }
                     }
                 }
@@ -79,6 +79,8 @@ class CertificateControlView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        usersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        usersTable.rowSorter.setComparator(0, new PersonaComparator())
         usersTable.rowSorter.addRowSorterListener({evt -> lastUsersSortEvent = evt})
         def selectionModel = usersTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

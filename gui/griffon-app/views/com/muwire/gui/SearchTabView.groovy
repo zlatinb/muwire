@@ -95,7 +95,7 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: String, read : { SenderBucket row -> row.sender.getHumanReadableName()})
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: Persona, read : { SenderBucket row -> row.sender})
                                             closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {SenderBucket row -> row.results.size()})
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browse})
                                             closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
@@ -394,8 +394,12 @@ class SearchTabView {
         })
         
         // senders table
+        def personaRenderer = new PersonaCellRenderer()
+        def personaComparator = new PersonaComparator()
         sendersTable.addMouseListener(sendersMouseListener)
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
+        sendersTable.setDefaultRenderer(Persona.class, personaRenderer)
+        sendersTable.rowSorter.setComparator(0, personaComparator)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = sendersTable.getSelectionModel()

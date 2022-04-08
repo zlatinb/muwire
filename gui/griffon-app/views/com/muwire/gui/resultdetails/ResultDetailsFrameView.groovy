@@ -1,10 +1,14 @@
 package com.muwire.gui.resultdetails
 
+import com.muwire.core.Persona
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.PersonaComparator
 import griffon.core.GriffonApplication
 import net.i2p.data.Destination
 
 import javax.inject.Inject
 import javax.swing.JPanel
+import javax.swing.JTable
 import javax.swing.border.Border
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -81,9 +85,9 @@ class ResultDetailsFrameView {
                             constraints: gbc(gridx: 0, gridy: gridy++, fill: GridBagConstraints.BOTH, weightx: 100, weighty: 100)) {
                         gridLayout(rows: 1, cols: 1)
                         scrollPane {
-                            table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                            table(id: "senders-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                 tableModel(list: model.senders.toList()) {
-                                    closureColumn(header: trans("SENDER"), read: { it.getHumanReadableName() })
+                                    closureColumn(header: trans("SENDER"), type: Persona, read: { it })
                                     closureColumn(header: trans("TRUST_NOUN"), read: {
                                         Destination destination = it.destination
                                         trans(model.core.trustService.getLevel(destination).name())
@@ -117,6 +121,11 @@ class ResultDetailsFrameView {
     }
     
     void mvcGroupInit(Map<String, String> args) {
+        if (model.senders.size() > 1) {
+            JTable sendersTable = builder.getVariable("senders-table")
+            sendersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+            sendersTable.rowSorter.setComparator(0, new PersonaComparator())
+        }
         if (certificatesPanel != null) {
             String mvcId = mvcGroup.mvcId + "_certificates"
             def params = [:]

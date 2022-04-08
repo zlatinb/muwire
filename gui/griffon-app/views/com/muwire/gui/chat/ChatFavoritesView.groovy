@@ -1,5 +1,8 @@
 package com.muwire.gui.chat
 
+import com.muwire.core.Persona
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.PersonaComparator
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -42,8 +45,8 @@ class ChatFavoritesView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 favoritesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list: model.chatFavorites.favorites) {
-                        closureColumn(header: trans("SERVER"), type: String, 
-                                read : {ChatFavorite cf -> cf.address.getHumanReadableName()})
+                        closureColumn(header: trans("SERVER"), type: Persona, 
+                                read : {ChatFavorite cf -> cf.address})
                         closureColumn(header: trans("CHAT_SERVERS_STARTUP_CONNECT"), preferredWidth: 50, 
                                 type: Boolean,
                                 read : {ChatFavorite cf -> cf.autoConnect},
@@ -83,6 +86,8 @@ class ChatFavoritesView {
     
     void mvcGroupInit(Map<String, String> args) {
         
+        favoritesTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        favoritesTable.rowSorter.setComparator(0, new PersonaComparator())
         favoritesTable.selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         
         window.addWindowListener( new WindowAdapter() {

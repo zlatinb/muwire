@@ -1,6 +1,7 @@
 package com.muwire.gui.resultdetails
 
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.PersonaCellRenderer
 
 import javax.swing.JLabel
 import javax.swing.JList
@@ -13,7 +14,8 @@ class ResultListCellRenderer implements ListCellRenderer<UIResultEvent>{
                                            UIResultEvent value, int index,
                                            boolean isSelected, boolean cellHasFocus) {
         JLabel rv = new JLabel()
-        rv.setText(value.sender.getHumanReadableName())
+        String text = "<html>" + PersonaCellRenderer.htmlize(value.sender) + "</html>"
+        rv.setText(text)
         if (!isSelected) {
             rv.setForeground(list.getForeground())
             rv.setBackground(list.getSelectionBackground())

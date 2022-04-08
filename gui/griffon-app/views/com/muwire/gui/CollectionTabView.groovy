@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
+
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
@@ -76,7 +78,7 @@ class CollectionTabView {
                     collectionsTable = table(id: "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.collections) {
                             closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {HTMLSanitizer.sanitize(it.name)})
-                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : String, read : {it.author.getHumanReadableName()})
+                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : Persona, read : {it.author})
                             closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
                             closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
                             closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
@@ -224,10 +226,12 @@ class CollectionTabView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
         
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
         
+        collectionsTable.rowSorter.setComparator(1, new PersonaComparator())
         collectionsTable.rowSorter.addRowSorterListener({evt -> lastCollectionsTableSortEvent = evt})
         collectionsTable.rowSorter.setSortsOnUpdates(true)
         

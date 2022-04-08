@@ -1,8 +1,12 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+
+import javax.swing.JTable
+
 import static com.muwire.gui.Translator.trans
 import javax.swing.JDialog
 import javax.swing.ListSelectionModel
@@ -49,7 +53,7 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER){
                         table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
-                                closureColumn(header: trans("TRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: trans("TRUSTED_USERS"), type : Persona, read : {it.persona})
                                 closureColumn(header: trans("REASON"), type : String, read : {HTMLSanitizer.sanitize(it.reason)})
                                 closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
@@ -66,7 +70,7 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER ){
                         table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
-                                closureColumn(header: trans("DISTRUSTED_USERS"), type : String, read : {it.persona.getHumanReadableName()})
+                                closureColumn(header: trans("DISTRUSTED_USERS"), type : Persona, read : {it.persona})
                                 closureColumn(header: trans("REASON"), type:String, read : {HTMLSanitizer.sanitize(it.reason)})
                                 closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
                             }
@@ -83,13 +87,20 @@ class TrustListView {
     }
 
     void mvcGroupInit(Map<String,String> args) {
+        
+        def personaRenderer = new PersonaCellRenderer()
+        def personaComparator = new PersonaComparator()
 
-        def trustedTable = builder.getVariable("trusted-table")
+        JTable trustedTable = builder.getVariable("trusted-table")
+        trustedTable.setDefaultRenderer(Persona.class, personaRenderer)
+        trustedTable.rowSorter.setComparator(0, personaComparator)
         trustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["trusted-table"] = evt})
         trustedTable.rowSorter.setSortsOnUpdates(true)
         trustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-        def distrustedTable = builder.getVariable("distrusted-table")
+        JTable distrustedTable = builder.getVariable("distrusted-table")
+        distrustedTable.setDefaultRenderer(Persona.class, personaRenderer)
+        distrustedTable.rowSorter.setComparator(0, personaComparator)
         distrustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["distrusted-table"] = evt})
         distrustedTable.rowSorter.setSortsOnUpdates(true)
         distrustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

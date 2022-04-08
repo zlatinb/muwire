@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
@@ -435,8 +436,8 @@ class MainFrameView {
                                             int percent = row.uploader.getProgress()
                                             trans("PERCENT_OF_PIECE", percent)
                                         })
-                                        closureColumn(header : trans("DOWNLOADER"), type : String, read : { row ->
-                                            row.uploader.getDownloader()
+                                        closureColumn(header : trans("DOWNLOADER"), type : Persona, read : { row ->
+                                            row.uploader.getDownloaderPersona()
                                         })
                                         closureColumn(header : trans("REMOTE_PIECES"), type : String, read : { row ->
                                             int pieces = row.uploader.getTotalPieces()
@@ -478,7 +479,7 @@ class MainFrameView {
                                     dragEnabled : true, transferHandler : collectionsTransferHandler) {
                                     tableModel(list : model.localCollections) {
                                         closureColumn(header : trans("NAME"), preferredWidth : 100, type : String, read : {HTMLSanitizer.sanitize(it.name)})
-                                        closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : String, read : {it.author.getHumanReadableName()})
+                                        closureColumn(header : trans("AUTHOR"), preferredWidth : 100, type : Persona, read : {it.author})
                                         closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {it.numFiles()})
                                         closureColumn(header : trans("SIZE"), preferredWidth : 10, type : Long, read : {it.totalSize()})
                                         closureColumn(header : trans("COMMENT"), preferredWidth : 10, type : Boolean, read : {it.comment != ""})
@@ -556,12 +557,8 @@ class MainFrameView {
                                         closureColumn(header : trans("KEYWORDS"), type : String, read : {
                                             HTMLSanitizer.sanitize(it.search)
                                         })
-                                        closureColumn(header : trans("FROM"), type : String, read : {
-                                            if (it.originator != null) {
-                                                return it.originator.getHumanReadableName()
-                                            } else {
-                                                return it.replyTo.toBase32()
-                                            }
+                                        closureColumn(header : trans("FROM"), type : Persona, read : {
+                                            it.originator
                                         })
                                         closureColumn(header : trans("COUNT"), type : String, read : {
                                             it.count.toString()
@@ -586,7 +583,7 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "feeds-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.feeds) {
-                                        closureColumn(header : trans("PUBLISHER"), preferredWidth: 350, type : String, read : {it.getPublisher().getHumanReadableName()})
+                                        closureColumn(header : trans("PUBLISHER"), preferredWidth: 350, type : Persona, read : {it.getPublisher()})
                                         closureColumn(header : trans("FILES"), preferredWidth: 10, type : Integer, read : {model.core.feedManager.getFeedItems(it.getPublisher()).size()})
                                         closureColumn(header : trans("LAST_UPDATED"), type : Long, read : {it.getLastUpdated()})
                                         closureColumn(header : trans("STATUS"), preferredWidth: 10, type : String, read : {trans(it.getStatus().name())})
@@ -651,7 +648,7 @@ class MainFrameView {
                                     table(id: "contacts-table", autoCreateRowSorter: true, rowHeight: rowHeight,
                                             dragEnabled: true, transferHandler: new PersonaTransferHandler()) {
                                         tableModel(list: model.contacts) {
-                                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: String, read: { it.persona.getHumanReadableName() })
+                                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: Persona, read: { it.persona })
                                             closureColumn(header: trans("REASON"), preferredWidth: 450, type: String, read: { it.reason })
                                             closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: String, read: { row ->
                                                 trans(model.core.trustService.getLevel(row.persona.destination).name())
@@ -691,7 +688,7 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "subscription-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.subscriptions) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 200, type: String, read : {it.persona.getHumanReadableName()})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 200, type: Persona, read : {it.persona})
                                         closureColumn(header : trans("TRUSTED"), preferredWidth : 20, type: Integer, read : {it.good.size()})
                                         closureColumn(header : trans("DISTRUSTED"), preferredWidth: 20, type: Integer, read : {it.bad.size()})
                                         closureColumn(header : trans("STATUS"), preferredWidth: 30, type: String, read : {trans(it.status.name())})
@@ -1065,10 +1062,14 @@ class MainFrameView {
 
 
         // collections table
+        def personaRenderer = new PersonaCellRenderer()
+        def personaComparator = new PersonaComparator()
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
+        collectionsTable.setDefaultRenderer(Persona.class, personaRenderer)
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(6).setCellRenderer(new DateRenderer())
 
+        collectionsTable.rowSorter.setComparator(1, personaComparator)
         collectionsTable.rowSorter.addRowSorterListener({ evt -> lastCollectionSortEvent = evt })
 
         selectionModel = collectionsTable.getSelectionModel()
@@ -1135,8 +1136,10 @@ class MainFrameView {
         })
 
         // uploadsTable
-        def uploadsTable = builder.getVariable("uploads-table")
+        JTable uploadsTable = builder.getVariable("uploads-table")
 
+        uploadsTable.setDefaultRenderer(Persona.class, personaRenderer)
+        uploadsTable.rowSorter.setComparator(2, personaComparator)
         uploadsTable.rowSorter.addRowSorterListener({ evt -> lastUploadsSortEvent = evt })
         uploadsTable.rowSorter.setSortsOnUpdates(true)
 
@@ -1155,7 +1158,8 @@ class MainFrameView {
         })
 
         // searches table
-        def searchesTable = builder.getVariable("searches-table")
+        JTable searchesTable = builder.getVariable("searches-table")
+        searchesTable.setDefaultRenderer(Persona.class, personaRenderer)
         JPopupMenu searchTableMenu = new JPopupMenu()
 
         JMenuItem copySearchToClipboard = new JMenuItem(trans("COPY_SEARCH_TO_CLIPBOARD"))
@@ -1184,9 +1188,11 @@ class MainFrameView {
         })
 
         // feeds table
-        def feedsTable = builder.getVariable("feeds-table")
+        JTable feedsTable = builder.getVariable("feeds-table")
         feedsTable.rowSorter.addRowSorterListener({ evt -> lastFeedsSortEvent = evt })
         feedsTable.rowSorter.setSortsOnUpdates(true)
+        feedsTable.rowSorter.setComparator(0, personaComparator)
+        feedsTable.setDefaultRenderer(Persona.class, personaRenderer)
         feedsTable.setDefaultRenderer(Integer.class, centerRenderer)
         feedsTable.setDefaultRenderer(Long.class, new DateRenderer())
         selectionModel = feedsTable.getSelectionModel()
@@ -1277,10 +1283,12 @@ class MainFrameView {
         })
 
         // subscription table
-        def subscriptionTable = builder.getVariable("subscription-table")
+        JTable subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
+        subscriptionTable.setDefaultRenderer(Persona.class, personaRenderer)
         subscriptionTable.rowSorter.addRowSorterListener({ evt -> lastContactsSubscriptionSortEvent = evt })
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
+        subscriptionTable.rowSorter.setComparator(0, personaComparator)
         selectionModel = subscriptionTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
@@ -1313,7 +1321,9 @@ class MainFrameView {
         subscriptionTable.setDefaultRenderer(Long.class, new DateRenderer())
 
         // contacts table
-        def contactsTable = builder.getVariable("contacts-table")
+        JTable contactsTable = builder.getVariable("contacts-table")
+        contactsTable.setDefaultRenderer(Persona.class, personaRenderer)
+        contactsTable.rowSorter.setComparator(0, personaComparator)
         contactsTable.rowSorter.addRowSorterListener({ evt -> lastContactsSortEvent = evt })
         contactsTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = contactsTable.getSelectionModel()

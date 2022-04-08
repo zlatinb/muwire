@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -52,7 +53,7 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 searchersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.searchers) {
-                        closureColumn(header : trans("SEARCHER"), type : String, read : {it.searcher?.getHumanReadableName()})
+                        closureColumn(header : trans("SEARCHER"), type : Persona, read : {it.searcher})
                         closureColumn(header : trans("QUERY"), type : String, read : {HTMLSanitizer.sanitize(it.query)})
                         closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
                     }
@@ -76,7 +77,7 @@ class SharedFileView {
             scrollPane(constraints : BorderLayout.CENTER) {
                 certificatesTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
-                        closureColumn(header : trans("ISSUER"), type:String, read : {it.issuer.getHumanReadableName()})
+                        closureColumn(header : trans("ISSUER"), type: Persona, read : {it.issuer})
                         closureColumn(header : trans("FILE_NAME"), type : String, read : {HTMLSanitizer.sanitize(it.name.name)})
                         closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.comment != null})
                         closureColumn(header : trans("TIMESTAMP"), type : Long, read : {it.timestamp})
@@ -90,7 +91,12 @@ class SharedFileView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        
+        def personaRenderer = new PersonaCellRenderer()
+        def personaComparator = new PersonaComparator()
 
+        certificatesTable.setDefaultRenderer(Persona.class, personaRenderer)
+        certificatesTable.rowSorter.setComparator(0, personaComparator)
         certificatesTable.rowSorter.addRowSorterListener({evt -> lastCertificateSortEvent = evt})
         def selectionModel = certificatesTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
@@ -113,6 +119,8 @@ class SharedFileView {
         certificatesTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         
+        searchersTable.rowSorter.setComparator(0, personaComparator)
+        searchersTable.setDefaultRenderer(Persona.class, personaRenderer)
         searchersTable.setDefaultRenderer(Long.class, new DateRenderer())
         
         def tabbedPane = new JTabbedPane()

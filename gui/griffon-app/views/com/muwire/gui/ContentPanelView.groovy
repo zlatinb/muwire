@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Persona
 import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -71,7 +72,7 @@ class ContentPanelView {
                 scrollPane(constraints : BorderLayout.CENTER) {
                      hitsTable = table(id : "hits-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                          tableModel(list : model.hits) {
-                             closureColumn(header : trans("SEARCHER"), type : String, read : {row -> row.persona.getHumanReadableName()})
+                             closureColumn(header : trans("SEARCHER"), type : Persona, read : { row -> row.persona})
                              closureColumn(header : trans("KEYWORDS"), type : String, read : {row -> HTMLSanitizer.sanitize(row.keywords.join(" "))})
                              closureColumn(header : trans("DATE"), type : String, read : {row -> String.valueOf(new Date(row.timestamp))})
                          }
@@ -128,7 +129,9 @@ class ContentPanelView {
                 }
             }
         })
-        
+
+        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        hitsTable.rowSorter.setComparator(0, new PersonaComparator())
         hitsTable.rowSorter.addRowSorterListener({evt -> lastHitsSortEvent = evt})
         hitsTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = hitsTable.getSelectionModel()
