@@ -162,7 +162,7 @@ public class Core {
     private final TrackerResponder trackerResponder
     final AutoUpdater autoUpdater
 
-    private final Router router
+    final Router router
 
     final AtomicBoolean shutdown = new AtomicBoolean()
     
