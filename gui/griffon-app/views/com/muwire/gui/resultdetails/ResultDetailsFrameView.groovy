@@ -140,7 +140,7 @@ class ResultDetailsFrameView {
             def params = [:]
             params.core = model.core
             params.resultEvent = model.resultEvent
-            params.uuid = UUID.fromString(model.uuid)
+            params.uuid = model.uuid != null ? UUID.fromString(model.uuid) : null
             collectionsGroup = mvcGroup.createMVCGroup("mini-collection-tab", mvcId, params)
             collectionsPanel.add(collectionsGroup.view.p, null)
         }
