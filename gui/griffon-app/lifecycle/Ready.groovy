@@ -108,13 +108,17 @@ class Ready extends AbstractLifecycleHandler {
             Runtime.getRuntime().addShutdownHook({
                 core.shutdown()
             })
-            core.startServices()
             application.context.put("core",core)
             application.getPropertyChangeListeners("core").each {
                 it.propertyChange(new PropertyChangeEvent(this, "core", null, core))
             }
 
             core.eventBus.publish(new UILoadedEvent())
+            
+            def initer = {core.startServices()} as Runnable
+            initer = new Thread(initer, "core initializer")
+            initer.setDaemon(true)
+            initer.start()
         } catch (Exception bad) {
             log.log(Level.SEVERE,"couldn't initialize core",bad)
             

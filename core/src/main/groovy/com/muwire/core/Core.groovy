@@ -237,8 +237,7 @@ public class Core {
             router = new Router(routerProps)
             router.getContext().setLogManager(new MuWireLogManager())
             router.runRouter()
-            while(!router.isRunning())
-                Thread.sleep(100)
+            Thread.sleep(5000)
         }
 
         log.info("initializing I2P socket manager")
@@ -559,11 +558,11 @@ public class Core {
             it.init(this)
         }
 
-        i2pConnector.connect()
         watchedDirectoryConverter.convert()
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
+        i2pConnector.connect()
         contentManager.start()
         hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)
         connectionManager.start()
