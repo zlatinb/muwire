@@ -62,10 +62,8 @@ class I2PConnector {
         }
     }
     
-    synchronized void shutdown() {
-        if (socketManager == null)
-            return
-        socketManager.destroySocketManager()
+    void shutdown() {
+        socketManager?.destroySocketManager()
         socketManager = null
     }
 

@@ -300,8 +300,8 @@ class H2HostCache extends HostCache {
     }
     @Override
     public synchronized void stop() {
-        timer.cancel()
-        sql.close()
+        try {timer.cancel()} catch (Exception ignore) {}
+        sql?.close()
     }
     @Override
     public synchronized void load() {
