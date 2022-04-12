@@ -237,7 +237,6 @@ public class Core {
             router = new Router(routerProps)
             router.getContext().setLogManager(new MuWireLogManager())
             router.runRouter()
-            Thread.sleep(5000)
         }
 
         log.info("initializing I2P socket manager")
