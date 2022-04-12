@@ -106,7 +106,7 @@ class ChatNotificator {
         }
 
         def taskBar = Taskbar.getTaskbar()
-        if (taskBar.isSupported(Feature.ICON_BADGE_NUMBER)) {
+        if (taskBar.isSupported(Feature.ICON_BADGE_NUMBER) && taskBar.isSupported(Feature.ICON_BADGE_TEXT)) {
             if (total == 0)
                 taskBar.setIconBadge("")
             else {
