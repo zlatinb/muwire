@@ -16,6 +16,7 @@ class SearchEvent extends Event {
     boolean collections
     boolean searchPaths
     boolean regex
+    boolean profile
 
     String toString() {
         def infoHash = null
@@ -23,6 +24,7 @@ class SearchEvent extends Event {
             infoHash = new InfoHash(searchHash)
         "searchTerms: $searchTerms searchHash:$infoHash, uuid:$uuid " +
                 "oobInfohash:$oobInfohash searchComments:$searchComments " +
-                "compressedResults:$compressedResults regex:$regex"
+                "compressedResults:$compressedResults regex:$regex" +
+                "profile:$profile"
     }
 }
