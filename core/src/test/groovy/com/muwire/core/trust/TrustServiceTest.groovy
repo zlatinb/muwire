@@ -78,7 +78,7 @@ class TrustServiceTest {
     void testLoad() {
         service.stop()
         persistGood.append("{ \"persona\" : \"${personas.persona1.toBase64()}\", \"reason\":\"good\"}\n")
-        persistBad.append("{ \"persona\" : \"${personas.persona2.toBase64()}\", \"reason\",\"bad\"}\n")
+        persistBad.append("{ \"persona\" : \"${personas.persona2.toBase64()}\", \"reason\":\"bad\"}\n")
         service = new TrustService(persistGood, persistBad)
         service.start()
         service.waitForLoad()
