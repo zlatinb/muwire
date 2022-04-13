@@ -45,6 +45,14 @@ class Request {
 
         def state = parseCommonHeaders(headers)
         
+        if (state.profile) {
+            def dis = new DataInputStream(is)
+            int profileLength = dis.readInt()
+            if (profileLength > Constants.MAX_PROFILE_LENGTH)
+                throw new IOException("Profile too large $profileLength")
+            dis.skipBytes(profileLength) // skip for now
+        }
+        
         new ContentRequest( infoHash : infoHash, range : new Range(start, end),
             headers : headers, downloader : state.downloader, have : state.have,
             browse : state.browse, feed : state.feed, chat : state.chat, message : state.message)
@@ -64,6 +72,7 @@ class Request {
         rv.feed = headers.containsKey("Feed") && Boolean.parseBoolean(headers['Feed'])
         rv.chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
         rv.message = headers.containsKey("Message") && Boolean.parseBoolean(headers['Message'])
+        rv.profile = headers.containsKey("Profile") && Boolean.parseBoolean(headers['Profile'])
         
         if (headers.containsKey("X-Have")) {
             def encoded = headers["X-Have"].trim()
@@ -92,7 +101,7 @@ class Request {
     
     private static class RequestParsingState {
         Persona downloader
-        boolean browse, feed, chat, message
+        boolean browse, feed, chat, message, profile
         int have
     }
 }
