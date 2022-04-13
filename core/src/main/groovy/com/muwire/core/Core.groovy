@@ -213,8 +213,8 @@ public class Core {
                 log.info "Initializing I2P context"
                 I2PAppContext.getGlobalContext().logManager()
                 I2PAppContext.getGlobalContext()._logManager = new MuWireLogManager()
-                router = null
             }
+            router = null
         } else {
             log.info("launching embedded router")
             Properties routerProps = new Properties()
@@ -236,7 +236,6 @@ public class Core {
             routerProps.setProperty("i2np.upnp.ipv6.enable", i2pOptions.getProperty("i2np.upnp.ipv6.enable","true"))
             router = new Router(routerProps)
             router.getContext().setLogManager(new MuWireLogManager())
-            router.runRouter()
         }
 
         log.info("initializing I2P socket manager")
@@ -561,6 +560,12 @@ public class Core {
         hasherService.start()
         trustService.start()
         trustService.waitForLoad()
+        
+        if (router != null) {
+            router.runRouter()
+            Thread.sleep(1000)
+        }
+        
         i2pConnector.connect()
         contentManager.start()
         hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)

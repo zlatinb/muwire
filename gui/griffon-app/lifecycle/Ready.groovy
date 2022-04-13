@@ -116,7 +116,6 @@ class Ready extends AbstractLifecycleHandler {
             core.eventBus.publish(new UILoadedEvent())
             
             def initer = {
-                Thread.sleep(1000)
                 core.startServices()
             } as Runnable
             initer = new Thread(initer, "core initializer")
