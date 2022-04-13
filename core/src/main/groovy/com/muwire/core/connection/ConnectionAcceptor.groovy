@@ -339,6 +339,9 @@ class ConnectionAcceptor {
             boolean feed = false
             if (headers.containsKey('Feed'))
                 feed = Boolean.parseBoolean(headers['Feed'])
+            boolean profile = false
+            if (headers.containsKey("Profile"))
+                profile = Boolean.parseBoolean(headers['Profile'])
                 
             byte [] personaBytes = Base64.decode(headers['Sender'])
             Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
@@ -348,7 +351,14 @@ class ConnectionAcceptor {
             int nResults = Integer.parseInt(headers['Count'])
             if (nResults > Constants.MAX_RESULTS)
                 throw new IOException("too many results $nResults")
-                
+            
+            if (profile) {
+                int profileLength = dis.readInt()
+                if (profileLength > Constants.MAX_PROFILE_LENGTH)
+                    throw new IOException("profile too large $profileLength")
+                dis.skipBytes(profileLength) // skip profile data for now
+            }
+            
             dis = new DataInputStream(new GZIPInputStream(dis))
             UIResultEvent[] results = new UIResultEvent[Math.min(RESULT_BATCH_SIZE, nResults)]
             int j = 0
