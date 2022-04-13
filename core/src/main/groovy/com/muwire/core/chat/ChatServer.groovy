@@ -111,6 +111,14 @@ class ChatServer {
             return
         }
         
+        if (headers.containsKey("Profile") && Boolean.parseBoolean(headers['Profile'])) {
+            def dis = new DataInputStream(is)
+            int profileLength = dis.readInt()
+            if (profileLength > Constants.MAX_PROFILE_LENGTH)
+                throw new IOException("Profile too big $profileLength")
+            dis.skipBytes(profileLength) // skip for now
+        }
+        
         os.with { 
             write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
             write("Version:${Constants.CHAT_VERSION}\r\n".getBytes(StandardCharsets.US_ASCII))
