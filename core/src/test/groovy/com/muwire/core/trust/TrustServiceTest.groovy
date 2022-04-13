@@ -81,7 +81,7 @@ class TrustServiceTest {
         persistBad.append("{ \"persona\" : \"${personas.persona2.toBase64()}\", \"reason\",\"bad\"}\n")
         service = new TrustService(persistGood, persistBad)
         service.start()
-        Thread.sleep(50)
+        service.waitForLoad()
 
         assert TrustLevel.TRUSTED == service.getLevel(personas.persona1.destination)
         assert TrustLevel.DISTRUSTED == service.getLevel(personas.persona2.destination)
