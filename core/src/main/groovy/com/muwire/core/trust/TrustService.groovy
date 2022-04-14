@@ -1,5 +1,7 @@
 package com.muwire.core.trust
 
+import com.muwire.core.EventBus
+
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -18,6 +20,7 @@ import net.i2p.util.ConcurrentHashSet
 @Log
 class TrustService extends Service {
 
+    private final EventBus eventBus
     final File persistGood, persistBad
 
     final Map<Destination, TrustEntry> good = new ConcurrentHashMap<>()
@@ -27,7 +30,8 @@ class TrustService extends Service {
 
     TrustService() {}
 
-    TrustService(File persistGood, File persistBad) {
+    TrustService(EventBus eventBus, File persistGood, File persistBad) {
+        this.eventBus = eventBus
         this.persistBad = persistBad
         this.persistGood = persistGood
     }
@@ -67,6 +71,7 @@ class TrustService extends Service {
             })
         }
         loaded = true
+        eventBus.publish(new TrustServiceLoadedEvent())
     }
 
     private void persist() {

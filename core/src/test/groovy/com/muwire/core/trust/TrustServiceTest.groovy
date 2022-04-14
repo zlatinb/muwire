@@ -1,23 +1,30 @@
 package com.muwire.core.trust
 
+import com.muwire.core.EventBus
 import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 
-import com.muwire.core.Destinations
 import com.muwire.core.Persona
 import com.muwire.core.Personas
 
 import groovy.json.JsonSlurper
 import net.i2p.data.Base64
-import net.i2p.data.Destination
 
 class TrustServiceTest {
 
+    private static EventBus eventBus
     TrustService service
     File persistGood, persistBad
     Personas personas = new Personas()
 
+    @BeforeClass
+    static void beforeClass() {
+        eventBus = new EventBus()
+    }
+    
     @Before
     void before() {
         persistGood = new File("good.trust")
@@ -26,13 +33,18 @@ class TrustServiceTest {
         persistBad.delete()
         persistGood.deleteOnExit()
         persistBad.deleteOnExit()
-        service = new TrustService(persistGood, persistBad)
+        service = new TrustService(eventBus, persistGood, persistBad)
         service.start()
     }
 
     @After
     void after() {
         service.stop()
+    }
+    
+    @AfterClass
+    static void afterClass() {
+        eventBus.shutdown()
     }
 
     @Test
@@ -79,7 +91,7 @@ class TrustServiceTest {
         service.stop()
         persistGood.append("{ \"persona\" : \"${personas.persona1.toBase64()}\", \"reason\":\"good\"}\n")
         persistBad.append("{ \"persona\" : \"${personas.persona2.toBase64()}\", \"reason\":\"bad\"}\n")
-        service = new TrustService(persistGood, persistBad)
+        service = new TrustService(eventBus, persistGood, persistBad)
         service.start()
         service.waitForLoad()
 

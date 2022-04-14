@@ -290,7 +290,7 @@ public class Core {
         log.info("initializing trust service")
         File goodTrust = new File(home, "trusted")
         File badTrust = new File(home, "distrusted")
-        trustService = new TrustService(goodTrust, badTrust)
+        trustService = new TrustService(eventBus, goodTrust, badTrust)
         eventBus.register(TrustEvent.class, trustService)
 
         log.info("initializing content manager")

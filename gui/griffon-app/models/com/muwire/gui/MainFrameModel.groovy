@@ -4,6 +4,7 @@ package com.muwire.gui
 import com.muwire.core.download.DownloadHopelessEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 import com.muwire.core.search.ResultsEvent
+import com.muwire.core.trust.TrustServiceLoadedEvent
 
 import javax.swing.DefaultListModel
 import javax.swing.SwingWorker
@@ -307,6 +308,7 @@ class MainFrameModel {
             core.eventBus.register(UploadEvent.class, this)
             core.eventBus.register(UploadFinishedEvent.class, this)
             core.eventBus.register(TrustEvent.class, this)
+            core.eventBus.register(TrustServiceLoadedEvent.class, this)
             core.eventBus.register(QueryEvent.class, this)
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
@@ -679,21 +681,31 @@ class MainFrameModel {
         }
     }
 
+    void onTrustServiceLoadedEvent(TrustServiceLoadedEvent e) {
+        runInsideUIAsync {
+            refreshContacts()
+        }
+    }
+    
     void onTrustEvent(TrustEvent e) {
         runInsideUIAsync {
 
-            contacts.clear()
-            contacts.addAll(core.trustService.good.values())
-            contacts.addAll(core.trustService.bad.values())
-
-            updateTablePreservingSelection("contacts-table")
-
+            refreshContacts()
+    
             results.values().each { MVCGroup group ->
                 if (group.alive) {
                     group.view.onTrustChanged(e.persona)
                 }
             }
         }
+    }
+    
+    private void refreshContacts() {
+        contacts.clear()
+        contacts.addAll(core.trustService.good.values())
+        contacts.addAll(core.trustService.bad.values())
+
+        updateTablePreservingSelection("contacts-table")
     }
 
     void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
