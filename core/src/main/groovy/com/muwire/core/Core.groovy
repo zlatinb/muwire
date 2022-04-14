@@ -236,6 +236,7 @@ public class Core {
             routerProps.setProperty("i2np.upnp.ipv6.enable", i2pOptions.getProperty("i2np.upnp.ipv6.enable","true"))
             router = new Router(routerProps)
             router.getContext().setLogManager(new MuWireLogManager())
+            router.setKillVMOnEnd(false)
         }
 
         log.info("initializing I2P socket manager")
@@ -563,7 +564,13 @@ public class Core {
         
         if (router != null) {
             router.runRouter()
-            Thread.sleep(1000)
+            while(!router.isRunning()) {
+                Thread.sleep(100)
+                if (!router.isAlive()) {
+                    log.severe("Router died while starting")
+                    System.exit(0) // TODO: fire an event and let GUI know
+                }
+            }
         }
         
         i2pConnector.connect()
