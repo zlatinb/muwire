@@ -30,7 +30,9 @@ class MeshManager {
         this.fileManager = fileManager
         this.home = home
         this.settings = settings
-        load()
+        try {
+            load()
+        } catch (Exception ignore){} // not important
     }
 
     Mesh get(InfoHash infoHash) {
