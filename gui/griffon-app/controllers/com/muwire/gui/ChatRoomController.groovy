@@ -185,7 +185,6 @@ class ChatRoomController {
         } catch (Exception bad) {
             return
         }
-        log.info("$model.room processing $command.action")
         switch(command.action) {
             case ChatAction.SAY : processSay(e, command.payload);break
             case ChatAction.JOIN : processJoin(e.timestamp, e.sender); break

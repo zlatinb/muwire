@@ -1,8 +1,8 @@
 package com.muwire.core.chat
 
 class ChatCommand {
-    private final ChatAction action
-    private final String payload
+    final ChatAction action
+    final String payload
     final String source
     ChatCommand(String source) {
         if (source.charAt(0) != '/')

@@ -34,6 +34,7 @@ class ChatConnection implements ChatLink {
     private final boolean incoming
     private final TrustService trustService
     private final MuWireSettings settings
+    private final int version
     
     private final AtomicBoolean running = new AtomicBoolean()
     private final BlockingQueue messages = new LinkedBlockingQueue()
@@ -49,13 +50,14 @@ class ChatConnection implements ChatLink {
     private volatile long lastPingSentTime
     
     ChatConnection(EventBus eventBus, Endpoint endpoint, Persona persona, boolean incoming,
-        TrustService trustService, MuWireSettings settings) {
+        TrustService trustService, MuWireSettings settings, int version) {
         this.eventBus = eventBus
         this.endpoint = endpoint
         this.persona = persona
         this.incoming = incoming
         this.trustService = trustService
         this.settings = settings
+        this.version = version
         
         this.dis = new DataInputStream(endpoint.getInputStream())
         this.dos = new DataOutputStream(endpoint.getOutputStream())
@@ -130,7 +132,9 @@ class ChatConnection implements ChatLink {
     }
     
     private void read() {
-        int length = dis.readUnsignedShort()
+        int length = version == 1 ? dis.readUnsignedShort() : dis.readInt()
+        if (length > (0x1 << 19))
+            throw new Exception("chat message too big $length")
         byte [] payload = new byte[length]
         dis.readFully(payload)
         def json = slurper.parse(payload)
@@ -148,7 +152,10 @@ class ChatConnection implements ChatLink {
     private void write(Object message) {
         byte [] payload = JsonOutput.toJson(message).bytes
         dos.with {
-            writeShort(payload.length)
+            if (version == 1) 
+                writeShort(payload.length) 
+            else
+                writeInt(payload.length)
             write(payload)
             flush()
         }

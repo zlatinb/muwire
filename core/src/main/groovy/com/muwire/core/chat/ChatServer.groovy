@@ -87,7 +87,7 @@ class ChatServer {
             throw new Exception("Version header missing")
         
         int version = Integer.parseInt(headers['Version'])
-        if (version != Constants.CHAT_VERSION)
+        if (version > Constants.CHAT_VERSION)
             throw new Exception("Unknown chat version $version")
         
         if (!headers.containsKey('Persona'))
@@ -121,14 +121,15 @@ class ChatServer {
         
         os.with { 
             write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
-            write("Version:${Constants.CHAT_VERSION}\r\n".getBytes(StandardCharsets.US_ASCII))
+            write("Version:${version}\r\n".getBytes(StandardCharsets.US_ASCII))
             if (settings.defaultChatRoom.size() > 0)
                 write("DefaultRoom:${settings.defaultChatRoom}\r\n".getBytes(StandardCharsets.US_ASCII))
             write("\r\n".getBytes(StandardCharsets.US_ASCII))
             flush()
         }
         
-        ChatConnection connection = new ChatConnection(eventBus, endpoint, client, true, trustService, settings)
+        ChatConnection connection = new ChatConnection(eventBus, endpoint, client, true, 
+                trustService, settings, version)
         connections.put(endpoint.destination, connection)
         joinRoom(client, CONSOLE)
         shortNames.put(client.getHumanReadableName(), client)

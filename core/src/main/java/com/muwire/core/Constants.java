@@ -7,7 +7,7 @@ public class Constants {
     public static final String INVALID_NICKNAME_CHARS = "'\"();<>=@$%";
     public static final int MAX_NICKNAME_LENGTH = 30;
     public static final byte FILE_CERT_VERSION = (byte)2;
-    public static final int CHAT_VERSION = 1;
+    public static final int CHAT_VERSION = 2;
     
     public static final byte COLLECTION_VERSION = (byte)1;
     public static final byte COLLECTION_ENTRY_VERSION = (byte)1;

@@ -1,6 +1,6 @@
 package com.muwire.core.chat;
 
-enum ChatAction {
+public enum ChatAction {
     JOIN(true, false, true, false), 
     LEAVE(false, false, true, false), 
     SAY(false, false, true, false), 
@@ -8,6 +8,7 @@ enum ChatAction {
     HELP(true, true, true, false),
     INFO(true, true, true, false),
     JOINED(true, true, false, false),
+    PROFILE(true, false, false, false),
     TRUST(true, false, true, true),
     DISTRUST(true, false, true, true);
     

@@ -92,7 +92,7 @@ class ChatClient implements Closeable {
                 throw new Exception("Version header missing")
             
             int version = Integer.parseInt(headers['Version'])
-            if (version != Constants.CHAT_VERSION)
+            if (version > Constants.CHAT_VERSION)
                 throw new Exception("Unknown chat version $version")
             
             String defaultRoom = null
@@ -102,7 +102,8 @@ class ChatClient implements Closeable {
             synchronized(this) {
                 if (!connectInProgress)
                     return
-                connection = new ChatConnection(eventBus, endpoint, host, false, trustService, settings)
+                connection = new ChatConnection(eventBus, endpoint, host, false, 
+                        trustService, settings, Constants.CHAT_VERSION)
                 connection.start()
             }
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 
