@@ -740,6 +740,13 @@ class ConnectionAcceptor {
                 throw new Exception("unrecognized version")
             int count = Integer.parseInt(headers['Count'])
             
+            if (headers.containsKey("Profile") && Boolean.parseBoolean(headers['Profile'])) {
+                int profileLength = dis.readInt()
+                if (profileLength > Constants.MAX_PROFILE_LENGTH)
+                    throw new IOException("Profile too big $profileLength")
+                dis.skipBytes(profileLength) // skip for now
+            }
+            
             dis = new DataInputStream(new GZIPInputStream(dis))
             count.times { 
                 MWMessage m = new MWMessage(dis)
