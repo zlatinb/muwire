@@ -995,7 +995,7 @@ class MainFrameController {
         params['core'] = core
         params['outgoing'] = false
         params['name'] = name
-        def group = application.mvcGroupManager.createMVCGroup('message-folder', 'folder-$name', params)
+        def group = application.mvcGroupManager.createMVCGroup('message-folder', "folder-$name", params)
         view.addUserMessageFolder(group)
 
         UIFolderCreateEvent event = new UIFolderCreateEvent(name: name)
