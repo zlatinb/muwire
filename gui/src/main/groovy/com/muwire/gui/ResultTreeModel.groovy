@@ -17,7 +17,7 @@ class ResultTreeModel extends DefaultTreeModel {
         MutableResultNode node = root
         if (event.path == null || event.path.length == 0) {
             def child = new MutableResultNode(event)
-            node.add(child)
+            node.addResult(child)
             return
         }
 
@@ -33,17 +33,17 @@ class ResultTreeModel extends DefaultTreeModel {
             if (elementNode == null) {
                 elementNode = new MutableResultNode()
                 elementNode.setUserObject(nodeData)
-                node.add(elementNode)
+                node.addResult(elementNode)
             }
             elementNode.getUserObject().addResult(event)
             node = elementNode
         }
 
         def fileNode = new MutableResultNode(event)
-        node.add(fileNode)
+        node.addResult(fileNode)
     }
     
-    static class MutableResultNode extends DefaultMutableTreeNode {
+    static class MutableResultNode extends DefaultMutableTreeNode implements Comparable<MutableResultNode>{
         private final Map<Object, MutableResultNode> childrenMap
         MutableResultNode() {
             super()
@@ -63,11 +63,29 @@ class ResultTreeModel extends DefaultTreeModel {
             super.removeAllChildren()
         }
 
+        void addResult(MutableResultNode newChild) {
+            childrenMap.put(newChild.getUserObject(), newChild)
+            if (children == null)
+                children = new Vector<>()
+            Object [] elementData = children.elementData
+            int idx = Arrays.binarySearch(elementData, 0, getChildCount(), newChild)
+            if (idx >= 0)
+                throw new IllegalStateException("duplicate result inserted?")
+            idx = - idx - 1
+            insert(newChild, idx)
+        }
+        
+        private String getStringName() {
+            def object = getUserObject()
+            if (object instanceof UIResultEvent)
+                return object.getName()
+            else
+                return object.toString()
+        }
+    
         @Override
-        void add(MutableTreeNode newChild) {
-            MutableResultNode mrn = (MutableResultNode) newChild
-            childrenMap.put(mrn.getUserObject(), mrn)
-            super.add(newChild)
+        int compareTo(MutableResultNode other) { 
+            String.compare(getStringName(), other.getStringName())
         }
     }
 }
