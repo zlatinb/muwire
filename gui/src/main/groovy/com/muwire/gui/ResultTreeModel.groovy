@@ -6,6 +6,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeNode
+import java.text.Collator
 
 class ResultTreeModel extends DefaultTreeModel {
     
@@ -84,8 +85,8 @@ class ResultTreeModel extends DefaultTreeModel {
         }
     
         @Override
-        int compareTo(MutableResultNode other) { 
-            String.compare(getStringName(), other.getStringName())
+        int compareTo(MutableResultNode other) {
+            Collator.getInstance().compare(getStringName(), other.getStringName())
         }
     }
 }
