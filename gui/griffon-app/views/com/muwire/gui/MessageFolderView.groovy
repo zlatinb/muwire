@@ -51,10 +51,12 @@ class MessageFolderView {
     
     JPanel folderPanel
     void initUI() {
+        def mainFrame = application.windowManager.findWindow("main-frame")
+        int dividerLocation = mainFrame.getHeight() / 2
         int rowHeight = application.context.get("row-height")
         folderPanel = builder.panel (constraints: model.name) {
             gridLayout(rows: 1, cols: 1)
-            splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: 500) {
+            splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: dividerLocation) {
                 scrollPane {
                     table(id: "message-header-table", autoCreateRowSorter: true, rowHeight: rowHeight,
                         dragEnabled: true, transferHandler: new MessageExportTransferHandler()) {
