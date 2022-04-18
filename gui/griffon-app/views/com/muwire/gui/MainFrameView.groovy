@@ -122,16 +122,14 @@ class MainFrameView {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         
-        int mainFrameX = 1
-        int mainFrameY = 1
-        int dividerLocation = 750
-        boolean pack = true
+        def screenDimensions = Toolkit.getDefaultToolkit().getScreenSize()
+        int mainFrameX = (int)Math.min(1400.0d, screenDimensions.getWidth())
+        int mainFrameY = (int)Math.min(1200.0d, screenDimensions.getHeight())
         if (settings.mainFrameX > 0 && settings.mainFrameY > 0) {
-            pack = false
             mainFrameX = settings.mainFrameX
             mainFrameY = settings.mainFrameY
-            dividerLocation = (int)(mainFrameY * 0.75d)
         }
+        final int dividerLocation = (int)(0.75d * mainFrameY)
         
         def transferHandler = new MWTransferHandler()
         def collectionsTransferHandler = new FileCollectionTransferHandler()
@@ -149,7 +147,7 @@ class MainFrameView {
             iconImages: [imageIcon('/MuWire-48x48.png').image,
                 imageIcon('/MuWire-32x32.png').image,
                 imageIcon('/MuWire-16x16.png').image],
-            pack : pack,
+            pack : false,
             visible : bind { model.coreInitialized }) {
                 menuBar {
                     menu (text : trans("FILE")) {
