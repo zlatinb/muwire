@@ -995,7 +995,8 @@ class MainFrameController {
         params['core'] = core
         params['outgoing'] = false
         params['name'] = name
-        def group = application.mvcGroupManager.createMVCGroup('message-folder', "folder-$name", params)
+        String groupId = "folder-$name=" + UUID.randomUUID().toString()
+        def group = application.mvcGroupManager.createMVCGroup('message-folder', groupId, params)
         view.addUserMessageFolder(group)
 
         UIFolderCreateEvent event = new UIFolderCreateEvent(name: name)
@@ -1017,6 +1018,7 @@ class MainFrameController {
         }
         
         view.deleteUserMessageFolder(model.folderIdx)
+        group.destroy()
 
         UIFolderDeleteEvent event = new UIFolderDeleteEvent(name: model.folderIdx)
         core.eventBus.publish(event)

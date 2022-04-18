@@ -2075,8 +2075,10 @@ class MainFrameView {
         def group = model.messageFoldersMap.remove(name)
         if (group == null)
             return
+        model.messageFolders.remove(group)
         model.userMessageFolderListModel.removeElement(name)
         messageFolderContents.remove(group.view.folderPanel)
+        userMessageFolderList.clearSelection()
     }
 
     int getSelectedContactsTableRow() {
