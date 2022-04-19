@@ -65,7 +65,7 @@ public class ConfigurationServlet extends HttpServlet {
                 update(name, value);
             }
             
-            PrintWriter pw = new PrintWriter(new File(core.getHome(), "webui.properties"), "UTF-8");
+            PrintWriter pw = new PrintWriter(new File(core.home, "webui.properties"), "UTF-8");
             webSettings.write(pw);
             pw.close();
             
