@@ -71,8 +71,9 @@ class ResultTreeModel extends DefaultTreeModel {
             Object [] elementData = children.elementData
             int idx = Arrays.binarySearch(elementData, 0, getChildCount(), newChild)
             if (idx >= 0)
-                throw new IllegalStateException("duplicate result inserted?")
-            idx = - idx - 1
+                idx++
+            else
+                idx = - idx - 1
             insert(newChild, idx)
         }
         
