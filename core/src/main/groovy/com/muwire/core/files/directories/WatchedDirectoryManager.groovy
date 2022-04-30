@@ -1,7 +1,10 @@
 package com.muwire.core.files.directories
 
 import com.muwire.core.MuWireSettings
+import com.muwire.core.Persona
 import com.muwire.core.files.AllFilesLoadedEvent
+import com.muwire.core.trust.TrustLevel
+import com.muwire.core.trust.TrustService
 
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
@@ -30,6 +33,7 @@ class WatchedDirectoryManager {
     private final MuWireSettings settings
     private final EventBus eventBus
     private final FileManager fileManager
+    private final TrustService trustService
     
     private final Map<File, WatchedDirectory> watchedDirs = new HashMap<>()
     private final Map<File, WatchedDirectory> aliasesMap = new HashMap<>()
@@ -44,11 +48,13 @@ class WatchedDirectoryManager {
     
     private boolean converting = true
     
-    WatchedDirectoryManager(File home, EventBus eventBus, FileManager fileManager, MuWireSettings settings) {
+    WatchedDirectoryManager(File home, EventBus eventBus, FileManager fileManager, TrustService trustService,
+                            MuWireSettings settings) {
         this.home = new File(home, "directories")
         this.home.mkdir()
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.trustService = trustService
         this.settings = settings
     }
     /**
@@ -61,6 +67,28 @@ class WatchedDirectoryManager {
     
     synchronized boolean isWatched(File f) {
         watchedDirs.containsKey(f) || aliasesMap.containsKey(f)
+    }
+    
+    synchronized Visibility getVisibility(File f) {
+        if (!isWatched(f))
+            return Visibility.EVERYONE
+        WatchedDirectory wd = watchedDirs.get(f)
+        if (wd == null)
+            wd = aliasesMap.get(f)
+        return wd.visibility
+    }
+    
+    synchronized boolean isVisible(File f, Persona persona) {
+        if (!isWatched(f))
+            return true
+        WatchedDirectory wd = watchedDirs.get(f)
+        if (wd == null)
+            wd = aliasesMap.get(f)
+        if (wd.visibility == Visibility.EVERYONE)
+            return true
+        if (wd.visibility == Visibility.CONTACTS)
+            return trustService.getLevel(persona.destination) == TrustLevel.TRUSTED
+        return wd.customVisibility.contains(persona)
     }
     
     synchronized WatchedDirectory getDirectory(File file) {
@@ -88,6 +116,8 @@ class WatchedDirectoryManager {
             def newDir = new WatchedDirectory(e.directory)
             // conversion is always autowatch really
             newDir.autoWatch = e.autoWatch
+            // and default visibility
+            newDir.visibility = Visibility.EVERYONE
             persist(newDir)
         } else {
             e.toApply.each {
@@ -101,6 +131,9 @@ class WatchedDirectoryManager {
                 }
                 wd.autoWatch = e.autoWatch
                 wd.syncInterval = e.syncInterval
+                wd.visibility = e.visibility
+                if (e.visibility == Visibility.CUSTOM)
+                    wd.customVisibility = e.customVisibility
                 persist(wd)
             }
         }
@@ -176,8 +209,13 @@ class WatchedDirectoryManager {
                 }
                 wd.autoWatch = parent.autoWatch
                 wd.syncInterval = parent.syncInterval
-            } else
+                wd.visibility = parent.visibility
+                if (wd.visibility == Visibility.CUSTOM)
+                    wd.customVisibility = new HashSet<>(parent.customVisibility)
+            } else {
                 wd.autoWatch = true
+                wd.visibility = Visibility.EVERYONE
+            }
             
             watchedDirs.put(wd.canonical, wd)
             aliasesMap.put(wd.directory, wd)

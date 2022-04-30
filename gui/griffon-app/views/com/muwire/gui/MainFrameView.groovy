@@ -20,6 +20,7 @@ import javax.swing.JTabbedPane
 import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.RowSorter
+import javax.swing.ToolTipManager
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
@@ -29,6 +30,7 @@ import java.awt.KeyboardFocusManager
 import java.awt.Window
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import java.util.function.Function
 import java.util.function.Predicate
 
 import static com.muwire.gui.Translator.trans
@@ -376,9 +378,12 @@ class MainFrameView {
                                         scrollPane(constraints : BorderLayout.CENTER) {
                                             def jtree = new JTree(model.sharedTree)
                                             jtree.setRowHeight(rowHeight)
-                                            jtree.setCellRenderer(new SharedTreeRenderer({model.core.getWatchedDirectoryManager().isWatched(it)} as Predicate))
+                                            def renderer = new SharedTreeRenderer({model.core.getWatchedDirectoryManager().isWatched(it)} as Predicate,
+                                                    {model.core.getWatchedDirectoryManager().getVisibility(it) } as Function)
+                                            jtree.setCellRenderer(renderer)
                                             jtree.setDragEnabled(true)
                                             jtree.setTransferHandler(transferHandler)
+                                            ToolTipManager.sharedInstance().registerComponent(jtree)
                                             tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
                                         }
                                     }

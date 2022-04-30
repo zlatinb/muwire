@@ -1,8 +1,10 @@
 package com.muwire.core.files
 
+import com.muwire.core.Persona
 import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
 
 import java.nio.file.Path
+import java.util.function.BiPredicate
 import java.util.function.Predicate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -37,6 +39,7 @@ class FileManager {
     final FileTree<SharedFile> positiveTree = new FileTree<>()
     final Set<File> sideCarFiles = new HashSet<>()
     private Predicate<File> isWatched
+    private BiPredicate<File, Persona> isVisible
 
     FileManager(File home, EventBus eventBus, MuWireSettings settings) {
         this.home = home
@@ -48,6 +51,10 @@ class FileManager {
     
     void setIsWatched(Predicate<File> isWatched) {
         this.isWatched = isWatched
+    }
+    
+    void setIsVisible(BiPredicate<File, Persona> isVisible) {
+        this.isVisible = isVisible
     }
     
     void onFileHashedEvent(FileHashedEvent e) {
@@ -288,9 +295,11 @@ class FileManager {
         // hash takes precedence
         ResultsEvent re = null
         if (e.searchHash != null) {
-            SharedFile[] found
-            found = rootToFiles.get new InfoHash(e.searchHash)
-            if (found != null && found.length > 0) {
+            List<SharedFile> found
+            found = rootToFiles.getOrDefault(new InfoHash(e.searchHash), new SharedFile[0]).toList()
+            if (!found.isEmpty()) 
+                found = found.toList().retainAll {isVisible.test(it.file.getParentFile(), e.persona)}
+            if (!found.isEmpty()) {
                 found.each { it.hit(e.persona, e.timestamp, "Hash Search") }
                 re = new ResultsEvent(results: found, uuid: e.uuid, searchEvent: e)
             }
@@ -317,8 +326,12 @@ class FileManager {
                         return false
                     }.collect(Collectors.toSet())
                 }
-                results.each {it.hit(e.persona, e.timestamp, "/${e.searchTerms[0]}/")}
-                re = new ResultsEvent(results: results.asList(), uuid: e.uuid, searchEvent: e)
+                if (!results.isEmpty())
+                    results.retainAll{isVisible.test(it.file.getParentFile(), e.persona)}
+                if (!results.isEmpty()) {
+                    results.each { it.hit(e.persona, e.timestamp, "/${e.searchTerms[0]}/") }
+                    re = new ResultsEvent(results: results.asList(), uuid: e.uuid, searchEvent: e)
+                }
             } catch (PatternSyntaxException bad) {
                 log.info("invalid regex received $e")
             }
@@ -341,6 +354,8 @@ class FileManager {
             Set<SharedFile> sharedFiles = new HashSet<>()
             files.each { sharedFiles.add fileToSharedFile[it] }
             
+            if (!sharedFiles.isEmpty())
+                sharedFiles.retainAll { isVisible.test(it.file.getParentFile(), e.persona)}
             if (!sharedFiles.isEmpty()) {
                 sharedFiles.each { it.hit(e.persona, e.timestamp, String.join(" ", e.searchTerms)) }
                 re = new ResultsEvent(results: sharedFiles.asList(), uuid: e.uuid, searchEvent: e)

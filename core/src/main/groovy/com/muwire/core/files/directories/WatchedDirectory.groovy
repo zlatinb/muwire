@@ -1,5 +1,6 @@
 package com.muwire.core.files.directories
 
+import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
@@ -11,6 +12,8 @@ class WatchedDirectory {
     boolean autoWatch
     int syncInterval
     long lastSync
+    Visibility visibility
+    Set<Persona> customVisibility = Collections.emptySet()
     
     WatchedDirectory(File directory) {
         this.directory = directory
@@ -26,6 +29,9 @@ class WatchedDirectory {
         rv.syncInterval = syncInterval
         rv.lastSync = lastSync
         rv.aliases = aliases.collect {encodeFileName(it)}
+        rv.visibility = visibility.name()
+        if (visibility == Visibility.CUSTOM)
+            rv.customVisibility = customVisibility.collect {it.toBase64()}
         rv
     }
     
@@ -37,6 +43,14 @@ class WatchedDirectory {
         rv.lastSync = json.lastSync
         if (json.aliases != null)
             rv.aliases.addAll json.aliases.collect{ decodeFileName(it)}
+        rv.visibility = Visibility.EVERYONE
+        if (json.visibility != null)
+            rv.visibility = Visibility.valueOf(json.visibility)
+        if (rv.visibility == Visibility.CUSTOM && json.customVisibility != null) {
+            rv.customVisibility = json.customVisibility.collect(new HashSet<>(), {
+                new Persona(new ByteArrayInputStream(Base64.decode(it)))
+            })
+        }
         rv
     }
     

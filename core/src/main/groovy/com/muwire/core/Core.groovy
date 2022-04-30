@@ -475,7 +475,7 @@ public class Core {
         watchedDirectoryConverter = new WatchedDirectoryConverter(this)
         
         log.info("initializing watched directory manager")
-        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager, props)
+        watchedDirectoryManager = new WatchedDirectoryManager(home, eventBus, fileManager, trustService, props)
         eventBus.with { 
             register(AllFilesLoadedEvent.class, watchedDirectoryManager)
             register(WatchedDirectoryConfigurationEvent.class, watchedDirectoryManager)
@@ -485,6 +485,7 @@ public class Core {
             register(UISyncDirectoryEvent.class, watchedDirectoryManager)
         }
         fileManager.setIsWatched(watchedDirectoryManager::isWatched)
+        fileManager.setIsVisible(watchedDirectoryManager::isVisible)
         
         
         log.info("initializing negative files")
