@@ -15,14 +15,16 @@ import com.muwire.core.connection.Endpoint
 abstract class Uploader {
     protected final Endpoint endpoint
     protected ByteBuffer mapped
+    protected final boolean confidential
     
     protected final AtomicInteger dataSinceLastRead = new AtomicInteger()
 
     final InfoHash infoHash
     
-    Uploader(Endpoint endpoint, InfoHash infoHash) {
+    Uploader(Endpoint endpoint, InfoHash infoHash, boolean confidential) {
         this.endpoint = endpoint
         this.infoHash = infoHash
+        this.confidential = confidential
     }
 
     abstract void respond()

@@ -1,10 +1,13 @@
 package com.muwire.core.collections
 
+import com.muwire.core.Persona
+
 import java.nio.file.StandardCopyOption
 import java.nio.file.Files
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.function.BiPredicate
 import java.util.function.Predicate
 import java.util.logging.Level
 
@@ -51,13 +54,17 @@ class CollectionManager {
     private final Map<String, Set<FileCollection>> nameToCollection = new HashMap<>()
     private final Map<String, Set<FileCollection>> commentToCollection = new HashMap<>()
     
+    private final BiPredicate<File, Persona> isVisible
+    
     private final ExecutorService diskIO = Executors.newSingleThreadExecutor({ Runnable r ->
         new Thread(r, "collections-io")
     } as ThreadFactory)
     
-    public CollectionManager(EventBus eventBus, FileManager fileManager, File home) {
+    public CollectionManager(EventBus eventBus, FileManager fileManager, 
+                             BiPredicate<File,Persona> isVisible, File home) {
         this.eventBus = eventBus
         this.fileManager = fileManager
+        this.isVisible = isVisible
 
         File collections = new File(home, "collections")
         localCollections = new File(collections, "local")
@@ -312,9 +319,12 @@ class CollectionManager {
 
             List<SharedFile> sharedFiles = new ArrayList<>()
             collection.files.each { item ->
-                SharedFile[] sfs = fileManager.getRootToFiles().get(item.infoHash)
-                if (sfs == null || sfs.length == 0)
+                List<SharedFile> sfs = fileManager.getRootToFiles().getOrDefault(item.infoHash, new SharedFile[0]).toList()
+                if (sfs.isEmpty())
                     return // hmm
+                sfs.retainAll {isVisible.test(it.file.getParentFile(), e.persona)}
+                if (sfs.isEmpty())
+                    return
                 sfs.each { sf -> sf.hit(e.persona, e.timestamp, "Collection Search")}
                 sharedFiles.addAll(sfs)
             }
@@ -367,9 +377,10 @@ class CollectionManager {
         collections.each { c ->
             c.hit(e.persona)
             c.files.each { f-> 
-                SharedFile[] sfs = fileManager.getRootToFiles().get(f.infoHash)
-                if (sfs == null || sfs.length == 0)
+                List<SharedFile> sfs = fileManager.getRootToFiles().getOrDefault(f.infoHash, new SharedFile[0]).toList()
+                if (sfs.isEmpty())
                     return
+                sfs.retainAll {isVisible.test(it.file.getParentFile(), e.persona)}
                 sfs.each { sf -> sf.hit(e.persona, e.timestamp, hitString)}
                 sharedFiles.addAll(sfs)
             }

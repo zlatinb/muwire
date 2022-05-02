@@ -10,8 +10,8 @@ class HeadUploader extends MeshUploader {
     
     private final Persona downloader
     
-    HeadUploader(File file, HeadRequest request, Endpoint endpoint, Mesh mesh) {
-        super(file, request, endpoint, mesh)
+    HeadUploader(File file, HeadRequest request, Endpoint endpoint, Mesh mesh, boolean confidential) {
+        super(file, request, endpoint, mesh, confidential)
         this.downloader = request.downloader
     }
     
@@ -21,6 +21,7 @@ class HeadUploader extends MeshUploader {
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII)) // what else can be said?
         writeMesh(downloader)
         writeHeadSupport()
+        writeConfidential()
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         os.flush()
     }

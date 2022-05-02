@@ -1,5 +1,7 @@
 package com.muwire.core.upload
 
+import com.muwire.core.files.directories.Visibility
+
 import java.nio.charset.StandardCharsets
 
 import com.muwire.core.EventBus
@@ -20,6 +22,9 @@ import com.muwire.core.mesh.MeshManager
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 
+import java.util.function.BiPredicate
+import java.util.function.Function
+
 @Log
 public class UploadManager {
     private final EventBus eventBus
@@ -33,17 +38,24 @@ public class UploadManager {
     private int totalUploads
     private final Map<Persona, Integer> uploadsPerUser = new HashMap<>()
     
+    private final BiPredicate<File, Persona> isVisible
+    private final Function<File, Visibility> visibilityFunction
+
     public UploadManager() {}
 
     public UploadManager(EventBus eventBus, FileManager fileManager,
-        MeshManager meshManager, DownloadManager downloadManager,
-        PersisterFolderService persisterService,
-        MuWireSettings props) {
+                         MeshManager meshManager, DownloadManager downloadManager,
+                         PersisterFolderService persisterService,
+                         BiPredicate<File, Persona> isVisible,
+                         Function<File, Visibility> visibilityFunction,
+                        MuWireSettings props) {
         this.eventBus = eventBus
         this.fileManager = fileManager
         this.persisterService = persisterService
         this.meshManager = meshManager
         this.downloadManager = downloadManager
+        this.isVisible = isVisible
+        this.visibilityFunction = visibilityFunction
         this.props = props
     }
 
@@ -71,21 +83,6 @@ public class UploadManager {
                 }
             }
             dis.readFully(infoHashStringBytes)
-            String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
-            log.info("Responding to upload request for root $infoHashString head $head")
-
-            byte [] infoHashRoot = Base64.decode(infoHashString)
-            InfoHash infoHash = new InfoHash(infoHashRoot)
-            SharedFile[] sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-            Downloader downloader = downloadManager.downloaders.get(infoHash)
-            if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
-                log.info "file not found"
-                e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                e.getOutputStream().flush()
-                e.close()
-                return
-            }
-
             byte [] rn = new byte[2]
             dis.readFully(rn)
             if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
@@ -93,49 +90,69 @@ public class UploadManager {
                 e.close()
                 return
             }
+            
+            String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
+            log.info("Responding to upload request for root $infoHashString head $head")
+            byte [] infoHashRoot = Base64.decode(infoHashString)
+            InfoHash infoHash = new InfoHash(infoHashRoot)
 
-            HeadRequest request
+            Request request
             if (head)
                 request = Request.parseHeadRequest(infoHash, e.getInputStream())
             else
                 request = Request.parseContentRequest(infoHash, e.getInputStream())
-            if (request.downloader != null && request.downloader.destination != e.destination) {
-                log.info("Downloader persona doesn't match their destination")
+            if (request.downloader == null || request.downloader.destination != e.destination) {
+                log.info("Downloader persona doesn't match their destination or null")
                 e.close()
                 return
             }
+            
+            List<SharedFile> sharedFiles = Collections.emptyList()
+            SharedFile[] sfs = fileManager.getSharedFiles(infoHashRoot)
+            if (sfs != null) {
+                sharedFiles = sfs.toList()
+                sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), request.downloader)}
+            }
+            Downloader downloader = downloadManager.downloaders.get(infoHash)
+            if ( (downloader == null || downloader.isConfidential()) && sharedFiles.isEmpty()) {
+                fourOhFour(e)
+                return
+            }
+
 
             if (request.have > 0)
                 eventBus.publish(new SourceDiscoveredEvent(infoHash : request.infoHash, source : request.downloader))
                 
             if (!incrementUploads(request.downloader)) {
-                log.info("rejecting due to slot limit")
-                e.getOutputStream().write("429 Too Many Requests\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                e.getOutputStream().flush()
-                e.close()
+                fourTwoNine(e)
                 return
             }
             
             Mesh mesh
             File file
             int pieceSize
-            if (downloader != null) {
+            boolean confidential = false
+            if (!sharedFiles.isEmpty()) {
+                sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
+                SharedFile sharedFile = sharedFiles.first();
+                mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
+                file = sharedFile.file
+                confidential = isConfidential(sharedFiles)
+                pieceSize = sharedFile.pieceSize
+            } else if (!downloader.isConfidential()) {
                 mesh = meshManager.get(infoHash)
                 file = downloader.incompleteFile
                 pieceSize = downloader.pieceSizePow2
             } else {
-                sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
-                SharedFile sharedFile = sharedFiles.iterator().next();
-                mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
-                file = sharedFile.file
-                pieceSize = sharedFile.pieceSize
+                fourOhFour(e)
+                return
             }
             
             Uploader uploader
             if (head)
-                uploader = new HeadUploader(file, request, e, mesh)
+                uploader = new HeadUploader(file, (HeadRequest)request, e, mesh, confidential)
             else
-                uploader = new ContentUploader(file, request, e, mesh, pieceSize)
+                uploader = new ContentUploader(file, (ContentRequest)request, e, mesh, pieceSize, confidential)
             eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
             try {
                 uploader.respond()
@@ -149,24 +166,10 @@ public class UploadManager {
     }
 
     public void processHashList(Endpoint e) {
-        byte [] infoHashStringBytes = new byte[44]
         DataInputStream dis = new DataInputStream(e.getInputStream())
+        
+        byte [] infoHashStringBytes = new byte[44]
         dis.readFully(infoHashStringBytes)
-        String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
-        log.info("Responding to hashlist request for root $infoHashString")
-
-        byte [] infoHashRoot = Base64.decode(infoHashString)
-        InfoHash infoHash = new InfoHash(infoHashRoot)
-        Downloader downloader = downloadManager.downloaders.get(infoHash)
-        SharedFile[] sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-        if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
-            log.info "file not found"
-            e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-            e.getOutputStream().flush()
-            e.close()
-            return
-        }
-
         byte [] rn = new byte[2]
         dis.readFully(rn)
         if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
@@ -174,39 +177,56 @@ public class UploadManager {
             e.close()
             return
         }
+        
+        String infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
+        log.info("Responding to hashlist request for root $infoHashString")
+        byte [] infoHashRoot = Base64.decode(infoHashString)
+        InfoHash infoHash = new InfoHash(infoHashRoot)
 
         Request request = Request.parseHashListRequest(infoHash, e.getInputStream())
-        if (request.downloader != null && request.downloader.destination != e.destination) {
-            log.info("Downloader persona doesn't match their destination")
+        if (request.downloader == null || request.downloader.destination != e.destination) {
+            log.info("Downloader persona doesn't match their destination or null")
             e.close()
+            return
+        }
+
+
+        Downloader downloader = downloadManager.downloaders.get(infoHash)
+        List<SharedFile> sharedFiles = Collections.emptyList()
+        SharedFile[] sfs = fileManager.getSharedFiles(infoHashRoot)
+        if (sfs != null) {
+            sharedFiles = sfs.toList()
+            sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), request.downloader)}
+        }
+        if ( (downloader == null || downloader.isConfidential()) && sharedFiles.isEmpty()) {
+            fourOhFour(e)
             return
         }
 
         InfoHash fullInfoHash
-        if (downloader == null) {
+        boolean confidential = false
+        if (!sharedFiles.isEmpty()) {
             fullInfoHash = persisterService.loadInfoHash(sharedFiles[0].file.getCanonicalFile())
-        } else {
+            confidential = isConfidential(sharedFiles)
+        } else if (!downloader.isConfidential()) {
             byte [] hashList = downloader.getInfoHash().getHashList()
             if (hashList != null && hashList.length > 0)
                 fullInfoHash = downloader.getInfoHash()
             else {
-                log.info("infohash not found in downloader")
-                e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                e.getOutputStream().flush()
-                e.close()
+                fourOhFour(e)
                 return
             }
+        } else {
+            fourOhFour(e)
+            return
         }
         
         if (!incrementUploads(request.downloader)) {
-            log.info("rejecting due to slot limit")
-            e.getOutputStream().write("429 Too Many Requests\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-            e.getOutputStream().flush()
-            e.close()
+            fourTwoNine(e)
             return
         }
 
-        Uploader uploader = new HashListUploader(e, fullInfoHash, request)
+        Uploader uploader = new HashListUploader(e, fullInfoHash, (HashListRequest)request, confidential)
         eventBus.publish(new UploadEvent(uploader : uploader, first: true)) // hash list is always a first
         try {
             try {
@@ -235,22 +255,8 @@ public class UploadManager {
                         return
                     }
                 }
+                
                 dis.readFully(infoHashStringBytes)
-                infoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
-                log.info("Responding to upload request for root $infoHashString")
-    
-                infoHashRoot = Base64.decode(infoHashString)
-                infoHash = new InfoHash(infoHashRoot)
-                sharedFiles = fileManager.getSharedFiles(infoHashRoot)
-                downloader = downloadManager.downloaders.get(infoHash)
-                if (downloader == null && (sharedFiles == null || sharedFiles.length == 0)) {
-                    log.info "file not found"
-                    e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
-                    e.getOutputStream().flush()
-                    e.close()
-                    return
-                }
-    
                 rn = new byte[2]
                 dis.readFully(rn)
                 if (rn != "\r\n".getBytes(StandardCharsets.US_ASCII)) {
@@ -258,6 +264,15 @@ public class UploadManager {
                     e.close()
                     return
                 }
+                
+                String contentInfoHashString = new String(infoHashStringBytes, StandardCharsets.US_ASCII)
+                if (contentInfoHashString != infoHashString) {
+                    log.warning("GET and HASHLIST infohash mismatch")
+                    e.close()
+                    return
+                }
+                
+                log.info("Responding to upload request for root $infoHashString")
     
                 if (head)
                     request = Request.parseHeadRequest(new InfoHash(infoHashRoot), e.getInputStream())
@@ -275,7 +290,7 @@ public class UploadManager {
                 Mesh mesh
                 File file
                 int pieceSize
-                if (downloader != null) {
+                if (sharedFiles.isEmpty()) {
                     mesh = meshManager.get(infoHash)
                     file = downloader.incompleteFile
                     pieceSize = downloader.pieceSizePow2
@@ -288,9 +303,9 @@ public class UploadManager {
                 }
     
                 if (head)
-                    uploader = new HeadUploader(file, request, e, mesh)
+                    uploader = new HeadUploader(file, (HeadRequest)request, e, mesh, confidential)
                 else
-                    uploader = new ContentUploader(file, request, e, mesh, pieceSize)
+                    uploader = new ContentUploader(file, (ContentRequest)request, e, mesh, pieceSize, confidential)
                 eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
                 try {
                     uploader.respond()
@@ -303,6 +318,29 @@ public class UploadManager {
         } finally {
             decrementUploads(request.downloader)
         }
+    }
+    
+    private static void fourOhFour(Endpoint e) {
+        log.info("file or infohash not found or not visible")
+        e.getOutputStream().write("404 File Not Found\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+        e.getOutputStream().flush()
+        e.close()
+    }
+    
+    private static void fourTwoNine(Endpoint e) {
+        log.info("rejecting due to slot limit")
+        e.getOutputStream().write("429 Too Many Requests\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+        e.getOutputStream().flush()
+        e.close()
+    }
+    
+    private boolean isConfidential(List<SharedFile> sfs) {
+        // only if all instances of this file are confidential is it considered such
+        boolean rv = true
+        sfs.each {
+            rv &= visibilityFunction.apply(it.file.getParentFile()) != Visibility.EVERYONE
+        }
+        rv
     }
     
     /**

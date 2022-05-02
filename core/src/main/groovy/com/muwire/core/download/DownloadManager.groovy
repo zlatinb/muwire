@@ -222,6 +222,8 @@ public class DownloadManager {
                 downloader.readPieces()
                 if (json.paused != null)
                     downloader.paused = json.paused
+                if (json.confidential != null)
+                    downloader.confidential = json.confidential
             } else {
                 File source = new File(DataUtil.readi18nString(Base64.decode(json.source)))
                 downloader = new CopyingDownloader(eventBus, this, file, toShare, (long)json.length,
@@ -307,6 +309,7 @@ public class DownloadManager {
                         
                     json.paused = downloader.paused
                     json.sequential = downloader.isSequential()
+                    json.confidential = downloader.isConfidential()
                     
                     writer.println(JsonOutput.toJson(json))
                 }

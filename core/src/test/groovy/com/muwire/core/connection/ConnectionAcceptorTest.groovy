@@ -3,6 +3,8 @@ package com.muwire.core.connection
 import com.muwire.core.Personas
 import com.muwire.core.hostcache.SimpleHostCache
 
+import java.util.function.BiPredicate
+
 import static org.junit.Assert.fail
 
 import java.util.concurrent.CopyOnWriteArrayList
@@ -98,7 +100,8 @@ class ConnectionAcceptorTest {
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
         acceptor = new ConnectionAcceptor(eventBus, null, connectionManager, settings, i2pAcceptor,
-            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null)
+            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null,
+                {f, p -> true} as BiPredicate)
         acceptor.start()
         Thread.sleep(100)
     }

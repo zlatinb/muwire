@@ -15,8 +15,8 @@ abstract class MeshUploader extends Uploader {
     
     private final HeadRequest request
 
-    MeshUploader(File file, HeadRequest request, Endpoint endpoint, Mesh mesh) {
-        super(endpoint, mesh.infoHash)
+    MeshUploader(File file, HeadRequest request, Endpoint endpoint, Mesh mesh, boolean confidential) {
+        super(endpoint, mesh.infoHash, confidential)
         this.mesh = mesh
         this.file = file
         this.request = request
@@ -35,6 +35,10 @@ abstract class MeshUploader extends Uploader {
     
     protected void writeHeadSupport() {
         endpoint.getOutputStream().write("Head: true\r\n".getBytes(StandardCharsets.US_ASCII))
+    }
+    
+    protected void writeConfidential() {
+        endpoint.getOutputStream().write("Confidential: $confidential\r\n".getBytes(StandardCharsets.US_ASCII))
     }
 
     @Override

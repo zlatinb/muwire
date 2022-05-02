@@ -12,8 +12,8 @@ import net.i2p.data.Base64
 class HashListUploader extends Uploader {
     private final HashListRequest request
 
-    HashListUploader(Endpoint endpoint, InfoHash infoHash, HashListRequest request) {
-        super(endpoint, infoHash)
+    HashListUploader(Endpoint endpoint, InfoHash infoHash, HashListRequest request, boolean confidential) {
+        super(endpoint, infoHash, confidential)
         mapped = ByteBuffer.wrap(infoHash.getHashList())
         this.request = request
     }
@@ -21,6 +21,7 @@ class HashListUploader extends Uploader {
     void respond() {
         OutputStream os = endpoint.getOutputStream()
         os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("Confidential: $confidential\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Content-Range: 0-${mapped.remaining()}\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
 
         byte[]tmp = new byte[0x1 << 13]

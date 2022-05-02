@@ -112,7 +112,7 @@ class PersisterFolderService extends BasePersisterService {
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent downloadedEvent) {
-        if (core.getMuOptions().getShareDownloadedFiles()) {
+        if (core.getMuOptions().getShareDownloadedFiles() && !downloadedEvent.confidential) {
             if (core.getMuOptions().getAutoPublishSharedFiles())
                 downloadedEvent.downloadedFile.publish(System.currentTimeMillis())
             

@@ -12,4 +12,5 @@ class FileDownloadedEvent extends Event {
     DownloadedFile downloadedFile
     File parentToShare
     InfoHash infoHash, collectionInfoHash
+    boolean confidential
 }

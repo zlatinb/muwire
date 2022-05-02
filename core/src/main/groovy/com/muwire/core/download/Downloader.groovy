@@ -84,6 +84,8 @@ abstract class Downloader {
     abstract int speed();
     
     abstract boolean isPausable();
+    
+    abstract boolean isConfidential();
 
     DownloadState getCurrentState() {
         if (cancelled)
@@ -130,14 +132,15 @@ abstract class Downloader {
     
     abstract File generatePreview();
     
-    protected void fireEvent(Set<Destination> successfulDestinations) {
+    protected void fireEvent(Set<Destination> successfulDestinations, boolean confidential) {
         def event = new FileDownloadedEvent(
                 downloadedFile: new DownloadedFile(file.getCanonicalFile(), infoHash.getRoot(), 
                         pieceSizePow2, successfulDestinations),
                 parentToShare: toShare,
                 downloader: this,
                 infoHash: infoHash,
-                collectionInfoHash: collectionInfoHash)
+                collectionInfoHash: collectionInfoHash,
+                confidential: confidential)
         eventBus.publish event
     }
 

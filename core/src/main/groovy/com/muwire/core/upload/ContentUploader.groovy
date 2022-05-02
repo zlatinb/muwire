@@ -16,8 +16,8 @@ class ContentUploader extends MeshUploader {
     
     private volatile boolean done
 
-    ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize) {
-        super(file, request, endpoint, mesh)
+    ContentUploader(File file, ContentRequest request, Endpoint endpoint, Mesh mesh, int pieceSize, boolean confidential) {
+        super(file, request, endpoint, mesh, confidential)
         this.request = request
         this.pieceSize = pieceSize
     }
@@ -48,6 +48,7 @@ class ContentUploader extends MeshUploader {
         os.write("Content-Range: $range.start-$range.end\r\n".getBytes(StandardCharsets.US_ASCII))
         writeMesh(request.downloader)
         writeHeadSupport()
+        writeConfidential()
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
         FileChannel channel = null

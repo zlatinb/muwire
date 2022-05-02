@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.DosFileAttributes
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.function.BiPredicate
 import java.util.logging.Level
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.GZIPInputStream
@@ -64,6 +65,7 @@ class ConnectionAcceptor {
     final CertificateManager certificateManager
     final ChatServer chatServer
     final CollectionManager collectionManager
+    private final BiPredicate<File, Persona> isVisible
 
     final ExecutorService acceptorThread
     final ExecutorService handshakerThreads
@@ -76,7 +78,7 @@ class ConnectionAcceptor {
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
         FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
-        ChatServer chatServer, CollectionManager collectionManager) {
+        ChatServer chatServer, CollectionManager collectionManager, BiPredicate<File,Persona> isVisible) {
         this.eventBus = eventBus
         this.me = me
         this.manager = manager
@@ -91,6 +93,7 @@ class ConnectionAcceptor {
         this.certificateManager = certificateManager
         this.chatServer = chatServer
         this.collectionManager = collectionManager
+        this.isVisible = isVisible
 
         acceptorThread = Executors.newSingleThreadExecutor { r ->
             def rv = new Thread(r)
@@ -421,6 +424,7 @@ class ConnectionAcceptor {
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
 
             def sharedFiles = fileManager.getSharedFiles().values()
+            sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), browser)}
 
             os.write("Count: ${sharedFiles.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
             
@@ -622,7 +626,9 @@ class ConnectionAcceptor {
             }
 
             List<SharedFile> published = fileManager.getPublishedSince(timestamp)
-
+            
+            published.retainAll {isVisible.test(it.file.getParentFile(), requestor)}
+            
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Count: ${published.size()}\r\n".getBytes(StandardCharsets.US_ASCII));
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))

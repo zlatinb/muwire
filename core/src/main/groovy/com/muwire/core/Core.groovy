@@ -4,6 +4,7 @@ import com.muwire.core.files.InfoHashEvent
 import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
 import com.muwire.core.files.PersisterFolderService
+import com.muwire.core.files.directories.Visibility
 import com.muwire.core.files.directories.WatchedDirectoriesLoadedEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
@@ -12,6 +13,8 @@ import com.muwire.core.update.AutoUpdater
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.BiPredicate
+import java.util.function.Function
 import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.zip.ZipException
@@ -282,6 +285,9 @@ public class Core {
         i2pConnector = new I2PConnector(eventBus, keyDat, (String)i2pOptions["i2cp.tcp.host"],
             Integer.parseInt((String)i2pOptions["i2cp.tcp.port"]), i2pOptions)
 
+        BiPredicate<File, Persona> isVisible = {f, p -> watchedDirectoryManager.isVisible(f, p)} as BiPredicate
+        Function<File, Visibility> visibilityFunction = {f -> watchedDirectoryManager.getVisibility(f)} as Function
+        
         log.info("initializing certificate manager")
         certificateManager = new CertificateManager(eventBus, home, me, spk)
         eventBus.register(UICreateCertificateEvent.class, certificateManager)
@@ -312,7 +318,8 @@ public class Core {
         eventBus.register(WatchedDirectoryConfigurationEvent.class, fileManager)
         
         log.info("initializing collection manager")
-        collectionManager = new CollectionManager(eventBus, fileManager, home)
+        collectionManager = new CollectionManager(eventBus, fileManager,
+                isVisible, home)
         eventBus.with { 
             register(AllFilesLoadedEvent.class, collectionManager)
             register(UICollectionCreatedEvent.class, collectionManager)
@@ -444,7 +451,10 @@ public class Core {
         eventBus.register(UIDownloadAttachmentEvent.class, downloadManager)
 
         log.info("initializing upload manager")
-        uploadManager = new UploadManager(eventBus, fileManager, meshManager, downloadManager, persisterFolderService, props)
+        uploadManager = new UploadManager(eventBus, fileManager, meshManager, 
+                downloadManager, persisterFolderService,
+                isVisible, visibilityFunction, 
+                props)
         
         log.info("initializing tracker responder")
         trackerResponder = new TrackerResponder(props, fileManager, downloadManager, meshManager, trustService, me)
@@ -460,7 +470,7 @@ public class Core {
         eventBus.register(RouterDisconnectedEvent.class, i2pAcceptor)
         connectionAcceptor = new ConnectionAcceptor(eventBus, me, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
-            certificateManager, chatServer, collectionManager)
+            certificateManager, chatServer, collectionManager, isVisible)
 
         log.info("initializing trust subscriber")
         trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
@@ -485,7 +495,7 @@ public class Core {
             register(UISyncDirectoryEvent.class, watchedDirectoryManager)
         }
         fileManager.setIsWatched(watchedDirectoryManager::isWatched)
-        fileManager.setIsVisible(watchedDirectoryManager::isVisible)
+        fileManager.setIsVisible(isVisible)
         
         
         log.info("initializing negative files")

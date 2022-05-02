@@ -34,7 +34,7 @@ class NetworkDownloader extends Downloader {
     
     private final File incompletes
     private final File piecesFile
-    private final File incompleteFile
+    final File incompleteFile
 
     private final Map<Destination, DownloadWorker> activeWorkers = new ConcurrentHashMap<>()
     final Set<Destination> successfulDestinations = new ConcurrentHashSet<>()
@@ -51,6 +51,7 @@ class NetworkDownloader extends Downloader {
     private final AtomicLong dataSinceLastRead = new AtomicLong()
     private volatile BandwidthCounter bwCounter = new BandwidthCounter(0)
     
+    private volatile boolean confidential
     
     NetworkDownloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
                       Persona me, File file, File toShare, long length, InfoHash infoHash, InfoHash collectionInfoHash,
@@ -227,6 +228,25 @@ class NetworkDownloader extends Downloader {
     boolean isPausable() {
         true
     }
+    
+    void setConfidential(boolean confidential) {
+        this.confidential = confidential
+    }
+    
+    boolean isConfidential() {
+        // if it was confidential before, it's confidential now
+        if (confidential)
+            return true
+        
+        // only if all downloaders say this is a confidential file
+        // is the download considered confidential.
+        boolean rv = true
+        activeWorkers.values().each {
+            rv &= it.confidential
+        }
+        confidential = rv
+        rv
+    }
 
     private boolean hasLiveSources() {
         destinations.size() > countHopelessSources()
@@ -342,6 +362,7 @@ class NetworkDownloader extends Downloader {
         private volatile boolean cancelled, rejected
         private final LinkedList<DownloadSession> sessionQueue = new LinkedList<>()
         private final Set<Integer> available = new HashSet<>()
+        private volatile boolean confidential
 
         DownloadWorker(Destination destination) {
             this.destination = destination
@@ -363,6 +384,7 @@ class NetworkDownloader extends Downloader {
                     HashListSession session = new HashListSession(me.toBase64(), infoHash, endpoint)
                     InfoHash received = session.request()
                     infoHash = received
+                    confidential = session.confidential
                     downloadManager.persistDownloaders()
                 }
                 currentState = WorkerState.DOWNLOADING
@@ -410,6 +432,7 @@ class NetworkDownloader extends Downloader {
                     successfulDestinations.add(endpoint.destination)
                     writePieces()
                     supportsHead = currentSession.supportsHead
+                    confidential = currentSession.confidential
                 }
 
                 // issue a HEAD request when everything is done
@@ -438,6 +461,8 @@ class NetworkDownloader extends Downloader {
                         writePieces()
                         if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
                             closePiecesFile()
+                            
+                            boolean confidential = NetworkDownloader.this.isConfidential()
                             activeWorkers.values().each {
                                 if (it.destination != destination)
                                     it.cancel()
@@ -450,7 +475,7 @@ class NetworkDownloader extends Downloader {
                                 Files.copy(incompleteFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
                                 incompleteFile.delete()
                             }
-                            fireEvent(getSuccessfulDestinations())
+                            fireEvent(getSuccessfulDestinations(), confidential)
                         }
                     }
                 } finally {

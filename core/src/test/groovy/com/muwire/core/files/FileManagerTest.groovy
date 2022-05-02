@@ -1,5 +1,7 @@
 package com.muwire.core.files
 
+import java.util.function.BiPredicate
+
 import static org.junit.jupiter.api.Assertions.assertAll
 
 import org.junit.Before
@@ -33,6 +35,7 @@ class FileManagerTest {
         eventBus = new EventBus()
         eventBus.register(ResultsEvent.class, listener)
         manager = new FileManager(new File("testHome"), eventBus, new MuWireSettings())
+        manager.setIsVisible({f, p -> true} as BiPredicate)
         results = null
     }
 

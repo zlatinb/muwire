@@ -1,5 +1,7 @@
 package com.muwire.core.download
 
+import com.muwire.core.util.DataUtil
+
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -20,6 +22,7 @@ class HashListSession {
     private final String meB64
     private final InfoHash infoHash
     private final Endpoint endpoint
+    boolean confidential
 
     HashListSession(String meB64, InfoHash infoHash, Endpoint endpoint) {
         this.meB64 = meB64
@@ -43,23 +46,24 @@ class HashListSession {
             throw new IOException("unknown code $code")
 
         // parse all headers
-        Set<String> headers = new HashSet<>()
-        String header
-        while((header = readTillRN(is)) != "" && headers.size() < Constants.MAX_HEADERS)
-            headers.add(header)
+        Map<String, String> headers = DataUtil.readAllHeaders(is)
 
+        if (headers.containsKey("Confidential") && Boolean.parseBoolean(headers["Confidential"]))
+            confidential = true
+        
         long receivedStart = -1
         long receivedEnd = -1
-        for (String receivedHeader : headers) {
-            def group = (receivedHeader =~ /^Content-Range: (\d+)-(\d+)$/)
-            if (group.size() != 1) {
-                log.info("ignoring header $receivedHeader")
-                continue
-            }
-
-            receivedStart = Long.parseLong(group[0][1])
-            receivedEnd = Long.parseLong(group[0][2])
+        String rangeHeader = headers.get("Content-Range")
+        if (rangeHeader == null)
+            throw new IOException("Content-Range header missing")
+        
+        def group = (rangeHeader =~ /^(\d+)-(\d+)$/)
+        if (group.size() != 1) {
+            throw new IOException("Invalid Content-Range header")
         }
+
+        receivedStart = Long.parseLong(group[0][1])
+        receivedEnd = Long.parseLong(group[0][2])
 
         if (receivedStart != 0)
             throw new IOException("hashlist started at $receivedStart")

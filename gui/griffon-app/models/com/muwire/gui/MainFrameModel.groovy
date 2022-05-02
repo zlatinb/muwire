@@ -827,7 +827,7 @@ class MainFrameModel {
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent e) {
-        if (!core.muOptions.shareDownloadedFiles)
+        if (!core.muOptions.shareDownloadedFiles || e.confidential)
             return
         runInsideUIAsync {
             allSharedFiles << e.downloadedFile

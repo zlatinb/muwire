@@ -48,6 +48,7 @@ class DownloadSession {
     int piece, position
     private long pieceStart, start, end
     boolean supportsHead
+    boolean confidential
 
     DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
         int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
@@ -156,7 +157,9 @@ class DownloadSession {
             
             if (headers.containsKey("Head") && Boolean.parseBoolean(headers["Head"]))
                 supportsHead = true
-
+            if (headers.containsKey("Confidential") && Boolean.parseBoolean(headers["Confidential"]))
+                confidential = true
+            
             // prase X-Alt if present
             if (headers.containsKey("X-Alt")) {
                 headers["X-Alt"].split(",").each {

@@ -61,7 +61,7 @@ class UploaderTest {
         for (int i = 0; i < pieces.nPieces; i++)
             pieces.markDownloaded(i)
         Mesh mesh = new Mesh(infoHash, pieces)
-        uploader = new ContentUploader(file, request, endpoint, mesh, FileHasher.getPieceSize(file.length()))
+        uploader = new ContentUploader(file, request, endpoint, mesh, FileHasher.getPieceSize(file.length()), false)
         uploadThread = new Thread(uploader.respond() as Runnable)
         uploadThread.setDaemon(true)
         uploadThread.start()
@@ -92,6 +92,7 @@ class UploaderTest {
         assert "Content-Range: 0-19" == readUntilRN()
         assert readUntilRN().startsWith("X-Have")
         assert readUntilRN().startsWith("Head")
+        assert readUntilRN().startsWith("Confidential")
         assert "" == readUntilRN()
 
         byte [] data = new byte[20]
@@ -109,6 +110,7 @@ class UploaderTest {
         assert "Content-Range: 5-15" == readUntilRN()
         assert readUntilRN().startsWith("X-Have")
         assert readUntilRN().startsWith("Head")
+        assert readUntilRN().startsWith("Confidential")
         assert "" == readUntilRN()
 
         byte [] data = new byte[11]
@@ -134,6 +136,7 @@ class UploaderTest {
         fillFile(length)
         request = new ContentRequest(range : new Range(0, length - 1))
         startUpload()
+        readUntilRN()
         readUntilRN()
         readUntilRN()
         readUntilRN()

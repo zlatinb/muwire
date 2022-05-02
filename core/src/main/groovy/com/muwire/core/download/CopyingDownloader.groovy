@@ -89,6 +89,11 @@ class CopyingDownloader extends Downloader{
     boolean isSequential() {
         true
     }
+    
+    @Override
+    boolean isConfidential() {
+        false
+    }
 
     @Override
     File generatePreview() {
@@ -101,7 +106,7 @@ class CopyingDownloader extends Downloader{
             file.getParentFile().mkdirs()
             Files.copy(source.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
             done = true
-            fireEvent(Collections.emptySet())
+            fireEvent(Collections.emptySet(), false)
         }
     }
 }

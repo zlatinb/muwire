@@ -74,7 +74,7 @@ class FileManager {
     }
 
     void onFileDownloadedEvent(FileDownloadedEvent e) {
-        if (settings.shareDownloadedFiles) {
+        if (settings.shareDownloadedFiles && !e.confidential) {
             addToIndex(e.downloadedFile)
         }
     }
@@ -298,7 +298,7 @@ class FileManager {
             List<SharedFile> found
             found = rootToFiles.getOrDefault(new InfoHash(e.searchHash), new SharedFile[0]).toList()
             if (!found.isEmpty()) 
-                found = found.toList().retainAll {isVisible.test(it.file.getParentFile(), e.persona)}
+                found.retainAll { isVisible.test(it.file.getParentFile(), e.persona) }
             if (!found.isEmpty()) {
                 found.each { it.hit(e.persona, e.timestamp, "Hash Search") }
                 re = new ResultsEvent(results: found, uuid: e.uuid, searchEvent: e)
