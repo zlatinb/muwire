@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Core
+import com.muwire.core.files.directories.Visibility
 import com.muwire.core.files.directories.WatchedDirectory
 
 import griffon.core.artifact.GriffonModel
@@ -14,9 +15,11 @@ class WatchedDirectoryModel {
     
     @Observable boolean autoWatch
     @Observable int syncInterval
+    @Observable Visibility visibility
     
     void mvcGroupInit(Map<String,String> args) {
         autoWatch = directory.autoWatch
         syncInterval = directory.syncInterval
+        visibility = directory.visibility
     }
 }
