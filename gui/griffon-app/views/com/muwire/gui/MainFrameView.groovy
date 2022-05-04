@@ -1496,7 +1496,7 @@ class MainFrameView {
         if (model.treeVisible) {
             def sharedFilesTree = builder.getVariable("shared-files-tree")
             TreePath[] selected = sharedFilesTree.getSelectionPaths()
-            if (selected.length != 1)
+            if (selected == null || selected.length != 1)
                 return null
             Object o = selected[0].getLastPathComponent().getUserObject()
             if (o instanceof SharedFile)
