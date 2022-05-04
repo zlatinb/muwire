@@ -26,6 +26,9 @@ abstract class MeshUploader extends Uploader {
         String xHave = DataUtil.encodeXHave(mesh.pieces.getDownloaded(), mesh.pieces.nPieces)
         endpoint.getOutputStream().write("X-Have: $xHave\r\n".getBytes(StandardCharsets.US_ASCII))
 
+        if (confidential)
+            return
+        
         Set<Persona> sources = mesh.getRandom(9, toExclude)
         if (!sources.isEmpty()) {
             String xAlts = sources.stream().map({ it.toBase64() }).collect(Collectors.joining(","))
