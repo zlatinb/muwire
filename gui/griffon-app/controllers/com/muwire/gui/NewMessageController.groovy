@@ -46,7 +46,7 @@ class NewMessageController {
         }
         
         Set<Persona> recipients = new HashSet<>()
-        recipients.addAll(model.recipients)
+        recipients.addAll(view.contactSelector.model.contacts)
         
         if (recipients.isEmpty()) {
             JOptionPane.showMessageDialog(null, trans("NO_RECIPIENTS_BODY"),

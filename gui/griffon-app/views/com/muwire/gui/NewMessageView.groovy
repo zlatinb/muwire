@@ -1,7 +1,7 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
-
+import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
@@ -48,24 +48,21 @@ class NewMessageView {
     NewMessageModel model
 
     JFrame window
-    DefaultListModel recipientsModel
-    JList recipientsList
     JTextField subjectField
     JTextArea bodyArea
     JTable attachmentsTable
     def lastAttachmentsTableSortEvent
     def mainFrame
+
+    MVCGroup contactSelector
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
         
-        recipientsModel = new DefaultListModel()
-        model.recipients.each { 
-            recipientsModel.addElement(new Recipient(it))
-        }
-        recipientsList = new JList(recipientsModel)
-        recipientsList.setVisibleRowCount(2)
+        def params = [:]
+        params.contacts = model.recipients
+        contactSelector = mvcGroup.createMVCGroup("contact-selector", UUID.randomUUID().toString(), params)
         
         window = builder.frame(visible : false, locationRelativeTo : mainFrame,
             defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
@@ -74,12 +71,9 @@ class NewMessageView {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
-                panel(constraints : BorderLayout.NORTH, border : titledBorder(title : trans("RECIPIENTS_TITLE"), 
-                    border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
-                    borderLayout()
-                    scrollPane(constraints : BorderLayout.CENTER) {
-                        widget(recipientsList)
-                    }
+                panel(constraints : BorderLayout.NORTH) {
+                    gridLayout(rows: 1, cols: 1)
+                    widget(contactSelector.view.component)
                 }
                 panel(constraints : BorderLayout.SOUTH, border : titledBorder(title : trans("SUBJECT"),
                     border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
@@ -147,28 +141,6 @@ class NewMessageView {
             }
         })
         
-        
-        // recipients list
-        transferHandler = new PersonaTransferHandler()
-        recipientsList.setTransferHandler(transferHandler)
-        recipientsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
-        
-        JPopupMenu recipientsMenu = new JPopupMenu()
-        JMenuItem removeItem = new JMenuItem(trans("REMOVE"))
-        removeItem.addActionListener({removeSelectedRecipients()})
-        recipientsMenu.add(removeItem)
-        
-        recipientsList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
-                    recipientsMenu.show(e.getComponent(), e.getX(), e.getY())
-            }
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
-                    recipientsMenu.show(e.getComponent(), e.getX(), e.getY())
-            }
-        })
-        
         // general window 
         
         window.addWindowListener(new WindowAdapter() {
@@ -181,15 +153,8 @@ class NewMessageView {
         window.setVisible(true)
     }
     
-    void removeSelectedRecipients() {
-        int [] selected = recipientsList.getSelectedIndices()
-        if (selected.length == 0)
-            return
-        Arrays.sort(selected)
-        for (int i = selected.length - 1; i >= 0; i--) {
-            Recipient removed = recipientsModel.remove(selected[i])
-            model.recipients.remove(removed.persona)
-        }
+    void mvcGroupDestroy() {
+        contactSelector?.destroy()
     }
     
     void removeSelectedAttachments() {
@@ -239,38 +204,5 @@ class NewMessageView {
         }
     }
     
-    class PersonaTransferHandler extends TransferHandler {
-        @Override
-        public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-            for (DataFlavor df : transferFlavors) {
-                if (df == CopyPasteSupport.LIST_FLAVOR) {
-                    return true
-                }
-            }
-            return false
-        }
-        public boolean importData(JComponent c, Transferable t) {
-            List<?> items = t.getTransferData(CopyPasteSupport.LIST_FLAVOR)
-            if (items == null || items.isEmpty()) {
-                return false
-            }
-            
-            items.each { 
-                if (model.recipients.add(it))
-                    recipientsModel.insertElementAt(new Recipient(it),0)
-            }
-            return true
-        }
-    }
-    
-    private static class Recipient {
-        private final Persona persona
-        Recipient(Persona persona) {
-            this.persona = persona
-        }
-        
-        public String toString() {
-            "<html>" + PersonaCellRenderer.htmlize(persona) + "</html>"
-        }
-    }
+
 }
