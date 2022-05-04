@@ -35,7 +35,6 @@
 |Metadata parsing and search | N/A | Core, Network? | Optional |
 |Automatic adjustment of I2P tunnels | N/A | Core | Optional |
 |Option to share contact list only with trusted users | N/A | Core, GUI|, Low |
-|Per-file access list aka confidential files | 29 | Core, GUI | Low |
 |Downloads queue with priorities | N/A | Core, GUI | Medium |
 |Remote queuing of uploads | N/A | Core, Network, GUI | Medium |
 |Incomplete file handling | 2 | Core, Portable | Low |
