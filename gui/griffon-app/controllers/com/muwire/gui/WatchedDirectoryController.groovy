@@ -22,7 +22,8 @@ class WatchedDirectoryController {
             autoWatch : view.autoWatchCheckbox.model.isSelected(),
             syncInterval : Integer.parseInt(view.syncIntervalField.text),
             subfolders: view.applySubCheckbox.model.isSelected(),
-            visibility: model.visibility)
+            visibility: model.visibility,
+            customVisibility: view.contactSelector.model.contacts)
         model.core.eventBus.publish(event)
         cancel()
     }

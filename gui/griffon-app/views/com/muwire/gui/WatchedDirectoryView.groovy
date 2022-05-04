@@ -3,6 +3,7 @@ package com.muwire.gui
 
 import com.muwire.core.files.directories.Visibility
 import griffon.core.artifact.GriffonView
+import griffon.core.mvc.MVCGroup
 
 import javax.swing.JFrame
 import javax.swing.border.TitledBorder
@@ -36,8 +37,14 @@ class WatchedDirectoryView {
     def syncIntervalField
     def applySubCheckbox
 
+    MVCGroup contactSelector
+
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
+        
+        def params = [:]
+        params.contacts = model.allowedContacts
+        contactSelector = mvcGroup.createMVCGroup("contact-selector", UUID.randomUUID().toString(), params)
         
         window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
             iconImage: builder.imageIcon("/MuWire-48x48.png").image,
@@ -47,7 +54,7 @@ class WatchedDirectoryView {
                 label(trans("WATCHED_DIRECTORY_CONFIGURATION_FOR",model.directory.directory.toString()))
             }
             panel (constraints : BorderLayout.CENTER) {
-                gridLayout(rows: 2, cols: 1)
+                gridLayout(rows: 3, cols: 1)
                 panel(border: titledBorder(title: trans("WATCHED_DIRECTORY_SYNC_CONFIG"), border: etchedBorder(),
                         titlePosition: TitledBorder.TOP)) {
                     gridBagLayout()
@@ -74,6 +81,7 @@ class WatchedDirectoryView {
                             selected: bind { model.visibility == Visibility.CUSTOM },
                             buttonGroup : visibilityGroup, actionPerformed : actionCustom)
                 }
+                widget(contactSelector.view.component)
             }
             panel (constraints : BorderLayout.SOUTH) {
                 gridLayout(rows: 1, cols: 3)
@@ -94,6 +102,8 @@ class WatchedDirectoryView {
         autoWatchCheckbox.addChangeListener({e ->
             model.autoWatch = autoWatchCheckbox.model.isSelected()
         } as ChangeListener)
+        
+        contactSelector.view.component.setEnabled(model.visibility == Visibility.CUSTOM)
 
         window.addWindowListener( new WindowAdapter() {
             void windowClosed(WindowEvent event) {
@@ -105,15 +115,22 @@ class WatchedDirectoryView {
         window.setVisible(true)
     }
     
+    void mvcGroupDestroy() {
+        contactSelector?.destroy()
+    }
+    
     def actionEveryone = {
+        contactSelector.view.component.setEnabled(false)
         model.visibility = Visibility.EVERYONE
     }
     
     def actionContacts = {
+        contactSelector.view.component.setEnabled(false)
         model.visibility = Visibility.CONTACTS
     }
     
     def actionCustom = {
+        contactSelector.view.component.setEnabled(true)
         model.visibility = Visibility.CUSTOM
     }
 }
