@@ -17,18 +17,6 @@ class AdvancedSharingController {
     AdvancedSharingView view
     
     @ControllerAction
-    void configure() {
-        def wd = view.selectedWatchedDirectory()
-        if (wd == null)
-            return
-            
-        def params = [:]
-        params['core'] = model.core
-        params['directory'] = wd
-        mvcGroup.createMVCGroup("watched-directory",params).destroy()
-    }
-    
-    @ControllerAction
     void sync() {
         def wd = view.selectedWatchedDirectory()
         if (wd == null)

@@ -2,6 +2,9 @@
 package com.muwire.gui
 
 import griffon.core.artifact.GriffonView
+
+import javax.swing.JFrame
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -23,9 +26,8 @@ class WatchedDirectoryView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     WatchedDirectoryModel model
-    
-    def dialog
-    def p
+
+    JFrame window
     def mainFrame
     
     def autoWatchCheckbox
@@ -34,10 +36,10 @@ class WatchedDirectoryView {
 
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
-        dialog = new JDialog(mainFrame, trans("WATCHED_DIRECTORY_CONFIGURATION"), true)
-        dialog.setResizable(false)
         
-        p = builder.panel {
+        window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
+            iconImage: builder.imageIcon("/MuWire-48x48.png").image,
+            title: trans("WATCHED_DIRECTORY_CONFIGURATION")) {
             borderLayout()
             panel (constraints : BorderLayout.NORTH) {
                 label(trans("WATCHED_DIRECTORY_CONFIGURATION_FOR",model.directory.directory.toString()))
@@ -73,11 +75,14 @@ class WatchedDirectoryView {
         autoWatchCheckbox.addChangeListener({e ->
             model.autoWatch = autoWatchCheckbox.model.isSelected()
         } as ChangeListener)
-        
-        dialog.getContentPane().add(p)
-        dialog.pack()
-        dialog.setLocationRelativeTo(mainFrame)
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.show()
+
+        window.addWindowListener( new WindowAdapter() {
+            void windowClosed(WindowEvent event) {
+                mvcGroup.destroy()
+            }
+        })
+        window.pack()
+        window.setLocationRelativeTo(mainFrame)
+        window.setVisible(true)
     }
 }

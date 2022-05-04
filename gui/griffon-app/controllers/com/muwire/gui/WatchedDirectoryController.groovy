@@ -28,6 +28,7 @@ class WatchedDirectoryController {
     
     @ControllerAction
     void cancel() {
-        view.dialog.setVisible(false)
+        view.window.setVisible(false)
+        mvcGroup.destroy()
     }
 }

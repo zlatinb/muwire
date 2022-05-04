@@ -68,8 +68,6 @@ class AdvancedSharingView {
                 }
             }
             panel (constraints : BorderLayout.SOUTH) {
-                button(text : trans("CONFIGURE"), toolTipText: trans("TOOLTIP_TOOLS_FOLDER_CONFIGURE"), 
-                        enabled : bind{model.configureActionEnabled}, configureAction)
                 button(text : trans("SYNC"), toolTipText: trans("TOOLTIP_TOOLS_FOLDER_SYNC"),
                         enabled : bind{model.syncActionEnabled}, syncAction)
                 button(text : trans("CLOSE"), closeAction)
@@ -98,7 +96,6 @@ class AdvancedSharingView {
         selectionModel.addListSelectionListener({
             def directory = selectedWatchedDirectory()
             model.syncActionEnabled = !(directory == null || directory.autoWatch)
-            model.configureActionEnabled = directory != null
         })
         
         watchedDirsTable.addMouseListener(new MouseAdapter() {
@@ -114,16 +111,14 @@ class AdvancedSharingView {
     }
     
     private void showMenu(MouseEvent e) {
-        JPopupMenu menu = new JPopupMenu()
-        JMenuItem configure = new JMenuItem(trans("CONFIGURE"))
-        configure.addActionListener({controller.configure()})
-        menu.add(configure)
+        if (!model.syncActionEnabled)
+            return
         
-        if (model.syncActionEnabled) {
-            JMenuItem sync = new JMenuItem(trans("SYNC"))
-            sync.addActionListener({controller.sync()})
-            menu.add(sync)
-        }
+        JPopupMenu menu = new JPopupMenu()
+        
+        JMenuItem sync = new JMenuItem(trans("SYNC"))
+        sync.addActionListener({controller.sync()})
+        menu.add(sync)
         
         menu.show(e.getComponent(), e.getX(), e.getY())
     }

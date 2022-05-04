@@ -658,7 +658,7 @@ class MainFrameController {
         def props = [:]
         props.core = model.core
         props.directory = wd
-        mvcGroup.createMVCGroup("watched-directory", props).destroy()
+        mvcGroup.createMVCGroup("watched-directory", UUID.randomUUID().toString(), props)
         
     }
     

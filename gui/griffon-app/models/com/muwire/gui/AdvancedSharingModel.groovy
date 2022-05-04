@@ -28,7 +28,6 @@ class AdvancedSharingModel {
     Core core
     
     @Observable boolean syncActionEnabled
-    @Observable boolean configureActionEnabled
     
     void mvcGroupInit(Map<String,String> args) {
         watchedDirectories.addAll(core.watchedDirectoryManager.watchedDirs.values())
