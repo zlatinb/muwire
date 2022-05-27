@@ -718,6 +718,9 @@ class SearchTabView {
     void addPendingResults() {
         JTable table = builder.getVariable("senders-table")
         int selectedRow = table.getSelectedRow()
+        int selectedRowToModel = -1
+        if (selectedRow >= 0)
+            selectedRowToModel = table.rowSorter.convertRowIndexToModel(selectedRow)
 
         int newRowsStart = -1
         int newRowsEnd = -1
@@ -751,6 +754,11 @@ class SearchTabView {
             if (shouldSort) {
                 table.model.fireTableDataChanged()
             }
+        }
+        
+        if (selectedRowToModel >= 0) {
+            int selectedRowToView = table.rowSorter.convertRowIndexToView(selectedRowToModel)
+            table.selectionModel.setSelectionInterval(selectedRowToView, selectedRowToView)
         }
     }
     
