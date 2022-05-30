@@ -6,6 +6,14 @@ public class Constants {
     public static final byte PERSONA_VERSION = (byte)1;
     public static final String INVALID_NICKNAME_CHARS = "'\"();<>=@$%";
     public static final int MAX_NICKNAME_LENGTH = 30;
+    
+    public static final byte PROFILE_HEADER_VERSION = (byte)1;
+    public static final int MAX_PROFILE_TITLE_LENGTH = 128;
+    
+    public static final byte PROFILE_VERSION = (byte)1;
+    public static final int MAX_PROFILE_IMAGE_LENGTH = 200 * 1024;
+    public static final int MAX_PROFILE_LENGTH = 0x1 << 18;
+    
     public static final byte FILE_CERT_VERSION = (byte)2;
     public static final int CHAT_VERSION = 2;
     
@@ -23,7 +31,6 @@ public class Constants {
     public static final long MAX_HEADER_TIME = 60 * 1000;
     
     public static final int MAX_RESULTS = 0x1 << 20;
-    public static final int MAX_PROFILE_LENGTH = 0x1 << 18;
     
     public static final int MAX_COMMENT_LENGTH = 0x1 << 15;
     

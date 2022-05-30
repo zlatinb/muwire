@@ -13,11 +13,11 @@ import java.nio.charset.StandardCharsets;
 public class Name {
     final String name;
 
-    Name(String name) {
+    public Name(String name) {
         this.name = name;
     }
 
-    Name(InputStream nameStream) throws IOException {
+    public Name(InputStream nameStream) throws IOException {
         DataInputStream dis = new DataInputStream(nameStream);
         int length = dis.readUnsignedShort();
         byte [] nameBytes = new byte[length];
