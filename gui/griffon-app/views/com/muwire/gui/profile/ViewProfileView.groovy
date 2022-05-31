@@ -7,6 +7,7 @@ import javax.imageio.ImageIO
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import javax.swing.SwingUtilities
 import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -72,10 +73,12 @@ class ViewProfileView {
                     gridLayout(rows: 1, cols: 2)
                     panel(border: titledBorder(title: trans("PROFILE_VIEWER_AVATAR"), border: etchedBorder(),
                         titlePosition: TitledBorder.TOP)) {
+                        gridLayout(rows: 1, cols: 1)
                         imagePanel = panel()
                     }
                     panel(border: titledBorder(title: trans("PROFILE_VIEWER_PROFILE"), border: etchedBorder(),
                         titlePosition: TitledBorder.TOP)) {
+                        gridLayout(rows: 1, cols: 1)
                         scrollPane {
                             bodyArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true)
                         }
@@ -119,14 +122,16 @@ class ViewProfileView {
         mainPanel.getLayout().show(mainPanel, "full-profile")
         titleLabel.setText(HTMLSanitizer.sanitize(profile.getHeader().getTitle()))
         bodyArea.setText(profile.getBody())
-        
+
         def rawImage = ImageIO.read(new ByteArrayInputStream(profile.getImage()))
         def mainImage = ImageScaler.scaleToMax(rawImage)
-        
-        def imgDim = imagePanel.getSize()
-        imagePanel.getGraphics().drawImage(mainImage,
-                (int)(imgDim.getWidth() / 2) - (int)(mainImage.getWidth() / 2),
-                (int)(imgDim.getHeight() / 2) - (int)(mainImage.getHeight() / 2),
-        null)
+
+        SwingUtilities.invokeLater {
+            def imgDim = imagePanel.getSize()
+            imagePanel.getGraphics().drawImage(mainImage,
+                    (int) (imgDim.getWidth() / 2) - (int) (mainImage.getWidth() / 2),
+                    (int) (imgDim.getHeight() / 2) - (int) (mainImage.getHeight() / 2),
+                    null)
+        } as Runnable
     }
 }
