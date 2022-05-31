@@ -243,4 +243,9 @@ mvcGroups {
         view = 'com.muwire.gui.profile.EditProfileView'
         controller = 'com.muwire.gui.profile.EditProfileController'
     }
+    'view-profile' {
+        model = 'com.muwire.gui.profile.ViewProfileModel'
+        view = 'com.muwire.gui.profile.ViewProfileView'
+        controller = 'com.muwire.gui.profile.ViewProfileController'
+    }
 }

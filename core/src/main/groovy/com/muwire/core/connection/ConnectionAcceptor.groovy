@@ -1,13 +1,15 @@
 package com.muwire.core.connection
 
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileHeader
 import net.i2p.I2PException
+import net.i2p.data.ByteArray
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.attribute.DosFileAttributes
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.function.BiPredicate
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.GZIPInputStream
@@ -54,6 +56,7 @@ class ConnectionAcceptor {
 
     final EventBus eventBus
     final Persona me
+    final Supplier<MWProfile> myProfile
     final UltrapeerConnectionManager manager
     final MuWireSettings settings
     final I2PAcceptor acceptor
@@ -75,13 +78,14 @@ class ConnectionAcceptor {
     
     volatile int browsed
 
-    ConnectionAcceptor(EventBus eventBus, Persona me, UltrapeerConnectionManager manager,
+    ConnectionAcceptor(EventBus eventBus, Persona me, Supplier<MWProfile> myProfile, UltrapeerConnectionManager manager,
         MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
         TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
         FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
         ChatServer chatServer, CollectionManager collectionManager, BiPredicate<File,Persona> isVisible) {
         this.eventBus = eventBus
         this.me = me
+        this.myProfile = myProfile
         this.manager = manager
         this.settings = settings
         this.acceptor = acceptor
@@ -188,6 +192,8 @@ class ConnectionAcceptor {
                 case (byte)'L':
                     processETTER(e)
                     break
+                case (byte)'A':
+                    procesVATAR(e)
                 default:
                     throw new Exception("Invalid read $read")
             }
@@ -771,6 +777,42 @@ class ConnectionAcceptor {
             }
         } catch (Exception bad) {
             log.log(Level.WARNING, "failed to process LETTER", bad)
+        } finally {
+            e.close()
+        }
+    }
+    
+    private void processVATAR(Endpoint e) {
+        byte [] VATAR = "VATAR\r\n".getBytes(StandardCharsets.US_ASCII)
+        byte [] read = new byte[VATAR.length]
+        
+        DataInputStream dis = new DataInputStream(e.getInputStream())
+        try {
+            dis.readFully(read)
+            if (VATAR != read)
+                throw new Exception("Invalid VATAR")
+            
+            Map<String, String> headers = DataUtil.readAllHeaders(dis)
+            if (headers['Version'] != "1")
+                throw new IOException("unrecognized version")
+
+            OutputStream os = e.getOutputStream()
+            MWProfile profile = myProfile.get()
+            if (profile == null) {
+                os.write("404 Not Found\r\n".getBytes(StandardCharsets.US_ASCII))
+                return
+            }
+            
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            ByteArrayOutputStream baos = new ByteArrayInputStream()
+            profile.write(baos)
+            byte [] payload = baos.toByteArray()
+            os.write("Length:${payload.length}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write(payload)
+        } catch (Exception bad) {
+            log.log(Level.WARNING, "failed to process AVATAR", bad)
         } finally {
             e.close()
         }

@@ -39,6 +39,7 @@ class SearchTabModel {
     @Observable boolean chatActionEnabled
     @Observable boolean subscribeActionEnabled
     @Observable boolean messageActionEnabled
+    @Observable boolean viewProfileActionEnabled
     @Observable boolean viewDetailsActionEnabled
     @Observable boolean groupedByFile
     
@@ -62,7 +63,6 @@ class SearchTabModel {
     
     def results2 = []
     def allResults2 = new LinkedHashSet()
-    def senders2 = []
     volatile String[] filter
     volatile Filterer filterer
     @Observable boolean clearFilterActionEnabled

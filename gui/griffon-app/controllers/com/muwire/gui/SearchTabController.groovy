@@ -90,6 +90,7 @@ class SearchTabController {
         def sender = view.selectedSender()
         if (sender == null)
             return
+        sender = sender.getPersona()
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED, reason : reason))
     }
@@ -99,16 +100,25 @@ class SearchTabController {
         def sender = view.selectedSender()
         if (sender == null)
             return
+        sender = sender.getPersona()
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
         core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED, reason : reason))
     }
 
     @ControllerAction
-    void neutral() {
+    void viewProfile() {
         def sender = view.selectedSender()
         if (sender == null)
             return
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.NEUTRAL))
+        
+        UUID uuid = UUID.randomUUID()
+        def params = [:]
+        params.core = model.core
+        params.persona = sender.getPersona()
+        params.uuid = uuid
+        params.profileTitle = sender.getTitle()
+        
+        mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }
 
     @ControllerAction
@@ -117,6 +127,7 @@ class SearchTabController {
         if (sender == null)
             return
 
+        sender = sender.getPersona()
         String groupId = UUID.randomUUID().toString()
         Map<String,Object> params = new HashMap<>()
         params['host'] = sender
@@ -131,6 +142,7 @@ class SearchTabController {
         if (sender == null)
             return
         
+        sender = sender.getPersona()
         UUID uuid = UUID.randomUUID()
         def params = [:]
         params['fileName'] = sender.getHumanReadableName()
@@ -147,6 +159,7 @@ class SearchTabController {
         if (sender == null)
             return
 
+        sender = sender.getPersona()
         Feed feed = new Feed(sender)
         feed.setAutoDownload(core.muOptions.defaultFeedAutoDownload)
         feed.setSequential(core.muOptions.defaultFeedSequential)
@@ -163,6 +176,7 @@ class SearchTabController {
         if (sender == null)
             return
         
+        sender = sender.getPersona()
         def parent = mvcGroup.parentGroup
         parent.controller.startChat(sender)
         parent.view.showChatWindow.call()
@@ -170,7 +184,8 @@ class SearchTabController {
 
     @ControllerAction
     void message() {
-        Persona recipient = view.selectedSender()
+        Persona recipient = view.selectedSender()?.getPersona()
+        
         if (recipient == null)
             return
         
@@ -182,7 +197,7 @@ class SearchTabController {
     
     @ControllerAction
     void copyFullID() {
-        Persona sender = view.selectedSender()
+        Persona sender = view.selectedSender()?.getPersona()
         if (sender == null)
             return
         CopyPasteSupport.copyToClipboard(sender.toBase64())

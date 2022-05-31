@@ -10,6 +10,9 @@ import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileFetcher
+import com.muwire.core.profile.MWProfileHeader
+import com.muwire.core.profile.UIProfileFetchEvent
 import com.muwire.core.update.AutoUpdater
 
 import java.nio.charset.StandardCharsets
@@ -290,6 +293,9 @@ public class Core {
         } else
             log.info("no profile exists for ${me.getHumanReadableName()}")
         
+        Supplier<MWProfile> profileSupplier = this::getMyProfile
+        Supplier<MWProfileHeader> profileHeaderSupplier = {getMyProfile()?.getHeader()} as Supplier
+        
         eventBus = new EventBus()
         
         log.info("initializing i2p connector")
@@ -430,7 +436,7 @@ public class Core {
         eventBus.register(UIFeedUpdateEvent.class, feedClient)
         
         log.info "initializing results sender"
-        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, { getMyProfile()?.getHeader() } as Supplier, 
+        ResultsSender resultsSender = new ResultsSender(eventBus, i2pConnector, me, profileHeaderSupplier, 
                 props, certificateManager, chatServer, collectionManager)
 
         log.info "initializing search manager"
@@ -480,7 +486,7 @@ public class Core {
         I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pConnector::getSocketManager)
         eventBus.register(RouterConnectedEvent.class, i2pAcceptor)
         eventBus.register(RouterDisconnectedEvent.class, i2pAcceptor)
-        connectionAcceptor = new ConnectionAcceptor(eventBus, me, connectionManager, props,
+        connectionAcceptor = new ConnectionAcceptor(eventBus, me, profileSupplier, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
             certificateManager, chatServer, collectionManager, isVisible)
 
@@ -492,6 +498,10 @@ public class Core {
         log.info("initializing browse manager")
         BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
         eventBus.register(UIBrowseEvent.class, browseManager)
+        
+        log.info("initializing profile fetcher")
+        MWProfileFetcher profileFetcher = new MWProfileFetcher(i2pConnector, eventBus, me, profileHeaderSupplier)
+        eventBus.register(UIProfileFetchEvent.class, profileFetcher)
         
         log.info("initializing watched directory converter")
         watchedDirectoryConverter = new WatchedDirectoryConverter(this)

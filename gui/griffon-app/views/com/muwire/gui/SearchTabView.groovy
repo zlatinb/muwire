@@ -126,6 +126,7 @@ class SearchTabView {
                                     panel (border : etchedBorder()){
                                         button(text : trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_ADD_CONTACT_SENDER"), enabled: bind {model.trustButtonsEnabled }, trustAction)
                                         button(text : trans("DISTRUST"), toolTipText: trans("TOOLTIP_DISTRUST_SENDER"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
+                                        button(text : trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"), enabled: bind {model.viewProfileActionEnabled}, viewProfileAction)
                                     }
                                 }
                             }
@@ -412,6 +413,7 @@ class SearchTabView {
             int row = selectedSenderRow()
             if (row < 0) {
                 model.trustButtonsEnabled = false
+                model.viewProfileActionEnabled = false
                 model.browseActionEnabled = false
                 model.subscribeActionEnabled = false
                 model.browseCollectionsActionEnabled = false
@@ -428,6 +430,7 @@ class SearchTabView {
                 model.subscribeActionEnabled = bucket.results[0].feed &&
                     model.core.feedManager.getFeed(sender) == null
                 model.trustButtonsEnabled = true
+                model.viewProfileActionEnabled = true
                 
                 model.results.clear()
                 model.results.addAll(bucket.results)
@@ -469,6 +472,7 @@ class SearchTabView {
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
                 model.messageActionEnabled = false
+                model.viewProfileActionEnabled = false
                 
                 return
             }
@@ -525,6 +529,7 @@ class SearchTabView {
         model.tab = parent.indexOfComponent(pane)
         parent.removeTabAt(model.tab)
         model.trustButtonsEnabled = false
+        model.viewProfileActionEnabled = false
         model.downloadActionEnabled = false
         resultDetails.values().each {it.destroy()}
         mvcGroup.destroy()
@@ -680,14 +685,11 @@ class SearchTabView {
         }
     }
     
-    Persona selectedSender() {
+    PersonaOrProfile selectedSender() {
         int row = selectedSenderRow()
         if (row < 0)
             return null
-        if (model.groupedByFile)
-            return model.senders2[row]?.sender
-        else
-            return model.senders[row]?.sender
+        return model.senders[row]
     }
     
     def showSenderGrouping = {

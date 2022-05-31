@@ -99,7 +99,7 @@ class ConnectionAcceptorTest {
         uploadManager = uploadManagerMock.proxyInstance()
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
-        acceptor = new ConnectionAcceptor(eventBus, null, connectionManager, settings, i2pAcceptor,
+        acceptor = new ConnectionAcceptor(eventBus, null, null, connectionManager, settings, i2pAcceptor,
             hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null,
                 {f, p -> true} as BiPredicate)
         acceptor.start()
