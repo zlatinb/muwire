@@ -269,7 +269,7 @@ class SearchTabModel {
                     icon = new ThumbnailIcon(profileHeader.getThumbNail())
                 } catch (IOException iox) {}
                 avatar = icon
-                profileTitle = profileHeader.getTitle()
+                profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
             } else {
                 avatar = null
                 profileTitle = null
