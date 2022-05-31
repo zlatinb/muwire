@@ -1,5 +1,6 @@
 package com.muwire.core.connection
 
+import com.muwire.core.profile.MWProfileHeader
 import net.i2p.I2PException
 
 import java.nio.charset.StandardCharsets
@@ -350,7 +351,15 @@ class ConnectionAcceptor {
             Persona sender = new Persona(new ByteArrayInputStream(personaBytes))
             if (sender.destination != e.getDestination())
                 throw new IOException("Sender destination mismatch expected ${e.getDestination()}, got $sender.destination")
-                
+            
+            MWProfileHeader profileHeader = null
+            if (headers.containsKey("ProfileHeader")) {
+                byte [] profileHeaderBytes = Base64.decode(headers['ProfileHeader'])
+                profileHeader = new MWProfileHeader(new ByteArrayInputStream(profileHeaderBytes))
+                if (profileHeader.getPersona() != sender)
+                    throw new IOException("Sender profile mismatch")
+            }
+            
             int nResults = Integer.parseInt(headers['Count'])
             if (nResults > Constants.MAX_RESULTS)
                 throw new IOException("too many results $nResults")
@@ -374,6 +383,7 @@ class ConnectionAcceptor {
                 results[j].chat = chat
                 results[j].messages = messages
                 results[j].feed = feed
+                results[j].profileHeader = profileHeader
                 j++
                 
                 if (j == results.length) {
