@@ -24,4 +24,15 @@ class EditProfileController {
     void copyFull() {
         CopyPasteSupport.copyToClipboard(model.core.me.toBase64())
     }
+    
+    @ControllerAction
+    void save() {
+        // TODO: implement
+        cancel()
+    }
+    
+    @ControllerAction
+    void cancel() {
+        view.dialog.setVisible(false)
+    }
 }
