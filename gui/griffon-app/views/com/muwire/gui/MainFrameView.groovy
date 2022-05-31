@@ -767,12 +767,8 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        gridBagLayout()
-                        label(text : bind {model.me}, toolTipText: trans("TOOLTIP_SHORT_ID"), constraints : gbc(gridx:0, gridy:0))
-                        button(text : trans("COPY_SHORT"), toolTipText: trans("TOOLTIP_COPY_SHORT_ID"),
-                                constraints : gbc(gridx:1, gridy:0), copyShortAction)
-                        button(text : trans("COPY_FULL"), toolTipText: trans("TOOLTIP_COPY_FULL_ID"),
-                                constraints : gbc(gridx:2, gridy:0), copyFullAction)
+                        button(text: "", icon: imageIcon('/edit_profile.png'), toolTipText: trans("TOOLTIP_PROFILE_EDITOR"),
+                            editProfileAction)
                     }
                     panel (constraints : BorderLayout.CENTER) {
                         gridBagLayout()

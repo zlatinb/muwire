@@ -9,6 +9,7 @@ import com.muwire.core.files.directories.WatchedDirectoriesLoadedEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.update.AutoUpdater
 
 import java.nio.charset.StandardCharsets
@@ -130,6 +131,7 @@ public class Core {
 
     final EventBus eventBus
     final Persona me
+    volatile MWProfile myProfile
     final String version;
     public final File home
     final Properties i2pOptions
@@ -279,6 +281,15 @@ public class Core {
         me = new Persona(new ByteArrayInputStream(baos.toByteArray()))
         log.info("Loaded myself as "+me.getHumanReadableName())
 
+        File profileFile = new File(home, me.getHumanReadableName() + ".profile")
+        if (profileFile.exists()) {
+            profileFile.withInputStream {
+                myProfile = new MWProfile(it)
+            }
+            log.info("loaded profile")
+        } else
+            log.info("no profile exists for ${me.getHumanReadableName()}")
+        
         eventBus = new EventBus()
         
         log.info("initializing i2p connector")
@@ -678,6 +689,11 @@ public class Core {
     public void saveI2PSettings() {
         File f = new File(home, "i2p.properties")
         f.withOutputStream { i2pOptions.store(it, "I2P Options") }
+    }
+    
+    void saveProfile() {
+        File f = new File(home, me.getHumanReadableName() + ".profile")
+        f.withOutputStream {myProfile.write(it)}
     }
 
     static main(args) {

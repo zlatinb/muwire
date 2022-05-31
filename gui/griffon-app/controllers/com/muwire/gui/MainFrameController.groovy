@@ -733,19 +733,11 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void copyShort() {
-        copy(model.core.me.getHumanReadableName())
-    }
-    
-    @ControllerAction
-    void copyFull() {
-        copy(model.core.me.toBase64())
-    }
-    
-    private void copy(String s) {
-        StringSelection selection = new StringSelection(s)
-        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-        clipboard.setContents(selection, null)
+    void editProfile() {
+        // TODO finish
+        def params = [:]
+        params.core = model.core
+        mvcGroup.createMVCGroup("edit-profile", params).destroy()
     }
     
     @ControllerAction

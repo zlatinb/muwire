@@ -238,4 +238,9 @@ mvcGroups {
         view = 'com.muwire.gui.ContactSelectorView'
         controller = 'com.muwire.gui.ContactSelectorController'
     }
+    'edit-profile' {
+        model = 'com.muwire.gui.profile.EditProfileModel'
+        view = 'com.muwire.gui.profile.EditProfileView'
+        controller = 'com.muwire.gui.profile.EditProfileController'
+    }
 }
