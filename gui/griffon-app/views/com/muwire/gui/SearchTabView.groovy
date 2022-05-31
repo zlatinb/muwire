@@ -5,6 +5,7 @@ import com.muwire.gui.SearchTabModel.SenderBucket
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
+import com.muwire.gui.profile.ResultPOP
 import griffon.core.artifact.GriffonView
 import net.i2p.data.Destination
 
@@ -498,7 +499,7 @@ class SearchTabView {
         if (group == null) {
             String mvcId = model.uuid + Base64.encode(infoHash.getRoot())
             
-            List<UIResultEvent> allResults = new ArrayList<>(model.hashBucket[infoHash].getResults())
+            List<ResultPOP> allResults = model.hashBucket[infoHash].getResults().collect{new ResultPOP(it)}
             
             def params = [:]
             params.core = model.core

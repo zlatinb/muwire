@@ -5,6 +5,11 @@ import com.muwire.core.search.UIResultEvent
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
+import com.muwire.gui.profile.ResultPOP
+import com.muwire.gui.profile.ThumbnailIcon
 import com.muwire.gui.resultdetails.ResultListCellRenderer
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
@@ -13,6 +18,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
+import javax.swing.Icon
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
@@ -41,7 +47,7 @@ class ResultDetailsTabsView {
     JTable sendersTable
     
     JPanel commentsPanel
-    JList<UIResultEvent> commentsList
+    JList<ResultPOP> commentsList
     JTextArea commentTextArea
 
     private MVCGroup certificateListGroup
@@ -63,14 +69,22 @@ class ResultDetailsTabsView {
             scrollPane(constraints: BorderLayout.CENTER) {
                 sendersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list: model.results) {
-                        closureColumn(header: trans("SENDER"), preferredWidth: 150, type: Persona, read : {it.sender})
-                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : {
-                            trans(model.core.trustService.getLevel(it.sender.destination).name())
+                        closureColumn(header: trans("SENDER"), preferredWidth: 150, type: PersonaOrProfile, read : {it})
+                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : { ResultPOP row ->
+                            trans(model.core.trustService.getLevel(row.getPersona().destination).name()) 
                         })
-                        closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : { HTMLSanitizer.sanitize(it.getFullPath())})
-                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : {it.comment != null})
-                        closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : {it.certificates})
-                        closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: {it.collections.size()})
+                        closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : { ResultPOP row -> 
+                            HTMLSanitizer.sanitize(row.getEvent().getFullPath())
+                        })
+                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : { ResultPOP row ->
+                            row.getEvent().comment != null
+                        })
+                        closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : { ResultPOP row ->
+                            row.getEvent().certificates
+                        })
+                        closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: { ResultPOP row ->
+                            row.getEvent().collections.size()
+                        })
                     }
                 }
             }
@@ -168,8 +182,8 @@ class ResultDetailsTabsView {
     void mvcGroupInit(Map<String,String> args) {
         
         // all senders table
-        sendersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
-        sendersTable.rowSorter.setComparator(0, new PersonaComparator())
+        sendersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+        sendersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
         def selectionModel = sendersTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
@@ -180,7 +194,7 @@ class ResultDetailsTabsView {
                 return
             }
             row = sendersTable.rowSorter.convertRowIndexToModel(row)
-            UIResultEvent event = model.results[row]
+            UIResultEvent event = model.results[row].getEvent()
             
             model.copyIdActionEnabled = true
             model.browseActionEnabled = event.browse
@@ -194,7 +208,7 @@ class ResultDetailsTabsView {
         selectionModel = commentsList.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
-            UIResultEvent event = commentsList.getSelectedValue()
+            UIResultEvent event = commentsList.getSelectedValue()?.getEvent()
             if (event != null)
                 commentTextArea.setText(event.comment)
         })
@@ -213,16 +227,16 @@ class ResultDetailsTabsView {
         model.results[row].sender
     }
     
-    void addResultToListGroups(UIResultEvent event) {
-        certificateListGroup?.model?.addResult(event)
-        collectionListGroup?.model?.addResult(event)
+    void addResultToListGroups(ResultPOP resultPOP) {
+        certificateListGroup?.model?.addResult(resultPOP)
+        collectionListGroup?.model?.addResult(resultPOP)
     }
     
     void refreshAll() {
         sendersTable.model.fireTableDataChanged()
         if (!model.resultsWithComments.isEmpty()) {
             commentsPanel.getLayout().show(commentsPanel,"yes-comments")
-            commentsList.setListData(model.resultsWithComments.toArray(new UIResultEvent[0]))
+            commentsList.setListData(model.resultsWithComments.toArray(new ResultPOP[0]))
         }
         
         buildTabs()

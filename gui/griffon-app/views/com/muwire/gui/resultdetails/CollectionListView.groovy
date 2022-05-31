@@ -1,6 +1,7 @@
 package com.muwire.gui.resultdetails
 
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.profile.ResultPOP
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -22,7 +23,7 @@ class CollectionListView {
     CollectionListModel model
 
     JPanel p
-    JList<UIResultEvent> senders
+    JList<ResultPOP> senders
     JPanel detailsPanel
     
     void initUI() {
@@ -50,7 +51,7 @@ class CollectionListView {
         selectionModel.addListSelectionListener({
             detailsPanel.removeAll()
             detailsPanel.updateUI()
-            UIResultEvent event = senders.getSelectedValue()
+            UIResultEvent event = senders.getSelectedValue()?.getEvent()
             if (event == null)
                 return
             def mvc = model.tabGroups.get(event.sender)
@@ -60,6 +61,6 @@ class CollectionListView {
     }
 
     void refresh() {
-        senders.setListData(model.results.toArray(new UIResultEvent[0]))
+        senders.setListData(model.results.toArray(new ResultPOP[0]))
     }
 }

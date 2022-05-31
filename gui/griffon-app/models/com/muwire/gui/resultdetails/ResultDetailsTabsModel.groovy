@@ -4,6 +4,7 @@ import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.search.UIResultEvent
+import com.muwire.gui.profile.ResultPOP
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -24,27 +25,28 @@ class ResultDetailsTabsModel {
     Core core
     String fileName
     InfoHash infoHash
-    List<UIResultEvent> results
+    List<ResultPOP> results
     String uuid
 
     String key
     
     private final Set<UIResultEvent> uniqueResults = new HashSet<>()
-    List<UIResultEvent> resultsWithComments = []
-    List<UIResultEvent> resultsWithCertificates = []
-    List<UIResultEvent> resultsWithCollections = []
+    List<ResultPOP> resultsWithComments = []
+    List<ResultPOP> resultsWithCertificates = []
+    List<ResultPOP> resultsWithCollections = []
     
     void mvcGroupInit(Map<String,String> args) {
         key = fileName + Base64.encode(infoHash.getRoot())
         
-        uniqueResults.addAll(results)
-        for (UIResultEvent event : results) {
+        uniqueResults.addAll(results.collect {it.getEvent()})
+        for (ResultPOP resultPOP : results) {
+            def event = resultPOP.getEvent()
             if (event.comment != null)
-                resultsWithComments << event
+                resultsWithComments << resultPOP
             if (event.certificates > 0)
-                resultsWithCertificates << event
+                resultsWithCertificates << resultPOP
             if (event.collections.size() > 0)
-                resultsWithCollections << event
+                resultsWithCollections << resultPOP
         }
     }
     
@@ -58,14 +60,15 @@ class ResultDetailsTabsModel {
     void addResult(UIResultEvent event) {
         if (!uniqueResults.add(event))
             return
-        results << event
+        def resultPOP = new ResultPOP(event)
+        results << resultPOP
         if (event.comment != null)
-            resultsWithComments << event
+            resultsWithComments << resultPOP
         if (event.certificates > 0)
-            resultsWithCertificates << event
+            resultsWithCertificates << resultPOP
         if (event.collections.size() > 0)
-            resultsWithCollections << event
-        view.addResultToListGroups(event)
+            resultsWithCollections << resultPOP
+        view.addResultToListGroups(resultPOP)
         view.refreshAll()
     }
 }
