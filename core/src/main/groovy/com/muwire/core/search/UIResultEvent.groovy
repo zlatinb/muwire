@@ -3,7 +3,7 @@ package com.muwire.core.search
 import com.muwire.core.Event
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
-
+import com.muwire.core.profile.MWProfileHeader
 import net.i2p.data.Destination
 
 class UIResultEvent extends Event {
@@ -23,6 +23,7 @@ class UIResultEvent extends Event {
     boolean messages
     Set<InfoHash> collections
     String[] path
+    MWProfileHeader profileHeader
     
     
     private String fullPath

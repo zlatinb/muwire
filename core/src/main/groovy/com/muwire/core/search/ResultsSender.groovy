@@ -7,6 +7,7 @@ import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.filecert.CertificateManager
 import com.muwire.core.files.FileHasher
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
 import com.muwire.core.Persona
 
@@ -16,6 +17,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.stream.Collectors
 import java.util.zip.GZIPOutputStream
@@ -48,17 +50,20 @@ class ResultsSender {
 
     private final I2PConnector connector
     private final Persona me
+    private final Supplier<MWProfileHeader> myProfileHeader
     private final EventBus eventBus
     private final MuWireSettings settings
     private final CertificateManager certificateManager
     private final ChatServer chatServer
     private final CollectionManager collectionManager
 
-    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, MuWireSettings settings, 
-        CertificateManager certificateManager, ChatServer chatServer, CollectionManager collectionManager) {
+    ResultsSender(EventBus eventBus, I2PConnector connector, Persona me, Supplier<MWProfileHeader> myProfileHeader,
+                  MuWireSettings settings, CertificateManager certificateManager, ChatServer chatServer, 
+                  CollectionManager collectionManager) {
         this.connector = connector;
         this.eventBus = eventBus
         this.me = me
+        this.myProfileHeader = myProfileHeader
         this.settings = settings
         this.certificateManager = certificateManager
         this.chatServer = chatServer
@@ -109,7 +114,8 @@ class ResultsSender {
                         messages : settings.allowMessages,
                         feed : settings.fileFeed && settings.advertiseFeed,
                         collections : collections, 
-                        path: path
+                        path: path,
+                        profileHeader: myProfileHeader.get()
                     )
                 uiResultEvents << uiResultEvent
             }
@@ -168,6 +174,9 @@ class ResultsSender {
                         os.write("Feed: $feed\r\n".getBytes(StandardCharsets.US_ASCII))
                         boolean messages = settings.allowMessages
                         os.write("Messages: $messages\r\n".getBytes(StandardCharsets.US_ASCII))
+                        MWProfileHeader header = myProfileHeader.get()
+                        if (header != null)
+                            os.write("ProfileHeader: ${myProfileHeader.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 

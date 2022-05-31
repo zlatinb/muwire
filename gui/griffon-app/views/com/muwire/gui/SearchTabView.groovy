@@ -2,6 +2,9 @@ package com.muwire.gui
 
 import com.muwire.core.SharedFile
 import com.muwire.gui.SearchTabModel.SenderBucket
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import griffon.core.artifact.GriffonView
 import net.i2p.data.Destination
 
@@ -95,7 +98,7 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: Persona, read : { SenderBucket row -> row.sender})
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: PersonaOrProfile, read : { SenderBucket row -> row})
                                             closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {SenderBucket row -> row.results.size()})
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browse})
                                             closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
@@ -394,12 +397,12 @@ class SearchTabView {
         })
         
         // senders table
-        def personaRenderer = new PersonaCellRenderer()
-        def personaComparator = new PersonaComparator()
+        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popComparator = new PersonaOrProfileComparator()
         sendersTable.addMouseListener(sendersMouseListener)
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
-        sendersTable.setDefaultRenderer(Persona.class, personaRenderer)
-        sendersTable.rowSorter.setComparator(0, personaComparator)
+        sendersTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        sendersTable.rowSorter.setComparator(0, popComparator)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = sendersTable.getSelectionModel()

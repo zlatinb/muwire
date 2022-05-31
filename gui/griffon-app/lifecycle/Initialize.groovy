@@ -105,7 +105,7 @@ class Initialize extends AbstractLifecycleHandler {
                 } else {
                     fontSize = uiSettings.fontSize
                 }
-                rowHeight = fontSize + 3
+                rowHeight = Math.max(24, fontSize + 3)
                 FontUIResource font = new FontUIResource(fontName, uiSettings.fontStyle, fontSize)
                 
                 def keys = lnf.getDefaults().keys()

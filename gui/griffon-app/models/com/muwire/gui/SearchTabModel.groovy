@@ -1,6 +1,10 @@
 package com.muwire.gui
 
 import com.muwire.core.InfoHash
+import com.muwire.core.profile.MWProfileHeader
+import com.muwire.gui.profile.ImageScaler
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ThumbnailIcon
 
 import javax.annotation.Nonnull
 
@@ -13,8 +17,11 @@ import griffon.inject.MVCMember
 import griffon.transform.Observable
 import griffon.metadata.ArtifactProviderFor
 
+import javax.imageio.ImageIO
+import javax.swing.Icon
 import javax.swing.SwingWorker
 import javax.swing.tree.DefaultMutableTreeNode
+import java.awt.image.BufferedImage
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
@@ -131,7 +138,7 @@ class SearchTabModel {
 
             SenderBucket senderBucket = sendersBucket.get(event.sender)
             if (senderBucket == null) {
-                senderBucket = new SenderBucket(event.sender, senders.size())
+                senderBucket = new SenderBucket(event.sender, event.profileHeader, senders.size())
                 sendersBucket[event.sender] = senderBucket
                 senders << senderBucket
             }
@@ -245,15 +252,40 @@ class SearchTabModel {
         }
     }
     
-    static class SenderBucket {
+    static class SenderBucket implements PersonaOrProfile {
         final Persona sender
+        private final Icon avatar
+        private final String profileTitle
         private final int rowIdx
         final List<UIResultEvent> results = []
         private int lastUpdatedIdx
         
-        SenderBucket(Persona sender, int rowIdx) {
+        SenderBucket(Persona sender, MWProfileHeader profileHeader,int rowIdx) {
             this.sender = sender
             this.rowIdx = rowIdx
+            if (profileHeader != null) {
+                Icon icon = null
+                try {
+                    icon = new ThumbnailIcon(profileHeader.getThumbNail())
+                } catch (IOException iox) {}
+                avatar = icon
+                profileTitle = profileHeader.getTitle()
+            } else {
+                avatar = null
+                profileTitle = null
+            }
+        }
+        
+        Persona getPersona() {
+            sender
+        }
+
+        Icon getThumbnail() {
+            avatar
+        }
+        
+        String getTitle() {
+            profileTitle
         }
         
         List<UIResultEvent> getPendingResults() {
