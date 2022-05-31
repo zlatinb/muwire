@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.Core
+import com.muwire.core.profile.MWProfileImageFormat
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -15,4 +16,6 @@ class EditProfileModel {
     EditProfileController controller
 
     Core core
+    byte [] imageData, thumbnailData
+    MWProfileImageFormat format
 }
