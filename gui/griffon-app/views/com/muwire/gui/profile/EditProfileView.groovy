@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.Constants
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileImageFormat
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
@@ -14,15 +15,19 @@ import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTextArea
 import javax.swing.JTextField
+import javax.swing.SwingUtilities
 import javax.swing.TransferHandler
 import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.datatransfer.DataFlavor
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.awt.image.BufferedImage
 
 import static com.muwire.gui.Translator.trans
@@ -48,8 +53,8 @@ class EditProfileView {
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
-        int dimX = Math.max(1024, (int)(mainFrame.getWidth() / 2))
-        int dimY = Math.max(600, (int)(mainFrame.getHeight() / 2))
+        int dimX = Math.max(1100, (int)(mainFrame.getWidth() / 2))
+        int dimY = Math.max(700, (int)(mainFrame.getHeight() / 2))
         dialog = new JDialog(mainFrame, "Profile Editor", true)
         dialog.setSize([dimX, dimY] as Dimension)
         dialog.setResizable(false)
@@ -116,9 +121,26 @@ class EditProfileView {
     
     void mvcGroupInit(Map<String, String> args) {
         dialog.getContentPane().add(mainPanel)
+        
+        MWProfile profile = model.core.myProfile
+        if (profile != null) {
+            model.format = profile.getFormat()
+            model.imageData = profile.getImage()
+            bodyArea.setText(profile.getBody())
+
+            model.thumbnailData = profile.getHeader().getThumbNail()
+            titleField.setText(profile.getHeader().getTitle())
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                void windowOpened(WindowEvent e) {
+                    setImageAndThumbnail(new ByteArrayInputStream(model.imageData))
+                }
+            })
+        }
+        
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.show()
+        dialog.setVisible(true)
     }
     
     void setImageAndThumbnail(InputStream inputStream) {
@@ -167,8 +189,11 @@ class EditProfileView {
             if (!(fileName.endsWith("jpg") || fileName.endsWith("jpeg") || fileName.endsWith("png")))
                 return false
             
-            if (f.length() > Constants.MAX_PROFILE_IMAGE_LENGTH)
+            if (f.length() > Constants.MAX_PROFILE_IMAGE_LENGTH) {
+                JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_FILE"),
+                    trans("PROFILE_EDITOR_ERROR_LARGE_FILE"), JOptionPane.ERROR_MESSAGE)
                 return false
+            }
             
             f.withInputStream {setImageAndThumbnail it}
             
@@ -177,5 +202,20 @@ class EditProfileView {
             
             return true
         }
+    }
+    
+    void showErrorNoImage() {
+        JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_NO_IMAGE"),
+            trans("PROFILE_EDITOR_ERROR_NO_IMAGE"), JOptionPane.ERROR_MESSAGE)
+    }
+    
+    void showErrorLongTitle() {
+        JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_TITLE"),
+                trans("PROFILE_EDITOR_ERROR_LARGE_TITLE"), JOptionPane.ERROR_MESSAGE)
+    }
+    
+    void showErrorLongProfile() {
+        JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_PROFILE"),
+                trans("PROFILE_EDITOR_ERROR_LARGE_PROFILE"), JOptionPane.ERROR_MESSAGE)
     }
 }

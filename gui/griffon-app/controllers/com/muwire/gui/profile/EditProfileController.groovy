@@ -1,5 +1,8 @@
 package com.muwire.gui.profile
 
+import com.muwire.core.Constants
+import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.profile.MWProfileImageFormat
 import com.muwire.gui.CopyPasteSupport
 import griffon.core.artifact.GriffonController
@@ -9,6 +12,7 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
 import javax.imageio.ImageIO
+import javax.swing.JOptionPane
 
 @ArtifactProviderFor(GriffonController)
 class EditProfileController {
@@ -39,7 +43,29 @@ class EditProfileController {
     
     @ControllerAction
     void save() {
-        // TODO: implement
+        if (model.imageData == null || model.thumbnailData == null) {
+            view.showErrorNoImage()
+            return
+        }
+        String title = view.titleField.getText()
+        if (title == null)
+            title = ""
+        if (title.length() > Constants.MAX_PROFILE_TITLE_LENGTH) {
+            view.showErrorLongTitle()
+            return
+        }
+        String body = view.bodyArea.getText()
+        if (body == null)
+            body = ""
+        if (body.length() > Constants.MAX_COMMENT_LENGTH) {
+            view.showErrorLongProfile()
+            return
+        }
+
+        MWProfileHeader header = new MWProfileHeader(model.core.me, model.thumbnailData, title, model.core.spk)
+        MWProfile profile = new MWProfile(header, model.imageData, model.format, body, model.core.spk)
+        model.core.myProfile = profile
+        model.core.saveProfile()
         cancel()
     }
     
