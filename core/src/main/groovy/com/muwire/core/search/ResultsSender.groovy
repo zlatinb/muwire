@@ -176,7 +176,7 @@ class ResultsSender {
                         os.write("Messages: $messages\r\n".getBytes(StandardCharsets.US_ASCII))
                         MWProfileHeader header = myProfileHeader.get()
                         if (header != null)
-                            os.write("ProfileHeader: ${myProfileHeader.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.write("ProfileHeader: ${header.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                         dos = new DataOutputStream(new GZIPOutputStream(os))
                         results.each { 

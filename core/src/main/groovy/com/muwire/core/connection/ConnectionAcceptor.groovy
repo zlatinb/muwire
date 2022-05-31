@@ -193,7 +193,7 @@ class ConnectionAcceptor {
                     processETTER(e)
                     break
                 case (byte)'A':
-                    procesVATAR(e)
+                    processVATAR(e)
                 default:
                     throw new Exception("Invalid read $read")
             }
@@ -805,7 +805,7 @@ class ConnectionAcceptor {
             
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
 
-            ByteArrayOutputStream baos = new ByteArrayInputStream()
+            ByteArrayOutputStream baos = new ByteArrayOutputStream()
             profile.write(baos)
             byte [] payload = baos.toByteArray()
             os.write("Length:${payload.length}\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -814,6 +814,10 @@ class ConnectionAcceptor {
         } catch (Exception bad) {
             log.log(Level.WARNING, "failed to process AVATAR", bad)
         } finally {
+            try {
+                e.getOutputStream().flush()
+                e.getOutputStream().close()
+            } catch (IOException ignore) {}
             e.close()
         }
     }
