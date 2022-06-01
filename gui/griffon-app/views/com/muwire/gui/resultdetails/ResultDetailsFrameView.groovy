@@ -3,6 +3,9 @@ package com.muwire.gui.resultdetails
 import com.muwire.core.Persona
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import griffon.core.GriffonApplication
 import net.i2p.data.Destination
 
@@ -87,9 +90,9 @@ class ResultDetailsFrameView {
                         scrollPane {
                             table(id: "senders-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                 tableModel(list: model.senders.toList()) {
-                                    closureColumn(header: trans("SENDER"), type: Persona, read: { it })
-                                    closureColumn(header: trans("TRUST_NOUN"), read: {
-                                        Destination destination = it.destination
+                                    closureColumn(header: trans("SENDER"), type: PersonaOrProfile, read: { it })
+                                    closureColumn(header: trans("TRUST_NOUN"), read: { PersonaOrProfile pop ->
+                                        Destination destination = pop.getPersona().destination
                                         trans(model.core.trustService.getLevel(destination).name())
                                     })
                                 }
@@ -123,8 +126,8 @@ class ResultDetailsFrameView {
     void mvcGroupInit(Map<String, String> args) {
         if (model.senders.size() > 1) {
             JTable sendersTable = builder.getVariable("senders-table")
-            sendersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
-            sendersTable.rowSorter.setComparator(0, new PersonaComparator())
+            sendersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+            sendersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
         }
         if (certificatesPanel != null) {
             String mvcId = mvcGroup.mvcId + "_certificates"

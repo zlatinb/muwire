@@ -3,6 +3,9 @@ package com.muwire.gui
 import com.muwire.core.Persona
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.core.profile.MWProfileHeader
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ResultPOP
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -174,8 +177,8 @@ class BrowseController {
         if (selectedResults == null || selectedResults.size() != 1)
             return
         def event = selectedResults[0]
-        Set<Persona> senders = new HashSet<>()
-        senders.add(model.host)
+        List<PersonaOrProfile> senders = new ArrayList<>()
+        senders << new ResultPOP(event)
         
         String mvcId = "resultdetails_" + model.host.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
         def params = [:]
@@ -183,5 +186,23 @@ class BrowseController {
         params.resultEvent = event
         params.senders = senders
         mvcGroup.createMVCGroup("result-details-frame", mvcId, params)
+    }
+    
+    @ControllerAction
+    void viewProfile() {
+        MWProfileHeader header = null
+        if (!model.allResults.isEmpty()) {
+            header = model.allResults[0].profileHeader
+        }
+        
+        UUID uuid = UUID.randomUUID()
+        
+        def params = [:]
+        params.core = core
+        params.persona = model.host
+        params.uuid = uuid
+        params.profileTitle = header?.getTitle()
+        
+        mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }
 }

@@ -4,6 +4,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.gui.profile.ImageScaler
 import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ResultPOP
 import com.muwire.gui.profile.ThumbnailIcon
 
 import javax.annotation.Nonnull
@@ -177,12 +178,12 @@ class SearchTabModel {
     private static class HashBucket {
         private final AtomicReference<UIResultEvent> first = new AtomicReference<>()
         private final Set<UIResultEvent> events = new HashSet<>()
-        private final Set<Persona> senders = new HashSet<>()
+        private final Map<Persona, PersonaOrProfile> senders = new HashMap<>()
         
         private void add(UIResultEvent event) {
             first.compareAndSet(null, event)
             events.add(event)
-            senders.add(event.sender)
+            senders.put(event.sender, new ResultPOP(event))
         }
         
         UIResultEvent firstEvent() {
@@ -194,7 +195,11 @@ class SearchTabModel {
         }
         
         Set<Persona> getSenders() {
-            senders
+            senders.keySet()
+        }
+        
+        Collection<PersonaOrProfile> getPOPs() {
+            senders.values()
         }
         
         String getName() {

@@ -5,10 +5,12 @@ import com.muwire.core.EventBus
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
+import net.i2p.data.Base64
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
@@ -59,6 +61,14 @@ class BrowseManager {
                 int results = Integer.parseInt(headers['Count'])
                 
                 boolean chat = headers.containsKey("Chat") && Boolean.parseBoolean(headers['Chat'])
+
+                MWProfileHeader profileHeader = null
+                if (headers.containsKey("ProfileHeader")) {
+                    byte [] profileHeaderBytes = Base64.decode(headers['ProfileHeader'])
+                    profileHeader = new MWProfileHeader(new ByteArrayInputStream(profileHeaderBytes))
+                    if (profileHeader.getPersona() != e.host)
+                        throw new IOException("Sender profile mismatch")
+                }
                 
                 // at this stage, start pulling the results
                 UUID uuid = e.uuid
@@ -79,6 +89,7 @@ class BrowseManager {
                     def json = slurper.parse(tmp)
                     UIResultEvent result = ResultsParser.parse(e.host, uuid, json)
                     result.chat = chat
+                    result.profileHeader = profileHeader
                     batch[j++] = result
                     
                     

@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.gui.profile.PersonaOrProfile
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -231,7 +232,7 @@ class SearchTabController {
         if (events.size() != 1)
             return
         UIResultEvent event = events.first()
-        Set<Persona> senders = new HashSet<>(model.hashBucket[event.infohash].senders)
+        List<PersonaOrProfile> senders = new ArrayList<>(model.hashBucket[event.infohash].getPOPs())
         
         String mvcId = "resultdetails_" + model.uuid + "_" + event.sender.getHumanReadableName() + "_" + Base64.encode(event.infohash.getRoot())
         if (application.getMvcGroupManager().findGroup(mvcId) != null)

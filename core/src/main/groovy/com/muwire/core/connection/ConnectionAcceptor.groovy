@@ -450,6 +450,11 @@ class ConnectionAcceptor {
             boolean feed = settings.fileFeed && settings.advertiseFeed
             os.write("Feed: ${feed}\r\n".getBytes(StandardCharsets.US_ASCII))
             
+            MWProfile profile = myProfile.get()
+            if (profile != null) {
+                os.write("ProfileHeader: ${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            }
+            
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
             dos = new DataOutputStream(new GZIPOutputStream(os))
