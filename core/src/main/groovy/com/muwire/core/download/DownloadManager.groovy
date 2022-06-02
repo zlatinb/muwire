@@ -142,7 +142,8 @@ public class DownloadManager {
             incompletes.mkdirs()
 
             Pieces pieces = getPieces(infoHash, size, pieceSize, sequential)
-            downloader = new NetworkDownloader(eventBus, this, chatServer, me, target, toShare, size,
+            downloader = new NetworkDownloader(eventBus, this, chatServer, me, profileSupplier, 
+                    target, toShare, size,
                     infoHash, collectionInfoHash, pieceSize, connector, destinations,
                     incompletes, pieces, muSettings.downloadMaxFailures)
         }
@@ -221,7 +222,7 @@ public class DownloadManager {
                 
                 Pieces pieces = getPieces(infoHash, (long)json.length, json.pieceSizePow2, sequential)
 
-                downloader = new NetworkDownloader(eventBus, this, chatServer, me, file, toShare, (long)json.length,
+                downloader = new NetworkDownloader(eventBus, this, chatServer, me, profileSupplier, file, toShare, (long)json.length,
                     infoHash, collectionInfoHash, json.pieceSizePow2, connector, destinations, incompletes, pieces, muSettings.downloadMaxFailures)
                     downloader.successfulDestinations.addAll(destinations) // if it was persisted, it was successful
                 downloader.readPieces()

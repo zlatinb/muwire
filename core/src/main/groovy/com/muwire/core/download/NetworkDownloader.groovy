@@ -428,7 +428,7 @@ class NetworkDownloader extends Downloader {
                         endpoint.getOutputStream().flush()
                     }
                     available.removeAll(queuedPieces)
-                    def nextSession = new DownloadSession(eventBus, me.toBase64(), pieces, infoHash,
+                    def nextSession = new DownloadSession(eventBus, me.toBase64(), null,  pieces, infoHash,
                             endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
                             browse, feed, chat, message)
                     if (nextSession.sendRequest()) {

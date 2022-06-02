@@ -39,9 +39,10 @@ class HashListSession {
 
         String root = Base64.encode(infoHash.getRoot())
         os.write("HASHLIST $root\r\n".getBytes(StandardCharsets.US_ASCII))
-        os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
         if (profile != null)
             os.write("ProfileHeader: ${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
         os.flush()
 
         String code = readTillRN(is)
