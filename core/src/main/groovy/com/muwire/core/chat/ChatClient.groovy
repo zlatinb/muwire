@@ -1,5 +1,8 @@
 package com.muwire.core.chat
 
+import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileHeader
+
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -15,6 +18,8 @@ import com.muwire.core.util.DataUtil
 
 import groovy.util.logging.Log
 
+import java.util.function.Supplier
+
 @Log
 class ChatClient implements Closeable {
     
@@ -25,6 +30,7 @@ class ChatClient implements Closeable {
     private final I2PConnector connector
     private final EventBus eventBus
     private final Persona host, me
+    private final Supplier<MWProfile> profileSupplier
     private final TrustService trustService
     private final MuWireSettings settings
     
@@ -33,12 +39,15 @@ class ChatClient implements Closeable {
     private long lastRejectionTime
     private Thread connectThread
     
-    ChatClient(I2PConnector connector, EventBus eventBus, Persona host, Persona me, TrustService trustService,
+    ChatClient(I2PConnector connector, EventBus eventBus, 
+               Persona host, Persona me, Supplier<MWProfile> profileSupplier, 
+               TrustService trustService,
         MuWireSettings settings) {
         this.connector = connector
         this.eventBus = eventBus
         this.host = host
         this.me = me
+        this.profileSupplier = profileSupplier
         this.trustService = trustService
         this.settings = settings
     }
@@ -67,6 +76,9 @@ class ChatClient implements Closeable {
                 write("IRC\r\n".getBytes(StandardCharsets.US_ASCII))
                 write("Version:${Constants.CHAT_VERSION}\r\n".getBytes(StandardCharsets.US_ASCII))
                 write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                MWProfile profile = profileSupplier.get()
+                if (profile != null)
+                    write("ProfileHeader:${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 write("\r\n".getBytes(StandardCharsets.US_ASCII))
                 flush()
             }
@@ -102,8 +114,8 @@ class ChatClient implements Closeable {
             synchronized(this) {
                 if (!connectInProgress)
                     return
-                connection = new ChatConnection(eventBus, endpoint, host, false, 
-                        trustService, settings, Constants.CHAT_VERSION)
+                connection = new ChatConnection(eventBus, endpoint, host, profileSupplier.get()?.getHeader(),
+                        false, trustService, settings, Constants.CHAT_VERSION)
                 connection.start()
             }
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, persona : host, 

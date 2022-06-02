@@ -1,8 +1,13 @@
 package com.muwire.core.chat
 
+import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileHeader
+
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Predicate
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.stream.Collectors
 
@@ -31,6 +36,7 @@ class ChatServer {
     private final MuWireSettings settings
     private final TrustService trustService
     private final Persona me
+    private final Supplier<MWProfile> profileSupplier
     private final SigningPrivateKey spk
     
     private final Map<Destination, ChatLink> connections = new ConcurrentHashMap()
@@ -40,11 +46,13 @@ class ChatServer {
     
     private final AtomicBoolean running = new AtomicBoolean()
     
-    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, Persona me, SigningPrivateKey spk) {
+    ChatServer(EventBus eventBus, MuWireSettings settings, TrustService trustService, 
+               Persona me, Supplier<MWProfile> profileSupplier, SigningPrivateKey spk) {
         this.eventBus = eventBus
         this.settings = settings
         this.trustService = trustService
         this.me = me
+        this.profileSupplier = profileSupplier
         this.spk = spk
         
         Timer timer = new Timer("chat-server-pinger", true)
@@ -96,6 +104,14 @@ class ChatServer {
         Persona client = new Persona(new ByteArrayInputStream(Base64.decode(headers['Persona'])))
         if (client.destination != endpoint.destination)
             throw new Exception("Client destination mismatch")
+
+        MWProfileHeader profileHeader = null
+        if (headers.containsKey("ProfileHeader")) {
+            byte [] decoded = Base64.decode(headers['ProfileHeader'])
+            profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
+            if (profileHeader.getPersona() != client)
+                throw new Exception("profile and persona mismatch")
+        }
         
         if (!running.get()) {
             os.write("400 Chat Not Enabled\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -128,7 +144,7 @@ class ChatServer {
             flush()
         }
         
-        ChatConnection connection = new ChatConnection(eventBus, endpoint, client, true, 
+        ChatConnection connection = new ChatConnection(eventBus, endpoint, client, profileHeader, true, 
                 trustService, settings, version)
         connections.put(endpoint.destination, connection)
         joinRoom(client, CONSOLE)
@@ -244,11 +260,24 @@ class ChatServer {
     
     private void processJoin(String room, ChatMessageEvent e) {
         joinRoom(e.sender, room)
+        
+        // tell everyone in the room about this person has joined
+        MWProfileHeader header = getHeaderFromConnection(e.link)
+        
+        ChatMessageEvent profileBroadcast = null
+        if (header != null) 
+            profileBroadcast = buildProfileBroadcast(header, room)
+        
         rooms[room].each { 
             if (it == e.sender)
                 return
             connections[it.destination].sendChat(e)
+            if (profileBroadcast != null)
+                connections[it.destination].sendChat(profileBroadcast)
         }
+        
+        
+        // tell the new joiner who else is in the room
         String payload = rooms[room].stream().filter({it != e.sender}).map({it.toBase64()})
             .collect(Collectors.joining(","))
         if (payload.length() == 0) {
@@ -262,12 +291,46 @@ class ChatServer {
             uuid : uuid,
             payload : payload,
             sender : me,
-            host : me,
+            host : me, 
+            link: LocalChatLink.INSTANCE,
             room : room,
             chatTime : now,
             sig : sig
             )
         connections[e.sender.destination].sendChat(echo)
+        
+        // send all profiles of people already joined
+        rooms[room].stream().
+                map({connections.get(it.destination)}).
+                map({getHeaderFromConnection(it)}).
+                filter({it != null}).
+                forEach {
+                    profileBroadcast = buildProfileBroadcast(it, room)
+                    connections[e.sender.destination].sendChat(profileBroadcast)
+                }
+    }
+    
+    private MWProfileHeader getHeaderFromConnection(ChatLink link) {
+        if (link instanceof LocalChatLink)
+            return profileSupplier.get()?.getHeader()
+        return link.getProfileHeader()
+    }
+    
+    private ChatMessageEvent buildProfileBroadcast(MWProfileHeader header, String room) {
+        UUID uuid = UUID.randomUUID()
+        long now = System.currentTimeMillis()
+        String payload = "/PROFILE ${header.toBase64()}"
+        byte [] sig = ChatConnection.sign(uuid, now, room, payload, me, me, spk)
+        new ChatMessageEvent(
+                uuid: uuid,
+                payload: payload,
+                sender: me,
+                host: me,
+                link: LocalChatLink.INSTANCE,
+                room: room,
+                chatTime: now,
+                sig: sig
+        )
     }
     
     private void processLeave(ChatMessageEvent e) {
@@ -330,7 +393,8 @@ class ChatServer {
             uuid : uuid,
             payload : payload,
             sender : me,
-            host : me,
+            host : me, 
+            link : LocalChatLink.INSTANCE,
             room : room,
             chatTime : now,
             sig : sig

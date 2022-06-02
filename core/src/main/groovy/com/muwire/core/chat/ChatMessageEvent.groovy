@@ -7,6 +7,7 @@ class ChatMessageEvent extends Event {
     UUID uuid
     String payload
     Persona sender, host
+    ChatLink link
     String room
     long chatTime
     byte [] sig

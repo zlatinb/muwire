@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.chat.LocalChatLink
+
 import static com.muwire.gui.Translator.trans
 
 import griffon.core.artifact.GriffonController
@@ -95,7 +97,8 @@ class ChatRoomController {
         def event = new ChatMessageEvent(uuid : uuid,
         payload : command.source,
         sender : model.core.me,
-        host : model.host,
+        host : model.host, 
+        link: LocalChatLink.INSTANCE,
         room : room,
         chatTime : now,
         sig : sig)
@@ -172,6 +175,7 @@ class ChatRoomController {
             payload : "/LEAVE",
             sender : model.core.me,
             host : model.host,
+            link : LocalChatLink.INSTANCE,
             room : model.room,
             chatTime : now,
             sig : sig)
@@ -266,6 +270,7 @@ class ChatRoomController {
             payload : join,
             sender : model.core.me,
             host : model.host,
+            link: LocalChatLink.INSTANCE,
             room : ChatServer.CONSOLE,
             chatTime : now,
             sig : sig

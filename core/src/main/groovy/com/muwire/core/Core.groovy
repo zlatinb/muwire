@@ -414,7 +414,7 @@ public class Core {
         eventBus.register(UIFetchCertificatesEvent.class, certificateClient)
         
         log.info("initializing chat server")
-        chatServer = new ChatServer(eventBus, props, trustService, me, spk)
+        chatServer = new ChatServer(eventBus, props, trustService, me, profileSupplier, spk)
         eventBus.with {
             register(ChatMessageEvent.class, chatServer)
             register(ChatDisconnectionEvent.class, chatServer)
@@ -445,7 +445,7 @@ public class Core {
         eventBus.register(ResultsEvent.class, searchManager)
 
         log.info("initializing chat manager")
-        chatManager = new ChatManager(eventBus, me, i2pConnector, trustService, props)
+        chatManager = new ChatManager(eventBus, me, profileSupplier, i2pConnector, trustService, props)
         eventBus.with { 
             register(UIConnectChatEvent.class, chatManager)
             register(UIDisconnectChatEvent.class, chatManager)

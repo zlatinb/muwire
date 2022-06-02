@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.chat.ChatConnection
 import com.muwire.core.chat.ChatMessageEvent
 import com.muwire.core.chat.ChatServer
+import com.muwire.core.chat.LocalChatLink
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -39,6 +40,7 @@ class ChatServerController {
                 payload: command,
                 sender: model.core.me,
                 host: model.host,
+                link: LocalChatLink.INSTANCE,
                 room: ChatServer.CONSOLE,
                 chatTime: now,
                 sig: sig)

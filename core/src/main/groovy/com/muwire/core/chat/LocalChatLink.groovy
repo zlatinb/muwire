@@ -1,5 +1,7 @@
 package com.muwire.core.chat
 
+import com.muwire.core.profile.MWProfileHeader
+
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -44,6 +46,10 @@ class LocalChatLink implements ChatLink {
     }
     
     public Persona getPersona() {
+        null
+    }
+    
+    public MWProfileHeader getProfileHeader() {
         null
     }
 }

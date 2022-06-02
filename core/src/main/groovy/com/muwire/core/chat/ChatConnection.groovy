@@ -1,5 +1,7 @@
 package com.muwire.core.chat
 
+import com.muwire.core.profile.MWProfileHeader
+
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
@@ -31,6 +33,7 @@ class ChatConnection implements ChatLink {
     private final EventBus eventBus
     private final Endpoint endpoint
     private final Persona persona
+    private final MWProfileHeader profileHeader
     private final boolean incoming
     private final TrustService trustService
     private final MuWireSettings settings
@@ -49,11 +52,12 @@ class ChatConnection implements ChatLink {
     
     private volatile long lastPingSentTime
     
-    ChatConnection(EventBus eventBus, Endpoint endpoint, Persona persona, boolean incoming,
-        TrustService trustService, MuWireSettings settings, int version) {
+    ChatConnection(EventBus eventBus, Endpoint endpoint, Persona persona, MWProfileHeader profileHeader, 
+                   boolean incoming, TrustService trustService, MuWireSettings settings, int version) {
         this.eventBus = eventBus
         this.endpoint = endpoint
         this.persona = persona
+        this.profileHeader = profileHeader
         this.incoming = incoming
         this.trustService = trustService
         this.settings = settings
@@ -88,6 +92,11 @@ class ChatConnection implements ChatLink {
     @Override
     public Persona getPersona() {
         persona
+    }
+    
+    @Override
+    public MWProfileHeader getProfileHeader() {
+        profileHeader
     }
     
     @Override
@@ -211,7 +220,7 @@ class ChatConnection implements ChatLink {
                 return
         }
         def event = new ChatMessageEvent( uuid : uuid, payload : payload, sender : sender,
-            host : host, room : room, chatTime : chatTime, sig : sig)
+            host : host, link: this, room : room, chatTime : chatTime, sig : sig)
         eventBus.publish(event)
         if (!incoming)
             incomingEvents.put(event)
