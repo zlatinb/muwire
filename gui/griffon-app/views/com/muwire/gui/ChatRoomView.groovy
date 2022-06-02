@@ -1,5 +1,8 @@
 package com.muwire.gui
 
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -77,8 +80,9 @@ class ChatRoomView {
                             scrollPane {
                                 membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: Persona, read : {it})
-                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, read : {trans(model.core.trustService.getLevel(it.destination).name())})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: PersonaOrProfile, read : {it})
+                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, 
+                                                read : {trans(model.core.trustService.getLevel(it.getPersona().destination).name())})
                                     }
                                 }
                             }
@@ -124,8 +128,8 @@ class ChatRoomView {
             
         if (membersTable != null) {
             
-            membersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
-            membersTable.rowSorter.setComparator(0, new PersonaComparator())
+            membersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+            membersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
             membersTable.rowSorter.addRowSorterListener({evt -> lastMembersTableSortEvent = evt})
             membersTable.rowSorter.setSortsOnUpdates(true)
             membersTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

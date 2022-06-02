@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.chat.LocalChatLink
+import com.muwire.core.profile.MWProfileHeader
 
 import static com.muwire.gui.Translator.trans
 
@@ -194,6 +195,7 @@ class ChatRoomController {
             case ChatAction.JOIN : processJoin(e.timestamp, e.sender); break
             case ChatAction.JOINED : processJoined(command.payload); break
             case ChatAction.LEAVE : processLeave(e.timestamp, e.sender); break
+            case ChatAction.PROFILE : processProfile(command.payload); break;
         }
     }
     
@@ -209,7 +211,7 @@ class ChatRoomController {
     private void processJoin(long timestamp, Persona p) {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("JOINED_ROOM", p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
-            model.members.add(p)
+            model.members.add(model.buildChatPOP(p))
             view.appendGray(toDisplay)
             trimLines()
             view.membersTable?.model?.fireTableDataChanged()
@@ -220,7 +222,7 @@ class ChatRoomController {
         runInsideUIAsync {
             list.split(",").each { 
                 Persona p = new Persona(new ByteArrayInputStream(Base64.decode(it)))
-                model.members.add(p)
+                model.members.add(model.buildChatPOP(p))
             }
             view.membersTable?.model?.fireTableDataChanged()
         }
@@ -229,9 +231,18 @@ class ChatRoomController {
     private void processLeave(long timestamp, Persona p) {
         String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("LEFT_ROOM",p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
-            model.members.remove(p)
+            model.members.remove(model.buildChatPOP(p))
             view.appendGray(toDisplay)
             trimLines()
+            view.membersTable?.model?.fireTableDataChanged()
+        }
+    }
+    
+    private processProfile(String payload) {
+        byte[] decoded = Base64.decode(payload)
+        MWProfileHeader header = new MWProfileHeader(new ByteArrayInputStream(decoded))
+        runInsideUIAsync {
+            model.profileHeaders.put(header.getPersona(), header)
             view.membersTable?.model?.fireTableDataChanged()
         }
     }
@@ -239,7 +250,8 @@ class ChatRoomController {
     void handleLeave(Persona p) {
         String toDisplay = DataHelper.formatTime(System.currentTimeMillis()) + " " + trans("USER_DISCONNECTED",p.getHumanReadableName()) + "\n"
         runInsideUIAsync {
-            if (model.members.remove(p)) {
+            if (model.members.remove(model.buildChatPOP(p))) {
+                model.profileHeaders.remove(p)
                 view.appendGray(toDisplay)
                 trimLines()
                 view.membersTable?.model?.fireTableDataChanged()
