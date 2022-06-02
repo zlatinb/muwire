@@ -47,7 +47,8 @@ class ChatManager {
             eventBus.publish(new ChatConnectionEvent(status : ChatConnectionAttemptStatus.SUCCESSFUL, 
                 persona : me, connection : LocalChatLink.INSTANCE, defaultRoom: defaultChatRoom))
         } else {
-            ChatClient client = new ChatClient(connector, eventBus, e.host, me, trustService, settings)
+            ChatClient client = new ChatClient(connector, eventBus, e.host, me, profileSupplier, 
+                    trustService, settings)
             clients.put(e.host, client)
         }
     }
