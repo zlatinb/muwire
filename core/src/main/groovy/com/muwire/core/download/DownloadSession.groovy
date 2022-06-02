@@ -1,5 +1,6 @@
-package com.muwire.core.download;
+package com.muwire.core.download
 
+import com.muwire.core.profile.MWProfile;
 import net.i2p.data.Base64
 
 import com.muwire.core.Constants
@@ -30,6 +31,7 @@ class DownloadSession {
 
     private final EventBus eventBus
     private final String meB64
+    private final MWProfile profile
     private final Pieces pieces
     private final InfoHash infoHash
     private final Endpoint endpoint
@@ -50,11 +52,13 @@ class DownloadSession {
     boolean supportsHead
     boolean confidential
 
-    DownloadSession(EventBus eventBus, String meB64, Pieces pieces, InfoHash infoHash, Endpoint endpoint, File file,
-        int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
+    DownloadSession(EventBus eventBus, String meB64, MWProfile profile,  Pieces pieces, 
+                    InfoHash infoHash, Endpoint endpoint, File file,
+                    int pieceSize, long fileLength, Set<Integer> available, AtomicLong dataSinceLastRead,
         boolean browse, boolean feed, boolean chat, boolean message) {
         this.eventBus = eventBus
         this.meB64 = meB64
+        this.profile = profile
         this.pieces = pieces
         this.endpoint = endpoint
         this.infoHash = infoHash
@@ -108,6 +112,8 @@ class DownloadSession {
             os.write("GET $root\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Range: $start-$end\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("X-Persona: $meB64\r\n".getBytes(StandardCharsets.US_ASCII))
+            if (profile != null)
+                os.write("ProfileHeader: ${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
             SessionSupport.writeInteractionHeaders(os, browse, chat, feed, message)
             SessionSupport.writeXHave(os, pieces)
             headersSent = true

@@ -1,5 +1,8 @@
 package com.muwire.core.upload
 
+import com.muwire.core.profile.MWProfileFetcher
+import com.muwire.core.profile.MWProfileHeader
+
 import java.nio.charset.StandardCharsets
 
 import com.muwire.core.Constants
@@ -18,6 +21,7 @@ class Request {
 
     InfoHash infoHash
     Persona downloader
+    MWProfileHeader profileHeader
     Map<String, String> headers
 
     static Request parseContentRequest(InfoHash infoHash, InputStream is) throws IOException {
@@ -55,14 +59,16 @@ class Request {
         
         new ContentRequest( infoHash : infoHash, range : new Range(start, end),
             headers : headers, downloader : state.downloader, have : state.have,
-            browse : state.browse, feed : state.feed, chat : state.chat, message : state.message)
+            browse : state.browse, feed : state.feed, chat : state.chat, message : state.message,
+            profileHeader: state.profileHeader)
     }
     
     static Request parseHeadRequest(InfoHash infoHash, InputStream is) throws IOException {
         Map<String, String> headers = DataUtil.readAllHeaders(is)
         def state = parseCommonHeaders(headers)
         new HeadRequest(infoHash: infoHash, headers: headers, downloader: state.downloader, have: state.have,
-            browse: state.browse, feed: state.feed, chat: state.chat, message: state.message)
+            browse: state.browse, feed: state.feed, chat: state.chat, message: state.message,
+            profileHeader: state.profileHeader)
     }
     
     private static RequestParsingState parseCommonHeaders(Map<String,String> headers) throws IOException {
@@ -85,6 +91,14 @@ class Request {
             rv.downloader = new Persona(new ByteArrayInputStream(decoded))
         }
         
+        if (headers.containsKey("ProfileHeader")) {
+            def encoded = headers["ProfileHeader"]
+            def decoded = Base64.decode(encoded)
+            rv.profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
+            if (rv.profileHeader.getPersona() != rv.downloader)
+                throw new IOException("persona and profile header mismatch")
+        }
+        
         rv
     }
 
@@ -96,12 +110,23 @@ class Request {
             def decoded = Base64.decode(encoded)
             downloader = new Persona(new ByteArrayInputStream(decoded))
         }
-        new HashListRequest(infoHash : infoHash, headers : headers, downloader : downloader)
+        
+        MWProfileHeader profileHeader = null
+        if (headers.containsKey("ProfileHeader")) {
+            def encoded = headers["ProfileHeader"]
+            def decoded = Base64.decode(encoded)
+            profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
+            if (profileHeader.getPersona() != downloader)
+                throw new IOException("persona and profile header mismsatch")
+        }
+        new HashListRequest(infoHash : infoHash, headers : headers, 
+                downloader : downloader, profileHeader: profileHeader)
     }
     
     private static class RequestParsingState {
         Persona downloader
         boolean browse, feed, chat, message, profile
         int have
+        MWProfileHeader profileHeader
     }
 }

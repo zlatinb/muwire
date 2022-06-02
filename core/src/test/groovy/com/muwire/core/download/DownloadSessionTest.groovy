@@ -78,7 +78,7 @@ class DownloadSessionTest {
         toUploader = new PipedOutputStream(fromDownloader)
         endpoint = new Endpoint(null, fromUploader, toUploader, null)
 
-        session = new DownloadSession(eventBus, "",pieces, infoHash, endpoint, target, pieceSize, size, available, new AtomicLong(),
+        session = new DownloadSession(eventBus, "", null, pieces, infoHash, endpoint, target, pieceSize, size, available, new AtomicLong(),
             browse, feed, chat, message)
         downloadThread = new Thread( { perform() } as Runnable)
         downloadThread.setDaemon(true)

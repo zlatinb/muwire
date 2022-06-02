@@ -1,6 +1,7 @@
 package com.muwire.core.upload
 
 import com.muwire.core.files.directories.Visibility
+import com.muwire.core.profile.MWProfileHeader
 
 import java.nio.charset.StandardCharsets
 
@@ -63,6 +64,7 @@ public class UploadManager {
         byte [] infoHashStringBytes = new byte[44]
         DataInputStream dis = new DataInputStream(e.getInputStream())
         boolean first = true
+        MWProfileHeader profileHeader = null
         while(true) {
             boolean wasFirst = false
             boolean head = false
@@ -101,6 +103,8 @@ public class UploadManager {
                 request = Request.parseHeadRequest(infoHash, e.getInputStream())
             else
                 request = Request.parseContentRequest(infoHash, e.getInputStream())
+            if (profileHeader == null)
+                profileHeader = request.profileHeader
             if (request.downloader == null || request.downloader.destination != e.destination) {
                 log.info("Downloader persona doesn't match their destination or null")
                 e.close()
@@ -153,7 +157,7 @@ public class UploadManager {
                 uploader = new HeadUploader(file, (HeadRequest)request, e, mesh, confidential)
             else
                 uploader = new ContentUploader(file, (ContentRequest)request, e, mesh, pieceSize, confidential)
-            eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
+            eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst, profileHeader: profileHeader))
             try {
                 uploader.respond()
                 if (!head)
@@ -184,6 +188,7 @@ public class UploadManager {
         InfoHash infoHash = new InfoHash(infoHashRoot)
 
         Request request = Request.parseHashListRequest(infoHash, e.getInputStream())
+        MWProfileHeader profileHeader = request.profileHeader
         if (request.downloader == null || request.downloader.destination != e.destination) {
             log.info("Downloader persona doesn't match their destination or null")
             e.close()
@@ -227,7 +232,7 @@ public class UploadManager {
         }
 
         Uploader uploader = new HashListUploader(e, fullInfoHash, (HashListRequest)request, confidential)
-        eventBus.publish(new UploadEvent(uploader : uploader, first: true)) // hash list is always a first
+        eventBus.publish(new UploadEvent(uploader : uploader, first: true, profileHeader: profileHeader)) // hash list is always a first
         try {
             try {
                 uploader.respond()
@@ -306,7 +311,7 @@ public class UploadManager {
                     uploader = new HeadUploader(file, (HeadRequest)request, e, mesh, confidential)
                 else
                     uploader = new ContentUploader(file, (ContentRequest)request, e, mesh, pieceSize, confidential)
-                eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst))
+                eventBus.publish(new UploadEvent(uploader : uploader, first: wasFirst, profileHeader: profileHeader))
                 try {
                     uploader.respond()
                     if (!head)

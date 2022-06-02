@@ -6,6 +6,7 @@ import com.muwire.core.Persona
 import com.muwire.core.chat.ChatServer
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.util.BandwidthCounter
 import com.muwire.core.util.DataUtil
 import groovy.util.logging.Log
@@ -19,6 +20,7 @@ import java.nio.file.StandardCopyOption
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
+import java.util.function.Supplier
 import java.util.logging.Level
 
 @Log
@@ -27,6 +29,7 @@ class NetworkDownloader extends Downloader {
 
     private final ChatServer chatServer
     private final Persona me
+    private final Supplier<MWProfile> profileSupplier
     private final Pieces pieces
     
     private final I2PConnector connector
@@ -54,13 +57,15 @@ class NetworkDownloader extends Downloader {
     private volatile boolean confidential
     
     NetworkDownloader(EventBus eventBus, DownloadManager downloadManager, ChatServer chatServer,
-                      Persona me, File file, File toShare, long length, InfoHash infoHash, InfoHash collectionInfoHash,
+                      Persona me, Supplier<MWProfile> profileSupplier, File file, File toShare, 
+                      long length, InfoHash infoHash, InfoHash collectionInfoHash,
                       int pieceSizePow2, I2PConnector connector, Set<Destination> destinations,
                       File incompletes, Pieces pieces, int maxFailures) {
         super(eventBus, downloadManager, file, toShare, length, infoHash, collectionInfoHash, pieceSizePow2)
         this.connector = connector
         this.chatServer = chatServer
         this.me = me
+        this.profileSupplier = profileSupplier
         this.destinations = destinations
         this.incompletes = incompletes
         
@@ -363,6 +368,7 @@ class NetworkDownloader extends Downloader {
         private final LinkedList<DownloadSession> sessionQueue = new LinkedList<>()
         private final Set<Integer> available = new HashSet<>()
         private volatile boolean confidential
+        private boolean profileHeaderSent
 
         DownloadWorker(Destination destination) {
             this.destination = destination
@@ -381,10 +387,11 @@ class NetworkDownloader extends Downloader {
                 endpoint = connector.connect(destination)
                 while(infoHash.hashList == null) {
                     currentState = WorkerState.HASHLIST
-                    HashListSession session = new HashListSession(me.toBase64(), infoHash, endpoint)
+                    HashListSession session = new HashListSession(me.toBase64(), infoHash, endpoint, profileSupplier.get())
                     InfoHash received = session.request()
                     infoHash = received
                     confidential = session.confidential
+                    profileHeaderSent = true
                     downloadManager.persistDownloaders()
                 }
                 currentState = WorkerState.DOWNLOADING
@@ -402,7 +409,12 @@ class NetworkDownloader extends Downloader {
                         boolean sentAnyRequests = false
                         queueSize.times {
                             available.removeAll(queuedPieces)
-                            def currentSession = new DownloadSession(eventBus, me.toBase64(), pieces, infoHash,
+                            MWProfile profile = null
+                            if (!profileHeaderSent) {
+                                profileHeaderSent = true
+                                profile = profileSupplier.get()
+                            }
+                            def currentSession = new DownloadSession(eventBus, me.toBase64(), profile,  pieces, infoHash,
                                     endpoint, incompleteFile, pieceSize, length, available, dataSinceLastRead,
                                     browse, feed, chat, message)
                             if (currentSession.sendRequest()) {

@@ -8,6 +8,7 @@ import com.muwire.core.files.FileManager
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.mesh.MeshManager
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 import com.muwire.core.util.DataUtil
@@ -34,6 +35,7 @@ import com.muwire.core.collections.UIDownloadCollectionEvent
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.function.Supplier
 import java.util.logging.Level
 
 @Log
@@ -47,13 +49,15 @@ public class DownloadManager {
     private final Executor executor
     private final File home
     private final Persona me
+    private final Supplier<MWProfile> profileSupplier
     private final ChatServer chatServer
     private final FileManager fileManager
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
     
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
-        I2PConnector connector, File home, Persona me, ChatServer chatServer, FileManager fileManager) {
+        I2PConnector connector, File home, Persona me, Supplier<MWProfile> profileSupplier, 
+                           ChatServer chatServer, FileManager fileManager) {
         this.eventBus = eventBus
         this.trustService = trustService
         this.meshManager = meshManager
@@ -61,6 +65,7 @@ public class DownloadManager {
         this.connector = connector
         this.home = home
         this.me = me
+        this.profileSupplier = profileSupplier
         this.chatServer = chatServer
         this.fileManager = fileManager
 

@@ -1,5 +1,6 @@
 package com.muwire.core.download
 
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.util.DataUtil
 
 import java.nio.ByteBuffer
@@ -22,12 +23,14 @@ class HashListSession {
     private final String meB64
     private final InfoHash infoHash
     private final Endpoint endpoint
+    private final MWProfile profile
     boolean confidential
 
-    HashListSession(String meB64, InfoHash infoHash, Endpoint endpoint) {
+    HashListSession(String meB64, InfoHash infoHash, Endpoint endpoint, MWProfile profile) {
         this.meB64 = meB64
         this.infoHash = infoHash
         this.endpoint = endpoint
+        this.profile = profile
     }
 
     InfoHash request() throws IOException, DownloadRejectedException {
@@ -37,6 +40,8 @@ class HashListSession {
         String root = Base64.encode(infoHash.getRoot())
         os.write("HASHLIST $root\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("X-Persona: $meB64\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+        if (profile != null)
+            os.write("ProfileHeader: ${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.flush()
 
         String code = readTillRN(is)
