@@ -271,7 +271,7 @@ class ChatRoomController {
             return
         
         model.members.clear()
-        model.members.add(model.core.me)
+        model.members.add(model.buildChatPOP(model.core.me))
         
         UUID uuid = UUID.randomUUID()
         long now = System.currentTimeMillis()
