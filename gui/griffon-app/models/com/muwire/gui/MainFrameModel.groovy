@@ -3,10 +3,14 @@ package com.muwire.gui
 
 import com.muwire.core.download.DownloadHopelessEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.search.ResultsEvent
 import com.muwire.core.trust.TrustServiceLoadedEvent
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ThumbnailIcon
 
 import javax.swing.DefaultListModel
+import javax.swing.Icon
 import javax.swing.SwingWorker
 import java.awt.Image
 import java.awt.TrayIcon
@@ -651,7 +655,7 @@ class MainFrameModel {
                 view.refreshUploadsTableRow(index)
             }
             else {
-                uploads << new UploaderWrapper(uploader: e.uploader)
+                uploads << new UploaderWrapper(e.uploader, e.profileHeader)
                 view.addUploadsTableRow(uploads.size() - 1)
                 if (e.first) {
                     Set<SharedFile> sfs = core.fileManager.getSharedFiles(e.uploader.infoHash.getRoot())
@@ -913,12 +917,36 @@ class MainFrameModel {
         !downloadInfoHashes.contains(hash)
     }
     
-    class UploaderWrapper {
+    class UploaderWrapper implements PersonaOrProfile {
         Uploader uploader
         int requests
         boolean finished
+        final MWProfileHeader profileHeader
+        private Icon icon
+        
+        UploaderWrapper(Uploader uploader, MWProfileHeader profileHeader) {
+            this.uploader = uploader
+            this.profileHeader = profileHeader
+        }
         
         private BandwidthCounter bwCounter = new BandwidthCounter(0)
+        
+        Persona getPersona() {
+            uploader.downloaderPersona
+        }
+        
+        String getTitle() {
+            HTMLSanitizer.sanitize(profileHeader?.getTitle())
+        }
+
+        Icon getThumbnail() {
+            if (profileHeader == null)
+                return null
+            if (icon == null) {
+                icon = new ThumbnailIcon(profileHeader.getThumbNail())
+            }
+            return icon
+        }
         
         public int speed() {
             

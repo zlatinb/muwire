@@ -6,6 +6,9 @@ import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatFavorites
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import com.muwire.gui.win.PrioritySetter
 import griffon.core.GriffonApplication
 import griffon.core.mvc.MVCGroup
@@ -439,9 +442,7 @@ class MainFrameView {
                                             int percent = row.uploader.getProgress()
                                             trans("PERCENT_OF_PIECE", percent)
                                         })
-                                        closureColumn(header : trans("DOWNLOADER"), type : Persona, read : { row ->
-                                            row.uploader.getDownloaderPersona()
-                                        })
+                                        closureColumn(header : trans("DOWNLOADER"), type : PersonaOrProfile, read : { PersonaOrProfile row -> row })
                                         closureColumn(header : trans("REMOTE_PIECES"), type : String, read : { row ->
                                             int pieces = row.uploader.getTotalPieces()
                                             int done = row.uploader.getDonePieces()
@@ -890,6 +891,8 @@ class MainFrameView {
                     WHEN_IN_FOCUSED_WINDOW)
         }
         
+        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popComparator = new PersonaOrProfileComparator()
 
         // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
@@ -1137,8 +1140,8 @@ class MainFrameView {
         // uploadsTable
         JTable uploadsTable = builder.getVariable("uploads-table")
 
-        uploadsTable.setDefaultRenderer(Persona.class, personaRenderer)
-        uploadsTable.rowSorter.setComparator(2, personaComparator)
+        uploadsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        uploadsTable.rowSorter.setComparator(2, popComparator)
         uploadsTable.rowSorter.addRowSorterListener({ evt -> lastUploadsSortEvent = evt })
         uploadsTable.rowSorter.setSortsOnUpdates(true)
 
