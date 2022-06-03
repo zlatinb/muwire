@@ -1,5 +1,7 @@
 package com.muwire.core.trust
 
+import com.muwire.core.profile.MWProfileHeader
+
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
@@ -144,34 +146,24 @@ class TrustSubscriber {
                 JsonSlurper slurper = new JsonSlurper()
                 
                 for (int i = 0; i < countGood; i++) {
-                    int length = dis.readUnsignedShort()
-                    byte []payload = new byte[length]
-                    dis.readFully(payload)
-                    def json = slurper.parse(payload)
-                    Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(json.persona)))
-                    good.add(new TrustEntry(persona, json.reason))
+                    good.add(fromDIS(slurper, dis))
                 }
                 
                 for (int i = 0; i < countBad; i++) {
-                    int length = dis.readUnsignedShort()
-                    byte []payload = new byte[length]
-                    dis.readFully(payload)
-                    def json = slurper.parse(payload)
-                    Persona persona = new Persona(new ByteArrayInputStream(Base64.decode(json.persona)))
-                    bad.add(new TrustEntry(persona, json.reason))
+                    bad.add(fromDIS(slurper, dis))
                 }
                 
             } else {
                 int nGood = dis.readUnsignedShort()
                 for (int i = 0; i < nGood; i++) {
                     Persona p = new Persona(dis)
-                    good.add(new TrustEntry(p,null))
+                    good.add(new TrustEntry(p,null,null))
                 }
 
                 int nBad = dis.readUnsignedShort()
                 for (int i = 0; i < nBad; i++) {
                     Persona p = new Persona(dis)
-                    bad.add(new TrustEntry(p, null))
+                    bad.add(new TrustEntry(p, null, null))
                 }
             }
 
@@ -189,5 +181,22 @@ class TrustSubscriber {
             endpoint?.close()
         }
 
+    }
+    
+    private static TrustEntry fromDIS(JsonSlurper slurper, DataInputStream dis) {
+        int length = dis.readUnsignedShort()
+        byte [] payload = new byte[length]
+        dis.readFully(payload)
+        def json = slurper.parse(payload)
+        byte [] decoded = Base64.decode(json.persona)
+        Persona persona = new Persona(new ByteArrayInputStream(decoded))
+        MWProfileHeader profileHeader = null
+        if (json.profileHeader != null) {
+            decoded = Base64.decode(json.profileHeader)
+            profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
+            if (persona != profileHeader.getPersona())
+                throw new IOException("persona and profile mismatch")
+        }
+        new TrustEntry(persona, (String)json.reason, profileHeader)
     }
 }

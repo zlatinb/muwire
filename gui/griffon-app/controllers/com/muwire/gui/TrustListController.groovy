@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.gui.profile.TrustPOP
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -27,8 +28,9 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.trusted[selectedRow].persona
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
+        TrustPOP tp = model.trusted[selectedRow]
+        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.TRUSTED, 
+                reason : reason, profileHeader: tp.getHeader()))
         view.fireUpdate("trusted-table")
     }
 
@@ -38,8 +40,9 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.distrusted[selectedRow].persona
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.TRUSTED, reason : reason))
+        TrustPOP tp = model.distrusted[selectedRow]
+        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.TRUSTED,
+                reason : reason, profileHeader: tp.getHeader()))
         view.fireUpdate("distrusted-table")
     }
 
@@ -49,8 +52,9 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.trusted[selectedRow].persona
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
+        TrustPOP tp = model.trusted[selectedRow]
+        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.DISTRUSTED,
+                reason : reason, profileHeader: tp.getHeader()))
         view.fireUpdate("trusted-table")
     }
 
@@ -60,8 +64,9 @@ class TrustListController {
         if (selectedRow < 0)
             return
         String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        Persona p = model.distrusted[selectedRow].persona
-        eventBus.publish(new TrustEvent(persona : p, level : TrustLevel.DISTRUSTED, reason : reason))
+        TrustPOP tp = model.distrusted[selectedRow]
+        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.DISTRUSTED,
+                reason : reason, profileHeader: tp.getHeader()))
         view.fireUpdate("distrusted-table")
     }
 }

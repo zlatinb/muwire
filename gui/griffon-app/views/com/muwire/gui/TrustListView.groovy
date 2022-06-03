@@ -1,6 +1,9 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -53,9 +56,12 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER){
                         table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.trusted) {
-                                closureColumn(header: trans("TRUSTED_USERS"), type : Persona, read : {it.persona})
-                                closureColumn(header: trans("REASON"), type : String, read : {HTMLSanitizer.sanitize(it.reason)})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
+                                closureColumn(header: trans("TRUSTED_USERS"), type : PersonaOrProfile, read : {it})
+                                closureColumn(header: trans("REASON"), type : String, read : {it.reason})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {
+                                    Persona p = it.persona
+                                    trans(model.trustService.getLevel(p.destination).name())
+                                })
                             }
                         }
                     }
@@ -70,9 +76,12 @@ class TrustListView {
                     scrollPane (constraints : BorderLayout.CENTER ){
                         table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                             tableModel(list : model.distrusted) {
-                                closureColumn(header: trans("DISTRUSTED_USERS"), type : Persona, read : {it.persona})
-                                closureColumn(header: trans("REASON"), type:String, read : {HTMLSanitizer.sanitize(it.reason)})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {trans(model.trustService.getLevel(it.persona.destination).name())})
+                                closureColumn(header: trans("DISTRUSTED_USERS"), type : PersonaOrProfile, read : {it})
+                                closureColumn(header: trans("REASON"), type:String, read : {it.reason})
+                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {
+                                    Persona p = it.persona
+                                    trans(model.trustService.getLevel(p.destination).name())
+                                })
                             }
                         }
                     }
@@ -88,19 +97,19 @@ class TrustListView {
 
     void mvcGroupInit(Map<String,String> args) {
         
-        def personaRenderer = new PersonaCellRenderer()
-        def personaComparator = new PersonaComparator()
+        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popComparator = new PersonaOrProfileComparator()
 
         JTable trustedTable = builder.getVariable("trusted-table")
-        trustedTable.setDefaultRenderer(Persona.class, personaRenderer)
-        trustedTable.rowSorter.setComparator(0, personaComparator)
+        trustedTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        trustedTable.rowSorter.setComparator(0, popComparator)
         trustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["trusted-table"] = evt})
         trustedTable.rowSorter.setSortsOnUpdates(true)
         trustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
         JTable distrustedTable = builder.getVariable("distrusted-table")
-        distrustedTable.setDefaultRenderer(Persona.class, personaRenderer)
-        distrustedTable.rowSorter.setComparator(0, personaComparator)
+        distrustedTable.setDefaultRenderer(Persona.class, popRenderer)
+        distrustedTable.rowSorter.setComparator(0, popComparator)
         distrustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["distrusted-table"] = evt})
         distrustedTable.rowSorter.setSortsOnUpdates(true)
         distrustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

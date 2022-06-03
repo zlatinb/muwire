@@ -530,6 +530,8 @@ class ConnectionAcceptor {
                     def obj = [:]
                     obj.persona = it.persona.toBase64()
                     obj.reason = it.reason
+                    if (it.profileHeader != null)
+                        obj.profileHeader = it.profileHeader.toBase64()
                     String toJson = JsonOutput.toJson(obj)
                     byte [] payload = toJson.getBytes(StandardCharsets.US_ASCII)
                     dos.writeShort(payload.length)
@@ -539,6 +541,8 @@ class ConnectionAcceptor {
                     def obj = [:]
                     obj.persona = it.persona.toBase64()
                     obj.reason = it.reason
+                    if (it.profileHeader != null)
+                        obj.profileHeader = it.profileHeader.toBase64()
                     String toJson = JsonOutput.toJson(obj)
                     byte [] payload = toJson.getBytes(StandardCharsets.US_ASCII)
                     dos.writeShort(payload.length)

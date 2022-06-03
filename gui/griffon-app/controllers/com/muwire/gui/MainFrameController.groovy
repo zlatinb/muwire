@@ -425,7 +425,7 @@ class MainFrameController {
             return
         core.muOptions.trustSubscriptions.remove(list.persona)
         saveMuWireSettings()
-        model.subscriptions.remove(list)
+        model.subscriptions.remove(model.buildSubPOP(list))
         JTable table = builder.getVariable("subscription-table")
         table.model.fireTableDataChanged()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : list.persona, subscribe : false))
@@ -435,7 +435,7 @@ class MainFrameController {
         int row = view.getSelectedContactSubscriptionTableRow()
         if (row < 0)
             return null
-        model.subscriptions[row]
+        model.subscriptions[row].getTrustList()
     }
     
     @ControllerAction
@@ -931,7 +931,7 @@ class MainFrameController {
         int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        TrustEntry te = model.contacts[row]
+        Persona persona = model.contacts[row].getPersona()
         
         def params = [:]
         params.recipients = new HashSet<>(Collections.singletonList(te.persona))
@@ -949,8 +949,8 @@ class MainFrameController {
         int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        TrustEntry te = model.contacts.get(row)
-        CopyPasteSupport.copyToClipboard(te.persona.toBase64())
+        Persona persona = model.contacts.get(row).getPersona()
+        CopyPasteSupport.copyToClipboard(persona.toBase64())
     }
     
     @ControllerAction

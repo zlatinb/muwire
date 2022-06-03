@@ -1,6 +1,8 @@
 package com.muwire.core.trust
 
 import com.muwire.core.EventBus
+import com.muwire.core.profile.MWProfileFetchEvent
+import com.muwire.core.profile.MWProfileHeader
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
@@ -50,9 +52,8 @@ class TrustService extends Service {
             persistGood.eachLine("UTF-8", {
                 try {
                     def json = slurper.parseText(it)
-                    byte [] decoded = Base64.decode(json.persona)
-                    Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                    good.put(persona.destination, new TrustEntry(persona, json.reason))
+                    def te = fromJson(json)
+                    good.put(te.persona.destination, te)
                 } catch (Exception bad) {
                     log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
                 }
@@ -62,9 +63,8 @@ class TrustService extends Service {
             persistBad.eachLine("UTF-8", {
                 try {
                     def json = slurper.parseText(it)
-                    byte [] decoded = Base64.decode(json.persona)
-                    Persona persona = new Persona(new ByteArrayInputStream(decoded))
-                    bad.put(persona.destination, new TrustEntry(persona, json.reason))
+                    def te = fromJson(json)
+                    bad.put(te.persona.destination, te)
                 } catch (Exception bad) {
                     log.log(Level.WARNING,"couldn't parse trust entry $it",bad)
                 }
@@ -72,6 +72,17 @@ class TrustService extends Service {
         }
         loaded = true
         eventBus.publish(new TrustServiceLoadedEvent())
+    }
+    
+    private static TrustEntry fromJson(def json) {
+        byte [] decoded = Base64.decode(json.persona)
+        Persona persona = new Persona(new ByteArrayInputStream(decoded))
+        MWProfileHeader profileHeader = null
+        if (json.profileHeader != null) {
+            decoded = Base64.decode(json.profileHeader)
+            profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
+        }
+        new TrustEntry(persona, (String)json.reason, profileHeader)
     }
 
     private void persist() {
@@ -81,6 +92,8 @@ class TrustService extends Service {
                 def json = [:]
                 json.persona = v.persona.toBase64()
                 json.reason = v.reason
+                if (v.profileHeader != null)
+                    json.profileHeader = v.profileHeader.toBase64()
                 writer.println JsonOutput.toJson(json)
             }
         })
@@ -90,6 +103,8 @@ class TrustService extends Service {
                 def json = [:]
                 json.persona = v.persona.toBase64()
                 json.reason = v.reason
+                if (v.profileHeader != null)
+                    json.profileHeader = v.profileHeader.toBase64()
                 writer.println JsonOutput.toJson(json)
             }
         })
@@ -102,16 +117,23 @@ class TrustService extends Service {
             return TrustLevel.DISTRUSTED
         TrustLevel.NEUTRAL
     }
+    
+    MWProfileHeader getProfileHeader(Persona persona) {
+        def rv = good[persona.destination]?.getProfileHeader()
+        if (rv == null)
+            rv = bad[persona.destination]?.getProfileHeader()
+        rv
+    }
 
     void onTrustEvent(TrustEvent e) {
         switch(e.level) {
             case TrustLevel.TRUSTED:
                 bad.remove(e.persona.destination)
-                good.put(e.persona.destination, new TrustEntry(e.persona, e.reason))
+                good.put(e.persona.destination, new TrustEntry(e.persona, e.reason, e.profileHeader))
                 break
             case TrustLevel.DISTRUSTED:
                 good.remove(e.persona.destination)
-                bad.put(e.persona.destination, new TrustEntry(e.persona, e.reason))
+                bad.put(e.persona.destination, new TrustEntry(e.persona, e.reason, e.profileHeader))
                 break
             case TrustLevel.NEUTRAL:
                 good.remove(e.persona.destination)
@@ -121,12 +143,25 @@ class TrustService extends Service {
         diskIO.submit({persist()} as Runnable)
     }
     
+    void onMWProfileFetchEvent(MWProfileFetchEvent event) {
+        def dest = event.profile.getHeader().getPersona().getDestination()
+        TrustEntry te = good[dest]
+        if (te == null)
+            te = bad[dest]
+        if (te == null)
+            return
+        te.profileHeader = event.profile.getHeader()
+        diskIO.submit({persist()} as Runnable)
+    }
+    
     public static class TrustEntry {
         final Persona persona
         final String reason
-        TrustEntry(Persona persona, String reason) {
+        volatile MWProfileHeader profileHeader
+        TrustEntry(Persona persona, String reason, MWProfileHeader profileHeader) {
             this.persona = persona
             this.reason = reason
+            this.profileHeader = profileHeader
         }
         
         public int hashCode() {

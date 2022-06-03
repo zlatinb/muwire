@@ -652,10 +652,10 @@ class MainFrameView {
                                     table(id: "contacts-table", autoCreateRowSorter: true, rowHeight: rowHeight,
                                             dragEnabled: true, transferHandler: new PersonaTransferHandler()) {
                                         tableModel(list: model.contacts) {
-                                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: Persona, read: { it.persona })
-                                            closureColumn(header: trans("REASON"), preferredWidth: 450, type: String, read: { it.reason })
-                                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: String, read: { row ->
-                                                trans(model.core.trustService.getLevel(row.persona.destination).name())
+                                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: PersonaOrProfile, read: { it })
+                                            closureColumn(header: trans("REASON"), preferredWidth: 450, type: String, read: { it.getReason() })
+                                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: String, read: { PersonaOrProfile row ->
+                                                trans(model.core.trustService.getLevel(row.getPersona().destination).name())
                                             })
                                         }
                                     }
@@ -692,11 +692,11 @@ class MainFrameView {
                             scrollPane(constraints : BorderLayout.CENTER) {
                                 table(id : "subscription-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.subscriptions) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 200, type: Persona, read : {it.persona})
-                                        closureColumn(header : trans("TRUSTED"), preferredWidth : 20, type: Integer, read : {it.good.size()})
-                                        closureColumn(header : trans("DISTRUSTED"), preferredWidth: 20, type: Integer, read : {it.bad.size()})
-                                        closureColumn(header : trans("STATUS"), preferredWidth: 30, type: String, read : {trans(it.status.name())})
-                                        closureColumn(header : trans("LAST_UPDATED"), preferredWidth: 200, type : Long, read : { it.timestamp })
+                                        closureColumn(header : trans("NAME"), preferredWidth: 200, type: PersonaOrProfile, read : {it})
+                                        closureColumn(header : trans("TRUSTED"), preferredWidth : 20, type: Integer, read : {it.trustList.good.size()})
+                                        closureColumn(header : trans("DISTRUSTED"), preferredWidth: 20, type: Integer, read : {it.trustList.bad.size()})
+                                        closureColumn(header : trans("STATUS"), preferredWidth: 30, type: String, read : {trans(it.trustList.status.name())})
+                                        closureColumn(header : trans("LAST_UPDATED"), preferredWidth: 200, type : Long, read : { it.trustList.timestamp })
                                     }
                                 }
                             }
@@ -1287,10 +1287,10 @@ class MainFrameView {
         // subscription table
         JTable subscriptionTable = builder.getVariable("subscription-table")
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
-        subscriptionTable.setDefaultRenderer(Persona.class, personaRenderer)
+        subscriptionTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         subscriptionTable.rowSorter.addRowSorterListener({ evt -> lastContactsSubscriptionSortEvent = evt })
         subscriptionTable.rowSorter.setSortsOnUpdates(true)
-        subscriptionTable.rowSorter.setComparator(0, personaComparator)
+        subscriptionTable.rowSorter.setComparator(0, popComparator)
         selectionModel = subscriptionTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
@@ -1301,7 +1301,7 @@ class MainFrameView {
                 model.unsubscribeButtonEnabled = false
                 return
             }
-            def trustList = model.subscriptions[selectedRow]
+            def trustList = model.subscriptions[selectedRow]?.getTrustList()
             if (trustList == null)
                 return
             switch (trustList.status) {
@@ -1324,8 +1324,8 @@ class MainFrameView {
 
         // contacts table
         JTable contactsTable = builder.getVariable("contacts-table")
-        contactsTable.setDefaultRenderer(Persona.class, personaRenderer)
-        contactsTable.rowSorter.setComparator(0, personaComparator)
+        contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        contactsTable.rowSorter.setComparator(0, popComparator)
         contactsTable.rowSorter.addRowSorterListener({ evt -> lastContactsSortEvent = evt })
         contactsTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = contactsTable.getSelectionModel()

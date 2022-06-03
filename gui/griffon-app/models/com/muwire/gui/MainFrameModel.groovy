@@ -5,9 +5,11 @@ import com.muwire.core.download.DownloadHopelessEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.search.ResultsEvent
+import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustServiceLoadedEvent
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ThumbnailIcon
+import com.muwire.gui.profile.TrustPOP
 
 import javax.swing.DefaultListModel
 import javax.swing.Icon
@@ -134,8 +136,8 @@ class MainFrameModel {
     
     def connectionList = []
     def searches = new LinkedList()
-    def contacts = []
-    def subscriptions = []
+    List<TrustPOP> contacts = []
+    List<SubscriptionPOP> subscriptions = []
     def feeds = []
     def feedItems = []
     
@@ -366,8 +368,8 @@ class MainFrameModel {
             }, 1000, 1000)
 
             runInsideUIAsync {
-                contacts.addAll(core.trustService.good.values())
-                contacts.addAll(core.trustService.bad.values())
+                contacts.addAll(core.trustService.good.values().collect {new TrustPOP(it)})
+                contacts.addAll(core.trustService.bad.values().collect {new TrustPOP(it)})
 
                 resumeButtonText = "RETRY"
                 
@@ -706,16 +708,17 @@ class MainFrameModel {
     
     private void refreshContacts() {
         contacts.clear()
-        contacts.addAll(core.trustService.good.values())
-        contacts.addAll(core.trustService.bad.values())
+        contacts.addAll(core.trustService.good.values().collect{new TrustPOP(it)})
+        contacts.addAll(core.trustService.bad.values().collect{new TrustPOP(it)})
 
         updateTablePreservingSelection("contacts-table")
     }
 
     void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
         runInsideUIAsync {
-            if (!subscriptions.contains(e.trustList))
-                subscriptions << e.trustList
+            def subPOP = new SubscriptionPOP(e.trustList)
+            if (!subscriptions.contains(subPOP))
+                subscriptions << subPOP
             updateTablePreservingSelection("subscription-table")
         }
     }
@@ -1126,6 +1129,46 @@ class MainFrameModel {
             libraryDirty = false
             setLoadedFiles(allSharedFiles.size())
             view.refreshSharedFiles()
+        }
+    }
+    
+    SubscriptionPOP buildSubPOP(RemoteTrustList list) {
+        new SubscriptionPOP(list)
+    }
+    
+    class SubscriptionPOP implements PersonaOrProfile {
+        final RemoteTrustList trustList
+        Icon icon
+        SubscriptionPOP(RemoteTrustList trustList) {
+            this.trustList = trustList
+        }
+
+        @Override
+        Persona getPersona() {
+            trustList.getPersona()
+        }
+        
+        @Override
+        Icon getThumbnail() {
+            MWProfileHeader header = core.trustService.getProfileHeader(getPersona())
+            if (header == null)
+                return null
+            if (icon == null)
+                icon = new ThumbnailIcon(header.getThumbNail())
+            return icon
+        }
+
+        @Override
+        String getTitle() {
+            String title = core.trustService.getProfileHeader(getPersona())?.getTitle()
+            return HTMLSanitizer.sanitize(title)
+        }
+        
+        public boolean equals(Object o) {
+            if (!(o instanceof SubscriptionPOP))
+                return false
+            SubscriptionPOP other = (SubscriptionPOP)o
+            return trustList == other.trustList
         }
     }
 }

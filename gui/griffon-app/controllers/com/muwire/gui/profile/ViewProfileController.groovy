@@ -28,13 +28,15 @@ class ViewProfileController {
     @ControllerAction
     void addContact() {
         String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
-        model.core.eventBus.publish(new TrustEvent(persona: model.persona, level: TrustLevel.TRUSTED, reason: reason))
+        model.core.eventBus.publish(new TrustEvent(persona: model.persona, level: TrustLevel.TRUSTED, 
+                reason: reason, profileHeader: model.profile?.getHeader()))
     }
     
     @ControllerAction
     void block() {
         String reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
-        model.core.eventBus.publish(new TrustEvent(persona: model.persona, level: TrustLevel.DISTRUSTED, reason: reason))
+        model.core.eventBus.publish(new TrustEvent(persona: model.persona, level: TrustLevel.DISTRUSTED, 
+                reason: reason, profileHeader: model.profile?.getHeader()))
     }
     
     @ControllerAction

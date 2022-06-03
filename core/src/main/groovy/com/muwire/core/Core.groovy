@@ -10,6 +10,7 @@ import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileFetchEvent
 import com.muwire.core.profile.MWProfileFetcher
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.profile.UIProfileFetchEvent
@@ -316,6 +317,7 @@ public class Core {
         File badTrust = new File(home, "distrusted")
         trustService = new TrustService(eventBus, goodTrust, badTrust)
         eventBus.register(TrustEvent.class, trustService)
+        eventBus.register(MWProfileFetchEvent.class, trustService)
 
         log.info("initializing content manager")
         contentManager = new ContentManager(eventBus, home, props)

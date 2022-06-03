@@ -2,6 +2,7 @@ package com.muwire.gui.profile
 
 import com.muwire.core.Core
 import com.muwire.core.Persona
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileFetchEvent
 import com.muwire.core.profile.MWProfileFetchStatus
 import com.muwire.core.profile.MWProfileHeader
@@ -24,6 +25,7 @@ class ViewProfileModel {
     String profileTitle
     
     @Observable MWProfileFetchStatus status
+    MWProfile profile
     
     private boolean registered
     
@@ -48,8 +50,10 @@ class ViewProfileModel {
             return
         runInsideUIAsync {
             status = event.status
-            if (status == MWProfileFetchStatus.FINISHED)
+            if (status == MWProfileFetchStatus.FINISHED) {
                 view.profileFetched(event.profile)
+                profile = event.profile
+            }
         }
     }
 }
