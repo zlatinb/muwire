@@ -8,7 +8,9 @@ import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.swing.JFrame
 import javax.swing.JTable
+import java.awt.Dimension
 
 import static com.muwire.gui.Translator.trans
 import javax.swing.JDialog
@@ -28,17 +30,20 @@ class TrustListView {
     @MVCMember @Nonnull
     TrustListModel model
 
-    def dialog
-    def mainFrame
-    def mainPanel
-
-    def sortEvents = [:]
+    JFrame window
+    JFrame mainFrame
+    JTable contactsTable
 
     void initUI() {
-        mainFrame = application.windowManager.findWindow("main-frame")
         int rowHeight = application.context.get("row-height")
-        dialog = new JDialog(mainFrame, model.trustList.persona.getHumanReadableName(), true)
-        mainPanel = builder.panel {
+        mainFrame = application.windowManager.findWindow("main-frame")
+        
+        int dimX = Math.max(600, (int)(mainFrame.getWidth() / 2))
+        int dimY = Math.max(500, (int)(mainFrame.getHeight() / 2))
+        
+        window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
+                iconImage: builder.imageIcon("/MuWire-48x48.png").image,
+                title: model.trustList.persona.getHumanReadableName()) {
             borderLayout()
             panel(constraints : BorderLayout.NORTH) {
                 borderLayout()
@@ -50,49 +55,30 @@ class TrustListView {
                 }
             }
             panel(constraints : BorderLayout.CENTER) {
-                gridLayout(rows : 1, cols : 2)
-                panel {
-                    borderLayout()
-                    scrollPane (constraints : BorderLayout.CENTER){
-                        table(id : "trusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                            tableModel(list : model.trusted) {
-                                closureColumn(header: trans("TRUSTED_USERS"), type : PersonaOrProfile, read : {it})
-                                closureColumn(header: trans("REASON"), type : String, read : {it.reason})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {
-                                    Persona p = it.persona
-                                    trans(model.trustService.getLevel(p.destination).name())
-                                })
-                            }
+                borderLayout()
+                scrollPane (constraints : BorderLayout.CENTER){
+                    contactsTable = table(id : "contacts-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
+                        tableModel(list : model.contacts) {
+                            closureColumn(header: trans("CONTACTS"), preferredWidth: 200, type : PersonaOrProfile, read : {it})
+                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 20,  type: String, read: {
+                                trans(it.level.name())
+                            })
+                            closureColumn(header: trans("REASON"), preferredWidth: 200,  type : String, read : {it.reason})
+                            closureColumn(header: trans("YOUR_TRUST"), preferredWidth: 20,  type : String, read : {
+                                Persona p = it.persona
+                                trans(model.trustService.getLevel(p.destination).name())
+                            })
                         }
-                    }
-                    panel (constraints : BorderLayout.SOUTH) {
-                        gridBagLayout()
-                        button(text : trans("TRUST_VERB"), constraints : gbc(gridx : 0, gridy : 0), trustFromTrustedAction)
-                        button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromTrustedAction)
                     }
                 }
-                panel {
-                    borderLayout()
-                    scrollPane (constraints : BorderLayout.CENTER ){
-                        table(id : "distrusted-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                            tableModel(list : model.distrusted) {
-                                closureColumn(header: trans("DISTRUSTED_USERS"), type : PersonaOrProfile, read : {it})
-                                closureColumn(header: trans("REASON"), type:String, read : {it.reason})
-                                closureColumn(header: trans("YOUR_TRUST"), type : String, read : {
-                                    Persona p = it.persona
-                                    trans(model.trustService.getLevel(p.destination).name())
-                                })
-                            }
-                        }
-                    }
-                    panel(constraints : BorderLayout.SOUTH) {
-                        gridBagLayout()
-                        button(text : trans("TRUST_VERB"), constraints : gbc(gridx : 0, gridy : 0), trustFromDistrustedAction)
-                        button(text : trans("DISTRUST"), constraints : gbc(gridx : 1, gridy : 0), distrustFromDistrustedAction)
-                    }
+                panel (constraints : BorderLayout.SOUTH) {
+                    gridBagLayout()
+                    button(text : trans("VIEW_PROFILE"), constraints : gbc(gridx : 0, gridy : 0), viewProfileAction)
+                    button(text : trans("CLOSE"), constraints : gbc(gridx : 1, gridy : 0), closeAction)
                 }
             }
         }
+        window.setPreferredSize([dimX, dimY] as Dimension)
     }
 
     void mvcGroupInit(Map<String,String> args) {
@@ -100,44 +86,29 @@ class TrustListView {
         def popRenderer = new PersonaOrProfileCellRenderer()
         def popComparator = new PersonaOrProfileComparator()
 
-        JTable trustedTable = builder.getVariable("trusted-table")
-        trustedTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
-        trustedTable.rowSorter.setComparator(0, popComparator)
-        trustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["trusted-table"] = evt})
-        trustedTable.rowSorter.setSortsOnUpdates(true)
-        trustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        contactsTable.rowSorter.setComparator(0, popComparator)
+        contactsTable.rowSorter.setSortsOnUpdates(true)
+        contactsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-        JTable distrustedTable = builder.getVariable("distrusted-table")
-        distrustedTable.setDefaultRenderer(Persona.class, popRenderer)
-        distrustedTable.rowSorter.setComparator(0, popComparator)
-        distrustedTable.rowSorter.addRowSorterListener({evt -> sortEvents["distrusted-table"] = evt})
-        distrustedTable.rowSorter.setSortsOnUpdates(true)
-        distrustedTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-
-        dialog.getContentPane().add(mainPanel)
-        dialog.pack()
-        dialog.setLocationRelativeTo(mainFrame)
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.addWindowListener(new WindowAdapter() {
+        window.pack()
+        window.setLocationRelativeTo(mainFrame)
+        window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 mvcGroup.destroy()
             }
         })
-        dialog.show()
+        window.setVisible(true)
     }
 
-    int getSelectedRow(String tableName) {
-        def table = builder.getVariable(tableName)
-        int selectedRow = table.getSelectedRow()
+    int getSelectedRow() {
+        int selectedRow = contactsTable.getSelectedRow()
         if (selectedRow < 0)
             return -1
-        if (sortEvents.get(tableName) != null)
-            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
-        selectedRow
+        contactsTable.rowSorter.convertRowIndexToModel(selectedRow)
     }
 
-    void fireUpdate(String tableName) {
-        def table = builder.getVariable(tableName)
-        table.model.fireTableDataChanged()
+    void updateTable() {
+        contactsTable.model.fireTableDataChanged()
     }
 }

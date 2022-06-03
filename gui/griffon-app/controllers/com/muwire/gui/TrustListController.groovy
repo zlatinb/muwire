@@ -1,5 +1,7 @@
 package com.muwire.gui
 
+import com.muwire.core.Core
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.gui.profile.TrustPOP
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -20,53 +22,30 @@ class TrustListController {
     @MVCMember @Nonnull
     TrustListView view
 
-    EventBus eventBus
-
+    Core core
+    
     @ControllerAction
-    void trustFromTrusted() {
-        int selectedRow = view.getSelectedRow("trusted-table")
+    void viewProfile() {
+        int selectedRow = view.getSelectedRow()
         if (selectedRow < 0)
             return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        TrustPOP tp = model.trusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.TRUSTED, 
-                reason : reason, profileHeader: tp.getHeader()))
-        view.fireUpdate("trusted-table")
+        
+        Persona persona = model.contacts[selectedRow].persona
+        MWProfileHeader profileHeader = model.contacts[selectedRow].getHeader()
+        UUID uuid = UUID.randomUUID()
+        
+        def params = [:]
+        params.persona = persona
+        params.core = core
+        params.uuid = uuid
+        params.profileHeader = profileHeader
+        
+        mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }
-
+    
     @ControllerAction
-    void trustFromDistrusted() {
-        int selectedRow = view.getSelectedRow("distrusted-table")
-        if (selectedRow < 0)
-            return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        TrustPOP tp = model.distrusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.TRUSTED,
-                reason : reason, profileHeader: tp.getHeader()))
-        view.fireUpdate("distrusted-table")
-    }
-
-    @ControllerAction
-    void distrustFromTrusted() {
-        int selectedRow = view.getSelectedRow("trusted-table")
-        if (selectedRow < 0)
-            return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        TrustPOP tp = model.trusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.DISTRUSTED,
-                reason : reason, profileHeader: tp.getHeader()))
-        view.fireUpdate("trusted-table")
-    }
-
-    @ControllerAction
-    void distrustFromDistrusted() {
-        int selectedRow = view.getSelectedRow("distrusted-table")
-        if (selectedRow < 0)
-            return
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        TrustPOP tp = model.distrusted[selectedRow]
-        eventBus.publish(new TrustEvent(persona : tp.getPersona(), level : TrustLevel.DISTRUSTED,
-                reason : reason, profileHeader: tp.getHeader()))
-        view.fireUpdate("distrusted-table")
+    void close() {
+        view.window.setVisible(false)
+        mvcGroup.destroy()
     }
 }

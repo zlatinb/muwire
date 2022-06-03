@@ -7,6 +7,7 @@ import com.muwire.core.profile.MWProfileFetchEvent
 import com.muwire.core.profile.MWProfileFetchStatus
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.profile.UIProfileFetchEvent
+import com.muwire.gui.HTMLSanitizer
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -23,6 +24,7 @@ class ViewProfileModel {
     Persona persona
     UUID uuid
     String profileTitle
+    MWProfileHeader profileHeader
     
     @Observable MWProfileFetchStatus status
     MWProfile profile
@@ -30,6 +32,8 @@ class ViewProfileModel {
     private boolean registered
     
     void mvcGroupInit(Map<String, String> args) {
+        if (profileHeader != null)
+            profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
     }
     
     void register() {
@@ -53,6 +57,7 @@ class ViewProfileModel {
             if (status == MWProfileFetchStatus.FINISHED) {
                 view.profileFetched(event.profile)
                 profile = event.profile
+                profileHeader = profile.getHeader()
             }
         }
     }

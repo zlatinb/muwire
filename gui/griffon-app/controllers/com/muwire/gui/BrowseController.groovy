@@ -201,7 +201,7 @@ class BrowseController {
         params.core = core
         params.persona = model.host
         params.uuid = uuid
-        params.profileTitle = HTMLSanitizer.sanitize(header?.getTitle())
+        params.profileHeader = header
         
         mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }

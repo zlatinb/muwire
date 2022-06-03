@@ -405,7 +405,7 @@ class MainFrameController {
         Map<String,Object> env = new HashMap<>()
         env["trustList"] = list
         env["trustService"] = core.trustService
-        env["eventBus"] = core.eventBus
+        env["core"] = core
         mvcGroup.createMVCGroup("trust-list", env)
 
     }
