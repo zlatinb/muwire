@@ -4,6 +4,9 @@ import com.muwire.core.Persona
 import com.muwire.core.collections.FileCollection
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.MWMessageAttachment
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaOrProfileCellRenderer
+import com.muwire.gui.profile.PersonaOrProfileComparator
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
@@ -62,7 +65,7 @@ class MessageFolderView {
                         dragEnabled: true, transferHandler: new MessageExportTransferHandler()) {
                         if (!model.outgoing) {
                             tableModel(list: model.messageHeaders) {
-                                closureColumn(header: trans("SENDER"), preferredWidth: 200, type: Persona, read: { it.message.sender })
+                                closureColumn(header: trans("SENDER"), preferredWidth: 200, type: PersonaOrProfile, read: { it })
                                 closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { HTMLSanitizer.sanitize(it.message.subject) })
                                 closureColumn(header: trans("RECIPIENTS"), preferredWidth: 20, type: Integer, read: { it.message.recipients.size() })
                                 closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
@@ -193,11 +196,11 @@ class MessageFolderView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
 
-        messageHeaderTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        messageHeaderTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
         messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         if (!model.outgoing)
-            messageHeaderTable.rowSorter.setComparator(0, new PersonaComparator())
+            messageHeaderTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
         messageHeaderTable.rowSorter.addRowSorterListener({evt -> lastMessageHeaderTableSortEvent = evt})
         messageHeaderTable.rowSorter.setSortsOnUpdates(true)
         def sortKey = new RowSorter.SortKey(model.outgoing ? 2 : 3, SortOrder.ASCENDING)

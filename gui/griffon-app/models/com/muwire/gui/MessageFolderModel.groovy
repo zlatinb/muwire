@@ -29,7 +29,7 @@ class MessageFolderModel {
     @Observable String messageRecipientList
 
     void deleteMessage(MWMessage message) {
-        MWMessageStatus status = new MWMessageStatus(message, false)
+        MWMessageStatus status = new MWMessageStatus(message, false, null)
         messageHeaders.remove(status)
         messages.remove(status)
         view.messageHeaderTable.model.fireTableDataChanged()
@@ -38,7 +38,7 @@ class MessageFolderModel {
     }
     
     void processMessageLoadedEvent(MessageLoadedEvent e) {
-        def status = new MWMessageStatus(e.message, e.unread)
+        def status = new MWMessageStatus(e.message, e.unread, e.profileHeader)
         if (messages.add(status)) {
             messageHeaders.add(status)
             view.messageHeaderTable.model.fireTableDataChanged()
@@ -46,7 +46,7 @@ class MessageFolderModel {
     }
     
     boolean processMessageReceivedEvent(MessageReceivedEvent e) {
-        def status = new MWMessageStatus(e.message, true)
+        def status = new MWMessageStatus(e.message, true, e.profileHeader)
         if (messages.add(status)) {
             messageHeaders.add(status)
             view.messageHeaderTable.model.fireTableDataChanged()

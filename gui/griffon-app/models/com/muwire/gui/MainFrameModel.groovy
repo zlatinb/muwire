@@ -1044,7 +1044,7 @@ class MainFrameModel {
     }
     
     void addToOutbox(MWMessage message) {
-        def status = new MWMessageStatus(message, false)
+        def status = new MWMessageStatus(message, false, null)
         messageFoldersMap.get(Messenger.OUTBOX).model.add(status)
     }
     
@@ -1070,7 +1070,7 @@ class MainFrameModel {
     
     void onMessageSentEvent(MessageSentEvent e) {
         runInsideUIAsync {
-            MWMessageStatus status = new MWMessageStatus(e.message, false)
+            MWMessageStatus status = new MWMessageStatus(e.message, false, null)
             messageFoldersMap.get(Messenger.OUTBOX).model.remove(status)
             messageFoldersMap.get(Messenger.SENT).model.add(status)
         }

@@ -1,5 +1,7 @@
 package com.muwire.core.messenger
 
+import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileHeader
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -8,6 +10,7 @@ import java.nio.file.StandardCopyOption
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.function.Supplier
 import java.util.logging.Level
 import java.util.zip.GZIPOutputStream
 
@@ -39,6 +42,7 @@ class Messenger {
     private final EventBus eventBus
     private final Map<String,File> folders = new HashMap<>()
     private final I2PConnector connector
+    private final Supplier<MWProfile> profileSupplier
     private final MuWireSettings settings
     
     private final Map<File, Set<MWMessage>> messages = new HashMap<>()
@@ -62,10 +66,12 @@ class Messenger {
     private long lastSendTime
     
     
-    Messenger(EventBus eventBus, File home, I2PConnector connector, MuWireSettings settings) {
+    Messenger(EventBus eventBus, File home, I2PConnector connector, 
+              Supplier<MWProfile> profileSupplier, MuWireSettings settings) {
         this.eventBus = eventBus
         this.home = home
         this.connector = connector
+        this.profileSupplier = profileSupplier
         this.settings = settings
         
         File messages = new File(home, "messages")
@@ -130,8 +136,16 @@ class Messenger {
                         message = new MWMessage(it)
                     }
                     addMessage(message, dest)
+                    MWProfileHeader header = null
+                    File profile = new File(file, deriveProfile(message))
+                    if (profile.exists()) {
+                        profile.withInputStream {
+                            header = new MWProfileHeader(it)
+                        }
+                    }
                     File unread = new File(file, deriveUnread(message))
-                    eventBus.publish(new MessageLoadedEvent(message: message, folder: folder, unread: unread.exists()))
+                    eventBus.publish(new MessageLoadedEvent(message: message, folder: folder, 
+                            unread: unread.exists(), profileHeader: header))
                 } catch (IOException iox) {
                     log.warning("couldn't load message from $path" )
                 }
@@ -178,6 +192,10 @@ class Messenger {
         namePrefix(message) + ".unread"
     }
     
+    private static String deriveProfile(MWMessage message) {
+        namePrefix(message) + ".profile"
+    }
+    
     private static String namePrefix(MWMessage message) {
         String ih = Base64.encode(message.getInfoHash().getRoot())
         "${ih}_${message.sender.getHumanReadableName()}_${message.timestamp}"
@@ -221,6 +239,12 @@ class Messenger {
             diskIO.execute({
                 File unread = new File(folders.get(INBOX), deriveUnread(e.message))
                 unread.createNewFile()
+                if (e.profileHeader != null) {
+                    File profile = new File(folders.get(INBOX), deriveProfile(e.message))
+                    profile.withOutputStream {
+                        e.profileHeader.write(it)
+                    }
+                }
                 persist(e.message, folders.get(INBOX))
             })
         }
@@ -233,6 +257,9 @@ class Messenger {
             os.write("LETTER\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Version:1\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Count:1\r\n".getBytes(StandardCharsets.US_ASCII))
+            MWProfile profile = profileSupplier.get()
+            if (profile != null)
+                os.write("ProfileHeader:${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             os = new GZIPOutputStream(os)
             message.write(os)
@@ -261,6 +288,10 @@ class Messenger {
         set.remove(message)
         File messageFile = new File(file, deriveName(message))
         messageFile.delete()
+        File unreadFile = new File(file, deriveUnread(message))
+        unreadFile.delete()
+        File profileFile = new File(file, deriveProfile(message))
+        profileFile.delete()
     }
     
     synchronized void onUIFolderCreateEvent(UIFolderCreateEvent e) {
@@ -303,6 +334,8 @@ class Messenger {
             unread = new File(unread, deriveUnread(e.message))
             boolean unreadExists = unread.exists()
 
+            File profileFrom = new File(containerFrom, e.from)
+            profileFrom = new File(profileFrom, deriveProfile(e.message))
 
             File containerTo
             if (RESERVED_FOLDERS.contains(e.to)) {
@@ -326,9 +359,19 @@ class Messenger {
                 unread = new File(unread, deriveUnread(e.message))
                 unread.createNewFile()
             }
+            
+            MWProfileHeader profileHeader = null
+            if (profileFrom.exists()) {
+                profileFrom.withInputStream {
+                    profileHeader = new MWProfileHeader(it)
+                }
+                File profileTo = new File(containerTo, e.to)
+                profileTo = new File(profileTo, deriveProfile(e.message))
+                Files.move(profileFrom.toPath(), profileTo.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            }
 
             eventBus.publish(new MessageLoadedEvent(message: e.message, folder: e.to,
-                    unread: unreadExists))
+                    unread: unreadExists, profileHeader: profileHeader))
         }
     }
 }

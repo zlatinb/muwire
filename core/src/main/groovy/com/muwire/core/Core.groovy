@@ -544,7 +544,7 @@ public class Core {
         eventBus.register(DirectoryUnsharedEvent.class, hasherService)
         
         log.info("initializing messenger")
-        messenger = new Messenger(eventBus, home, i2pConnector, props)
+        messenger = new Messenger(eventBus, home, i2pConnector, profileSupplier, props)
         eventBus.with { 
             register(UILoadedEvent.class, messenger)
             register(MessageReceivedEvent.class, messenger)

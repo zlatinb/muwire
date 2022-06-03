@@ -767,6 +767,14 @@ class ConnectionAcceptor {
                 throw new Exception("unrecognized version")
             int count = Integer.parseInt(headers['Count'])
             
+            MWProfileHeader header = null
+            if (headers.containsKey("ProfileHeader")) {
+                byte [] decoded = Base64.decode(headers['ProfileHeader'])
+                header = new MWProfileHeader(new ByteArrayInputStream(decoded))
+                if (header.getPersona().destination != e.destination)
+                    throw new Exception("profile and destination mismatch")
+            }
+            
             if (headers.containsKey("Profile") && Boolean.parseBoolean(headers['Profile'])) {
                 int profileLength = dis.readInt()
                 if (profileLength > Constants.MAX_PROFILE_LENGTH)
@@ -778,7 +786,7 @@ class ConnectionAcceptor {
             count.times { 
                 MWMessage m = new MWMessage(dis)
                 if (m.sender.destination == e.destination && m.recipients.contains(me))
-                    eventBus.publish(new MessageReceivedEvent(message : m))
+                    eventBus.publish(new MessageReceivedEvent(message : m, profileHeader: header))
             }
         } catch (Exception bad) {
             log.log(Level.WARNING, "failed to process LETTER", bad)
