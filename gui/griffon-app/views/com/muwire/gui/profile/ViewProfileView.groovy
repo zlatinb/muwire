@@ -145,7 +145,9 @@ class ViewProfileView {
         def mainImage = ImageScaler.scaleToMax(rawImage)
 
         imagePanel.setImage(mainImage)
-        imagePanel.repaint()
+        SwingUtilities.invokeLater { // for some reason linux needs this.
+            imagePanel.repaint()
+        }
     }
     
     private void drawThumbnail(ThumbnailIcon thumbNail) {
