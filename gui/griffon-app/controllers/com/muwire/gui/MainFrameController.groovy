@@ -4,6 +4,9 @@ import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.directories.WatchedDirectory
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
+import com.muwire.gui.MainFrameModel.UploaderWrapper
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ViewProfileHelper
 
 import javax.swing.JTextField
 import java.util.regex.Pattern
@@ -940,17 +943,18 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void copyIdFromUploads(Uploader u) {
-        CopyPasteSupport.copyToClipboard(u.getDownloaderPersona().toBase64())
+    void viewProfileFromUploads(UploaderWrapper wrapper) {
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, wrapper)
     }
     
     @ControllerAction
-    void copyIdFromTrusted() {
+    void viewProfileFromTrusted() {
         int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona persona = model.contacts.get(row).getPersona()
-        CopyPasteSupport.copyToClipboard(persona.toBase64())
+
+        PersonaOrProfile pop = model.contacts.get(row)
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
     }
     
     @ControllerAction

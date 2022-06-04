@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import com.muwire.core.chat.LocalChatLink
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ViewProfileHelper
 
 import static com.muwire.gui.Translator.trans
 
@@ -163,6 +165,11 @@ class ChatRoomController {
         params['core'] = model.core
         mvcGroup.createMVCGroup("browse",groupId,params)
         application.mvcGroupManager.findGroup("MainFrame").view.showSearchWindow.call()
+    }
+    
+    void viewProfile() {
+        PersonaOrProfile pop = view.getSelectedPOP()
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
     }
     
     void leaveRoom() {

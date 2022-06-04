@@ -167,11 +167,6 @@ class BrowseController {
     }
     
     @ControllerAction
-    void copyId() {
-        CopyPasteSupport.copyToClipboard(model.host.toBase64())
-    }
-    
-    @ControllerAction
     void viewDetails() {
         def selectedResults = view.selectedResults()
         if (selectedResults == null || selectedResults.size() != 1)

@@ -91,8 +91,8 @@ class ResultDetailsTabsView {
             panel(constraints: BorderLayout.SOUTH) {
                 button(text: trans("BROWSE_HOST"), toolTipText: trans("TOOLTIP_BROWSE_FILES_SENDER"), 
                         enabled : bind {model.browseActionEnabled}, browseAction)
-                button(text: trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_SENDER_COPY_FULL"),
-                        enabled: bind {model.copyIdActionEnabled}, copyIdAction)
+                button(text: trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"),
+                        enabled: bind {model.viewProfileActionEnabled}, viewProfileAction)
             }
         }
         
@@ -189,14 +189,14 @@ class ResultDetailsTabsView {
         selectionModel.addListSelectionListener({
             int row = sendersTable.getSelectedRow()
             if (row < 0) {
-                model.copyIdActionEnabled = false
+                model.viewProfileActionEnabled = false
                 model.browseActionEnabled = false
                 return
             }
             row = sendersTable.rowSorter.convertRowIndexToModel(row)
             UIResultEvent event = model.results[row].getEvent()
             
-            model.copyIdActionEnabled = true
+            model.viewProfileActionEnabled = true
             model.browseActionEnabled = event.browse
         })
         
@@ -219,12 +219,12 @@ class ResultDetailsTabsView {
         collectionListGroup?.destroy()
     }
     
-    Persona selectedSender() {
+    PersonaOrProfile selectedSender() {
         int row = sendersTable.getSelectedRow()
         if (row < 0)
             return null
         row = sendersTable.rowSorter.convertRowIndexToModel(row)
-        model.results[row].sender
+        model.results[row]
     }
     
     void addResultToListGroups(ResultPOP resultPOP) {

@@ -4,6 +4,7 @@ import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ViewProfileHelper
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -87,40 +88,12 @@ class SearchTabController {
     }
 
     @ControllerAction
-    void trust() {
-        def sender = view.selectedSender()
-        if (sender == null)
-            return
-        sender = sender.getPersona()
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.TRUSTED, reason : reason))
-    }
-
-    @ControllerAction
-    void distrust() {
-        def sender = view.selectedSender()
-        if (sender == null)
-            return
-        sender = sender.getPersona()
-        String reason = JOptionPane.showInputDialog("Enter reason (optional)")
-        core.eventBus.publish( new TrustEvent(persona : sender, level : TrustLevel.DISTRUSTED, reason : reason))
-    }
-
-    @ControllerAction
     void viewProfile() {
         def sender = view.selectedSender()
         if (sender == null)
             return
         
-        UUID uuid = UUID.randomUUID()
-        def params = [:]
-        params.core = model.core
-        params.persona = sender.getPersona()
-        params.uuid = uuid
-        params.profileTitle = sender.getTitle()
-        params.profileHeader = sender.getHeader()
-        
-        mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, sender)
     }
 
     @ControllerAction
@@ -195,14 +168,6 @@ class SearchTabController {
         params.recipients = new HashSet<>(Collections.singletonList(recipient))
         params.core = model.core
         mvcGroup.parentGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
-    }
-    
-    @ControllerAction
-    void copyFullID() {
-        Persona sender = view.selectedSender()?.getPersona()
-        if (sender == null)
-            return
-        CopyPasteSupport.copyToClipboard(sender.toBase64())
     }
     
     @ControllerAction

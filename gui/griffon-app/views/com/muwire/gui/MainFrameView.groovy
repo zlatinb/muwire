@@ -1732,7 +1732,7 @@ class MainFrameView {
             return null
         if (lastUploadsSortEvent != null) 
             selectedRow = uploadsTable.rowSorter.convertRowIndexToModel(selectedRow)
-        model.uploads[selectedRow].uploader
+        model.uploads[selectedRow]
     }
     
     void focusOnSharedFile(SharedFile sf) {
@@ -1775,10 +1775,11 @@ class MainFrameView {
     }
     
     void showUploadsMenu(MouseEvent e) {
-        Uploader uploader = selectedUploader()
-        if (uploader == null)
+        MainFrameModel.UploaderWrapper uploaderWrapper = selectedUploader()
+        if (uploaderWrapper == null)
             return
-            
+        
+        Uploader uploader = uploaderWrapper.uploader
         JPopupMenu uploadsTableMenu = new JPopupMenu()
         JMenuItem showInLibrary = new JMenuItem(trans("SHOW_IN_LIBRARY"))
         showInLibrary.addActionListener({mvcGroup.controller.showInLibrary(uploader)})
@@ -1811,9 +1812,9 @@ class MainFrameView {
             uploadsTableMenu.add(messageItem)
         }
         
-        JMenuItem copyIDItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIDItem.addActionListener({mvcGroup.controller.copyIdFromUploads(uploader)})
-        uploadsTableMenu.add(copyIDItem)
+        JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfileItem.addActionListener({mvcGroup.controller.viewProfileFromUploads(uploaderWrapper)})
+        uploadsTableMenu.add(viewProfileItem)
         
         showPopupMenu(uploadsTableMenu, e)
     }
@@ -2302,9 +2303,10 @@ class MainFrameView {
             messageItem.addActionListener({ mvcGroup.controller.messageFromTrusted() })
             trustMenu.add(messageItem)
         }
-        JMenuItem copyIdFromTrustedItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyIdFromTrustedItem.addActionListener({mvcGroup.controller.copyIdFromTrusted()})
-        trustMenu.add(copyIdFromTrustedItem)
+        
+        JMenuItem viewProfileFromTrustedItem = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfileFromTrustedItem.addActionListener({mvcGroup.controller.viewProfileFromTrusted()})
+        trustMenu.add(viewProfileFromTrustedItem)
         
         showPopupMenu(trustMenu, e)
     }

@@ -2,6 +2,8 @@ package com.muwire.gui.resultdetails
 
 import com.muwire.core.Persona
 import com.muwire.gui.CopyPasteSupport
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.ViewProfileHelper
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -19,7 +21,7 @@ class ResultDetailsTabsController {
     
     @ControllerAction
     void browse() {
-        Persona p = view.selectedSender()
+        Persona p = view.selectedSender()?.getPersona()
         if (p == null)
             return
         String groupId = UUID.randomUUID().toString()
@@ -31,10 +33,11 @@ class ResultDetailsTabsController {
     }
     
     @ControllerAction
-    void copyId() {
-        Persona p = view.selectedSender()
-        if (p == null)
+    void viewProfile() {
+        PersonaOrProfile pop = view.selectedSender()
+        if (pop == null)
             return
-        CopyPasteSupport.copyToClipboard(p.toBase64())
+
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
     }
 }

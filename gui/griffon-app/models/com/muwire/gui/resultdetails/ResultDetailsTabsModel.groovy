@@ -20,7 +20,7 @@ class ResultDetailsTabsModel {
     ResultDetailsTabsView view
     
     @Observable boolean browseActionEnabled
-    @Observable boolean copyIdActionEnabled
+    @Observable boolean viewProfileActionEnabled
 
     Core core
     String fileName

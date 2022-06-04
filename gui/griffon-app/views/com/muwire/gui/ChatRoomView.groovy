@@ -167,6 +167,9 @@ class ChatRoomView {
         JMenuItem browse = new JMenuItem(trans("BROWSE"))
         browse.addActionListener({controller.browse()})
         menu.add(browse)
+        JMenuItem viewProfile = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfile.addActionListener({controller.viewProfile()})
+        menu.add(viewProfile)
         JMenuItem markTrusted = new JMenuItem(trans("MARK_TRUSTED"))
         markTrusted.addActionListener({controller.markTrusted()})
         menu.add(markTrusted)
@@ -180,6 +183,10 @@ class ChatRoomView {
     }
     
     Persona getSelectedPersona() {
+        getSelectedPOP()?.getPersona()
+    }
+    
+    PersonaOrProfile getSelectedPOP() {
         int selectedRow = membersTable.getSelectedRow()
         if (selectedRow < 0)
             return null

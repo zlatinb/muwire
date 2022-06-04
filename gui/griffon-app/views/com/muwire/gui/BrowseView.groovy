@@ -71,7 +71,6 @@ class BrowseView {
                     })
                 }
                 panel(constraints: BorderLayout.EAST) {
-                    button(text: trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_COPY_SENDER_FULL_ID"), copyIdAction)
                     button(text: trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"), viewProfileAction)
                 }
             }

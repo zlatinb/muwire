@@ -282,9 +282,9 @@ class MessageFolderView {
         messagesMenu.add(deleteMenuItem)
         
         if (singleSelected) {
-            JMenuItem copyIdFromMessageItem = new JMenuItem(trans("COPY_FULL_ID"))
-            copyIdFromMessageItem.addActionListener({ controller.copyIdFromMessage() })
-            messagesMenu.add(copyIdFromMessageItem)
+            JMenuItem viewProfileFromMessage = new JMenuItem(trans("VIEW_PROFILE"))
+            viewProfileFromMessage.addActionListener({controller.viewProfileFromMessage()})
+            messagesMenu.add(viewProfileFromMessage)
         }
         messagesMenu
     }

@@ -7,6 +7,7 @@ import com.muwire.core.messenger.MWMessageAttachment
 import com.muwire.core.messenger.UIDownloadAttachmentEvent
 import com.muwire.core.messenger.UIMessageDeleteEvent
 import com.muwire.core.messenger.UIMessageReadEvent
+import com.muwire.gui.profile.ViewProfileHelper
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
@@ -56,12 +57,13 @@ class MessageFolderController {
     }
 
     @ControllerAction
-    void copyIdFromMessage() {
+    void viewProfileFromMessage() {
         int []rows = view.selectedMessageHeaders()
         if (rows.length != 1)
             return
+        
         MWMessageStatus status = model.messageHeaders.get(rows[0])
-        CopyPasteSupport.copyToClipboard(status.message.sender.toBase64())
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, status)
     }
 
     @ControllerAction

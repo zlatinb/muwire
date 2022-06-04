@@ -2,7 +2,9 @@ package com.muwire.gui
 
 import com.muwire.core.Core
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.TrustPOP
+import com.muwire.gui.profile.ViewProfileHelper
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -30,17 +32,8 @@ class TrustListController {
         if (selectedRow < 0)
             return
         
-        Persona persona = model.contacts[selectedRow].persona
-        MWProfileHeader profileHeader = model.contacts[selectedRow].getHeader()
-        UUID uuid = UUID.randomUUID()
-        
-        def params = [:]
-        params.persona = persona
-        params.core = core
-        params.uuid = uuid
-        params.profileHeader = profileHeader
-        
-        mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
+        PersonaOrProfile pop = model.contacts[selectedRow]
+        ViewProfileHelper.initViewProfileGroup(core, mvcGroup, pop)
     }
     
     @ControllerAction

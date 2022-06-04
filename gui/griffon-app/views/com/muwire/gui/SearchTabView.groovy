@@ -124,8 +124,6 @@ class SearchTabView {
                                         button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_BROWSE_COLLECTIONS_SENDER"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
                                     }
                                     panel (border : etchedBorder()){
-                                        button(text : trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_ADD_CONTACT_SENDER"), enabled: bind {model.trustButtonsEnabled }, trustAction)
-                                        button(text : trans("DISTRUST"), toolTipText: trans("TOOLTIP_DISTRUST_SENDER"), enabled : bind {model.trustButtonsEnabled}, distrustAction)
                                         button(text : trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"), enabled: bind {model.viewProfileActionEnabled}, viewProfileAction)
                                     }
                                 }
@@ -306,9 +304,9 @@ class SearchTabView {
         
         // senders popup menu
         JPopupMenu popupMenu = new JPopupMenu()
-        JMenuItem copyFullIDItem = new JMenuItem(trans("COPY_FULL_ID"))
-        copyFullIDItem.addActionListener({mvcGroup.controller.copyFullID()})
-        popupMenu.add(copyFullIDItem)
+        JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfileItem.addActionListener({mvcGroup.controller.viewProfile()})
+        popupMenu.add(viewProfileItem)
         
         def sendersMouseListener = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -412,7 +410,6 @@ class SearchTabView {
         selectionModel.addListSelectionListener({
             int row = selectedSenderRow()
             if (row < 0) {
-                model.trustButtonsEnabled = false
                 model.viewProfileActionEnabled = false
                 model.browseActionEnabled = false
                 model.subscribeActionEnabled = false
@@ -429,7 +426,6 @@ class SearchTabView {
                 model.messageActionEnabled = bucket.results[0].messages
                 model.subscribeActionEnabled = bucket.results[0].feed &&
                     model.core.feedManager.getFeed(sender) == null
-                model.trustButtonsEnabled = true
                 model.viewProfileActionEnabled = true
                 
                 model.results.clear()
@@ -467,7 +463,6 @@ class SearchTabView {
             List<UIResultEvent> selectedResults = selectedResults()
             if (selectedResults.isEmpty()) {
                 model.downloadActionEnabled = false
-                model.trustButtonsEnabled = false
                 model.browseActionEnabled = false
                 model.browseCollectionsActionEnabled = false
                 model.chatActionEnabled = false
@@ -528,7 +523,6 @@ class SearchTabView {
     def closeTab = {
         model.tab = parent.indexOfComponent(pane)
         parent.removeTabAt(model.tab)
-        model.trustButtonsEnabled = false
         model.viewProfileActionEnabled = false
         model.downloadActionEnabled = false
         resultDetails.values().each {it.destroy()}
