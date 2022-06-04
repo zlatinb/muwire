@@ -60,12 +60,7 @@ class ViewProfileView {
             borderLayout()
             panel(border: titledBorder(title : trans("PROFILE_VIEWER_HEADER"), border: etchedBorder(),
                 titlePosition: TitledBorder.TOP), constraints: BorderLayout.NORTH) {
-                if (model.profileHeader == null)
-                    thumbnailPanel = panel(preferredSize: [ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE])
-                else {
-                    Icon thumbNail = new ThumbnailIcon(model.profileHeader.getThumbNail())
-                    thumbnailPanel = panel(icon: thumbNail.image)
-                }
+                thumbnailPanel = panel(preferredSize: [ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE])
                 if (model.profileTitle == null)
                     titleLabel = label(text: trans("PROFILE_VIEWER_HEADER_MISSING"))
                 else
@@ -113,12 +108,19 @@ class ViewProfileView {
             }
             
         }
-        
         window.setPreferredSize([dimX, dimY] as Dimension)        
     }
     
     void mvcGroupInit(Map<String, String> params) {
         window.addWindowListener(new WindowAdapter() {
+            @Override
+            void windowOpened(WindowEvent e) {
+                if (model.profileHeader != null) {
+                    Icon thumbNail = new ThumbnailIcon(model.profileHeader.getThumbNail())
+                    drawThumbnail(thumbNail)
+                }
+            } 
+            
             @Override
             void windowClosed(WindowEvent e) {
                 mvcGroup.destroy()
@@ -141,11 +143,7 @@ class ViewProfileView {
         SwingUtilities.invokeLater {
             
             Icon thumbNail = new ThumbnailIcon(profile.getHeader().getThumbNail())
-            def thumbDim = thumbnailPanel.getSize()
-            thumbnailPanel.getGraphics().drawImage(thumbNail.image,
-                    (int)(thumbDim.getWidth() / 2) - (int)(thumbNail.getIconHeight() / 2),
-                    (int)(thumbDim.getHeight() / 2) - (int)(thumbNail.getIconHeight() / 2),
-                    null)
+            drawThumbnail(thumbNail)
             
             def imgDim = imagePanel.getSize()
             imagePanel.getGraphics().drawImage(mainImage,
@@ -153,5 +151,13 @@ class ViewProfileView {
                     (int) (imgDim.getHeight() / 2) - (int) (mainImage.getHeight() / 2),
                     null)
         } as Runnable
+    }
+    
+    private void drawThumbnail(ThumbnailIcon thumbNail) {
+            def thumbDim = thumbnailPanel.getSize()
+            thumbnailPanel.getGraphics().drawImage(thumbNail.image,
+                    (int)(thumbDim.getWidth() / 2) - (int)(thumbNail.getIconHeight() / 2),
+                    (int)(thumbDim.getHeight() / 2) - (int)(thumbNail.getIconHeight() / 2),
+                    null)
     }
 }
