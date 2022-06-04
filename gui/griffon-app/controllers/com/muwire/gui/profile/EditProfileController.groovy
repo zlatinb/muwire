@@ -5,6 +5,8 @@ import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.profile.MWProfileImageFormat
 import com.muwire.gui.CopyPasteSupport
+import static com.muwire.gui.Translator.trans
+
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -12,7 +14,7 @@ import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
 import javax.imageio.ImageIO
-import javax.swing.JOptionPane
+import javax.swing.JFileChooser
 
 @ArtifactProviderFor(GriffonController)
 class EditProfileController {
@@ -39,6 +41,40 @@ class EditProfileController {
         def baos = new ByteArrayOutputStream()
         ImageIO.write(generated, "png", baos)
         view.setImageAndThumbnail(baos.toByteArray())
+    }
+    
+    @ControllerAction
+    void choose() {
+        def chooser = new JFileChooser()
+        chooser.setDialogTitle(trans("PROFILE_EDITOR_CHOOSER_TITLE"))
+        chooser.setFileHidingEnabled(false)
+        def filter = new javax.swing.filechooser.FileFilter() {
+            @Override
+            boolean accept(File pathname) {
+                String name = pathname.getName().toLowerCase()
+                if (!(name.endsWith("jpg") || name.endsWith("jpeg") || name.endsWith("png")))
+                    return false
+                if (pathname.length() > Constants.MAX_PROFILE_IMAGE_LENGTH)
+                    return false
+                return true
+            }
+
+            @Override
+            String getDescription() {
+                return trans("PROFILE_EDITOR_CHOOSER_DESCRIPTION")
+            }
+        }
+        chooser.setFileFilter(filter)
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        int rv = chooser.showOpenDialog(null)
+        if (rv != JFileChooser.APPROVE_OPTION)
+            return
+        
+        File f = chooser.getSelectedFile()
+        f.withInputStream {view.setImageAndThumbnail(it)}
+        String name = f.getName().toLowerCase()
+        model.format = name.endsWith("png") ? MWProfileImageFormat.PNG : MWProfileImageFormat.JPG
+        model.imageData = f.bytes
     }
     
     @ControllerAction

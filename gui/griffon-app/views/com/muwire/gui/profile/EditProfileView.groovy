@@ -110,6 +110,7 @@ class EditProfileView {
                 panel {
                     button(text: trans("PROFILE_EDITOR_GENERATE"), toolTipText: trans("TOOLTIP_PROFILE_EDITOR_GENERATE"),
                             generateAction)
+                    button(text: trans("CHOOSE"), chooseAction)
                 }
                 panel {
                     button(text: trans("SAVE"), saveAction)
