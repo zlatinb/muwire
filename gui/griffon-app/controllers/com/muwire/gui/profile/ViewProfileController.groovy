@@ -2,6 +2,7 @@ package com.muwire.gui.profile
 
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
+import com.muwire.gui.CopyPasteSupport
 import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
@@ -23,6 +24,11 @@ class ViewProfileController {
     @ControllerAction
     void fetch() {
         model.register()
+    }
+    
+    @ControllerAction
+    void copyFull() {
+        CopyPasteSupport.copyToClipboard(model.persona.toBase64())
     }
     
     @ControllerAction

@@ -261,6 +261,7 @@ class SearchTabModel {
         final Persona sender
         private final Icon avatar
         private final String profileTitle
+        private final MWProfileHeader profileHeader
         private final int rowIdx
         final List<UIResultEvent> results = []
         private int lastUpdatedIdx
@@ -268,6 +269,7 @@ class SearchTabModel {
         SenderBucket(Persona sender, MWProfileHeader profileHeader,int rowIdx) {
             this.sender = sender
             this.rowIdx = rowIdx
+            this.profileHeader = profileHeader
             if (profileHeader != null) {
                 Icon icon = null
                 try {
@@ -291,6 +293,10 @@ class SearchTabModel {
         
         String getTitle() {
             profileTitle
+        }
+        
+        MWProfileHeader getHeader() {
+            profileHeader
         }
         
         List<UIResultEvent> getPendingResults() {

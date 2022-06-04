@@ -39,6 +39,7 @@ class TrustPOP implements PersonaOrProfile {
         return HTMLSanitizer.sanitize(trustEntry.getProfileHeader()?.getTitle())
     }
     
+    @Override
     public MWProfileHeader getHeader() {
         trustEntry.getProfileHeader()
     }

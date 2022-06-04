@@ -76,5 +76,9 @@ class ChatRoomModel {
             ChatPOP other = (ChatPOP)o
             persona == other.persona
         }
+        
+        public MWProfileHeader getHeader() {
+            profileHeaders[persona]
+        }
     }
 }

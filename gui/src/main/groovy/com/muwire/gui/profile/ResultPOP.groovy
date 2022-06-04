@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.Persona
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.search.UIResultEvent
 import com.muwire.gui.HTMLSanitizer
 
@@ -31,5 +32,10 @@ class ResultPOP implements PersonaOrProfile {
     @Override
     String getTitle() {
         return HTMLSanitizer.sanitize(event.profileHeader?.getTitle())
+    }
+    
+    @Override
+    MWProfileHeader getHeader() {
+        return event.profileHeader
     }
 }

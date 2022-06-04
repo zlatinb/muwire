@@ -4,6 +4,7 @@ import com.muwire.core.profile.MWProfile
 import com.muwire.gui.HTMLSanitizer
 
 import javax.imageio.ImageIO
+import javax.swing.Icon
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextArea
@@ -41,6 +42,7 @@ class ViewProfileView {
     JFrame mainFrame
 
     JPanel mainPanel
+    JPanel thumbnailPanel
     JLabel titleLabel
     JPanel imagePanel
     JTextArea bodyArea
@@ -58,6 +60,12 @@ class ViewProfileView {
             borderLayout()
             panel(border: titledBorder(title : trans("PROFILE_VIEWER_HEADER"), border: etchedBorder(),
                 titlePosition: TitledBorder.TOP), constraints: BorderLayout.NORTH) {
+                if (model.profileHeader == null)
+                    thumbnailPanel = panel(preferredSize: [ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE])
+                else {
+                    Icon thumbNail = new ThumbnailIcon(model.profileHeader.getThumbNail())
+                    thumbnailPanel = panel(icon: thumbNail.image)
+                }
                 if (model.profileTitle == null)
                     titleLabel = label(text: trans("PROFILE_VIEWER_HEADER_MISSING"))
                 else
@@ -86,22 +94,26 @@ class ViewProfileView {
                 }
             }
             panel(constraints: BorderLayout.SOUTH) {
-                borderLayout()
-                panel(constraints: BorderLayout.WEST) {
+                gridLayout(rows:1, cols: 4)
+                panel {
                     label(text : bind { model.status == null ? "" : trans(model.status.name())})
                 }
-                panel(constraints: BorderLayout.CENTER) {
+                panel {
+                    button(text: trans("COPY_FULL_ID"), copyFullAction)
+                }
+                panel {
                     button(text: trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_ADD_CONTACT"),
                             addContactAction)
                     button(text: trans("PROFILE_VIEWER_BLOCK"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_BLOCK"),
                             blockAction)
                 }
-                panel(constraints: BorderLayout.EAST) {
+                panel {
                     button(text : trans("CLOSE"), closeAction)
                 }
             }
             
         }
+        
         window.setPreferredSize([dimX, dimY] as Dimension)        
     }
     
@@ -127,6 +139,14 @@ class ViewProfileView {
         def mainImage = ImageScaler.scaleToMax(rawImage)
 
         SwingUtilities.invokeLater {
+            
+            Icon thumbNail = new ThumbnailIcon(profile.getHeader().getThumbNail())
+            def thumbDim = thumbnailPanel.getSize()
+            thumbnailPanel.getGraphics().drawImage(thumbNail.image,
+                    (int)(thumbDim.getWidth() / 2) - (int)(thumbNail.getIconHeight() / 2),
+                    (int)(thumbDim.getHeight() / 2) - (int)(thumbNail.getIconHeight() / 2),
+                    null)
+            
             def imgDim = imagePanel.getSize()
             imagePanel.getGraphics().drawImage(mainImage,
                     (int) (imgDim.getWidth() / 2) - (int) (mainImage.getWidth() / 2),

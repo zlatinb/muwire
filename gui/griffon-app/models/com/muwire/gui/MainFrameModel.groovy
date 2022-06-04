@@ -951,6 +951,10 @@ class MainFrameModel {
             return icon
         }
         
+        MWProfileHeader getHeader() {
+            profileHeader
+        }
+        
         public int speed() {
             
             if (finished) 
@@ -1150,7 +1154,7 @@ class MainFrameModel {
         
         @Override
         Icon getThumbnail() {
-            MWProfileHeader header = core.trustService.getProfileHeader(getPersona())
+            MWProfileHeader header = getHeader()
             if (header == null)
                 return null
             if (icon == null)
@@ -1162,6 +1166,11 @@ class MainFrameModel {
         String getTitle() {
             String title = core.trustService.getProfileHeader(getPersona())?.getTitle()
             return HTMLSanitizer.sanitize(title)
+        }
+        
+        @Override
+        MWProfileHeader getHeader() {
+            core.trustService.getProfileHeader(getPersona())
         }
         
         public boolean equals(Object o) {

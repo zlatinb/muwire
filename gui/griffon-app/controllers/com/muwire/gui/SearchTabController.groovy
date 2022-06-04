@@ -118,6 +118,7 @@ class SearchTabController {
         params.persona = sender.getPersona()
         params.uuid = uuid
         params.profileTitle = sender.getTitle()
+        params.profileHeader = sender.getHeader()
         
         mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }
