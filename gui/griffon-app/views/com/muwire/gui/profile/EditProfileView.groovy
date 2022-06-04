@@ -24,6 +24,7 @@ import javax.swing.TransferHandler
 import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.Graphics
 import java.awt.GridBagConstraints
 import java.awt.datatransfer.DataFlavor
 import java.awt.event.WindowAdapter
@@ -45,7 +46,7 @@ class EditProfileView {
 
     JFrame mainFrame
     JDialog dialog
-    JPanel imagePanel, thumbnailPanel
+    ImagePanel imagePanel, thumbnailPanel
     JTextField titleField
     JTextArea bodyArea
     def mainPanel
@@ -60,6 +61,10 @@ class EditProfileView {
         dialog.setResizable(false)
         
         def transferHandler = new ImageTransferHandler()
+        
+        imagePanel = new ImagePanel()
+        imagePanel.setTransferHandler(transferHandler)
+        thumbnailPanel = new ImagePanel()
         
         mainPanel = builder.panel {
             borderLayout()
@@ -76,7 +81,7 @@ class EditProfileView {
                 panel(border: titledBorder(title: trans("PROFILE_EDITOR_MAIN_IMAGE"), border: etchedBorder(),
                     titlePosition: TitledBorder.TOP), transferHandler: transferHandler) {
                     gridLayout(rows: 1, cols: 1)
-                    imagePanel = panel(transferHandler: transferHandler)
+                    widget(imagePanel)
                 }
                 panel {
                     gridBagLayout()
@@ -85,7 +90,7 @@ class EditProfileView {
                         titlePosition: TitledBorder.TOP), 
                             constraints: gbc(gridx: 0, gridy: gridY, weightx: 100, weighty: 10, fill: GridBagConstraints.BOTH)) {
                         gridLayout(rows:1, cols:1)
-                        thumbnailPanel = panel()
+                        widget(thumbnailPanel)
                     }
                     gridY++
                     panel(border: titledBorder(title: trans("PROFILE_EDITOR_TITLE", Constants.MAX_PROFILE_TITLE_LENGTH), border: etchedBorder(),
@@ -149,21 +154,15 @@ class EditProfileView {
         def mainImage = ImageScaler.scaleToMax(rawImage)
         def thumbNail = ImageScaler.scaleToThumbnail(rawImage)
         
-        def imgDim = imagePanel.getSize()
-        imagePanel.getGraphics().clearRect(0,0,(int)imgDim.getWidth(), (int)imgDim.getHeight())
-        imagePanel.getGraphics().drawImage(mainImage,
-                (int)(imgDim.getWidth() / 2) - (int)(mainImage.getWidth() / 2),
-                (int)(imgDim.getHeight() / 2) - (int)(mainImage.getHeight() / 2),
-                null)
-        
-        def thumbDim = thumbnailPanel.getSize()
-        thumbnailPanel.getGraphics().clearRect(0,0, (int)thumbDim.getWidth(), (int)thumbDim.getHeight())
-        thumbnailPanel.getGraphics().drawImage(thumbNail, (int)(thumbDim.getWidth() / 2) - 12,
-                (int)(thumbDim.getHeight() / 2) - 12, null)
-        
         def baos = new ByteArrayOutputStream()
         ImageIO.write(thumbNail, "png", baos)
         model.thumbnailData = baos.toByteArray()
+        
+        imagePanel.image = mainImage
+        thumbnailPanel.image = thumbNail
+        
+        imagePanel.repaint()
+        thumbnailPanel.repaint()
     }
     
     void setImageAndThumbnail(byte [] rawData) {

@@ -42,9 +42,9 @@ class ViewProfileView {
     JFrame mainFrame
 
     JPanel mainPanel
-    JPanel thumbnailPanel
+    ImagePanel thumbnailPanel
     JLabel titleLabel
-    JPanel imagePanel
+    ImagePanel imagePanel
     JTextArea bodyArea
     
     void initUI() {
@@ -54,13 +54,17 @@ class ViewProfileView {
         int dimX = Math.max(1100, (int)(mainDim.getWidth() / 2))
         int dimY = Math.max(700, (int)(mainDim.getHeight() / 2))
         
+        thumbnailPanel = new ImagePanel()
+        thumbnailPanel.setPreferredSize([ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
+        imagePanel = new ImagePanel()
+        
         window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
                 iconImage: builder.imageIcon("/MuWire-48x48.png").image,
                 title: trans("PROFILE_VIEWER_TITLE", model.persona.getHumanReadableName())) {
             borderLayout()
             panel(border: titledBorder(title : trans("PROFILE_VIEWER_HEADER"), border: etchedBorder(),
                 titlePosition: TitledBorder.TOP), constraints: BorderLayout.NORTH) {
-                thumbnailPanel = panel(preferredSize: [ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE])
+                widget(thumbnailPanel)
                 if (model.profileTitle == null)
                     titleLabel = label(text: trans("PROFILE_VIEWER_HEADER_MISSING"))
                 else
@@ -77,7 +81,7 @@ class ViewProfileView {
                     panel(border: titledBorder(title: trans("PROFILE_VIEWER_AVATAR"), border: etchedBorder(),
                         titlePosition: TitledBorder.TOP)) {
                         gridLayout(rows: 1, cols: 1)
-                        imagePanel = panel()
+                        widget(imagePanel)
                     }
                     panel(border: titledBorder(title: trans("PROFILE_VIEWER_PROFILE"), border: etchedBorder(),
                         titlePosition: TitledBorder.TOP)) {
@@ -140,24 +144,12 @@ class ViewProfileView {
         def rawImage = ImageIO.read(new ByteArrayInputStream(profile.getImage()))
         def mainImage = ImageScaler.scaleToMax(rawImage)
 
-        SwingUtilities.invokeLater {
-            
-            Icon thumbNail = new ThumbnailIcon(profile.getHeader().getThumbNail())
-            drawThumbnail(thumbNail)
-            
-            def imgDim = imagePanel.getSize()
-            imagePanel.getGraphics().drawImage(mainImage,
-                    (int) (imgDim.getWidth() / 2) - (int) (mainImage.getWidth() / 2),
-                    (int) (imgDim.getHeight() / 2) - (int) (mainImage.getHeight() / 2),
-                    null)
-        } as Runnable
+        imagePanel.setImage(mainImage)
+        imagePanel.repaint()
     }
     
     private void drawThumbnail(ThumbnailIcon thumbNail) {
-            def thumbDim = thumbnailPanel.getSize()
-            thumbnailPanel.getGraphics().drawImage(thumbNail.image,
-                    (int)(thumbDim.getWidth() / 2) - (int)(thumbNail.getIconHeight() / 2),
-                    (int)(thumbDim.getHeight() / 2) - (int)(thumbNail.getIconHeight() / 2),
-                    null)
+        thumbnailPanel.setImage(thumbNail.image)
+        thumbnailPanel.repaint()
     }
 }
