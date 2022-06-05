@@ -18,6 +18,7 @@ import com.muwire.gui.wizard.WizardDefaults
 import javax.swing.JButton
 import javax.swing.JDialog
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import java.awt.BorderLayout
 import java.nio.charset.StandardCharsets
 
@@ -128,7 +129,9 @@ class Ready extends AbstractLifecycleHandler {
                     core.startServices()
                 } catch (Throwable bad) {
                     log.log(Level.SEVERE, "couldn't start core", bad)
-                    fatalShutdown(bad)
+                    SwingUtilities.invokeLater {
+                        fatalShutdown(bad)
+                    }
                 }
             } as Runnable
             initer = new Thread(initer, "core initializer")
