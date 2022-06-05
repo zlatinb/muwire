@@ -144,6 +144,8 @@ class TrustService extends Service {
     }
     
     void onMWProfileFetchEvent(MWProfileFetchEvent event) {
+        if (event.profile == null)
+            return
         def dest = event.profile.getHeader().getPersona().getDestination()
         TrustEntry te = good[dest]
         if (te == null)
