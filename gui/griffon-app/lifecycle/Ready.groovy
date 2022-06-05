@@ -116,20 +116,28 @@ class Ready extends AbstractLifecycleHandler {
             core.eventBus.publish(new UILoadedEvent())
             
             def initer = {
-                core.startServices()
+                try {
+                    core.startServices()
+                } catch (Exception bad) {
+                    log.log(Level.SEVERE, "couldn't start core", bad)
+                    fatalShutdown(props)
+                }
             } as Runnable
             initer = new Thread(initer, "core initializer")
             initer.setDaemon(true)
             initer.start()
         } catch (Exception bad) {
             log.log(Level.SEVERE,"couldn't initialize core",bad)
-            
+            fatalShutdown(props)       
+        }
+    }
+    
+    private void fatalShutdown(MuWireSettings props) {
             String key = props.embeddedRouter ? "CORE_INIT_ERROR_BODY_EMBEDDED" : "CORE_INIT_ERROR_BODY_EXTERNAL"
             
             JOptionPane.showMessageDialog(null, trans(key),
                     trans("CORE_INIT_ERROR_HEADER"), JOptionPane.WARNING_MESSAGE)
             application.shutdown()
-        }
     }
 }
 
