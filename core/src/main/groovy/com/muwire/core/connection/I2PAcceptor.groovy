@@ -34,12 +34,13 @@ class I2PAcceptor {
     Endpoint accept() {
         while(true) {
             try {
-                I2PServerSocket serverSocket
+                I2PServerSocket ss
                 synchronized (this) {
-                    while((serverSocket = this.serverSocket) == null)
-                    wait()
+                    while((ss = serverSocket) == null) {
+                        wait(1000)
+                    }
                 }
-                def socket = serverSocket.accept()
+                def socket = ss.accept()
                 return new Endpoint(socket.getPeerDestination(), socket.getInputStream(), socket.getOutputStream(), socket)
             } catch (I2PException|ConnectException routerDown) {
                 log.log(Level.WARNING, "router disconnected?", routerDown)
