@@ -1,6 +1,7 @@
-
+import com.muwire.gui.CopyPasteSupport
 import griffon.core.GriffonApplication
 import griffon.core.env.Metadata
+import groovy.swing.SwingBuilder
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
 
@@ -13,6 +14,13 @@ import com.muwire.core.UILoadedEvent
 import com.muwire.core.files.FileSharedEvent
 import com.muwire.core.util.DataUtil
 import com.muwire.gui.wizard.WizardDefaults
+
+import javax.swing.JButton
+import javax.swing.JDialog
+import javax.swing.JPanel
+import java.awt.BorderLayout
+import java.nio.charset.StandardCharsets
+
 import static com.muwire.gui.Translator.trans
 
 import javax.annotation.Nonnull
@@ -118,26 +126,64 @@ class Ready extends AbstractLifecycleHandler {
             def initer = {
                 try {
                     core.startServices()
-                } catch (Exception bad) {
+                } catch (Throwable bad) {
                     log.log(Level.SEVERE, "couldn't start core", bad)
-                    fatalShutdown(props)
+                    fatalShutdown(bad)
                 }
             } as Runnable
             initer = new Thread(initer, "core initializer")
             initer.setDaemon(true)
             initer.start()
-        } catch (Exception bad) {
+        } catch (Throwable bad) {
             log.log(Level.SEVERE,"couldn't initialize core",bad)
-            fatalShutdown(props)       
+            fatalShutdown(bad)       
         }
     }
     
-    private void fatalShutdown(MuWireSettings props) {
-            String key = props.embeddedRouter ? "CORE_INIT_ERROR_BODY_EMBEDDED" : "CORE_INIT_ERROR_BODY_EXTERNAL"
-            
-            JOptionPane.showMessageDialog(null, trans(key),
-                    trans("CORE_INIT_ERROR_HEADER"), JOptionPane.WARNING_MESSAGE)
+    private void fatalShutdown(Throwable throwable) {
+        String body = trans("CORE_INIT_ERROR_BODY_EMBEDDED")
+        String header = trans("CORE_INIT_ERROR_HEADER")
+
+        def baos = new ByteArrayOutputStream()
+        def pos = new PrintStream(baos)
+        throwable.printStackTrace(pos)
+        pos.close()
+        String trace = new String(baos.toByteArray())
+
+        JDialog dialog = new JDialog()
+        JButton quit, copyToClipboard
+        def builder = new SwingBuilder()
+        JPanel contentPanel = builder.panel {
+            borderLayout()
+            panel(constraints: BorderLayout.NORTH) {
+                label(text: body)
+            }
+            scrollPane(constraints: BorderLayout.CENTER) {
+                textArea(editable: false, lineWrap: false, text: trace)
+            }
+            panel(constraints: BorderLayout.SOUTH) {
+                copyToClipboard = button(text: trans("COPY_TO_CLIPBOARD"))
+                quit = button(text: trans("EXIT"))
+            }
+        }
+
+        quit.addActionListener({
+            dialog.setVisible(false)
             application.shutdown()
+        })
+
+        copyToClipboard.addActionListener({
+            CopyPasteSupport.copyToClipboard(trace)
+        })
+
+        dialog.with {
+            setModal(true)
+            setLocationRelativeTo(null)
+            setTitle(header)
+            getContentPane().add(contentPanel)
+            pack()
+            setVisible(true)
+        }
     }
 }
 
