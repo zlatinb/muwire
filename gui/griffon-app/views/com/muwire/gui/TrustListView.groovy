@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -63,14 +64,12 @@ class TrustListView {
                 scrollPane (constraints : BorderLayout.CENTER){
                     contactsTable = table(id : "contacts-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                         tableModel(list : model.contacts) {
-                            closureColumn(header: trans("CONTACTS"), preferredWidth: 200, type : PersonaOrProfile, read : {it})
-                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 20,  type: String, read: {
-                                trans(it.level.name())
-                            })
-                            closureColumn(header: trans("REASON"), preferredWidth: 200,  type : String, read : {it.reason})
-                            closureColumn(header: trans("YOUR_TRUST"), preferredWidth: 20,  type : String, read : {
+                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type : PersonaOrProfile, read : {it})
+                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 10,  type: TrustLevel, read: {it.level})
+                            closureColumn(header: trans("REASON"), preferredWidth: 250,  type : String, read : {it.reason})
+                            closureColumn(header: trans("YOUR_TRUST"), preferredWidth: 10,  type : TrustLevel, read : {
                                 Persona p = it.persona
-                                trans(model.trustService.getLevel(p.destination).name())
+                                model.trustService.getLevel(p.destination)
                             })
                         }
                     }
@@ -90,6 +89,7 @@ class TrustListView {
         def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
 
+        contactsTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         contactsTable.rowSorter.setComparator(0, popComparator)
         contactsTable.rowSorter.setSortsOnUpdates(true)

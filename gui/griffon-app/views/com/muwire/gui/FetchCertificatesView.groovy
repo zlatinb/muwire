@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import com.muwire.core.trust.TrustLevel
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 
@@ -60,7 +61,7 @@ class FetchCertificatesView {
                 certsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.certificates) {
                         closureColumn(header : trans("ISSUER"), preferredWidth : 200, type : Persona, read : {it.issuer})
-                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 50, type : String, read : {trans(controller.core.trustService.getLevel(it.issuer.destination).name())})
+                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 10, type : TrustLevel, read : {controller.core.trustService.getLevel(it.issuer.destination)})
                         closureColumn(header : trans("NAME"), preferredWidth : 200, type: String, read : {HTMLSanitizer.sanitize(it.name.name.toString())})
                         closureColumn(header : trans("ISSUED"), preferredWidth : 100, type : String, read : {
                             def date = new Date(it.timestamp)
@@ -76,7 +77,8 @@ class FetchCertificatesView {
                 button(text : trans("CLOSE"), dismissAction)
             }
         }
-        
+
+        certsTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         certsTable.rowSorter.setComparator(0, new PersonaComparator())
         certsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})

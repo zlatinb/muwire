@@ -655,8 +655,8 @@ class MainFrameView {
                                         tableModel(list: model.contacts) {
                                             closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: PersonaOrProfile, read: { it })
                                             closureColumn(header: trans("REASON"), preferredWidth: 450, type: String, read: { it.getReason() })
-                                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: String, read: { PersonaOrProfile row ->
-                                                trans(model.core.trustService.getLevel(row.getPersona().destination).name())
+                                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: TrustLevel, read: { PersonaOrProfile row ->
+                                                model.core.trustService.getLevel(row.getPersona().destination)
                                             })
                                         }
                                     }
@@ -894,6 +894,8 @@ class MainFrameView {
         
         def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
+        
+        def trustRenderer = new TrustCellRenderer()
 
         // downloads table
         def downloadsTable = builder.getVariable("downloads-table")
@@ -1325,6 +1327,7 @@ class MainFrameView {
 
         // contacts table
         JTable contactsTable = builder.getVariable("contacts-table")
+        contactsTable.setDefaultRenderer(TrustLevel.class, trustRenderer)
         contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         contactsTable.rowSorter.setComparator(0, popComparator)
         contactsTable.rowSorter.addRowSorterListener({ evt -> lastContactsSortEvent = evt })

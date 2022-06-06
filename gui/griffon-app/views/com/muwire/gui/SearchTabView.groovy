@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.SharedFile
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.SearchTabModel.SenderBucket
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
@@ -104,15 +105,15 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 500, type: PersonaOrProfile, read : { SenderBucket row -> row})
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 600, type: PersonaOrProfile, read : { SenderBucket row -> row})
                                             closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {SenderBucket row -> row.results.size()})
                                             closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browse})
                                             closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
                                             closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].feed})
                                             closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].messages})
                                             closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].chat})
-                                            closureColumn(header : trans("TRUST_NOUN"), preferredWidth : 50, type: String, read : { SenderBucket row ->
-                                                trans(model.core.trustService.getLevel(row.sender.destination).name())
+                                            closureColumn(header : trans("TRUST_STATUS"), preferredWidth : 10, type: TrustLevel, read : { SenderBucket row ->
+                                                model.core.trustService.getLevel(row.sender.destination)
                                             })
                                         }
                                     }
@@ -405,6 +406,7 @@ class SearchTabView {
         def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
         sendersTable.addMouseListener(sendersMouseListener)
+        sendersTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         sendersTable.rowSorter.setComparator(0, popComparator)

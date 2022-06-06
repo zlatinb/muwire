@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -86,9 +87,9 @@ class ChatRoomView {
                             scrollPane {
                                 membersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                                     tableModel(list : model.members) {
-                                        closureColumn(header : trans("NAME"), preferredWidth: 100, type: PersonaOrProfile, read : {it})
-                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 30, type : String, 
-                                                read : {trans(model.core.trustService.getLevel(it.getPersona().destination).name())})
+                                        closureColumn(header : trans("NAME"), preferredWidth: 150, type: PersonaOrProfile, read : {it})
+                                        closureColumn(header : trans("TRUST_STATUS"), preferredWidth: 10, type : TrustLevel, 
+                                                read : {model.core.trustService.getLevel(it.getPersona().destination)})
                                     }
                                 }
                             }
@@ -134,6 +135,7 @@ class ChatRoomView {
             
         if (membersTable != null) {
             
+            membersTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
             membersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
             membersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
             membersTable.rowSorter.addRowSorterListener({evt -> lastMembersTableSortEvent = evt})

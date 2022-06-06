@@ -2,10 +2,12 @@ package com.muwire.gui.resultdetails
 
 import com.muwire.core.Persona
 import com.muwire.core.filecert.Certificate
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.DateRenderer
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
+import com.muwire.gui.TrustCellRenderer
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
@@ -52,8 +54,8 @@ class CertificateTabView {
                         tableModel(list: model.certificates) {
                             closureColumn(header: trans("ISSUER"), preferredWidth: 150, type: Persona,
                                     read:{it.issuer})
-                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String,
-                                    read:{trans(model.core.trustService.getLevel(it.issuer.destination).name())})
+                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 10, type: TrustLevel,
+                                    read:{model.core.trustService.getLevel(it.issuer.destination)})
                             closureColumn(header: trans("NAME"), preferredWidth: 450,
                                     read: { Certificate c -> HTMLSanitizer.sanitize(c.name.name) })
                             closureColumn(header: trans("ISSUED"), preferredWidth: 50, type: Long,
@@ -72,6 +74,7 @@ class CertificateTabView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        certsTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         certsTable.setDefaultRenderer(Long.class, new DateRenderer())
         certsTable.rowSorter.setComparator(0, new PersonaComparator())

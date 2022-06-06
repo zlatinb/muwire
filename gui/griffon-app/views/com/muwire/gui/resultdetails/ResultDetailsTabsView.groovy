@@ -1,7 +1,9 @@
 package com.muwire.gui.resultdetails
 
 import com.muwire.core.search.UIResultEvent
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.TrustCellRenderer
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -71,10 +73,10 @@ class ResultDetailsTabsView {
                 sendersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list: model.results) {
                         closureColumn(header: trans("SENDER"), preferredWidth: 150, type: PersonaOrProfile, read : {it})
-                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 30, type:String, read : { ResultPOP row ->
-                            trans(model.core.trustService.getLevel(row.getPersona().destination).name()) 
+                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 10, type: TrustLevel, read : { ResultPOP row ->
+                            model.core.trustService.getLevel(row.getPersona().destination) 
                         })
-                        closureColumn(header: trans("NAME"), preferredWidth: 650,  type: String, read : { ResultPOP row -> 
+                        closureColumn(header: trans("NAME"), preferredWidth: 700,  type: String, read : { ResultPOP row -> 
                             HTMLSanitizer.sanitize(row.getEvent().getFullPath())
                         })
                         closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : { ResultPOP row ->
@@ -183,6 +185,7 @@ class ResultDetailsTabsView {
     void mvcGroupInit(Map<String,String> args) {
         
         // all senders table
+        sendersTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         sendersTable.setDefaultRenderer(PersonaOrProfile.class, 
                 new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
         sendersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
