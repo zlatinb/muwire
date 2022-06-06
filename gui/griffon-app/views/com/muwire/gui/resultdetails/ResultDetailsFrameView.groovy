@@ -1,8 +1,5 @@
 package com.muwire.gui.resultdetails
 
-import com.muwire.core.Persona
-import com.muwire.gui.PersonaCellRenderer
-import com.muwire.gui.PersonaComparator
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -12,7 +9,6 @@ import net.i2p.data.Destination
 import javax.inject.Inject
 import javax.swing.JPanel
 import javax.swing.JTable
-import javax.swing.border.Border
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter

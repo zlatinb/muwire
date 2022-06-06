@@ -1,6 +1,10 @@
 package com.muwire.gui
 
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -31,6 +35,8 @@ class CertificateControlView {
     CertificateControlModel model
     @MVCMember @Nonnull
     CertificateControlController controller
+    @Inject
+    GriffonApplication application
 
     def mainFrame
     def dialog
@@ -79,7 +85,7 @@ class CertificateControlView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        usersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        usersTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         usersTable.rowSorter.setComparator(0, new PersonaComparator())
         usersTable.rowSorter.addRowSorterListener({evt -> lastUsersSortEvent = evt})
         def selectionModel = usersTable.getSelectionModel()

@@ -1065,7 +1065,7 @@ class MainFrameView {
 
 
         // collections table
-        def personaRenderer = new PersonaCellRenderer()
+        def personaRenderer = new PersonaCellRenderer(application.context.get("ui-settings"))
         def personaComparator = new PersonaComparator()
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
         collectionsTable.setDefaultRenderer(Persona.class, personaRenderer)

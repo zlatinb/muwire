@@ -1,6 +1,9 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
+
+import javax.inject.Inject
 
 import static com.muwire.gui.Translator.trans
 
@@ -37,6 +40,8 @@ class CollectionsToolView {
     CollectionsToolModel model
     @MVCMember @Nonnull
     CollectionsToolController controller
+    @Inject
+    GriffonApplication application
 
     def mainFrame
     def dialog
@@ -72,7 +77,7 @@ class CollectionsToolView {
     void mvcGroupInit(Map<String,String> args) {
         // hits table
         hitsTable.setDefaultRenderer(Long.class, new DateRenderer())
-        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         hitsTable.rowSorter.setComparator(0, new PersonaComparator())
         
         dialog.getContentPane().add(mainPanel)

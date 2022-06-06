@@ -31,6 +31,7 @@ import java.awt.BorderLayout
 import java.awt.datatransfer.Transferable
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.util.function.Function
 import java.util.stream.Collectors
 
 import static com.muwire.gui.Translator.trans
@@ -52,11 +53,13 @@ class MessageFolderView {
     def lastMessageHeaderTableSortEvent
     def lastMessageAttachmentsTableSortEvent
     
+    private UISettings settings
     JPanel folderPanel
     void initUI() {
         def mainFrame = application.windowManager.findWindow("main-frame")
         int dividerLocation = mainFrame.getHeight() / 2
         int rowHeight = application.context.get("row-height")
+        settings = application.context.get("ui-settings")
         folderPanel = builder.panel (constraints: model.name) {
             gridLayout(rows: 1, cols: 1)
             splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout: true, dividerLocation: dividerLocation) {
@@ -76,8 +79,10 @@ class MessageFolderView {
                                 closureColumn(header: trans("RECIPIENTS"), preferredWidth: 400, type: String, read : {
                                     StringBuilder sb = new StringBuilder()
                                     sb.append("<html>")
+                                    Function<Persona, String> mapper = settings.personaRendererIds ? 
+                                            PersonaCellRenderer::htmlize :  PersonaCellRenderer::justName
                                     String collected = it.message.recipients.stream().
-                                            map(PersonaCellRenderer::htmlize).
+                                            map(mapper).
                                             collect(Collectors.joining(","))
                                     sb.append(collected)
                                     sb.append("</html>")
@@ -222,7 +227,9 @@ class MessageFolderView {
                 MWMessage selected = selectedStatus.message
                 messageBody.setText(selected.body)
                 model.messageButtonsEnabled = true
-                model.messageRecipientList = String.join(",", selected.recipients.collect {it.getHumanReadableName()})
+                Function<Persona, String> mapper = settings.personaRendererIds ? 
+                        Persona::getHumanReadableName : PersonaCellRenderer::justName
+                model.messageRecipientList = selected.recipients.stream().map(mapper).collect(Collectors.joining(","))
 
                 if (selected.attachments.isEmpty() && selected.collections.isEmpty()) {
                     messageSplitPane.setDividerLocation(1.0d)

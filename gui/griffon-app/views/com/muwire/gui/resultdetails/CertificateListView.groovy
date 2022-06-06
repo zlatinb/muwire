@@ -2,11 +2,13 @@ package com.muwire.gui.resultdetails
 
 import com.muwire.core.search.UIResultEvent
 import com.muwire.gui.profile.ResultPOP
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.ListSelectionModel
@@ -23,6 +25,8 @@ class CertificateListView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     CertificateListModel model
+    @Inject
+    GriffonApplication application
 
     JPanel p
     JList<ResultPOP> senders
@@ -47,7 +51,7 @@ class CertificateListView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        senders.setCellRenderer(new ResultListCellRenderer())
+        senders.setCellRenderer(new ResultListCellRenderer(application.context.get("ui-settings")))
         def selectionModel = senders.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({

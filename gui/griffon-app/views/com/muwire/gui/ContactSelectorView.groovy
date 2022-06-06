@@ -1,11 +1,13 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.DefaultListModel
 import javax.swing.JComponent
 import javax.swing.JList
@@ -29,6 +31,8 @@ class ContactSelectorView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     ContactSelectorModel model
+    @Inject
+    GriffonApplication application
     
     DefaultListModel contactsModel
     JList contactsList
@@ -110,13 +114,17 @@ class ContactSelectorView {
     }
 
     private static class Contact {
+        private final UISettings settings
         private final Persona persona
         Contact(Persona persona) {
             this.persona = persona
         }
 
         public String toString() {
-            "<html>" + PersonaCellRenderer.htmlize(persona) + "</html>"
+            if (settings.personaRendererIds)
+                return "<html>" + PersonaCellRenderer.htmlize(persona) + "</html>"
+            else
+                return PersonaCellRenderer.justName(persona)
         }
     }
 }

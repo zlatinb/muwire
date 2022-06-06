@@ -6,11 +6,13 @@ import com.muwire.gui.DateRenderer
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
@@ -24,6 +26,8 @@ class CertificateTabView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     CertificateTabModel model
+    @Inject
+    GriffonApplication application
 
     JPanel p
     JTable certsTable
@@ -68,7 +72,7 @@ class CertificateTabView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         certsTable.setDefaultRenderer(Long.class, new DateRenderer())
         certsTable.rowSorter.setComparator(0, new PersonaComparator())
         certsTable.rowSorter.setSortsOnUpdates(true)

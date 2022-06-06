@@ -1,7 +1,11 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -30,6 +34,8 @@ class FetchCertificatesView {
     FetchCertificatesModel model
     @MVCMember @Nonnull
     FetchCertificatesController controller
+    @Inject
+    GriffonApplication application
 
     def mainFrame
     def dialog
@@ -71,7 +77,7 @@ class FetchCertificatesView {
             }
         }
         
-        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        certsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         certsTable.rowSorter.setComparator(0, new PersonaComparator())
         certsTable.rowSorter.addRowSorterListener({evt -> lastSortEvent = evt})
         certsTable.rowSorter.setSortsOnUpdates(true)

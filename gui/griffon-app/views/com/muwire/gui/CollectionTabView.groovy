@@ -1,7 +1,9 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
 
+import javax.inject.Inject
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
@@ -44,6 +46,8 @@ class CollectionTabView {
     CollectionTabModel model
     @MVCMember @Nonnull
     CollectionTabController controller
+    @Inject
+    GriffonApplication application
 
     def parent
     JComponent p
@@ -226,7 +230,7 @@ class CollectionTabView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
-        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())

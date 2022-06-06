@@ -1,7 +1,11 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -27,6 +31,8 @@ class ContentPanelView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     ContentPanelModel model
+    @Inject
+    GriffonApplication application
 
     def dialog
     def mainFrame
@@ -130,7 +136,7 @@ class ContentPanelView {
             }
         })
 
-        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        hitsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         hitsTable.rowSorter.setComparator(0, new PersonaComparator())
         hitsTable.rowSorter.addRowSorterListener({evt -> lastHitsSortEvent = evt})
         hitsTable.rowSorter.setSortsOnUpdates(true)

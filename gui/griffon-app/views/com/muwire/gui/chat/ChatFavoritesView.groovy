@@ -3,11 +3,13 @@ package com.muwire.gui.chat
 import com.muwire.core.Persona
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.DefaultCellEditor
 import javax.swing.JCheckBox
 import javax.swing.JFrame
@@ -27,6 +29,8 @@ class ChatFavoritesView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     ChatFavoritesModel model
+    @Inject
+    GriffonApplication application
 
     JFrame window
     private JTable favoritesTable
@@ -86,7 +90,7 @@ class ChatFavoritesView {
     
     void mvcGroupInit(Map<String, String> args) {
         
-        favoritesTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        favoritesTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         favoritesTable.rowSorter.setComparator(0, new PersonaComparator())
         favoritesTable.selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         

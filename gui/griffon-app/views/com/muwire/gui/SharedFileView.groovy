@@ -1,7 +1,11 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -31,6 +35,8 @@ class SharedFileView {
     SharedFileModel model
     @MVCMember @Nonnull
     SharedFileController controller
+    @Inject
+    GriffonApplication application
 
     def mainFrame
     def dialog
@@ -92,7 +98,7 @@ class SharedFileView {
     
     void mvcGroupInit(Map<String,String> args) {
         
-        def personaRenderer = new PersonaCellRenderer()
+        def personaRenderer = new PersonaCellRenderer(application.context.get("ui-settings"))
         def personaComparator = new PersonaComparator()
 
         certificatesTable.setDefaultRenderer(Persona.class, personaRenderer)

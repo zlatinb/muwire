@@ -1,10 +1,7 @@
 package com.muwire.gui.resultdetails
 
-import com.muwire.core.Persona
 import com.muwire.core.search.UIResultEvent
 import com.muwire.gui.HTMLSanitizer
-import com.muwire.gui.PersonaCellRenderer
-import com.muwire.gui.PersonaComparator
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -209,7 +206,7 @@ class ResultDetailsTabsView {
         // comments tab
         if (!model.resultsWithComments.isEmpty())
             commentsPanel.getLayout().show(commentsPanel, "yes-comments")
-        commentsList.setCellRenderer(new ResultListCellRenderer())
+        commentsList.setCellRenderer(new ResultListCellRenderer(application.context.get("ui-settings")))
         selectionModel = commentsList.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({

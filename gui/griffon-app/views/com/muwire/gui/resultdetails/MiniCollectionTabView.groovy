@@ -7,11 +7,13 @@ import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.PersonaComparator
 import com.muwire.gui.SizeRenderer
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
@@ -25,6 +27,8 @@ class MiniCollectionTabView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     MiniCollectionTabModel model
+    @Inject
+    GriffonApplication application
 
     JPanel p
     JTable collectionsTable
@@ -64,7 +68,7 @@ class MiniCollectionTabView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
-        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer())
+        collectionsTable.setDefaultRenderer(Persona.class, new PersonaCellRenderer(application.context.get("ui-settings")))
         collectionsTable.columnModel.getColumn(3).setCellRenderer(new SizeRenderer())
         collectionsTable.columnModel.getColumn(5).setCellRenderer(new DateRenderer())
         collectionsTable.rowSorter.setComparator(1, new PersonaComparator())
