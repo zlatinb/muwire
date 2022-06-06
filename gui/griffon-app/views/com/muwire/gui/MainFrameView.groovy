@@ -788,7 +788,7 @@ class MainFrameView {
                     panel (constraints : BorderLayout.EAST) {
                         label(icon : imageIcon("/email.png"), toolTipText: trans("TOOLTIP_UNREAD_MESSAEGS"))
                         label(text : bind {model.messages})
-                        label("   " + trans("CONNECTIONS") + ":", toolTipText: trans("TOOLTIP_CONNECTIONS"))
+                        label(icon: imageIcon("/connections.png"), toolTipText: trans("TOOLTIP_CONNECTIONS"))
                         label(text : bind {model.connections})
                     }
                 }
