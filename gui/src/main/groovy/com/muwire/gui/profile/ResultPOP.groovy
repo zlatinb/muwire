@@ -30,11 +30,6 @@ class ResultPOP implements PersonaOrProfile {
     }
 
     @Override
-    String getTitle() {
-        return HTMLSanitizer.sanitize(event.profileHeader?.getTitle())
-    }
-    
-    @Override
     MWProfileHeader getHeader() {
         return event.profileHeader
     }

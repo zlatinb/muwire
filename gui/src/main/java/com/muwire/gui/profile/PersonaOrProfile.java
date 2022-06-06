@@ -3,16 +3,33 @@ package com.muwire.gui.profile;
 import com.muwire.core.Persona;
 import com.muwire.core.profile.MWProfile;
 import com.muwire.core.profile.MWProfileHeader;
+import com.muwire.gui.HTMLSanitizer;
 
 import javax.swing.*;
 
 public interface PersonaOrProfile {
-    Persona getPersona();
+    default Persona getPersona() {return getHeader().getPersona();}
+    
     Icon getThumbnail();
-    String getTitle();
+    
+    default String getTitle() { 
+        return HTMLSanitizer.sanitize(getRawTitle());
+    }
+    
+    default String getRawTitle() {
+        MWProfileHeader header = getHeader();
+        if (header == null)
+            return null;
+        return header.getTitle();
+    }
     
     default MWProfileHeader getHeader() {
-        return null;
+        MWProfile profile = getProfile();
+        if (profile == null)
+            return null;
+        return profile.getHeader();
     }
+    
+    
     default MWProfile getProfile() { return null; }
 }

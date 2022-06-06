@@ -259,7 +259,6 @@ class SearchTabModel {
     static class SenderBucket implements PersonaOrProfile {
         final Persona sender
         private final Icon avatar
-        private final String profileTitle
         private final MWProfileHeader profileHeader
         private final int rowIdx
         final List<UIResultEvent> results = []
@@ -275,10 +274,8 @@ class SearchTabModel {
                     icon = new ThumbnailIcon(profileHeader.getThumbNail())
                 } catch (IOException iox) {}
                 avatar = icon
-                profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
             } else {
                 avatar = null
-                profileTitle = null
             }
         }
         
@@ -288,10 +285,6 @@ class SearchTabModel {
 
         Icon getThumbnail() {
             avatar
-        }
-        
-        String getTitle() {
-            profileTitle
         }
         
         MWProfileHeader getHeader() {

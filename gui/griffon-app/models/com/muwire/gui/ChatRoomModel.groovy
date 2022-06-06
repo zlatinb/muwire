@@ -49,11 +49,11 @@ class ChatRoomModel {
             return persona
         }
         
-        public String getTitle() {
+        public String getRawTitle() {
             MWProfileHeader header = profileHeaders.get(persona)
             if (header == null)
                 return ""
-            return HTMLSanitizer.sanitize(header.getTitle())
+            return header.getTitle()
         }
         
         public Icon getThumbnail() {

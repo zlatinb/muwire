@@ -27,7 +27,7 @@ class TrustPOP implements PersonaOrProfile {
 
     @Override
     Icon getThumbnail() {
-        MWProfileHeader header = trustEntry.getProfileHeader()
+        MWProfileHeader header = getHeader()
         if (header == null)
             return null
         if (icon == null)
@@ -35,11 +35,6 @@ class TrustPOP implements PersonaOrProfile {
         return icon
     }
 
-    @Override
-    String getTitle() {
-        return HTMLSanitizer.sanitize(trustEntry.getProfileHeader()?.getTitle())
-    }
-    
     @Override
     public MWProfileHeader getHeader() {
         trustEntry.getProfileHeader()

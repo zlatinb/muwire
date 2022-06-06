@@ -941,10 +941,6 @@ class MainFrameModel {
             uploader.downloaderPersona
         }
         
-        String getTitle() {
-            HTMLSanitizer.sanitize(profileHeader?.getTitle())
-        }
-
         Icon getThumbnail() {
             if (profileHeader == null)
                 return null
@@ -1166,9 +1162,8 @@ class MainFrameModel {
         }
 
         @Override
-        String getTitle() {
-            String title = core.trustService.getProfileHeader(getPersona())?.getTitle()
-            return HTMLSanitizer.sanitize(title)
+        String getRawTitle() {
+            getHeader()?.getTitle()
         }
         
         @Override

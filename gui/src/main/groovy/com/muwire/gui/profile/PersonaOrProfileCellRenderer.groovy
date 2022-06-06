@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.Persona
+import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.UISettings
 
 import javax.swing.JTable
@@ -28,9 +29,15 @@ class PersonaOrProfileCellRenderer extends DefaultTableCellRenderer {
         else
             setIcon(null)
         
-        if (pop.getTitle() != null)
-            setToolTipText(pop.getTitle())
-        else
+        if (pop.getTitle() != null) {
+            if (settings.personaRendererIds)
+                setToolTipText(pop.getTitle())
+            else {
+                String escaped = HTMLSanitizer.escape(pop.getRawTitle());
+                String tooltip = "<html><body>${pop.getPersona().getHumanReadableName()}: ${escaped}</body><html>"
+                setToolTipText(tooltip)
+            }
+        } else
             setToolTipText(trans("NO_PROFILE"))
         
         Persona persona = pop.getPersona()

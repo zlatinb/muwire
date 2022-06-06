@@ -43,13 +43,6 @@ class MWMessageStatus implements PersonaOrProfile {
     }
 
     @Override
-    String getTitle() {
-        if (profileHeader == null)
-            return null
-        return HTMLSanitizer.sanitize(profileHeader.getTitle())
-    }
-    
-    @Override
     MWProfileHeader getHeader() {
         profileHeader
     }
