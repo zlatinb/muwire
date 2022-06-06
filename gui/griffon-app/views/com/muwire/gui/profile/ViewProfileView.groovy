@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.profile.MWProfile
+import com.muwire.core.profile.MWProfileFetchStatus
 import com.muwire.gui.HTMLSanitizer
 
 import javax.imageio.ImageIO
@@ -74,21 +75,29 @@ class ViewProfileView {
                 cardLayout()
                 panel(constraints: "fetch-profile") {
                     button(text: trans("PROFILE_VIEWER_FETCH"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_FETCH"), 
+                            enabled: bind {model.fetchEnabled()}, 
                             fetchAction)
                 }
                 panel(constraints: "full-profile") {
-                    gridLayout(rows: 1, cols: 2)
-                    panel(border: titledBorder(title: trans("PROFILE_VIEWER_AVATAR"), border: etchedBorder(),
-                        titlePosition: TitledBorder.TOP)) {
-                        gridLayout(rows: 1, cols: 1)
-                        widget(imagePanel)
-                    }
-                    panel(border: titledBorder(title: trans("PROFILE_VIEWER_PROFILE"), border: etchedBorder(),
-                        titlePosition: TitledBorder.TOP)) {
-                        gridLayout(rows: 1, cols: 1)
-                        scrollPane {
-                            bodyArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true)
+                    borderLayout()
+                    panel(constraints: BorderLayout.CENTER) {
+                        gridLayout(rows: 1, cols: 2)
+                        panel(border: titledBorder(title: trans("PROFILE_VIEWER_AVATAR"), border: etchedBorder(),
+                                titlePosition: TitledBorder.TOP)) {
+                            gridLayout(rows: 1, cols: 1)
+                            widget(imagePanel)
                         }
+                        panel(border: titledBorder(title: trans("PROFILE_VIEWER_PROFILE"), border: etchedBorder(),
+                                titlePosition: TitledBorder.TOP)) {
+                            gridLayout(rows: 1, cols: 1)
+                            scrollPane {
+                                bodyArea = textArea(editable: false, lineWrap: true, wrapStyleWord: true)
+                            }
+                        }
+                    }
+                    panel(constraints: BorderLayout.SOUTH) {
+                        button(text: trans("PROFILE_VIEWER_UPDATE"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_UPDATE"),
+                            enabled: bind { model.fetchEnabled()}, fetchAction)
                     }
                 }
             }

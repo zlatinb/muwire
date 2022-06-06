@@ -38,11 +38,18 @@ class ViewProfileModel {
             profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
     }
     
+    boolean fetchEnabled() {
+        status != MWProfileFetchStatus.CONNECTING && status != MWProfileFetchStatus.FETCHING
+    }
+    
     void register() {
         if (registered)
             return
         registered = true
         core.getEventBus().register(MWProfileFetchEvent.class, this)
+    }
+    
+    void fetch() {
         core.getEventBus().publish(new UIProfileFetchEvent(uuid: uuid, host: persona))
     }
     

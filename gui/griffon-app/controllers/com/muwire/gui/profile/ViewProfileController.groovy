@@ -24,6 +24,7 @@ class ViewProfileController {
     @ControllerAction
     void fetch() {
         model.register()
+        model.fetch()
     }
     
     @ControllerAction
