@@ -1,7 +1,10 @@
 import com.muwire.gui.LNFs
+import com.muwire.gui.MWErrorDisplayer
 import com.muwire.gui.profile.ProfileConstants
 import com.muwire.gui.win.PrioritySetter
+import griffon.core.ExceptionHandler
 import griffon.core.GriffonApplication
+import griffon.core.RunnableWithArgs
 import groovy.swing.SwingBuilder
 import groovy.util.logging.Log
 import net.i2p.util.SystemVersion
@@ -48,6 +51,12 @@ class Initialize extends AbstractLifecycleHandler {
 
     @Override
     void execute() {
+        
+        log.info("registering exception displayer")
+        application.eventRouter.addEventListener('UncaughtExceptionThrown',
+                {
+                    MWErrorDisplayer.fatal(application, it[0])
+                } as RunnableWithArgs)
         
         log.info "Loading home dir"
         def portableHome = System.getProperty("portable.home")
