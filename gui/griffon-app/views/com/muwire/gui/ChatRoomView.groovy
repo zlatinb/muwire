@@ -3,7 +3,11 @@ package com.muwire.gui
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+
+import javax.inject.Inject
+
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -40,6 +44,8 @@ class ChatRoomView {
     ChatRoomModel model
     @MVCMember @Nonnull
     ChatRoomController controller
+    @Inject
+    GriffonApplication application
 
     ChatNotificator chatNotificator
     
@@ -128,7 +134,7 @@ class ChatRoomView {
             
         if (membersTable != null) {
             
-            membersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+            membersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
             membersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
             membersTable.rowSorter.addRowSorterListener({evt -> lastMembersTableSortEvent = evt})
             membersTable.rowSorter.setSortsOnUpdates(true)

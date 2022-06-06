@@ -4,10 +4,12 @@ import com.muwire.core.Persona
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 
+import javax.inject.Inject
 import javax.swing.JFrame
 import javax.swing.JTable
 import java.awt.Dimension
@@ -29,6 +31,8 @@ class TrustListView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     TrustListModel model
+    @Inject
+    GriffonApplication application
 
     JFrame window
     JFrame mainFrame
@@ -83,7 +87,7 @@ class TrustListView {
 
     void mvcGroupInit(Map<String,String> args) {
         
-        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
 
         contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)

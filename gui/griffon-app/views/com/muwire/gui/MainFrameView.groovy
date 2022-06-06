@@ -891,7 +891,7 @@ class MainFrameView {
                     WHEN_IN_FOCUSED_WINDOW)
         }
         
-        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
 
         // downloads table

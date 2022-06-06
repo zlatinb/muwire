@@ -92,6 +92,8 @@ class OptionsView {
     def showUnsharedPathsCheckbox
     def storeSearchHistoryCheckbox
     def messageNotificationsCheckbox
+    def personaRendererAvatarsCheckbox
+    def personaRendererIdsCheckbox
 
     def inBwField
     def outBwField
@@ -442,7 +444,17 @@ class OptionsView {
                     }
                 }
             }
-            panel (constraints : gbc(gridx: 0, gridy: 3, weighty: 100))
+            panel (border : titledBorder(title : trans("OPTIONS_PERSONA_RENDERING"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
+                    constraints : gbc(gridx : 0, gridy : 3, fill : GridBagConstraints.HORIZONTAL, weightx : 100)) {
+                gridBagLayout()
+                label(text: trans("OPTIONS_PERSONA_RENDERING_AVATARS"), constraints: gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                personaRendererAvatarsCheckbox = checkBox(selected: bind {model.personaRendererAvatars},
+                constraints: gbc(gridx:1, gridy:0, anchor: GridBagConstraints.LINE_END))
+                label(text: trans("OPTIONS_PERSONA_RENDERING_IDS"), constraints: gbc(gridx: 0, gridy: 1, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                personaRendererIdsCheckbox = checkBox(selected: bind {model.personaRendererIds},
+                        constraints: gbc(gridx:1, gridy:1, anchor: GridBagConstraints.LINE_END))
+            }
+            panel (constraints : gbc(gridx: 0, gridy: 4, weighty: 100))
         }
         bandwidth = builder.panel {
             gridBagLayout()

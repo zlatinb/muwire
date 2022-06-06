@@ -100,6 +100,10 @@ class OptionsModel {
     @Observable boolean allowOnlyTrustedMessages
     @Observable int messageSendInterval
     
+    // persona rendering options
+    @Observable boolean personaRendererAvatars
+    @Observable boolean personaRendererIds
+    
     boolean disableUpdates
 
     void mvcGroupInit(Map<String, String> args) {
@@ -155,6 +159,8 @@ class OptionsModel {
         groupByFile = uiSettings.groupByFile
         messageNotifications = uiSettings.messageNotifications
         showUnsharedPaths = uiSettings.showUnsharedPaths
+        personaRendererAvatars = uiSettings.personaRendererAvatars
+        personaRendererIds = uiSettings.personaRendererIds
 
         if (System.getProperty("embeddedRouter") == "true") {
             inBw = String.valueOf(settings.inBw)

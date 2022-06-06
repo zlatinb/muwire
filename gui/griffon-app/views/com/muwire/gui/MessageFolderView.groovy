@@ -196,7 +196,8 @@ class MessageFolderView {
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
 
-        messageHeaderTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+        messageHeaderTable.setDefaultRenderer(PersonaOrProfile.class, 
+                new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
         messageHeaderTable.setDefaultRenderer(Integer.class, centerRenderer)
         messageHeaderTable.setDefaultRenderer(Long.class, new DateRenderer())
         if (!model.outgoing)

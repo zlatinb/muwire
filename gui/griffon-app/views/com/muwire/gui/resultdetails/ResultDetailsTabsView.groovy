@@ -11,6 +11,7 @@ import com.muwire.gui.profile.PersonaOrProfileComparator
 import com.muwire.gui.profile.ResultPOP
 import com.muwire.gui.profile.ThumbnailIcon
 import com.muwire.gui.resultdetails.ResultListCellRenderer
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
@@ -18,6 +19,7 @@ import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
 import javax.swing.Icon
 import javax.swing.JList
 import javax.swing.JPanel
@@ -36,6 +38,8 @@ class ResultDetailsTabsView {
     FactoryBuilderSupport builder
     @MVCMember @Nonnull
     ResultDetailsTabsModel model
+    @Inject
+    GriffonApplication application
     
     
     JPanel p
@@ -182,7 +186,8 @@ class ResultDetailsTabsView {
     void mvcGroupInit(Map<String,String> args) {
         
         // all senders table
-        sendersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+        sendersTable.setDefaultRenderer(PersonaOrProfile.class, 
+                new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
         sendersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
         def selectionModel = sendersTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)

@@ -341,6 +341,14 @@ class OptionsController {
             if (model.closeDecisionMade)
                 uiSettings.closeWarning = false
         }
+        
+        boolean personaRendererAvatars = view.personaRendererAvatarsCheckbox.model.isSelected()
+        model.personaRendererAvatars = personaRendererAvatars
+        uiSettings.personaRendererAvatars = personaRendererAvatars
+        
+        boolean personaRendererIds = view.personaRendererIdsCheckbox.model.isSelected()
+        model.personaRendererIds = personaRendererIds
+        uiSettings.personaRendererIds = personaRendererIds
             
         saveUISettings()
 

@@ -126,7 +126,8 @@ class ResultDetailsFrameView {
     void mvcGroupInit(Map<String, String> args) {
         if (model.senders.size() > 1) {
             JTable sendersTable = builder.getVariable("senders-table")
-            sendersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer())
+            sendersTable.setDefaultRenderer(PersonaOrProfile.class, 
+                    new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
             sendersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
         }
         if (certificatesPanel != null) {

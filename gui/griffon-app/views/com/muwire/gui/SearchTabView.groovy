@@ -6,9 +6,11 @@ import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
 import com.muwire.gui.profile.ResultPOP
+import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import net.i2p.data.Destination
 
+import javax.inject.Inject
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JPanel
@@ -64,6 +66,8 @@ class SearchTabView {
     SearchTabModel model
     @MVCMember @Nonnull
     SearchTabController controller
+    @Inject
+    GriffonApplication application
     
     UISettings settings
 
@@ -397,7 +401,7 @@ class SearchTabView {
         })
         
         // senders table
-        def popRenderer = new PersonaOrProfileCellRenderer()
+        def popRenderer = new PersonaOrProfileCellRenderer(application.context.get("ui-settings"))
         def popComparator = new PersonaOrProfileComparator()
         sendersTable.addMouseListener(sendersMouseListener)
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)

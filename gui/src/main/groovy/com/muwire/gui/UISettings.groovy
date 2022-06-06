@@ -33,6 +33,10 @@ class UISettings {
     Set<String> openTabs
     boolean messageNotifications
     
+    // persona renderer settings
+    boolean personaRendererAvatars
+    boolean personaRendererIds
+    
     UISettings(Properties props) {
         lnf = props.getProperty("lnf", "system")
         locale = props.getProperty("locale","us")
@@ -63,6 +67,9 @@ class UISettings {
         messageNotifications = Boolean.parseBoolean(props.getProperty("messageNotifications","true"))
         
         showUnsharedPaths = Boolean.parseBoolean(props.getProperty("showUnsharedPaths","false"))
+        
+        personaRendererAvatars = Boolean.parseBoolean(props.getProperty("personaRendererAvatars", "true"))
+        personaRendererIds = Boolean.parseBoolean(props.getProperty("personaRendererIds", "true"))
     }
 
     void write(OutputStream out) throws IOException {
@@ -97,6 +104,9 @@ class UISettings {
         props.setProperty("messageNotifications", String.valueOf(messageNotifications))
         
         props.setProperty("showUnsharedPaths", String.valueOf(showUnsharedPaths))
+        
+        props.setProperty("personaRendererAvatars", String.valueOf(personaRendererAvatars))
+        props.setProperty("personaRendererIds", String.valueOf(personaRendererIds))
 
         props.store(out, "UI Properties")
     }
