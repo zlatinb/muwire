@@ -123,6 +123,8 @@ class ViewProfileView {
                     Icon thumbNail = new ThumbnailIcon(model.profileHeader.getThumbNail())
                     drawThumbnail(thumbNail)
                 }
+                if (model.profile != null)
+                    profileFetched(model.profile)
             } 
             
             @Override

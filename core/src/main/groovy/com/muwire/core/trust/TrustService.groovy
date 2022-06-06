@@ -1,6 +1,7 @@
 package com.muwire.core.trust
 
 import com.muwire.core.EventBus
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileFetchEvent
 import com.muwire.core.profile.MWProfileHeader
 
@@ -82,7 +83,12 @@ class TrustService extends Service {
             decoded = Base64.decode(json.profileHeader)
             profileHeader = new MWProfileHeader(new ByteArrayInputStream(decoded))
         }
-        new TrustEntry(persona, (String)json.reason, profileHeader)
+        MWProfile profile = null
+        if (json.profile != null) {
+            decoded = Base64.decode(json.profile)
+            profile = new MWProfile(new ByteArrayInputStream(decoded))
+        }
+        new TrustEntry(persona, (String)json.reason, profileHeader, profile)
     }
 
     private void persist() {
@@ -94,6 +100,8 @@ class TrustService extends Service {
                 json.reason = v.reason
                 if (v.profileHeader != null)
                     json.profileHeader = v.profileHeader.toBase64()
+                if (v.profile != null)
+                    json.profile = v.profile.toBase64()
                 writer.println JsonOutput.toJson(json)
             }
         })
@@ -105,6 +113,7 @@ class TrustService extends Service {
                 json.reason = v.reason
                 if (v.profileHeader != null)
                     json.profileHeader = v.profileHeader.toBase64()
+                // do not persist profiles of distrusted contacts
                 writer.println JsonOutput.toJson(json)
             }
         })
@@ -129,11 +138,13 @@ class TrustService extends Service {
         switch(e.level) {
             case TrustLevel.TRUSTED:
                 bad.remove(e.persona.destination)
-                good.put(e.persona.destination, new TrustEntry(e.persona, e.reason, e.profileHeader))
+                good.put(e.persona.destination, new TrustEntry(e.persona, e.reason, 
+                        e.profileHeader, e.profile))
                 break
             case TrustLevel.DISTRUSTED:
                 good.remove(e.persona.destination)
-                bad.put(e.persona.destination, new TrustEntry(e.persona, e.reason, e.profileHeader))
+                bad.put(e.persona.destination, new TrustEntry(e.persona, e.reason, 
+                        e.profileHeader, e.profile))
                 break
             case TrustLevel.NEUTRAL:
                 good.remove(e.persona.destination)
@@ -153,6 +164,7 @@ class TrustService extends Service {
         if (te == null)
             return
         te.profileHeader = event.profile.getHeader()
+        te.profile = event.profile
         diskIO.submit({persist()} as Runnable)
     }
     
@@ -160,10 +172,13 @@ class TrustService extends Service {
         final Persona persona
         final String reason
         volatile MWProfileHeader profileHeader
-        TrustEntry(Persona persona, String reason, MWProfileHeader profileHeader) {
+        volatile MWProfile profile
+        TrustEntry(Persona persona, String reason, 
+                   MWProfileHeader profileHeader, MWProfile profile) {
             this.persona = persona
             this.reason = reason
             this.profileHeader = profileHeader
+            this.profile = profile
         }
         
         public int hashCode() {

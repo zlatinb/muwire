@@ -13,6 +13,7 @@ class ViewProfileHelper {
         params.uuid = uuid
         params.profileTitle = pop.getTitle()
         params.profileHeader = pop.getHeader()
+        params.profile = pop.getProfile()
         
         group.createMVCGroup("view-profile", uuid.toString(), params)
     }

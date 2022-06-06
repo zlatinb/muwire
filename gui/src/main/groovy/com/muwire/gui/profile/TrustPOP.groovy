@@ -1,6 +1,7 @@
 package com.muwire.gui.profile
 
 import com.muwire.core.Persona
+import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService.TrustEntry
@@ -42,5 +43,10 @@ class TrustPOP implements PersonaOrProfile {
     @Override
     public MWProfileHeader getHeader() {
         trustEntry.getProfileHeader()
+    }
+    
+    @Override
+    public MWProfile getProfile() {
+        trustEntry.getProfile()
     }
 }

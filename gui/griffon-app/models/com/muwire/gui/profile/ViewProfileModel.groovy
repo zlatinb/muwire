@@ -32,6 +32,8 @@ class ViewProfileModel {
     private boolean registered
     
     void mvcGroupInit(Map<String, String> args) {
+        if (profile != null)
+            profileHeader = profile.getHeader()
         if (profileHeader != null)
             profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
     }
