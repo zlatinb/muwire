@@ -197,6 +197,6 @@ class TrustSubscriber {
             if (persona != profileHeader.getPersona())
                 throw new IOException("persona and profile mismatch")
         }
-        new TrustEntry(persona, (String)json.reason, profileHeader)
+        new TrustEntry(persona, (String)json.reason, profileHeader, null)
     }
 }
