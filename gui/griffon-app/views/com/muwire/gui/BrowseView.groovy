@@ -57,6 +57,7 @@ class BrowseView {
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
+        int treeRowHeight = application.context.get("tree-row-height")
         
         p = builder.panel {
             borderLayout()
@@ -94,7 +95,7 @@ class BrowseView {
                     borderLayout()
                     scrollPane(constraints: BorderLayout.CENTER) {
                         resultsTree = new ResultTree(model.resultsTreeModel)
-                        tree(id: "results-tree", rowHeight: rowHeight, resultsTree)
+                        tree(id: "results-tree", rowHeight: treeRowHeight, resultsTree)
                     }
                 }
             }

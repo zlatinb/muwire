@@ -1,4 +1,5 @@
 import com.muwire.gui.LNFs
+import com.muwire.gui.profile.ProfileConstants
 import com.muwire.gui.win.PrioritySetter
 import griffon.core.GriffonApplication
 import groovy.swing.SwingBuilder
@@ -67,6 +68,7 @@ class Initialize extends AbstractLifecycleHandler {
         def guiPropsFile = new File(home, "gui.properties")
         UISettings uiSettings
         int rowHeight = 15
+        int treeRowHeight = 15
         if (guiPropsFile.exists()) {
             Properties props = new Properties()
             guiPropsFile.withInputStream { props.load(it) }
@@ -105,7 +107,7 @@ class Initialize extends AbstractLifecycleHandler {
                 } else {
                     fontSize = uiSettings.fontSize
                 }
-                rowHeight = Math.max(24, fontSize + 3)
+                rowHeight = fontSize + 3
                 FontUIResource font = new FontUIResource(fontName, uiSettings.fontStyle, fontSize)
                 
                 def keys = lnf.getDefaults().keys()
@@ -136,6 +138,9 @@ class Initialize extends AbstractLifecycleHandler {
             uiSettings.locale = showLanguageDialog()
         }
 
+        treeRowHeight = rowHeight
+        rowHeight = Math.max(ProfileConstants.MAX_THUMBNAIL_SIZE, rowHeight)
+        application.context.put("tree-row-height", treeRowHeight)
         application.context.put("row-height", rowHeight)
         application.context.put("ui-settings", uiSettings)
         

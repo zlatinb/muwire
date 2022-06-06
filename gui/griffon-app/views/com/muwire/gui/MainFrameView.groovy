@@ -126,6 +126,7 @@ class MainFrameView {
         
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
+        int treeRowHeight = application.context.get("tree-row-height")
         
         def screenDimensions = Toolkit.getDefaultToolkit().getScreenSize()
         int mainFrameX = (int)Math.min(1400.0d, screenDimensions.getWidth())
@@ -387,7 +388,7 @@ class MainFrameView {
                                             jtree.setDragEnabled(true)
                                             jtree.setTransferHandler(transferHandler)
                                             ToolTipManager.sharedInstance().registerComponent(jtree)
-                                            tree(id : "shared-files-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
+                                            tree(id : "shared-files-tree", rowHeight : treeRowHeight, rootVisible : false, expandsSelectedPaths: true, largeModel : true, jtree)
                                         }
                                     }
                                 }

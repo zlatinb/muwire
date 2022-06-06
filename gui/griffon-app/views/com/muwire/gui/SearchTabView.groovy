@@ -91,6 +91,7 @@ class SearchTabView {
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
+        int treeRowHeight = application.context.get("tree-row-height")
         pane = builder.panel {
                 borderLayout()
                 panel (id : "results-panel", constraints : BorderLayout.CENTER) {
@@ -156,7 +157,7 @@ class SearchTabView {
                                         borderLayout()
                                         scrollPane(constraints: BorderLayout.CENTER) {
                                             resultTree = new ResultTree(model.treeModel)
-                                            tree(id: "results-tree", rowHeight: rowHeight, resultTree)
+                                            tree(id: "results-tree", rowHeight: treeRowHeight, resultTree)
                                         }
                                     }
                                 }
