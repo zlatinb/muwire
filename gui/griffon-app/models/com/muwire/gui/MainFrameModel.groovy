@@ -425,7 +425,10 @@ class MainFrameModel {
 
     void onUIResultBatchEvent(UIResultBatchEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
-        resultsGroup?.model?.handleResultBatch(e.results)
+        if (resultsGroup == null)
+            return
+        if (resultsGroup.isAlive())
+            resultsGroup.model.handleResultBatch(e.results)
     }
 
     void onDownloadStartedEvent(DownloadStartedEvent e) {
