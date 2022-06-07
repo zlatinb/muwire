@@ -1,22 +1,20 @@
 package com.muwire.gui
 
 import javax.swing.AbstractListModel
+import javax.swing.DefaultComboBoxModel
 import javax.swing.MutableComboBoxModel
 
-class SearchFieldModel extends AbstractListModel implements MutableComboBoxModel {
+class SearchFieldModel extends DefaultComboBoxModel implements MutableComboBoxModel {
     private final UISettings uiSettings
     private final File settingsFile
-    private final List<String> objects = new ArrayList<>()
-    private String selectedObject
-    
+
     SearchFieldModel(UISettings uiSettings, File home) {
         super()
         this.uiSettings = uiSettings
         this.settingsFile = new File(home, "gui.properties")
-        uiSettings.searchHistory.each { objects.add(it) }
-        fireIntervalAdded(this, 0, objects.size() - 1)
+        addAll(uiSettings.searchHistory)
     }
-    
+
     public void addElement(Object string) {
         if (string == null)
             return
@@ -25,75 +23,27 @@ class SearchFieldModel extends AbstractListModel implements MutableComboBoxModel
                 return
             settingsFile.withOutputStream { uiSettings.write(it) }
         }
-        objects.add(string);
-        fireIntervalAdded(this,objects.size()-1, objects.size()-1);
-        if ( objects.size() == 1 && selectedObject == null && string != null ) {
-            setSelectedItem( string );
-        }
+        super.addElement(string)
     }
     
     boolean onKeyStroke(String selected) {
-        selectedObject = selected
         if (selected == null || selected.length() == 0) {
-            objects.clear()
-            uiSettings.searchHistory.each { objects.add(it) }
+            removeAllElements()
+            addAll(uiSettings.searchHistory)
             return true
         }
-        
-        objects.clear()
 
-        Set<String> matching = new HashSet<>(uiSettings.searchHistory)
+        removeAllElements()
+        setSelectedItem(selected)
+
+        List<String> matching = new ArrayList<>(uiSettings.searchHistory)
         matching.retainAll { it.containsIgnoreCase(selected) }
-        
-        matching.each {
-            objects.add(it)
-        }
-        Collections.sort(objects)
-        if (!objects.isEmpty()) {
-            fireIntervalAdded(this, 0, objects.size() - 1)
-            return true
-        }
-        false
-    }
 
-    @Override
-    public void setSelectedItem(Object anObject) {
-        if ((selectedObject != null && !selectedObject.equals( anObject )) ||
-            selectedObject == null && anObject != null) {
-            selectedObject = anObject;
-        }
-    }
+        if (matching.isEmpty())
+            return false
 
-    @Override
-    public Object getSelectedItem() {
-        selectedObject
-    }
-
-    @Override
-    public int getSize() {
-        objects.size()
-    }
-
-    @Override
-    public Object getElementAt(int index) {
-        if ( index >= 0 && index < objects.size() )
-            return objects.get(index);
-        else
-            return null;
-    }
-
-    @Override
-    public void removeElement(Object obj) {
-        
-    }
-
-    @Override
-    public void insertElementAt(Object item, int index) {
-        
-    }
-
-    @Override
-    public void removeElementAt(int index) {
-        
+        Collections.sort(matching)
+        addAll(matching)
+        return true
     }
 }

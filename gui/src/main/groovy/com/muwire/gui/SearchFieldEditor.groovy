@@ -26,31 +26,6 @@ class SearchFieldEditor extends BasicComboBoxEditor {
         def action = field.getAction()
         field.setAction(null)
         editor.setAction(action)
-        editor.getDocument().addDocumentListener(new DocumentListener() {
-
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        SwingUtilities.invokeLater({
-                            field.hidePopup()
-                            if (model.onKeyStroke(editor.text))
-                                field.showPopup()
-                        })
-                    }
-
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        SwingUtilities.invokeLater({
-                            field.hidePopup()
-                            if (model.onKeyStroke(editor.text))
-                                field.showPopup()
-                        })
-                    }
-
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                    }
-
-                })
         
         editor.addMouseListener(new MouseAdapter() {
             @Override
@@ -73,11 +48,14 @@ class SearchFieldEditor extends BasicComboBoxEditor {
         editor.addKeyListener(new KeyAdapter() {
             @Override
             void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() != KeyEvent.VK_ENTER) 
+                int keyCode = e.getKeyCode()
+                if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_DOWN) 
                     return
-                if (model.getSelectedItem() != null) {
-                    editor.setText((String)model.getSelectedItem())
-                }
+                SwingUtilities.invokeLater({
+                    field.hidePopup()
+                    if (model.onKeyStroke(editor.text))
+                        field.showPopup()
+                })
             }
         })
     }
