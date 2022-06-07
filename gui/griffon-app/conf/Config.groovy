@@ -234,9 +234,9 @@ mvcGroups {
         controller = 'com.muwire.gui.chat.ChatFavoritesController'
     }
     'contact-selector' {
-        model = 'com.muwire.gui.ContactSelectorModel'
-        view = 'com.muwire.gui.ContactSelectorView'
-        controller = 'com.muwire.gui.ContactSelectorController'
+        model = 'com.muwire.gui.contacts.ContactSelectorModel'
+        view = 'com.muwire.gui.contacts.ContactSelectorView'
+        controller = 'com.muwire.gui.contacts.ContactSelectorController'
     }
     'edit-profile' {
         model = 'com.muwire.gui.profile.EditProfileModel'

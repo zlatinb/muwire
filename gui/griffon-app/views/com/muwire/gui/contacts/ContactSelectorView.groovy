@@ -1,6 +1,9 @@
-package com.muwire.gui
+package com.muwire.gui.contacts
 
 import com.muwire.core.Persona
+import com.muwire.gui.CopyPasteSupport
+import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.UISettings
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
