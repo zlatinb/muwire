@@ -23,6 +23,10 @@ import javax.swing.border.TitledBorder
 import java.awt.BorderLayout
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
+import java.awt.event.ItemEvent
+import java.awt.event.ItemListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
@@ -39,23 +43,37 @@ class ContactSelectorView {
     
     DefaultListModel contactsModel
     JList contactsList
+    ContactChooser contactChooser
+    ContactChooserModel contactChooserModel
 
     JPanel component
     
+    private UISettings settings
+    
+    private Contact lastSelectedContact
+    
     void initUI() {
+        settings = application.context.get("ui-settings")
+        
         contactsModel = new DefaultListModel()
         model.contacts.each {
-            contactsModel.addElement(new Contact(it))
+            contactsModel.addElement(new Contact(it, settings))
         }
         contactsList = new JList(contactsModel)
         contactsList.setVisibleRowCount(2)
         
-        component = builder.panel(border : builder.titledBorder(title : trans("RECIPIENTS_TITLE"),
-                border : builder.etchedBorder(), titlePosition : TitledBorder.TOP)) {
+        contactChooserModel= new ContactChooserModel(model.core.trustService.getGood().values())
+        contactChooser = new ContactChooser(settings, contactChooserModel)
+        
+        component = builder.panel {
             borderLayout()
-            scrollPane(constraints : BorderLayout.CENTER) {
+            scrollPane(constraints : BorderLayout.CENTER, border : builder.titledBorder(title : trans("RECIPIENTS_TITLE"),
+                    border : builder.etchedBorder(), titlePosition : TitledBorder.TOP)) {
                 widget(contactsList)
             }
+            widget(contactChooser, constraints: BorderLayout.SOUTH, 
+                    border : builder.titledBorder(title : trans("CONTACT_CHOOSER_SELECT_CONTACT"),
+                    border : builder.etchedBorder(), titlePosition : TitledBorder.TOP))
         }
     }
     
@@ -77,6 +95,34 @@ class ContactSelectorView {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     contactsMenu.show(e.getComponent(), e.getX(), e.getY())
+            }
+        })
+        
+        contactChooser.addItemListener(new ItemListener() {
+            @Override
+            void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() != ItemEvent.SELECTED)
+                    return
+                Object item = e.getItem()
+                if (item == null || item instanceof String)
+                    return
+                ContactChooserPOP ccp = (ContactChooserPOP) item
+                if (ccp.getPersona() == null)
+                    return
+          
+                lastSelectedContact = new Contact(ccp.getPersona(), settings)
+            }
+        })
+        
+        contactChooser.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+            @Override
+            void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() != KeyEvent.VK_ENTER)
+                    return
+                if (lastSelectedContact != null) {
+                    if (model.contacts.add(lastSelectedContact.persona))
+                        contactsModel << lastSelectedContact
+                }
             }
         })
     }
@@ -110,7 +156,7 @@ class ContactSelectorView {
 
             items.each {
                 if (model.contacts.add(it))
-                    contactsModel.insertElementAt(new Contact(it),0)
+                    contactsModel.insertElementAt(new Contact(it, settings),0)
             }
             return true
         }
@@ -119,8 +165,9 @@ class ContactSelectorView {
     private static class Contact {
         private final UISettings settings
         private final Persona persona
-        Contact(Persona persona) {
+        Contact(Persona persona, UISettings settings) {
             this.persona = persona
+            this.settings = settings
         }
 
         public String toString() {

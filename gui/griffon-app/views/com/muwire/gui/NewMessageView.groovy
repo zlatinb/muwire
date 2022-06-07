@@ -62,6 +62,7 @@ class NewMessageView {
         
         def params = [:]
         params.contacts = model.recipients
+        params.core = model.core
         contactSelector = mvcGroup.createMVCGroup("contact-selector", UUID.randomUUID().toString(), params)
         
         window = builder.frame(visible : false, locationRelativeTo : mainFrame,

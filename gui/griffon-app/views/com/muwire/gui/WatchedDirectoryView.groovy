@@ -43,6 +43,7 @@ class WatchedDirectoryView {
         mainFrame = application.windowManager.findWindow("main-frame")
         
         def params = [:]
+        params.core = model.core
         params.contacts = model.allowedContacts
         contactSelector = mvcGroup.createMVCGroup("contact-selector", UUID.randomUUID().toString(), params)
         
