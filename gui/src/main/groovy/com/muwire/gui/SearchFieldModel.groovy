@@ -61,7 +61,6 @@ class SearchFieldModel extends AbstractListModel implements MutableComboBoxModel
         if ((selectedObject != null && !selectedObject.equals( anObject )) ||
             selectedObject == null && anObject != null) {
             selectedObject = anObject;
-            fireContentsChanged(this, -1, -1);
         }
     }
 

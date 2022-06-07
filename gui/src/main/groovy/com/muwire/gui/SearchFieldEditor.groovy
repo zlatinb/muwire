@@ -7,6 +7,8 @@ import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.plaf.basic.BasicComboBoxEditor
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
@@ -65,6 +67,17 @@ class SearchFieldEditor extends BasicComboBoxEditor {
                     return
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
                     showPopupMenu(e)
+            }
+        })
+        
+        editor.addKeyListener(new KeyAdapter() {
+            @Override
+            void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() != KeyEvent.VK_ENTER) 
+                    return
+                if (model.getSelectedItem() != null) {
+                    editor.setText((String)model.getSelectedItem())
+                }
             }
         })
     }
