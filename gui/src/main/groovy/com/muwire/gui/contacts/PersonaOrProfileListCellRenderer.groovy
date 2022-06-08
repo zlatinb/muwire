@@ -23,8 +23,14 @@ class PersonaOrProfileListCellRenderer extends DefaultListCellRenderer {
     @Override
     Component getListCellRendererComponent(JList<?> list, Object v, 
                                            int index, boolean isSelected, boolean cellHasFocus) {
+        if (v == null)
+            return this
+        
         super.getListCellRendererComponent(list, v, index, isSelected, cellHasFocus)
         PersonaOrProfile value = (PersonaOrProfile)v
+        
+        if (value.getPersona() == null) 
+            return this
         
         String text
         if (settings.personaRendererIds)
