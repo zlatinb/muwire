@@ -9,8 +9,10 @@ import javax.swing.JTextField
 
 class ContactChooser extends JComboBox{
     private final ContactChooserEditor chooserEditor
+    private final ContactChooserModel chooserModel
     ContactChooser(UISettings settings, ContactChooserModel model) {
         setModel(model)
+        this.chooserModel = model
         chooserEditor = new ContactChooserEditor(model, this, settings)
         setEditor(chooserEditor)
         setRenderer(new PersonaOrProfileListCellRenderer(settings))
@@ -22,6 +24,13 @@ class ContactChooser extends JComboBox{
     }
     
     Set<PersonaOrProfile> getSelectedPOPs() {
-        chooserEditor.textPane.getSelectedPOPs()
+        Set<PersonaOrProfile> rv = chooserEditor.textPane.getSelectedPOPs()
+        def lastPOP = chooserEditor.getItem()
+        if (lastPOP == null)
+            return rv
+        lastPOP = chooserModel.findByName(lastPOP.toString())
+        if (lastPOP != null)
+            rv << lastPOP
+        rv
     }
 }
