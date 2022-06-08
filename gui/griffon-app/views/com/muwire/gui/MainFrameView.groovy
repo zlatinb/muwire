@@ -2143,7 +2143,13 @@ class MainFrameView {
     
     void refreshSharedFilesTableRow(int row) {
         JTable table = builder.getVariable("shared-files-table")
-        table.model.fireTableRowsUpdated(row, row)
+        try {
+            table.model.fireTableRowsUpdated(row, row)
+        } catch (IndexOutOfBoundsException bad) {
+            int modelSize = table.model.size()
+            int sharedSize = model.shared.size()
+            throw new Exception("Index out of bounds: row=$row sharedSize=$sharedSize modelSize=$modelSize", bad)
+        }
     }
     
     void fullUpdateIfColumnSorted(String tableName, int column) {
