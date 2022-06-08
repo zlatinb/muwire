@@ -2146,9 +2146,7 @@ class MainFrameView {
         try {
             table.model.fireTableRowsUpdated(row, row)
         } catch (IndexOutOfBoundsException bad) {
-            int modelSize = table.model.size()
-            int sharedSize = model.shared.size()
-            throw new Exception("Index out of bounds: row=$row sharedSize=$sharedSize modelSize=$modelSize", bad)
+            // TODO: figure out why this happens
         }
     }
     
