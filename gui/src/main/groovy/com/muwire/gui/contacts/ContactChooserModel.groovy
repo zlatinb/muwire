@@ -52,7 +52,6 @@ class ContactChooserModel extends DefaultComboBoxModel implements MutableComboBo
     
     @Override
     public void setSelectedItem(Object anObject) {
-        println "CCM.setSelectedItem $anObject"
         if (anObject instanceof String) {
             if (anObject == selectedPOP?.getPersona()?.getHumanReadableName())
                 super.setSelectedItem(selectedPOP)
