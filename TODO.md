@@ -38,7 +38,6 @@
 |Downloads queue with priorities | N/A | Core, GUI | Medium |
 |Remote queuing of uploads | N/A | Core, Network, GUI | Medium |
 |Incomplete file handling | 2 | Core, Portable | Low |
-|Chat - break up lines on CR/LF | N/A | GUI | Low |
 |Chat - enforce # in room names | N/A | GUI | Low |
 |Chat - jump from notification window to room | N/A | GUI | Optional |
 |Chat - emoji support | 113 | GUI | Low |

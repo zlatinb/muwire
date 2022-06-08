@@ -15,12 +15,20 @@ class POPLabel extends JLabel {
     private final UISettings settings
 
     POPLabel(PersonaOrProfile personaOrProfile, UISettings settings) {
+        this(personaOrProfile, settings, 
+                BorderFactory.createEmptyBorder(2, 2, 2, 2),
+                JLabel.CENTER)
+    }
+    
+    POPLabel(PersonaOrProfile personaOrProfile, UISettings settings, 
+             Border border, int verticalAllignment) {
         super()
+        setVerticalAlignment(verticalAllignment)
         this.personaOrProfile = personaOrProfile
         this.settings = settings
 
-        Border border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
-        setBorder(border)
+        if (border != null)
+            setBorder(border)
         
         MWProfileHeader header = personaOrProfile.getHeader()
         if (settings.personaRendererAvatars) {

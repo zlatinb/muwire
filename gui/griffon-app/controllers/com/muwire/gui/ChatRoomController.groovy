@@ -61,14 +61,7 @@ class ChatRoomController {
         long now = System.currentTimeMillis()
         
         if (command.action == ChatAction.SAY && command.payload.length() > 0) {
-            String header = DataHelper.formatTime(now) + " <" + model.core.me.getHumanReadableName() + ">"
-            StyledDocument sd = view.roomTextArea.getStyledDocument()
-            sd.insertString(sd.getEndPosition().getOffset() - 1, header, sd.getStyle("italic"))
-            sd.insertString(sd.getEndPosition().getOffset() - 1, " ", sd.getStyle("regular"))
-            sd.insertString(sd.getEndPosition().getOffset() - 1, command.payload, sd.getStyle("regular"))
-            sd.insertString(sd.getEndPosition().getOffset() - 1, "\n", sd.getStyle("regular"))
-
-            trimLines()
+            view.appendSay(command.payload, model.buildChatPOP(model.core.me), now)
         }
         
         if (command.action == ChatAction.JOIN && model.console) {
@@ -208,8 +201,7 @@ class ChatRoomController {
     
     private void processSay(ChatMessageEvent e, String text) {
         runInsideUIAsync {
-            view.appendSay(text, e.sender, e.timestamp)
-            trimLines()
+            view.appendSay(text, model.buildChatPOP(e.sender), e.timestamp)
             if (!model.console)
                 view.chatNotificator.onMessage(mvcGroup.mvcId)
         }
@@ -266,7 +258,7 @@ class ChatRoomController {
         }
     }
     
-    private void trimLines() {
+    void trimLines() {
         if (model.settings.maxChatLines < 0)
             return
         while(view.getLineCount() > model.settings.maxChatLines) 

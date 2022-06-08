@@ -1,6 +1,9 @@
 package com.muwire.gui
 
 import com.muwire.core.trust.TrustLevel
+import com.muwire.gui.chat.ChatEntry
+import com.muwire.gui.chat.ChatTextField
+import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -8,6 +11,11 @@ import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 
 import javax.inject.Inject
+import javax.swing.BorderFactory
+import javax.swing.JLabel
+import javax.swing.JScrollPane
+import javax.swing.border.Border
+import java.text.SimpleDateFormat
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -52,15 +60,21 @@ class ChatRoomView {
     
     def pane
     def parent
-    def sayField
+    ChatTextField sayField
     JTextPane roomTextArea
     def textScrollPane
     def membersTable
     def lastMembersTableSortEvent
+    UISettings settings
     
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
     void initUI() {
+        settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         def parentModel = mvcGroup.parentGroup.model
+        
+        sayField = new ChatTextField()
+        
         if (model.console || model.privateChat) {
             pane = builder.panel {
                 borderLayout()
@@ -73,7 +87,9 @@ class ChatRoomView {
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
-                    sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    scrollPane(verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, constraints: BorderLayout.CENTER) {
+                        widget(sayField, enabled: bind { parentModel.sayActionEnabled }, actionPerformed: { controller.say() })
+                    }
                 }
             }
         } else {
@@ -105,7 +121,9 @@ class ChatRoomView {
                 panel(constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
-                    sayField = textField(enabled : bind {parentModel.sayActionEnabled}, actionPerformed : {controller.say()}, constraints : BorderLayout.CENTER)
+                    scrollPane(verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, constraints: BorderLayout.CENTER) {
+                        widget(sayField, enabled: bind { parentModel.sayActionEnabled }, actionPerformed: { controller.say() })
+                    }
                 }
 
             }
@@ -222,12 +240,26 @@ class ChatRoomView {
         doc.insertString(doc.getEndPosition().getOffset() - 1, gray, doc.getStyle("gray"))
     }
     
-    void appendSay(String text, Persona sender, long timestamp) {
+    void appendSay(String text, PersonaOrProfile sender, long timestamp) {
         StyledDocument doc = roomTextArea.getStyledDocument()
-        String header = DataHelper.formatTime(timestamp) + " <" + sender.getHumanReadableName() + "> "
-        doc.insertString(doc.getEndPosition().getOffset() - 1, header, doc.getStyle("italic"))
-        doc.insertString(doc.getEndPosition().getOffset() - 1, text, doc.getStyle("regular"))
+        def label = new DateLabel(timestamp)
+        def style = doc.addStyle("newStyle", null)
+        StyleConstants.setComponent(style, label)
+        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
+
+        Border border = BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        label = new POPLabel(sender, settings, border, JLabel.TOP)
+        label.setAlignmentY(0f)
+        style = doc.addStyle("newStyle", null)
+        StyleConstants.setComponent(style, label)
+        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
+        
+        def textField = new ChatEntry("$text")
+        style = doc.addStyle("newStyle", null)
+        StyleConstants.setComponent(style, textField)
+        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
         doc.insertString(doc.getEndPosition().getOffset() - 1, "\n", doc.getStyle("regular"))
+        controller.trimLines()
     }
     
     int getLineCount() {
@@ -239,5 +271,13 @@ class ChatRoomView {
         StyledDocument doc = roomTextArea.getStyledDocument()
         Element element = doc.getParagraphElement(0)
         doc.remove(0, element.getEndOffset())
+    }
+    
+    private static class DateLabel extends JLabel {
+        DateLabel(long now) {
+            setAlignmentY(0f)
+            String text = SDF.format(new Date(now))
+            setText(text)
+        }
     }
 }
