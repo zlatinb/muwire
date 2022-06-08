@@ -1812,7 +1812,7 @@ class MainFrameView {
         
         if (uploader.isMessageEnabled()) {
             JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
-            messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload(uploader)})
+            messageItem.addActionListener({mvcGroup.controller.messageComposeFromUpload(uploaderWrapper)})
             uploadsTableMenu.add(messageItem)
         }
         

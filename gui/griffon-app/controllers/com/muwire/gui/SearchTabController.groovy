@@ -159,13 +159,13 @@ class SearchTabController {
 
     @ControllerAction
     void message() {
-        Persona recipient = view.selectedSender()?.getPersona()
+        PersonaOrProfile recipient = view.selectedSender()
         
         if (recipient == null)
             return
         
         def params = [:]
-        params.recipients = new HashSet<>(Collections.singletonList(recipient))
+        params.recipientsPOP = new HashSet<>(Collections.singletonList(recipient))
         params.core = model.core
         mvcGroup.parentGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }

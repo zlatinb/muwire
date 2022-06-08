@@ -2,6 +2,7 @@
 package com.muwire.gui
 
 import com.muwire.core.files.directories.Visibility
+import com.muwire.gui.contacts.ContactChooser
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
 
@@ -38,14 +39,16 @@ class WatchedDirectoryView {
     def applySubCheckbox
 
     MVCGroup contactSelector
+    ContactChooser contactChooser
 
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
         
         def params = [:]
         params.core = model.core
-        params.contacts = model.allowedContacts
+        params.contactsPOP = model.allowedContacts
         contactSelector = mvcGroup.createMVCGroup("contact-selector", UUID.randomUUID().toString(), params)
+        contactChooser = contactSelector.view.contactChooser
         
         window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
             iconImage: builder.imageIcon("/MuWire-48x48.png").image,
@@ -82,7 +85,9 @@ class WatchedDirectoryView {
                             selected: bind { model.visibility == Visibility.CUSTOM },
                             buttonGroup : visibilityGroup, actionPerformed : actionCustom)
                 }
-                widget(contactSelector.view.component)
+                scrollPane {
+                    widget(contactSelector.view.component)
+                }
             }
             panel (constraints : BorderLayout.SOUTH) {
                 gridLayout(rows: 1, cols: 3)

@@ -52,9 +52,12 @@ class ContactChooserModel extends DefaultComboBoxModel implements MutableComboBo
     
     @Override
     public void setSelectedItem(Object anObject) {
+        println "CCM.setSelectedItem $anObject"
         if (anObject instanceof String) {
             if (anObject == selectedPOP?.getPersona()?.getHumanReadableName())
-            super.setSelectedItem(selectedPOP)
+                super.setSelectedItem(selectedPOP)
+            else
+                super.setSelectedItem(new ContactChooserPOP(anObject))
             return
         }
         if (anObject == null)
@@ -70,4 +73,7 @@ class ContactChooserModel extends DefaultComboBoxModel implements MutableComboBo
         super.setSelectedItem(anObject)
     }
 
+    PersonaOrProfile findByName(String name) {
+        allObjects.find {it.getPersona().getHumanReadableName() == name}
+    }
 }

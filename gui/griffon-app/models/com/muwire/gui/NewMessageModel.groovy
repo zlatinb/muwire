@@ -1,5 +1,8 @@
 package com.muwire.gui
 
+import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.PersonaPOP
+
 import javax.annotation.Nonnull
 
 import com.muwire.core.Core
@@ -26,9 +29,20 @@ class NewMessageModel {
     Core core
     MWMessage reply
     Set<Persona> recipients 
+    Set<PersonaOrProfile> recipientsPOP
+    Set<PersonaOrProfile> allPops = new HashSet<>()
+    
     List<?> attachments = new ArrayList<>()
     
     void mvcGroupInit(Map<String, String> args) {
+    
+        if (recipients != null) {
+            recipients.each {allPops.add(new PersonaPOP(it))}
+        }
+        if (recipientsPOP != null) {
+            allPops.addAll(recipientsPOP)
+        }
+        
         if (reply == null)
             return
         String text = reply.body

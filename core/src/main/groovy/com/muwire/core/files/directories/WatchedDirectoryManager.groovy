@@ -132,8 +132,10 @@ class WatchedDirectoryManager {
                 wd.autoWatch = e.autoWatch
                 wd.syncInterval = e.syncInterval
                 wd.visibility = e.visibility
-                if (e.visibility == Visibility.CUSTOM)
+                if (e.visibility == Visibility.CUSTOM) {
                     wd.customVisibility = e.customVisibility
+                    wd.customVisibilityHeaders = e.customVisibilityHeaders
+                }
                 persist(wd)
             }
         }

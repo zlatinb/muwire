@@ -13,6 +13,8 @@ import griffon.core.artifact.GriffonController
 import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
+import net.i2p.data.Hash
+
 import javax.annotation.Nonnull
 import javax.inject.Inject
 
@@ -29,12 +31,13 @@ class MessageFolderController {
         int[] rows = view.selectedMessageHeaders()
         if (rows.length == 0)
             return
-        MWMessage msg = model.messageHeaders.get(rows[0]).message
+        MWMessageStatus status = model.messageHeaders.get(rows[0]) 
+        MWMessage msg = status.message
 
         def params = [:]
         params.reply = msg
         params.core = model.core
-        params.recipients = new HashSet<>(Collections.singletonList(msg.sender))
+        params.recipientsPOP = new HashSet<>(Collections.singletonList(status))
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
 
@@ -43,16 +46,17 @@ class MessageFolderController {
         int[] rows = view.selectedMessageHeaders()
         if (rows.length == 0)
             return
-        MWMessage msg = model.messageHeaders.get(rows[0]).message
+        MWMessageStatus status = model.messageHeaders.get(rows[0]) 
+        MWMessage msg = status.message
 
         Set<Persona> all = new HashSet<>()
-        all.add(msg.sender)
         all.addAll(msg.recipients)
 
         def params = [:]
         params.reply = msg
         params.core = model.core
         params.recipients = all
+        params.recipientsPOP = new HashSet(Collections.singletonList(status))
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
 

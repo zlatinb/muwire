@@ -52,8 +52,9 @@ class ContactChooserPOP implements PersonaOrProfile {
         if (!(o instanceof ContactChooserPOP))
             return false
         ContactChooserPOP other = (ContactChooserPOP)o
-        Objects.equals(text, other.text) &&
+        boolean rv = Objects.equals(text, other.text) &&
                 Objects.equals(trustEntry, other.trustEntry)
+        rv
     }
     
     String toString() {

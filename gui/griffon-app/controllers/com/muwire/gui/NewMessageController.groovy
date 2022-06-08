@@ -46,7 +46,7 @@ class NewMessageController {
         }
         
         Set<Persona> recipients = new HashSet<>()
-        recipients.addAll(view.contactSelector.model.contacts)
+        recipients.addAll(view.contactSelector.view.contactChooser.getSelectedPOPs().collect {it.getPersona()})
         
         if (recipients.isEmpty()) {
             JOptionPane.showMessageDialog(null, trans("NO_RECIPIENTS_BODY"),

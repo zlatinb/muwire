@@ -1,6 +1,7 @@
 package com.muwire.core.files.directories
 
 import com.muwire.core.Persona
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
 
 import net.i2p.data.Base64
@@ -14,6 +15,7 @@ class WatchedDirectory {
     long lastSync
     Visibility visibility
     Set<Persona> customVisibility = Collections.emptySet()
+    Set<MWProfileHeader> customVisibilityHeaders = Collections.emptySet()
     
     WatchedDirectory(File directory) {
         this.directory = directory
@@ -30,8 +32,12 @@ class WatchedDirectory {
         rv.lastSync = lastSync
         rv.aliases = aliases.collect {encodeFileName(it)}
         rv.visibility = visibility.name()
-        if (visibility == Visibility.CUSTOM)
-            rv.customVisibility = customVisibility.collect {it.toBase64()}
+        if (visibility == Visibility.CUSTOM) {
+            if (!customVisibility.isEmpty())
+                rv.customVisibility = customVisibility.collect { it.toBase64() }
+            if (!customVisibilityHeaders.isEmpty())
+                rv.customVisibilityHeaders = customVisibilityHeaders.collect {it.toBase64()}
+        }
         rv
     }
     
@@ -46,10 +52,18 @@ class WatchedDirectory {
         rv.visibility = Visibility.EVERYONE
         if (json.visibility != null)
             rv.visibility = Visibility.valueOf(json.visibility)
-        if (rv.visibility == Visibility.CUSTOM && json.customVisibility != null) {
-            rv.customVisibility = json.customVisibility.collect(new HashSet<>(), {
-                new Persona(new ByteArrayInputStream(Base64.decode(it)))
-            })
+        if (rv.visibility == Visibility.CUSTOM) {
+            if (json.customVisibility != null) {
+                rv.customVisibility = json.customVisibility.collect(new HashSet<>(), {
+                    new Persona(new ByteArrayInputStream(Base64.decode(it)))
+                })
+            }
+            if (json.customVisibilityHeaders != null) {
+                rv.customVisibilityHeaders = json.customVisibilityHeaders.collect(new HashSet<>(),{
+                    new MWProfileHeader(new ByteArrayInputStream(Base64.decode(it)))
+                })
+                rv.customVisibilityHeaders.each {rv.customVisibility.add(it.getPersona())}
+            }
         }
         rv
     }

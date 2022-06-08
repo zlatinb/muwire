@@ -920,11 +920,10 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void messageComposeFromUpload(Uploader u) {
-        Persona p = u.getDownloaderPersona()
+    void messageComposeFromUpload(UploaderWrapper u) {
         
         def params = [:]
-        params.recipients = new HashSet<>(Collections.singletonList(p))
+        params.recipientsPOP = new HashSet<>(Collections.singletonList(u))
         params.core = core
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }
@@ -934,10 +933,10 @@ class MainFrameController {
         int row = view.getSelectedContactsTableRow()
         if (row < 0)
             return
-        Persona persona = model.contacts[row].getPersona()
+        PersonaOrProfile persona = model.contacts[row]
         
         def params = [:]
-        params.recipients = new HashSet<>(Collections.singletonList(te.persona))
+        params.recipientsPOP = new HashSet<>(Collections.singletonList(persona))
         params.core = core
         mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
     }

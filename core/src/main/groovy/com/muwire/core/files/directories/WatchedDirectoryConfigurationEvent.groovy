@@ -2,6 +2,7 @@ package com.muwire.core.files.directories
 
 import com.muwire.core.Event
 import com.muwire.core.Persona
+import com.muwire.core.profile.MWProfileHeader
 
 class WatchedDirectoryConfigurationEvent extends Event {
     /** directory selected by user or by converter */
@@ -15,4 +16,5 @@ class WatchedDirectoryConfigurationEvent extends Event {
     boolean subfolders
     Visibility visibility
     Set<Persona> customVisibility
+    Set<MWProfileHeader> customVisibilityHeaders
 }

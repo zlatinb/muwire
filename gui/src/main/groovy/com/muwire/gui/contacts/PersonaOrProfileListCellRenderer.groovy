@@ -4,6 +4,7 @@ import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.UISettings
 import com.muwire.gui.profile.PersonaOrProfile
 
+import javax.swing.DefaultListCellRenderer
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.ListCellRenderer
@@ -11,7 +12,7 @@ import java.awt.Component
 
 import static com.muwire.gui.Translator.trans
 
-class PersonaOrProfileListCellRenderer implements ListCellRenderer<PersonaOrProfile>{
+class PersonaOrProfileListCellRenderer extends DefaultListCellRenderer {
 
     private final UISettings settings
     
@@ -20,35 +21,36 @@ class PersonaOrProfileListCellRenderer implements ListCellRenderer<PersonaOrProf
     }
     
     @Override
-    Component getListCellRendererComponent(JList<? extends PersonaOrProfile> list, PersonaOrProfile value, 
+    Component getListCellRendererComponent(JList<?> list, Object v, 
                                            int index, boolean isSelected, boolean cellHasFocus) {
+        super.getListCellRendererComponent(list, v, index, isSelected, cellHasFocus)
+        PersonaOrProfile value = (PersonaOrProfile)v
         
-        JLabel rv = new JLabel()
         String text
         if (settings.personaRendererIds)
             text = "<html>" + PersonaCellRenderer.htmlize(value.getPersona()) + "</html>"
         else
             text = PersonaCellRenderer.justName(value.getPersona())
 
-        rv.setText(text)
+        setText(text)
 
         if (value.getThumbnail() != null)
-            rv.setIcon(value.getThumbnail())
+            setIcon(value.getThumbnail())
         else
-            rv.setIcon(null)
+            setIcon(null)
 
         if (value.getTitle() != null)
-            rv.setToolTipText(value.getTitle())
+            setToolTipText(value.getTitle())
         else
-            rv.setToolTipText(trans("NO_PROFILE"))
+            setToolTipText(trans("NO_PROFILE"))
 
         if (!isSelected) {
-            rv.setForeground(list.getForeground())
-            rv.setBackground(list.getBackground())
+            setForeground(list.getForeground())
+            setBackground(list.getBackground())
         } else {
-            rv.setForeground(list.getSelectionForeground())
-            rv.setBackground(list.getSelectionBackground())
+            setForeground(list.getSelectionForeground())
+            setBackground(list.getSelectionBackground())
         }
-        rv
+        this
     }
 }
