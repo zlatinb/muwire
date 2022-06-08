@@ -1,5 +1,7 @@
 package com.muwire.core.upload
 
+import groovy.util.logging.Log
+
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -9,6 +11,9 @@ import com.muwire.core.connection.Endpoint
 import com.muwire.core.mesh.Mesh
 import com.muwire.core.util.DataUtil
 
+import java.util.logging.Level
+
+@Log
 class ContentUploader extends MeshUploader {
 
     private final ContentRequest request
@@ -67,7 +72,10 @@ class ContentUploader extends MeshUploader {
                 dataSinceLastRead.addAndGet(read)
             }
             done = true
-        } finally {
+        } catch (InternalError bad) {
+            // nothing can be done here, happens with jre 18.0.1
+            log.log(Level.SEVERE,"Internal error while uploading", bad)        
+        }finally {
             try {channel?.close() } catch (IOException ignored) {}
             synchronized(this) {
                 DataUtil.tryUnmap(mapped)
