@@ -19,7 +19,6 @@ class ChatTextField extends JTextField {
         
         @Override
         void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-            println "inserting string $str"
             getDocumentProperties().put("filterNewlines", false)
             super.insertString(offs, str, a)
         }
@@ -27,7 +26,6 @@ class ChatTextField extends JTextField {
         @Override
         String getText(int offset, int length) throws BadLocationException {
             String rv = super.getText(offset, length)
-            println "getting string $rv"
             return rv
         }
     }
