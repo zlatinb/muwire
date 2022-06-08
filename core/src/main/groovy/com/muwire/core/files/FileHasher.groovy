@@ -2,7 +2,7 @@ package com.muwire.core.files
 
 import com.muwire.core.InfoHash
 import com.muwire.core.util.DataUtil
-
+import groovy.util.logging.Log
 import net.i2p.data.Base64
 
 import java.nio.MappedByteBuffer
@@ -11,7 +11,9 @@ import java.nio.channels.FileChannel.MapMode
 import java.nio.channels.FileLock
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.logging.Level
 
+@Log
 class FileHasher {
 
     public static final int MIN_PIECE_SIZE_POW2 = 17
@@ -50,34 +52,41 @@ class FileHasher {
     }
 
     InfoHash hashFile(File file) {
-        final long length = file.length()
-        final long size = 0x1L << getPieceSize(length)
-        int numPieces = (length / size).toInteger()
-        if (numPieces * size < length)
-            numPieces++
+        while(true) {
+            try {
+                final long length = file.length()
+                final long size = 0x1L << getPieceSize(length)
+                int numPieces = (length / size).toInteger()
+                if (numPieces * size < length)
+                    numPieces++
 
-        def output = new ByteArrayOutputStream()
-        RandomAccessFile raf = new RandomAccessFile(file, "r")
-        MappedByteBuffer buf = null
-        
-        try(FileLock lock = raf.getChannel().lock(0, Long.MAX_VALUE, true)) {
-            for (int i = 0; i < numPieces - 1; i++) {
-                buf = raf.getChannel().map(MapMode.READ_ONLY, size * i, size.toInteger())
-                digest.update buf
-                DataUtil.tryUnmap(buf)
-                output.write(digest.digest(), 0, 32)
+                def output = new ByteArrayOutputStream()
+                RandomAccessFile raf = new RandomAccessFile(file, "r")
+                MappedByteBuffer buf = null
+
+                try (FileLock lock = raf.getChannel().lock(0, Long.MAX_VALUE, true)) {
+                    for (int i = 0; i < numPieces - 1; i++) {
+                        buf = raf.getChannel().map(MapMode.READ_ONLY, size * i, size.toInteger())
+                        digest.update buf
+                        DataUtil.tryUnmap(buf)
+                        output.write(digest.digest(), 0, 32)
+                    }
+                    long lastPieceLength = length - (numPieces - 1) * size
+                    buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength.toInteger())
+                    digest.update buf
+                    output.write(digest.digest(), 0, 32)
+                } finally {
+                    raf.close()
+                    DataUtil.tryUnmap(buf)
+                }
+
+                byte[] hashList = output.toByteArray()
+                return InfoHash.fromHashList(hashList)
+            } catch (InternalError bad) {
+                // nothing we can but try again.  Happens on jre 18.0.1
+                log.log(Level.SEVERE,"internal error while hashing", bad)
             }
-            long lastPieceLength = length - (numPieces - 1) * size
-            buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength.toInteger())
-            digest.update buf
-            output.write(digest.digest(), 0, 32)
-        } finally {
-            raf.close()
-            DataUtil.tryUnmap(buf)
         }
-
-        byte [] hashList = output.toByteArray()
-        InfoHash.fromHashList(hashList)
     }
 
     public static void main(String[] args) {
