@@ -22,6 +22,8 @@ class PersonaOrProfileCellRenderer extends DefaultTableCellRenderer {
     Component getTableCellRendererComponent(JTable table, Object value,
                                             boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+        if (value == null)
+            return this // TODO: investiage how this can happen
         
         PersonaOrProfile pop = (PersonaOrProfile) value
         if (pop.getThumbnail() != null && settings.personaRendererAvatars)
