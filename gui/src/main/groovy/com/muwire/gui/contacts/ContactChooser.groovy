@@ -28,7 +28,7 @@ class ContactChooser extends JComboBox{
         def lastPOP = chooserEditor.getItem()
         if (lastPOP == null)
             return rv
-        lastPOP = chooserModel.findByName(lastPOP.toString())
+        lastPOP = chooserModel.findByName(lastPOP.toString().trim())
         if (lastPOP != null)
             rv << lastPOP
         rv
