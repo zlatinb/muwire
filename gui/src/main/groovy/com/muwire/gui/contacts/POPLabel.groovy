@@ -1,6 +1,7 @@
 package com.muwire.gui.contacts
 
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
 import com.muwire.gui.UISettings
 import com.muwire.gui.profile.PersonaOrProfile
@@ -9,6 +10,8 @@ import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.border.Border
+
+import static com.muwire.gui.Translator.trans
 
 class POPLabel extends JLabel {
     final PersonaOrProfile personaOrProfile
@@ -37,11 +40,20 @@ class POPLabel extends JLabel {
         
         String text
         if (settings.personaRendererIds) {
-            text = personaOrProfile.getPersona().getHumanReadableName()
+            text = "<html>${PersonaCellRenderer.htmlize(personaOrProfile.getPersona())}</html>"
         } else
             text = PersonaCellRenderer.justName(personaOrProfile.getPersona())
         setText(text)
-        
-        // TODO: add tooltip
+
+        if (personaOrProfile.getTitle() != null) {
+            if (settings.personaRendererIds)
+                setToolTipText(personaOrProfile.getTitle())
+            else {
+                String escaped = HTMLSanitizer.escape(personaOrProfile.getRawTitle());
+                String tooltip = "<html><body>${personaOrProfile.getPersona().getHumanReadableName()}: ${escaped}</body><html>"
+                setToolTipText(tooltip)
+            }
+        } else
+            setToolTipText(trans("NO_PROFILE"))
     }
 }
