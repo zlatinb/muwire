@@ -2,7 +2,8 @@ package com.muwire.gui
 
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatEntry
-import com.muwire.gui.chat.ChatTextField
+import com.muwire.gui.chat.ChatEntryPane
+
 import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
@@ -20,23 +21,19 @@ import java.text.SimpleDateFormat
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
-import net.i2p.data.DataHelper
 
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSplitPane
 import javax.swing.JTextPane
 import javax.swing.ListSelectionModel
-import javax.swing.SwingConstants
 import javax.swing.text.Element
 import javax.swing.text.Style
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyleContext
 import javax.swing.text.StyledDocument
-import javax.swing.SpringLayout.Constraints
 
 import com.muwire.core.Persona
-import com.muwire.core.chat.ChatConnectionAttemptStatus
 
 import java.awt.BorderLayout
 import java.awt.Color
@@ -60,7 +57,7 @@ class ChatRoomView {
     
     def pane
     def parent
-    ChatTextField sayField
+    ChatEntryPane sayField
     JTextPane roomTextArea
     def textScrollPane
     def membersTable
@@ -68,12 +65,13 @@ class ChatRoomView {
     UISettings settings
     
     private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
+    
     void initUI() {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         def parentModel = mvcGroup.parentGroup.model
         
-        sayField = new ChatTextField()
+        sayField = new ChatEntryPane(settings, model.members)
         
         if (model.console || model.privateChat) {
             pane = builder.panel {
