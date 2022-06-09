@@ -59,13 +59,18 @@ class ChatEntryPane extends JTextPane {
             }
         })
 
-        KeyStroke back = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
         InputMap inputMap = getInputMap()
         ActionMap actionMap = getActionMap()
         
+        KeyStroke back = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
         Object backObject = inputMap.get(back)
         backspaceAction = actionMap.get(backObject)
         actionMap.put(backObject, new BackspaceAction(backspaceAction))
+        
+        Action noAction = new NullAction()
+        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+        Object enterObject = inputMap.get(enter)
+        actionMap.put(enterObject, noAction)
     }
 
     private String getTextSinceAt(){
@@ -196,6 +201,16 @@ class ChatEntryPane extends JTextPane {
                 delegate.actionPerformed(e)
                 position--
             }
+        }
+    }
+    
+    private static class NullAction extends UIAction {
+        NullAction() {
+            super("nothing")
+        }
+
+        @Override
+        void actionPerformed(ActionEvent e) {
         }
     }
 }
