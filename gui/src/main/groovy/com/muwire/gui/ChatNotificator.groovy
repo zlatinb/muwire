@@ -9,6 +9,9 @@ import javax.swing.JTabbedPane
 
 import griffon.core.mvc.MVCGroupManager
 
+import static com.muwire.gui.Translator.trans
+
+import java.awt.TrayIcon
 import java.awt.Window
 
 class ChatNotificator {
@@ -20,6 +23,7 @@ class ChatNotificator {
     private final MVCGroupManager groupManager
     private final Window window
     private final Image image
+    private final TrayIcon trayIcon
     
     private boolean chatInFocus
     private String currentServerTab
@@ -29,10 +33,17 @@ class ChatNotificator {
     
     private Listener listener
     
-    ChatNotificator(MVCGroupManager groupManager, Window window, Image image) {
+    ChatNotificator(MVCGroupManager groupManager, TrayIcon trayIcon, Window window, Image image) {
         this.groupManager = groupManager
         this.window = window
         this.image = image
+        this.trayIcon = trayIcon
+    }
+    
+    void notifyMention() {
+        if (trayIcon == null)
+            return
+        trayIcon.displayMessage(trans("NEW_CHAT_MENTION"), trans("NEW_CHAT_MENTION"), TrayIcon.MessageType.INFO)       
     }
     
     void serverTabChanged(JTabbedPane source) {

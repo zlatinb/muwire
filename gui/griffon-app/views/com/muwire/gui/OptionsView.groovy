@@ -114,6 +114,7 @@ class OptionsView {
 
     def startChatServerCheckbox
     def maxChatConnectionsField
+    def chatNotifyMentionsCheckbox
     def advertiseChatCheckbox
     def maxChatLinesField
     def joinDefaultChatRoomCheckbox
@@ -547,25 +548,36 @@ class OptionsView {
             panel (border : titledBorder(title : trans("OPTIONS_CHAT_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),
                 constraints : gbc(gridx : 0, gridy : 0, fill : GridBagConstraints.HORIZONTAL, weightx: 100)) {
                 gridBagLayout()
-                label(text : trans("OPTIONS_START_CHAT_SERVER_STARTUP"), constraints : gbc(gridx: 0, gridy: 0, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:2, gridy:0, anchor:GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_MAX_CHAT_CONNECTIONS"), constraints : gbc(gridx: 0, gridy:1, anchor:GridBagConstraints.LINE_START, weightx:100))
-                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 2, gridy : 1, anchor:GridBagConstraints.LINE_END), 
+                int j = 0
+                label(text : trans("OPTIONS_START_CHAT_SERVER_STARTUP"), constraints : gbc(gridx: 0, gridy: j, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                startChatServerCheckbox = checkBox(selected : bind{model.startChatServer}, constraints : gbc(gridx:2, gridy:j, anchor:GridBagConstraints.LINE_END))
+                j++
+                label(text : trans("OPTIONS_MAX_CHAT_CONNECTIONS"), constraints : gbc(gridx: 0, gridy:j, anchor:GridBagConstraints.LINE_START, weightx:100))
+                maxChatConnectionsField = textField(text : bind {model.maxChatConnections}, constraints : gbc(gridx: 2, gridy : j, anchor:GridBagConstraints.LINE_END), 
                         columns: COLUMNS, horizontalAlignment: JTextField.RIGHT)
-                label(text : trans("OPTIONS_ADVERTISE_CHAT"), constraints : gbc(gridx: 0, gridy:2, anchor:GridBagConstraints.LINE_START, weightx:100))
-                advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:2, anchor:GridBagConstraints.LINE_END))
-                label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:3, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: 3, anchor: GridBagConstraints.LINE_END), 
+                j++
+                label(text : trans("OPTIONS_ADVERTISE_CHAT"), constraints : gbc(gridx: 0, gridy:j, anchor:GridBagConstraints.LINE_START, weightx:100))
+                advertiseChatCheckbox = checkBox(selected : bind{model.advertiseChat}, constraints : gbc(gridx:2, gridy:j, anchor:GridBagConstraints.LINE_END))
+                j++
+                label(text : trans("OPTIONS_MAX_CHAT_SCROLLBACK"), constraints : gbc(gridx:0, gridy:j, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                maxChatLinesField = textField(text : bind{model.maxChatLines}, constraints : gbc(gridx:2, gridy: j, anchor: GridBagConstraints.LINE_END), 
                         columns: COLUMNS, horizontalAlignment: JTextField.RIGHT)
-                label(text: trans("OPTIONS_CHAT_JOIN_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 4, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                joinDefaultChatRoomCheckbox = checkBox(selected: bind{model.joinDefaultChatRoom}, constraints: gbc(gridx: 2, gridy: 4, anchor: GridBagConstraints.LINE_END))
-                label(text: trans("OPTIONS_CHAT_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: 5, anchor: GridBagConstraints.LINE_START, weightx: 100))
-                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: 5, anchor: GridBagConstraints.LINE_END), 
+                j++
+                label(text : trans("OPTIONS_CHAT_NOTIFY_MENTIONS"), constraints: gbc(gridx: 0, gridy: j, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                chatNotifyMentionsCheckbox = checkBox(selected: bind {model.chatNotifyMentions}, constraints: gbc(gridx:2, gridy:j, anchor: GridBagConstraints.LINE_END))
+                j++
+                label(text: trans("OPTIONS_CHAT_JOIN_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: j, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                joinDefaultChatRoomCheckbox = checkBox(selected: bind{model.joinDefaultChatRoom}, constraints: gbc(gridx: 2, gridy: j, anchor: GridBagConstraints.LINE_END))
+                j++
+                label(text: trans("OPTIONS_CHAT_DEFAULT_ROOM"), constraints: gbc(gridx: 0, gridy: j, anchor: GridBagConstraints.LINE_START, weightx: 100))
+                defaultChatRoomField = textField(text : bind { model.defaultChatRoom}, constraints: gbc(gridx: 2, gridy: j, anchor: GridBagConstraints.LINE_END), 
                         columns: COLUMNS * 2, horizontalAlignment: JTextField.RIGHT)
+                j++
                 if (!isAqua()) {
-                    label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : 6, anchor : GridBagConstraints.LINE_START, weightx: 100))
-                    label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : 6))
-                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : 6, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
+                    label(text : trans("OPTIONS_CHAT_WELCOME_FILE"), constraints : gbc(gridx : 0, gridy : j, anchor : GridBagConstraints.LINE_START, weightx: 100))
+                    label(text : bind {model.chatWelcomeFile}, constraints : gbc(gridx : 1, gridy : j))
+                    button(text : trans("CHOOSE"), constraints : gbc(gridx : 2, gridy : j, anchor : GridBagConstraints.LINE_END), chooseChatFileAction)
+                    j++
                 }
             }
             panel (border : titledBorder(title : trans("OPTIONS_MESSAGING_SETTINGS"), border : etchedBorder(), titlePosition : TitledBorder.TOP),

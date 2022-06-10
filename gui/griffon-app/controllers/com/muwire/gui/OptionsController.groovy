@@ -250,6 +250,10 @@ class OptionsController {
         model.maxChatLines = maxChatLines
         uiSettings.maxChatLines = maxChatLines
         
+        boolean chatNotifyMentions = view.chatNotifyMentionsCheckbox.model.isSelected()
+        model.chatNotifyMentions = chatNotifyMentions
+        uiSettings.chatNotifyMentions = chatNotifyMentions
+        
         boolean joinDefaultChatRoom = view.joinDefaultChatRoomCheckbox.model.isSelected()
         model.joinDefaultChatRoom = joinDefaultChatRoom
         settings.joinDefaultChatRoom = joinDefaultChatRoom

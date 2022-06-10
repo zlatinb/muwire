@@ -246,6 +246,12 @@ class ChatRoomView {
     }
     
     void appendSay(String text, PersonaOrProfile sender, long timestamp) {
+        
+        if (settings.chatNotifyMentions &&
+                sender.getPersona() != model.core.me &&
+                text.contains("@${model.core.me.getHumanReadableName()}"))
+            chatNotificator.notifyMention()
+        
         StyledDocument doc = roomTextArea.getStyledDocument()
         def label = new DateLabel(timestamp)
         def style = doc.addStyle("newStyle", null)

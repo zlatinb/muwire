@@ -30,6 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 import java.awt.Image
 import java.awt.KeyboardFocusManager
+import java.awt.TrayIcon
 import java.awt.Window
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -797,6 +798,7 @@ class MainFrameView {
         }
 
         chatNotificator = new ChatNotificator(application.getMvcGroupManager(),
+                (TrayIcon)application.context.get("tray-icon"),
                 (Window)application.getWindowManager().findWindow("main-frame"),
                 (Image) builder.imageIcon("/comment.png").image)
         chatFavorites = new ChatFavorites(application)

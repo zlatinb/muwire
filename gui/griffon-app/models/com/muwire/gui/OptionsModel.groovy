@@ -91,6 +91,7 @@ class OptionsModel {
     @Observable int maxChatConnections
     @Observable boolean advertiseChat
     @Observable int maxChatLines
+    @Observable boolean chatNotifyMentions
     @Observable String chatWelcomeFile
     @Observable String defaultChatRoom
     @Observable boolean joinDefaultChatRoom
@@ -186,6 +187,7 @@ class OptionsModel {
         maxChatConnections = settings.maxChatConnections
         advertiseChat = settings.advertiseChat
         maxChatLines = uiSettings.maxChatLines
+        chatNotifyMentions = uiSettings.chatNotifyMentions
         chatWelcomeFile = settings.chatWelcomeFile?.getAbsolutePath()
         defaultChatRoom = settings.defaultChatRoom
         joinDefaultChatRoom = settings.joinDefaultChatRoom

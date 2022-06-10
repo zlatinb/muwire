@@ -29,6 +29,7 @@ class UISettings {
     boolean storeSearchHistory
     boolean groupByFile
     int maxChatLines
+    boolean chatNotifyMentions
     Set<String> searchHistory
     Set<String> openTabs
     boolean messageNotifications
@@ -57,6 +58,7 @@ class UISettings {
         storeSearchHistory = Boolean.parseBoolean(props.getProperty("storeSearchHistory","true"))
         groupByFile = Boolean.parseBoolean(props.getProperty("groupByFile","false"))
         maxChatLines = Integer.parseInt(props.getProperty("maxChatLines","-1"))
+        chatNotifyMentions = Boolean.parseBoolean(props.getProperty("chatNotifyMentions", "true"))
         
         mainFrameX = Integer.parseInt(props.getProperty("mainFrameX","-1"))
         mainFrameY = Integer.parseInt(props.getProperty("mainFrameY","-1"))
@@ -91,6 +93,8 @@ class UISettings {
         props.setProperty("storeSearchHistory", String.valueOf(storeSearchHistory))
         props.setProperty("groupByFile", String.valueOf(groupByFile))
         props.setProperty("maxChatLines", String.valueOf(maxChatLines))
+        props.setProperty("chatNotifyMentions", String.valueOf(chatNotifyMentions))
+        
         props.setProperty("fontStyle", String.valueOf(fontStyle))
         if (font != null)
             props.setProperty("font", font)
