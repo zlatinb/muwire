@@ -18,6 +18,22 @@ import net.i2p.util.ConcurrentHashSet;
 
 public class DataUtil {
 
+    /** The 32 valid Base32 values. */
+    private final static char[] ALPHABET = {'a', 'b', 'c', 'd',
+            'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p',
+            'q', 'r', 's', 't', 'u', 'v',
+            'w', 'x', 'y', 'z',
+            '2', '3', '4', '5', '6', '7'};
+
+    public static boolean validBase32(char c) {
+        for (int i = 0; i < ALPHABET.length; i++) {
+            if (ALPHABET[i] == c)
+                return true;
+        }
+        return false;
+    }
+    
     private final static int MAX_SHORT = (0x1 << 16) - 1;
 
     static void writeUnsignedShort(int value, OutputStream os) throws IOException {

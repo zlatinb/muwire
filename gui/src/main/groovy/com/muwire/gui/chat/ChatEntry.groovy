@@ -1,6 +1,7 @@
 package com.muwire.gui.chat
 
 import com.muwire.core.Constants
+import com.muwire.core.util.DataUtil
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
@@ -23,7 +24,7 @@ class ChatEntry extends JTextPane {
     private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
 
     private static final char AT = "@".toCharacter()
-    
+
     private final UISettings settings
     private final Function<String, PersonaOrProfile> function
     
@@ -132,6 +133,12 @@ class ChatEntry extends JTextPane {
 
         @Override
         ParsingState consume(char c) {
+            if (!DataUtil.validBase32(c)) {
+                consumed = true
+                String payload = "${currentName}${stringBuilder.toString()}"
+                tokens << new TextChatToken(payload)
+                return new TextParsingState()
+            }
             if (stringBuilder.length() == maxSize) {
                 consumed = true
                 String readableName = "${currentName}${stringBuilder.toString()}"
