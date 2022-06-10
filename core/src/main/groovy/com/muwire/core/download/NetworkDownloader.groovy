@@ -192,6 +192,7 @@ class NetworkDownloader extends Downloader {
     
     
     protected void doCancel() {
+        log.info("CANCELLED:${getLogName()}")
         stop()
         synchronized(piecesFile) {
             piecesFileClosed = true
@@ -359,6 +360,10 @@ class NetworkDownloader extends Downloader {
             }
         }
     }
+    
+    private String getLogName() {
+        file.getName() + ":" + Base64.encode(getInfoHash().getRoot())
+    }
 
     class DownloadWorker implements Runnable {
         private final Destination destination
@@ -460,7 +465,7 @@ class NetworkDownloader extends Downloader {
                     log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))
                     markFailed(destination)
                     if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true)) {
-                        log.info("Download hopeless, removing incomplete file")
+                        log.info("HOPELESS:${getLogName()}")
                         incompleteFile.delete()
                         closePiecesFile()
                         eventBus.publish(new DownloadHopelessEvent(downloader: NetworkDownloader.this))
@@ -472,6 +477,7 @@ class NetworkDownloader extends Downloader {
                     if (!this.cancelled) {
                         writePieces()
                         if (pieces.isComplete() && eventFired.compareAndSet(false, true)) {
+                            log.info("COMPLETE:${getLogName()}")
                             closePiecesFile()
                             
                             boolean confidential = NetworkDownloader.this.isConfidential()
