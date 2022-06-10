@@ -70,7 +70,8 @@ class ChatEntry extends JTextPane {
         void finishUp() {
             if (consumed)
                 return
-            tokens << new TextChatToken(stringBuilder.toString())
+            if (stringBuilder.size() > 0)
+                tokens << new TextChatToken(stringBuilder.toString())
         }
         
         abstract ParsingState consume(char c)
@@ -152,11 +153,6 @@ class ChatEntry extends JTextPane {
         
         void render() {
             StyledDocument document = getStyledDocument()
-            
-            setSelectionStart(document.getEndPosition().getOffset() - 1)
-            setSelectionEnd(document.getEndPosition().getOffset())
-            replaceSelection("")
-            
             
             def popLabel = new POPLabel(personaOrProfile, settings)
             popLabel.setMaximumSize([200, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
