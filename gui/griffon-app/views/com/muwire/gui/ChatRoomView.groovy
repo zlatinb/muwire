@@ -8,6 +8,7 @@ import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
+import com.muwire.gui.profile.ProfileConstants
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 
@@ -16,6 +17,8 @@ import javax.swing.BorderFactory
 import javax.swing.JLabel
 import javax.swing.JScrollPane
 import javax.swing.border.Border
+import javax.swing.text.SimpleAttributeSet
+import java.awt.Dimension
 import java.text.SimpleDateFormat
 
 import static com.muwire.gui.Translator.trans
@@ -110,7 +113,7 @@ class ChatRoomView {
                         }
                         panel {
                             gridLayout(rows : 1, cols : 1)
-                            textScrollPane = scrollPane {
+                            textScrollPane = scrollPane(horizontalScrollBarPolicy: JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
                                 roomTextArea = textPane(editable : false)
                             }
                         }
@@ -180,7 +183,11 @@ class ChatRoomView {
         StyleConstants.setItalic(italic, true)
         Style gray = document.addStyle("gray", regular)
         StyleConstants.setForeground(gray, Color.GRAY)
-          
+
+
+        SimpleAttributeSet sab = new SimpleAttributeSet()
+        StyleConstants.setAlignment(sab, StyleConstants.ALIGN_LEFT)
+        roomTextArea.setParagraphAttributes(sab, false)
     }
     
     private void showPopupMenu(MouseEvent e) {
@@ -247,12 +254,13 @@ class ChatRoomView {
 
         Border border = BorderFactory.createEmptyBorder(0, 5, 0, 5)
         label = new POPLabel(sender, settings, border, JLabel.TOP)
+        label.setMaximumSize([200, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
         label.setAlignmentY(0f)
         style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, label)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
         
-        def textField = new ChatEntry("$text")
+        def textField = new ChatEntry(text, settings, model::getByName)
         style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, textField)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
