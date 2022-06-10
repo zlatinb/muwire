@@ -65,7 +65,22 @@ class ChatEntryPane extends JTextPane {
         KeyStroke back = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
         Object backObject = inputMap.get(back)
         backspaceAction = actionMap.get(backObject)
-        actionMap.put(backObject, new BackspaceAction(backspaceAction))
+        actionMap.put(backObject, new ForwardingAction(backspaceAction, false, true))
+        
+        KeyStroke delete = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
+        Object deleteObject = inputMap.get(delete)
+        Action originalDeleteAction = actionMap.get(deleteObject)
+        actionMap.put(deleteObject, new ForwardingAction(originalDeleteAction, true, true))
+        
+        KeyStroke left = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
+        Object leftObject = inputMap.get(left)
+        Action originalLeftAction = actionMap.get(leftObject)
+        actionMap.put(leftObject, new ForwardingAction(originalLeftAction, false, false))
+        
+        KeyStroke right = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)
+        Object rightObject = inputMap.get(right)
+        Action originalRightAction = actionMap.get(rightObject)
+        actionMap.put(rightObject, new ForwardingAction(originalRightAction, true, false))
         
         Action noAction = new NullAction()
         KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
@@ -178,29 +193,47 @@ class ChatEntryPane extends JTextPane {
         }
     }
     
-    private class BackspaceAction extends UIAction {
+    private class ForwardingAction extends UIAction {
         private final Action delegate
-        BackspaceAction(Action delegate) {
-            super("backspace")
+        private final boolean forward, modifying
+        ForwardingAction(Action delegate, boolean forward, boolean modifying) {
+            super("forwarding")
             this.delegate = delegate
+            this.forward = forward
+            this.modifying = modifying
         }
 
         @Override
         void actionPerformed(ActionEvent e) {
-            StyledDocument document = getStyledDocument()
-            int position = getCaret().getDot() - 1
-            Element element = document.getCharacterElement(position)
-            if (element.getAttributes().getAttribute(StyleConstants.ComponentAttribute) == null) {
+            int position = getCaret().getDot()
+            if (!forward)
+                position--
+            if (!isInComponent(position)) {
                 delegate.actionPerformed(e)
                 return
             }
-            while(position > 0) {
-                element = document.getCharacterElement(position)
-                if (element.getAttributes().getAttribute(StyleConstants.ComponentAttribute) == null)
-                    break
-                delegate.actionPerformed(e)
-                position--
+            if (forward) {
+                while(position < getDocument().getEndPosition().getOffset()) {
+                    if (!isInComponent(position))
+                        break
+                    delegate.actionPerformed(e)
+                    if (!modifying)
+                        position++
+                }
+            } else {
+                while (position > 0) {
+                    if (!isInComponent(position))
+                        break
+                    delegate.actionPerformed(e)
+                    position--
+                }
             }
+        }
+        
+        private boolean isInComponent(int position) {
+            StyledDocument document = getStyledDocument()
+            Element element = document.getCharacterElement(position)
+            return element.getAttributes().getAttribute(StyleConstants.ComponentAttribute) != null
         }
     }
     
