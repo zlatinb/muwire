@@ -15,9 +15,12 @@ import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
 import java.awt.Dimension
+import java.text.SimpleDateFormat
 import java.util.function.Function
 
 class ChatEntry extends JTextPane {
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
 
     private static final char AT = "@".toCharacter()
     
@@ -28,7 +31,8 @@ class ChatEntry extends JTextPane {
     
     private String currentName
     
-    ChatEntry(String text, UISettings settings, Function<String, PersonaOrProfile> function) {
+    ChatEntry(String text, UISettings settings, Function<String, PersonaOrProfile> function,
+        long timestamp, PersonaOrProfile sender) {
         super()
         this.settings = settings
         this.function = function
@@ -37,7 +41,20 @@ class ChatEntry extends JTextPane {
 
         SimpleAttributeSet sab = new SimpleAttributeSet()
         StyleConstants.setAlignment(sab, StyleConstants.ALIGN_LEFT)
+        StyleConstants.setSpaceAbove(sab, 0)
         setParagraphAttributes(sab, false)
+        
+        
+        StyledDocument doc = getStyledDocument()
+        doc.insertString(doc.getEndPosition().getOffset() - 1, SDF.format(new Date(timestamp)) + " ", null)
+
+        Border border = BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        def label = new POPLabel(sender, settings, border, JLabel.TOP)
+        def style = doc.addStyle("newStyle", null)
+        StyleConstants.setComponent(style, label)
+        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
+        doc.insertString(doc.getEndPosition().getOffset() - 1, ": ", null)
+        
         
         ParsingState state = new TextParsingState()
         for(int i = 0; i < text.length(); i ++)
@@ -45,9 +62,6 @@ class ChatEntry extends JTextPane {
         state.finishUp()
         
         tokens.each {it.render()}
-
-        
-
     }
     
     private abstract class ParsingState {
@@ -158,7 +172,7 @@ class ChatEntry extends JTextPane {
             StyledDocument document = getStyledDocument()
 
             Border border = BorderFactory.createEtchedBorder()
-            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.TOP)
+            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.CENTER)
             def style = document.addStyle("newStyle", null)
             StyleConstants.setComponent(style, popLabel)
             document.insertString(document.getEndPosition().getOffset() - 1,

@@ -64,9 +64,13 @@ class POPLabel extends JLabel {
             preferredX += fontMetrics.charWidth(text.charAt(i))
 
         preferredX += getIconTextGap()
-        Insets insets = border.getBorderInsets(this)
-        preferredX += insets.left
-        preferredX += insets.right
+        if (border != null) {
+            Insets insets = border.getBorderInsets(this)
+            preferredX += insets.left
+            preferredX += insets.right
+            preferredY += insets.top
+            preferredY += insets.bottom
+        }
         
         if (personaOrProfile.getTitle() != null) {
             if (settings.personaRendererIds)
@@ -80,5 +84,7 @@ class POPLabel extends JLabel {
             setToolTipText(trans("NO_PROFILE"))
         
         setMaximumSize([preferredX, preferredY] as Dimension)
+        float alignmentY = 0.5f + (settings.fontSize * 1f / preferredY) / 2
+        setAlignmentY(alignmentY)
     }
 }

@@ -67,8 +67,6 @@ class ChatRoomView {
     def lastMembersTableSortEvent
     UISettings settings
     
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
-    
     void initUI() {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
@@ -253,21 +251,9 @@ class ChatRoomView {
             chatNotificator.notifyMention()
         
         StyledDocument doc = roomTextArea.getStyledDocument()
-        def label = new DateLabel(timestamp)
-        def style = doc.addStyle("newStyle", null)
-        StyleConstants.setComponent(style, label)
-        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
-
-        Border border = BorderFactory.createEmptyBorder(0, 5, 0, 5)
-        label = new POPLabel(sender, settings, border, JLabel.TOP)
-        label.setMaximumSize([200, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
-        label.setAlignmentY(0f)
-        style = doc.addStyle("newStyle", null)
-        StyleConstants.setComponent(style, label)
-        doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
         
-        def textField = new ChatEntry(text, settings, model::getByName)
-        style = doc.addStyle("newStyle", null)
+        def textField = new ChatEntry(text, settings, model::getByName, timestamp, sender)
+        def style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, textField)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
         doc.insertString(doc.getEndPosition().getOffset() - 1, "\n", doc.getStyle("regular"))
@@ -283,13 +269,5 @@ class ChatRoomView {
         StyledDocument doc = roomTextArea.getStyledDocument()
         Element element = doc.getParagraphElement(0)
         doc.remove(0, element.getEndOffset())
-    }
-    
-    private static class DateLabel extends JLabel {
-        DateLabel(long now) {
-            setAlignmentY(0f)
-            String text = SDF.format(new Date(now))
-            setText(text)
-        }
     }
 }

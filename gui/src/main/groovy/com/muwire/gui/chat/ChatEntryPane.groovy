@@ -183,7 +183,7 @@ class ChatEntryPane extends JTextPane {
 
 
             Border border = BorderFactory.createEtchedBorder()
-            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.TOP)
+            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.CENTER)
             
             StyledDocument document = getStyledDocument()
             Style style = document.addStyle("newStyle", null)
