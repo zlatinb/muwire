@@ -44,7 +44,7 @@ class ChatRoomController {
     
     @ControllerAction
     void say() {
-        String words = view.sayField.text
+        String words = view.sayField.getFinalText()
         view.sayField.setText(null)
         
         ChatCommand command

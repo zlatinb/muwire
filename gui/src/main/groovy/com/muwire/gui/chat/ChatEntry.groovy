@@ -6,7 +6,10 @@ import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ProfileConstants
 
+import javax.swing.BorderFactory
+import javax.swing.JLabel
 import javax.swing.JTextPane
+import javax.swing.border.Border
 import javax.swing.text.Document
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
@@ -153,9 +156,9 @@ class ChatEntry extends JTextPane {
         
         void render() {
             StyledDocument document = getStyledDocument()
-            
-            def popLabel = new POPLabel(personaOrProfile, settings)
-            popLabel.setMaximumSize([200, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
+
+            Border border = BorderFactory.createEtchedBorder()
+            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.TOP)
             def style = document.addStyle("newStyle", null)
             StyleConstants.setComponent(style, popLabel)
             document.insertString(document.getEndPosition().getOffset() - 1,

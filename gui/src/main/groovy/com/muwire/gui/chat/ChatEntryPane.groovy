@@ -8,6 +8,7 @@ import com.muwire.gui.profile.ProfileConstants
 import sun.swing.UIAction
 
 import javax.swing.*
+import javax.swing.border.Border
 import javax.swing.event.MenuKeyEvent
 import javax.swing.event.MenuKeyListener
 import javax.swing.text.*
@@ -21,6 +22,7 @@ import java.util.stream.Collectors
 class ChatEntryPane extends JTextPane {
     
     private static final char AT = "@".toCharacter()
+    private static final char SPACE = " ".toCharacter()
     private static final char BACKSPACE = (char)8
     private static final int ENTER = 10
     
@@ -179,18 +181,48 @@ class ChatEntryPane extends JTextPane {
             setSelectionEnd(position)
             replaceSelection("")
 
-            final String name = personaOrProfile.getPersona().getHumanReadableName()
+
+            Border border = BorderFactory.createEtchedBorder()
+            def popLabel = new POPLabel(personaOrProfile, settings, border, JLabel.TOP)
             
             StyledDocument document = getStyledDocument()
-            def popLabel = new POPLabel(personaOrProfile, settings)
-            popLabel.setMaximumSize([200, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
             Style style = document.addStyle("newStyle", null)
             StyleConstants.setComponent(style, popLabel)
-            document.insertString(startPosition, name, style)
+            document.insertString(startPosition, " ", style)
             
             popupMenu?.setVisible(false)
             popupMenu = null
         }
+    }
+    
+    String getFinalText() {
+        String currentText = getText()
+        StringBuilder sb = new StringBuilder()
+        for (int i = 0; i < currentText.length(); i ++) {
+            final char c = currentText.charAt(i)
+            if ( c != SPACE) {
+                sb.append(c)
+                continue
+            }
+            def component = getComponentForPosition(i)
+            if (component == null) {
+                sb.append(c)
+                continue
+            }
+            POPLabel label = (POPLabel) component
+            sb.append(label.personaOrProfile.getPersona().getHumanReadableName())
+        }
+        sb.toString()
+    }
+
+    private boolean isInComponent(int position) {
+        getComponentForPosition(position) != null
+    }
+    
+    private Object getComponentForPosition(int position) {
+        StyledDocument document = getStyledDocument()
+        Element element = document.getCharacterElement(position)
+        element.getAttributes().getAttribute(StyleConstants.ComponentAttribute)
     }
     
     private class ForwardingAction extends UIAction {
@@ -228,12 +260,6 @@ class ChatEntryPane extends JTextPane {
                     position--
                 }
             }
-        }
-        
-        private boolean isInComponent(int position) {
-            StyledDocument document = getStyledDocument()
-            Element element = document.getCharacterElement(position)
-            return element.getAttributes().getAttribute(StyleConstants.ComponentAttribute) != null
         }
     }
     
