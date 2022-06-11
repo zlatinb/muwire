@@ -681,6 +681,8 @@ class MainFrameModel {
                     break
                 }
             }
+            if (index == -1)
+                return // TODO: investigate how this is possible
             if (uiSettings.clearUploads) {
                 uploads.remove(index)
                 view.removeUploadsTableRow(index)
