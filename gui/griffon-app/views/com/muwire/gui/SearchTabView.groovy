@@ -823,7 +823,9 @@ class SearchTabView {
         
         // 2. it exists in the senders table, update the row
         JTable table = builder.getVariable("senders-table")
-        table.model.fireTableRowsUpdated(index, index)
+        try {
+            table.model.fireTableRowsUpdated(index, index)
+        } catch (IndexOutOfBoundsException strange) {} // TODO: investigate
         
         // 3. if the senders table was sorted by trust status, re-sort
         List<RowSorter.SortKey> keys = table.rowSorter.getSortKeys()
