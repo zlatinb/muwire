@@ -9,6 +9,7 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileChannel.MapMode
 import java.nio.channels.FileLock
+import java.nio.channels.OverlappingFileLockException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.logging.Level
@@ -75,6 +76,10 @@ class FileHasher {
                     buf = raf.getChannel().map(MapMode.READ_ONLY, length - lastPieceLength, lastPieceLength.toInteger())
                     digest.update buf
                     output.write(digest.digest(), 0, 32)
+                } catch (OverlappingFileLockException ofle) {
+                    // lock may have been re-acquired by the notifier
+                    Thread.sleep(10)
+                    continue
                 } finally {
                     raf.close()
                     DataUtil.tryUnmap(buf)

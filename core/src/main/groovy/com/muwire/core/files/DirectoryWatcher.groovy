@@ -1,6 +1,7 @@
 package com.muwire.core.files
 
 import java.nio.channels.FileChannel
+import java.nio.channels.OverlappingFileLockException
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -29,7 +30,7 @@ import net.i2p.util.SystemVersion
 @Log
 class DirectoryWatcher {
 
-    private static final long WAIT_TIME = 1000
+    private static final long WAIT_TIME = 3000
 
     private static final WatchEvent.Kind[] kinds
     static {
@@ -46,7 +47,7 @@ class DirectoryWatcher {
     private final WatchedDirectoryManager watchedDirectoryManager
     private final NegativeFiles negativeFiles
     private final Thread watcherThread, publisherThread
-    private final Map<File, Long> waitingFiles = new ConcurrentHashMap<>()
+    private final Map<File, WaitingEntry> waitingFiles = new ConcurrentHashMap<>()
     private final Map<File, WatchKey> watchedDirectories = new ConcurrentHashMap<>()
     private WatchService watchService
     private volatile boolean shutdown
@@ -135,7 +136,7 @@ class DirectoryWatcher {
         if (f.isDirectory())
             eventBus.publish(new FileSharedEvent(file : f, fromWatch : true))
         else
-            waitingFiles.put(f, System.currentTimeMillis())
+            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), f.length()))
     }
 
     private void processModified(Path parent, Path path) {
@@ -144,7 +145,7 @@ class DirectoryWatcher {
         if (!settings.shareHiddenFiles && f.isHidden())
             return
         if (!negativeFiles.negativeTree.get(f))
-            waitingFiles.put(f, System.currentTimeMillis())
+            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), f.length()))
     }
 
     private void processDeleted(Path parent, Path path) {
@@ -170,15 +171,26 @@ class DirectoryWatcher {
                 Thread.sleep(WAIT_TIME)
                 long now = System.currentTimeMillis()
                 def published = []
-                waitingFiles.each { file, timestamp ->
-                    if (now - timestamp > WAIT_TIME) {
+                waitingFiles.each { file, waitingEntry ->
+                    if (now - waitingEntry.timestamp > WAIT_TIME) {
+                        final long length = file.length()
+                        if (length != waitingEntry.length) {
+                            log.fine("${file} length changed during wait period")
+                            waitingEntry.length = length
+                            return
+                        }
                         try (FileChannel fc = Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
-                            def lock = fc.tryLock(0, Long.MAX_VALUE, true)
-                            if (lock == null) {
-                                log.fine("Couldn't acquire read lock on $file will try again")
+                            try {
+                                def lock = fc.tryLock(0, Long.MAX_VALUE, true)
+                                if (lock == null) {
+                                    log.fine("Couldn't acquire read lock on $file will try again")
+                                    return
+                                }
+                                lock.release()
+                            } catch (OverlappingFileLockException ofle) {
+                                log.fine("file $file has already started hashing")
                                 return
                             }
-                            lock.release()
                             log.fine("publishing file $file")
                             eventBus.publish new FileSharedEvent(file: file, fromWatch: true)
                             published << file
@@ -194,6 +206,15 @@ class DirectoryWatcher {
         } catch (InterruptedException e) {
             if (!shutdown)
                 throw e
+        }
+    }
+    
+    private static class WaitingEntry {
+        private final long timestamp
+        private volatile long length
+        WaitingEntry(long timestamp, long length) {
+            this.timestamp = timestamp
+            this.length = length
         }
     }
 }
