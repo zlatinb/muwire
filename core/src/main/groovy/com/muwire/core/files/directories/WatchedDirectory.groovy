@@ -10,12 +10,12 @@ class WatchedDirectory {
     final File directory, canonical
     final String encodedName
     final Set<File> aliases = new HashSet<>()
-    boolean autoWatch
-    int syncInterval
-    long lastSync
-    Visibility visibility
-    Set<Persona> customVisibility = Collections.emptySet()
-    Set<MWProfileHeader> customVisibilityHeaders = Collections.emptySet()
+    volatile boolean autoWatch
+    volatile int syncInterval
+    volatile long lastSync
+    volatile Visibility visibility
+    volatile Set<Persona> customVisibility = Collections.emptySet()
+    volatile Set<MWProfileHeader> customVisibilityHeaders = Collections.emptySet()
     
     WatchedDirectory(File directory) {
         this.directory = directory
