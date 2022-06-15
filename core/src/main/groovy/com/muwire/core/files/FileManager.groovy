@@ -387,6 +387,7 @@ class FileManager {
     }
     
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
+        final long start = System.currentTimeMillis() - e.timestamp
         // just enriches the event with subdirectories.
         if (!e.subfolders) {
             e.toApply = new File[] {e.directory}
@@ -395,6 +396,8 @@ class FileManager {
             positiveTree.traverse(e.directory, cb)
             e.toApply = cb.subDirs.toArray(new File[0])
         }
+        final long end = System.currentTimeMillis() - e.timestamp
+        log.fine("WatchedDirectoryConfiguration enrichment \"${e.directory}\" ${start} ${end}")
     }
     
     public List<SharedFile> getPublishedSince(long timestamp) {

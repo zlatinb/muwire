@@ -112,6 +112,7 @@ class WatchedDirectoryManager {
     }
     
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
+        log.fine("WatchedDirectoryConfiguration processing ${System.currentTimeMillis() - e.timestamp}")
         if (converting) {
             def newDir = new WatchedDirectory(e.directory)
             // conversion is always autowatch really
@@ -176,10 +177,12 @@ class WatchedDirectoryManager {
     }
     
     private void persist(WatchedDirectory dir) {
+        log.fine("persist ${dir.directory}")
         diskIO.submit({doPersist(dir)} as Runnable)
     }
     
     private void doPersist(WatchedDirectory dir) {
+        log.fine("doPersist ${dir.directory}")
         def json = JsonOutput.toJson(dir.toJson())
         def targetFile = new File(home, dir.getEncodedName() + ".json")
         targetFile.text = json
