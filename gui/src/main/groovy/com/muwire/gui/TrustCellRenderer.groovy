@@ -24,6 +24,9 @@ class TrustCellRenderer extends DefaultTableCellRenderer {
     Component getTableCellRendererComponent(JTable table, Object value,
                                             boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+        
+        if (value == null)
+            return this // TODO: investigate
 
         TrustLevel level = (TrustLevel) value
         switch(value) {
