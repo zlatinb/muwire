@@ -4,6 +4,8 @@ import com.muwire.core.Persona
 import com.muwire.core.files.directories.WatchedDirectoryConfigurationEvent
 
 import java.nio.file.Path
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import java.util.function.BiPredicate
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -40,6 +42,7 @@ class FileManager {
     final Set<File> sideCarFiles = new HashSet<>()
     private Predicate<File> isWatched
     private BiPredicate<File, Persona> isVisible
+    private final Executor INDEX_IO = Executors.newSingleThreadExecutor()
 
     FileManager(File home, EventBus eventBus, MuWireSettings settings) {
         this.home = home
@@ -55,6 +58,17 @@ class FileManager {
     
     void setIsVisible(BiPredicate<File, Persona> isVisible) {
         this.isVisible = isVisible
+    }
+    
+    private void updateIndex(SearchIndex index, String string, boolean add) {
+        log.fine("submitting update to index add $add string $string")
+        INDEX_IO.submit ({
+            log.fine("updating index add $add string $string")
+            if (add)
+                index.add(string)
+            else
+                index.remove(string)
+        } as Runnable)
     }
     
     void onFileHashedEvent(FileHashedEvent e) {
@@ -132,7 +146,7 @@ class FileManager {
         String comment = sf.getComment()
         if (comment != null) {
             comment = DataUtil.readi18nString(Base64.decode(comment))
-            index.add(comment)
+            updateIndex(index, comment, true)
             Set<File> existingComment = commentToFile.get(comment)
             if(existingComment == null) {
                 existingComment = new HashSet<>()
@@ -141,14 +155,14 @@ class FileManager {
             existingComment.add(sf.getFile())
         }
         
-        index.add(name)
+        updateIndex(index, name, true)
         
         String path = getVisiblePath(sf.getFile())
         if (path == null)
             return
         
         log.fine("will index path $path")
-        pathIndex.add(path)
+        updateIndex(pathIndex, path, true)
         existingFiles = pathToFiles.get(path)
         if (existingFiles == null) {
             existingFiles = new File[] {sf.getFile()}
@@ -231,12 +245,12 @@ class FileManager {
                 existingComment.remove(sf.getFile())
                 if (existingComment.isEmpty()) {
                     commentToFile.remove(comment)
-                    index.remove(comment)
+                    updateIndex(index, comment, false)
                 }
             }
         }
 
-        index.remove(name)
+        updateIndex(index, name, false)
         
         String path = getVisiblePath(sf.file)
         if (path == null)
@@ -263,14 +277,14 @@ class FileManager {
             existingFiles.remove(e.sharedFile.getFile())
             if (existingFiles.isEmpty()) {
                 commentToFile.remove(comment)
-                index.remove(comment)
+                updateIndex(index, comment, false)
             }
         }
         
         String comment = e.sharedFile.getComment()
         comment = DataUtil.readi18nString(Base64.decode(comment))
         if (comment != null) {
-            index.add(comment)
+            updateIndex(index, comment, true)
             Set<File> existingComment = commentToFile.get(comment)
             if(existingComment == null) {
                 existingComment = new HashSet<>()

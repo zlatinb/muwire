@@ -17,11 +17,11 @@ class SearchIndex {
         actualSearchIndex = new SearchIndexImpl(name)
     }
     
-    void add(String string) {
+    synchronized void add(String string) {
         actualSearchIndex.add(string, split(string))
     }
 
-    void remove(String string) {
+    synchronized void remove(String string) {
         actualSearchIndex.remove(string, split(string))
     }
 

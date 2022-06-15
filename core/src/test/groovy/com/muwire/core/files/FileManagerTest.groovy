@@ -102,6 +102,8 @@ class FileManagerTest {
         FileHashedEvent fhe = new FileHashedEvent(sharedFile: sf)
         manager.onFileHashedEvent(fhe)
 
+        Thread.sleep(50)
+        
         UUID uuid = UUID.randomUUID()
         manager.onSearchEvent new SearchEvent(searchTerms: ["a"], uuid:uuid)
         Thread.sleep(20)
@@ -124,6 +126,8 @@ class FileManagerTest {
         SharedFile sf2 = new SharedFile(f2, ih2.getRoot(), 0)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
 
+        Thread.sleep(50)
+        
         UUID uuid = UUID.randomUUID()
         manager.onSearchEvent new SearchEvent(searchTerms: ["c"], uuid:uuid)
         Thread.sleep(20)
@@ -214,6 +218,7 @@ class FileManagerTest {
         
         manager.onFileLoadedEvent(new FileLoadedEvent(loadedFile : sf2))
         
+        Thread.sleep(50)
         manager.onSearchEvent(new SearchEvent(searchTerms : ["muwire"]))
         Thread.sleep(20)
         
