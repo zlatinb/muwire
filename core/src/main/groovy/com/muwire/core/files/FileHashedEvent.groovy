@@ -9,6 +9,12 @@ class FileHashedEvent extends Event {
     SharedFile sharedFile
     String error
 
+    /**
+     * This will be non-null in case of a re-hash.
+     * Enriched by FileManager
+     */
+    SharedFile duplicate
+
     @Override
     public String toString() {
         super.toString() + " sharedFile " + sharedFile?.file?.getAbsolutePath() + " error: $error"

@@ -66,6 +66,9 @@ class FileManager {
             if (sideCar.exists()) 
                 e.sharedFile.setComment(Base64.encode(DataUtil.encodei18nString(sideCar.text)))
         }
+        
+        e.duplicate = fileToSharedFile[f]
+        
         addToIndex(e.sharedFile)
     }
 
@@ -109,7 +112,7 @@ class FileManager {
             existing = unique.toArray(existing)
         }
         rootToFiles.put(infoHash, existing);
-            
+        
         fileToSharedFile.put(sf.file, sf)
         positiveTree.add(sf.file, sf);
         

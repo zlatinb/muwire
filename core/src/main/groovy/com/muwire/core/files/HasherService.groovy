@@ -65,7 +65,7 @@ class HasherService {
     void onFileSharedEvent(FileSharedEvent evt) {
         if (!settings.shareHiddenFiles && evt.file.isHidden())
             return
-        if (fileManager.fileToSharedFile.containsKey(evt.file)) 
+        if (fileManager.fileToSharedFile.containsKey(evt.file) && !evt.fromWatch) 
             return
         if (negativeFiles.negativeTree.get(evt.file))
             return
@@ -77,12 +77,12 @@ class HasherService {
         if (evt.file.getName().endsWith(".mwcomment")) { 
             if (evt.file.length() <= Constants.MAX_COMMENT_LENGTH)
                 eventBus.publish(new SideCarFileEvent(file : evt.file))
-        } else if (hashed.add(evt.file)) {
+        } else if (hashed.add(evt.file) || evt.fromWatch) {
             File canonical = evt.file.getCanonicalFile()
             if (canonical.isDirectory())
                 executor.execute({processDirectory(evt.file)} as Runnable)
             else
-                throttlerExecutor.execute({ throttle(evt.file, canonical) } as Runnable)
+                throttlerExecutor.execute({ throttle(evt.file, canonical, evt.fromWatch) } as Runnable)
         }
     }
     
@@ -96,13 +96,13 @@ class HasherService {
             hashed.remove(dir)
     }
 
-    private synchronized void throttle(File f, File canonical) {
+    private synchronized void throttle(File f, File canonical, boolean forceHash) {
         while(currentHashes >= settings.hashingCores)
             wait(10)
         currentHashes++
         if (++totalHashes % TARGET_Q_SIZE == 0)
             System.gc()
-        executor.execute({processFile(f, canonical)} as Runnable)
+        executor.execute({processFile(f, canonical, forceHash)} as Runnable)
     }
     
     private void processDirectory(File f) {
@@ -117,7 +117,7 @@ class HasherService {
         }
     }
     
-    private void processFile(File f, File canonical) {
+    private void processFile(File f, File canonical, boolean forceHash) {
         try {
             if (f.length() == 0) {
                 eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
@@ -128,8 +128,8 @@ class HasherService {
             } else {
                 eventBus.publish new FileHashingEvent(hashingFile: f)
                 def hash = hashListFunction.apply(canonical)
-                if (hash == null) {
-                    log.fine("did not find a hash list for $f => $canonical")
+                if (hash == null || forceHash) {
+                    log.fine("will hash $f => $canonical force $forceHash")
                     hash = HASHER_TL.get().hashFile canonical
                     eventBus.publish new InfoHashEvent(file: canonical, infoHash: hash)
                 } else

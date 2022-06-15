@@ -494,6 +494,8 @@ class MainFrameModel {
             hashingFiles--
             if (e.sharedFile.file == hashingFile)
                 hashingFile = null
+            if (e.duplicate != null) 
+                allSharedFiles.remove(e.duplicate)
             allSharedFiles << e.sharedFile
             insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
             if (filter(e.sharedFile)) {
