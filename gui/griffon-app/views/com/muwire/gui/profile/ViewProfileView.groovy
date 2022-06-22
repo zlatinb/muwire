@@ -128,6 +128,7 @@ class ViewProfileView {
         window.addWindowListener(new WindowAdapter() {
             @Override
             void windowOpened(WindowEvent e) {
+                window.requestFocus()
                 if (model.profileHeader != null) {
                     Icon thumbNail = new ThumbnailIcon(model.profileHeader.getThumbNail())
                     drawThumbnail(thumbNail)
