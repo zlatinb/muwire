@@ -250,7 +250,8 @@ class NetworkDownloader extends Downloader {
         activeWorkers.values().each {
             rv &= it.confidential
         }
-        confidential = rv
+        if (!activeWorkers.isEmpty())
+            confidential = rv
         rv
     }
 

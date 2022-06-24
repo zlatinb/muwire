@@ -336,6 +336,8 @@ class MainFrameView {
                                             label(text : bind {model.downloader?.getNPieces()}, constraints : gbc(gridx:6, gridy:0, insets : [0,0,0,20]))
                                             label(text : trans("DONE_PIECES") + ":", constraints: gbc(gridx:5, gridy: 1))
                                             label(text : bind {model.downloader?.donePieces()}, constraints : gbc(gridx:6, gridy:1, insets : [0,0,0,20]))
+                                            label(text : trans("CONFIDENTIAL") + ":", constraints: gbc(gridx:5, gridy: 2))
+                                            label(text : bind {model.downloader?.isConfidential()}, constraints: gbc(gridx: 6, gridy: 2, insets : [0,0,0,20]))
                                         }
                                     }
                                 }
