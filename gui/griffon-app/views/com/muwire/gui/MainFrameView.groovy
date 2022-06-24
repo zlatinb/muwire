@@ -123,6 +123,8 @@ class MainFrameView {
     JList systemMessageFolderList, userMessageFolderList
     JPanel messageFolderContents
     
+    JTabbedPane contactsPane
+    
     void initUI() {
         
         settings = application.context.get("ui-settings")
@@ -140,6 +142,8 @@ class MainFrameView {
         
         def transferHandler = new MWTransferHandler()
         def collectionsTransferHandler = new FileCollectionTransferHandler()
+        
+        contactsPane = new JTabbedPane()
             
         String version = metadata["application.version"]
         String beta = metadata["application.beta"]
@@ -646,46 +650,7 @@ class MainFrameView {
                     }
                     panel(constraints : "trust window") {
                         gridLayout(rows : 2, cols : 1)
-                        panel {
-                            gridLayout(rows: 1, cols: 1)
-                            panel(border: etchedBorder()) {
-                                borderLayout()
-                                scrollPane(constraints: BorderLayout.CENTER) {
-                                    table(id: "contacts-table", autoCreateRowSorter: true, rowHeight: rowHeight,
-                                            dragEnabled: true, transferHandler: new PersonaTransferHandler()) {
-                                        tableModel(list: model.contacts) {
-                                            closureColumn(header: trans("CONTACTS"), preferredWidth: 250, type: PersonaOrProfile, read: { it })
-                                            closureColumn(header: trans("REASON"), preferredWidth: 450, type: String, read: { it.getReason() })
-                                            closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 60, type: TrustLevel, read: { PersonaOrProfile row ->
-                                                model.core.trustService.getLevel(row.getPersona().destination)
-                                            })
-                                        }
-                                    }
-                                }
-                                panel(constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows : 1, cols : 2)
-                                    panel (border : etchedBorder()) {
-                                        button(text : trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_ADD_CONTACT"), addContactAction)
-                                        button(text : trans("REMOVE_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_REMOVE_CONTACT"),
-                                                enabled : bind {model.removeContactButtonEnabled}, removeContactAction)
-                                        button(text : trans("MARK_TRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_TRUSTED"),
-                                                enabled : bind {model.markTrustedButtonEnabled}, markTrustedAction)
-                                        button(text : trans("MARK_DISTRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_DISTRUSTED"),
-                                                enabled : bind {model.markDistrustedButtonEnabled}, markDistrustedAction)
-                                    }
-                                    panel (border : etchedBorder()) {
-                                        button(text : trans("BROWSE"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_FILES"),
-                                                enabled: bind {model.browseFromTrustedButtonEnabled}, browseFromTrustedAction)
-                                        button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_COLLECTIONS"),
-                                                enabled : bind {model.browseFromTrustedButtonEnabled}, browseCollectionsFromTrustedAction)
-                                        button(text : trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_CONTACTS_SUBSCRIBE"),
-                                                enabled : bind {model.subscribeButtonEnabled}, subscribeAction)
-                                        button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_CONTACTS_MESSAGE"),
-                                                enabled : bind {model.messageFromTrustedButtonEnabled}, messageFromTrustedAction)
-                                    }
-                                }
-                            }
-                        }
+                        widget(contactsPane)
                         panel {
                             borderLayout()
                             panel (constraints : BorderLayout.NORTH){
@@ -796,7 +761,64 @@ class MainFrameView {
 
             }
         }
+        
+        JPanel trustedContactsPanel = builder.panel {
+            borderLayout()
+            scrollPane(constraints: BorderLayout.CENTER) {
+                table(id: "trusted-contacts-table", rowHeight: rowHeight, autoCreateRowSorter: true,
+                    dragEnabled: true, transferHandler: new PersonaTransferHandler()) {
+                    tableModel(list: model.trustedContacts) {
+                        closureColumn(header: trans("NAME"), preferredWidth: 250, type: PersonaOrProfile, read: {it})
+                        closureColumn(header: trans("REASON"), preferredWidth: 750, type: String, read: {it.getReason()})
+                    }
+                }
+            }
+            panel(constraints: BorderLayout.SOUTH) {
+                gridLayout(rows: 1, cols: 2)
+                panel(border: etchedBorder()) {
+                    button(text: trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_ADD_CONTACT"), 
+                            addTrustedContactAction)
+                    button(text : trans("REMOVE_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_REMOVE_CONTACT"),
+                            removeTrustedContactAction)
+                    button(text : trans("MARK_DISTRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_DISTRUSTED"),
+                            enabled: bind {model.markDistrustedButtonEnabled},markDistrustedAction)
+                }
+                panel(border: etchedBorder()) {
+                    button(text : trans("BROWSE"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_FILES"),
+                        browseFromTrustedAction)
+                    button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_CONTACTS_BROWSE_COLLECTIONS"),
+                            browseCollectionsFromTrustedAction)
+                    button(text : trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_CONTACTS_SUBSCRIBE"),
+                            subscribeAction)
+                    button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_CONTACTS_MESSAGE"),
+                            messageFromTrustedAction)
+                }
+            }
+        }
+        
+        JPanel distrustedContactsPanel = builder.panel {
+            borderLayout()
+            scrollPane(constraints: BorderLayout.CENTER) {
+                table(id: "distrusted-contacts-table", rowHeight: rowHeight, autoCreateRowSorter: true) {
+                    tableModel(list: model.distrustedContacts) {
+                        closureColumn(header: trans("NAME"), preferredWidth: 250, type: PersonaOrProfile, read: {it})
+                        closureColumn(header: trans("REASON"), preferredWidth: 750, type: String, read: {it.getReason()})
+                    }
+                }
+            }
+            panel(constraints: BorderLayout.SOUTH) {
+                button(text: trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_ADD_DISTRUSTED_CONTACT"),
+                        addDistrustedContactAction)
+                button(text : trans("REMOVE_CONTACT"), toolTipText: trans("TOOLTIP_CONTACTS_REMOVE_CONTACT"),
+                        removeDistrustedContactAction)
+                button(text : trans("MARK_TRUSTED"), toolTipText: trans("TOOLTIP_CONTACTS_MARK_TRUSTED"),
+                        enabled: bind {model.markTrustedButtonEnabled}, markTrustedAction)
+            }
+        }
 
+        contactsPane.addTab(trans("TRUSTED"), trustedContactsPanel)
+        contactsPane.addTab(trans("DISTRUSTED"), distrustedContactsPanel)
+        
         chatNotificator = new ChatNotificator(application.getMvcGroupManager(),
                 (TrayIcon)application.context.get("tray-icon"),
                 (Window)application.getWindowManager().findWindow("main-frame"),
@@ -1327,61 +1349,67 @@ class MainFrameView {
 
         subscriptionTable.setDefaultRenderer(Long.class, new DateRenderer())
 
-        // contacts table
-        JTable contactsTable = builder.getVariable("contacts-table")
-        contactsTable.setDefaultRenderer(TrustLevel.class, trustRenderer)
-        contactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
-        contactsTable.rowSorter.setComparator(0, popComparator)
-        contactsTable.rowSorter.addRowSorterListener({ evt -> lastContactsSortEvent = evt })
-        contactsTable.rowSorter.setSortsOnUpdates(true)
-        selectionModel = contactsTable.getSelectionModel()
+        // trusted contacts table
+        JTable trustedContactsTable = builder.getVariable("trusted-contacts-table")
+        trustedContactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        trustedContactsTable.rowSorter.setComparator(0, popComparator)
+        trustedContactsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = trustedContactsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
-            int selectedRow = getSelectedContactsTableRow()
+            int selectedRow = getSelectedContactsTableRow(true)
             if (selectedRow < 0) {
                 model.subscribeButtonEnabled = false
                 model.markDistrustedButtonEnabled = false
                 model.chatFromTrustedButtonEnabled = false
                 model.browseFromTrustedButtonEnabled = false
                 model.messageFromTrustedButtonEnabled = false
-                model.removeContactButtonEnabled = false
-                model.markTrustedButtonEnabled = false
                 return
             }
-            model.removeContactButtonEnabled = true
-
-            TrustLevel level = model.core.trustService.getLevel(model.contacts[selectedRow].persona.destination)
-            switch (level) {
-                case TrustLevel.TRUSTED:
-                    model.subscribeButtonEnabled = true
-                    model.markDistrustedButtonEnabled = true
-                    model.markTrustedButtonEnabled = false
-                    model.chatFromTrustedButtonEnabled = true
-                    model.browseFromTrustedButtonEnabled = true
-                    model.messageFromTrustedButtonEnabled = true
-                    break
-                case TrustLevel.DISTRUSTED :
-                    model.subscribeButtonEnabled = false
-                    model.markTrustedButtonEnabled = true
-                    model.markDistrustedButtonEnabled = false
-                    model.chatFromTrustedButtonEnabled = false
-                    model.browseFromTrustedButtonEnabled = false
-                    model.messageFromTrustedButtonEnabled = false
-                    break
-                case TrustLevel.NEUTRAL :
-                    throw new IllegalStateException()
-            }
-    
+            
+            model.subscribeButtonEnabled = true
+            model.markDistrustedButtonEnabled = true
+            model.chatFromTrustedButtonEnabled = true
+            model.browseFromTrustedButtonEnabled = true
+            model.messageFromTrustedButtonEnabled = true
         })
         
-        contactsTable.addMouseListener(new MouseAdapter() {
+        trustedContactsTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showContactsMenu(e)
+                    showContactsMenu(e, true)
             }
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    showContactsMenu(e)
+                    showContactsMenu(e, true)
+            }
+        })
+
+        // distrusted contacts table
+        JTable distrustedContactsTable = builder.getVariable("distrusted-contacts-table")
+        distrustedContactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
+        distrustedContactsTable.rowSorter.setComparator(0, popComparator)
+        distrustedContactsTable.rowSorter.setSortsOnUpdates(true)
+        selectionModel = distrustedContactsTable.getSelectionModel()
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        selectionModel.addListSelectionListener({
+            int selectedRow = getSelectedContactsTableRow(false)
+            if (selectedRow < 0) {
+                model.markTrustedButtonEnabled = false
+                return
+            }
+
+            model.markTrustedButtonEnabled = true
+        })
+
+        distrustedContactsTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showContactsMenu(e, false)
+            }
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showContactsMenu(e, false)
             }
         })
 
@@ -2090,14 +2118,13 @@ class MainFrameView {
         userMessageFolderList.clearSelection()
     }
 
-    int getSelectedContactsTableRow() {
-        def table = builder.getVariable("contacts-table")
+    int getSelectedContactsTableRow(boolean trusted) {
+        String id = trusted ? "trusted-contacts-table" : "distrusted-contacts-table"
+        def table = builder.getVariable(id)
         int selectedRow = table.getSelectedRow()
         if (selectedRow < 0)
             return -1
-        if (lastContactsSortEvent != null)
-            selectedRow = table.rowSorter.convertRowIndexToModel(selectedRow)
-        selectedRow
+        table.rowSorter.convertRowIndexToModel(selectedRow)
     }
     
     int getSelectedContactSubscriptionTableRow() {
@@ -2280,9 +2307,9 @@ class MainFrameView {
         showPopupMenu(menu, e)
     }
     
-    void showContactsMenu(MouseEvent e) {
+    void showContactsMenu(MouseEvent e, boolean trusted) {
         JPopupMenu trustMenu = new JPopupMenu()
-        if (model.subscribeButtonEnabled) {
+        if (trusted && model.subscribeButtonEnabled) {
             JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
             subscribeItem.addActionListener({ mvcGroup.controller.subscribe() })
             trustMenu.add(subscribeItem)
@@ -2290,17 +2317,18 @@ class MainFrameView {
         JMenuItem markNeutralItem = new JMenuItem(trans("REMOVE_CONTACT"))
         markNeutralItem.addActionListener({mvcGroup.controller.removeContact()})
         trustMenu.add(markNeutralItem)
-        if (model.markDistrustedButtonEnabled) {
+        
+        if (trusted && model.markDistrustedButtonEnabled) {
             JMenuItem markDistrustedItem = new JMenuItem(trans("MARK_DISTRUSTED"))
             markDistrustedItem.addActionListener({ mvcGroup.controller.markDistrusted() })
             trustMenu.add(markDistrustedItem)
         }
-        if (model.markTrustedButtonEnabled) {
+        if (!trusted && model.markTrustedButtonEnabled) {
             JMenuItem markTrustedItem = new JMenuItem(trans("MARK_TRUSTED"))
             markTrustedItem.addActionListener({mvcGroup.controller.markTrusted()})
             trustMenu.add(markTrustedItem)
         }
-        if (model.browseFromTrustedButtonEnabled) {
+        if (trusted && model.browseFromTrustedButtonEnabled) {
             JMenuItem browseItem = new JMenuItem(trans("BROWSE"))
             browseItem.addActionListener({ mvcGroup.controller.browseFromTrusted() })
             trustMenu.add(browseItem)
@@ -2308,14 +2336,17 @@ class MainFrameView {
             browseCollectionsItem.addActionListener({ mvcGroup.controller.browseCollectionsFromTrusted() })
             trustMenu.add(browseCollectionsItem)
         }
-        if (model.messageFromTrustedButtonEnabled) {
+        if (trusted && model.messageFromTrustedButtonEnabled) {
             JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
             messageItem.addActionListener({ mvcGroup.controller.messageFromTrusted() })
             trustMenu.add(messageItem)
         }
         
         JMenuItem viewProfileFromTrustedItem = new JMenuItem(trans("VIEW_PROFILE"))
-        viewProfileFromTrustedItem.addActionListener({mvcGroup.controller.viewProfileFromTrusted()})
+        if (trusted) 
+            viewProfileFromTrustedItem.addActionListener({mvcGroup.controller.viewProfileFromTrusted()})
+        else
+            viewProfileFromTrustedItem.addActionListener({mvcGroup.controller.viewProfileFromDistrusted()})
         trustMenu.add(viewProfileFromTrustedItem)
         
         showPopupMenu(trustMenu, e)
@@ -2467,10 +2498,10 @@ class MainFrameView {
         @Override
         protected Transferable createTransferable(JComponent c) {
             if (c instanceof JTable) {
-                int row = getSelectedContactsTableRow()
+                int row = getSelectedContactsTableRow(true)
                 if (row < 0)
                     return null
-                return new MWTransferable(Collections.singletonList(model.contacts.get(row).persona))
+                return new MWTransferable(Collections.singletonList(model.trustedContacts.get(row).persona))
             }
             return null
         }

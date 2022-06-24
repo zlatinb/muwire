@@ -6,6 +6,7 @@ import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.gui.MainFrameModel.UploaderWrapper
 import com.muwire.gui.profile.PersonaOrProfile
+import com.muwire.gui.profile.TrustPOP
 import com.muwire.gui.profile.ViewProfileHelper
 
 import javax.swing.JTextField
@@ -322,53 +323,62 @@ class MainFrameController {
     }
     
     @ControllerAction
-    void addContact() {
+    void addTrustedContact() {
         def params = [:]
         params.core = core
+        params.trusted = true
+        mvcGroup.createMVCGroup("add-contact", params).destroy()
+    }
+
+    @ControllerAction
+    void addDistrustedContact() {
+        def params = [:]
+        params.core = core
+        params.trusted = false
         mvcGroup.createMVCGroup("add-contact", params).destroy()
     }
     
     @ControllerAction
-    void removeContact() {
-        markTrust(TrustLevel.NEUTRAL)
+    void removeTrustedContact() {
+        markTrust(TrustLevel.NEUTRAL, true)
     }
 
-    private void markTrust(TrustLevel level) {
-        int row = view.getSelectedContactsTableRow()
+    @ControllerAction
+    void removeDistrustedContact() {
+        markTrust(TrustLevel.NEUTRAL, false)
+    }
+
+    private void markTrust(TrustLevel level, boolean trusted) {
+        int row = view.getSelectedContactsTableRow(trusted)
         if (row < 0)
             return
         String reason = null
         if (level != TrustLevel.NEUTRAL)
             reason = JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
-        builder.getVariable("contacts-table").model.fireTableDataChanged()
-        core.eventBus.publish(new TrustEvent(persona : model.contacts[row].persona, level : level, reason : reason))
+        List<TrustPOP> list = trusted ? model.trustedContacts : model.distrustedContacts
+        core.eventBus.publish(new TrustEvent(persona : list[row].persona, level : level, reason : reason))
     }
 
     @ControllerAction
     void markTrusted() {
-        markTrust(TrustLevel.TRUSTED)
-        model.markTrustedButtonEnabled = false
+        markTrust(TrustLevel.TRUSTED, false)
     }
 
     @ControllerAction
     void markDistrusted() {
-        markTrust(TrustLevel.DISTRUSTED)
-        model.subscribeButtonEnabled = false
-        model.markDistrustedButtonEnabled = false
+        markTrust(TrustLevel.DISTRUSTED, true)
     }
 
     @ControllerAction
     void subscribe() {
-        int row = view.getSelectedContactsTableRow()
+        int row = view.getSelectedContactsTableRow(true)
         if (row < 0)
             return
-        Persona p = model.contacts[row].persona
+        Persona p = model.trustedContacts[row].persona
         core.muOptions.trustSubscriptions.add(p)
         saveMuWireSettings()
         core.eventBus.publish(new TrustSubscriptionEvent(persona : p, subscribe : true))
         model.subscribeButtonEnabled = false
-        model.markDistrustedButtonEnabled = false
-        model.removeContactButtonEnabled = false
     }
     
     @ControllerAction
@@ -950,11 +960,21 @@ class MainFrameController {
     
     @ControllerAction
     void viewProfileFromTrusted() {
-        int row = view.getSelectedContactsTableRow()
+        int row = view.getSelectedContactsTableRow(true)
         if (row < 0)
             return
 
-        PersonaOrProfile pop = model.contacts.get(row)
+        PersonaOrProfile pop = model.trustedContacts.get(row)
+        ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
+    }
+
+    @ControllerAction
+    void viewProfileFromDistrusted() {
+        int row = view.getSelectedContactsTableRow(false)
+        if (row < 0)
+            return
+
+        PersonaOrProfile pop = model.distrustedContacts.get(row)
         ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
     }
     

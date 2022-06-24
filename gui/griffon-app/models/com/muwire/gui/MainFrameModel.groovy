@@ -136,7 +136,8 @@ class MainFrameModel {
     
     def connectionList = []
     def searches = new LinkedList()
-    List<TrustPOP> contacts = []
+    List<TrustPOP> trustedContacts = []
+    List<TrustPOP> distrustedContacts = []
     List<SubscriptionPOP> subscriptions = []
     def feeds = []
     def feedItems = []
@@ -173,12 +174,12 @@ class MainFrameModel {
     @Observable boolean viewFeedItemCertificatesButtonEnabled
     @Observable boolean subscribeButtonEnabled
     
-    @Observable boolean removeContactButtonEnabled
     @Observable boolean markDistrustedButtonEnabled
     @Observable boolean browseFromTrustedButtonEnabled
     @Observable boolean chatFromTrustedButtonEnabled
     @Observable boolean messageFromTrustedButtonEnabled
     @Observable boolean markTrustedButtonEnabled
+    
     @Observable boolean reviewButtonEnabled
     @Observable boolean updateButtonEnabled
     @Observable boolean unsubscribeButtonEnabled
@@ -286,7 +287,8 @@ class MainFrameModel {
 
                 updateTablePreservingSelection("uploads-table")
                 updateTablePreservingSelection("downloads-table")
-                updateTablePreservingSelection("contacts-table")
+                updateTablePreservingSelection("trusted-contacts-table")
+                updateTablePreservingSelection("distrusted-contacts-table")
                 
                 int totalUpload = 0
                 uploads.each { 
@@ -369,8 +371,8 @@ class MainFrameModel {
             }, 1000, 1000)
 
             runInsideUIAsync {
-                contacts.addAll(core.trustService.good.values().collect {new TrustPOP(it)})
-                contacts.addAll(core.trustService.bad.values().collect {new TrustPOP(it)})
+                trustedContacts.addAll(core.trustService.good.values().collect {new TrustPOP(it)})
+                distrustedContacts.addAll(core.trustService.bad.values().collect {new TrustPOP(it)})
 
                 resumeButtonText = "RETRY"
                 
@@ -691,11 +693,13 @@ class MainFrameModel {
     }
     
     private void refreshContacts() {
-        contacts.clear()
-        contacts.addAll(core.trustService.good.values().collect{new TrustPOP(it)})
-        contacts.addAll(core.trustService.bad.values().collect{new TrustPOP(it)})
+        trustedContacts.clear()
+        trustedContacts.addAll(core.trustService.good.values().collect{new TrustPOP(it)})
+        distrustedContacts.clear()
+        distrustedContacts.addAll(core.trustService.bad.values().collect{new TrustPOP(it)})
 
-        updateTablePreservingSelection("contacts-table")
+        updateTablePreservingSelection("trusted-contacts-table")
+        updateTablePreservingSelection("distrusted-contacts-table")
     }
 
     void onTrustSubscriptionUpdatedEvent(TrustSubscriptionUpdatedEvent e) {
