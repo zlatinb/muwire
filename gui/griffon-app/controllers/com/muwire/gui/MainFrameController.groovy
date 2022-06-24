@@ -455,10 +455,10 @@ class MainFrameController {
     
     @ControllerAction
     void browseFromTrusted() {
-        int row = view.getSelectedContactsTableRow()
+        int row = view.getSelectedContactsTableRow(true)
         if (row < 0)
             return
-        Persona p = model.contacts[row].persona
+        Persona p = model.trustedContacts[row].persona
         
         String groupId = UUID.randomUUID().toString()
         def params = [:]
@@ -470,10 +470,10 @@ class MainFrameController {
     
     @ControllerAction
     void browseCollectionsFromTrusted() {
-        int row = view.getSelectedContactsTableRow()
+        int row = view.getSelectedContactsTableRow(true)
         if (row < 0)
             return
-        Persona p = model.contacts[row].persona
+        Persona p = model.trustedContacts[row].persona
         
         UUID uuid = UUID.randomUUID()
         def params = [:]
@@ -942,10 +942,10 @@ class MainFrameController {
     
     @ControllerAction
     void messageFromTrusted() {
-        int row = view.getSelectedContactsTableRow()
+        int row = view.getSelectedContactsTableRow(true)
         if (row < 0)
             return
-        PersonaOrProfile persona = model.contacts[row]
+        PersonaOrProfile persona = model.trustedContacts[row]
         
         def params = [:]
         params.recipientsPOP = new HashSet<>(Collections.singletonList(persona))
