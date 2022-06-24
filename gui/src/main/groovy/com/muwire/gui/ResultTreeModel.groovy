@@ -18,7 +18,7 @@ class ResultTreeModel extends DefaultTreeModel {
         MutableResultNode node = root
         if (event.path == null || event.path.length == 0) {
             def child = new MutableResultNode(event)
-            node.addResult(child)
+            node.addDescendant(child)
             return
         }
 
@@ -29,65 +29,37 @@ class ResultTreeModel extends DefaultTreeModel {
         String hiddenRoot = elements.remove(0)
         for (String element : elements) {
             def nodeData = new ResultTreeRenderer.ResultTreeNode(hiddenRoot, element)
-            def elementNode = node.childrenMap.get(nodeData)
+            def elementNode = node.getByKey(nodeData)
             
             if (elementNode == null) {
                 elementNode = new MutableResultNode()
                 elementNode.setUserObject(nodeData)
-                node.addResult(elementNode)
+                node.addDescendant(elementNode)
             }
             elementNode.getUserObject().addResult(event)
             node = elementNode
         }
 
         def fileNode = new MutableResultNode(event)
-        node.addResult(fileNode)
+        node.addDescendant(fileNode)
     }
     
-    static class MutableResultNode extends DefaultMutableTreeNode implements Comparable<MutableResultNode>{
-        private final Map<Object, MutableResultNode> childrenMap
+    static class MutableResultNode extends SortedTreeNode<UIResultEvent> {
         MutableResultNode() {
             super()
-            childrenMap = new HashMap<>()
         }
         
         MutableResultNode(UIResultEvent event) {
-            super()
-            childrenMap = Collections.emptyMap()
-            setUserObject(event)
+            super(event)
         }
 
         @Override
-        void removeAllChildren() {
-            if (!childrenMap.isEmpty())
-                childrenMap.clear()
-            super.removeAllChildren()
-        }
-
-        void addResult(MutableResultNode newChild) {
-            childrenMap.put(newChild.getUserObject(), newChild)
-            if (children == null)
-                children = new Vector<>()
-            Object [] elementData = children.elementData
-            int idx = Arrays.binarySearch(elementData, 0, getChildCount(), newChild)
-            if (idx >= 0)
-                idx++
-            else
-                idx = - idx - 1
-            insert(newChild, idx)
-        }
-        
-        private String getStringName() {
+        protected String getStringName() {
             def object = getUserObject()
             if (object instanceof UIResultEvent)
                 return object.getName()
             else
                 return object.toString()
-        }
-    
-        @Override
-        int compareTo(MutableResultNode other) {
-            Collator.getInstance().compare(getStringName(), other.getStringName())
         }
     }
 }

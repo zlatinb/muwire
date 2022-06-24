@@ -12,6 +12,11 @@ class InterimTreeNode {
         return file;
     }
     
+    
+    public int hashCode() {
+        file.hashCode()
+    }
+    
     public boolean equals(Object o) {
         if (!(o instanceof InterimTreeNode))
             return false

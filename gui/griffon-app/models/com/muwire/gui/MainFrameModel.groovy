@@ -130,8 +130,8 @@ class MainFrameModel {
     private boolean libraryDirty
     boolean libraryTabVisible
     private final javax.swing.Timer libraryTimer = new javax.swing.Timer(1000, {refreshLibrary()})
-    TreeModel sharedTree 
-    DefaultMutableTreeNode allFilesTreeRoot, treeRoot
+    LibraryTreeModel allFilesSharedTree, sharedTree 
+    SortedTreeNode<SharedFile> allFilesTreeRoot, treeRoot
     final Map<SharedFile, TreeNode> fileToNode = new HashMap<>()
     
     def connectionList = []
@@ -247,9 +247,10 @@ class MainFrameModel {
                 (Image) view.builder.imageIcon("/email.png").image)
         
         shared = []
-        treeRoot = new DefaultMutableTreeNode()
-        sharedTree = new DefaultTreeModel(treeRoot)
-        allFilesTreeRoot = new DefaultMutableTreeNode()
+        treeRoot = new LibraryTreeModel.LibraryTreeNode()
+        sharedTree = new LibraryTreeModel(treeRoot)
+        allFilesTreeRoot = new LibraryTreeModel.LibraryTreeNode()
+        allFilesSharedTree = new LibraryTreeModel(allFilesTreeRoot)
 
         Timer timer = new Timer("download-pumper", true)
         timer.schedule({
@@ -497,10 +498,10 @@ class MainFrameModel {
             if (e.duplicate != null) 
                 allSharedFiles.remove(e.duplicate)
             allSharedFiles << e.sharedFile
-            insertIntoTree(e.sharedFile, allFilesTreeRoot, fileToNode)
+            insertIntoTree(e.sharedFile, allFilesSharedTree, fileToNode)
             if (filter(e.sharedFile)) {
                 insertIntoTable(e.sharedFile)
-                insertIntoTree(e.sharedFile, treeRoot, null)
+                insertIntoTree(e.sharedFile, sharedTree, null)
                 libraryDirty = true
             }
         }
@@ -511,9 +512,9 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             allSharedFiles << e.loadedFile
-            insertIntoTree(e.loadedFile, allFilesTreeRoot, fileToNode)
+            insertIntoTree(e.loadedFile, allFilesSharedTree, fileToNode)
             insertIntoTable(e.loadedFile)
-            insertIntoTree(e.loadedFile, treeRoot, null)
+            insertIntoTree(e.loadedFile, sharedTree, null)
             libraryDirty = true
         }
     }
@@ -547,7 +548,7 @@ class MainFrameModel {
                     insertIntoTable(sf)
             }
             shared.each {
-                insertIntoTree(it, treeRoot, null)
+                insertIntoTree(it, sharedTree, null)
             }
             view.refreshSharedFiles()
             view.magicTreeExpansion()
@@ -577,7 +578,7 @@ class MainFrameModel {
             for (SharedFile sf : chunks)
                 insertIntoTable(sf)
             chunks.each {
-                insertIntoTree(it, treeRoot, null)
+                insertIntoTree(it, sharedTree, null)
             }
             view.refreshSharedFiles()
         }
@@ -616,36 +617,12 @@ class MainFrameModel {
     }
 
     private void removeUnsharedFromTree(SharedFile sharedFile, boolean deleted) {
-        DefaultMutableTreeNode dmtn = fileToNode.remove(sharedFile)
+        SortedTreeNode dmtn = fileToNode.remove(sharedFile)
         if (dmtn == null)
             return
 
-        Object[] path = dmtn.getUserObjectPath()
-        DefaultMutableTreeNode otherNode = treeRoot
-        for (int i = 1; i < path.length; i++) {
-            Object o = path[i]
-            DefaultMutableTreeNode next = null
-            for (int j = 0; j < otherNode.childCount; j++) {
-                if (otherNode.getChildAt(j).getUserObject() == o) {
-                    next = otherNode.getChildAt(j)
-                    break
-                }
-            }
-            if (next == null) {
-                if (deleted)
-                    return
-                throw new IllegalStateException()
-            }
-            otherNode = next
-        }
-        while (true) {
-            def parent = otherNode.getParent()
-            otherNode.removeFromParent()
-            if (parent.getChildCount() == 0) {
-                otherNode = parent
-            } else
-                break
-        }
+        allFilesSharedTree.removeFromTree(sharedFile, deleted)
+        sharedTree.removeFromTree(sharedFile, deleted)
     }
     
     void onUploadEvent(UploadEvent e) {
@@ -845,10 +822,10 @@ class MainFrameModel {
             return
         runInsideUIAsync {
             allSharedFiles << e.downloadedFile
-            insertIntoTree(e.downloadedFile, allFilesTreeRoot, fileToNode)
+            insertIntoTree(e.downloadedFile, allFilesSharedTree, fileToNode)
             if (filter(e.downloadedFile)) {
                 insertIntoTable(e.downloadedFile)
-                insertIntoTree(e.downloadedFile,treeRoot, null)
+                insertIntoTree(e.downloadedFile,sharedTree, null)
                 libraryDirty = true
             }
         }
@@ -866,37 +843,9 @@ class MainFrameModel {
         }
     }
     
-    private void insertIntoTree(SharedFile file, TreeNode root, Map<File,TreeNode> f2n) {
-        List<File> parents = new ArrayList<>()
-        File tmp = file.file.getParentFile()
-        while(tmp.getParent() != null) {
-            parents << tmp
-            tmp = tmp.getParentFile()
-        }
-        Collections.reverse(parents)
-        TreeNode node = root
-        for(File path : parents) {
-            boolean exists = false
-            def children = node.children()
-            def child = null
-            while(children.hasMoreElements()) {
-                child = children.nextElement()
-                def userObject = child.getUserObject()
-                if (userObject != null && userObject.file == path) {
-                    exists = true
-                    break
-                }
-            }
-            if (!exists) {
-                child = new DefaultMutableTreeNode(new InterimTreeNode(path))
-                node.add(child)
-            }
-            node = child
-        }
-        
-        def dmtn = new DefaultMutableTreeNode(file)
-        f2n?.put(file, dmtn)
-        node.add(dmtn)
+    private void insertIntoTree(SharedFile file, LibraryTreeModel libraryTreeModel, Map<SharedFile,TreeNode> f2n) {
+        def leaf = libraryTreeModel.addToTree(file)
+        f2n?.put(file, leaf)
     }
     
     private void insertIntoTable(SharedFile sharedFile) {
