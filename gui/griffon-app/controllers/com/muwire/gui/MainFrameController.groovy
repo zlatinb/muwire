@@ -291,7 +291,9 @@ class MainFrameController {
         if (!view.selectedFolders().isEmpty())
             return
         SharedFile sf = selected[0]
-        Desktop.getDesktop().open(sf.file)
+        try {
+            Desktop.getDesktop().open(sf.file)
+        } catch (IOException ignore) {} // TODO: show some warning
     }
 
     @ControllerAction
