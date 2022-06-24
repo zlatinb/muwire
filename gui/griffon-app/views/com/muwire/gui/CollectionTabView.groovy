@@ -64,6 +64,7 @@ class CollectionTabView {
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
+        int treeRowHeight = application.context.get("tree-row-height")
         p = builder.panel {
             gridLayout(rows : 3, cols: 1)
             panel {
@@ -138,7 +139,7 @@ class CollectionTabView {
                         scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
                             itemsTree = new JTree(model.fileTreeModel)
                             itemsTree.setCellRenderer(new PathTreeRenderer())
-                            tree(id: "items-tree", rowHeight : rowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
+                            tree(id: "items-tree", rowHeight : treeRowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
                         }
                     }
                 }
