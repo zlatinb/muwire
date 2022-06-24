@@ -29,6 +29,7 @@ class H2HostCache extends HostCache {
     private final Map<Destination, HostMCProfile> profiles = new HashMap<>()    
     
     private final Timer timer
+    private boolean closed
     
     private Collection<Destination> toVerify = new LinkedHashSet<>()
     
@@ -302,6 +303,7 @@ class H2HostCache extends HostCache {
     public synchronized void stop() {
         try {timer.cancel()} catch (Exception ignore) {}
         sql?.close()
+        closed = true
     }
     @Override
     public synchronized void load() {
@@ -346,12 +348,18 @@ class H2HostCache extends HostCache {
         
         log.fine("loaded ${allHosts.size()} hosts from db")
         timer.schedule({
-            recycleSQL()
-            purgeHopeless()
-            verifyHosts()
-            recordConnectionCount()
+            houseKeep()
         } as TimerTask, 60000, 60000)
         loaded = true
+    }
+    
+    private synchronized void houseKeep() {
+        if (closed)
+            return
+        recycleSQL()
+        purgeHopeless()
+        verifyHosts()
+        recordConnectionCount()
     }
     
     private synchronized void verifyHosts() {
