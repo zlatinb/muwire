@@ -7,6 +7,8 @@ import com.muwire.core.profile.MWProfileFetchEvent
 import com.muwire.core.profile.MWProfileFetchStatus
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.profile.UIProfileFetchEvent
+import com.muwire.core.trust.TrustEvent
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.HTMLSanitizer
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
@@ -29,6 +31,8 @@ class ViewProfileModel {
     @Observable MWProfileFetchStatus status
     MWProfile profile
     
+    @Observable TrustLevel trustLevel
+    
     private boolean registered
     
     void mvcGroupInit(Map<String, String> args) {
@@ -36,6 +40,9 @@ class ViewProfileModel {
             profileHeader = profile.getHeader()
         if (profileHeader != null)
             profileTitle = HTMLSanitizer.sanitize(profileHeader.getTitle())
+        
+        setTrustLevel(core.getTrustService().getLevel(persona.getDestination()))
+        core.getEventBus().register(TrustEvent.class, this)
     }
     
     boolean fetchEnabled() {
@@ -54,6 +61,7 @@ class ViewProfileModel {
     }
     
     void mvcGroupDestroy() {
+        core.getEventBus().unregister(TrustEvent.class, this)
         if (registered)
             core.getEventBus().unregister(MWProfileFetchEvent.class, this)
     }
@@ -68,6 +76,14 @@ class ViewProfileModel {
                 profile = event.profile
                 profileHeader = profile.getHeader()
             }
+        }
+    }
+    
+    void onTrustEvent(TrustEvent event) {
+        if (event.persona != persona)
+            return
+        runInsideUIAsync {
+            trustLevel = event.level
         }
     }
 }

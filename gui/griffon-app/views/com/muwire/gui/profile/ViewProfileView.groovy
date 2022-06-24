@@ -2,6 +2,7 @@ package com.muwire.gui.profile
 
 import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileFetchStatus
+import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.HTMLSanitizer
 
 import javax.imageio.ImageIO
@@ -104,16 +105,23 @@ class ViewProfileView {
             panel(constraints: BorderLayout.SOUTH) {
                 gridLayout(rows:1, cols: 4)
                 panel {
-                    label(text : bind { model.status == null ? "" : trans(model.status.name())})
+                    borderLayout()
+                    panel(constraints: BorderLayout.WEST) {
+                        label(text: trans("YOUR_TRUST") + " : ")
+                        label(text: bind {trans(model.trustLevel.name())})
+                    }
+                    panel(constraints: BorderLayout.EAST) {
+                        label(text: bind { model.status == null ? "" : trans(model.status.name()) })
+                    }
                 }
                 panel {
                     button(text: trans("COPY_FULL_ID"), copyFullAction)
                 }
                 panel {
                     button(text: trans("ADD_CONTACT"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_ADD_CONTACT"),
-                            addContactAction)
+                            enabled: bind {model.trustLevel != TrustLevel.TRUSTED}, addContactAction)
                     button(text: trans("PROFILE_VIEWER_BLOCK"), toolTipText: trans("TOOLTIP_PROFILE_VIEWER_BLOCK"),
-                            blockAction)
+                            enabled: bind {model.trustLevel != TrustLevel.DISTRUSTED}, blockAction)
                 }
                 panel {
                     button(text : trans("CLOSE"), closeAction)
