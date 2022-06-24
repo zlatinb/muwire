@@ -181,8 +181,10 @@ class FileManagerTest {
         InfoHash ih2 = InfoHash.fromHashList(new byte[64])
         SharedFile sf2 = new SharedFile(f2, ih2.getRoot(), 0)
         manager.onFileLoadedEvent new FileLoadedEvent(loadedFile: sf2)
+        Thread.sleep(50)
 
         manager.onFileUnsharedEvent new FileUnsharedEvent(deleted : true, unsharedFiles: new SharedFile[]{sf2})
+        Thread.sleep(50)
 
         // 1 match left
         manager.onSearchEvent new SearchEvent(searchTerms: ["c"])
