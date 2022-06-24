@@ -735,6 +735,9 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
+                        button(text: trans("UPDATE"), toolTipText: trans("TOOLTIP_UPDATE"),
+                                enabled: bind {model.updateAvailableEvent != null || model.updateDownloadedEvent != null},
+                                showUpdateAction)
                         button(text: "", icon: imageIcon('/edit_profile.png'), toolTipText: trans("TOOLTIP_PROFILE_EDITOR"),
                             editProfileAction)
                     }

@@ -1062,6 +1062,17 @@ class MainFrameController {
         mvcGroup.createMVCGroup("chat-favorites", params)
     }
 
+    @ControllerAction
+    void showUpdate() {
+        if (application.mvcGroupManager.findGroup("update") == null) {
+            Map<String, Object> args = new HashMap<>()
+            args['core'] = core
+            args['available'] = model.updateAvailableEvent
+            args['downloaded'] = model.updateDownloadedEvent
+            mvcGroup.createMVCGroup("update", "update", args).destroy()
+        }
+    }
+
     void saveMuWireSettings() {
         core.saveMuSettings()
     }

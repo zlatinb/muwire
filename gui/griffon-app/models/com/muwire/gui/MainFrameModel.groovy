@@ -10,6 +10,7 @@ import com.muwire.core.trust.TrustServiceLoadedEvent
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ThumbnailIcon
 import com.muwire.gui.profile.TrustPOP
+import griffon.core.controller.ControllerAction
 
 import javax.swing.DefaultListModel
 import javax.swing.Icon
@@ -206,6 +207,9 @@ class MainFrameModel {
     
     @Observable int downSpeed
     @Observable int upSpeed
+    
+    @Observable UpdateDownloadedEvent updateDownloadedEvent
+    @Observable UpdateAvailableEvent updateAvailableEvent
 
     private final Set<InfoHash> downloadInfoHashes = new ConcurrentHashSet<>()
 
@@ -411,16 +415,18 @@ class MainFrameModel {
 
     void onUpdateDownloadedEvent(UpdateDownloadedEvent e) {
         runInsideUIAsync {
-            if (application.mvcGroupManager.findGroup("update") == null) {
-                Map<String, Object> args = new HashMap<>()
-                args['core'] = core
-                args['available'] = null
-                args['downloaded'] = e
-                mvcGroup.createMVCGroup("update", "update", args).destroy()
-            }
+            updateDownloadedEvent = e
+            updateAvailableEvent = null
         }
     }
 
+    void onUpdateAvailableEvent(UpdateAvailableEvent e) {
+        runInsideUIAsync {
+            updateDownloadedEvent = null
+            updateAvailableEvent = e
+        }
+    }
+    
     void onUIResultEvent(UIResultEvent e) {
         MVCGroup resultsGroup = results.get(e.uuid)
         resultsGroup?.model.handleResult(e)
@@ -795,18 +801,6 @@ class MainFrameModel {
             this.uuid = uuid
             this.count = 1
             this.timestamp = Calendar.getInstance()
-        }
-    }
-
-    void onUpdateAvailableEvent(UpdateAvailableEvent e) {
-        runInsideUIAsync {
-            if (application.mvcGroupManager.findGroup("update") == null) {
-                Map<String, Object> args = new HashMap<>()
-                args['core'] = core
-                args['available'] = e
-                args['downloaded'] = null
-                mvcGroup.createMVCGroup("update", "update", args).destroy()
-            }
         }
     }
 
