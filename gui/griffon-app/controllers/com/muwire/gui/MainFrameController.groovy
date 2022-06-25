@@ -281,7 +281,7 @@ class MainFrameController {
         def downloader = downloads.get(0)
         def params = [:]
         params['downloader'] = downloader
-        mvcGroup.createMVCGroup("download-preview", params)
+        mvcGroup.createMVCGroup("download-preview", params).destroy()
     }
     
     @ControllerAction

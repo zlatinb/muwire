@@ -44,12 +44,6 @@ class DownloadPreviewView {
         dialog.setResizable(false)
         dialog.setLocationRelativeTo(mainFrame)
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE)
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                mainFrame.setVisible(false)
-                mvcGroup.destroy()
-            }
-        })
     }
     
     void mvcGroupInit(Map<String, String> args) {
