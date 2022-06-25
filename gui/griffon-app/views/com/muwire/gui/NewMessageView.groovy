@@ -29,6 +29,7 @@ import com.muwire.core.SharedFile
 import com.muwire.core.messenger.MWMessageAttachment
 
 import java.awt.BorderLayout
+import java.awt.GridBagConstraints
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.event.MouseAdapter
@@ -71,35 +72,35 @@ class NewMessageView {
             iconImage : builder.imageIcon("/MuWire-48x48.png").image, 
                 preferredSize: [800, 600]){
             borderLayout()
-            panel(constraints : BorderLayout.NORTH) {
-                borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
+            panel(constraints: BorderLayout.CENTER) {
+                gridBagLayout()
+                panel(constraints: gbc(gridx: 0, gridy: 0, weightx: 100, weighty: 10, fill: GridBagConstraints.BOTH)) {
                     gridLayout(rows: 1, cols: 1)
                     widget(contactSelector.view.component)
                 }
-                panel(constraints : BorderLayout.SOUTH, border : titledBorder(title : trans("SUBJECT"),
-                    border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
-                    borderLayout()
-                    subjectField = textField(constraints : BorderLayout.CENTER)
+                panel(constraints: gbc(gridx: 0, gridy: 1, weightx: 100, weighty: 0, fill: GridBagConstraints.BOTH),
+                        border: titledBorder(title: trans("SUBJECT"), border: etchedBorder(), titlePosition: TitledBorder.TOP)) {
+                    gridLayout(rows: 1, cols: 1)
+                    subjectField = textField()
                 }
-            }
-            panel(constraints : BorderLayout.CENTER) {
-                gridLayout(rows : 1, cols : 1)
-                splitPane(orientation : JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation : 300) {
-                    scrollPane(border : titledBorder(title : trans("MESSAGE_NOUN"), border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
-                        bodyArea = textArea(editable : true, rows : 10, columns : 50, lineWrap : true, wrapStyleWord : true)
+                panel(constraints: gbc(gridx: 0, gridy: 2, weightx: 100, weighty: 90, fill : GridBagConstraints.BOTH)) {
+                    gridBagLayout()
+                    scrollPane(border: titledBorder(title: trans("MESSAGE_NOUN"), border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                        constraints: gbc(gridx: 0, gridy: 0, weightx: 100, weighty: 70, fill: GridBagConstraints.BOTH)) {
+                        bodyArea = textArea(editable: true, rows: 10, columns: 50, lineWrap: true, wrapStyleWord: true)
                     }
-                    panel (border : titledBorder(title : trans("ATTACHMENT_DROP_TABLE_TITLE"),
-                        border : etchedBorder(), titlePosition : TitledBorder.TOP)) {
+                    panel(border: titledBorder(title: trans("ATTACHMENT_DROP_TABLE_TITLE"),
+                            border: etchedBorder(), titlePosition: TitledBorder.TOP),
+                            constraints: gbc(gridx:0, gridy:1, weightx: 100, weighty: 30, fill: GridBagConstraints.BOTH)) {
                         borderLayout()
-                        scrollPane(constraints : BorderLayout.CENTER) {
-                            attachmentsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) { 
-                                tableModel(list : model.attachments) {
-                                    closureColumn(header : trans("NAME"), type : String, read : {it.name})
-                                    closureColumn(header : trans("SIZE"), type : Long, read : {
+                        scrollPane(constraints: BorderLayout.CENTER) {
+                            attachmentsTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                tableModel(list: model.attachments) {
+                                    closureColumn(header: trans("NAME"), type: String, read: { it.name })
+                                    closureColumn(header: trans("SIZE"), type: Long, read: {
                                         if (it instanceof MWMessageAttachment)
                                             return it.length
-                                        else 
+                                        else
                                             return it.totalSize()
                                     })
                                 }
