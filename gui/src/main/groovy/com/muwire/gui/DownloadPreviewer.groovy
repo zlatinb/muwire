@@ -27,10 +27,12 @@ class DownloadPreviewer extends SwingWorker {
     public void done() {
         File previewFile = get()
         view.dialog.setVisible(false)
-        view.mvcGroup.destroy()
         if (previewFile == null)
             JOptionPane.showMessageDialog(null, "Generating preview file failed", "Preview Failed", JOptionPane.ERROR_MESSAGE)
-        else 
-            Desktop.getDesktop().open(previewFile)
+        else {
+            try {
+                Desktop.getDesktop().open(previewFile)
+            } catch (IOException ignore) {}
+        }
     }
 }
