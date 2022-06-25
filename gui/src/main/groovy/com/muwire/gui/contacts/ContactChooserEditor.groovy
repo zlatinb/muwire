@@ -69,6 +69,7 @@ class ContactChooserEditor extends BasicComboBoxEditor{
         KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)
         KeyStroke up = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)
         KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+        KeyStroke semicolon = KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, 0)
         
         def inputMap = textPane.getInputMap()
         def actionMap = textPane.getActionMap()
@@ -80,8 +81,13 @@ class ContactChooserEditor extends BasicComboBoxEditor{
         Action upAction = actionMap.get(upKey)
         actionMap.put(upKey, new MyAction("selectPrevious", false, upAction))
         
+        def enterAction = new EnterAction()
         Object enterKey = inputMap.get(enter)
-        actionMap.put(enterKey, new EnterAction())
+        actionMap.put(enterKey, enterAction)
+        
+        Object semicolonKey = new Object()
+        inputMap.put(semicolon, semicolonKey)
+        actionMap.put(semicolonKey, enterAction)
      
     }
     

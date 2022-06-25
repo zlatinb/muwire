@@ -19,7 +19,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
 class ContactChooserTextPane extends JTextPane {
-    private static final String SEPARATOR_STRING = "\n"
+    private static final String SEPARATOR_STRING = ";"
     private final UISettings settings
     
     ContactChooserTextPane(UISettings settings) {
@@ -31,7 +31,10 @@ class ContactChooserTextPane extends JTextPane {
     String getLatestText() {
         String allText = getText()
         int pos = getStartOffset()
-        allText.substring(pos).trim()
+        allText = allText.substring(pos).trim()
+        if (allText.endsWith(SEPARATOR_STRING))
+            allText = allText.substring(0, allText.length() - SEPARATOR_STRING.length())
+        allText
     }
     
     private int getStartOffset() {
