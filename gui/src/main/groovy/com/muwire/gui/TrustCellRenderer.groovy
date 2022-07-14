@@ -2,6 +2,8 @@ package com.muwire.gui
 
 import com.muwire.core.trust.TrustLevel
 
+import javax.swing.JLabel
+
 import static com.muwire.gui.Translator.trans
 
 import javax.swing.Icon
@@ -18,6 +20,7 @@ class TrustCellRenderer extends DefaultTableCellRenderer {
         trusted = new ImageIcon(getClass().getClassLoader().getResource("trusted.png"))
         neutral = new ImageIcon(getClass().getClassLoader().getResource("neutral.png"))
         distrusted = new ImageIcon(getClass().getClassLoader().getResource("distrusted.png"))
+        setHorizontalAlignment(CENTER)
     }
 
     @Override
