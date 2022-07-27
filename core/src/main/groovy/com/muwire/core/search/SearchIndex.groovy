@@ -10,7 +10,7 @@ import com.muwire.core.SplitPattern
  */
 class SearchIndex {
 
-    
+    private boolean closed
     private final SearchIndexImpl actualSearchIndex
     
     SearchIndex(String name) {
@@ -18,10 +18,14 @@ class SearchIndex {
     }
     
     synchronized void add(String string) {
+        if (closed)
+            return
         actualSearchIndex.add(string, split(string))
     }
 
     synchronized void remove(String string) {
+        if (closed)
+            return
         actualSearchIndex.remove(string, split(string))
     }
 
@@ -41,9 +45,17 @@ class SearchIndex {
         rv.toArray(new String[0])
     }
 
-    String[] search(List<String> terms) {
+    synchronized String[] search(List<String> terms) {
+        if (closed)
+            return new String[0]
         return actualSearchIndex.search(terms)
     }
     
+    synchronized void close() {
+        if (closed)
+            return
+        closed = true
+        actualSearchIndex.close()
+    }
 
 }

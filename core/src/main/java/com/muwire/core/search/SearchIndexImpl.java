@@ -15,13 +15,19 @@ public class SearchIndexImpl {
     
     private final SkipList<String, int[]> keywords;
     private final SkipList<Integer, String[]> hashes;
+    private final BlockFile blockFile;
     
     SearchIndexImpl(String name) throws IOException {
-        BlockFile blockFile = new BlockFile(name, true);
+        blockFile = new BlockFile(name, true);
         keywords = blockFile.makeIndex("keywords", new StringSerializer(), new HashArraySerializer());
         hashes = blockFile.makeIndex("hashes", new HashSerializer(), new StringArraySerializer2());
     }
 
+    void close() {
+        try {
+            blockFile.close();
+        } catch (IOException iox) {}
+    }
     
     void add(String string, String [] split) throws IOException {
         final int hash = string.hashCode();

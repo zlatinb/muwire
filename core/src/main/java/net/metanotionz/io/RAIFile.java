@@ -58,16 +58,17 @@ public class RAIFile implements RandomAccessInterface {
 	}
 	
 	private static class FileChunk {
+		private final File file;
 		private final int index;
 		private final ByteBuffer byteBuffer;
 		private final FileChannel fileChannel;
 		
 		FileChunk(int index, String prefix) throws IOException {
 			this.index = index;
-			File f = File.createTempFile(prefix,"db" + index);
-			f.createNewFile();
-			f.deleteOnExit();
-			fileChannel = (FileChannel) Files.newByteChannel(f.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
+			file = File.createTempFile(prefix,"db" + index);
+			file.createNewFile();
+			file.deleteOnExit();
+			fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
 			byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, MAX_SIZE);
 		}
 		
@@ -78,6 +79,7 @@ public class RAIFile implements RandomAccessInterface {
 		void close() throws IOException {
 			fileChannel.close();
 			DataUtil.tryUnmap(byteBuffer);
+			file.delete();
 		}
 	}
 	
@@ -135,7 +137,6 @@ public class RAIFile implements RandomAccessInterface {
 	}
 
 	// Closeable Methods
-	// TODO May need to change.
 	public void close()	throws IOException { 
 		for (FileChunk chunk : chunkList)
 			chunk.close();

@@ -651,6 +651,8 @@ public class Core {
         persisterFolderService.stop()
         log.info("shutting down collection manager")
         collectionManager.stop()
+        log.info("shutting down file manager")
+        fileManager.close()
         log.info("shutting down download manager")
         downloadManager.shutdown()
         log.info("shutting down connection acceptor")

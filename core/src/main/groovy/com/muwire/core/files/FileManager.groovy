@@ -423,6 +423,12 @@ class FileManager {
         }
     }
     
+    public void close() {
+        INDEX_IO.shutdownNow()
+        pathIndex.close()
+        index.close()
+    }
+    
     private static class DirDeletionCallback implements FileTreeCallback<SharedFile> {
         
         final List<File> subDirs = new ArrayList<>()

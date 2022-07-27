@@ -96,7 +96,8 @@ class CollectionManager {
     }
     
     void stop() {
-        diskIO.shutdown()
+        diskIO.shutdownNow()
+        index.close()
     }
     
     private void load() {

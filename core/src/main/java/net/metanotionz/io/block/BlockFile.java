@@ -496,9 +496,6 @@ public class BlockFile implements Closeable {
 
 	/**
 	 *  Closes all open skiplists and then the blockfile itself.
-	 *
-	 *  Note (I2P)
-	 *  Does NOT close the RAF / RAI.
 	 */
 	public void close() throws IOException {
 		// added I2P
@@ -514,5 +511,7 @@ public class BlockFile implements Closeable {
 		// Unmount.
 		file.seek(BlockFile.OFFSET_MOUNTED);
 		file.writeShort(0);
+		
+		file.close();
 	}
 }
