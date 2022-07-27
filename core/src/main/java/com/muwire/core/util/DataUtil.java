@@ -34,6 +34,16 @@ public class DataUtil {
         return false;
     }
     
+    private static final Set<Character> BASE64_CHARS = new HashSet<>();
+    static {
+        for (int i = 0; i < Base64.ALPHABET_I2P.length(); i++)
+            BASE64_CHARS.add(Base64.ALPHABET_I2P.charAt(i));
+    }
+    
+    public static boolean validBase64(char c) {
+        return BASE64_CHARS.contains(c);
+    }
+    
     private final static int MAX_SHORT = (0x1 << 16) - 1;
 
     static void writeUnsignedShort(int value, OutputStream os) throws IOException {

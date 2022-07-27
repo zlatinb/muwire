@@ -45,6 +45,14 @@ class ChatRoomModel {
         null
     }
     
+    PersonaOrProfile getByPersona(Persona persona) {
+        for(PersonaOrProfile pop : members) {
+            if (persona == pop.getPersona())
+                return pop
+        }
+        null
+    }
+    
     class ChatPOP implements PersonaOrProfile {
         final Persona persona
         Icon icon

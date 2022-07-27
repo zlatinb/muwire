@@ -210,7 +210,8 @@ class ChatEntryPane extends JTextPane {
                 continue
             }
             POPLabel label = (POPLabel) component
-            sb.append(label.personaOrProfile.getPersona().getHumanReadableName())
+            sb.append(label.personaOrProfile.getPersona().toBase64())
+            sb.append(AT)
         }
         sb.toString()
     }

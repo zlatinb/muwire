@@ -247,12 +247,12 @@ class ChatRoomView {
         
         if (settings.chatNotifyMentions &&
                 sender.getPersona() != model.core.me &&
-                text.contains("@${model.core.me.getHumanReadableName()}"))
+                text.contains("@${model.core.me.toBase64()}@"))
             chatNotificator.notifyMention()
         
         StyledDocument doc = roomTextArea.getStyledDocument()
         
-        def textField = new ChatEntry(text, settings, model::getByName, timestamp, sender)
+        def textField = new ChatEntry(text, settings, model::getByPersona, timestamp, sender)
         def style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, textField)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)

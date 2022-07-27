@@ -1,11 +1,13 @@
 package com.muwire.gui.chat
 
 import com.muwire.core.Constants
+import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ProfileConstants
+import net.i2p.data.Base64
 
 import javax.swing.BorderFactory
 import javax.swing.JLabel
@@ -24,15 +26,14 @@ class ChatEntry extends JTextPane {
     private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM hh:mm:ss")
 
     private static final char AT = "@".toCharacter()
+    private static final char EQUALS = "=".toCharacter()
 
     private final UISettings settings
-    private final Function<String, PersonaOrProfile> function
+    private final Function<Persona, PersonaOrProfile> function
     
     private final List<ChatToken> tokens = []
     
-    private String currentName
-    
-    ChatEntry(String text, UISettings settings, Function<String, PersonaOrProfile> function,
+    ChatEntry(String text, UISettings settings, Function<Persona, PersonaOrProfile> function,
         long timestamp, PersonaOrProfile sender) {
         super()
         this.settings = settings
@@ -67,21 +68,11 @@ class ChatEntry extends JTextPane {
     
     private abstract class ParsingState {
         protected final StringBuilder stringBuilder = new StringBuilder()
-        protected final int maxSize
         
         protected boolean consumed
         
-        ParsingState(int maxSize) {
-            this.maxSize = maxSize
-        }
-        
         ParsingState process(char c) {
             stringBuilder.append(c)
-            if (stringBuilder.size() > maxSize) {
-                consumed = true
-                tokens << new TextChatToken(stringBuilder.toString())
-                return new TextParsingState()
-            }
             return consume(c)
         }
         
@@ -96,57 +87,42 @@ class ChatEntry extends JTextPane {
     }
     
     private class TextParsingState extends ParsingState {
-        TextParsingState() {
-            super(Integer.MAX_VALUE)
-        }
         @Override
         ParsingState consume(char c) {
             if (c == AT) {
                 consumed = true
                 tokens << new TextChatToken(stringBuilder.toString())
-                return new NameParsingState()
+                return new PersonaParsingState()
             }
             this
         }
     }
     
-    private class NameParsingState extends ParsingState {
-        NameParsingState() {
-            super(Constants.MAX_NICKNAME_LENGTH)
-        }
+    private class PersonaParsingState extends ParsingState {
 
         @Override
         ParsingState consume(char c) {
+            if (c == EQUALS)
+                return this
             if (c == AT) {
-                consumed = true
-                currentName = stringBuilder.toString()
-                return new KeyParsingState()
-            }
-            this
-        }
-    }
-    
-    private class KeyParsingState extends ParsingState {
-        KeyParsingState() {
-            super(32)
-        }
-
-        @Override
-        ParsingState consume(char c) {
-            if (!DataUtil.validBase32(c)) {
-                consumed = true
-                String payload = "${currentName}${stringBuilder.toString()}"
-                tokens << new TextChatToken(payload)
+                String payload = stringBuilder.toString()
+                payload = payload.substring(0, payload.length() - 1)
+                try {
+                    Persona persona = new Persona(
+                            new ByteArrayInputStream(Base64.decode(payload)))
+                    PersonaOrProfile pop = function.apply(persona)
+                    if (pop != null)
+                        tokens << new POPChatToken(pop)
+                    else
+                        tokens << new TextChatToken(payload + "@")
+                } catch (Exception badPersona) {
+                    tokens << new TextChatToken(payload + "@")
+                }
                 return new TextParsingState()
             }
-            if (stringBuilder.length() == maxSize) {
+            if (!DataUtil.validBase64(c)) {
                 consumed = true
-                String readableName = "${currentName}${stringBuilder.toString()}"
-                PersonaOrProfile pop = function.apply(readableName)
-                if (pop != null)
-                    tokens << new POPChatToken(pop)
-                else
-                    tokens << new TextChatToken(readableName)
+                tokens << new TextChatToken(stringBuilder.toString())
                 return new TextParsingState()
             }
             return this
