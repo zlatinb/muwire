@@ -47,6 +47,8 @@ class ChatEntryPane extends JTextPane {
             void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == AT) {
                     lastPoint = getCaret().getMagicCaretPosition()
+                    if (lastPoint == null)
+                        lastPoint = getBounds().getLocation()
                     lastComponent = e.getComponent()
                     if (lastPoint == null || lastComponent == null)
                         return
