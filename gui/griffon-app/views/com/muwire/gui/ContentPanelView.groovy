@@ -80,7 +80,7 @@ class ContentPanelView {
                          tableModel(list : model.hits) {
                              closureColumn(header : trans("SEARCHER"), type : Persona, read : { row -> row.persona})
                              closureColumn(header : trans("KEYWORDS"), type : String, read : {row -> HTMLSanitizer.sanitize(row.keywords.join(" "))})
-                             closureColumn(header : trans("DATE"), type : String, read : {row -> String.valueOf(new Date(row.timestamp))})
+                             closureColumn(header : trans("DATE"), type : Long, read : {row -> row.timestamp})
                          }
                      }   
                 }
@@ -140,6 +140,7 @@ class ContentPanelView {
         hitsTable.rowSorter.setComparator(0, new PersonaComparator())
         hitsTable.rowSorter.addRowSorterListener({evt -> lastHitsSortEvent = evt})
         hitsTable.rowSorter.setSortsOnUpdates(true)
+        hitsTable.setDefaultRenderer(Long.class, new DateRenderer())
         selectionModel = hitsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
