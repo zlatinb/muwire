@@ -37,7 +37,7 @@ abstract class MuLink {
     }
     
     
-    private boolean verify() {
+    protected boolean verify() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         
         baos.write(infoHash.getRoot())
