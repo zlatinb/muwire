@@ -37,7 +37,7 @@ abstract class MuLink {
     }
     
     
-    boolean verify() {
+    private boolean verify() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream()
         
         baos.write(infoHash.getRoot())
@@ -110,12 +110,17 @@ abstract class MuLink {
             if (sigBytes.length != Constants.SIG_TYPE.getSigLen())
                 throw new InvalidMuLinkException("invalid sig key")
             
+            MuLink rv
             if (linkType == LinkType.FILE)
-                return new FileMuLink(p, ih, n, sigBytes, query)
+                rv = new FileMuLink(p, ih, n, sigBytes, query)
             else if (linkType == LinkType.COLLECTION)
-                return new CollectionMuLink(p, ih, n, sigBytes, query)
+                rv = new CollectionMuLink(p, ih, n, sigBytes, query)
+            else 
+                throw new InvalidMuLinkException("unknown type $linkType")
             
-            throw new InvalidMuLinkException("unknown type $linkType")
+            if (!rv.verify())
+                throw new InvalidMuLinkException("failed verification")
+            return rv
         } catch (InvalidMuLinkException e) {
             throw e
         } catch (Exception e) {

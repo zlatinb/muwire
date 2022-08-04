@@ -95,8 +95,6 @@ class MainFrameController {
         if(search.startsWith("muwire://")) {
             try {
                 MuLink link = MuLink.parse(search)
-                if(!link.verify())
-                    throw new InvalidMuLinkException("failed verification")
                 if (link.getLinkType() == MuLink.LinkType.FILE)
                     downloadLink((FileMuLink)link)
                 else if (link.getLinkType() == MuLink.LinkType.COLLECTION)
