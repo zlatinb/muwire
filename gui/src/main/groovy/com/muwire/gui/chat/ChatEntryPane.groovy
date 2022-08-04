@@ -1,8 +1,12 @@
 package com.muwire.gui.chat
 
-
+import com.muwire.gui.CopyPasteSupport
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
+import com.muwire.gui.mulinks.CollectionMuLink
+import com.muwire.gui.mulinks.FileMuLink
+import com.muwire.gui.mulinks.InvalidMuLinkException
+import com.muwire.gui.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ProfileConstants
 import sun.swing.UIAction
@@ -14,6 +18,7 @@ import javax.swing.event.MenuKeyListener
 import javax.swing.text.*
 import java.awt.*
 import java.awt.event.ActionEvent
+import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.util.List
@@ -90,6 +95,10 @@ class ChatEntryPane extends JTextPane {
         KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
         Object enterObject = inputMap.get(enter)
         actionMap.put(enterObject, noAction)
+        
+        Action originalPasteAction = actionMap.get(DefaultEditorKit.pasteAction)
+        Action linkPasteAction = new LinkPasteAction(originalPasteAction)
+        actionMap.put(DefaultEditorKit.pasteAction, linkPasteAction)
     }
 
     private String getTextSinceAt(){
@@ -211,9 +220,17 @@ class ChatEntryPane extends JTextPane {
                 sb.append(c)
                 continue
             }
-            POPLabel label = (POPLabel) component
-            sb.append(label.personaOrProfile.getPersona().toBase64())
-            sb.append(AT)
+            if (component instanceof POPLabel) {
+                POPLabel label = (POPLabel) component
+                sb.append(label.personaOrProfile.getPersona().toBase64())
+                sb.append(AT)
+            }
+            if (component instanceof MuLinkLabel) {
+                MuLinkLabel label = (MuLinkLabel) component
+                sb.append("<")
+                sb.append(label.link.toLink())
+                sb.append(">")
+            }
         }
         sb.toString()
     }
@@ -256,12 +273,47 @@ class ChatEntryPane extends JTextPane {
                         position++
                 }
             } else {
-                while (position > 0) {
+                while (position >= 0) {
                     if (!isInComponent(position))
                         break
                     delegate.actionPerformed(e)
                     position--
                 }
+            }
+        }
+    }
+    
+    private class LinkPasteAction extends UIAction {
+        private final Action delegate
+        LinkPasteAction(Action delegate) {
+            super("Paste")
+            this.delegate = delegate
+        }
+
+        @Override
+        void actionPerformed(ActionEvent e) {
+            if(!CopyPasteSupport.canPasteString())
+                return
+
+
+            String string = CopyPasteSupport.pasteFromClipboard()
+            try {
+                MuLink link = MuLink.parse(string)
+                JLabel label = null
+                if (link.getLinkType() == MuLink.LinkType.FILE) {
+                    label = new FileLinkLabel((FileMuLink) link, settings, true)
+                } else if (link.getLinkType() == MuLink.LinkType.COLLECTION) {
+                    label = new CollectionLinkLabel((CollectionMuLink)link, settings, true)
+                }
+
+                final int position = getCaret().getDot()
+                StyledDocument document = getStyledDocument()
+                Style style = document.addStyle("newStyle", null)
+                StyleConstants.setComponent(style, label)
+                document.insertString(position, " ", style)
+                
+            } catch (InvalidMuLinkException notALink) {
+                delegate.actionPerformed(e)
             }
         }
     }
