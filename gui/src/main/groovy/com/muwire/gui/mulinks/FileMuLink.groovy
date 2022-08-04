@@ -18,7 +18,8 @@ class FileMuLink extends MuLink {
     throws InvalidMuLinkException {
         super(host, infoHash, name, sig, LinkType.FILE)
         
-        int fileSize, pieceSizePow2
+        long fileSize
+        int pieceSizePow2
         try {
             fileSize = Long.parseLong(query.fileSize)
             pieceSizePow2 = Integer.parseInt(query.pieceSizePow2)
