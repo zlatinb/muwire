@@ -3,7 +3,8 @@ package com.muwire.gui.chat
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.SizeFormatter
 import com.muwire.gui.UISettings
-import com.muwire.gui.mulinks.CollectionMuLink 
+import com.muwire.gui.mulinks.CollectionMuLink
+import static com.muwire.gui.Translator.trans
 
 class CollectionLinkLabel extends MuLinkLabel {
     CollectionLinkLabel(CollectionMuLink link, UISettings settings, boolean border) {
@@ -17,6 +18,7 @@ class CollectionLinkLabel extends MuLinkLabel {
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(link.totalSize, sb)
         
-        return HTMLSanitizer.escape(link.name) + " (" + link.numFiles + " files " + sb.toString()+")"
+        return HTMLSanitizer.escape(link.name) + " (" + link.numFiles + " files " + 
+                sb.toString() + trans("BYTES_SHORT") + ")"
     }
 }

@@ -3,7 +3,9 @@ package com.muwire.gui.chat
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.SizeFormatter
 import com.muwire.gui.UISettings
-import com.muwire.gui.mulinks.FileMuLink 
+import com.muwire.gui.mulinks.FileMuLink
+
+import static com.muwire.gui.Translator.trans
 
 class FileLinkLabel extends MuLinkLabel {
     
@@ -17,6 +19,6 @@ class FileLinkLabel extends MuLinkLabel {
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(link.fileSize, sb)
         
-        HTMLSanitizer.escape(link.name) + " (" + sb.toString() + ")"
+        HTMLSanitizer.escape(link.name) + " (" + sb.toString() + trans("BYTES_SHORT") + ")"
     }
 }
