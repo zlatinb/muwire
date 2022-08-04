@@ -18,7 +18,7 @@ class CollectionLinkLabel extends MuLinkLabel {
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(link.totalSize, sb)
         
-        return HTMLSanitizer.escape(link.name) + " (" + link.numFiles + " files " + 
-                sb.toString() + trans("BYTES_SHORT") + ")"
+        return HTMLSanitizer.escape(link.name) + " (" + link.numFiles + " " + trans("FILES") + 
+                " " + sb.toString() + trans("BYTES_SHORT") + ")"
     }
 }
