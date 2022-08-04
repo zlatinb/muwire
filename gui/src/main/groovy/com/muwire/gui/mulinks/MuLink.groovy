@@ -112,6 +112,9 @@ abstract class MuLink {
             
             if (linkType == LinkType.FILE)
                 return new FileMuLink(p, ih, n, sigBytes, query)
+            else if (linkType == LinkType.COLLECTION)
+                return new CollectionMuLink(p, ih, n, sigBytes, query)
+            
             throw new InvalidMuLinkException("unknown type $linkType")
         } catch (InvalidMuLinkException e) {
             throw e

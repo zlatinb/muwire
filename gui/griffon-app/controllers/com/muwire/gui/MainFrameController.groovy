@@ -6,6 +6,7 @@ import com.muwire.core.files.directories.WatchedDirectory
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.gui.MainFrameModel.UploaderWrapper
+import com.muwire.gui.mulinks.CollectionMuLink
 import com.muwire.gui.mulinks.FileMuLink
 import com.muwire.gui.mulinks.InvalidMuLinkException
 import com.muwire.gui.mulinks.MuLink
@@ -98,6 +99,8 @@ class MainFrameController {
                     throw new InvalidMuLinkException("failed verification")
                 if (link.getLinkType() == MuLink.LinkType.FILE)
                     downloadLink((FileMuLink)link)
+                else if (link.getLinkType() == MuLink.LinkType.COLLECTION)
+                    fetchCollectionLink((CollectionMuLink)link)
             } catch (InvalidMuLinkException e) {
                 JOptionPane.showMessageDialog(null, trans("INVALID_MULINK"),
                     trans("INVALID_MULINK"), JOptionPane.WARNING_MESSAGE)
@@ -236,6 +239,20 @@ class MainFrameController {
             length: link.fileSize,
             pieceSizePow2: link.pieceSizePow2)
         core.eventBus.publish event
+    }
+    
+    private void fetchCollectionLink(CollectionMuLink link) {
+        
+        UUID uuid = UUID.randomUUID()
+        
+        def params = [:]
+        params.fileName = link.name
+        params.host = link.host
+        params.infoHashes = [link.infoHash]
+        params.uuid = uuid
+        params.eventBus = core.eventBus
+        
+        mvcGroup.createMVCGroup("collection-tab", uuid.toString(), params)
     }
     
     private List<Downloader> selectedDownloads() {
@@ -909,6 +926,16 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void copyCollectionLink() {
+        int row = view.selectedCollectionRow()
+        if (row < 0)
+            return
+        FileCollection collection = model.localCollections.get(row)
+        MuLink link = new CollectionMuLink(collection, core.me, core.spk)
+        CopyPasteSupport.copyToClipboard(link.toLink())
+    }
+    
+    @ControllerAction
     void copyCollectionHash() {
         int row = view.selectedCollectionRow()
         if (row < 0)
@@ -916,10 +943,7 @@ class MainFrameController {
         FileCollection collection = model.localCollections.get(row)
         
         String b64 = Base64.encode(collection.getInfoHash().getRoot())
-        
-        StringSelection selection = new StringSelection(b64)
-        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-        clipboard.setContents(selection, null)
+        CopyPasteSupport.copyToClipboard(b64)
     }
     
     @ControllerAction

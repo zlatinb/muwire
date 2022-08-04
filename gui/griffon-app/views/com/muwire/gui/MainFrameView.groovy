@@ -2291,6 +2291,11 @@ class MainFrameView {
         FileCollection collection = model.localCollections.get(row)
         
         JPopupMenu menu = new JPopupMenu()
+        
+        JMenuItem copyLinkToClipboard = new JMenuItem(trans("COPY_LINK_TO_CLIPBOARD"))
+        copyLinkToClipboard.addActionListener({controller.copyCollectionLink()})
+        menu.add(copyLinkToClipboard)
+        
         JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
         copyHashToClipboard.addActionListener({controller.copyCollectionHash()})
         menu.add(copyHashToClipboard)
