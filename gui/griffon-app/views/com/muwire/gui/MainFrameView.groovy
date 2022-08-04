@@ -6,6 +6,8 @@ import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatFavorites
+import com.muwire.gui.mulinks.FileMuLink
+import com.muwire.gui.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -1579,9 +1581,17 @@ class MainFrameView {
             if (iterator.hasNext())
                 roots += "\n"
         }
-        StringSelection selection = new StringSelection(roots)
-        def clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
-        clipboard.setContents(selection, null)
+        CopyPasteSupport.copyToClipboard(roots)
+    }
+    
+    void copyLinkToClipboard() {
+        def selectedFiles = selectedSharedFiles()
+        if (selectedFiles == null || selectedFiles.size() != 1)
+            return
+        
+        SharedFile sf = selectedFiles[0]
+        MuLink link = new FileMuLink(sf, model.core.me, model.core.spk )
+        CopyPasteSupport.copyToClipboard(link.toLink())
     }
 
     def copySearchToClipboard(JTable searchesTable) {
@@ -1868,6 +1878,10 @@ class MainFrameView {
             JMenuItem openFile = new JMenuItem(trans("OPEN"))
             openFile.addActionListener({mvcGroup.controller.open()})
             sharedFilesMenu.add(openFile)
+            
+            JMenuItem copyLinkToClipboard = new JMenuItem(trans("COPY_LINK_TO_CLIPBOARD"))
+            copyLinkToClipboard.addActionListener({mvcGroup.view.copyLinkToClipboard()})
+            sharedFilesMenu.add(copyLinkToClipboard)
         }
         
         JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
