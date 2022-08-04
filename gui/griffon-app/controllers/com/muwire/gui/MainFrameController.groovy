@@ -1,10 +1,14 @@
 package com.muwire.gui
 
+import com.muwire.core.download.UIDownloadLinkEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.directories.WatchedDirectory
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.gui.MainFrameModel.UploaderWrapper
+import com.muwire.gui.mulinks.FileMuLink
+import com.muwire.gui.mulinks.InvalidMuLinkException
+import com.muwire.gui.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.TrustPOP
 import com.muwire.gui.profile.ViewProfileHelper
@@ -83,13 +87,28 @@ class MainFrameController {
     void search(ActionEvent evt) {
         if (evt?.getActionCommand() == null)
             return
-        def cardsPanel = builder.getVariable("cards-panel")
-        cardsPanel.getLayout().show(cardsPanel, "search window")
 
-        def searchField = builder.getVariable("search-field") 
-        def search = searchField.getSelectedItem()
-        searchField.model.addElement(search)
-        performSearch(search, null)
+        def searchField = builder.getVariable("search-field")
+        String search = searchField.getSelectedItem()
+        
+        if(search.startsWith("muwire://")) {
+            try {
+                MuLink link = MuLink.parse(search)
+                if(!link.verify())
+                    throw new InvalidMuLinkException("failed verification")
+                if (link.getLinkType() == MuLink.LinkType.FILE)
+                    downloadLink((FileMuLink)link)
+            } catch (InvalidMuLinkException e) {
+                JOptionPane.showMessageDialog(null, trans("INVALID_MULINK"),
+                    trans("INVALID_MULINK"), JOptionPane.WARNING_MESSAGE)
+            }
+        } else {
+            searchField.model.addElement(search)
+            performSearch(search, null)
+
+            def cardsPanel = builder.getVariable("cards-panel")
+            cardsPanel.getLayout().show(cardsPanel, "search window")
+        }
     }
     
     void repeatSearch(String terms, Integer tab, Boolean regex) {
@@ -207,6 +226,16 @@ class MainFrameController {
         core.eventBus.publish(new QueryEvent(searchEvent : searchEvent, firstHop : true, local: true,
             replyTo: core.me.destination, receivedOn: core.me.destination,
             originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : sig2))
+    }
+    
+    private void downloadLink(FileMuLink link) {
+        view.showDownloadsWindow.call()
+        def event = new UIDownloadLinkEvent(host: link.host,
+            infoHash: link.infoHash,
+            fileName: link.name,
+            length: link.fileSize,
+            pieceSizePow2: link.pieceSizePow2)
+        core.eventBus.publish event
     }
     
     private List<Downloader> selectedDownloads() {

@@ -95,6 +95,17 @@ public class DownloadManager {
 
     }
     
+    void onUIDownloadLinkEvent(UIDownloadLinkEvent e) {
+        Set<Destination> singleSource = new HashSet<>()
+        singleSource.add(e.host.destination)
+        
+        File target = muSettings.downloadLocation
+        target = new File(target, e.fileName)
+        
+        // TODO: sequential
+        doDownload(e.infoHash, target, null, e.length, e.pieceSizePow2, false, singleSource, null)
+    }
+    
     public void onUIDownloadFeedItemEvent(UIDownloadFeedItemEvent e) {
         Set<Destination> singleSource = new HashSet<>()
         singleSource.add(e.item.getPublisher().getDestination())

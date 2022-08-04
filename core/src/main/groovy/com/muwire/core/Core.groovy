@@ -1,5 +1,6 @@
 package com.muwire.core
 
+import com.muwire.core.download.UIDownloadLinkEvent
 import com.muwire.core.files.InfoHashEvent
 import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
@@ -469,6 +470,7 @@ public class Core {
         eventBus.register(DownloadHopelessEvent.class, downloadManager)
         eventBus.register(UIDownloadCollectionEvent.class, downloadManager)
         eventBus.register(UIDownloadAttachmentEvent.class, downloadManager)
+        eventBus.register(UIDownloadLinkEvent.class, downloadManager)
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, 
