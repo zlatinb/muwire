@@ -231,7 +231,7 @@ class MainFrameController {
             originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : sig2))
     }
     
-    private void downloadLink(FileMuLink link) {
+    void downloadLink(FileMuLink link) {
         view.showDownloadsWindow.call()
         def event = new UIDownloadLinkEvent(host: link.host,
             infoHash: link.infoHash,
@@ -241,7 +241,7 @@ class MainFrameController {
         core.eventBus.publish event
     }
     
-    private void fetchCollectionLink(CollectionMuLink link) {
+    void fetchCollectionLink(CollectionMuLink link) {
         
         UUID uuid = UUID.randomUUID()
         

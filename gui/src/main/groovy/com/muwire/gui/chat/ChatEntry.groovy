@@ -1,25 +1,25 @@
 package com.muwire.gui.chat
 
-import com.muwire.core.Constants
+
 import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
+import com.muwire.gui.mulinks.FileMuLink
+import com.muwire.gui.mulinks.InvalidMuLinkException
+import com.muwire.gui.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
-import com.muwire.gui.profile.ProfileConstants
 import net.i2p.data.Base64
 
-import javax.swing.BorderFactory
-import javax.swing.JLabel
-import javax.swing.JTextPane
+import javax.swing.*
 import javax.swing.border.Border
 import javax.swing.text.Document
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
-import java.awt.Dimension
 import java.text.SimpleDateFormat
-import java.util.function.Function
+import java.util.function.Consumer
+import java.util.function.Function 
 
 class ChatEntry extends JTextPane {
 
@@ -27,17 +27,22 @@ class ChatEntry extends JTextPane {
 
     private static final char AT = "@".toCharacter()
     private static final char EQUALS = "=".toCharacter()
+    private static final char LT = "<".toCharacter()
+    private static final char GT = ">".toCharacter() 
 
     private final UISettings settings
     private final Function<Persona, PersonaOrProfile> function
+    private final Consumer<MuLink> linkConsumer
     
     private final List<ChatToken> tokens = []
     
     ChatEntry(String text, UISettings settings, Function<Persona, PersonaOrProfile> function,
+            Consumer<MuLink> linkConsumer,
         long timestamp, PersonaOrProfile sender) {
         super()
         this.settings = settings
         this.function = function
+        this.linkConsumer = linkConsumer
         setEditable(false)
         setAlignmentY(0f)
 
@@ -94,6 +99,12 @@ class ChatEntry extends JTextPane {
                 tokens << new TextChatToken(stringBuilder.toString())
                 return new PersonaParsingState()
             }
+            if (c == LT) {
+                consumed = true
+                stringBuilder.setLength(stringBuilder.length() - 1)
+                tokens << new TextChatToken(stringBuilder.toString())
+                return new MuLinkParsingState()
+            }
             this
         }
     }
@@ -123,6 +134,25 @@ class ChatEntry extends JTextPane {
             if (!DataUtil.validBase64(c)) {
                 consumed = true
                 tokens << new TextChatToken(stringBuilder.toString())
+                return new TextParsingState()
+            }
+            return this
+        }
+    }
+    
+    private class MuLinkParsingState extends ParsingState {
+
+        @Override
+        ParsingState consume(char c) {
+            if (c == GT) {
+                stringBuilder.setLength(stringBuilder.length() - 1)
+                String payload = stringBuilder.toString()
+                try {
+                    MuLink link = MuLink.parse(payload)
+                    tokens << new LinkChatToken(link)
+                } catch (InvalidMuLinkException e) {
+                    tokens << new TextChatToken(payload + ">")
+                }
                 return new TextParsingState()
             }
             return this
@@ -160,6 +190,23 @@ class ChatEntry extends JTextPane {
             StyleConstants.setComponent(style, popLabel)
             document.insertString(document.getEndPosition().getOffset() - 1,
                     personaOrProfile.getPersona().getHumanReadableName(),
+                    style)
+        }
+    }
+    
+    private class LinkChatToken implements ChatToken {
+        private final MuLink link
+        LinkChatToken(MuLink link){
+            this.link = link
+        }
+        void render() {
+            StyledDocument document = getStyledDocument()
+            JPanel panel = new MuLinkPanel(link, settings, linkConsumer)
+
+            def style = document.addStyle("newStyle", null)
+            StyleConstants.setComponent(style, panel)
+            document.insertString(document.getEndPosition().getOffset() - 1,
+                    " ",
                     style)
         }
     }

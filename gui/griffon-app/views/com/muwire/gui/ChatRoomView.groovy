@@ -1,16 +1,20 @@
 package com.muwire.gui
 
+import com.muwire.core.download.UIDownloadLinkEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatEntry
 import com.muwire.gui.chat.ChatEntryPane
 
 import com.muwire.gui.contacts.POPLabel
+import com.muwire.gui.mulinks.FileMuLink
+import com.muwire.gui.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
 import com.muwire.gui.profile.ProfileConstants
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
+import griffon.core.mvc.MVCGroup
 
 import javax.inject.Inject
 import javax.swing.BorderFactory
@@ -20,6 +24,7 @@ import javax.swing.border.Border
 import javax.swing.text.SimpleAttributeSet
 import java.awt.Dimension
 import java.text.SimpleDateFormat
+import java.util.function.Consumer
 
 import static com.muwire.gui.Translator.trans
 import griffon.inject.MVCMember
@@ -66,6 +71,8 @@ class ChatRoomView {
     def membersTable
     def lastMembersTableSortEvent
     UISettings settings
+    
+    private final Consumer<MuLink> muLinkConsumer = new MuLinkConsumer()
     
     void initUI() {
         settings = application.context.get("ui-settings")
@@ -252,7 +259,7 @@ class ChatRoomView {
         
         StyledDocument doc = roomTextArea.getStyledDocument()
         
-        def textField = new ChatEntry(text, settings, model::getByPersona, timestamp, sender)
+        def textField = new ChatEntry(text, settings, model::getByPersona, muLinkConsumer, timestamp, sender)
         def style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, textField)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)
@@ -269,5 +276,18 @@ class ChatRoomView {
         StyledDocument doc = roomTextArea.getStyledDocument()
         Element element = doc.getParagraphElement(0)
         doc.remove(0, element.getEndOffset())
+    }
+    
+    private class MuLinkConsumer implements Consumer<MuLink> {
+
+        @Override
+        void accept(MuLink muLink) {
+            MVCGroup mainFrame = application.mvcGroupManager.findGroup("MainFrame")
+            if (muLink.getLinkType() == MuLink.LinkType.FILE) {
+                mainFrame.controller.downloadLink(muLink)
+            } else if (muLink.getLinkType() == MuLink.LinkType.COLLECTION) {
+                mainFrame.controller.fetchCollectionLink(muLink)
+            }
+        }
     }
 }
