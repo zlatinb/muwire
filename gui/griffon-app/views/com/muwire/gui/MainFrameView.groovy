@@ -514,8 +514,8 @@ class MainFrameView {
                                             enabled : bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
                                     button(text : trans("COLLECTION_SHOW_HITS"), toolTipText: trans("TOOLTIP_COLLECTIONS_SHOW_HITS"),
                                             enabled : bind {model.deleteCollectionButtonEnabled}, showCollectionToolAction)
-                                    button(text : trans("COPY_HASH_TO_CLIPBOARD"), toolTipText: trans("TOOLTIP_COLLECTIONS_COPY_HASH"),
-                                            enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionHashAction)
+                                    button(text : trans("COPY_LINK_TO_CLIPBOARD"), toolTipText: trans("TOOLTIP_COLLECTIONS_COPY_LINK"),
+                                            enabled : bind {model.deleteCollectionButtonEnabled}, copyCollectionLinkAction)
                                 }
                             }
                         }
