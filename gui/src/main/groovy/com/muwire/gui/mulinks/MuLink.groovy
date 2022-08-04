@@ -8,7 +8,8 @@ import net.i2p.data.Base64
 import net.i2p.data.Signature
 import net.i2p.data.SigningPublicKey
 
-import java.nio.charset.StandardCharsets 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Path
 
 abstract class MuLink {
     
@@ -58,7 +59,6 @@ abstract class MuLink {
         def query = [:]
         query.name = URLEncoder.encode(name, StandardCharsets.UTF_8)
         query.sig = Base64.encode(sig)
-        query.type = linkType.name()
         addQueryElements(query)
         
         def kvs = []
@@ -68,12 +68,10 @@ abstract class MuLink {
         String queryStr = kvs.join("&")
         
         URI uri = new URI(SCHEME,
-            Base64.encode(infoHash.getRoot()),
-            host.toBase64(),
-            PORT,
-            "/",
-            queryStr,
-            null)
+                host.toBase64(), 
+                "/${linkType.name()}/" + Base64.encode(infoHash.getRoot()),
+                queryStr,
+                null)
         uri.toASCIIString()
     }
     
@@ -84,14 +82,21 @@ abstract class MuLink {
             URI uri = new URI(url)
             if (uri.getScheme() != SCHEME)
                 throw new InvalidMuLinkException("Unsupported scheme ${uri.getScheme()}")
-            
-            if (uri.getUserInfo() == null)
-                throw new InvalidMuLinkException("no infohash")
-            InfoHash ih = new InfoHash(Base64.decode(uri.getUserInfo()))
-            
-            if (uri.getHost() == null)
+
+
+            if (uri.getAuthority() == null)
                 throw new InvalidMuLinkException("no persona")
-            Persona p = new Persona(new ByteArrayInputStream(Base64.decode(uri.getHost())))
+            Persona p = new Persona(new ByteArrayInputStream(Base64.decode(uri.getAuthority())))
+
+            if (uri.getPath() == null)
+                throw new InvalidMuLinkException("no path")
+            String [] pathElements = uri.getPath().split("/")
+            if (pathElements.length < 3)
+                throw new InvalidMuLinkException("path elements ${pathElements.length}")
+            
+            LinkType linkType = LinkType.valueOf(pathElements[1])
+            
+            InfoHash ih = new InfoHash(Base64.decode(pathElements[2]))
             
             Map<String,String> query = parseQuery(uri.getQuery())
             
@@ -104,10 +109,6 @@ abstract class MuLink {
             byte[] sigBytes = Base64.decode(query.sig)
             if (sigBytes.length != Constants.SIG_TYPE.getSigLen())
                 throw new InvalidMuLinkException("invalid sig key")
-            
-            if (query.type == null)
-                throw new InvalidMuLinkException("type missing")
-            LinkType linkType = LinkType.valueOf(query.type)
             
             if (linkType == LinkType.FILE)
                 return new FileMuLink(p, ih, n, sigBytes, query)
@@ -132,7 +133,7 @@ abstract class MuLink {
             
             if (rv.containsKey(k))
                 throw new InvalidMuLinkException("duplicate key $k")
-            rv.k = v
+            rv[k] = v
         }
         rv
     }

@@ -33,10 +33,6 @@ class FileMuLink extends MuLink {
             throw new InvalidMuLinkException("invalid size $fileSize")
         if (pieceSizePow2 < FileHasher.MIN_PIECE_SIZE_POW2 || pieceSizePow2 > FileHasher.MAX_PIECE_SIZE_POW2)
             throw new InvalidMuLinkException("invalid piece size $pieceSizePow2")
-
-        Path path = Path.of(name)
-        if (path.getNameCount() != 1)
-            throw new InvalidMuLinkException("name path count ${path.getNameCount()}")
     }
 
     FileMuLink(SharedFile sharedFile, Persona me, SigningPrivateKey spk) {
