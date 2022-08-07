@@ -19,6 +19,7 @@ import griffon.core.mvc.MVCGroup
 import javax.inject.Inject
 import javax.swing.BorderFactory
 import javax.swing.JLabel
+import javax.swing.JMenu
 import javax.swing.JScrollPane
 import javax.swing.border.Border
 import javax.swing.text.SimpleAttributeSet
@@ -200,21 +201,29 @@ class ChatRoomView {
         JMenuItem privateChat = new JMenuItem(trans("START_PRIVATE_CHAT"))
         privateChat.addActionListener({controller.privateMessage()})
         menu.add(privateChat)
-        JMenuItem browse = new JMenuItem(trans("BROWSE"))
-        browse.addActionListener({controller.browse()})
-        menu.add(browse)
+        menu.addSeparator()
         JMenuItem viewProfile = new JMenuItem(trans("VIEW_PROFILE"))
         viewProfile.addActionListener({controller.viewProfile()})
         menu.add(viewProfile)
+        menu.addSeparator()
+        JMenuItem browse = new JMenuItem(trans("BROWSE"))
+        browse.addActionListener({controller.browse()})
+        menu.add(browse)
+
+        menu.addSeparator()
+        
+        JMenu otherActionsMenu = new JMenu(trans("OTHER_ACTIONS"))
         JMenuItem markTrusted = new JMenuItem(trans("MARK_TRUSTED"))
         markTrusted.addActionListener({controller.markTrusted()})
-        menu.add(markTrusted)
+        otherActionsMenu.add(markTrusted)
         JMenuItem markNeutral = new JMenuItem(trans("MARK_NEUTRAL"))
         markNeutral.addActionListener({controller.markNeutral()})
-        menu.add(markNeutral)
+        otherActionsMenu.add(markNeutral)
         JMenuItem markDistrusted = new JMenuItem(trans("MARK_DISTRUSTED"))
         markDistrusted.addActionListener({controller.markDistrusted()})
-        menu.add(markDistrusted)
+        otherActionsMenu.add(markDistrusted)
+        menu.add(otherActionsMenu)
+        
         menu.show(e.getComponent(), e.getX(), e.getY())
     }
     
