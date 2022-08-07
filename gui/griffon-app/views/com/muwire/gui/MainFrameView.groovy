@@ -20,6 +20,7 @@ import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.DropMode
 import javax.swing.JButton
+import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 import javax.swing.JTextField
@@ -1884,37 +1885,51 @@ class MainFrameView {
             JMenuItem openFile = new JMenuItem(trans("OPEN"))
             openFile.addActionListener({mvcGroup.controller.open()})
             sharedFilesMenu.add(openFile)
+
+            JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
+            openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
+            sharedFilesMenu.add(openContainingFolder)
+            
+            sharedFilesMenu.addSeparator()
             
             JMenuItem copyLinkToClipboard = new JMenuItem(trans("COPY_LINK_TO_CLIPBOARD"))
             copyLinkToClipboard.addActionListener({mvcGroup.view.copyLinkToClipboard()})
             sharedFilesMenu.add(copyLinkToClipboard)
+            
+            JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
+            copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
+            sharedFilesMenu.add(copyHashToClipboard)
+            
+            sharedFilesMenu.addSeparator()
         }
-        
-        JMenuItem copyHashToClipboard = new JMenuItem(trans("COPY_HASH_TO_CLIPBOARD"))
-        copyHashToClipboard.addActionListener({mvcGroup.view.copyHashToClipboard()})
-        sharedFilesMenu.add(copyHashToClipboard)
-        
-        JMenuItem createCollection = new JMenuItem(trans("CREATE_COLLECTION"))
-        createCollection.addActionListener({mvcGroup.controller.collection()})
-        sharedFilesMenu.add(createCollection)
 
         JMenuItem unshareSelectedFiles = new JMenuItem(trans("UNSHARE_SELECTED_FILES"))
         unshareSelectedFiles.addActionListener({mvcGroup.controller.unshareSelectedFile()})
         sharedFilesMenu.add(unshareSelectedFiles)
+        
+        sharedFilesMenu.addSeparator()
+
+        JMenu otherActionsMenu = new JMenu(trans("OTHER_ACTIONS"))
+        
+        JMenuItem createCollection = new JMenuItem(trans("CREATE_COLLECTION"))
+        createCollection.addActionListener({mvcGroup.controller.collection()})
+        otherActionsMenu.add(createCollection)
+
         JMenuItem commentSelectedFiles = new JMenuItem(trans("COMMENT_SELECTED_FILES"))
         commentSelectedFiles.addActionListener({mvcGroup.controller.addComment()})
-        sharedFilesMenu.add(commentSelectedFiles)
+        otherActionsMenu.add(commentSelectedFiles)
         JMenuItem certifySelectedFiles = new JMenuItem(trans("CERTIFY_SELECTED_FILES"))
         certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
-        sharedFilesMenu.add(certifySelectedFiles)
-        JMenuItem openContainingFolder = new JMenuItem(trans("OPEN_CONTAINING_FOLDER"))
-        openContainingFolder.addActionListener({mvcGroup.controller.openContainingFolder()})
-        sharedFilesMenu.add(openContainingFolder)
+        otherActionsMenu.add(certifySelectedFiles)
+        
+        sharedFilesMenu.add(otherActionsMenu)
         if (singleSelectedFile != null) {
+            sharedFilesMenu.addSeparator()
             JMenuItem showFileDetails = new JMenuItem(trans("SHOW_FILE_DETAILS"))
             showFileDetails.addActionListener({ mvcGroup.controller.showFileDetails() })
             sharedFilesMenu.add(showFileDetails)
         } else if (selectedFolders.size() == 1 && model.core.getWatchedDirectoryManager().isWatched(selectedFolders.first())) {
+            sharedFilesMenu.addSeparator()
             JMenuItem configure = new JMenuItem(trans("CONFIGURE"))
             configure.addActionListener({mvcGroup.controller.configureFolder()})
             sharedFilesMenu.add(configure)
