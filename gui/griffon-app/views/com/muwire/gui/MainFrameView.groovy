@@ -2339,7 +2339,9 @@ class MainFrameView {
             trustMenu.add(subscribeItem)
         }
         JMenuItem markNeutralItem = new JMenuItem(trans("REMOVE_CONTACT"))
-        markNeutralItem.addActionListener({mvcGroup.controller.removeContact()})
+        markNeutralItem.addActionListener({
+            trusted ? mvcGroup.controller.removeTrustedContact() :
+                    mvcGroup.controller.removeDistrustedContact()})
         trustMenu.add(markNeutralItem)
         
         if (trusted && model.markDistrustedButtonEnabled) {
