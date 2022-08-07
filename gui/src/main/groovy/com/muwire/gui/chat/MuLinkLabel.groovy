@@ -19,7 +19,8 @@ abstract class MuLinkLabel extends JLabel {
         this.settings = settings
         
         String visibleText = getVisibleText()
-        setText("<html>$visibleText</html>")
+        String nbspd = visibleText.replaceAll(" ", "&nbsp;")
+        setText("<html>$nbspd</html>")
         
         int preferredX = 0, preferredY = 24
 
