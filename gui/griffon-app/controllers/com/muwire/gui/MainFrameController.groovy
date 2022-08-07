@@ -631,6 +631,18 @@ class MainFrameController {
     }
     
     @ControllerAction
+    void attachFiles() {
+        def selectedFiles = view.selectedSharedFiles()
+        if (selectedFiles == null || selectedFiles.isEmpty())
+            return
+        
+        def params = [:]
+        params.selectedFiles = selectedFiles
+        params.core = model.core
+        mvcGroup.createMVCGroup("new-message", UUID.randomUUID().toString(), params)
+    }
+    
+    @ControllerAction
     void addComment() {
         def selectedFiles = view.selectedSharedFiles()
         if (selectedFiles == null || selectedFiles.isEmpty())

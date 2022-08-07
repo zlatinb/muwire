@@ -1921,6 +1921,9 @@ class MainFrameView {
         JMenuItem certifySelectedFiles = new JMenuItem(trans("CERTIFY_SELECTED_FILES"))
         certifySelectedFiles.addActionListener({mvcGroup.controller.issueCertificate()})
         otherActionsMenu.add(certifySelectedFiles)
+        JMenuItem attachSelectedFiles = new JMenuItem(trans("ATTACH_SELECTED_FILES"))
+        attachSelectedFiles.addActionListener({mvcGroup.controller.attachFiles()})
+        otherActionsMenu.add(attachSelectedFiles)
         
         sharedFilesMenu.add(otherActionsMenu)
         if (singleSelectedFile != null) {

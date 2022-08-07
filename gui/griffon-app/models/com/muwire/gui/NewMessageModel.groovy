@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.SharedFile
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaPOP
 
@@ -33,6 +34,7 @@ class NewMessageModel {
     Set<PersonaOrProfile> allPops = new HashSet<>()
     
     List<?> attachments = new ArrayList<>()
+    List<?> selectedFiles
     
     void mvcGroupInit(Map<String, String> args) {
     
@@ -42,6 +44,8 @@ class NewMessageModel {
         if (recipientsPOP != null) {
             allPops.addAll(recipientsPOP)
         }
+        if (selectedFiles != null)
+            attachments.addAll(selectedFiles.collect {fromSF(it)})
         
         if (reply == null)
             return
@@ -67,5 +71,10 @@ class NewMessageModel {
         else
             replySubject = reply.subject
         
+    }
+    
+    static MWMessageAttachment fromSF(SharedFile sharedFile) {
+        return new MWMessageAttachment(sharedFile.getRootInfoHash(), sharedFile.getFile().getName(),
+            sharedFile.getCachedLength(),(byte)sharedFile.getPieceSize())
     }
 }

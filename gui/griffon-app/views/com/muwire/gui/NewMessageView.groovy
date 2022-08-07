@@ -196,7 +196,7 @@ class NewMessageView {
             items.each {
                 def attachment
                 if (it instanceof SharedFile)
-                    attachment = new MWMessageAttachment(new InfoHash(it.getRoot()), it.file.getName(), it.getCachedLength(), (byte)it.pieceSize)
+                    attachment = NewMessageModel.fromSF(it)
                 else
                     attachment = it
                 model.attachments.add(attachment)
