@@ -6,13 +6,13 @@ MuWire is a file publishing and networking tool that protects the identity of it
 
 Users can then use their MuWire identities to publish files, search for files published by others, subscribe to each other’s publications and communicate through chat and messaging. Furthermore, users can establish trust-based relationship with each other where they assign a “trust level” to their contacts. 
 
-The current stable release is available for download at https://muwire.com.  `.zip` bundles built from the latest source code are available on the [continuous integration] page.  The latest plugin build and instructions how to install the plugin are available inside I2P at http://muwire.i2p.  
+The current stable release is available for download at https://muwire.com.  `.zip` bundles built from the latest source code are available on the [continuous integration] page.
 
 You can find technical documentation in the [doc] folder.  Also check out the [Wiki] for various other documentation.
 
 ## Building
 
-You need a JDK version between 11 and 17 inclusive.  Newer versions may not work.  After installing that and setting up the appropriate paths, just type
+You need a JDK version between 11 and 18 inclusive.  Newer versions may not work.  After installing that and setting up the appropriate paths, just type
 
 ```
 ./gradlew clean assemble
@@ -33,10 +33,6 @@ Type
 ```
 
 The setup wizard will ask you for the host and port of an I2P or I2Pd router.
-
-## Running the Web UI / Plugin
-
-There is a Web-based UI under development.  It is intended to be run as a plugin to the Java I2P router.  Instructions how to build it are available at the wiki [Plugin] page.
 
 ## Docker
 
