@@ -350,17 +350,23 @@ class MainFrameView {
                         gridLayout(cols : 1, rows : 2)
                         panel {
                             borderLayout()
-                            panel (constraints : BorderLayout.NORTH) {
-                                label(text : bind {
-                                    if (model.hashingFile == null && model.hashingFiles == 0) {
-                                        trans("YOU_CAN_DRAG_AND_DROP")
-                                    } else if (model.hashingFiles == 1 && model.hashingFile != null) {
-                                        trans("HASHING") + ": " +
-                                            model.hashingFile.getAbsolutePath() + " (" + formatSize(model.hashingFile.length(),"BYTES_SHORT") + ")"
-                                    } else {
-                                        trans("HASHING") + " " + model.hashingFiles + " " + trans("FILES")
-                                    }
-                                })
+                            panel (id: "library-title", constraints : BorderLayout.NORTH) {
+                                cardLayout()
+                                panel(constraints: "library-is-loading") {
+                                    label(text: trans("LIBRARY_IS_LOADING"))
+                                }
+                                panel(constraints: "you-can-drag-and-drop") {
+                                    label(text: bind {
+                                        if (model.hashingFile == null && model.hashingFiles == 0) {
+                                            trans("YOU_CAN_DRAG_AND_DROP")
+                                        } else if (model.hashingFiles == 1 && model.hashingFile != null) {
+                                            trans("HASHING") + ": " +
+                                                    model.hashingFile.getAbsolutePath() + " (" + formatSize(model.hashingFile.length(), "BYTES_SHORT") + ")"
+                                        } else {
+                                            trans("HASHING") + " " + model.hashingFiles + " " + trans("FILES")
+                                        }
+                                    })
+                                }
                             }
                             panel (border : etchedBorder(), constraints : BorderLayout.CENTER) {
                                 borderLayout()
@@ -2472,6 +2478,11 @@ class MainFrameView {
         SizeFormatter.format(size, sb)
         sb.append(suffix)
         sb.toString()
+    }
+    
+    void switchLibraryTitle() {
+        def cardsPanel = builder.getVariable("library-title")
+        cardsPanel.getLayout().show(cardsPanel, "you-can-drag-and-drop")
     }
 
     private class MWTransferHandler extends TransferHandler {

@@ -407,6 +407,7 @@ class MainFrameModel {
             libraryDirty = false
             view.magicTreeExpansion()
             filteringEnabled = true
+            view.switchLibraryTitle()
             core.muOptions.trustSubscriptions.each {
                 core.eventBus.publish(new TrustSubscriptionEvent(persona : it, subscribe : true))
             }
