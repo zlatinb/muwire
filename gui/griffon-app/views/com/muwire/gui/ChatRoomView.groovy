@@ -256,10 +256,13 @@ class ChatRoomView {
                 sender.getPersona() != model.core.me &&
                 text.contains("@${model.core.me.toBase64()}@"))
             chatNotificator.notifyMention()
+
+        
+        boolean trusted = model.core.trustService.getLevel(sender.getPersona().getDestination()) == TrustLevel.TRUSTED
+        def textField = new ChatEntry(text, settings, model::getByPersona, muLinkConsumer, timestamp, sender, trusted)
+        
         
         StyledDocument doc = roomTextArea.getStyledDocument()
-        
-        def textField = new ChatEntry(text, settings, model::getByPersona, muLinkConsumer, timestamp, sender)
         def style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, textField)
         doc.insertString(doc.getEndPosition().getOffset() - 1, " ", style)

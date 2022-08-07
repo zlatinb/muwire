@@ -17,6 +17,7 @@ import javax.swing.text.Document
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
+import java.awt.Color
 import java.text.SimpleDateFormat
 import java.util.function.Consumer
 import java.util.function.Function 
@@ -38,7 +39,7 @@ class ChatEntry extends JTextPane {
     
     ChatEntry(String text, UISettings settings, Function<Persona, PersonaOrProfile> function,
             Consumer<MuLink> linkConsumer,
-        long timestamp, PersonaOrProfile sender) {
+        long timestamp, PersonaOrProfile sender, boolean trusted) {
         super()
         this.settings = settings
         this.function = function
@@ -55,7 +56,13 @@ class ChatEntry extends JTextPane {
         StyledDocument doc = getStyledDocument()
         doc.insertString(doc.getEndPosition().getOffset() - 1, SDF.format(new Date(timestamp)) + " ", null)
 
-        Border border = BorderFactory.createEmptyBorder(0, 5, 0, 5)
+        Border border = trusted ? 
+                BorderFactory.createEtchedBorder(Color.GREEN, Color.GREEN) :
+                BorderFactory.createEmptyBorder()
+        
+        border = BorderFactory.createCompoundBorder(border,
+                BorderFactory.createEmptyBorder(0, 5, 0, 5))
+        
         def label = new POPLabel(sender, settings, border, JLabel.TOP)
         def style = doc.addStyle("newStyle", null)
         StyleConstants.setComponent(style, label)
