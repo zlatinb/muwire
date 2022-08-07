@@ -165,16 +165,7 @@ class MainFrameController {
         }
         
         def uuid = UUID.randomUUID()
-        Map<String, Object> params = new HashMap<>()
-        params["search-terms"] = search
-        params["uuid"] = uuid.toString()
-        params["core"] = core
-        params["settings"] = view.settings
-        params["tab"] = tab
-        params["regex"] = regexSearch
-        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
-        model.results[uuid.toString()] = group
-
+        
         def searchEvent
         byte [] payload
         if (hashSearch) {
@@ -188,6 +179,11 @@ class MainFrameController {
                 payload = search.getBytes(StandardCharsets.UTF_8)
             } else {
                 terms = SplitPattern.termify(search)
+                if (terms.length == 0) {
+                    JOptionPane.showMessageDialog(null, trans("INVALID_SEARCH_TERM"),
+                        trans("INVALID_SEARCH_TERM"), JOptionPane.WARNING_MESSAGE)
+                    return
+                }
                 payload = String.join(" ", terms).getBytes(StandardCharsets.UTF_8)
             }
             searchEvent = new SearchEvent(searchTerms : terms, uuid : uuid, oobInfohash: true,
@@ -203,6 +199,15 @@ class MainFrameController {
         replyTo: core.me.destination, receivedOn: core.me.destination,
         originator : core.me, sig : sig.data, queryTime : timestamp, sig2 : DataUtil.signUUID(uuid, timestamp, core.spk)))
 
+        Map<String, Object> params = new HashMap<>()
+        params["search-terms"] = search
+        params["uuid"] = uuid.toString()
+        params["core"] = core
+        params["settings"] = view.settings
+        params["tab"] = tab
+        params["regex"] = regexSearch
+        def group = mvcGroup.createMVCGroup("SearchTab", uuid.toString(), params)
+        model.results[uuid.toString()] = group
     }
 
     void search(String infoHash, String tabTitle) {
