@@ -101,7 +101,6 @@ class ChatEntry extends JTextPane {
             }
             if (c == LT) {
                 consumed = true
-                stringBuilder.setLength(stringBuilder.length() - 1)
                 tokens << new TextChatToken(stringBuilder.toString())
                 return new MuLinkParsingState()
             }
@@ -205,6 +204,7 @@ class ChatEntry extends JTextPane {
 
             def style = document.addStyle("newStyle", null)
             StyleConstants.setComponent(style, panel)
+            document.remove(document.getEndPosition().getOffset() - 2, 1)
             document.insertString(document.getEndPosition().getOffset() - 1,
                     " ",
                     style)
