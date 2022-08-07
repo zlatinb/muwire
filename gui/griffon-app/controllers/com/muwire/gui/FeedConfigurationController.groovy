@@ -31,6 +31,5 @@ class FeedConfigurationController {
     @ControllerAction
     void cancel() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }

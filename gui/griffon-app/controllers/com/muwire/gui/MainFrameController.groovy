@@ -843,7 +843,7 @@ class MainFrameController {
         def params = [:]
         params['core'] = core
         params['feed'] = feed
-        mvcGroup.createMVCGroup("feed-configuration", params)
+        mvcGroup.createMVCGroup("feed-configuration", params).destroy()
     }
     
     @ControllerAction
