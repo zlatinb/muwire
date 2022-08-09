@@ -19,6 +19,9 @@ class DownloadProgressRenderer extends DefaultTableCellRenderer {
     @Override
     JComponent getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
+        if (value == null)
+            return this //TODO investigate
+        
         int percent = -1
         Downloader d = (Downloader) value
         if (d instanceof CopyingDownloader)
