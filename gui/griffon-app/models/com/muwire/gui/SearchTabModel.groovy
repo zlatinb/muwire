@@ -51,7 +51,6 @@ class SearchTabModel {
     Boolean regex
     
     boolean visible
-    private boolean dirty
     List<UIResultEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())
     javax.swing.Timer timer = new javax.swing.Timer(500, {displayBatchedResults()})
     
@@ -120,12 +119,25 @@ class SearchTabModel {
         }
     }
     
+    void setVisible(boolean visible) {
+        boolean oldVisible = this.visible
+        this.visible = visible
+        if (!oldVisible && visible)
+            displayBatchedResults()
+    }
+    
     private void displayBatchedResults() {
+        if (!visible)
+            return
+        
         List<UIResultEvent> copy
         synchronized (pendingResults) {
+            if (pendingResults.isEmpty())
+                return
             copy = new ArrayList<>(pendingResults)
             pendingResults.clear()
         }
+        
         for(UIResultEvent event : copy) {
             if (uiSettings.excludeLocalResult &&
                     core.fileManager.rootToFiles.containsKey(event.infohash))
@@ -152,26 +164,20 @@ class SearchTabModel {
 
             bucket.add event
             senderBucket.results << event
+            
+            view.addResultToDetailMaps(event)
         }
         
-        
-        if (visible) {
-            if (!copy.isEmpty() || dirty) {
-                results2.clear()
-                synchronized (allResults2) {
-                    for (InfoHash ih : hashBucket.keySet()) {
-                        for (UIResultEvent event : hashBucket[ih].getResults())
-                            view.addResultToDetailMaps(event)
-                    }
-                    allResults2.addAll(hashBucket.keySet())
-                    allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
-                }
-                view.addPendingResults()
-                view.updateResultsTable2()
-                dirty = false
-            }
-        } else if (!copy.isEmpty())
-            dirty = true
+        results2.clear()
+        synchronized (allResults2) {
+            allResults2.addAll(copy)
+            if (filter == null)
+                results2.addAll(allResults2)
+            else
+                allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
+        }
+        view.addPendingResults()
+        view.updateResultsTable2()
     }
     
     private static class HashBucket {
