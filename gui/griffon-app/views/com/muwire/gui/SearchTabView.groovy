@@ -85,6 +85,9 @@ class SearchTabView {
     def lastSortEvent
     def lastResults2SortEvent
     
+    // caches the last selected sender to avoid re-rendering of the results
+    int lastSelectedSenderRow = Integer.MIN_VALUE
+    
     def sequentialDownloadCheckbox
     def sequentialDownloadCheckbox2
 
@@ -416,6 +419,9 @@ class SearchTabView {
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
         selectionModel.addListSelectionListener({
             int row = selectedSenderRow()
+            if (row == lastSelectedSenderRow)
+                return
+            lastSelectedSenderRow = row
             if (row < 0) {
                 model.viewProfileActionEnabled = false
                 model.browseActionEnabled = false
@@ -724,7 +730,7 @@ class SearchTabView {
     
     void addPendingResults() {
         JTable table = builder.getVariable("senders-table")
-        int selectedRow = table.getSelectedRow()
+        final int selectedRow = table.getSelectedRow()
         int selectedRowToModel = -1
         if (selectedRow >= 0)
             selectedRowToModel = table.rowSorter.convertRowIndexToModel(selectedRow)
@@ -743,8 +749,10 @@ class SearchTabView {
             } else {
                 table.model.fireTableRowsUpdated(row, row)
             }
-            if (row == selectedRow)
+            if (row == selectedRow) {
+                lastSelectedSenderRow = Integer.MIN_VALUE
                 displayPendingResults(pending)
+            }
         }
 
         if (newRowsStart >= 0 && newRowsEnd >= 0) {
