@@ -168,13 +168,13 @@ class SearchTabModel {
             view.addResultToDetailMaps(event)
         }
         
-        results2.clear()
         synchronized (allResults2) {
-            allResults2.addAll(copy)
-            if (filter == null)
-                results2.addAll(allResults2)
-            else
-                allResults2.stream().filter({ InfoHash ih -> filter(ih) }).forEach({ results2.add it })
+            for (UIResultEvent event : copy) {
+                InfoHash ih = event.getInfohash()
+                allResults2.add ih
+                if (filter(ih))
+                    results2.add(ih)
+            }
         }
         view.addPendingResults()
         view.updateResultsTable2()
