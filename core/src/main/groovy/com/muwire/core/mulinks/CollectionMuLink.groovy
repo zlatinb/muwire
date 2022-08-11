@@ -1,4 +1,4 @@
-package com.muwire.gui.mulinks
+package com.muwire.core.mulinks
 
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona

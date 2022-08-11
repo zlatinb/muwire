@@ -3,7 +3,7 @@ package com.muwire.gui.chat
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.SizeFormatter
 import com.muwire.gui.UISettings
-import com.muwire.gui.mulinks.CollectionMuLink
+import com.muwire.core.mulinks.CollectionMuLink
 import static com.muwire.gui.Translator.trans
 
 class CollectionLinkLabel extends MuLinkLabel {

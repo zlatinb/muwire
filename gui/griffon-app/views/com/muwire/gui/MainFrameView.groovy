@@ -4,10 +4,9 @@ import com.muwire.core.Persona
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
-import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatFavorites
-import com.muwire.gui.mulinks.FileMuLink
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.FileMuLink
+import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
@@ -32,7 +31,6 @@ import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 import java.awt.Image
-import java.awt.KeyboardFocusManager
 import java.awt.TrayIcon
 import java.awt.Window
 import java.awt.event.ActionEvent

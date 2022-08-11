@@ -1,4 +1,4 @@
-package com.muwire.gui.mulinks
+package com.muwire.core.mulinks
 
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
@@ -8,7 +8,6 @@ import net.i2p.crypto.DSAEngine
 import net.i2p.data.SigningPrivateKey
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
 
 class FileMuLink extends MuLink {
     final long fileSize

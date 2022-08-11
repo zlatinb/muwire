@@ -3,12 +3,11 @@ package com.muwire.gui.chat
 import com.muwire.gui.CopyPasteSupport
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
-import com.muwire.gui.mulinks.CollectionMuLink
-import com.muwire.gui.mulinks.FileMuLink
-import com.muwire.gui.mulinks.InvalidMuLinkException
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.CollectionMuLink
+import com.muwire.core.mulinks.FileMuLink
+import com.muwire.core.mulinks.InvalidMuLinkException
+import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
-import com.muwire.gui.profile.ProfileConstants
 import sun.swing.UIAction
 
 import javax.swing.*
@@ -18,7 +17,6 @@ import javax.swing.event.MenuKeyListener
 import javax.swing.text.*
 import java.awt.*
 import java.awt.event.ActionEvent
-import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.util.List

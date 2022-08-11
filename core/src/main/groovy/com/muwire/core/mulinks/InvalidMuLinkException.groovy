@@ -1,4 +1,4 @@
-package com.muwire.gui.mulinks
+package com.muwire.core.mulinks
 
 class InvalidMuLinkException extends Exception {
     InvalidMuLinkException(String message) {

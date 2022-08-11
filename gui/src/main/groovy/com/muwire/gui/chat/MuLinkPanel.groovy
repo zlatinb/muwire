@@ -2,9 +2,9 @@ package com.muwire.gui.chat
 
 import com.muwire.gui.CopyPasteSupport
 import com.muwire.gui.UISettings
-import com.muwire.gui.mulinks.CollectionMuLink
-import com.muwire.gui.mulinks.FileMuLink
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.CollectionMuLink
+import com.muwire.core.mulinks.FileMuLink
+import com.muwire.core.mulinks.MuLink
 
 import static com.muwire.gui.Translator.trans
 

@@ -2,7 +2,7 @@ package com.muwire.gui.chat
 
 
 import com.muwire.gui.UISettings
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.MuLink
 
 import javax.swing.*
 import javax.swing.border.Border

@@ -5,9 +5,8 @@ import com.muwire.core.Persona
 import com.muwire.core.util.DataUtil
 import com.muwire.gui.UISettings
 import com.muwire.gui.contacts.POPLabel
-import com.muwire.gui.mulinks.FileMuLink
-import com.muwire.gui.mulinks.InvalidMuLinkException
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.InvalidMuLinkException
+import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import net.i2p.data.Base64
 

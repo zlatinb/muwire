@@ -6,10 +6,10 @@ import com.muwire.core.files.directories.WatchedDirectory
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.gui.MainFrameModel.UploaderWrapper
-import com.muwire.gui.mulinks.CollectionMuLink
-import com.muwire.gui.mulinks.FileMuLink
-import com.muwire.gui.mulinks.InvalidMuLinkException
-import com.muwire.gui.mulinks.MuLink
+import com.muwire.core.mulinks.CollectionMuLink
+import com.muwire.core.mulinks.FileMuLink
+import com.muwire.core.mulinks.InvalidMuLinkException
+import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.TrustPOP
 import com.muwire.gui.profile.ViewProfileHelper
@@ -28,8 +28,6 @@ import net.i2p.data.Base64
 import net.i2p.data.Signature
 
 import java.awt.Desktop
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
 import java.nio.charset.StandardCharsets
 
@@ -57,15 +55,12 @@ import com.muwire.core.filefeeds.UIDownloadFeedItemEvent
 import com.muwire.core.filefeeds.UIFeedConfigurationEvent
 import com.muwire.core.filefeeds.UIFeedDeletedEvent
 import com.muwire.core.filefeeds.UIFeedUpdateEvent
-import com.muwire.core.filefeeds.UIFilePublishedEvent
-import com.muwire.core.filefeeds.UIFileUnpublishedEvent
 import com.muwire.core.files.FileUnsharedEvent
 import com.muwire.core.search.QueryEvent
 import com.muwire.core.search.SearchEvent
 import com.muwire.core.trust.RemoteTrustList
 import com.muwire.core.trust.TrustEvent
 import com.muwire.core.trust.TrustLevel
-import com.muwire.core.trust.TrustService.TrustEntry
 import com.muwire.core.trust.TrustSubscriptionEvent
 import com.muwire.core.upload.HashListUploader
 import com.muwire.core.upload.Uploader

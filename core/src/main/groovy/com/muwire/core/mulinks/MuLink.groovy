@@ -1,4 +1,4 @@
-package com.muwire.gui.mulinks
+package com.muwire.core.mulinks
 
 import com.muwire.core.Constants
 import com.muwire.core.InfoHash
@@ -9,7 +9,6 @@ import net.i2p.data.Signature
 import net.i2p.data.SigningPublicKey
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
 
 abstract class MuLink {
     
