@@ -62,7 +62,7 @@ abstract class BasePersisterService extends Service{
         SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
         sf.setComment(json.comment)
         if (json.downloaders != null)
-            sf.getDownloaders().addAll(json.downloaders)
+            json.downloaders.each {sf.addDownloader(it)}
         if (json.searchers != null) {
             json.searchers.each {
                 Persona searcher = null
@@ -121,8 +121,8 @@ abstract class BasePersisterService extends Service{
         sf.setComment(json.comment)
         if (published)
             sf.publish(publishedTimestamp)
-        if (json.downloaders != null)
-            sf.getDownloaders().addAll(json.downloaders)
+        if (json.downloaders != null) 
+            json.downloaders.each {sf.addDownloader(it)}
         if (json.searchers != null) {
             json.searchers.each {
                 Persona searcher = null

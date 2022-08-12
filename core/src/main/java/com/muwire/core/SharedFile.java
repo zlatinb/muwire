@@ -31,8 +31,8 @@ public class SharedFile {
     private String b64PathHash;
     
     private volatile String comment;
-    private final Set<String> downloaders = Collections.synchronizedSet(new HashSet<>());
-    private final Set<SearchEntry> searches = Collections.synchronizedSet(new HashSet<>());
+    private Set<String> downloaders = Collections.emptySet();
+    private Set<SearchEntry> searches = Collections.emptySet();
     private volatile boolean published;
     private volatile long publishedTimestamp;
     
@@ -107,6 +107,9 @@ public class SharedFile {
     }
     
     public void hit(Persona searcher, long timestamp, String query) {
+        Set<SearchEntry> empty = Collections.emptySet();
+        if (searches == empty)
+            searches = Collections.synchronizedSet(new HashSet<>());
         searches.add(new SearchEntry(searcher, timestamp, query));
     }
     
@@ -119,6 +122,9 @@ public class SharedFile {
     }
     
     public void addDownloader(String name) {
+        Set<String> empty = Collections.emptySet();
+        if (downloaders == empty)
+            downloaders = Collections.synchronizedSet(new HashSet<>());
         downloaders.add(name);
     }
     

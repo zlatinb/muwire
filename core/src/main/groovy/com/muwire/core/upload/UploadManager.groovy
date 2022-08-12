@@ -137,7 +137,7 @@ public class UploadManager {
             int pieceSize
             boolean confidential = false
             if (!sharedFiles.isEmpty()) {
-                sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
+                sharedFiles.each { it.addDownloader(request.downloader.getHumanReadableName()) }
                 SharedFile sharedFile = sharedFiles.first();
                 mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
                 file = sharedFile.file
@@ -300,7 +300,7 @@ public class UploadManager {
                     file = downloader.incompleteFile
                     pieceSize = downloader.pieceSizePow2
                 } else {
-                    sharedFiles.each { it.getDownloaders().add(request.downloader.getHumanReadableName()) }
+                    sharedFiles.each { it.addDownloader(request.downloader.getHumanReadableName()) }
                     SharedFile sharedFile = sharedFiles[0];
                     mesh = meshManager.getOrCreate(request.infoHash, sharedFile.NPieces, false)
                     file = sharedFile.file
