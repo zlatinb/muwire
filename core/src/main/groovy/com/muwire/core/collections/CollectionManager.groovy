@@ -50,7 +50,7 @@ class CollectionManager {
     private final Map<InfoHash, FileCollection> rootToCollectionRemote = new HashMap<>()
     private final Map<FileCollection, Set<InfoHash>> filesInRemoteCollection = new HashMap<>()
     
-    private final SearchIndex index = new SearchIndex("collectionManager")
+    private final SearchIndex index
     private final Map<String, Set<FileCollection>> nameToCollection = new HashMap<>()
     private final Map<String, Set<FileCollection>> commentToCollection = new HashMap<>()
     
@@ -71,7 +71,12 @@ class CollectionManager {
         remoteCollections = new File(collections, "remote")
         
         localCollections.mkdirs()
-        remoteCollections.mkdirs()        
+        remoteCollections.mkdirs() 
+        
+        File tmp = new File(home, "tmp")
+        if (!tmp.exists())
+            tmp.mkdirs()
+        index = new SearchIndex(tmp, "collectionManager")
     }
 
     synchronized List<FileCollection> getCollections() {

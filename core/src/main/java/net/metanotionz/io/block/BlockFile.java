@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package net.metanotionz.io.block;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -244,7 +245,7 @@ public class BlockFile implements Closeable {
 	}
 
 	/** File must be writable */
-	public BlockFile(String prefix, boolean init) throws IOException { this(new RAIFile(prefix), init); }
+	public BlockFile(File dir, String prefix, boolean init) throws IOException { this(new RAIFile(dir, prefix), init); }
 
 	/** Use this constructor with a readonly RAI and init = false for a readonly blockfile */
 	public BlockFile(RandomAccessInterface rai, boolean init) throws IOException {

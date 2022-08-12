@@ -42,8 +42,9 @@ import java.util.List;
 
 public class RAIFile implements RandomAccessInterface {
 	
-	static final long MAX_SIZE = 0x1 << 20;
+	static final long MAX_SIZE = 0x1 << 26;
 	
+	private final File dir;
 	private final String prefix;
 
 	private final List<FileChunk> chunkList = new ArrayList<>();
@@ -51,9 +52,10 @@ public class RAIFile implements RandomAccessInterface {
 	private FileChunk current;
 	private int maxPosition;
 
-	public RAIFile(String prefix) throws IOException {
+	public RAIFile(File dir, String prefix) throws IOException {
+		this.dir = dir;
 		this.prefix = prefix;
-		chunkList.add(new FileChunk(0, prefix));
+		chunkList.add(new FileChunk(0, dir, prefix));
 		current = chunkList.get(0);
 	}
 	
@@ -63,9 +65,9 @@ public class RAIFile implements RandomAccessInterface {
 		private final ByteBuffer byteBuffer;
 		private final FileChannel fileChannel;
 		
-		FileChunk(int index, String prefix) throws IOException {
+		FileChunk(int index, File dir, String prefix) throws IOException {
 			this.index = index;
-			file = File.createTempFile(prefix,"db" + index);
+			file = new File(dir, prefix + "." + index);
 			file.createNewFile();
 			file.deleteOnExit();
 			fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
@@ -86,7 +88,7 @@ public class RAIFile implements RandomAccessInterface {
 	private void switchChunk(long position) throws IOException {
 		int idx = (int) (position / MAX_SIZE);
 		while(chunkList.size() <= idx)
-			chunkList.add(new FileChunk(chunkList.size(), prefix));
+			chunkList.add(new FileChunk(chunkList.size(), dir, prefix));
 		current = chunkList.get(idx);
 		current.byteBuffer.position((int)(position % MAX_SIZE));
 	}

@@ -10,7 +10,7 @@ class RAIFileTest {
     
     @Before
     void setup() {
-        rf = new RAIFile("test")
+        rf = new RAIFile(new File("."),"test")
     }
     
     @After

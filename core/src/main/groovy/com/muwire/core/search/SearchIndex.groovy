@@ -13,8 +13,8 @@ class SearchIndex {
     private boolean closed
     private final SearchIndexImpl actualSearchIndex
     
-    SearchIndex(String name) {
-        actualSearchIndex = new SearchIndexImpl(name)
+    SearchIndex(File dir, String name) {
+        actualSearchIndex = new SearchIndexImpl(dir, name)
     }
     
     synchronized void add(String string) {

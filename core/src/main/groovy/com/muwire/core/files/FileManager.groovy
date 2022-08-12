@@ -48,8 +48,11 @@ class FileManager {
         this.home = home
         this.settings = settings
         this.eventBus = eventBus
-        this.index = new SearchIndex("fileManager")
-        this.pathIndex = new SearchIndex("fileManagerPaths")
+        File tmp = new File(home, "tmp")
+        if (!tmp.exists())
+            tmp.mkdirs()
+        this.index = new SearchIndex(tmp,"fileManager") 
+        this.pathIndex = new SearchIndex(tmp,"fileManagerPaths")
     }
     
     void setIsWatched(Predicate<File> isWatched) {

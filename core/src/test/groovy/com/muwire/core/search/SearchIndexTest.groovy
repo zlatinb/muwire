@@ -7,7 +7,7 @@ class SearchIndexTest {
     SearchIndex index
 
     private void initIndex(List<String> entries) {
-        index = new SearchIndex("testIndex")
+        index = new SearchIndex(new File("."), "testIndex")
         entries.each {
             index.add(it)
         }
@@ -21,7 +21,7 @@ class SearchIndexTest {
         assert found.size() == 1
         assert found.contains("a b.c")
     }
-
+    
     @Test
     void testSingleTermOverlap() {
         initIndex(["a b.c", "c d.e"])

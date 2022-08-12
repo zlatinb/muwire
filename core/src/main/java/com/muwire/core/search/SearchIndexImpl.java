@@ -17,8 +17,8 @@ public class SearchIndexImpl {
     private final SkipList<Integer, String[]> hashes;
     private final BlockFile blockFile;
     
-    SearchIndexImpl(String name) throws IOException {
-        blockFile = new BlockFile(name, true);
+    SearchIndexImpl(File dir, String name) throws IOException {
+        blockFile = new BlockFile(dir, name, true);
         keywords = blockFile.makeIndex("keywords", new StringSerializer(), new HashArraySerializer());
         hashes = blockFile.makeIndex("hashes", new HashSerializer(), new StringArraySerializer2());
     }
