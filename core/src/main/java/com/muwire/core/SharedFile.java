@@ -102,26 +102,26 @@ public class SharedFile {
         return comment;
     }
     
-    public int getHits() {
+    public synchronized int getHits() {
         return searches.size();
     }
     
-    public void hit(Persona searcher, long timestamp, String query) {
+    public synchronized void hit(Persona searcher, long timestamp, String query) {
         Set<SearchEntry> empty = Collections.emptySet();
         if (searches == empty)
             searches = Collections.synchronizedSet(new HashSet<>());
         searches.add(new SearchEntry(searcher, timestamp, query));
     }
     
-    public Set<String> getDownloaders() {
+    public synchronized Set<String> getDownloaders() {
         return downloaders;
     }
     
-    public Set<SearchEntry> getSearches() {
+    public synchronized Set<SearchEntry> getSearches() {
         return searches;
     }
     
-    public void addDownloader(String name) {
+    public synchronized void addDownloader(String name) {
         Set<String> empty = Collections.emptySet();
         if (downloaders == empty)
             downloaders = Collections.synchronizedSet(new HashSet<>());
