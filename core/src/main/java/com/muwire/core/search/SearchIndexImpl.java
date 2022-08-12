@@ -9,6 +9,11 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 public class SearchIndexImpl {
@@ -18,6 +23,12 @@ public class SearchIndexImpl {
     private final BlockFile blockFile;
     
     SearchIndexImpl(File dir, String name) throws IOException {
+        
+        // delete any stale blockfiles
+        Files.walk(dir.toPath()).
+                filter(path -> {return path.getFileName().toString().startsWith(name);}).
+                forEach(path -> {path.toFile().delete();});
+        
         blockFile = new BlockFile(dir, name, true);
         keywords = blockFile.makeIndex("keywords", new StringSerializer(), new HashArraySerializer());
         hashes = blockFile.makeIndex("hashes", new HashSerializer(), new StringArraySerializer2());
