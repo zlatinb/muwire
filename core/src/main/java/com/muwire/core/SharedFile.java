@@ -28,8 +28,6 @@ public class SharedFile {
     private final long cachedLength;
     private final int hashCode;
 
-    private String b64PathHash;
-    
     private volatile String comment;
     private Set<String> downloaders = Collections.emptySet();
     private Set<SearchEntry> searches = Collections.emptySet();
@@ -54,17 +52,14 @@ public class SharedFile {
         return file;
     }
 
-    public byte[] getPathHash() throws NoSuchAlgorithmException {
+    private byte[] getPathHash() throws NoSuchAlgorithmException {
         MessageDigest digester = MessageDigest.getInstance("SHA-256");
         digester.update(file.getAbsolutePath().getBytes());
         return digester.digest();
     }
 
     public String getB64PathHash() throws NoSuchAlgorithmException {
-        if(b64PathHash == null){
-            b64PathHash = Base64.encode(getPathHash());
-        }
-        return b64PathHash;
+        return Base64.encode(getPathHash());
     }
 
     public byte[] getRoot() {
