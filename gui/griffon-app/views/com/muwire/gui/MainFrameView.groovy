@@ -131,6 +131,7 @@ class MainFrameView {
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         int treeRowHeight = application.context.get("tree-row-height")
+        MuWireSettings muWireSettings = application.context.get("muwire-settings")
         
         def screenDimensions = Toolkit.getDefaultToolkit().getScreenSize()
         int mainFrameX = (int)Math.min(1400.0d, screenDimensions.getWidth())
@@ -744,9 +745,11 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        button(text: "", icon: imageIcon('/update.png'), toolTipText: trans("TOOLTIP_UPDATE"),
-                                enabled: bind {model.updateAvailableEvent != null || model.updateDownloadedEvent != null},
-                                showUpdateAction)
+                        if (!muWireSettings.disableUpdates) {
+                            button(text: "", icon: imageIcon('/update.png'), toolTipText: trans("TOOLTIP_UPDATE"),
+                                    enabled: bind { model.updateAvailableEvent != null || model.updateDownloadedEvent != null },
+                                    showUpdateAction)
+                        }
                         button(text: "", icon: imageIcon('/edit_profile.png'), toolTipText: trans("TOOLTIP_PROFILE_EDITOR"),
                             editProfileAction)
                     }
