@@ -1,21 +1,13 @@
 package com.muwire.core;
 
+import net.i2p.data.Base64;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import com.muwire.core.util.DataUtil;
-
-import net.i2p.data.Base64;
+import java.util.*;
 
 public class SharedFile {
 
@@ -29,8 +21,8 @@ public class SharedFile {
     private final int hashCode;
 
     private volatile String comment;
-    private Set<String> downloaders = Collections.emptySet();
-    private Set<SearchEntry> searches = Collections.emptySet();
+    private List<String> downloaders = Collections.emptyList();
+    private List<SearchEntry> searches = Collections.emptyList();
     private volatile boolean published;
     private volatile long publishedTimestamp;
     
@@ -102,25 +94,28 @@ public class SharedFile {
     }
     
     public synchronized void hit(Persona searcher, long timestamp, String query) {
-        Set<SearchEntry> empty = Collections.emptySet();
+        List<SearchEntry> empty = Collections.emptyList();
         if (searches == empty)
-            searches = Collections.synchronizedSet(new HashSet<>());
-        searches.add(new SearchEntry(searcher, timestamp, query));
+            searches = Collections.synchronizedList(new ArrayList<>());
+        SearchEntry newEntry = new SearchEntry(searcher, timestamp, query);
+        if (!searches.contains(newEntry))
+            searches.add(newEntry);
     }
     
-    public synchronized Set<String> getDownloaders() {
+    public synchronized List<String> getDownloaders() {
         return downloaders;
     }
     
-    public synchronized Set<SearchEntry> getSearches() {
+    public synchronized List<SearchEntry> getSearches() {
         return searches;
     }
     
     public synchronized void addDownloader(String name) {
-        Set<String> empty = Collections.emptySet();
+        List<String> empty = Collections.emptyList();
         if (downloaders == empty)
-            downloaders = Collections.synchronizedSet(new HashSet<>());
-        downloaders.add(name);
+            downloaders = Collections.synchronizedList(new ArrayList<>());
+        if (!downloaders.contains(name))
+            downloaders.add(name);
     }
     
     public void publish(long timestamp) {
