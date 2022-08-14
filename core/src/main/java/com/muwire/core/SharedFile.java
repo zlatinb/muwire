@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+/** State associated with a single shared file */
 public class SharedFile {
 
     private final File file;
@@ -16,8 +17,7 @@ public class SharedFile {
     private final InfoHash rootInfoHash;
     private final int pieceSize;
 
-    private final String cachedPath;
-    private final long cachedLength;
+    private volatile VisualCache visualCache;
     private final int hashCode;
 
     private volatile String comment;
@@ -27,15 +27,12 @@ public class SharedFile {
     
     /** Path to the top-most parent File that is shared.  Null if no such exists */
     private volatile Path pathToSharedParent;
-    private volatile String cachedVisiblePath;
 
     public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
         this.file = file;
         this.root = root;
         this.rootInfoHash = new InfoHash(root);
         this.pieceSize = pieceSize;
-        this.cachedPath = file.getAbsolutePath();
-        this.cachedLength = file.length();
         this.hashCode = Arrays.hashCode(root) ^ file.hashCode();
     }
 
@@ -73,11 +70,13 @@ public class SharedFile {
     }
     
     public String getCachedPath() {
-        return cachedPath;
+        initVisualCache();
+        return visualCache.cachedPath;
     }
 
     public long getCachedLength() {
-        return cachedLength;
+        initVisualCache();
+        return visualCache.cachedLength;
     }
     
     public void setComment(String comment) {
@@ -147,16 +146,6 @@ public class SharedFile {
      */
     public void setPathToSharedParent(Path path) {
         this.pathToSharedParent = path;
-        
-        String shortPath;
-        if (pathToSharedParent.getNameCount() > 1) {
-            Path tmp = pathToSharedParent.subpath(1, pathToSharedParent.getNameCount());
-            shortPath = "..." + File.separator + tmp;
-        } else {
-            shortPath = "...";
-        }
-        shortPath += File.separator + getFile().getName();
-        this.cachedVisiblePath = shortPath;
     }
     
     public Path getPathToSharedParent() {
@@ -164,7 +153,13 @@ public class SharedFile {
     }
     
     public String getCachedVisiblePath() {
-        return cachedVisiblePath;
+        initVisualCache();
+        return visualCache.getCachedVisiblePath();
+    }
+
+    private void initVisualCache() {
+        if (visualCache == null)
+            visualCache = new VisualCache();
     }
     
     @Override
@@ -214,6 +209,35 @@ public class SharedFile {
             return Objects.equals(searcher, other.searcher) &&
                     timestamp == other.timestamp &&
                     query.equals(other.query);
+        }
+    }
+    
+    /** Caches fields accessed by the UI */
+    private class VisualCache {
+        private final String cachedPath;
+        private final long cachedLength;
+        private String cachedVisiblePath;
+        
+        VisualCache() {
+            cachedPath = file.getAbsolutePath();
+            cachedLength = file.length();
+        }
+        
+        private synchronized String getCachedVisiblePath() {
+            if (cachedVisiblePath != null)
+                return cachedVisiblePath;
+            if (pathToSharedParent == null)
+                return null;
+            String shortPath;
+            if (pathToSharedParent.getNameCount() > 1) {
+                Path tmp = pathToSharedParent.subpath(1, pathToSharedParent.getNameCount());
+                shortPath = "..." + File.separator + tmp;
+            } else {
+                shortPath = "...";
+            }
+            shortPath += File.separator + getFile().getName();
+            cachedVisiblePath = shortPath;
+            return cachedVisiblePath;
         }
     }
 }
