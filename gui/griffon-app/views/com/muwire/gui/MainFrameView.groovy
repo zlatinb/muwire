@@ -1877,6 +1877,27 @@ class MainFrameView {
         Set<File> selectedFolders = selectedFolders()
         SharedFile singleSelectedFile = singleSelectedFile()
         
+        if (selectedFolders.isEmpty()) {
+            List<SharedFile> selectedFiles = selectedSharedFiles()
+            if (selectedFiles == null || selectedFiles.isEmpty()) {
+                if (model.treeVisible) {
+                    JTree tree = (JTree) e.getComponent()
+                    int row = tree.getRowForLocation(e.getX(), e.getY())
+                    if (row < 0)
+                        return
+                    tree.setSelectionRow(row)
+                } else {
+                    JTable table = (JTable) e.getComponent()
+                    int row = table.rowAtPoint(e.getPoint())
+                    if (row < 0)
+                        return
+                    table.getSelectionModel().setSelectionInterval(row, row)
+                }
+                selectedFolders = this.selectedFolders()
+                singleSelectedFile = this.singleSelectedFile()
+            }
+        }
+        
         JPopupMenu sharedFilesMenu = new JPopupMenu()
         
         if (singleSelectedFile != null) {
