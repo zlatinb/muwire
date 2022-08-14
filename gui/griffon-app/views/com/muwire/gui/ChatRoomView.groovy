@@ -15,7 +15,9 @@ import griffon.core.mvc.MVCGroup
 import javax.inject.Inject
 import javax.swing.JMenu
 import javax.swing.JScrollPane
+import javax.swing.JTable
 import javax.swing.text.SimpleAttributeSet
+import java.awt.Point
 import java.util.function.Consumer
 
 import static com.muwire.gui.Translator.trans
@@ -188,8 +190,12 @@ class ChatRoomView {
     }
     
     private void showPopupMenu(MouseEvent e) {
-        if (getSelectedPOP() == null)
+        JTable table = (JTable) e.getComponent()
+        Point point = e.getPoint()
+        int row = table.rowAtPoint(point)
+        if (row < 0)
             return
+        table.getSelectionModel().setSelectionInterval(row, row)
         JPopupMenu menu = new JPopupMenu()
         JMenuItem privateChat = new JMenuItem(trans("START_PRIVATE_CHAT"))
         privateChat.addActionListener({controller.privateMessage()})
