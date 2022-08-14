@@ -188,6 +188,8 @@ class ChatRoomView {
     }
     
     private void showPopupMenu(MouseEvent e) {
+        if (getSelectedPOP() == null)
+            return
         JPopupMenu menu = new JPopupMenu()
         JMenuItem privateChat = new JMenuItem(trans("START_PRIVATE_CHAT"))
         privateChat.addActionListener({controller.privateMessage()})
