@@ -96,26 +96,34 @@ public class SharedFile {
     public synchronized void hit(Persona searcher, long timestamp, String query) {
         List<SearchEntry> empty = Collections.emptyList();
         if (searches == empty)
-            searches = Collections.synchronizedList(new ArrayList<>());
+            searches = new ArrayList<>();
         SearchEntry newEntry = new SearchEntry(searcher, timestamp, query);
-        if (!searches.contains(newEntry))
+        if (!searches.contains(newEntry)) {
             searches.add(newEntry);
+            ((ArrayList)searches).trimToSize();
+        }
     }
     
     public synchronized List<String> getDownloaders() {
-        return downloaders;
+        if (downloaders.isEmpty())
+            return downloaders;
+        return new ArrayList<>(downloaders);
     }
     
     public synchronized List<SearchEntry> getSearches() {
-        return searches;
+        if (searches.isEmpty())
+            return searches;
+        return new ArrayList<>(searches);
     }
     
     public synchronized void addDownloader(String name) {
         List<String> empty = Collections.emptyList();
         if (downloaders == empty)
-            downloaders = Collections.synchronizedList(new ArrayList<>());
-        if (!downloaders.contains(name))
+            downloaders = new ArrayList<>();
+        if (!downloaders.contains(name)) {
             downloaders.add(name);
+            ((ArrayList)downloaders).trimToSize();
+        }
     }
     
     public void publish(long timestamp) {
