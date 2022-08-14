@@ -16,7 +16,7 @@ class FeedItems {
         json.version = 1
         json.name = Base64.encode(DataUtil.encodei18nString(sf.getFile().getName()))
         json.infoHash = Base64.encode(sf.getRoot())
-        json.size = sf.getCachedLength()
+        json.size = sf.getFile().length()
         json.pieceSize = sf.getPieceSize()
         
         if (sf.getComment() != null)

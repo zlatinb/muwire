@@ -88,7 +88,7 @@ class FileCollectionBuilder {
                 comment = ""
             else
                 comment = DataUtil.readi18nString(Base64.decode(comment))
-            def item = new FileCollectionItem(new InfoHash(sf.root), comment, sfPathElements.get(sf), (byte)sf.pieceSize, sf.getCachedLength())
+            def item = new FileCollectionItem(new InfoHash(sf.root), comment, sfPathElements.get(sf), (byte)sf.pieceSize, sf.getFile().length())
             files.add(item)
         } 
         

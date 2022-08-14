@@ -39,7 +39,7 @@ class FileMuLink extends MuLink {
         super(me, sharedFile.getRootInfoHash(), sharedFile.getFile().getName(),
             deriveSig(sharedFile, spk),
             LinkType.FILE)
-        fileSize = sharedFile.getCachedLength()
+        fileSize = sharedFile.getFile().length()
         pieceSizePow2 = sharedFile.getPieceSize()
     }
     
@@ -50,7 +50,7 @@ class FileMuLink extends MuLink {
         daos.write(sharedFile.getRoot())
         daos.write(sharedFile.getFile().getName().getBytes(StandardCharsets.UTF_8))
         daos.writeByte(LinkType.FILE.ordinal())
-        daos.writeLong(sharedFile.getCachedLength())
+        daos.writeLong(sharedFile.getFile().length())
         daos.writeByte(sharedFile.getPieceSize())
         
         daos.flush()

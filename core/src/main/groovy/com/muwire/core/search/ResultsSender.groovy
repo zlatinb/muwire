@@ -215,7 +215,7 @@ class ResultsSender {
         obj.version = 2
         obj.name = encodedName
         obj.infohash = Base64.encode(sf.getRoot())
-        obj.size = sf.getCachedLength()
+        obj.size = sf.getFile().length()
         obj.pieceSize = sf.getPieceSize()
 
         if (sf instanceof DownloadedFile)
