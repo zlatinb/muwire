@@ -23,7 +23,6 @@ public class SharedFile {
     private volatile String comment;
     private List<String> downloaders = Collections.emptyList();
     private List<SearchEntry> searches = Collections.emptyList();
-    private volatile boolean published;
     private volatile long publishedTimestamp;
     
     /** Path to the top-most parent File that is shared.  Null if no such exists */
@@ -96,11 +95,11 @@ public class SharedFile {
     public synchronized void hit(Persona searcher, long timestamp, String query) {
         List<SearchEntry> empty = Collections.emptyList();
         if (searches == empty)
-            searches = new ArrayList<>();
+            searches = new ArrayList<>(1);
         SearchEntry newEntry = new SearchEntry(searcher, timestamp, query);
         if (!searches.contains(newEntry)) {
             searches.add(newEntry);
-            ((ArrayList)searches).trimToSize();
+            ((ArrayList<?>)searches).trimToSize();
         }
     }
     
@@ -119,25 +118,23 @@ public class SharedFile {
     public synchronized void addDownloader(String name) {
         List<String> empty = Collections.emptyList();
         if (downloaders == empty)
-            downloaders = new ArrayList<>();
+            downloaders = new ArrayList<>(1);
         if (!downloaders.contains(name)) {
             downloaders.add(name);
-            ((ArrayList)downloaders).trimToSize();
+            ((ArrayList<?>)downloaders).trimToSize();
         }
     }
     
     public void publish(long timestamp) {
-        published = true;
         publishedTimestamp = timestamp;
     }
     
     public void unpublish() {
-        published = false;
         publishedTimestamp = 0;
     }
     
     public boolean isPublished() {
-        return published;
+        return publishedTimestamp > 0;
     }
     
     public long getPublishedTimestamp() {
