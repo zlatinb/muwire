@@ -162,6 +162,8 @@ class ChatRoomController {
     
     void viewProfile() {
         PersonaOrProfile pop = view.getSelectedPOP()
+        if (pop == null)
+            return
         ViewProfileHelper.initViewProfileGroup(model.core, mvcGroup, pop)
     }
     
