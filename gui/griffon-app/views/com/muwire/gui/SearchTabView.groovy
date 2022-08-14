@@ -22,6 +22,7 @@ import javax.swing.RowSorter
 import javax.swing.table.DefaultTableModel
 import javax.swing.tree.TreePath
 import java.awt.Component
+import java.awt.Point
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.util.stream.Collectors
@@ -312,19 +313,14 @@ class SearchTabView {
 
         
         // senders popup menu
-        JPopupMenu popupMenu = new JPopupMenu()
-        JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
-        viewProfileItem.addActionListener({mvcGroup.controller.viewProfile()})
-        popupMenu.add(viewProfileItem)
-        
         def sendersMouseListener = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY())
+                    showSendersPopupMenu(e)
             }
             public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY())
+                if(e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                    showSendersPopupMenu(e)
             }
         }
         
@@ -501,6 +497,22 @@ class SearchTabView {
         } else {
             showSenderGrouping.call()
         }
+    }
+    
+    private void showSendersPopupMenu(MouseEvent event) {
+        JTable table = (JTable) event.getComponent()
+        Point point = event.getPoint()
+        int row = table.rowAtPoint(point)
+        if (row < 0)
+            return
+        table.getSelectionModel().setSelectionInterval(row, row)
+
+        JPopupMenu popupMenu = new JPopupMenu()
+        JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfileItem.addActionListener({mvcGroup.controller.viewProfile()})
+        popupMenu.add(viewProfileItem)
+        
+        popupMenu.show(table, event.getX(), event.getY())
     }
     
     private void showResultDetailsByFile(UIResultEvent event) {
