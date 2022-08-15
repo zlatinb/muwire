@@ -392,7 +392,6 @@ class FileManager {
         for (File dir : e.directories) {
             log.fine("FM: traversing from $dir")
             positiveTree.traverse(dir, cb)
-            positiveTree.remove(dir)
         }
         cb.subDirs.each {log.fine("FM: will remove dir $it")}
         if (!cb.subDirs.isEmpty())
@@ -401,6 +400,8 @@ class FileManager {
             eventBus.publish(new FileUnsharedEvent(unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]),
                     deleted: e.deleted, implicit: true))
         }
+        for (File dir : e.directories)
+            positiveTree.remove(dir)
     }
     
     void onWatchedDirectoryConfigurationEvent(WatchedDirectoryConfigurationEvent e) {
