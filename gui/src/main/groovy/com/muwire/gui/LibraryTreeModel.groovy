@@ -14,7 +14,7 @@ class LibraryTreeModel extends DefaultTreeModel {
     }
     
     TreeNode addToTree(SharedFile sharedFile) {
-        List<File> parents = getParents(sharedFile)
+        List<File> parents = getParents(sharedFile.getFile())
         LibraryTreeNode node = root
         for (File path : parents) {
             def key = new InterimTreeNode(path)
@@ -32,21 +32,33 @@ class LibraryTreeModel extends DefaultTreeModel {
         leaf
     }
     
-    void removeFromTree(SharedFile sharedFile, boolean deleted) {
-        List<File> parents = getParents(sharedFile)
-        LibraryTreeNode node = root
-        
-        for (File path : parents) {
-            def key = new InterimTreeNode(path)
-            def child = node.getByKey(key)
-            if (child == null) {
-                if (deleted)
-                    return
-                throw new IllegalStateException()
-            }
-            node = child
+    void removeFromTree(File folder) {
+        def node = findParentNode(folder, false)
+        def key = new InterimTreeNode(folder)
+        def child = node.getByKey(key)
+        while(true) {
+            def parent = child.getParent()
+            child.removeFromParent()
+            if (parent.getChildCount() == 0 && parent != root)
+                child = parent
+            else
+                break
         }
+    }
+    
+    List<SharedFile> getFilesInFolder(File folder) {
+        def node = findParentNode(folder, false)
+        def key = new InterimTreeNode(folder)
+        def child = node.getByKey(key)
+        List<SharedFile> rv = []
+        TreeUtil.getLeafs(child, rv)
+        rv
+    }
+    
+    void removeFromTree(SharedFile sharedFile, boolean deleted) {
+        def node = findParentNode(sharedFile.getFile(), deleted)
         def leaf = node.getByKey(sharedFile)
+        
         while(true) {
             def parent = leaf.getParent()
             leaf.removeFromParent()
@@ -57,9 +69,26 @@ class LibraryTreeModel extends DefaultTreeModel {
         }
     }
     
-    private List<File> getParents(SharedFile sharedFile) {
+    private LibraryTreeNode findParentNode(File file, boolean deleted) {
+        List<File> parents = getParents(file)
+        LibraryTreeNode node = root
+
+        for (File path : parents) {
+            def key = new InterimTreeNode(path)
+            def child = node.getByKey(key)
+            if (child == null) {
+                if (deleted)
+                    return null
+                throw new IllegalStateException()
+            }
+            node = child
+        }
+        node
+    }
+    
+    private static List<File> getParents(File sharedFile) {
         List<File> parents = new ArrayList<>()
-        File tmp = sharedFile.file.getParentFile()
+        File tmp = sharedFile.getParentFile()
         while(tmp.getParent() != null) {
             parents << tmp
             tmp = tmp.getParentFile()

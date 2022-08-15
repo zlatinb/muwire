@@ -580,49 +580,75 @@ class MainFrameController {
     }
 
     void unshareSelectedFile() {
-        def sfs = view.selectedSharedFiles()
+        /*
+         * A selection may include files, folders or both.
+         */
         Set<File> folders = view.selectedFolders()
-        if (sfs == null && folders.isEmpty()) 
-            return
-        if (sfs == null)
-            sfs = Collections.emptyList()
+        List<SharedFile> leafFiles = view.selectedIndividualSharedFiles()
+        if (leafFiles == null)
+            leafFiles = Collections.emptyList()
         
-        List<SharedFile> toUnshare = new ArrayList<>()
-        sfs.each { SharedFile sf ->
-            
-            if (view.settings.collectionWarning) {
-                Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(sf.rootInfoHash)
-                if (!collectionsInfoHashes.isEmpty()) {
-                    String[] affected = collectionsInfoHashes.collect({core.collectionManager.getByInfoHash(it)}).collect{it.name}.toArray(new String[0])
+        if (folders.isEmpty() && leafFiles.isEmpty())
+            return
 
-                    boolean [] answer = new boolean[1]
-                    def props = [:]
-                    props.collections = affected
-                    props.answer = answer
-                    props.fileName = sf.file.getName()
-                    props.settings = view.settings
-                    props.home = core.home
-                    def mvc = mvcGroup.createMVCGroup("collection-warning", props)
-                    mvc.destroy()
-                    if (!answer[0]) {
-                        File f = sf.getFile()
-                        while(true) {
-                            File parent = f.getParentFile()
-                            if (parent == null)
-                                break
-                            folders.remove(parent)
-                            f = parent
-                        }
-                        return
-                    }
-                }
+        List<SharedFile> implicitUnshared = new ArrayList<>()
+        for (File folder : folders) {
+            List<SharedFile> contained = model.sharedTree.getFilesInFolder(folder)
+            for (SharedFile sf : contained) {
+                if (collectionMembershipCheck(sf))
+                    implicitUnshared.add sf
+                else
+                    return
             }
-            toUnshare.add(sf)
         }
-        if (!folders.isEmpty())
+        
+        List<SharedFile> explicitUnshared = new ArrayList<>()
+        for (SharedFile sf : leafFiles) {
+            if (collectionMembershipCheck(sf))
+                explicitUnshared << sf
+            else
+                return
+        }
+        
+        if (!folders.isEmpty()) {
+            for (File folder : folders) {
+                model.sharedTree.removeFromTree(folder)
+                model.allFilesSharedTree.removeFromTree(folder)
+            }
             core.eventBus.publish(new DirectoryUnsharedEvent(directories: folders.toArray(new File[0]), deleted: false))
-        if (!toUnshare.isEmpty())
-            core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : toUnshare.toArray(new SharedFile[0])))
+            core.eventBus.publish(new FileUnsharedEvent(
+                    unsharedFiles: implicitUnshared.toArray(new SharedFile[0]),
+                    deleted: false,
+                    implicit: true
+            ))
+        }
+        if (!explicitUnshared.isEmpty())
+            core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : explicitUnshared.toArray(new SharedFile[0])))
+    }
+
+    /**
+     * @param sharedFile that may be in a collection
+     * @return true if the file should be unshared
+     */
+    private boolean collectionMembershipCheck(SharedFile sf) {
+        if (!view.settings.collectionWarning)
+            return true
+        Set<InfoHash> collectionsInfoHashes = core.collectionManager.collectionsForFile(sf.rootInfoHash)
+        if (!collectionsInfoHashes.isEmpty()) {
+            String[] affected = collectionsInfoHashes.collect({core.collectionManager.getByInfoHash(it)}).collect{it.name}.toArray(new String[0])
+
+            boolean [] answer = new boolean[1]
+            def props = [:]
+            props.collections = affected
+            props.answer = answer
+            props.fileName = sf.file.getName()
+            props.settings = view.settings
+            props.home = core.home
+            def mvc = mvcGroup.createMVCGroup("collection-warning", props)
+            mvc.destroy()
+            return answer[0]
+        }
+        return true
     }
     
     @ControllerAction

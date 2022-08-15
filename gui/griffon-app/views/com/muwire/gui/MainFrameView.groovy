@@ -1533,6 +1533,23 @@ class MainFrameView {
             return rv
         }
     }
+    
+    List<SharedFile> selectedIndividualSharedFiles() {
+        if (!model.treeVisible)
+            return selectedSharedFiles()
+        else {
+            List<SharedFile> rv = new ArrayList<>()
+            def sharedFilesTree = builder.getVariable("shared-files-tree")
+            TreePath[] selectedPaths = sharedFilesTree.getSelectionPaths()
+            for (TreePath path : selectedPaths) {
+                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent()
+                Object obj = dmtn.getUserObject()
+                if (obj instanceof SharedFile)
+                    rv << obj
+            }
+            return rv
+        }
+    }
 
     /**
      * @return if a single file is selected, return it.

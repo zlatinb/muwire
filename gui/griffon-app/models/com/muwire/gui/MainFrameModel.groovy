@@ -621,21 +621,19 @@ class MainFrameModel {
             loadedFiles = allSharedFiles.size()
             
             for (SharedFile sharedFile : e.unsharedFiles) {
-                removeUnsharedFromTree(sharedFile, e.deleted)
+                if (fileToNode.remove(sharedFile) == null)
+                    continue
+                if (e.implicit)
+                    continue
+
+                allFilesSharedTree.removeFromTree(sharedFile, e.deleted)
+                sharedTree.removeFromTree(sharedFile, e.deleted)
             }
+            
             view.refreshSharedFiles()
         }
     }
 
-    private void removeUnsharedFromTree(SharedFile sharedFile, boolean deleted) {
-        SortedTreeNode dmtn = fileToNode.remove(sharedFile)
-        if (dmtn == null)
-            return
-
-        allFilesSharedTree.removeFromTree(sharedFile, deleted)
-        sharedTree.removeFromTree(sharedFile, deleted)
-    }
-    
     void onUploadEvent(UploadEvent e) {
         runInsideUIAsync {
             int index = -1
