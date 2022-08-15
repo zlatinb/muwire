@@ -33,9 +33,13 @@ class LibraryTreeModel extends DefaultTreeModel {
     }
     
     void removeFromTree(File folder) {
-        def node = findParentNode(folder, false)
+        def node = findParentNode(folder, true)
+        if (node == null)
+            return
         def key = new InterimTreeNode(folder)
         def child = node.getByKey(key)
+        if (child == null)
+            return
         while(true) {
             def parent = child.getParent()
             child.removeFromParent()

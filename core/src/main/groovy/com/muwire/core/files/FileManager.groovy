@@ -399,7 +399,7 @@ class FileManager {
             eventBus.publish(new DirectoryUnsharedEvent(directories: cb.subDirs.toArray(new File[0]), deleted: e.deleted))
         if (!cb.unsharedFiles.isEmpty()) {
             eventBus.publish(new FileUnsharedEvent(unsharedFiles: cb.unsharedFiles.toArray(new SharedFile[0]),
-                    deleted: e.deleted))
+                    deleted: e.deleted, implicit: true))
         }
     }
     

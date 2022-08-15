@@ -2,6 +2,7 @@
 package com.muwire.gui
 
 import com.muwire.core.download.DownloadHopelessEvent
+import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.search.ResultsEvent
@@ -326,6 +327,7 @@ class MainFrameModel {
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
             core.eventBus.register(FileUnsharedEvent.class, this)
+            core.eventBus.register(DirectoryUnsharedEvent.class, this)
             core.eventBus.register(RouterDisconnectedEvent.class, this)
             core.eventBus.register(AllFilesLoadedEvent.class, this)
             core.eventBus.register(UpdateDownloadedEvent.class, this)
@@ -603,6 +605,16 @@ class MainFrameModel {
                 view.fullTreeExpansion()
             else
                 view.magicTreeExpansion()
+        }
+    }
+    
+    void onDirectoryUnsharedEvent(DirectoryUnsharedEvent event) {
+        runInsideUIAsync {
+            for (File folder : event.directories) {
+                sharedTree.removeFromTree(folder)
+                allFilesSharedTree.removeFromTree(folder)
+            }
+            view.refreshSharedFiles()
         }
     }
 

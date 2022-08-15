@@ -591,41 +591,42 @@ class MainFrameController {
         if (folders.isEmpty() && leafFiles.isEmpty())
             return
 
-        List<SharedFile> implicitUnshared = new ArrayList<>()
-        for (File folder : folders) {
-            List<SharedFile> contained = model.sharedTree.getFilesInFolder(folder)
-            for (SharedFile sf : contained) {
+        
+        final boolean collectionCheck = shouldCheckCollectionMembership()
+        
+        if (collectionCheck) {
+            for (File folder : folders) {
+                List<SharedFile> contained = model.sharedTree.getFilesInFolder(folder)
+                for (SharedFile sf : contained) {
+                    if (!collectionMembershipCheck(sf))
+                        return
+                }
+            }
+        }
+        
+        List<SharedFile> explicitUnshared = leafFiles
+        if (collectionCheck) {
+            explicitUnshared = new ArrayList<>(leafFiles.size())
+            for (SharedFile sf : leafFiles) {
                 if (collectionMembershipCheck(sf))
-                    implicitUnshared.add sf
+                    explicitUnshared << sf
                 else
                     return
             }
         }
         
-        List<SharedFile> explicitUnshared = new ArrayList<>()
-        for (SharedFile sf : leafFiles) {
-            if (collectionMembershipCheck(sf))
-                explicitUnshared << sf
-            else
-                return
-        }
-        
-        if (!folders.isEmpty()) {
-            for (File folder : folders) {
-                model.sharedTree.removeFromTree(folder)
-                model.allFilesSharedTree.removeFromTree(folder)
-            }
+        if (!folders.isEmpty()) 
             core.eventBus.publish(new DirectoryUnsharedEvent(directories: folders.toArray(new File[0]), deleted: false))
-            core.eventBus.publish(new FileUnsharedEvent(
-                    unsharedFiles: implicitUnshared.toArray(new SharedFile[0]),
-                    deleted: false,
-                    implicit: true
-            ))
-        }
         if (!explicitUnshared.isEmpty())
             core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : explicitUnshared.toArray(new SharedFile[0])))
     }
 
+    private boolean shouldCheckCollectionMembership() {
+        if (!view.settings.collectionWarning)
+            return false
+        return !core.collectionManager.collections.isEmpty()
+    }
+    
     /**
      * @param sharedFile that may be in a collection
      * @return true if the file should be unshared
