@@ -607,10 +607,12 @@ class MainFrameModel {
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {
+        synchronized (allSharedFiles) {
+            for (SharedFile sharedFile : e.unsharedFiles)
+                allSharedFiles.remove(sharedFile)
+        }
         runInsideUIAsync {
             synchronized (allSharedFiles) {
-                for (SharedFile sharedFile : e.unsharedFiles)
-                    allSharedFiles.remove(sharedFile)
                 shared.retainAll(allSharedFiles)
             }
             sharedFileIdx.clear()
