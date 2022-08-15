@@ -171,8 +171,7 @@ class SearchTabModel {
         synchronized (allResults2) {
             for (UIResultEvent event : copy) {
                 InfoHash ih = event.getInfohash()
-                allResults2.add ih
-                if (filter(ih))
+                if (allResults2.add(ih) && filter(ih))
                     results2.add(ih)
             }
         }
