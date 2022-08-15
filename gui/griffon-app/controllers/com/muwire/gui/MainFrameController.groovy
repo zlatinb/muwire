@@ -615,8 +615,14 @@ class MainFrameController {
             }
         }
         
-        if (!folders.isEmpty()) 
+        if (!folders.isEmpty()) {
             core.eventBus.publish(new DirectoryUnsharedEvent(directories: folders.toArray(new File[0]), deleted: false))
+            for (File folder : folders) {
+                model.sharedTree.removeFromTree(folder)
+                model.allFilesSharedTree.removeFromTree(folder)
+            }
+            view.refreshSharedFiles()
+        }
         if (!explicitUnshared.isEmpty())
             core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : explicitUnshared.toArray(new SharedFile[0])))
     }
