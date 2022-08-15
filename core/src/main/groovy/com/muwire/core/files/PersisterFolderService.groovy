@@ -41,7 +41,10 @@ import java.util.stream.Stream
 class PersisterFolderService extends BasePersisterService {
 
     final static int CUT_LENGTH = 6
-
+    
+    
+    private static final int PARALLEL_UNSHARE = 128
+    
     private final byte[] salt
     private final String saltHash
     private final Map<Path, String> cachedRoots = Collections.synchronizedMap(new HashMap<>())
@@ -135,10 +138,14 @@ class PersisterFolderService extends BasePersisterService {
      * @param unsharedEvent
      */
     void onFileUnsharedEvent(FileUnsharedEvent unsharedEvent) {
-        persisterExecutor.submit( {
-            for(SharedFile sharedFile : unsharedEvent.unsharedFiles)
-                unshareFile(sharedFile)
-        } as Runnable)
+        if (unsharedEvent.unsharedFiles.length < PARALLEL_UNSHARE) {
+            persisterExecutor.submit({
+                for (SharedFile sharedFile : unsharedEvent.unsharedFiles)
+                    unshareFile(sharedFile)
+            } as Runnable)
+        } else {
+            unsharedEvent.unsharedFiles.toList().stream().parallel().forEach {unshareFile(it)}
+        }
     }
     
     private void unshareFile(SharedFile sharedFile) {
