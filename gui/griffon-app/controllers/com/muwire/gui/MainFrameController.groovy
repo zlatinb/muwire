@@ -621,7 +621,7 @@ class MainFrameController {
                 model.sharedTree.removeFromTree(folder)
                 model.allFilesSharedTree.removeFromTree(folder)
             }
-            view.refreshSharedFiles()
+            view.refreshSharedFilesTree(true)
         }
         if (!explicitUnshared.isEmpty())
             core.eventBus.publish(new FileUnsharedEvent(unsharedFiles : explicitUnshared.toArray(new SharedFile[0])))

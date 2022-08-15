@@ -2226,12 +2226,16 @@ class MainFrameView {
     }
     
     public void refreshSharedFiles() {
-        refreshSharedFilesTree()
+        refreshSharedFilesTree(false)
         refreshSharedFilesTable()
     }
     
-    void refreshSharedFilesTree() {
-        def tree = builder.getVariable("shared-files-tree")
+    void refreshSharedFilesTree(boolean clearSelection) {
+        JTree tree = (JTree) builder.getVariable("shared-files-tree")
+        
+        if (clearSelection)
+            tree.clearSelection()
+        
         TreePath[] selectedPaths = tree.getSelectionPaths()
         Set<TreePath> expanded = new HashSet<>(expansionListener.expandedPaths)
         
