@@ -98,7 +98,7 @@ class CollectionWizardView {
                         }
                         panel(constraints : BorderLayout.SOUTH) {
                             button(text : trans("CANCEL"), cancelAction)
-                            button(text : trans("REVIEW"), reviewAction)
+                            button(text : trans("REVIEW"), enabled: bind {model.numFiles > 0}, reviewAction)
                         }
                     }
                 }
