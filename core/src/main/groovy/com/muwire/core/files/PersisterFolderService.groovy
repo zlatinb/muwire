@@ -138,14 +138,13 @@ class PersisterFolderService extends BasePersisterService {
      * @param unsharedEvent
      */
     void onFileUnsharedEvent(FileUnsharedEvent unsharedEvent) {
-        if (unsharedEvent.unsharedFiles.length < PARALLEL_UNSHARE) {
-            persisterExecutor.submit({
+        persisterExecutor.submit({
+            if (unsharedEvent.unsharedFiles.length < PARALLEL_UNSHARE) {
                 for (SharedFile sharedFile : unsharedEvent.unsharedFiles)
                     unshareFile(sharedFile)
-            } as Runnable)
-        } else {
-            unsharedEvent.unsharedFiles.toList().stream().parallel().forEach {unshareFile(it)}
-        }
+            } else
+                unsharedEvent.unsharedFiles.toList().stream().parallel().forEach { unshareFile(it) }        
+        } as Runnable)
     }
     
     private void unshareFile(SharedFile sharedFile) {
