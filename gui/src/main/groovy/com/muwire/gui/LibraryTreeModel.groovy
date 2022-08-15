@@ -31,15 +31,19 @@ class LibraryTreeModel extends DefaultTreeModel {
         node.addDescendant(leaf)
         leaf
     }
-    
-    void removeFromTree(File folder) {
+
+    /**
+     * @param folder to remove from the tree
+     * @return true if tree was modified
+     */
+    boolean removeFromTree(File folder) {
         def node = findParentNode(folder, true)
         if (node == null)
-            return
+            return false
         def key = new InterimTreeNode(folder)
         def child = node.getByKey(key)
         if (child == null)
-            return
+            return false
         while(true) {
             def parent = child.getParent()
             child.removeFromParent()
@@ -48,6 +52,7 @@ class LibraryTreeModel extends DefaultTreeModel {
             else
                 break
         }
+        return true
     }
     
     List<SharedFile> getFilesInFolder(File folder) {

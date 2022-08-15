@@ -610,11 +610,13 @@ class MainFrameModel {
     
     void onDirectoryUnsharedEvent(DirectoryUnsharedEvent event) {
         runInsideUIAsync {
+            boolean modified = false
             for (File folder : event.directories) {
-                sharedTree.removeFromTree(folder)
-                allFilesSharedTree.removeFromTree(folder)
+                modified |= sharedTree.removeFromTree(folder)
+                modified |= allFilesSharedTree.removeFromTree(folder)
             }
-            view.refreshSharedFiles()
+            if (modified)
+                view.refreshSharedFiles()
         }
     }
 
