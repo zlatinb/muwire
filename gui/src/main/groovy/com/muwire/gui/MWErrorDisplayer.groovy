@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.Core
 import griffon.core.GriffonApplication
 import groovy.swing.SwingBuilder
 
@@ -22,6 +23,11 @@ class MWErrorDisplayer {
     
     private static void fatalDialog(GriffonApplication application, Throwable throwable, 
                                     String titleKey, String bodyKey) {
+        
+        Core core = application.context.get("core")
+        if (core != null && core.getShutdown().get())
+            return
+        
         String body = trans(bodyKey)
         String header = trans(titleKey)
 
