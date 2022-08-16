@@ -206,6 +206,10 @@ class FileManager {
             unshareFile(sharedFile, e.deleted)
     }
     
+    void onFileModifiedEvent(FileModifiedEvent event) {
+        unshareFile(event.sharedFile, false)
+    }
+    
     private void unshareFile(SharedFile sf, boolean deleted) {
         log.fine("unsharing ${sf.getFile()} deleted:$deleted")
         

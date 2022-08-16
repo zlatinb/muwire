@@ -147,6 +147,12 @@ class PersisterFolderService extends BasePersisterService {
         } as Runnable)
     }
     
+    void onFileModifiedEvent(FileModifiedEvent event) {
+        persisterExecutor.submit( {
+            unshareFile(event.sharedFile)
+        } as Runnable)
+    }
+    
     private void unshareFile(SharedFile sharedFile) {
         def jsonPath = getJsonPath(sharedFile)
         def jsonFile = jsonPath.toFile()

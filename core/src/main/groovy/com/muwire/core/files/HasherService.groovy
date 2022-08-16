@@ -95,6 +95,12 @@ class HasherService {
         for(File dir : evt.directories)
             hashed.remove(dir)
     }
+    
+    void onFileModifiedEvent(FileModifiedEvent event) {
+        File f = event.sharedFile.getFile()
+        File canonical = f.getCanonicalFile()
+        throttlerExecutor.execute({throttle(f, canonical, true)})
+    }
 
     private synchronized void throttle(File f, File canonical, boolean forceHash) {
         while(currentHashes >= settings.hashingCores)

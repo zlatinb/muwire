@@ -1,6 +1,7 @@
 package com.muwire.core
 
 import com.muwire.core.download.UIDownloadLinkEvent
+import com.muwire.core.files.FileModifiedEvent
 import com.muwire.core.files.InfoHashEvent
 import com.muwire.core.files.NegativeFiles
 import com.muwire.core.files.PersisterDoneEvent
@@ -336,6 +337,7 @@ public class Core {
         eventBus.register(UICommentEvent.class, fileManager)
         eventBus.register(SideCarFileEvent.class, fileManager)
         eventBus.register(WatchedDirectoryConfigurationEvent.class, fileManager)
+        eventBus.register(FileModifiedEvent.class, fileManager)
         
         log.info("initializing collection manager")
         collectionManager = new CollectionManager(eventBus, fileManager,
@@ -371,6 +373,7 @@ public class Core {
         eventBus.register(UIFilePublishedEvent.class, persisterFolderService)
         eventBus.register(UIFileUnpublishedEvent.class, persisterFolderService)
         eventBus.register(InfoHashEvent.class, persisterFolderService)
+        eventBus.register(FileModifiedEvent.class, persisterFolderService)
 
         log.info("initializing host cache")
         hostCache = new H2HostCache(home,trustService, props, me.destination)
@@ -546,6 +549,7 @@ public class Core {
         eventBus.register(FileSharedEvent.class, hasherService)
         eventBus.register(FileUnsharedEvent.class, hasherService)
         eventBus.register(DirectoryUnsharedEvent.class, hasherService)
+        eventBus.register(FileModifiedEvent.class, hasherService)
         
         log.info("initializing messenger")
         messenger = new Messenger(eventBus, home, i2pConnector, profileSupplier, props)

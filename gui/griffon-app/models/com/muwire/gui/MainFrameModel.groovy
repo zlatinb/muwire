@@ -3,6 +3,7 @@ package com.muwire.gui
 
 import com.muwire.core.download.DownloadHopelessEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
+import com.muwire.core.files.FileModifiedEvent
 import com.muwire.core.messenger.MessageFolderLoadingEvent
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.search.ResultsEvent
@@ -327,6 +328,7 @@ class MainFrameModel {
             core.eventBus.register(UpdateAvailableEvent.class, this)
             core.eventBus.register(FileDownloadedEvent.class, this)
             core.eventBus.register(FileUnsharedEvent.class, this)
+            core.eventBus.register(FileModifiedEvent.class, this)
             core.eventBus.register(DirectoryUnsharedEvent.class, this)
             core.eventBus.register(RouterDisconnectedEvent.class, this)
             core.eventBus.register(AllFilesLoadedEvent.class, this)
@@ -618,6 +620,16 @@ class MainFrameModel {
             if (modified)
                 view.refreshSharedFiles()
         }
+    }
+    
+    void onFileModifiedEvent(FileModifiedEvent event) {
+        // shortcut
+        FileUnsharedEvent e = new FileUnsharedEvent(
+                unsharedFiles: new SharedFile[]{event.sharedFile},
+                deleted: false,
+                implicit: false
+        )
+        onFileUnsharedEvent(e)
     }
 
     void onFileUnsharedEvent(FileUnsharedEvent e) {

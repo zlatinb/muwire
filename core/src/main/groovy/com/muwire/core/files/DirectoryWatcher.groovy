@@ -136,7 +136,7 @@ class DirectoryWatcher {
         if (f.isDirectory())
             eventBus.publish(new FileSharedEvent(file : f, fromWatch : true))
         else
-            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), f.length()))
+            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), false, f.length())) 
     }
 
     private void processModified(Path parent, Path path) {
@@ -145,7 +145,7 @@ class DirectoryWatcher {
         if (!settings.shareHiddenFiles && f.isHidden())
             return
         if (!negativeFiles.negativeTree.get(f))
-            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), f.length()))
+            waitingFiles.put(f, new WaitingEntry(System.currentTimeMillis(), true, f.length()))
     }
 
     private void processDeleted(Path parent, Path path) {
@@ -191,9 +191,17 @@ class DirectoryWatcher {
                                 log.fine("file $file has already started hashing")
                                 return
                             }
+                            published << file
+                            if (waitingEntry.modified) {
+                                SharedFile sf = fileManager.fileToSharedFile.get(file)
+                                if (sf != null) {
+                                    log.fine ("modified shared $file")
+                                    eventBus.publish(new FileModifiedEvent(sharedFile: sf))
+                                    return 
+                                }
+                            }
                             log.fine("publishing file $file")
                             eventBus.publish new FileSharedEvent(file: file, fromWatch: true)
-                            published << file
                         } catch (IOException cantOpen) {
                             log.fine("couldn't open file $file for reading, will try again")
                         }
@@ -211,9 +219,11 @@ class DirectoryWatcher {
     
     private static class WaitingEntry {
         private final long timestamp
+        private final boolean modified
         private volatile long length
-        WaitingEntry(long timestamp, long length) {
+        WaitingEntry(long timestamp, boolean modified, long length) {
             this.timestamp = timestamp
+            this.modified = modified
             this.length = length
         }
     }
