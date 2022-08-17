@@ -66,8 +66,11 @@ class SearchTabController {
             !mvcGroup.parentGroup.model.canDownload(it.infohash)
         }
         
-        Set<InfoHash> uniqueHashes = results.stream().map({it.infohash}).collect(Collectors.toSet())
-        results = uniqueHashes.stream().map({model.hashBucket[it].firstEvent()}).collect(Collectors.toList())
+        Set<InfoHash> uniqueHashes = new HashSet<>()
+        for (Iterator<UIResultEvent> iter = results.iterator(); iter.hasNext();) {
+            if (!uniqueHashes.add(iter.next().getInfohash()))
+                iter.remove()
+        }
 
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
         List<ResultAndTargets> targets = view.decorateResults(results)
