@@ -128,6 +128,10 @@ class MainFrameView {
     
     void initUI() {
         
+        boolean dosableUpdates = false
+        if (System.getProperties().containsKey("disableUpdates"))
+            disableUpdates = Boolean.parseBoolean(System.getProperty("disableUpdates"))
+        
         settings = application.context.get("ui-settings")
         int rowHeight = application.context.get("row-height")
         int treeRowHeight = application.context.get("tree-row-height")
@@ -744,9 +748,11 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        button(text: "", icon: imageIcon('/update.png'), toolTipText: trans("TOOLTIP_UPDATE"),
-                                enabled: bind { model.updateAvailableEvent != null || model.updateDownloadedEvent != null },
-                                showUpdateAction)
+                        if (!dosableUpdates) {
+                            button(text: "", icon: imageIcon('/update.png'), toolTipText: trans("TOOLTIP_UPDATE"),
+                                    enabled: bind { model.updateAvailableEvent != null || model.updateDownloadedEvent != null },
+                                    showUpdateAction)
+                        }
                         button(text: "", icon: imageIcon('/edit_profile.png'), toolTipText: trans("TOOLTIP_PROFILE_EDITOR"),
                             editProfileAction)
                     }
