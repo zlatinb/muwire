@@ -2249,8 +2249,10 @@ class MainFrameView {
         def table = builder.getVariable("shared-files-table")
         int [] selectedRows = table.getSelectedRows()
         table.model.fireTableDataChanged()
-        for (int row : selectedRows)
-            table.selectionModel.addSelectionInterval(row, row)
+        for (int row : selectedRows) {
+            if (row < model.shared.size())
+                table.selectionModel.addSelectionInterval(row, row)
+        }
     }
     
     void refreshSharedFilesTableRow(int row) {
