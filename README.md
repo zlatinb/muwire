@@ -52,6 +52,11 @@ If you want to create your own MuWire network instructions are on the [Wiki].
 The MuWire Tracker Daemon (or mwtrackerd for short) is a project to bring functionality similar to BitTorrent tracking to MuWire.  For more info see the [Tracker] page.
 ### MuCats
 MuCats is a project to create a website for hosting hashes of files shared on the MuWire network.  For more info see the [MuCats] project.
+### MuWire Seedbox Daemon
+A headless daemon that only serves files and is controlled via a JSON-RPC interface.  Suitable for seedboxes.  [More info](https://github.com/zlatinb/muwire-seedbox-daemon)
+### MuWire Seedbox Console
+A web console to manage one or more seedbox daemons.  [More info](https://github.com/zlatinb/muwire-seedbox-console)
+
 
 ## GPG Fingerprint
 
