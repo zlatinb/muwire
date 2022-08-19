@@ -1316,8 +1316,7 @@ class MainFrameView {
                 if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
                     showFeedItemsPopupMenu(e)
                 else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2 &&
-                        selectedItems != null && selectedItems.size() == 1 &&
-                        model.canDownload(selectedItems.get(0).getInfoHash())) {
+                        selectedItems != null && selectedItems.size() == 1) {
                     mvcGroup.controller.downloadFeedItem()
                 }
             }

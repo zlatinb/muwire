@@ -62,10 +62,6 @@ class SearchTabController {
         if (results.isEmpty())
             return
 
-        results.removeAll {
-            !mvcGroup.parentGroup.model.canDownload(it.infohash)
-        }
-        
         Set<InfoHash> uniqueHashes = new HashSet<>()
         for (Iterator<UIResultEvent> iter = results.iterator(); iter.hasNext();) {
             if (!uniqueHashes.add(iter.next().getInfohash()))

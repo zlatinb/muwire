@@ -296,7 +296,6 @@ class MainFrameController {
     void cancel() {
         for (Downloader downloader : selectedDownloads()) {
             downloader.cancel()
-            model.downloadInfoHashes.remove(downloader.getInfoHash())
             core.eventBus.publish(new UIDownloadCancelledEvent(downloader: downloader))
         }
     }
@@ -898,8 +897,6 @@ class MainFrameController {
             return
         Feed f = model.core.getFeedManager().getFeed(items.get(0).getPublisher())
         items.each { 
-            if (!model.canDownload(it.getInfoHash()))
-                return
             File target = new File(application.context.get("muwire-settings").downloadLocation, it.getName())
             model.core.eventBus.publish(new UIDownloadFeedItemEvent(item : it, target : target, sequential : f.isSequential()))
         }

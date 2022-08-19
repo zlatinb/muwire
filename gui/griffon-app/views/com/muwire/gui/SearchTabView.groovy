@@ -394,11 +394,7 @@ class SearchTabView {
                     rows[i] = resultsTable.rowSorter.convertRowIndexToModel(rows[i])
                 }
             }
-            boolean downloadActionEnabled = true
-            rows.each {
-                downloadActionEnabled &= mvcGroup.parentGroup.model.canDownload(model.results[it].infohash)
-            }
-            model.downloadActionEnabled = downloadActionEnabled
+            model.downloadActionEnabled = true
         })
         
         // senders table

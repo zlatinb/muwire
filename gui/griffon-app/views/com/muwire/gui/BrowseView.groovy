@@ -211,15 +211,8 @@ class BrowseView {
                 }
             }
             
-            boolean downloadActionEnabled = true
-            
             model.viewDetailsActionEnabled = rows.length == 1
-             
-            def mainFrameGroup = application.mvcGroupManager.getGroups()['MainFrame']
-            rows.each {
-                downloadActionEnabled &= mainFrameGroup.model.canDownload(model.results[it].infohash)
-            }
-            model.downloadActionEnabled = downloadActionEnabled
+            model.downloadActionEnabled = true
             
         })
         resultsTable.addMouseListener(mouseListener)

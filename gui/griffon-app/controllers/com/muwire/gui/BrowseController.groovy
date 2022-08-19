@@ -140,13 +140,8 @@ class BrowseController {
         def selectedResults = view.selectedResults()
         if (selectedResults == null || selectedResults.isEmpty())
             return
-            
-        def group = application.mvcGroupManager.getGroups()['MainFrame']
 
-        selectedResults.removeAll {
-            !group.model.canDownload(it.infohash)
-        }
-        
+
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
         List<ResultAndTargets> targets = view.decorateResults(selectedResults)
         targets.each { target ->
@@ -162,7 +157,8 @@ class BrowseController {
                 sequential : view.sequentialDownloadCheckbox.model.isSelected()
                 ))
         }
-        
+
+        def group = application.mvcGroupManager.getGroups()['MainFrame']
         group.view.showDownloadsWindow.call()
     }
     
