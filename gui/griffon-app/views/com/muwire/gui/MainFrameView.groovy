@@ -128,7 +128,7 @@ class MainFrameView {
     
     void initUI() {
         
-        boolean dosableUpdates = false
+        boolean disableUpdates = false
         if (System.getProperties().containsKey("disableUpdates"))
             disableUpdates = Boolean.parseBoolean(System.getProperty("disableUpdates"))
         
@@ -748,7 +748,7 @@ class MainFrameView {
                 panel (border: etchedBorder(), constraints : BorderLayout.SOUTH) {
                     borderLayout()
                     panel (constraints : BorderLayout.WEST) {
-                        if (!dosableUpdates) {
+                        if (!disableUpdates) {
                             button(text: "", icon: imageIcon('/update.png'), toolTipText: trans("TOOLTIP_UPDATE"),
                                     enabled: bind { model.updateAvailableEvent != null || model.updateDownloadedEvent != null },
                                     showUpdateAction)
