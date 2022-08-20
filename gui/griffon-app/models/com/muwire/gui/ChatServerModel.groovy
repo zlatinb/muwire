@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.chat.ChatDisconnectionEvent
 import griffon.core.GriffonApplication
 
 import java.util.logging.Level
@@ -45,6 +46,7 @@ class ChatServerModel {
     void mvcGroupInit(Map<String, String> params) {
         disconnectActionEnabled = host != core.me // can't disconnect from myself
         core.eventBus.register(ChatConnectionEvent.class, this)
+        core.eventBus.register(ChatDisconnectionEvent.class, this)
 
         connect()        
     }
@@ -59,6 +61,7 @@ class ChatServerModel {
     void mvcGroupDestroy() {
         stopPoller()
         core.eventBus.unregister(ChatConnectionEvent.class, this)
+        core.eventBus.unregister(ChatDisconnectionEvent.class, this)
     }
     
     private void startPoller() {
@@ -102,6 +105,12 @@ class ChatServerModel {
             }
         } else {
             stopPoller()
+        }
+    }
+    
+    void onChatDisconnectionEvent(ChatDisconnectionEvent event) {
+        mvcGroup.childrenGroups.each {k, v ->
+            v.controller.serverDisconnected()
         }
     }
     

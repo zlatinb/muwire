@@ -289,12 +289,24 @@ class ChatRoomController {
             sig : sig
         )
         model.core.eventBus.publish(event)
+        
+        runInsideUIAsync {
+            long timestamp = System.currentTimeMillis()
+            String toDisplay = DataHelper.formatTime(timestamp) + " You reconnected to the server\n" // TODO translate
+            view.appendGreen(toDisplay)
+            trimLines()
+        }
     }
     
     void serverDisconnected() {
         runInsideUIAsync {
             model.members.clear()
             view.membersTable?.model?.fireTableDataChanged()
+            
+            long timestamp = System.currentTimeMillis()
+            String toDisplay = DataHelper.formatTime(timestamp) + " You disconnected from the server\n" // TODO translate
+            view.appendRed(toDisplay)
+            trimLines()
         }
     }
 }

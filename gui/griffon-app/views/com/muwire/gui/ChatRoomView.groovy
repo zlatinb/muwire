@@ -182,6 +182,10 @@ class ChatRoomView {
         StyleConstants.setItalic(italic, true)
         Style gray = document.addStyle("gray", regular)
         StyleConstants.setForeground(gray, Color.GRAY)
+        Style red = document.addStyle("red", regular)
+        StyleConstants.setForeground(red, Color.RED)
+        Style green = document.addStyle("green", regular)
+        StyleConstants.setForeground(green, Color.GREEN)
 
 
         SimpleAttributeSet sab = new SimpleAttributeSet()
@@ -252,6 +256,16 @@ class ChatRoomView {
     void appendGray(String gray) {
         StyledDocument doc = roomTextArea.getStyledDocument()
         doc.insertString(doc.getEndPosition().getOffset() - 1, gray, doc.getStyle("gray"))
+    }
+    
+    void appendRed(String red) {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        doc.insertString(doc.getEndPosition().getOffset() - 1, red, doc.getStyle("red"))
+    }
+
+    void appendGreen(String green) {
+        StyledDocument doc = roomTextArea.getStyledDocument()
+        doc.insertString(doc.getEndPosition().getOffset() - 1, green, doc.getStyle("green"))
     }
     
     void appendSay(String text, PersonaOrProfile sender, long timestamp) {
