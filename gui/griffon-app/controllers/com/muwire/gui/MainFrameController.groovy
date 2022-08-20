@@ -650,8 +650,7 @@ class MainFrameController {
             props.fileName = sf.file.getName()
             props.settings = view.settings
             props.home = core.home
-            def mvc = mvcGroup.createMVCGroup("collection-warning", props)
-            mvc.destroy()
+            def mvc = mvcGroup.createMVCGroup("collection-warning", props).destroy()
             return answer[0]
         }
         return true

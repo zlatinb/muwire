@@ -31,6 +31,5 @@ class CollectionWarningController {
     @ControllerAction
     void cancel() {
         view.dialog.setVisible(false)
-        mvcGroup.destroy()
     }
 }
