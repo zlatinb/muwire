@@ -190,8 +190,7 @@ class EditProfileView {
                 return false
             
             if (f.length() > Constants.MAX_PROFILE_IMAGE_LENGTH) {
-                JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_FILE"),
-                    trans("PROFILE_EDITOR_ERROR_LARGE_FILE"), JOptionPane.ERROR_MESSAGE)
+                showErrorLargeImage()
                 return false
             }
             
@@ -217,5 +216,10 @@ class EditProfileView {
     void showErrorLongProfile() {
         JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_PROFILE"),
                 trans("PROFILE_EDITOR_ERROR_LARGE_PROFILE"), JOptionPane.ERROR_MESSAGE)
+    }
+    
+    void showErrorLargeImage() {
+        JOptionPane.showMessageDialog(dialog, trans("PROFILE_EDITOR_ERROR_LARGE_FILE"),
+                trans("PROFILE_EDITOR_ERROR_LARGE_FILE"), JOptionPane.ERROR_MESSAGE)
     }
 }

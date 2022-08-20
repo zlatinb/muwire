@@ -71,6 +71,11 @@ class EditProfileController {
             return
         
         File f = chooser.getSelectedFile()
+        if (f.length() > Constants.MAX_PROFILE_IMAGE_LENGTH) {
+            view.showErrorLargeImage()
+            return
+        }
+        
         f.withInputStream {view.setImageAndThumbnail(it)}
         String name = f.getName().toLowerCase()
         model.format = name.endsWith("png") ? MWProfileImageFormat.PNG : MWProfileImageFormat.JPG
