@@ -8,6 +8,7 @@ import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
 import com.muwire.gui.profile.PersonaOrProfileComparator
+import com.muwire.gui.profile.ProfileConstants
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.core.mvc.MVCGroup
@@ -17,6 +18,7 @@ import javax.swing.JMenu
 import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.text.SimpleAttributeSet
+import java.awt.Dimension
 import java.awt.Point
 import java.util.function.Consumer
 
@@ -118,7 +120,7 @@ class ChatRoomView {
                         }
                     }
                 }
-                panel(constraints : BorderLayout.SOUTH) {
+                panel(constraints : BorderLayout.SOUTH, minimumSize: [0, ProfileConstants.MAX_THUMBNAIL_SIZE * 2] as Dimension) {
                     borderLayout()
                     label(text : trans("SAY_SOMETHING_HERE") + ": ", constraints : BorderLayout.WEST)
                     scrollPane(verticalScrollBarPolicy: JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, constraints: BorderLayout.CENTER) {
