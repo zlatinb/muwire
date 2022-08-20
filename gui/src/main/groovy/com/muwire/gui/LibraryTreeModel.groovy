@@ -57,6 +57,8 @@ class LibraryTreeModel extends DefaultTreeModel {
     
     List<SharedFile> getFilesInFolder(File folder) {
         def node = findParentNode(folder, false)
+        if (node == null)
+            return 
         def key = new InterimTreeNode(folder)
         def child = node.getByKey(key)
         List<SharedFile> rv = []
@@ -66,6 +68,8 @@ class LibraryTreeModel extends DefaultTreeModel {
     
     void removeFromTree(SharedFile sharedFile, boolean deleted) {
         def node = findParentNode(sharedFile.getFile(), deleted)
+        if (node == null)
+            return
         def leaf = node.getByKey(sharedFile)
         
         while(true) {
