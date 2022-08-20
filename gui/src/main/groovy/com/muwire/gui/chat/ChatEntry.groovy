@@ -23,7 +23,7 @@ import java.util.function.Function
 
 class ChatEntry extends JTextPane {
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM HH:mm:ss")
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd MMM HH:mm:ss")
 
     private static final char AT = "@".toCharacter()
     private static final char EQUALS = "=".toCharacter()
