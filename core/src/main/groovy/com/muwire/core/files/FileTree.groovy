@@ -52,6 +52,10 @@ class FileTree<T> {
         fileToNode.get(file)?.value
     }
     
+    boolean contains(File file) {
+        fileToNode.containsKey(file)
+    }
+    
     synchronized void traverse(FileTreeCallback<T> callback) {
         doTraverse(root, callback);
     }
