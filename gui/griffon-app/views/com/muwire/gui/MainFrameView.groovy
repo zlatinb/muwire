@@ -1647,6 +1647,8 @@ class MainFrameView {
     }
 
     def showDownloadsMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         int[] selected = selectedDownloaderRows()
         if (selected.length == 0)
             return
@@ -1753,6 +1755,8 @@ class MainFrameView {
     }
     
     void showFeedsPopupMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         Feed feed = selectedFeed()
         if (feed == null)
             return
@@ -1779,6 +1783,8 @@ class MainFrameView {
     }
     
     void showFeedItemsPopupMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         List<FeedItem> items = selectedFeedItems()
         if (items == null || items.isEmpty())
             return
@@ -1851,6 +1857,8 @@ class MainFrameView {
     }
     
     void showUploadsMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         MainFrameModel.UploaderWrapper uploaderWrapper = selectedUploader()
         if (uploaderWrapper == null)
             return
@@ -1896,29 +1904,10 @@ class MainFrameView {
     }
     
     void showSharedFilesPopupMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         Set<File> selectedFolders = selectedFolders()
         SharedFile singleSelectedFile = singleSelectedFile()
-        
-        if (selectedFolders.isEmpty()) {
-            List<SharedFile> selectedFiles = selectedSharedFiles()
-            if (selectedFiles == null || selectedFiles.isEmpty()) {
-                if (model.treeVisible) {
-                    JTree tree = (JTree) e.getComponent()
-                    int row = tree.getRowForLocation(e.getX(), e.getY())
-                    if (row < 0)
-                        return
-                    tree.setSelectionRow(row)
-                } else {
-                    JTable table = (JTable) e.getComponent()
-                    int row = table.rowAtPoint(e.getPoint())
-                    if (row < 0)
-                        return
-                    table.getSelectionModel().setSelectionInterval(row, row)
-                }
-                selectedFolders = this.selectedFolders()
-                singleSelectedFile = this.singleSelectedFile()
-            }
-        }
         
         JPopupMenu sharedFilesMenu = new JPopupMenu()
         
@@ -2356,6 +2345,8 @@ class MainFrameView {
     }
     
     private void showCollectionTableMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         int row = selectedCollectionRow()
         if (row < 0)
             return
@@ -2389,6 +2380,8 @@ class MainFrameView {
     }
     
     private void showItemsMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         int row = selectedItemRow()
         if (row < 0)
             return
@@ -2403,6 +2396,8 @@ class MainFrameView {
     }
     
     void showContactsMenu(MouseEvent e, boolean trusted) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         JPopupMenu trustMenu = new JPopupMenu()
         if (trusted && model.subscribeButtonEnabled) {
             JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))

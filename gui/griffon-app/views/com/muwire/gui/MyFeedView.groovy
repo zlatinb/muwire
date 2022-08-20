@@ -91,6 +91,8 @@ class MyFeedView {
     }
     
     private void showMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         JPopupMenu menu = new JPopupMenu()
         JMenuItem unpublish = new JMenuItem(trans("UNPUBLISH"))
         unpublish.addActionListener({controller.unpublish()})

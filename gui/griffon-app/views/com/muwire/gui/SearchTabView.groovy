@@ -496,19 +496,15 @@ class SearchTabView {
     }
     
     private void showSendersPopupMenu(MouseEvent event) {
-        JTable table = (JTable) event.getComponent()
-        Point point = event.getPoint()
-        int row = table.rowAtPoint(point)
-        if (row < 0)
+        if (!RightClickSupport.processRightClick(event))
             return
-        table.getSelectionModel().setSelectionInterval(row, row)
 
         JPopupMenu popupMenu = new JPopupMenu()
         JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
         viewProfileItem.addActionListener({mvcGroup.controller.viewProfile()})
         popupMenu.add(viewProfileItem)
         
-        popupMenu.show(table, event.getX(), event.getY())
+        popupMenu.show(event.getComponent(), event.getX(), event.getY())
     }
     
     private void showResultDetailsByFile(UIResultEvent event) {
@@ -559,6 +555,10 @@ class SearchTabView {
     }
 
     def showPopupMenu(MouseEvent e) {
+        
+        if (!RightClickSupport.processRightClick(e))
+            return
+        
         JPopupMenu menu = new JPopupMenu()
         boolean showMenu = false
         if (model.downloadActionEnabled) {

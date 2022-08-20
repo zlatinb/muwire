@@ -248,12 +248,18 @@ class MessageFolderView {
 
         messageHeaderTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3) {
+                    if (!RightClickSupport.processRightClick(e))
+                        return
                     showPopupMenu(buildMessagesMenu(), e)
+                }
             }
             public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.button == MouseEvent.BUTTON3) {
+                    if (!RightClickSupport.processRightClick(e))
+                        return
                     showPopupMenu(buildMessagesMenu(), e)
+                }
             }
         })
 

@@ -221,6 +221,9 @@ class BrowseView {
     }
     
     private void showMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
+        
         JPopupMenu menu = new JPopupMenu()
         if (model.downloadActionEnabled) {
             JMenuItem download = new JMenuItem(trans("DOWNLOAD"))

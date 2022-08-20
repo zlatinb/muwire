@@ -372,6 +372,8 @@ class CollectionTabView {
     }
     
     private void showCollectionMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         int row = selectedCollection()
         if (row < 0)
             return
@@ -383,6 +385,8 @@ class CollectionTabView {
     }
     
     private void showItemsMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         List<FileCollectionItem> selected = selectedItems()
         if (selected.isEmpty())
             return

@@ -190,12 +190,8 @@ class ChatRoomView {
     }
     
     private void showPopupMenu(MouseEvent e) {
-        JTable table = (JTable) e.getComponent()
-        Point point = e.getPoint()
-        int row = table.rowAtPoint(point)
-        if (row < 0)
+        if (!RightClickSupport.processRightClick(e))
             return
-        table.getSelectionModel().setSelectionInterval(row, row)
         JPopupMenu menu = new JPopupMenu()
         JMenuItem privateChat = new JMenuItem(trans("START_PRIVATE_CHAT"))
         privateChat.addActionListener({controller.privateMessage()})

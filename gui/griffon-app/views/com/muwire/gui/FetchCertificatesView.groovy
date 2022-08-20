@@ -113,6 +113,8 @@ class FetchCertificatesView {
     }
     
     private void showMenu(MouseEvent e) {
+        if (!RightClickSupport.processRightClick(e))
+            return
         JPopupMenu menu = new JPopupMenu()
         JMenuItem importItem = new JMenuItem(trans("IMPORT"))
         importItem.addActionListener({controller.importCertificates()})

@@ -150,12 +150,18 @@ class CollectionWizardView {
         
         filesTable.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {
-                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
+                    if (!RightClickSupport.processRightClick(e))
+                        return
                     filesMenu.show(e.getComponent(), e.getX(), e.getY())
+                }
             }
             public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3)
+                if (e.isPopupTrigger() || e.getButton() == MouseEvent.BUTTON3) {
+                    if (!RightClickSupport.processRightClick(e))
+                        return
                     filesMenu.show(e.getComponent(), e.getX(), e.getY())
+                }
             }
         })
         
