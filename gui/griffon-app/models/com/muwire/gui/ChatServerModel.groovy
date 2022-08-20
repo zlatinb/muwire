@@ -109,9 +109,12 @@ class ChatServerModel {
     }
     
     void onChatDisconnectionEvent(ChatDisconnectionEvent event) {
+        if (event.persona != host) 
+            return
         mvcGroup.childrenGroups.each {k, v ->
             v.controller.serverDisconnected()
         }
+            
     }
     
     private void eventLoop() {
