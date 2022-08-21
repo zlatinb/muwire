@@ -39,7 +39,7 @@ class RAIFileTest {
     void writeUTF8AtBoundary() {
         final int zeroes = RAIFile.MAX_SIZE - 8
         final String longString = "long long string"
-        zeroes.times {rf.writeByte(0)}
+        rf.seek(zeroes)
         rf.writeUTF(longString)
         rf.seek(zeroes)
         assert longString == rf.readUTF()
@@ -48,7 +48,7 @@ class RAIFileTest {
     @Test
     void writeLongAtBoundary() {
         final int zeroes = RAIFile.MAX_SIZE - 4
-        zeroes.times {rf.writeByte(0)}
+        rf.seek(zeroes)
         rf.writeLong(Long.MAX_VALUE)
         rf.seek(zeroes)
         assert Long.MAX_VALUE == rf.readLong()
