@@ -35,7 +35,11 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
                                             boolean leaf, int row, boolean hasFocus) {
          def userObject = value.getUserObject()
     
-         def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) 
+         def defaultRenderer = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
+         
+         if (userObject == null)
+             return defaultRenderer // TODO investigate
+         
          if (userObject instanceof ResultTreeNode) {
              String name = HTMLSanitizer.sanitize(userObject.toString())
              defaultRenderer.setText(name)
