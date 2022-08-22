@@ -19,6 +19,9 @@ class SharedFileNameRenderer extends DefaultTableCellRenderer {
     Component getTableCellRendererComponent(JTable table, Object value,
                                             boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+        if (value == null)
+            return this // TODO: investigate
+        
         SharedFile sf = (SharedFile) value
         String fullPath = HTMLSanitizer.sanitize(sf.getCachedPath())
         setToolTipText(fullPath)
