@@ -303,7 +303,7 @@ class WatchedDirectoryManager {
         }
         
         Set<File> addedFiles = new HashSet<>(filesOnFS)
-        addedFiles.removeAll(cb.files)
+        addedFiles.removeAll(cb.files.keySet())
         addedFiles.each { 
             eventBus.publish(new FileSharedEvent(file : it, fromWatch : true))
         }
@@ -313,9 +313,12 @@ class WatchedDirectoryManager {
             eventBus.publish(new FileSharedEvent(file : it, fromWatch : true))
         }
         
-        Set<File> deletedFiles = new HashSet<>(cb.files)
+        Set<File> deletedFiles = new HashSet<>(cb.files.keySet())
         deletedFiles.removeAll(filesOnFS)
-        eventBus.publish(new FileUnsharedEvent(unsharedFiles: deletedFiles.toArray(new SharedFile[0]), deleted: true))
+        List<SharedFile> unshared = []
+        for (File deleted : deletedFiles)
+            unshared << cb.files.get(deleted)
+        eventBus.publish(new FileUnsharedEvent(unsharedFiles: unshared, deleted: true))
         Set<File> deletedDirs = new HashSet<>(cb.dirs)
         deletedDirs.removeAll(dirsOnFS)
         deletedDirs.each {
@@ -325,12 +328,12 @@ class WatchedDirectoryManager {
     
     private static class DirSyncCallback implements FileListCallback<SharedFile> {
         
-        private final Set<File> files = new HashSet<>()
+        private final Map<File, SharedFile> files = new HashMap<>()
         private final Set<File> dirs = new HashSet<>()
 
         @Override
         public void onFile(File f, SharedFile value) {
-            files.add(f)
+            files.put(f, value)
         }
 
         @Override
