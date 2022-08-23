@@ -238,6 +238,7 @@ public class Core {
             routerProps.setProperty("router.sharePercentage", String.valueOf(props.sharePercentage))
             routerProps.setProperty("i2cp.disableInterface", "true")
             routerProps.setProperty("i2np.ntcp.nodelay", "true")
+            routerProps.setProperty("i2np.ssu2.enable", "true")
             routerProps.setProperty("router.encType","4")
             routerProps.setProperty("router.useShortTBM","true")
             routerProps.setProperty("i2np.ntcp.port", i2pOptions["i2np.ntcp.port"])
