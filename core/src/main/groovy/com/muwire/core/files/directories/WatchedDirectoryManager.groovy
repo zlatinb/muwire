@@ -72,18 +72,13 @@ class WatchedDirectoryManager {
     synchronized Visibility getVisibility(File f) {
         if (!isWatched(f))
             return Visibility.EVERYONE
-        WatchedDirectory wd = watchedDirs.get(f)
-        if (wd == null)
-            wd = aliasesMap.get(f)
-        return wd.visibility
+        return getDirectory(f).visibility
     }
     
     synchronized boolean isVisible(File f, Persona persona) {
         if (!isWatched(f))
             return true
-        WatchedDirectory wd = watchedDirs.get(f)
-        if (wd == null)
-            wd = aliasesMap.get(f)
+        WatchedDirectory wd = getDirectory(f)
         if (wd.visibility == Visibility.EVERYONE)
             return true
         if (wd.visibility == Visibility.CONTACTS)
@@ -103,7 +98,7 @@ class WatchedDirectoryManager {
     }
     
     synchronized void onUISyncDirectoryEvent(UISyncDirectoryEvent e) {
-        def wd = watchedDirs.get(e.directory)
+        def wd = getDirectory(e.directory)
         if (wd == null) {
             log.warning("Got a sync event for non-watched dir ${e.directory}")
             return
@@ -122,10 +117,7 @@ class WatchedDirectoryManager {
             persist(newDir)
         } else {
             e.toApply.each {
-                def wd
-                synchronized (this) {
-                    wd = watchedDirs.get(it)
-                }
+                def wd = getDirectory(it)
                 if (wd == null) {
                     log.severe("got a configuration event for a non-watched directory ${it}")
                     return
@@ -157,6 +149,11 @@ class WatchedDirectoryManager {
                         (settings.shareHiddenFiles || !wd.directory.isHidden())) {
                     synchronized (this) {
                         watchedDirs.put(wd.canonical, wd)
+                        if (wd.aliases != null) {
+                            wd.aliases.each {
+                                aliasesMap[it] = wd
+                            }
+                        }
                     }
                 }
                 else
