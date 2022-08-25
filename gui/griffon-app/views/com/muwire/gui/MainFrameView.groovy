@@ -2472,12 +2472,7 @@ class MainFrameView {
         settings.mainFrameY = mainFrame.getSize().height
         File uiPropsFile = new File(core.home, "gui.properties")
         uiPropsFile.withOutputStream { settings.write(it) }
-        
-        Thread t = new Thread({
-            core.shutdown()
-            application.shutdown()
-        }as Runnable)
-        t.start()
+        application.shutdown()
     }
     
     private class ResultTabsChangeListener implements ChangeListener {

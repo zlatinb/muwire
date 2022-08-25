@@ -12,6 +12,7 @@ import groovy.util.logging.Log
 @Log
 class EventBus {
 
+    private volatile boolean shutdown
     private Map handlers = new HashMap()
     private final ExecutorService executor = Executors.newSingleThreadExecutor {r ->
         def rv = new Thread(r)
@@ -21,6 +22,8 @@ class EventBus {
     }
 
     void publish(Event e) {
+        if (shutdown)
+            return
         executor.execute({publishInternal(e)} as Runnable)
     }
 
@@ -58,6 +61,7 @@ class EventBus {
     }
     
     void shutdown() {
+        shutdown = true
         executor.shutdownNow()
     }
 }

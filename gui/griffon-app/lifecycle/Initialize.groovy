@@ -52,6 +52,13 @@ class Initialize extends AbstractLifecycleHandler {
     @Override
     void execute() {
         
+        log.info("registering shutdown handler")
+        application.eventRouter.addEventListener("ShutdownStart",{
+            Core core = application.context.get("core")
+            if (core != null)
+                core.shutdown()
+        } as RunnableWithArgs)
+        
         log.info("registering exception displayer")
         application.eventRouter.addEventListener('UncaughtExceptionThrown',
                 {

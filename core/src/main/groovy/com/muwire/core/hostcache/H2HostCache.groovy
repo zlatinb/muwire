@@ -59,6 +59,8 @@ class H2HostCache extends HostCache {
     
     @Override
     protected synchronized void onConnection(Destination d, ConnectionAttemptStatus status) {
+        if (closed)
+            return
         
         log.fine("onConnection ${d.toBase32()} status $status")
         if (uniqueHosts.add(d)) {
