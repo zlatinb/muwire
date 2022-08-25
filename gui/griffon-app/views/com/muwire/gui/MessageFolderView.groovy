@@ -88,7 +88,7 @@ class MessageFolderView {
                                     sb.append("</html>")
                                     return sb.toString()
                                 })
-                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { it.message.subject })
+                                closureColumn(header: trans("SUBJECT"), preferredWidth: 300, type: String, read: { HTMLSanitizer.sanitize(it.message.subject) })
                                 closureColumn(header: trans("DATE"), preferredWidth: 50, type: Long, read: { it.message.timestamp })
                             }
                         }
