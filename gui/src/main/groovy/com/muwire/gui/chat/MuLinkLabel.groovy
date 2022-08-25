@@ -1,6 +1,6 @@
 package com.muwire.gui.chat
 
-
+import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.UISettings
 import com.muwire.core.mulinks.MuLink
 
@@ -19,8 +19,8 @@ abstract class MuLinkLabel extends JLabel {
         this.settings = settings
         
         String visibleText = getVisibleText()
-        String nbspd = visibleText.replaceAll(" ", "&nbsp;")
-        setText("<html>$nbspd</html>")
+        String escaped = HTMLSanitizer.escape(visibleText)
+        setText("<html>$escaped</html>")
         
         int preferredX = 0, preferredY = 24
 

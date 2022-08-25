@@ -19,6 +19,6 @@ class FileLinkLabel extends MuLinkLabel {
         StringBuffer sb = new StringBuffer()
         SizeFormatter.format(link.fileSize, sb)
         
-        HTMLSanitizer.escape(link.name) + " (" + sb.toString() + trans("BYTES_SHORT") + ")"
+        link.name + " (" + sb.toString() + trans("BYTES_SHORT") + ")"
     }
 }
