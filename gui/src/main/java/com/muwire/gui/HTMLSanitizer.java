@@ -23,6 +23,7 @@ public class HTMLSanitizer {
                 case '\"': sb.append("&quot;"); break;
                 case '<' : sb.append("&lt;"); break;
                 case '>' : sb.append("&gt;"); break;
+                case ' ' : sb.append("&nbsp;"); break;
                 default :
                     sb.append(c);
             }
