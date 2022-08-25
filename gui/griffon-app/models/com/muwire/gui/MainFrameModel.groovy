@@ -247,7 +247,7 @@ class MainFrameModel {
         uiSettings = application.context.get("ui-settings")
         
         messageNotificator = new MessageNotificator(uiSettings,
-                (TrayIcon) application.context.get("tray-icon"),
+                (NotifyService) application.context.get("notify-service"),
                 (Window) application.getWindowManager().findWindow("main-frame"),
                 (Image) view.builder.imageIcon("/email.png").image)
         

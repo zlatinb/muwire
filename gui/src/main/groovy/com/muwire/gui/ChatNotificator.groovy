@@ -1,6 +1,6 @@
 package com.muwire.gui
 
-import com.muwire.gui.linux.NotifyService
+import com.muwire.gui.linux.DBUSNotifyService
 import net.i2p.util.SystemVersion
 
 import java.awt.Image
@@ -26,7 +26,8 @@ class ChatNotificator {
     private final MVCGroupManager groupManager
     private final Window window
     private final Image image
-    private final TrayIcon trayIcon
+    
+    private final NotifyService notifyService
     
     private boolean chatInFocus
     private String currentServerTab
@@ -36,19 +37,15 @@ class ChatNotificator {
     
     private Listener listener
     
-    ChatNotificator(MVCGroupManager groupManager, TrayIcon trayIcon, Window window, Image image) {
+    ChatNotificator(MVCGroupManager groupManager, NotifyService notifyService, Window window, Image image) {
         this.groupManager = groupManager
         this.window = window
         this.image = image
-        this.trayIcon = trayIcon
+        this.notifyService = notifyService
     }
     
-    void notifyMention() {
-        String translated = trans("NEW_CHAT_MENTION")
-        if (!SystemVersion.isWindows() && !SystemVersion.isMac())
-            NotifyService.notify(translated)
-        if (trayIcon != null)
-            trayIcon.displayMessage(translated, translated, TrayIcon.MessageType.INFO)       
+    void notifyMention(String room, String server) {
+        notifyService.notifyChatMention(room, server)
     }
     
     void serverTabChanged(JTabbedPane source) {

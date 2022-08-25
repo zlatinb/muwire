@@ -275,7 +275,7 @@ class ChatRoomView {
         if (settings.chatNotifyMentions &&
                 sender.getPersona() != model.core.me &&
                 text.contains("@${model.core.me.toBase64()}@"))
-            chatNotificator.notifyMention()
+            chatNotificator.notifyMention(model.room, model.host.getHumanReadableName())
 
         
         boolean trusted = model.core.trustService.getLevel(sender.getPersona().getDestination()) == TrustLevel.TRUSTED

@@ -1,5 +1,6 @@
 import com.muwire.gui.LNFs
 import com.muwire.gui.MWErrorDisplayer
+import com.muwire.gui.NotifyService
 import com.muwire.gui.profile.ProfileConstants
 import com.muwire.gui.win.PrioritySetter
 import griffon.core.ExceptionHandler
@@ -164,13 +165,14 @@ class Initialize extends AbstractLifecycleHandler {
         
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
         
+        TrayIcon trayIcon = null
         if (SystemTray.isSupported()) {
             try {
                 def tray = SystemTray.getSystemTray()
                 def url = Initialize.class.getResource("/MuWire-16x16.png")
                 def image = new ImageIcon(url, "tray icon").getImage()
                 def popupMenu = new PopupMenu()
-                def trayIcon = new TrayIcon(image, "MuWire", popupMenu)
+                trayIcon = new TrayIcon(image, "MuWire", popupMenu)
 
 
                 def exit = new MenuItem(Translator.trans("EXIT"))
@@ -203,11 +205,12 @@ class Initialize extends AbstractLifecycleHandler {
                 
                 
                 trayIcon.addActionListener(showMW)
-                application.getContext().put("tray-icon", trayIcon)
             } catch (Exception bad) {
                 log.log(Level.WARNING,"couldn't set tray icon",bad)
             }
         }
+        NotifyService notifyService = new NotifyService(trayIcon)
+        application.context.put("notify-service", notifyService)
     }
 
     /**

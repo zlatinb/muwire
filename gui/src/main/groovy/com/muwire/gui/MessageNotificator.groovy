@@ -11,14 +11,14 @@ import java.awt.TrayIcon
 class MessageNotificator {
     
     private final UISettings settings
-    private final TrayIcon trayIcon
+    private final NotifyService notifyService
     private final Window window
     private final Image image
-    MessageNotificator(UISettings settings, TrayIcon trayIcon, Window window, Image image) {
+    MessageNotificator(UISettings settings, NotifyService notifyService, Window window, Image image) {
         this.settings = settings
-        this.trayIcon = trayIcon
         this.window = window
         this.image = image
+        this.notifyService = notifyService
     }
     
     void newMessage(String from) {
@@ -29,9 +29,7 @@ class MessageNotificator {
             if (taskBar.isSupported(Feature.USER_ATTENTION))
                 taskBar.requestUserAttention(true, false)
         }
-        if (trayIcon != null) {
-            trayIcon.displayMessage(trans("NEW_MESSAGE"), trans("NEW_MESSAGE_FROM",from), TrayIcon.MessageType.INFO)
-        }
+        notifyService.notifyNewMessage(from)
     }
     
     void messages(int count) {

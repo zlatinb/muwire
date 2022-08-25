@@ -8,35 +8,35 @@ import org.freedesktop.dbus.types.UInt32
 import org.freedesktop.dbus.types.UInt64
 import org.freedesktop.dbus.types.Variant
 
-class NotifyService {
+class DBUSNotifyService {
+    
+    public static final String SOUND_CHAT = "message-new-instant"
+    public static final String SOUND_MESSAGE = "message-new-email"
     
     private static final String BUS_NAME = "org.freedesktop.Notifications"
     private static final String BUS_PATH = "/org/freedesktop/Notifications"
-    private static final DBusConnection CONNECTION
-    
+    private static final Notifications NOTIFICATIONS
+    private static final boolean sound
     static {
-        CONNECTION = DBusConnectionBuilder.forSessionBus().build()
+        NOTIFICATIONS = DBusConnectionBuilder.forSessionBus().build().
+                getRemoteObject(BUS_NAME, BUS_PATH, Notifications.class)
+        sound = NOTIFICATIONS.GetCapabilities().contains("sound")
     }
     
-    static void notify(String text) {
-        println "notifying $text"
-        Notifications notifications = CONNECTION.getRemoteObject(BUS_NAME, BUS_PATH, Notifications.class)
-        boolean sound = notifications.GetCapabilities().contains("sound")
+    static void notify(String summary, String body, String soundName) {
         
         Map<String, Variant<?>> hints = new HashMap<>()
         if (sound) {
-            Variant<String> variant = new Variant("message-new-instant")
+            Variant<String> variant = new Variant(soundName)
             hints.put("sound-name", variant)
         }
-        UInt32 rv = notifications.Notify("MuWire", // app name 
+        UInt32 rv = NOTIFICATIONS.Notify("MuWire", // app name 
                 new UInt32(0L), // replaces
                 "", // no icon
-                text, // summary
-                text, // body
+                summary, // summary
+                body, // body
                 Collections.emptyList(), // actions
                 hints, // hints
                 -1) // expire timeout
-        
-        println "rv is $rv"
     }
 }

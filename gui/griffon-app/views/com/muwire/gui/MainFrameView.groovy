@@ -31,6 +31,7 @@ import javax.swing.event.ChangeListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.GridBagConstraints
 import java.awt.Image
+import java.awt.SystemTray
 import java.awt.TrayIcon
 import java.awt.Window
 import java.awt.event.ActionEvent
@@ -836,7 +837,7 @@ class MainFrameView {
         contactsPane.addTab(trans("DISTRUSTED"), distrustedContactsPanel)
         
         chatNotificator = new ChatNotificator(application.getMvcGroupManager(),
-                (TrayIcon)application.context.get("tray-icon"),
+                (NotifyService)application.context.get("notify-service"),
                 (Window)application.getWindowManager().findWindow("main-frame"),
                 (Image) builder.imageIcon("/comment.png").image)
         chatFavorites = new ChatFavorites(application)
@@ -856,7 +857,7 @@ class MainFrameView {
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 chatNotificator.mainWindowDeactivated()
-                if (application.getContext().get("tray-icon") != null) {
+                if (SystemTray.isSupported()) {
                     if (SystemVersion.isWindows())
                         PrioritySetter.enterBackgroundMode()
                     if (settings.closeWarning) {
