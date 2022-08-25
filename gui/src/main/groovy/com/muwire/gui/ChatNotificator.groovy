@@ -1,5 +1,8 @@
 package com.muwire.gui
 
+import com.muwire.gui.linux.NotifyService
+import net.i2p.util.SystemVersion
+
 import java.awt.Image
 import java.awt.Taskbar
 import java.awt.Taskbar.Feature
@@ -41,9 +44,11 @@ class ChatNotificator {
     }
     
     void notifyMention() {
-        if (trayIcon == null)
-            return
-        trayIcon.displayMessage(trans("NEW_CHAT_MENTION"), trans("NEW_CHAT_MENTION"), TrayIcon.MessageType.INFO)       
+        String translated = trans("NEW_CHAT_MENTION")
+        if (!SystemVersion.isWindows() && !SystemVersion.isMac())
+            NotifyService.notify(translated)
+        if (trayIcon != null)
+            trayIcon.displayMessage(translated, translated, TrayIcon.MessageType.INFO)       
     }
     
     void serverTabChanged(JTabbedPane source) {

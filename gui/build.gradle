@@ -115,6 +115,10 @@ dependencies {
     implementation "net.java.dev.jna:jna:5.10.0"
     implementation 'net.java.dev.jna:jna-platform:5.10.0'
 
+    implementation 'com.github.hypfvieh:dbus-java-parent:4.1.0'
+    implementation 'com.github.hypfvieh:dbus-java-transport-jnr-unixsocket:4.1.0'
+    implementation 'com.github.hypfvieh:dbus-java-transport-tcp:4.1.0'
+
     // runtime "org.slf4j:slf4j-simple:${slf4jVersion}"
 
     runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
