@@ -24,7 +24,7 @@ class NotifyService {
         println notifications.GetCapabilities()
         
         UInt32 rv = notifications.Notify("MuWire", // app name 
-                new UInt32(0L)), // replaces
+                new UInt32(0L), // replaces
                 "", // no icon
                 text, // summary
                 text, // body
