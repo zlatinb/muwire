@@ -76,7 +76,6 @@ class MuLinkPanel extends JPanel {
         preferredY += insets.top
         preferredY += insets.bottom
         
-        preferredX += 40
         
         setMaximumSize([(int)preferredX, (int)preferredY] as Dimension)
         float alignmentY = 0.5f + (settings.fontSize * 1f / preferredY) / 2
