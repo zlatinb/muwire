@@ -238,8 +238,6 @@ class MainFrameView {
                             borderLayout()
                             panel(constraints: BorderLayout.CENTER) {
                                 borderLayout()
-                                label("        " + trans("ENTER_SEARCH")+ " ", constraints: BorderLayout.WEST) // TODO: fix this
-                                
                                 def searchFieldModel = new SearchFieldModel(settings, new File(application.context.get("muwire-home")))
                                 JComboBox myComboBox = new SearchField(searchFieldModel)
                                 myComboBox.setAction(searchAction)
@@ -248,7 +246,7 @@ class MainFrameView {
 
                             }
                             panel( constraints: BorderLayout.EAST) {
-                                button(text: trans("SEARCH"), searchAction)
+                                button(text: "", icon: imageIcon("/search.png"), toolTipText: trans("SEARCH"), searchAction)
                             }
                         }
                     }
