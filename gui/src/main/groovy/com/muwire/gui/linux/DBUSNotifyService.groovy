@@ -40,13 +40,15 @@ class DBUSNotifyService {
             Variant<String> variant = new Variant(soundName)
             hints.put("sound-name", variant)
         }
-        UInt32 rv = NOTIFICATIONS.Notify("MuWire", // app name 
-                new UInt32(0L), // replaces
-                "", // no icon
-                summary, // summary
-                body, // body
-                Collections.emptyList(), // actions
-                hints, // hints
-                -1) // expire timeout
+        try {
+            NOTIFICATIONS.Notify("MuWire", // app name 
+                    new UInt32(0L), // replaces
+                    "", // no icon
+                    summary, // summary
+                    body, // body
+                    Collections.emptyList(), // actions
+                    hints, // hints
+                    -1) // expire timeout
+        } catch (NoReply ignore) {}
     }
 }
