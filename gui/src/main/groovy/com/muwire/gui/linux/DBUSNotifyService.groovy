@@ -3,6 +3,8 @@ package com.muwire.gui.linux
 import org.freedesktop.Notifications
 import org.freedesktop.dbus.connections.impl.DBusConnection
 import org.freedesktop.dbus.connections.impl.DBusConnectionBuilder
+import org.freedesktop.dbus.errors.NoReply
+import org.freedesktop.dbus.exceptions.DBusException
 import org.freedesktop.dbus.interfaces.DBusInterface
 import org.freedesktop.dbus.types.UInt32
 import org.freedesktop.dbus.types.UInt64
@@ -18,12 +20,20 @@ class DBUSNotifyService {
     private static final Notifications NOTIFICATIONS
     private static final boolean sound
     static {
-        NOTIFICATIONS = DBusConnectionBuilder.forSessionBus().build().
-                getRemoteObject(BUS_NAME, BUS_PATH, Notifications.class)
-        sound = NOTIFICATIONS.GetCapabilities().contains("sound")
+        Notifications notifications = null
+        try {
+            notifications = DBusConnectionBuilder.forSessionBus().build().
+                    getRemoteObject(BUS_NAME, BUS_PATH, Notifications.class)
+            sound = notifications.GetCapabilities().contains("sound")
+        } catch (DBusException | NoReply bad) {
+            sound = false
+        }
+        NOTIFICATIONS = notifications
     }
     
     static void notify(String summary, String body, String soundName) {
+        if (NOTIFICATIONS == null)
+            return
         
         Map<String, Variant<?>> hints = new HashMap<>()
         if (sound) {
