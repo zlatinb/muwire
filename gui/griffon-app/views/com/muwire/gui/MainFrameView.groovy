@@ -158,7 +158,7 @@ class MainFrameView {
         builder.with {
             application(size : [mainFrameX,mainFrameY], id: 'main-frame',
             locationRelativeTo : null,
-            defaultCloseOperation : JFrame.DO_NOTHING_ON_CLOSE,
+            defaultCloseOperation : JFrame.DISPOSE_ON_CLOSE,
             title: application.configuration['application.title'] + " " + version,
             iconImage:   imageIcon('/MuWire-48x48.png').image,
             iconImages: [imageIcon('/MuWire-48x48.png').image,
