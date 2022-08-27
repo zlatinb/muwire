@@ -854,45 +854,7 @@ class MainFrameView {
 
         def mainFrame = builder.getVariable("main-frame")
 
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                chatNotificator.mainWindowDeactivated()
-                if (SystemTray.isSupported()) {
-                    if (SystemVersion.isWindows())
-                        PrioritySetter.enterBackgroundMode()
-                    if (settings.closeWarning) {
-                        runInsideUIAsync {
-                            Map<String, Object> args2 = new HashMap<>()
-                            args2.put("settings", settings)
-                            args2.put("home", model.core.home)
-                            mvcGroup.createMVCGroup("close-warning", "Close Warning", args2).destroy()
-                        }
-                    } else if (settings.exitOnClose)
-                        closeApplication()
-                } else {
-                    closeApplication()
-                }
-            }
-
-            public void windowDeactivated(WindowEvent e) {
-                chatNotificator.mainWindowDeactivated()
-            }
-
-            public void windowActivated(WindowEvent e) {
-                if (!model.chatPaneButtonEnabled)
-                    chatNotificator.mainWindowActivated()
-            }
-            
-            public void windowIconified(WindowEvent e) {
-                if (SystemVersion.isWindows())
-                    PrioritySetter.enterBackgroundMode()
-            }
-            
-            public void windowDeiconified(WindowEvent e) {
-                if(SystemVersion.isWindows())
-                    PrioritySetter.exitBackgroundMode()
-            }
-        })
+        mainFrame.addWindowListener(new MWWindowAdapter())
 
         // search field
         JComponent searchField = builder.getVariable("search-field")
@@ -2537,6 +2499,54 @@ class MainFrameView {
     void switchLibraryTitle() {
         def cardsPanel = builder.getVariable("library-title")
         cardsPanel.getLayout().show(cardsPanel, "you-can-drag-and-drop")
+    }
+    
+    private class MWWindowAdapter extends WindowAdapter {
+        private boolean backGroundMode, exit
+
+        public void windowClosing(WindowEvent e) {
+            chatNotificator.mainWindowDeactivated()
+            if (SystemTray.isSupported()) {
+                backGroundMode = true
+                if (settings.closeWarning) {
+                    runInsideUIAsync {
+                        Map<String, Object> args2 = new HashMap<>()
+                        args2.put("settings", settings)
+                        args2.put("home", model.core.home)
+                        mvcGroup.createMVCGroup("close-warning", "Close Warning", args2).destroy()
+                    }
+                } else if (settings.exitOnClose)
+                    exit = true
+            } else {
+                exit = true
+            }
+        }
+
+        public void windowDeactivated(WindowEvent e) {
+            chatNotificator.mainWindowDeactivated()
+        }
+
+        public void windowActivated(WindowEvent e) {
+            if (!model.chatPaneButtonEnabled)
+                chatNotificator.mainWindowActivated()
+        }
+
+        public void windowIconified(WindowEvent e) {
+            if (SystemVersion.isWindows())
+                PrioritySetter.enterBackgroundMode()
+        }
+
+        public void windowDeiconified(WindowEvent e) {
+            if(SystemVersion.isWindows())
+                PrioritySetter.exitBackgroundMode()
+        }
+
+        public void windowClosed(WindowEvent e) {
+            if (exit)
+                closeApplication()
+            else if (backGroundMode && SystemVersion.isWindows())
+                PrioritySetter.enterBackgroundMode()
+        }
     }
 
     private class MWTransferHandler extends TransferHandler {
