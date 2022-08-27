@@ -56,17 +56,25 @@ class BrowseManager {
     void processV1Request(Persona browser, Endpoint endpoint, boolean showPaths) {
         def sharedFiles = fileManager.getSharedFiles().values()
         sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), browser)}
-        def dos = new DataOutputStream(new GZIPOutputStream(endpoint.getOutputStream()))
+        def dos = null
         JsonOutput jsonOutput = new JsonOutput()
-        sharedFiles.each {
-            it.hit(browser, System.currentTimeMillis(), "Browse Host");
-            InfoHash ih = new InfoHash(it.getRoot())
-            int certificates = certificateManager.getByInfoHash(ih).size()
-            Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-            def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections, showPaths)
-            def json = jsonOutput.toJson(obj)
-            dos.writeShort((short)json.length())
-            dos.write(json.getBytes(StandardCharsets.US_ASCII))
+        try {
+            dos = new DataOutputStream(new GZIPOutputStream(endpoint.getOutputStream()))
+            sharedFiles.each {
+                it.hit(browser, System.currentTimeMillis(), "Browse Host");
+                InfoHash ih = new InfoHash(it.getRoot())
+                int certificates = certificateManager.getByInfoHash(ih).size()
+                Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
+                def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections, showPaths)
+                def json = jsonOutput.toJson(obj)
+                dos.writeShort((short)json.length())
+                dos.write(json.getBytes(StandardCharsets.US_ASCII))
+            }
+        } finally {
+            try {
+                dos?.flush()
+                dos?.close()
+            } catch (Exception ignore) {}
         }
     }
 }
