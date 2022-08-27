@@ -1,6 +1,6 @@
 package com.muwire.core.collections
 
-class PathTree {
+class PathTree<T> {
 
     private final Map<PathNode.Key, PathNode> keyToNode = new HashMap<>()
 
@@ -11,7 +11,7 @@ class PathTree {
         keyToNode.put(this.root.key(), this.root)
     }
 
-    void add(List<String> paths, FileCollectionItem item) {
+    void add(List<String> paths, T item) {
         PathNode current = null
         for (String path : paths) {
             if (current == null) {
@@ -40,7 +40,7 @@ class PathTree {
     
     private void doTraverse(PathNode node, Callback cb) {
         if (node.children.isEmpty())
-            cb.onFile(node.path)
+            cb.onFile(node.path, node.userObject)
         else {
             cb.onDirectoryEnter(node.path)
             for (PathNode child : node.children)
@@ -49,12 +49,12 @@ class PathTree {
         }
     }
 
-    static class PathNode {
+    static class PathNode<T> {
         final String path
         final PathNode parent
         final Set<PathNode> children = new LinkedHashSet<>()
         private final int hashCode
-        Object userObject
+        T userObject
 
         PathNode(String path, PathNode parent) {
             this.parent = parent
@@ -82,9 +82,9 @@ class PathTree {
         }
     }
     
-    public static interface Callback {
+    public static interface Callback<T> {
         public void onDirectoryEnter(String name)
         public void onDirectoryLeave()
-        public void onFile(String name)
+        public void onFile(String name, T value)
     }
 }

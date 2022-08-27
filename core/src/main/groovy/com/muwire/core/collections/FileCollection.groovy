@@ -38,7 +38,7 @@ class FileCollection {
         this.files = files
         
         name = files.first().pathElements.first()
-        tree = new PathTree(name)
+        tree = new PathTree<FileCollectionItem>(name)
         for(FileCollectionItem item : files) {
             tree.add(item.pathElements, item)
         }
@@ -74,7 +74,7 @@ class FileCollection {
             throw new InvalidCollectionException("invalid signature")
         
         name = files.first().pathElements.first()
-        tree = new PathTree(name)
+        tree = new PathTree<FileCollectionItem>(name)
         for(FileCollectionItem item : files) {
             tree.add(item.pathElements, item)
         }
