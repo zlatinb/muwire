@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.download.UIDownloadLinkEvent
 import com.muwire.core.files.DirectoryUnsharedEvent
 import com.muwire.core.files.directories.WatchedDirectory
+import com.muwire.core.hostcache.HostDiscoveredEvent
 import com.muwire.core.messenger.UIFolderCreateEvent
 import com.muwire.core.messenger.UIFolderDeleteEvent
 import com.muwire.gui.MainFrameModel.UploaderWrapper
@@ -13,7 +14,9 @@ import com.muwire.core.mulinks.MuLink
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.TrustPOP
 import com.muwire.gui.profile.ViewProfileHelper
+import net.i2p.data.Destination
 
+import javax.swing.JFileChooser
 import javax.swing.JTextField
 import java.util.regex.Pattern
 
@@ -1162,6 +1165,67 @@ class MainFrameController {
             args['available'] = model.updateAvailableEvent
             args['downloaded'] = model.updateDownloadedEvent
             mvcGroup.createMVCGroup("update", "update", args).destroy()
+        }
+    }
+    
+    @ControllerAction
+    void importConnections() {
+        def chooser = new JFileChooser()
+        chooser.setDialogTitle(trans("IMPORT_CONNECTIONS_TITLE"))
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        int rv = chooser.showOpenDialog(null)
+        if (rv != JFileChooser.APPROVE_OPTION)
+            return
+        
+        int imported = 0
+        File f = chooser.getSelectedFile()
+        try {
+            f.eachLine {
+                Destination destination = new Destination(it)
+                model.core.getEventBus().publish(new HostDiscoveredEvent(destination: destination, fromHostcache: true))
+                imported++
+            }
+        } catch (Exception ignored) {}
+        
+        if (imported == 0) {
+            JOptionPane.showMessageDialog(null, trans("IMPORT_CONNECTIONS_FAILED"),
+                trans("IMPORT_CONNECTIONS_FAILED"), JOptionPane.ERROR_MESSAGE)
+        } else {
+            JOptionPane.showMessageDialog(null, trans("IMPORT_CONNECTIONS_SUCCESS", imported),
+                trans("IMPORT_CONNECTIONS_IMPORTED"), JOptionPane.INFORMATION_MESSAGE)
+        }
+    }
+    
+    @ControllerAction
+    void exportConnections() {
+        def chooser = new JFileChooser()
+        chooser.setDialogTitle(trans("EXPORT_CONNECTIONS_TITLE"))
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY)
+        int rv = chooser.showSaveDialog(null)
+        if (rv != JFileChooser.APPROVE_OPTION)
+            return
+        
+        int exported = 0
+        File f = chooser.getSelectedFile()
+        try {
+            f.withPrintWriter {
+                it.println(model.core.me.getDestination().toBase64()) // always export myself
+                exported++
+                List<Destination> goodHosts = model.core.getHostCache().getGoodHosts(Integer.MAX_VALUE)
+                for (Destination destination : goodHosts) {
+                    it.println(destination.toBase64())
+                    exported++
+                }
+            }
+        } catch (Exception ignored) {}
+        
+        if (exported == 0) {
+            JOptionPane.showMessageDialog(null, trans("EXPORT_CONNECTIONS_FAILED"),
+                    trans("EXPORT_CONNECTIONS_FAILED"), JOptionPane.ERROR_MESSAGE)
+        } else {
+            JOptionPane.showMessageDialog(null, 
+                    trans("EXPORT_CONNECTIONS_SUCCESS", exported, f.getAbsolutePath()),
+                    trans("EXPORT_CONNECTIONS_EXPORTED"), JOptionPane.INFORMATION_MESSAGE)
         }
     }
 

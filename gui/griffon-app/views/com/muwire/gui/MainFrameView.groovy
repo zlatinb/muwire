@@ -179,6 +179,10 @@ class MainFrameView {
                             mvcGroup.createMVCGroup("Options", params).destroy()
                         })
                     }
+                    menu (text : trans("CONNECTIONS")) {
+                        menuItem(trans("IMPORT_CONNECTIONS"), actionPerformed: {controller.importConnections()})
+                        menuItem(trans("EXPORT_CONNECTIONS"), actionPerformed: {controller.exportConnections()})
+                    }
                     menu (text : trans("STATUS")) {
                         menuItem("MuWire", actionPerformed : {mvcGroup.createMVCGroup("mu-wire-status").destroy()})
                         MuWireSettings muSettings = application.context.get("muwire-settings")

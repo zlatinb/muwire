@@ -19,8 +19,6 @@
 
 |Name|GitHub issue|Component(s)|Priority|
 |---|---|---|---|
-|Add custom connection|N/A|Core, GUI|High|
-|Export known hosts|N/A|Core, GUI|High|
 |Rewrite download peristence|167|Core|High|
 |Redesign options window|N/A|GUI|Medium|
 |Free space check before dnwnload|N/A|Core, GUI|Medium|
