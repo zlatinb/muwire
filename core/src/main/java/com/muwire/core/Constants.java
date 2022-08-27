@@ -14,6 +14,8 @@ public class Constants {
     public static final int MAX_PROFILE_IMAGE_LENGTH = 200 * 1024;
     public static final int MAX_PROFILE_LENGTH = 0x1 << 18;
     
+    public static final int BROWSE_VERSION = 2;
+    
     public static final byte FILE_CERT_VERSION = (byte)2;
     public static final int CHAT_VERSION = 2;
     

@@ -2,6 +2,7 @@ package com.muwire.core.connection
 
 import com.muwire.core.profile.MWProfile
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.core.search.BrowseManager
 import net.i2p.I2PException
 import net.i2p.data.ByteArray
 
@@ -69,6 +70,7 @@ class ConnectionAcceptor {
     final CertificateManager certificateManager
     final ChatServer chatServer
     final CollectionManager collectionManager
+    private final BrowseManager browseManager
     private final BiPredicate<File, Persona> isVisible
 
     final ExecutorService acceptorThread
@@ -79,10 +81,11 @@ class ConnectionAcceptor {
     volatile int browsed
 
     ConnectionAcceptor(EventBus eventBus, Persona me, Supplier<MWProfile> myProfile, UltrapeerConnectionManager manager,
-        MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
-        TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
-        FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
-        ChatServer chatServer, CollectionManager collectionManager, BiPredicate<File,Persona> isVisible) {
+                       MuWireSettings settings, I2PAcceptor acceptor, HostCache hostCache,
+                       TrustService trustService, SearchManager searchManager, UploadManager uploadManager,
+                       FileManager fileManager, ConnectionEstablisher establisher, CertificateManager certificateManager,
+                       ChatServer chatServer, CollectionManager collectionManager, BrowseManager browseManager,
+                       BiPredicate < File, Persona > isVisible) {
         this.eventBus = eventBus
         this.me = me
         this.myProfile = myProfile
@@ -98,6 +101,7 @@ class ConnectionAcceptor {
         this.certificateManager = certificateManager
         this.chatServer = chatServer
         this.collectionManager = collectionManager
+        this.browseManager = browseManager
         this.isVisible = isVisible
 
         acceptorThread = Executors.newSingleThreadExecutor { r ->
@@ -407,7 +411,6 @@ class ConnectionAcceptor {
     }
     
     private void processBROWSE(Endpoint e) {
-        DataOutputStream dos = null
         try {
             byte [] rowse = new byte[7]
             DataInputStream dis = new DataInputStream(e.getInputStream())
@@ -430,19 +433,25 @@ class ConnectionAcceptor {
                 e.close()
                 return
             }
-
+            
+            int version = 1
+            if (headers.containsKey("Version"))
+                version = Math.min(Constants.BROWSE_VERSION, Integer.parseInt(headers['Version']))
+            
             browsed++
-            
-            boolean showPaths = settings.showPaths && 
-                    headers.containsKey('Path') && 
-                    Boolean.parseBoolean(headers['Path'])
-            
+
+
             os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            boolean showPaths = settings.showPaths &&
+                    headers.containsKey('Path') &&
+                    Boolean.parseBoolean(headers['Path'])
 
-            def sharedFiles = fileManager.getSharedFiles().values()
-            sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), browser)}
+            int count = fileManager.getFileToSharedFile().values().count {
+                isVisible.test(it.file.getParentFile(), browser)
+            }
 
-            os.write("Count: ${sharedFiles.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Count: ${count}\r\n".getBytes(StandardCharsets.US_ASCII))
             
             boolean chat = chatServer.isRunning() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -455,25 +464,13 @@ class ConnectionAcceptor {
                 os.write("ProfileHeader: ${profile.getHeader().toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
             }
             
+            os.write("Version:$version\r\n".getBytes(StandardCharsets.US_ASCII))
+            
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
-            dos = new DataOutputStream(new GZIPOutputStream(os))
-            JsonOutput jsonOutput = new JsonOutput()
-            sharedFiles.each {
-                it.hit(browser, System.currentTimeMillis(), "Browse Host");
-                InfoHash ih = new InfoHash(it.getRoot())
-                int certificates = certificateManager.getByInfoHash(ih).size()
-                Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
-                def obj = ResultsSender.sharedFileToObj(it, false, certificates, collections, showPaths)
-                def json = jsonOutput.toJson(obj)
-                dos.writeShort((short)json.length())
-                dos.write(json.getBytes(StandardCharsets.US_ASCII))
-            }
+            if (version == 1)
+                browseManager.processV1Request(browser, e, showPaths)
         } finally {
-            try {
-                dos?.flush()
-                dos?.close()
-            } catch (Exception ignored) {}
             e.close()
         }
     }

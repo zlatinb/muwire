@@ -490,22 +490,24 @@ public class Core {
         log.info("initializing connection establisher")
         connectionEstablisher = new ConnectionEstablisher(eventBus, i2pConnector, props, connectionManager, hostCache)
 
+        log.info("initializing browse manager")
+        BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me, fileManager, 
+                certificateManager, collectionManager, isVisible)
+        eventBus.register(UIBrowseEvent.class, browseManager)
+        
         log.info("initializing acceptor")
         I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pConnector::getSocketManager)
         eventBus.register(RouterConnectedEvent.class, i2pAcceptor)
         eventBus.register(RouterDisconnectedEvent.class, i2pAcceptor)
         connectionAcceptor = new ConnectionAcceptor(eventBus, me, profileSupplier, connectionManager, props,
             i2pAcceptor, hostCache, trustService, searchManager, uploadManager, fileManager, connectionEstablisher,
-            certificateManager, chatServer, collectionManager, isVisible)
+            certificateManager, chatServer, collectionManager, browseManager, isVisible)
 
         log.info("initializing trust subscriber")
         trustSubscriber = new TrustSubscriber(eventBus, i2pConnector, props)
         eventBus.register(UILoadedEvent.class, trustSubscriber)
         eventBus.register(TrustSubscriptionEvent.class, trustSubscriber)
         
-        log.info("initializing browse manager")
-        BrowseManager browseManager = new BrowseManager(i2pConnector, eventBus, me)
-        eventBus.register(UIBrowseEvent.class, browseManager)
         
         log.info("initializing profile fetcher")
         MWProfileFetcher profileFetcher = new MWProfileFetcher(i2pConnector, eventBus, me, profileHeaderSupplier)
