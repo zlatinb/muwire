@@ -4,19 +4,26 @@ import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
+import com.muwire.core.SharedFile
 import com.muwire.core.collections.CollectionManager
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.filecert.CertificateManager
+import com.muwire.core.files.FileListCallback
 import com.muwire.core.files.FileManager
+import com.muwire.core.files.FileTree
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
+import com.muwire.core.util.PathTree
+import com.muwire.core.util.PathTreeListCallback
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.function.BiPredicate
@@ -54,6 +61,8 @@ class BrowseManager {
     }
     
     void processV1Request(Persona browser, Endpoint endpoint, boolean showPaths) {
+        endpoint.getOutputStream().write("\r\n".getBytes(StandardCharsets.US_ASCII))
+        
         def sharedFiles = fileManager.getSharedFiles().values()
         sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), browser)}
         def dos = null
@@ -75,6 +84,141 @@ class BrowseManager {
                 dos?.flush()
                 dos?.close()
             } catch (Exception ignore) {}
+        }
+    }
+    
+    void processV2Request(Persona browser, Endpoint endpoint) {
+        // 1. build the tree the browser will see
+        PathTree<SharedFile> tempTree = new PathTree<>()
+        for (SharedFile sf : fileManager.getSharedFiles().values()) {
+            if (!isVisible.test(sf.file.getParentFile(), browser))
+                continue
+            Path path = sf.getPathToSharedParent()
+            if (path == null) {
+                path = Path.of(sf.getFile().getName())
+            } else {
+                String first = path.getName(0)
+                String[] more = new String[path.getNameCount()]
+                for (int i = 1; i < path.getNameCount(); i ++)
+                    more[i - 1] = path.getName(i)
+                more[more.length - 1] = sf.getFile().getName()
+                path = Path.of(first, more)
+            }
+            tempTree.add(path, sf)
+        }
+        
+        // 2. Grab the top-level items (top level is actually hidden roots, so level 2)
+        def hiddenRoots = new ListCallback()
+        tempTree.list(null, hiddenRoots)
+        def topLevelItems = new ListCallback()
+        for (Path path : hiddenRoots.dirs) {
+            tempTree.list(path, topLevelItems)
+        }
+        
+        int itemCount = topLevelItems.dirs.size() + topLevelItems.files.size()
+        topLevelItems.files.values().each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
+        OutputStream os = endpoint.getOutputStream()
+        os.write("ItemCount:${itemCount}\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+
+        JsonOutput jsonOutput = new JsonOutput()
+        DataOutputStream dos = null
+        GZIPOutputStream gzos = null
+        try {
+            gzos = new GZIPOutputStream(os)
+            dos = new DataOutputStream(gzos)
+            writeFiles(topLevelItems.files.values(), dos, jsonOutput)
+            writeDirs(topLevelItems.dirs, dos, jsonOutput)
+            dos.flush()
+            gzos.finish()
+            
+            while(true) {
+                String firstLine = DataUtil.readTillRN(endpoint.getInputStream())
+                if (firstLine.startsWith("PING")) {
+                    os.write("PONG\r\n".getBytes(StandardCharsets.US_ASCII))
+                    os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+                    os.flush()
+                    continue
+                } 
+                if (!firstLine.startsWith("GET ")) 
+                    throw new Exception("=Unknown verb")
+                
+                firstLine = firstLine.substring(4)
+                String[] elements = firstLine.split(",")
+                if (elements.length == 0)
+                    throw new Exception("invalid GET request")
+                def decoded = elements.collect {DataUtil.readi18nString(Base64.decode(it))}
+                String first = decoded.remove(0)
+                String[] more = decoded.toArray(new String[0])
+                Path requestedPath = Path.of(first, more)
+
+                os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+                
+                // TODO: add recursive
+                def cb = new ListCallback()
+                tempTree.list(requestedPath, cb)
+                
+                itemCount = cb.dirs.size() + cb.files.size()
+                os.write("ItemCount:${itemCount}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+                
+                gzos = new GZIPOutputStream(os)
+                dos = new DataOutputStream(gzos)
+                writeFiles(cb.files.values(), dos, jsonOutput)  
+                writeDirs(cb.dirs, dos, jsonOutput)
+                dos.flush()
+                gzos.finish()
+            }
+        } finally {
+            try {
+                dos?.flush()
+                dos?.close()
+            } catch (Exception ignored) {}
+        }
+    }
+    
+    private void writeFiles(Collection<SharedFile> files, DataOutputStream dos, JsonOutput jsonOutput) {
+        for (SharedFile sharedFile : files) {
+            InfoHash ih = sharedFile.getRootInfoHash()
+            int certificates = certificateManager.getByInfoHash(ih).size()
+            Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
+            def obj = ResultsSender.sharedFileToObj(sharedFile, false, certificates, collections, true)
+            def json = jsonOutput.toJson(obj)
+            dos.writeShort((short)json.length())
+            dos.write(json.getBytes(StandardCharsets.US_ASCII))
+        }
+    }
+    
+    private void writeDirs(Collection<Path> dirs, DataOutputStream dos, JsonOutput jsonOutput) {
+        for(Path path : dirs) {
+            def obj = [:]
+            obj.directory = true
+            List<String> toStringPaths = []
+            for (Path element : path) {
+                String toString = element.toString()
+                if (!toString.isEmpty())
+                    toStringPaths << Base64.encode(DataUtil.encodei18nString(toString))
+            }
+            obj.path = toStringPaths
+            def json = jsonOutput.toJson(obj)
+            dos.writeShort((short)json.length())
+            dos.write(json.getBytes(StandardCharsets.US_ASCII))
+        }
+    }
+    
+    private static class ListCallback implements PathTreeListCallback<SharedFile> {
+
+        final Map<Path, SharedFile> files = new HashMap<>()
+        final Set<Path> dirs = new HashSet<>()
+
+        @Override
+        void onLeaf(Path path, SharedFile value) {
+            files.put(path, value)
+        }
+
+        @Override
+        void onDirectory(Path path) {
+            dirs.add(path)
         }
     }
 }

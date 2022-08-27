@@ -466,10 +466,10 @@ class ConnectionAcceptor {
             
             os.write("Version:$version\r\n".getBytes(StandardCharsets.US_ASCII))
             
-            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-
             if (version == 1)
                 browseManager.processV1Request(browser, e, showPaths)
+            else if (version == 2)
+                browseManager.processV2Request(browser, e)
         } finally {
             e.close()
         }
