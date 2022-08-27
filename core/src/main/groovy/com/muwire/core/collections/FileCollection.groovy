@@ -6,8 +6,6 @@ import com.muwire.core.Constants
 import com.muwire.core.InfoHash
 import com.muwire.core.Name
 import com.muwire.core.Persona
-import com.muwire.core.util.DataUtil
-
 import net.i2p.crypto.DSAEngine
 import net.i2p.data.Signature
 import net.i2p.data.SigningPrivateKey
@@ -26,7 +24,7 @@ class FileCollection {
     
     final Set<FileCollectionItem> files = new LinkedHashSet<>()
     
-    final PathTree tree
+    final StringPathTree tree
 
     final List<SearchHit> hits = new ArrayList<>()
         
@@ -38,7 +36,7 @@ class FileCollection {
         this.files = files
         
         name = files.first().pathElements.first()
-        tree = new PathTree<FileCollectionItem>(name)
+        tree = new StringPathTree<FileCollectionItem>(name)
         for(FileCollectionItem item : files) {
             tree.add(item.pathElements, item)
         }
@@ -74,7 +72,7 @@ class FileCollection {
             throw new InvalidCollectionException("invalid signature")
         
         name = files.first().pathElements.first()
-        tree = new PathTree<FileCollectionItem>(name)
+        tree = new StringPathTree<FileCollectionItem>(name)
         for(FileCollectionItem item : files) {
             tree.add(item.pathElements, item)
         }

@@ -1,11 +1,12 @@
 package com.muwire.core.collections
 
-class PathTree<T> {
+class StringPathTree<T> {
 
     private final Map<PathNode.Key, PathNode> keyToNode = new HashMap<>()
 
     final PathNode root
-    PathTree(String root) {
+
+    StringPathTree(String root) {
         this.root = new PathNode(root, null)
         this.root.setUserObject(root)
         keyToNode.put(this.root.key(), this.root)

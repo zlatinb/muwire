@@ -6,7 +6,7 @@ import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
 
-import com.muwire.core.collections.PathTree
+import com.muwire.core.collections.StringPathTree
 
 
 
@@ -15,7 +15,7 @@ class TreeUtil {
     private TreeUtil() {
     }
     
-    public static void copy(DefaultMutableTreeNode jtreeNode, PathTree.PathNode pathNode) {
+    public static void copy(DefaultMutableTreeNode jtreeNode, StringPathTree.PathNode pathNode) {
         jtreeNode.setUserObject(pathNode.getUserObject())
         pathNode.children.each {
             MutableTreeNode newChild = new DefaultMutableTreeNode()

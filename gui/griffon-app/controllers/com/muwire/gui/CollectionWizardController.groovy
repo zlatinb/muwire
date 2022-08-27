@@ -10,13 +10,9 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 import javax.annotation.Nonnull
-import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.MutableTreeNode
 
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollectionBuilder
-import com.muwire.core.collections.PathTree
-import com.muwire.core.collections.PathTree.Callback
 import com.muwire.core.collections.UICollectionCreatedEvent
 
 @ArtifactProviderFor(GriffonController)
