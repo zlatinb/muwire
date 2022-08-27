@@ -115,10 +115,10 @@ class BrowseManager {
             tempTree.list(path, topLevelItems)
         }
         
-        int itemCount = topLevelItems.dirs.size() + topLevelItems.files.size()
         topLevelItems.files.values().each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
         OutputStream os = endpoint.getOutputStream()
-        os.write("ItemCount:${itemCount}\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("Files:${topLevelItems.files.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.write("Dirs:${topLevelItems.dirs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
         JsonOutput jsonOutput = new JsonOutput()
@@ -158,8 +158,8 @@ class BrowseManager {
                 def cb = new ListCallback()
                 tempTree.list(requestedPath, cb)
                 
-                itemCount = cb.dirs.size() + cb.files.size()
-                os.write("ItemCount:${itemCount}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("Files:${cb.files.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("Dirs:${cb.dirs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                 
                 gzos = new GZIPOutputStream(os)

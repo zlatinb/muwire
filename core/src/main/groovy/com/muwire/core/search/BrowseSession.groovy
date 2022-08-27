@@ -1,5 +1,6 @@
 package com.muwire.core.search
 
+import com.muwire.core.Constants
 import com.muwire.core.EventBus
 import com.muwire.core.Persona
 import com.muwire.core.connection.Endpoint
@@ -23,7 +24,7 @@ class BrowseSession implements Runnable {
     private final EventBus eventBus
     private final I2PConnector connector
     private final Persona me
-    private volatile Thread currentThrad
+    private volatile Thread currentThread
     private volatile boolean closed
     
     BrowseSession(EventBus eventBus, I2PConnector connector, UIBrowseEvent event, Persona me) {
@@ -36,7 +37,7 @@ class BrowseSession implements Runnable {
     void run() {
         if (closed)
             return
-        currentThrad = Thread.currentThread()
+        currentThread = Thread.currentThread()
         Endpoint endpoint = null
         try {
             eventBus.publish(new BrowseStatusEvent(host : event.host, status : BrowseStatus.CONNECTING, 
@@ -46,6 +47,7 @@ class BrowseSession implements Runnable {
             os.write("BROWSE\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Persona:${me.toBase64()}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Path:true\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Version:${Constants.BROWSE_VERSION}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
             InputStream is = endpoint.getInputStream()
@@ -70,41 +72,92 @@ class BrowseSession implements Runnable {
                 if (profileHeader.getPersona() != event.host)
                     throw new IOException("Sender profile mismatch")
             }
+            
+            int version = 1
+            if (headers.containsKey("Version"))
+                version = Integer.parseInt(headers['Version'])
 
-            // at this stage, start pulling the results
             UUID uuid = event.uuid
-            eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FETCHING,
-                    totalResults : results, uuid : uuid))
-            log.info("Starting to fetch $results results with uuid $uuid")
+            // if we're version 1 just pull everything
+            if (version == 1) {
+                eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
+                        totalResults: results, currentItems: results, uuid: uuid))
+                log.info("Starting to fetch $results results with uuid $uuid")
 
-            JsonSlurper slurper = new JsonSlurper()
-            DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
-            UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, results)]
-            int j = 0
-            for (int i = 0; i < results; i++) {
-                if (closed)
-                    return
-                log.fine("parsing result $i at batch position $j")
+                JsonSlurper slurper = new JsonSlurper()
+                DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
+                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, results)]
+                int j = 0
+                for (int i = 0; i < results; i++) {
+                    if (closed)
+                        return
+                    log.fine("parsing result $i at batch position $j")
 
-                int size = dis.readUnsignedShort()
-                byte [] tmp = new byte[size]
-                dis.readFully(tmp)
-                def json = slurper.parse(tmp)
-                UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
-                result.chat = chat
-                result.profileHeader = profileHeader
-                batch[j++] = result
+                    def json = readJson(slurper, dis)
+                    UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
+                    result.chat = chat
+                    result.profileHeader = profileHeader
+                    batch[j++] = result
 
 
-                // publish piecemally
-                if (j == batch.length) {
-                    eventBus.publish(new UIResultBatchEvent(results : batch, uuid : uuid))
-                    j = 0
-                    batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
-                    log.fine("publishing batch, next batch size ${batch.length}")
+                    // publish piecemally
+                    if (j == batch.length) {
+                        eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
+                        j = 0
+                        batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
+                        log.fine("publishing batch, next batch size ${batch.length}")
+                    }
                 }
-            }
+            } else if (version == 2) {
+                // version 2 should have Files and Dirs headers
+                if (!headers.containsKey("Files"))
+                    throw new Exception("Files header missing")
+                int files = Integer.parseInt(headers['Files'])
+                if (!headers.containsKey("Dirs"))
+                    throw new Exception("Dirs header missing")
+                int dirs = Integer.parseInt(headers['Dirs'])
+                eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
+                    totalResults: results, currentItems: (files + dirs), uuid: uuid))
+                log.info("starting to fetch top-level ${files} files and ${dirs} dirs with uuid $uuid")
 
+                JsonSlurper slurper = new JsonSlurper()
+                DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
+                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, results)]
+                int j = 0
+                for (int i = 0; i < files; i ++) {
+                    if (closed)
+                        return
+                    log.fine("parsing result $i at batch position $j")
+
+                    def json = readJson(slurper, dis)
+                    UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
+                    result.chat = chat
+                    result.profileHeader = profileHeader
+                    batch[j++] = result
+
+
+                    // publish piecemally
+                    if (j == batch.length) {
+                        eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
+                        j = 0
+                        batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
+                        log.fine("publishing batch, next batch size ${batch.length}")
+                    }
+                }
+                for (int i = 0; i < dirs; i++) {
+                    if (closed)
+                        return
+
+                    def json = readJson(slurper, dis)
+                    if (!json.directory || json.path == null)
+                        throw new Exception("Invalid dir json")
+                    List<String> path = json.path.collect {DataUtil.readi18nString(Base64.decode(it))}
+                    def event = new UIBrowseDirEvent(uuid : uuid,
+                        path : path.toArray(new String[0]))
+                    eventBus.publish(event)
+                }
+            } else 
+                throw new Exception("unrecognized version $version")
             eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
         } catch (Exception bad) {
             if (!closed) {
@@ -112,14 +165,21 @@ class BrowseSession implements Runnable {
                 eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FAILED, uuid: event.uuid))
             }
         } finally {
-            currentThrad = null
+            currentThread = null
             endpoint?.close()
         }
+    }
+    
+    private static def readJson(JsonSlurper slurper, DataInputStream dis) {
+        int size = dis.readUnsignedShort()
+        byte[] tmp = new byte[size]
+        dis.readFully(tmp)
+        slurper.parse(tmp) 
     }
     
     void close() {
         log.info("closing browse session for UUID ${event.uuid}")
         closed = true
-        currentThrad?.interrupt()
+        currentThread?.interrupt()
     }
 }

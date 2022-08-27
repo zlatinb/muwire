@@ -27,6 +27,7 @@ class BrowseModel {
     @Observable boolean downloadActionEnabled
     @Observable boolean viewDetailsActionEnabled
     @Observable int totalResults
+    @Observable int currentBatch
     @Observable int resultCount
     @Observable boolean filterEnabled
     @Observable boolean clearFilterEnabled

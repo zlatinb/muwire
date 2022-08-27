@@ -67,9 +67,11 @@ class BrowseView {
                     label(text: trans("STATUS") + ":")
                     label(text: bind { trans(model.status.name()) })
                     label(text: bind {
-                        model.totalResults == 0 ? "" :
-                                "$model.resultCount/$model.totalResults (" + Math.round(model.resultCount * 100 / model.totalResults)+ "%)"
+                        model.currentBatch == 0 ? "" :
+                                "$model.resultCount/$model.currentBatch (" + Math.round(model.resultCount * 100 / model.currentBatch)+ "%)"
                     })
+                    label(text : trans("BROWSE_TOTAL_FILES") + ":")
+                    label(text: bind {model.totalResults})
                 }
                 panel(constraints: BorderLayout.EAST) {
                     button(text: trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"), viewProfileAction)

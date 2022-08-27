@@ -105,8 +105,10 @@ class BrowseController {
         }
         for(BrowseStatusEvent event : statusCopy) {
             model.status = event.status
-            if (event.status == BrowseStatus.FETCHING)
+            if(event.status == BrowseStatus.FETCHING) {
+                model.currentBatch = event.currentItems
                 model.totalResults = event.totalResults
+            }
         }
         if (!statusCopy.isEmpty()) {
             if ((model.status == BrowseStatus.FINISHED || model.status == BrowseStatus.FAILED) &&

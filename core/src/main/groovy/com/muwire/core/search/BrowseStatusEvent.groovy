@@ -8,5 +8,6 @@ class BrowseStatusEvent extends Event {
     BrowseStatus status
     BrowseSession session
     int totalResults
+    int currentItems
     UUID uuid
 }
