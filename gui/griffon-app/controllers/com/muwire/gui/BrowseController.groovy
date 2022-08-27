@@ -48,6 +48,7 @@ class BrowseController {
     
     void mvcGroupDestroy() {
         timer.stop()
+        model.session?.close()
         core.eventBus.unregister(BrowseStatusEvent.class, this)
         core.eventBus.unregister(UIResultBatchEvent.class, this)
         core.eventBus.unregister(DownloadStartedEvent.class, this)
@@ -62,6 +63,8 @@ class BrowseController {
     void onBrowseStatusEvent(BrowseStatusEvent e) {
         if (e.uuid != model.uuid)
             return
+        if (e.session != null)
+            model.session = e.session
         model.pendingStatuses.add(e)
     }
     

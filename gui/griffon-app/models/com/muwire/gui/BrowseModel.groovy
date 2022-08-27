@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.Persona
+import com.muwire.core.search.BrowseSession
 import com.muwire.core.search.BrowseStatusEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
@@ -30,6 +31,7 @@ class BrowseModel {
     @Observable boolean filterEnabled
     @Observable boolean clearFilterEnabled
     volatile UUID uuid
+    volatile BrowseSession session
     
     def results = []
     List<UIResultEvent> allResults = []
