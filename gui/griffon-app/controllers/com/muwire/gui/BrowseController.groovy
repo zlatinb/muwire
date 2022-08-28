@@ -24,6 +24,7 @@ import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 
 import javax.swing.JTextField
+import javax.swing.tree.TreePath
 
 @ArtifactProviderFor(GriffonController)
 class BrowseController {
@@ -126,7 +127,7 @@ class BrowseController {
         for(BrowseStatusEvent event : statusCopy) {
             model.status = event.status
             if(event.status == BrowseStatus.FETCHING) {
-                model.currentBatch = event.currentItems
+                model.currentBatch += event.currentItems
                 model.totalResults = event.totalResults
             }
         }
@@ -221,4 +222,10 @@ class BrowseController {
         
         mvcGroup.createMVCGroup("view-profile", uuid.toString(), params)
     }
+    
+    void requestFetch(TreePath treePath, boolean recursive) {
+        List<String> path = model.resultsTreeModel.getPathFromRoot(treePath)
+        if (path != null)
+            model.session.fetch(path, recursive)
+    } 
 }

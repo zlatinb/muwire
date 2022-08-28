@@ -94,6 +94,10 @@ class ResultTreeRenderer extends DefaultTreeCellRenderer {
             element
         }
         
+        String getHiddenRoot() {
+            hiddenRoot
+        }
+        
         void addResult(UIResultEvent event) {
             files++
             size += event.size

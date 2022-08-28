@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeNode
+import javax.swing.tree.TreePath
 import java.text.Collator
 
 class ResultTreeModel extends DefaultTreeModel {
@@ -31,7 +32,8 @@ class ResultTreeModel extends DefaultTreeModel {
                 elementNode = new MutableResultNode()
                 elementNode.setUserObject(nodeData)
                 node.addDescendant(elementNode)
-            }
+            } else
+                removePlaceholder(elementNode)
             node = elementNode
         }
      
@@ -59,16 +61,46 @@ class ResultTreeModel extends DefaultTreeModel {
                 elementNode = new MutableResultNode()
                 elementNode.setUserObject(nodeData)
                 node.addDescendant(elementNode)
+            } else {
+                removePlaceholder(elementNode)
             }
             elementNode.getUserObject().addResult(event)
             node = elementNode
         }
 
         def fileNode = new MutableResultNode(event)
+        removePlaceholder(node)
+        node.addDescendant(fileNode)
+    }
+    
+    private static void removePlaceholder(SortedTreeNode node) {
         TreeNode placeHolder = node.getByKey(ResultTreeRenderer.PLACEHOLDER)
         if (placeHolder != null)
             node.remove(placeHolder)
-        node.addDescendant(fileNode)
+    }
+    
+    List<String> getPathFromRoot(TreePath treePath) {
+        
+        MutableResultNode last = (MutableResultNode)treePath.getLastPathComponent()
+        if (last.getChildCount() != 1)
+            return null
+        if (!(last.getChildAt(0) instanceof PlaceholderNode))
+            return null
+        
+        Object [] objects = treePath.getPath()
+        
+        List<String> rv = new ArrayList<>()
+        String hiddenRoot = null
+        for (int i = 1; i < objects.length; i++) {
+            Object userObject = objects[i].getUserObject()
+            if (userObject instanceof ResultTreeRenderer.ResultTreeNode) {
+                hiddenRoot = userObject.getHiddenRoot()
+                rv << userObject.toString()
+            }
+        }
+        
+        rv.add(0, hiddenRoot)
+        rv
     }
     
     static class MutableResultNode extends SortedTreeNode<UIResultEvent> {

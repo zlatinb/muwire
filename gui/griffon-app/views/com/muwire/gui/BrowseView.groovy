@@ -10,6 +10,8 @@ import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTree
 import javax.swing.KeyStroke
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
 import javax.swing.tree.TreePath
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -54,6 +56,8 @@ class BrowseView {
     def lastSortEvent
     
     def sequentialDownloadCheckbox
+    
+    private boolean onDemandExpansionRegistered
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -330,11 +334,13 @@ class BrowseView {
         Set<TreePath> expanded = new HashSet<>(treeExpansions.expandedPaths)
         model.resultsTreeModel.nodeStructureChanged(model.root)
         if (model.session == null && !model.session.supportsIncremental()) {
-            if (treeExpansions.manualExpansion)
-                expanded.each { tree.expandPath(it) }
-            else
-                TreeUtil.expand(tree)
+            TreeUtil.expand(tree)
+        } else if (!onDemandExpansionRegistered) {
+            onDemandExpansionRegistered = true
+            tree.addTreeExpansionListener(new OnDemandTreeExpansion())
         }
+        if (treeExpansions.manualExpansion)
+            expanded.each { tree.expandPath(it) }
         tree.setSelectionPaths(selectedPaths)
     }
     
@@ -414,6 +420,18 @@ class BrowseView {
             model.visible = focus
             if (!oldVisible && focus)
                 controller.displayBatchedResults()
+        }
+    }
+    
+    private class OnDemandTreeExpansion implements TreeExpansionListener {
+
+        @Override
+        void treeExpanded(TreeExpansionEvent event) {
+            controller.requestFetch(event.getPath(), false)
+        }
+
+        @Override
+        void treeCollapsed(TreeExpansionEvent event) {
         }
     }
 }
