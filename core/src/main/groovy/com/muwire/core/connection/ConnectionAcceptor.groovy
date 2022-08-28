@@ -446,6 +446,9 @@ class ConnectionAcceptor {
             boolean showPaths = settings.showPaths &&
                     headers.containsKey('Path') &&
                     Boolean.parseBoolean(headers['Path'])
+            
+            if (!showPaths)
+                version = 1
 
             boolean chat = chatServer.isRunning() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
