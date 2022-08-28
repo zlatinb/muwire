@@ -127,6 +127,7 @@ class BrowseSession implements Runnable {
                 }
                 eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
             } else if (version == 2) {
+                Set<String> fetchedPaths = new HashSet<>()
                 while(true) {
                     // version 2 should have Files and Dirs headers
                     if (!headers.containsKey("Files"))
@@ -191,6 +192,8 @@ class BrowseSession implements Runnable {
                             log.fine("sending GET for path ${nextPath.path} recursive ${nextPath.recursive}")
                             def encoded = nextPath.path.collect {Base64.encode(DataUtil.encodei18nString(it))} 
                             String joined = encoded.join(",")
+                            if (!fetchedPaths.add(joined))
+                                continue
                             os.write("GET $joined\r\n".getBytes(StandardCharsets.US_ASCII))
                             os.write("Recursive:${nextPath.recursive}\r\n".getBytes(StandardCharsets.US_ASCII))
                             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
