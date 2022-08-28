@@ -160,7 +160,7 @@ class BrowseSession implements Runnable {
                         if (j == batch.length) {
                             eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
                             j = 0
-                            batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
+                            batch = new UIResultEvent[Math.min(files - i - 1, BATCH_SIZE)]
                             log.fine("publishing batch, next batch size ${batch.length}")
                         }
                     }
