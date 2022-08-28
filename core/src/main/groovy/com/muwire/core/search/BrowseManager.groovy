@@ -85,7 +85,7 @@ class BrowseManager {
     void processV2Request(Persona browser, Endpoint endpoint) {
         // 1. build the tree the browser will see
         int count = 0
-        PathTree<BrowsedFile> tempTree = new PathTree<>()
+        PathTree<BrowsedFile, BrowsedFolder> tempTree = new PathTree<>(BrowsedFolder::new)
         for (SharedFile sf : fileManager.getSharedFiles().values()) {
             if (!isVisible.test(sf.file.getParentFile(), browser))
                 continue
@@ -220,7 +220,7 @@ class BrowseManager {
         }
     }
     
-    private static class ListCallback implements PathTreeListCallback<BrowsedFile> {
+    private static class ListCallback implements PathTreeListCallback<BrowsedFile, BrowsedFolder> {
 
         final Map<Path, SharedFile> files = new HashMap<>()
         final Set<Path> dirs = new HashSet<>()
@@ -234,17 +234,20 @@ class BrowseManager {
         }
 
         @Override
-        void onDirectory(Path path) {
-            dirs.add(path)
+        void onDirectory(Path path, BrowsedFolder value) {
+            if (!value.sent) {
+                value.sent = true
+                dirs.add(path)
+            }
         }
     }
     
-    private static class PathCallback implements PathTreeCallback<BrowsedFile> {
+    private static class PathCallback implements PathTreeCallback<BrowsedFile, BrowsedFolder> {
         
         final Set<SharedFile> files = new HashSet<>()
 
         @Override
-        void onDirectoryEnter(Path path) {
+        void onDirectoryEnter(Path path, BrowsedFolder value) {
         }
 
         @Override
@@ -265,6 +268,14 @@ class BrowseManager {
         private boolean sent
         BrowsedFile(SharedFile sharedFile) {
             this.sharedFile = sharedFile
+        }
+    }
+    
+    private static class BrowsedFolder {
+        private final Path path
+        private boolean sent
+        BrowsedFolder(Path path) {
+            this.path = path
         }
     }
 }

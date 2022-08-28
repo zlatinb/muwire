@@ -40,7 +40,7 @@ class PathTreeTest {
         assert cb.leftDirs == 2
     }
     
-    private static class ListCB implements PathTreeListCallback<String> {
+    private static class ListCB implements PathTreeListCallback<String, Void> {
         Set<Path> dirs = new HashSet<>()
         Set<String> files = new HashSet<>()
 
@@ -50,19 +50,19 @@ class PathTreeTest {
         }
 
         @Override
-        void onDirectory(Path path) {
+        void onDirectory(Path path, Void value) {
             dirs.add(path)
         }
     }
     
-    private static class CB implements PathTreeCallback<String> {
+    private static class CB implements PathTreeCallback<String, Void> {
         
         private Set<Path> dirs = new HashSet<>()
         private Map<Path, String> files = new HashMap<>()
         private int leftDirs
 
         @Override
-        void onDirectoryEnter(Path path) {
+        void onDirectoryEnter(Path path, Void value) {
             dirs.add(path)
         }
 

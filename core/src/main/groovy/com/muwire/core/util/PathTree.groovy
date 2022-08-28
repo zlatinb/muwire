@@ -1,11 +1,29 @@
 package com.muwire.core.util
 
 import java.nio.file.Path
+import java.util.function.Function
 
-class PathTree<T> {
+/**
+ * 
+ * @param <T> type of object to store at leaf nodes
+ * @param <I> type of object to store at interim nodes
+ */
+class PathTree<T,I> {
+
+    private final Node[] EMPTY_CHILDREN = new Node[0]
     
     private final Node root = new Node()
     private final Map<Path, Node> pathNodeMap = new HashMap<>()
+    
+    private final Function<Path, I> function
+    
+    PathTree() {
+        this(null)
+    }
+    
+    PathTree(Function<Path, I> function) {
+        this.function = function
+    }
     
     synchronized void add(Path path, T value) {
         Node parent = root
@@ -16,6 +34,8 @@ class PathTree<T> {
                 newNode = new Node()
                 newNode.path = subPath
                 newNode.parent = parent
+                if (function != null)
+                    newNode.interimValue = function.apply(newNode.path)
                 parent.addChild(newNode)
                 pathNodeMap[subPath] = newNode
             }
@@ -24,32 +44,32 @@ class PathTree<T> {
         parent.value = value
     }
     
-    synchronized void traverse(PathTreeCallback<T> cb) {
+    synchronized void traverse(PathTreeCallback<T, I> cb) {
         doTraverse(root, cb)
     }
     
-    synchronized void traverse(Path from, PathTreeCallback<T> cb) {
+    synchronized void traverse(Path from, PathTreeCallback<T, I> cb) {
         Node node = pathNodeMap[from]
         if (node == null)
             return
         doTraverse(node, cb)
     }
     
-    private synchronized void doTraverse(Node from, PathTreeCallback<T> cb) {
+    private synchronized void doTraverse(Node from, PathTreeCallback<T,I> cb) {
         if (from.children.length == 0) {
             cb.onLeaf(from.path, from.value)
             return
         }
         
         if (from != root)
-            cb.onDirectoryEnter(from.path)
+            cb.onDirectoryEnter(from.path, from.interimValue)
         for (Node child : from.children)
             doTraverse(child, cb)
         if (from != root)
             cb.onDirectoryLeave()
     }
     
-    synchronized void list(Path from, PathTreeListCallback<T> cb) {
+    synchronized void list(Path from, PathTreeListCallback<T, I> cb) {
         Node node
         if (from == null)
             node = root
@@ -60,7 +80,7 @@ class PathTree<T> {
             if (child.children.length == 0)
                 cb.onLeaf(child.path, child.value)
             else
-                cb.onDirectory(child.path)
+                cb.onDirectory(child.path, child.interimValue)
         }
     }
     
@@ -68,6 +88,7 @@ class PathTree<T> {
         Node parent
         Path path
         T value
+        I interimValue
         Node[] children = EMPTY_CHILDREN
         
         int hashCode() {
@@ -89,5 +110,5 @@ class PathTree<T> {
         }
     }
     
-    private static final Node[] EMPTY_CHILDREN = new Node[0]
+    
 }
