@@ -15,6 +15,7 @@ import com.muwire.core.files.FileTree
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
 import com.muwire.core.util.PathTree
+import com.muwire.core.util.PathTreeCallback
 import com.muwire.core.util.PathTreeListCallback
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -132,9 +133,11 @@ class BrowseManager {
             dos.flush()
             gzos.finish()
             
+            InputStream is = endpoint.getInputStream()
             while(true) {
-                String firstLine = DataUtil.readTillRN(endpoint.getInputStream())
+                String firstLine = DataUtil.readTillRN(is)
                 if (firstLine.startsWith("PING")) {
+                    DataUtil.readAllHeaders(is)
                     os.write("PONG\r\n".getBytes(StandardCharsets.US_ASCII))
                     os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                     os.flush()
@@ -143,6 +146,10 @@ class BrowseManager {
                 if (!firstLine.startsWith("GET ")) 
                     throw new Exception("=Unknown verb")
                 
+                Map<String,String> headers = DataUtil.readAllHeaders(is)
+                boolean recursive = headers.containsKey("Recursive") &&
+                        Boolean.parseBoolean(headers['Recursive'])
+
                 firstLine = firstLine.substring(4)
                 String[] elements = firstLine.split(",")
                 if (elements.length == 0)
@@ -153,19 +160,28 @@ class BrowseManager {
                 Path requestedPath = Path.of(first, more)
 
                 os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
-                
-                // TODO: add recursive
-                def cb = new ListCallback()
-                tempTree.list(requestedPath, cb)
-                
-                os.write("Files:${cb.files.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
-                os.write("Dirs:${cb.dirs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+
+                Collection<SharedFile> filesToWrite
+                Collection<Path> dirsToWrite
+                if (!recursive) {
+                    def cb = new ListCallback()
+                    tempTree.list(requestedPath, cb)
+                    filesToWrite = cb.files.values()
+                    dirsToWrite = cb.dirs
+                } else {
+                    def cb = new PathCallback()
+                    tempTree.traverse(requestedPath, cb)
+                    filesToWrite = cb.files
+                    dirsToWrite = Collections.emptySet()
+                }
+                os.write("Files:${filesToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+                os.write("Dirs:${dirsToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                 
                 gzos = new GZIPOutputStream(os)
                 dos = new DataOutputStream(gzos)
-                writeFiles(cb.files.values(), dos, jsonOutput)  
-                writeDirs(cb.dirs, dos, jsonOutput)
+                writeFiles(filesToWrite, dos, jsonOutput)  
+                writeDirs(dirsToWrite, dos, jsonOutput)
                 dos.flush()
                 gzos.finish()
             }
@@ -219,6 +235,24 @@ class BrowseManager {
         @Override
         void onDirectory(Path path) {
             dirs.add(path)
+        }
+    }
+    
+    private static class PathCallback implements PathTreeCallback<SharedFile> {
+        
+        final Set<SharedFile> files = new HashSet<>()
+
+        @Override
+        void onDirectoryEnter(Path path) {
+        }
+
+        @Override
+        void onDirectoryLeave() {
+        }
+
+        @Override
+        void onLeaf(Path path, SharedFile value) {
+            files.add(value)
         }
     }
 }

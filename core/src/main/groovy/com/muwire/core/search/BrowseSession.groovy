@@ -12,12 +12,16 @@ import groovy.util.logging.Log
 import net.i2p.data.Base64
 
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 
 @Log
 class BrowseSession implements Runnable {
 
+    private static final int PING_INTERVAL = 45000
     private static final int BATCH_SIZE = 128
     
     private final UIBrowseEvent event
@@ -27,11 +31,17 @@ class BrowseSession implements Runnable {
     private volatile Thread currentThread
     private volatile boolean closed
     
+    private final BlockingQueue<Request> fetchQueue = new LinkedBlockingDeque<>()
+
     BrowseSession(EventBus eventBus, I2PConnector connector, UIBrowseEvent event, Persona me) {
         this.event = event
         this.eventBus = eventBus
         this.connector = connector
         this.me = me
+    }
+    
+    void fetch(List<String> path, boolean recursive) {
+        fetchQueue.offer(new Request(path, recursive))
     }
     
     void run() {
@@ -108,57 +118,86 @@ class BrowseSession implements Runnable {
                         log.fine("publishing batch, next batch size ${batch.length}")
                     }
                 }
+                eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
             } else if (version == 2) {
-                // version 2 should have Files and Dirs headers
-                if (!headers.containsKey("Files"))
-                    throw new Exception("Files header missing")
-                int files = Integer.parseInt(headers['Files'])
-                if (!headers.containsKey("Dirs"))
-                    throw new Exception("Dirs header missing")
-                int dirs = Integer.parseInt(headers['Dirs'])
-                eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
-                    totalResults: results, currentItems: (files + dirs), uuid: uuid))
-                log.info("starting to fetch top-level ${files} files and ${dirs} dirs with uuid $uuid")
+                while(true) {
+                    // version 2 should have Files and Dirs headers
+                    if (!headers.containsKey("Files"))
+                        throw new Exception("Files header missing")
+                    int files = Integer.parseInt(headers['Files'])
+                    if (!headers.containsKey("Dirs"))
+                        throw new Exception("Dirs header missing")
+                    int dirs = Integer.parseInt(headers['Dirs'])
+                    eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
+                            totalResults: results, currentItems: (files + dirs), uuid: uuid))
+                    log.info("starting to fetch ${files} files and ${dirs} dirs with uuid $uuid")
 
-                JsonSlurper slurper = new JsonSlurper()
-                DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
-                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, files)]
-                int j = 0
-                for (int i = 0; i < files; i ++) {
-                    if (closed)
-                        return
-                    log.fine("parsing result $i at batch position $j")
+                    JsonSlurper slurper = new JsonSlurper()
+                    DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
+                    UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, files)]
+                    int j = 0
+                    for (int i = 0; i < files; i++) {
+                        if (closed)
+                            return
+                        log.fine("parsing result $i at batch position $j")
 
-                    def json = readJson(slurper, dis)
-                    UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
-                    result.chat = chat
-                    result.profileHeader = profileHeader
-                    batch[j++] = result
+                        def json = readJson(slurper, dis)
+                        UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
+                        result.chat = chat
+                        result.profileHeader = profileHeader
+                        batch[j++] = result
 
 
-                    // publish piecemally
-                    if (j == batch.length) {
-                        eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
-                        j = 0
-                        batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
-                        log.fine("publishing batch, next batch size ${batch.length}")
+                        // publish piecemally
+                        if (j == batch.length) {
+                            eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
+                            j = 0
+                            batch = new UIResultEvent[Math.min(results - i - 1, BATCH_SIZE)]
+                            log.fine("publishing batch, next batch size ${batch.length}")
+                        }
                     }
-                }
-                for (int i = 0; i < dirs; i++) {
-                    if (closed)
-                        return
+                    for (int i = 0; i < dirs; i++) {
+                        if (closed)
+                            return
 
-                    def json = readJson(slurper, dis)
-                    if (!json.directory || json.path == null)
-                        throw new Exception("Invalid dir json")
-                    List<String> path = json.path.collect {DataUtil.readi18nString(Base64.decode(it))}
-                    def event = new UIBrowseDirEvent(uuid : uuid,
-                        path : path.toArray(new String[0]))
-                    eventBus.publish(event)
+                        def json = readJson(slurper, dis)
+                        if (!json.directory || json.path == null)
+                            throw new Exception("Invalid dir json")
+                        List<String> path = json.path.collect { DataUtil.readi18nString(Base64.decode(it)) }
+                        def event = new UIBrowseDirEvent(uuid: uuid,
+                                path: path.toArray(new String[0]))
+                        eventBus.publish(event)
+                    }
+                    eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
+                    
+                    while(true) {
+                        Request nextPath = fetchQueue.poll(PING_INTERVAL, TimeUnit.MILLISECONDS)
+                        if (nextPath == null) {
+                            log.fine("sending PING on browse connection uuid $uuid")
+                            os.write("PING\r\n\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.flush()
+                            String pong = DataUtil.readTillRN(is)
+                            if (pong != "PONG")
+                                throw new Exception("didn't get a pong after a ping")
+                            DataUtil.readAllHeaders(is)
+                        } else {
+                            log.fine("sending GET for path ${nextPath.path} recursive ${nextPath.recursive}")
+                            def encoded = nextPath.path.collect {Base64.encode(DataUtil.encodei18nString(it))} 
+                            String joined = encoded.join(",")
+                            os.write("GET $joined\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.write("Recursive:${nextPath.recursive}\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.flush()
+                            String response = DataUtil.readTillRN(is)
+                            if (!response.startsWith("200"))
+                                throw new Exception("response not ok")
+                            headers = DataUtil.readAllHeaders(is)
+                            break
+                        }
+                    }
                 }
             } else 
                 throw new Exception("unrecognized version $version")
-            eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
         } catch (Exception bad) {
             if (!closed) {
                 log.log(Level.WARNING, "browse failed", bad)
@@ -181,5 +220,14 @@ class BrowseSession implements Runnable {
         log.info("closing browse session for UUID ${event.uuid}")
         closed = true
         currentThread?.interrupt()
+    }
+    
+    private static class Request {
+        private final List<String> path
+        private final boolean recursive
+        Request(List<String> path, boolean recursive) {
+            this.path = path
+            this.recursive = recursive
+        }
     }
 }
