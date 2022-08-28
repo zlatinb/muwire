@@ -70,5 +70,30 @@ class ResultTree extends JTree{
             return obj
         return null
     }
+    
+    boolean folderSelected() {
+        TreePath[] selected = getSelectionPaths()
+        if (selected == null)
+            return
+        for (TreePath path : selected) {
+            def obj = path.getLastPathComponent().getUserObject()
+            if (obj instanceof ResultTreeRenderer.ResultTreeNode)
+                return true
+        }
+        false
+    }
+    
+    List<TreePath> selectedFolderPaths() {
+        TreePath[] selected = getSelectionPaths()
+        if (selected == null)
+            return
+        List<TreePath> rv = []
+        for (TreePath path : selected) {
+            def obj = path.getLastPathComponent().getUserObject()
+            if (obj instanceof ResultTreeRenderer.ResultTreeNode)
+                return rv << path
+        }
+        rv
+    }
    
 }

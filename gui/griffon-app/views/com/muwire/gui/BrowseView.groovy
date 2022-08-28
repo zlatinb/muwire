@@ -58,6 +58,7 @@ class BrowseView {
     def sequentialDownloadCheckbox
     
     private boolean onDemandExpansionRegistered
+    private Set<TreePath> fullyExpandedPaths = new HashSet<>()
     
     void initUI() {
         int rowHeight = application.context.get("row-height")
@@ -271,6 +272,18 @@ class BrowseView {
         })
         menu.add(copyName)
         
+        if (model.treeVisible && model.session != null && 
+                model.session.supportsIncremental() && resultsTree.folderSelected()) {
+            JMenuItem expand = new JMenuItem(trans("EXPAND_FULLY"))
+            expand.addActionListener({
+                List<TreePath> selected = resultsTree.selectedFolderPaths()
+                selected.each {controller.requestFetch(it, true)}
+                fullyExpandedPaths.addAll(selected)
+                selected.each {TreeUtil.expandNode(resultsTree, it.getLastPathComponent())}
+            })
+            menu.add(expand)
+        }
+        
         menu.show(e.getComponent(), e.getX(), e.getY())
     }
     
@@ -341,6 +354,7 @@ class BrowseView {
         }
         if (treeExpansions.manualExpansion)
             expanded.each { tree.expandPath(it) }
+        fullyExpandedPaths.each {TreeUtil.expandNode(tree, it.getLastPathComponent())}
         tree.setSelectionPaths(selectedPaths)
     }
     
@@ -432,6 +446,7 @@ class BrowseView {
 
         @Override
         void treeCollapsed(TreeExpansionEvent event) {
+            fullyExpandedPaths.remove(event.getPath())
         }
     }
 }

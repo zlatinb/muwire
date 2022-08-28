@@ -28,7 +28,7 @@ class TreeUtil {
         expandNode(tree, tree.model.root)
     }
     
-    private static void expandNode(JTree tree, DefaultMutableTreeNode node) {
+    static void expandNode(JTree tree, DefaultMutableTreeNode node) {
         List<DefaultMutableTreeNode> copy = Collections.list(node.children())
         for(def child : copy)
             expandNode(tree, child)
