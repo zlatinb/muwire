@@ -447,12 +447,6 @@ class ConnectionAcceptor {
                     headers.containsKey('Path') &&
                     Boolean.parseBoolean(headers['Path'])
 
-            int count = fileManager.getFileToSharedFile().values().count {
-                isVisible.test(it.file.getParentFile(), browser)
-            }
-
-            os.write("Count: ${count}\r\n".getBytes(StandardCharsets.US_ASCII))
-            
             boolean chat = chatServer.isRunning() && settings.advertiseChat
             os.write("Chat: ${chat}\r\n".getBytes(StandardCharsets.US_ASCII))
             

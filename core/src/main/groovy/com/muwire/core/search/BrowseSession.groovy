@@ -127,7 +127,7 @@ class BrowseSession implements Runnable {
                 }
                 eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
             } else if (version == 2) {
-                Set<String> fetchedPaths = new HashSet<>()
+                Set<Request> fetchedPaths = new HashSet<>()
                 while(true) {
                     // version 2 should have Files and Dirs headers
                     if (!headers.containsKey("Files"))
@@ -190,11 +190,10 @@ class BrowseSession implements Runnable {
                             DataUtil.readAllHeaders(is)
                         } else {
                             log.fine("sending GET for path ${nextPath.path} recursive ${nextPath.recursive}")
-                            def encoded = nextPath.path.collect {Base64.encode(DataUtil.encodei18nString(it))} 
-                            String joined = encoded.join(",")
-                            if (!fetchedPaths.add(joined))
+                             
+                            if (!fetchedPaths.add(nextPath))
                                 continue
-                            os.write("GET $joined\r\n".getBytes(StandardCharsets.US_ASCII))
+                            os.write("GET ${nextPath.getJoined()}\r\n".getBytes(StandardCharsets.US_ASCII))
                             os.write("Recursive:${nextPath.recursive}\r\n".getBytes(StandardCharsets.US_ASCII))
                             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
                             os.flush()
@@ -235,9 +234,30 @@ class BrowseSession implements Runnable {
     private static class Request {
         private final List<String> path
         private final boolean recursive
+        private String joined
         Request(List<String> path, boolean recursive) {
             this.path = path
             this.recursive = recursive
+        }
+        
+        String getJoined() {
+            if (joined == null) {
+                def encoded = nextPath.path.collect {Base64.encode(DataUtil.encodei18nString(it))}
+                joined = encoded.join(",")
+            }
+            joined
+        }
+        
+        int hashCode() {
+            Objects.hash(getJoined(), recursive)
+        }
+        
+        boolean equals(Object o) {
+            if (!(o instanceof Request))
+                return false
+            Request other = (Request) o
+            return getJoined() == other.getJoined() &&
+                    recursive == other.recursive
         }
     }
 }

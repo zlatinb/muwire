@@ -1,6 +1,6 @@
 package com.muwire.core.search
 
-import com.muwire.core.Constants
+
 import com.muwire.core.EventBus
 import com.muwire.core.InfoHash
 import com.muwire.core.Persona
@@ -9,27 +9,20 @@ import com.muwire.core.collections.CollectionManager
 import com.muwire.core.connection.Endpoint
 import com.muwire.core.connection.I2PConnector
 import com.muwire.core.filecert.CertificateManager
-import com.muwire.core.files.FileListCallback
 import com.muwire.core.files.FileManager
-import com.muwire.core.files.FileTree
-import com.muwire.core.profile.MWProfileHeader
 import com.muwire.core.util.DataUtil
 import com.muwire.core.util.PathTree
 import com.muwire.core.util.PathTreeCallback
 import com.muwire.core.util.PathTreeListCallback
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
 import groovy.util.logging.Log
 import net.i2p.data.Base64
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.function.BiPredicate
-import java.util.logging.Level
-import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 @Log
@@ -62,16 +55,17 @@ class BrowseManager {
     }
     
     void processV1Request(Persona browser, Endpoint endpoint, boolean showPaths) {
-        endpoint.getOutputStream().write("\r\n".getBytes(StandardCharsets.US_ASCII))
-        
         def sharedFiles = fileManager.getSharedFiles().values()
         sharedFiles.retainAll {isVisible.test(it.file.getParentFile(), browser)}
+        
+        endpoint.getOutputStream().write("Count:${sharedFiles.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+        endpoint.getOutputStream().write("\r\n".getBytes(StandardCharsets.US_ASCII))
         def dos = null
         JsonOutput jsonOutput = new JsonOutput()
         try {
             dos = new DataOutputStream(new GZIPOutputStream(endpoint.getOutputStream()))
             sharedFiles.each {
-                it.hit(browser, System.currentTimeMillis(), "Browse Host");
+                it.hit(browser, System.currentTimeMillis(), "Browse Host")
                 InfoHash ih = new InfoHash(it.getRoot())
                 int certificates = certificateManager.getByInfoHash(ih).size()
                 Set<InfoHash> collections = collectionManager.collectionsForFile(ih)
@@ -90,10 +84,12 @@ class BrowseManager {
     
     void processV2Request(Persona browser, Endpoint endpoint) {
         // 1. build the tree the browser will see
-        PathTree<SharedFile> tempTree = new PathTree<>()
+        int count = 0
+        PathTree<BrowsedFile> tempTree = new PathTree<>()
         for (SharedFile sf : fileManager.getSharedFiles().values()) {
             if (!isVisible.test(sf.file.getParentFile(), browser))
                 continue
+            count++
             Path path = sf.getPathToSharedParent()
             if (path == null) {
                 path = Path.of(sf.getFile().getName())
@@ -105,7 +101,7 @@ class BrowseManager {
                 more[more.length - 1] = sf.getFile().getName()
                 path = Path.of(first, more)
             }
-            tempTree.add(path, sf)
+            tempTree.add(path, new BrowsedFile(sf))
         }
         
         // 2. Grab the top-level items (top level is actually hidden roots, so level 2)
@@ -118,13 +114,14 @@ class BrowseManager {
         
         topLevelItems.files.values().each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
         OutputStream os = endpoint.getOutputStream()
+        os.write("Count:${count}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Files:${topLevelItems.files.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Dirs:${topLevelItems.dirs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
 
         JsonOutput jsonOutput = new JsonOutput()
         DataOutputStream dos = null
-        GZIPOutputStream gzos = null
+        GZIPOutputStream gzos
         try {
             gzos = new GZIPOutputStream(os)
             dos = new DataOutputStream(gzos)
@@ -174,6 +171,7 @@ class BrowseManager {
                     filesToWrite = cb.files
                     dirsToWrite = Collections.emptySet()
                 }
+                filesToWrite.each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
                 os.write("Files:${filesToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("Dirs:${dirsToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
@@ -205,7 +203,7 @@ class BrowseManager {
         }
     }
     
-    private void writeDirs(Collection<Path> dirs, DataOutputStream dos, JsonOutput jsonOutput) {
+    private static void writeDirs(Collection<Path> dirs, DataOutputStream dos, JsonOutput jsonOutput) {
         for(Path path : dirs) {
             def obj = [:]
             obj.directory = true
@@ -222,14 +220,17 @@ class BrowseManager {
         }
     }
     
-    private static class ListCallback implements PathTreeListCallback<SharedFile> {
+    private static class ListCallback implements PathTreeListCallback<BrowsedFile> {
 
         final Map<Path, SharedFile> files = new HashMap<>()
         final Set<Path> dirs = new HashSet<>()
 
         @Override
-        void onLeaf(Path path, SharedFile value) {
-            files.put(path, value)
+        void onLeaf(Path path, BrowsedFile value) {
+            if (!value.sent) {
+                value.sent = true
+                files.put(path, value.sharedFile)
+            }
         }
 
         @Override
@@ -238,7 +239,7 @@ class BrowseManager {
         }
     }
     
-    private static class PathCallback implements PathTreeCallback<SharedFile> {
+    private static class PathCallback implements PathTreeCallback<BrowsedFile> {
         
         final Set<SharedFile> files = new HashSet<>()
 
@@ -251,8 +252,19 @@ class BrowseManager {
         }
 
         @Override
-        void onLeaf(Path path, SharedFile value) {
-            files.add(value)
+        void onLeaf(Path path, BrowsedFile value) {
+            if (!value.sent) {
+                value.sent = true
+                files.add(value.sharedFile)
+            }
+        }
+    }
+    
+    private static class BrowsedFile {
+        private final SharedFile sharedFile
+        private boolean sent
+        BrowsedFile(SharedFile sharedFile) {
+            this.sharedFile = sharedFile
         }
     }
 }
