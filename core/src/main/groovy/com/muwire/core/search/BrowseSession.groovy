@@ -28,6 +28,9 @@ class BrowseSession implements Runnable {
     private final EventBus eventBus
     private final I2PConnector connector
     private final Persona me
+    
+    private volatile int version
+    
     private volatile Thread currentThread
     private volatile boolean closed
     
@@ -42,6 +45,10 @@ class BrowseSession implements Runnable {
     
     void fetch(List<String> path, boolean recursive) {
         fetchQueue.offer(new Request(path, recursive))
+    }
+    
+    boolean supportsIncremental() {
+        version == Constants.BROWSE_VERSION
     }
     
     void run() {
@@ -83,7 +90,7 @@ class BrowseSession implements Runnable {
                     throw new IOException("Sender profile mismatch")
             }
             
-            int version = 1
+            version = 1
             if (headers.containsKey("Version"))
                 version = Integer.parseInt(headers['Version'])
 

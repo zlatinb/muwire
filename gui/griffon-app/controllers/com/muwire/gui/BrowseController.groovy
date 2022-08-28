@@ -4,6 +4,7 @@ import com.muwire.core.Persona
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.DownloadStartedEvent
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.core.search.UIBrowseDirEvent
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ResultPOP
 import griffon.core.artifact.GriffonController
@@ -41,6 +42,7 @@ class BrowseController {
         core.eventBus.register(BrowseStatusEvent.class, this)
         core.eventBus.register(UIResultBatchEvent.class, this)
         core.eventBus.register(DownloadStartedEvent.class, this)
+        core.eventBus.register(UIBrowseDirEvent.class, this)
         model.uuid = UUID.randomUUID()
         timer.start()
         core.eventBus.publish(new UIBrowseEvent(host : model.host, uuid: model.uuid))
@@ -49,6 +51,7 @@ class BrowseController {
     void mvcGroupDestroy() {
         timer.stop()
         model.session?.close()
+        core.eventBus.unregister(UIBrowseDirEvent.class, this)
         core.eventBus.unregister(BrowseStatusEvent.class, this)
         core.eventBus.unregister(UIResultBatchEvent.class, this)
         core.eventBus.unregister(DownloadStartedEvent.class, this)
@@ -74,13 +77,22 @@ class BrowseController {
         model.pendingResults.add(e)
     }
     
-    private void displayBatchedResults() {
-        List<UIResultBatchEvent> copy
+    void onUIBrowseDirEvent(UIBrowseDirEvent event) {
+        if (event.uuid != model.uuid)
+            return
+        model.pendingDirs.add(event)
+    }
+    
+    void displayBatchedResults() {
+        if (!model.visible)
+            return
+        
+        List<UIResultBatchEvent> resultsCopy
         synchronized(model.pendingResults) {
-            copy = new ArrayList<>(model.pendingResults)
+            resultsCopy = new ArrayList<>(model.pendingResults)
             model.pendingResults.clear()
         }
-        for(UIResultBatchEvent event : copy) {
+        for(UIResultBatchEvent event : resultsCopy) {
             List<UIResultEvent> results = event.results.toList()
             model.results.addAll(results)
             for (UIResultEvent result : results)
@@ -90,13 +102,19 @@ class BrowseController {
             }
             model.resultCount = model.results.size()
         }
-        if (model.visible) {
-            if (!copy.isEmpty() || model.dirty) {
-                view.refreshResults()
-                model.dirty = false
-            }
-        } else if (!copy.isEmpty())
-            model.dirty = true
+        
+        List<UIBrowseDirEvent> dirsCopy
+        synchronized (model.pendingDirs) {
+            dirsCopy = new ArrayList<>(model.pendingDirs)
+            model.pendingDirs.clear()
+        }
+        for (UIBrowseDirEvent event : dirsCopy) {
+            model.resultsTreeModel.addToTree(event)
+        }
+            
+        if (model.visible && !(resultsCopy.isEmpty() && dirsCopy.isEmpty())) {
+            view.refreshResults()
+        } 
         
         List<BrowseStatusEvent> statusCopy
         synchronized (model.pendingStatuses) {

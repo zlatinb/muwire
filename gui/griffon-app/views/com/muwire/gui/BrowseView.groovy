@@ -409,7 +409,10 @@ class BrowseView {
     
     private class FocusListener {
         void onFocus(boolean focus) {
+            boolean oldVisible = model.visible
             model.visible = focus
+            if (!oldVisible && focus)
+                controller.displayBatchedResults()
         }
     }
 }

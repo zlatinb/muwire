@@ -30,7 +30,8 @@ class ResultTree extends JTree{
             def node = path.getLastPathComponent()
             def userObject = node.getUserObject()
 
-            if (userObject instanceof UIResultEvent) {
+            if (userObject == ResultTreeRenderer.PLACEHOLDER) { // nothing
+            } else if (userObject instanceof UIResultEvent) {
                 // a leaf is selected
                 if (results.contains(userObject))
                     rv << new ResultAndTargets(userObject, new File(userObject.name), null)

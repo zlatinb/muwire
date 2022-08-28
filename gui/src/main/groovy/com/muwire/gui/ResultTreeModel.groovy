@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.muwire.core.search.UIBrowseDirEvent
 import com.muwire.core.search.UIResultEvent
 
 import javax.swing.tree.DefaultMutableTreeNode
@@ -12,6 +13,29 @@ class ResultTreeModel extends DefaultTreeModel {
     
     ResultTreeModel(TreeNode root) {
         super(root)
+    }
+    
+    void addToTree(UIBrowseDirEvent event) {
+        MutableResultNode node = root
+
+        List<String> elements = new ArrayList<>()
+        for (String element : event.path)
+            elements << element
+
+        String hiddenRoot = elements.remove(0)
+        for (String element : elements) {
+            def nodeData = new ResultTreeRenderer.ResultTreeNode(hiddenRoot, element)
+            def elementNode = node.getByKey(nodeData)
+
+            if (elementNode == null) {
+                elementNode = new MutableResultNode()
+                elementNode.setUserObject(nodeData)
+                node.addDescendant(elementNode)
+            }
+            node = elementNode
+        }
+     
+        node.addDescendant(new PlaceholderNode())
     }
 
     void addToTree(UIResultEvent event) {
@@ -41,6 +65,9 @@ class ResultTreeModel extends DefaultTreeModel {
         }
 
         def fileNode = new MutableResultNode(event)
+        TreeNode placeHolder = node.getByKey(ResultTreeRenderer.PLACEHOLDER)
+        if (placeHolder != null)
+            node.remove(placeHolder)
         node.addDescendant(fileNode)
     }
     
@@ -60,6 +87,17 @@ class ResultTreeModel extends DefaultTreeModel {
                 return object.getName()
             else
                 return object.toString()
+        }
+    }
+    
+    static class PlaceholderNode extends SortedTreeNode {
+        PlaceholderNode() {
+            super(ResultTreeRenderer.PLACEHOLDER)
+        }
+        
+        @Override
+        protected String getStringName() {
+            "N/A"
         }
     }
 }

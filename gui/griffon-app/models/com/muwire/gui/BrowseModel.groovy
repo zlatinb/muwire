@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.Persona
 import com.muwire.core.search.BrowseSession
 import com.muwire.core.search.BrowseStatusEvent
+import com.muwire.core.search.UIBrowseDirEvent
 import com.muwire.core.search.UIResultBatchEvent
 import com.muwire.core.search.UIResultEvent
 import griffon.core.artifact.GriffonModel
@@ -38,9 +39,9 @@ class BrowseModel {
     List<UIResultEvent> allResults = []
     
     boolean visible = true
-    boolean dirty
     List<UIResultBatchEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())
     List<BrowseStatusEvent> pendingStatuses = Collections.synchronizedList(new ArrayList<>())
+    List<UIBrowseDirEvent> pendingDirs = Collections.synchronizedList(new ArrayList<>())
 
 
     ResultTreeModel resultsTreeModel
