@@ -37,6 +37,7 @@ class BrowseModel {
     
     def results = []
     List<UIResultEvent> allResults = []
+    List<UIBrowseDirEvent> allDirs = []
     
     boolean visible = true
     List<UIResultBatchEvent> pendingResults = Collections.synchronizedList(new ArrayList<>())

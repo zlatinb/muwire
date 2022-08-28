@@ -329,11 +329,12 @@ class BrowseView {
         TreePath[] selectedPaths = tree.getSelectionPaths()
         Set<TreePath> expanded = new HashSet<>(treeExpansions.expandedPaths)
         model.resultsTreeModel.nodeStructureChanged(model.root)
-        
-        if (treeExpansions.manualExpansion)
-            expanded.each { tree.expandPath(it) }
-        else
-            TreeUtil.expand(tree)
+        if (model.session == null && !model.session.supportsIncremental()) {
+            if (treeExpansions.manualExpansion)
+                expanded.each { tree.expandPath(it) }
+            else
+                TreeUtil.expand(tree)
+        }
         tree.setSelectionPaths(selectedPaths)
     }
     

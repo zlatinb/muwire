@@ -100,7 +100,6 @@ class BrowseController {
             synchronized (model.allResults) {
                 model.allResults.addAll(results)
             }
-            model.resultCount = model.results.size()
         }
         
         List<UIBrowseDirEvent> dirsCopy
@@ -110,11 +109,14 @@ class BrowseController {
         }
         for (UIBrowseDirEvent event : dirsCopy) {
             model.resultsTreeModel.addToTree(event)
+            model.allDirs.add(event)
         }
             
         if (model.visible && !(resultsCopy.isEmpty() && dirsCopy.isEmpty())) {
             view.refreshResults()
         } 
+        
+        model.resultCount = model.results.size() + model.allDirs.size()
         
         List<BrowseStatusEvent> statusCopy
         synchronized (model.pendingStatuses) {
