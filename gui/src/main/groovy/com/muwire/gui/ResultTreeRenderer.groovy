@@ -18,7 +18,7 @@ import java.awt.Component
 
 class ResultTreeRenderer extends DefaultTreeCellRenderer {
     
-    public static final TreeNode PLACEHOLDER = new PlaceholderNode()
+    public static final Object PLACEHOLDER = new PlaceholderNode()
     
     private final ImageIcon commentIcon, sharedIcon, downloadingIcon
     private final String bShort
