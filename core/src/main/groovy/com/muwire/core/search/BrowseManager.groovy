@@ -100,7 +100,7 @@ class BrowseManager {
                 String first = path.getName(0)
                 String[] more = new String[path.getNameCount()]
                 for (int i = 1; i < path.getNameCount(); i ++)
-                    more[i - 1] = path.getName(i)
+                    more[i - 1] = path.getName(i).toString()
                 more[more.length - 1] = sf.getFile().getName()
                 path = Path.of(first, more)
             }

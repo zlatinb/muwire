@@ -122,7 +122,7 @@ class BrowseSession implements Runnable {
 
                 JsonSlurper slurper = new JsonSlurper()
                 DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
-                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, results)]
+                UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, files)]
                 int j = 0
                 for (int i = 0; i < files; i ++) {
                     if (closed)
