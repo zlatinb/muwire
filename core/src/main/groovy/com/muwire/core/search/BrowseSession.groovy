@@ -242,7 +242,7 @@ class BrowseSession implements Runnable {
         
         String getJoined() {
             if (joined == null) {
-                def encoded = nextPath.path.collect {Base64.encode(DataUtil.encodei18nString(it))}
+                def encoded = path.collect {Base64.encode(DataUtil.encodei18nString(it))}
                 joined = encoded.join(",")
             }
             joined
