@@ -214,6 +214,7 @@ class BrowseSession implements Runnable {
             }
         } finally {
             currentThread = null
+            endpoint?.getOutputStream()?.close()
             endpoint?.close()
         }
     }

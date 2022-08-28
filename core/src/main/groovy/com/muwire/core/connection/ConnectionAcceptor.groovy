@@ -468,6 +468,7 @@ class ConnectionAcceptor {
             else if (version == 2)
                 browseManager.processV2Request(browser, e)
         } finally {
+            try {e.getOutputStream().close()} catch (IOException ignore) {}
             e.close()
         }
     }
