@@ -93,7 +93,8 @@ class BrowseModel {
                 root.add(topLevel)
             }
             view.refreshResults()
-            view.expandUnconditionally()
+            if (session == null || !session.supportsIncremental())
+                view.expandUnconditionally()
         }
     }
     
