@@ -102,6 +102,10 @@ abstract class BasePersisterService extends Service{
             publishedTimestamp = json.publishedTimestamp
         }
 
+        Path path = null
+        if (json.pathToSharedParent != null) 
+            path = Path.of(json.pathToSharedParent)
+        
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
@@ -109,12 +113,10 @@ abstract class BasePersisterService extends Service{
             if (published)
                 df.publish(publishedTimestamp)
             df.setComment(json.comment)
+            df.setPathToSharedParent(path)
             return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
 
-        Path path = null
-        if (json.pathToSharedParent != null) 
-            path = Path.of(json.pathToSharedParent)
 
         SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
         sf.setPathToSharedParent(path)
