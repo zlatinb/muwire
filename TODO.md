@@ -46,7 +46,6 @@
 |I2P Status panel for external router | N/A | GUI | Low |
 |Option to disable switching of tabs on actions | N/A | GUI | Low |
 |Ability to change language after install| 109 | GUI | Medium |
-|On-demand browse host|104|Network, Core, GUI | Low |
 |Diacritics-insensitive filtering | 103 | GUI | Low |
 |Redesign the Browse Collections tab | 92 | GUI | Medium |
 |Automatically search for more sources | 75 | Core | Medium |
