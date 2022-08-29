@@ -292,7 +292,7 @@ class ChatRoomController {
         
         runInsideUIAsync {
             long timestamp = System.currentTimeMillis()
-            String toDisplay = DataHelper.formatTime(timestamp) + " You reconnected to the server\n" // TODO translate
+            String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("YOU_RECONNECTED") + "\n" 
             view.appendGreen(toDisplay)
             trimLines()
         }
@@ -304,7 +304,7 @@ class ChatRoomController {
             view.membersTable?.model?.fireTableDataChanged()
             
             long timestamp = System.currentTimeMillis()
-            String toDisplay = DataHelper.formatTime(timestamp) + " You disconnected from the server\n" // TODO translate
+            String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("YOU_DISCONNECTED") + "\n"
             view.appendRed(toDisplay)
             trimLines()
         }
