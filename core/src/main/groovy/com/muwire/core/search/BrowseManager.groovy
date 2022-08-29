@@ -118,6 +118,7 @@ class BrowseManager {
         os.write("Files:${topLevelItems.files.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("Dirs:${topLevelItems.dirs.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
         os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+        os.flush()
 
         JsonOutput jsonOutput = new JsonOutput()
         DataOutputStream dos = null
