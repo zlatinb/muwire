@@ -121,76 +121,67 @@ class BrowseManager {
         os.flush()
 
         JsonOutput jsonOutput = new JsonOutput()
-        DataOutputStream dos = null
-        GZIPOutputStream gzos
-        try {
-            gzos = new GZIPOutputStream(os)
-            dos = new DataOutputStream(gzos)
-            writeFiles(topLevelItems.files.values(), dos, jsonOutput)
-            writeDirs(topLevelItems.dirs, dos, jsonOutput)
-            dos.flush()
-            gzos.finish()
-            dos.flush()
-            
-            InputStream is = endpoint.getInputStream()
-            while(true) {
-                String firstLine = DataUtil.readTillRN(is)
-                if (firstLine.startsWith("PING")) {
-                    DataUtil.readAllHeaders(is)
-                    os.write("PONG\r\n".getBytes(StandardCharsets.US_ASCII))
-                    os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-                    os.flush()
-                    continue
-                } 
-                if (!firstLine.startsWith("GET ")) 
-                    throw new Exception("=Unknown verb")
-                
-                Map<String,String> headers = DataUtil.readAllHeaders(is)
-                boolean recursive = headers.containsKey("Recursive") &&
-                        Boolean.parseBoolean(headers['Recursive'])
-
-                firstLine = firstLine.substring(4)
-                String[] elements = firstLine.split(",")
-                if (elements.length == 0)
-                    throw new Exception("invalid GET request")
-                def decoded = elements.collect {DataUtil.readi18nString(Base64.decode(it))}
-                String first = decoded.remove(0)
-                String[] more = decoded.toArray(new String[0])
-                Path requestedPath = Path.of(first, more)
-
-                os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
-
-                Collection<SharedFile> filesToWrite
-                Collection<Path> dirsToWrite
-                if (!recursive) {
-                    def cb = new ListCallback()
-                    tempTree.list(requestedPath, cb)
-                    filesToWrite = cb.files.values()
-                    dirsToWrite = cb.dirs
-                } else {
-                    def cb = new PathCallback()
-                    tempTree.traverse(requestedPath, cb)
-                    filesToWrite = cb.files
-                    dirsToWrite = Collections.emptySet()
-                }
-                filesToWrite.each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
-                os.write("Files:${filesToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
-                os.write("Dirs:${dirsToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+        def baos = new ByteArrayOutputStream()
+        def dos = new DataOutputStream(new GZIPOutputStream(baos))
+        writeFiles(topLevelItems.files.values(), dos, jsonOutput)
+        writeDirs(topLevelItems.dirs, dos, jsonOutput)
+        dos.close()
+        os.write(baos.toByteArray())
+        os.flush()
+        
+        InputStream is = endpoint.getInputStream()
+        while(true) {
+            String firstLine = DataUtil.readTillRN(is)
+            if (firstLine.startsWith("PING")) {
+                DataUtil.readAllHeaders(is)
+                os.write("PONG\r\n".getBytes(StandardCharsets.US_ASCII))
                 os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
-                
-                gzos = new GZIPOutputStream(os)
-                dos = new DataOutputStream(gzos)
-                writeFiles(filesToWrite, dos, jsonOutput)  
-                writeDirs(dirsToWrite, dos, jsonOutput)
-                dos.flush()
-                gzos.finish()
-                dos.flush()
+                os.flush()
+                continue
+            } 
+            if (!firstLine.startsWith("GET ")) 
+                throw new Exception("=Unknown verb")
+            
+            Map<String,String> headers = DataUtil.readAllHeaders(is)
+            boolean recursive = headers.containsKey("Recursive") &&
+                    Boolean.parseBoolean(headers['Recursive'])
+
+            firstLine = firstLine.substring(4)
+            String[] elements = firstLine.split(",")
+            if (elements.length == 0)
+                throw new Exception("invalid GET request")
+            def decoded = elements.collect {DataUtil.readi18nString(Base64.decode(it))}
+            String first = decoded.remove(0)
+            String[] more = decoded.toArray(new String[0])
+            Path requestedPath = Path.of(first, more)
+
+            os.write("200 OK\r\n".getBytes(StandardCharsets.US_ASCII))
+
+            Collection<SharedFile> filesToWrite
+            Collection<Path> dirsToWrite
+            if (!recursive) {
+                def cb = new ListCallback()
+                tempTree.list(requestedPath, cb)
+                filesToWrite = cb.files.values()
+                dirsToWrite = cb.dirs
+            } else {
+                def cb = new PathCallback()
+                tempTree.traverse(requestedPath, cb)
+                filesToWrite = cb.files
+                dirsToWrite = Collections.emptySet()
             }
-        } finally {
-            try {
-                dos?.flush()
-                dos?.close()
-            } catch (Exception ignored) {}
+            filesToWrite.each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
+            os.write("Files:${filesToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("Dirs:${dirsToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
+            os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
+            
+            baos = new ByteArrayOutputStream()
+            dos = new DataOutputStream(new GZIPOutputStream(baos))
+            writeFiles(filesToWrite, dos, jsonOutput)  
+            writeDirs(dirsToWrite, dos, jsonOutput)
+            dos.close()
+            os.write(baos.toByteArray())
+            os.flush()
         }
     }
     
