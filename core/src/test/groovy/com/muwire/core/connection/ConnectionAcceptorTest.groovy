@@ -105,50 +105,7 @@ class ConnectionAcceptorTest {
         acceptor.start()
         Thread.sleep(100)
     }
-
-    @Test
-    void testSuccessfulLeaf() {
-        settings = new MuWireSettings() {
-            boolean isLeaf() {
-                false
-            }
-        }
-        i2pAcceptorMock.demand.accept {
-            def is = new PipedInputStream()
-            outputStream = new PipedOutputStream(is)
-            def os = new PipedOutputStream()
-            inputStream = new PipedInputStream(os)
-            new Endpoint(destinations.dest1, is, os, null)
-        }
-        i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
-        connectionManagerMock.demand.isConnected { dest ->
-            assert dest == destinations.dest1
-            false
-        }
-        connectionManagerMock.demand.hasLeafSlots() { true }
-        trustServiceMock.demand.getLevel { dest ->
-            assert dest == destinations.dest1
-            TrustLevel.TRUSTED
-        }
-
-        initMocks()
-
-        outputStream.write("MuWire leaf".bytes)
-        byte [] OK = new byte[2]
-        def dis = new DataInputStream(inputStream)
-        dis.readFully(OK)
-        assert OK == "OK".bytes
-
-        Thread.sleep(50)
-        assert connectionEvents.size() == 1
-        def event = connectionEvents[0]
-        assert event.endpoint.destination == destinations.dest1
-        assert event.status == ConnectionAttemptStatus.SUCCESSFUL
-        assert event.incoming == true
-        assert event.leaf == true
-    }
-
+    
     @Test
     void testSuccessfulPeer() {
         settings = new MuWireSettings() {
@@ -191,79 +148,7 @@ class ConnectionAcceptorTest {
         assert event.incoming == true
         assert event.leaf == false
     }
-
-    @Test
-    void testLeafRejectsLeaf() {
-        settings = new MuWireSettings() {
-            boolean isLeaf() {
-                true
-            }
-        }
-        i2pAcceptorMock.demand.accept {
-            def is = new PipedInputStream()
-            outputStream = new PipedOutputStream(is)
-            def os = new PipedOutputStream()
-            inputStream = new PipedInputStream(os)
-            new Endpoint(destinations.dest1, is, os, null)
-        }
-        i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-        trustServiceMock.demand.getLevel { dest ->
-            assert dest == destinations.dest1
-            TrustLevel.TRUSTED
-        }
-
-        initMocks()
-
-        outputStream.write("MuWire leaf".bytes)
-        outputStream.flush()
-        Thread.sleep(50)
-        assert inputStream.read() == -1
-
-        Thread.sleep(50)
-        assert connectionEvents.size() == 1
-        def event = connectionEvents[0]
-        assert event.endpoint.destination == destinations.dest1
-        assert event.status == ConnectionAttemptStatus.FAILED
-        assert event.incoming == true
-        assert event.leaf == null
-    }
-
-    @Test
-    void testLeafRejectsPeer() {
-        settings = new MuWireSettings() {
-            boolean isLeaf() {
-                true
-            }
-        }
-        i2pAcceptorMock.demand.accept {
-            def is = new PipedInputStream()
-            outputStream = new PipedOutputStream(is)
-            def os = new PipedOutputStream()
-            inputStream = new PipedInputStream(os)
-            new Endpoint(destinations.dest1, is, os, null)
-        }
-        i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-        trustServiceMock.demand.getLevel { dest ->
-            assert dest == destinations.dest1
-            TrustLevel.TRUSTED
-        }
-
-        initMocks()
-
-        outputStream.write("MuWire peer".bytes)
-        outputStream.flush()
-        Thread.sleep(50)
-        assert inputStream.read() == -1
-
-        Thread.sleep(50)
-        assert connectionEvents.size() == 1
-        def event = connectionEvents[0]
-        assert event.endpoint.destination == destinations.dest1
-        assert event.status == ConnectionAttemptStatus.FAILED
-        assert event.incoming == true
-        assert event.leaf == null
-    }
-
+    
     @Test
     void testPeerRejectsPeerSlots() {
         settings = new MuWireSettings() {
@@ -309,53 +194,6 @@ class ConnectionAcceptorTest {
         assert event.status == ConnectionAttemptStatus.REJECTED
         assert event.incoming == true
         assert event.leaf == false
-    }
-
-    @Test
-    void testPeerRejectsLeafSlots() {
-        settings = new MuWireSettings() {
-            boolean isLeaf() {
-                false
-            }
-        }
-        i2pAcceptorMock.demand.accept {
-            def is = new PipedInputStream()
-            outputStream = new PipedOutputStream(is)
-            def os = new PipedOutputStream()
-            inputStream = new PipedInputStream(os)
-            new Endpoint(destinations.dest1, is, os, null)
-        }
-        i2pAcceptorMock.demand.accept { Thread.sleep(Integer.MAX_VALUE) }
-        connectionEstablisherMock.demand.isInProgress(destinations.dest1) { false }
-        connectionManagerMock.demand.isConnected { dest ->
-            assert dest == destinations.dest1
-            false
-        }
-        connectionManagerMock.demand.hasLeafSlots() { false }
-        trustServiceMock.demand.getLevel { dest ->
-            assert dest == destinations.dest1
-            TrustLevel.TRUSTED
-        }
-        hostCacheMock.ignore.getGoodHosts { n -> [] }
-
-        initMocks()
-
-        outputStream.write("MuWire leaf".bytes)
-        byte [] OK = new byte[6]
-        def dis = new DataInputStream(inputStream)
-        dis.readFully(OK)
-        assert OK == "REJECT".bytes
-
-        Thread.sleep(50)
-        assert dis.read() == -1
-
-        Thread.sleep(50)
-        assert connectionEvents.size() == 1
-        def event = connectionEvents[0]
-        assert event.endpoint.destination == destinations.dest1
-        assert event.status == ConnectionAttemptStatus.REJECTED
-        assert event.incoming == true
-        assert event.leaf == true
     }
 
     @Test
