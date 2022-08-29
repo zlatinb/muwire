@@ -167,6 +167,11 @@ class BrowseController {
         if (selectedResults == null || selectedResults.isEmpty())
             return
 
+        if (model.treeVisible && model.session != null && model.session.supportsIncremental() &&
+                view.resultsTree.selectedUnfetchedFolder()) {
+            view.showUnexpandedFolderWarning()
+            return
+        }
 
         File downloadsFolder = application.context.get("muwire-settings").downloadLocation
         List<ResultAndTargets> targets = view.decorateResults(selectedResults)

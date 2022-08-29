@@ -5,6 +5,7 @@ import griffon.core.artifact.GriffonView
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.JTextField
@@ -406,6 +407,11 @@ class BrowseView {
            rv.addAll(resultsTree.decorateResults(results))
         }
         rv
+    }
+    
+    void showUnexpandedFolderWarning() {
+        JOptionPane.showMessageDialog(null, trans("WARNING_UNEXPANDED_FOLDER_BODY"),
+            trans("WARNING_UNEXPANDED_FOLDER_TITLE"), JOptionPane.WARNING_MESSAGE)
     }
     
     def showTree = {

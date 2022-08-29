@@ -86,7 +86,7 @@ class ResultTree extends JTree{
     List<TreePath> selectedFolderPaths() {
         TreePath[] selected = getSelectionPaths()
         if (selected == null)
-            return
+            return Collections.emptyList()
         List<TreePath> rv = []
         for (TreePath path : selected) {
             def obj = path.getLastPathComponent().getUserObject()
@@ -94,6 +94,24 @@ class ResultTree extends JTree{
                 return rv << path
         }
         rv
+    }
+
+    /**
+     * @return true if an unfetched folder has been selected
+     */
+    boolean selectedUnfetchedFolder() {
+        List<TreePath> selected = selectedFolderPaths()
+        if (selected.isEmpty())
+            return false
+        List<?> userObjects = []
+        for (TreePath path : selected) {
+            TreeUtil.getLeafs(path.getLastPathComponent(), userObjects)
+        }
+        for (Object o : userObjects) {
+            if (o == ResultTreeRenderer.PLACEHOLDER)
+                return true
+        }
+        false
     }
    
 }
