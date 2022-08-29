@@ -199,7 +199,7 @@ class BrowseSession implements Runnable {
                             os.flush()
                             String response = DataUtil.readTillRN(is)
                             if (!response.startsWith("200"))
-                                throw new Exception("response not ok")
+                                throw new Exception("response not ok $response")
                             headers = DataUtil.readAllHeaders(is)
                             break
                         }

@@ -129,6 +129,7 @@ class BrowseManager {
             writeDirs(topLevelItems.dirs, dos, jsonOutput)
             dos.flush()
             gzos.finish()
+            dos.flush()
             
             InputStream is = endpoint.getInputStream()
             while(true) {
@@ -182,6 +183,7 @@ class BrowseManager {
                 writeDirs(dirsToWrite, dos, jsonOutput)
                 dos.flush()
                 gzos.finish()
+                dos.flush()
             }
         } finally {
             try {
