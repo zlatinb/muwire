@@ -230,7 +230,6 @@ class BrowseController {
     
     void requestFetch(TreePath treePath, boolean recursive) {
         List<String> path = model.resultsTreeModel.getPathFromRoot(treePath)
-        if (path != null)
-            model.session.fetch(path, recursive)
+        model.session.fetch(path, recursive)
     } 
 }

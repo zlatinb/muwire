@@ -81,12 +81,6 @@ class ResultTreeModel extends DefaultTreeModel {
     
     List<String> getPathFromRoot(TreePath treePath) {
         
-        MutableResultNode last = (MutableResultNode)treePath.getLastPathComponent()
-        if (last.getChildCount() != 1)
-            return null
-        if (!(last.getChildAt(0) instanceof PlaceholderNode))
-            return null
-        
         Object [] objects = treePath.getPath()
         
         List<String> rv = new ArrayList<>()
