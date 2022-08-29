@@ -285,7 +285,7 @@ class MainFrameView {
                                     downloadsTable = table(id : "downloads-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list: model.downloads) {
                                             closureColumn(header: trans("NAME"), preferredWidth: 300, type: String, read : {row -> HTMLSanitizer.sanitize(row.downloader.file.getName())})
-                                            closureColumn(header: trans("STATUS"), preferredWidth: 50, type: String, read : {row -> trans(row.downloader.getCurrentState().name())})
+                                            closureColumn(header: trans("STATUS"), preferredWidth: 50, type: Downloader.DownloadState, read : { row -> row.downloader.getCurrentState()})
                                             closureColumn(header: trans("PROGRESS"), preferredWidth: 70, type: Downloader, read: { row -> row.downloader })
                                             closureColumn(header: trans("SPEED"), preferredWidth: 50, type:String, read :{row ->
                                                 formatSize(row.downloader.speed(),"B_SEC")
@@ -1003,6 +1003,7 @@ class MainFrameView {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         downloadsTable.setDefaultRenderer(Integer.class, centerRenderer)
         downloadsTable.setDefaultRenderer(Downloader.class, new DownloadProgressRenderer())
+        downloadsTable.setDefaultRenderer(Downloader.DownloadState.class, new DownloadStateRenderer())
 
         downloadsTable.rowSorter.addRowSorterListener({ evt -> lastDownloadSortEvent = evt })
         downloadsTable.rowSorter.setSortsOnUpdates(true)
