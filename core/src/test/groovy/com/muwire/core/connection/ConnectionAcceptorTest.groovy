@@ -100,7 +100,7 @@ class ConnectionAcceptorTest {
         connectionEstablisher = connectionEstablisherMock.proxyInstance()
 
         acceptor = new ConnectionAcceptor(eventBus, null, null, connectionManager, settings, i2pAcceptor,
-            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null,
+            hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null, null,
                 {f, p -> true} as BiPredicate)
         acceptor.start()
         Thread.sleep(100)

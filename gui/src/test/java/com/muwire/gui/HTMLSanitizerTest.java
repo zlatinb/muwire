@@ -4,7 +4,7 @@ import org.junit.Test;
 
 public class HTMLSanitizerTest {
     
-    private static void assertSantizied(String raw, String sanitized) {
+    private static void assertSanitized(String raw, String sanitized) {
         assert HTMLSanitizer.sanitize(raw).equals("<html><body>" + sanitized + "</body></html>");
     }
     @Test
@@ -14,20 +14,21 @@ public class HTMLSanitizerTest {
     
     @Test
     public void testSingleChars() {
-        assertSantizied("&", "&amp;");
-        assertSantizied("\"","&quot;");
-        assertSantizied("<","&lt;");
-        assertSantizied(">","&gt;");
+        assertSanitized("&", "&amp;");
+        assertSanitized("\"","&quot;");
+        assertSanitized("<","&lt;");
+        assertSanitized(">","&gt;");
+        assertSanitized(" ", "&nbsp;");
     }
     
     @Test
     public void testEvilHTMLDoubleQuote() {
-        assertSantizied("<html><img src=\"my.tracking.server.com\"/></html>",
-                "&lt;html&gt;&lt;img src=&quot;my.tracking.server.com&quot;/&gt;&lt;/html&gt;");
+        assertSanitized("<html><img src=\"my.tracking.server.com\"/></html>",
+                "&lt;html&gt;&lt;img&nbsp;src=&quot;my.tracking.server.com&quot;/&gt;&lt;/html&gt;");
     }
     
     @Test
     public void textMixture() {
-        assertSantizied("><\"&", "&gt;&lt;&quot;&amp;");
+        assertSanitized("><\"&", "&gt;&lt;&quot;&amp;");
     }
 }
