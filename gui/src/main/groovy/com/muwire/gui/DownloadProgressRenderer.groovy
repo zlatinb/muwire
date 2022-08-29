@@ -13,12 +13,13 @@ import net.i2p.data.DataHelper
 
 class DownloadProgressRenderer extends DefaultTableCellRenderer {
     DownloadProgressRenderer() {
-        setHorizontalAlignment(JLabel.CENTER)
+        setHorizontalAlignment(CENTER)
     }
     
     @Override
     JComponent getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
         if (value == null)
             return this //TODO investigate
         
