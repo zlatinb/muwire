@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.chat.ChatDisconnectionEvent
 import griffon.core.GriffonApplication
 
+import javax.inject.Inject
 import java.util.logging.Level
 
 import javax.annotation.Nonnull
@@ -30,9 +31,13 @@ class ChatServerModel {
     ChatServerView view
     @MVCMember @Nonnull
     ChatServerController controller
+    @Inject
+    GriffonApplication application
     
     Persona host
     Core core
+    UISettings settings
+    NotifyService notifyService
     
     @Observable boolean disconnectActionEnabled
     @Observable String buttonText = "DISCONNECT"
@@ -44,6 +49,10 @@ class ChatServerModel {
     volatile boolean running
     
     void mvcGroupInit(Map<String, String> params) {
+        
+        settings = application.context.get("ui-settings")
+        notifyService = application.context.get("notify-service")
+        
         disconnectActionEnabled = host != core.me // can't disconnect from myself
         core.eventBus.register(ChatConnectionEvent.class, this)
         core.eventBus.register(ChatDisconnectionEvent.class, this)
@@ -154,6 +163,10 @@ class ChatServerModel {
             room == core.me.toBase64()) {
             String groupId = host.getHumanReadableName()+"-"+e.sender.getHumanReadableName() + "-private-chat"
             if (!mvcGroup.childrenGroups.containsKey(groupId)) {
+                
+                if (settings.chatNotifyMentions)
+                    notifyService.notifyPrivateChat(e.sender.getHumanReadableName(), host.getHumanReadableName())
+                
                 def params = [:]
                 params['core'] = core
                 params['tabName'] = host.getHumanReadableName() + "-chat-rooms"
