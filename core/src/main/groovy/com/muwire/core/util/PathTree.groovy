@@ -10,9 +10,7 @@ import java.util.function.Function
  */
 class PathTree<T,I> {
 
-    private final Node[] EMPTY_CHILDREN = new Node[0]
-    
-    private final Node root = new Node()
+    private final Node root = new Node(null, null)
     private final Map<Path, Node> pathNodeMap = new HashMap<>()
     
     private final Function<Path, I> function
@@ -31,9 +29,7 @@ class PathTree<T,I> {
             Path subPath = path.subpath(0, i + 1)
             Node newNode = pathNodeMap[subPath]
             if (newNode == null) {
-                newNode = new Node()
-                newNode.path = subPath
-                newNode.parent = parent
+                newNode = new Node(parent, subPath)
                 if (function != null)
                     newNode.interimValue = function.apply(newNode.path)
                 parent.addChild(newNode)
@@ -56,7 +52,7 @@ class PathTree<T,I> {
     }
     
     private synchronized void doTraverse(Node from, PathTreeCallback<T,I> cb) {
-        if (from.children.length == 0) {
+        if (from.children.isEmpty()) {
             cb.onLeaf(from.path, from.value)
             return
         }
@@ -77,7 +73,7 @@ class PathTree<T,I> {
             node = pathNodeMap[from]
         
         for (Node child : node.children) {
-            if (child.children.length == 0)
+            if (child.children.isEmpty())
                 cb.onLeaf(child.path, child.value)
             else
                 cb.onDirectory(child.path, child.interimValue)
@@ -85,14 +81,25 @@ class PathTree<T,I> {
     }
     
     private class Node {
-        Node parent
-        Path path
+        final Node parent
+        final Path path
+        final int hashcode
+        
         T value
         I interimValue
-        Node[] children = EMPTY_CHILDREN
+        Set<Node> children = Collections.emptySet()
+        
+        Node(Node parent, Path path) {
+            this.parent = parent
+            this.path = path
+            if (path != null)
+                hashcode = path.hashCode()
+            else
+                hashcode = 0
+        }
         
         int hashCode() {
-            Objects.hash(path)
+            hashcode
         }
         
         boolean equals(Object o) {
@@ -103,10 +110,9 @@ class PathTree<T,I> {
         }
         
         private void addChild(Node child) {
-            Set<Node> unique = new HashSet<>()
-            unique.addAll(children)
-            unique.add(child)
-            children = unique.toArray(children)
+            if (children == Collections.emptySet())
+                children = new HashSet<>()
+            children.add(child)
         }
     }
     
