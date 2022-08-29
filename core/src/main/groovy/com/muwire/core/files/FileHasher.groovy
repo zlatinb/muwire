@@ -87,6 +87,13 @@ class FileHasher {
 
                 byte[] hashList = output.toByteArray()
                 return InfoHash.fromHashList(hashList)
+            } catch (FileNotFoundException weird) {
+                if (file.exists()) {
+                    // this is apparently possible on some systems while the file is being used
+                    // by another process, see GitHub issue 167. So we try again.
+                    Thread.sleep(10)
+                } else
+                    break // give up
             } catch (InternalError bad) {
                 // nothing we can but try again.  Happens on jre 18.0.1
                 log.log(Level.SEVERE,"internal error while hashing", bad)
