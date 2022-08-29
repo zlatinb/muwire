@@ -268,6 +268,13 @@ class ChatRoomController {
     }
     
     void rejoinRoom() {
+        runInsideUIAsync {
+            long timestamp = System.currentTimeMillis()
+            String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("YOU_RECONNECTED") + "\n"
+            view.appendGreen(toDisplay)
+            trimLines()
+        }
+        
         if (model.console || model.privateChat)
             return
         
@@ -289,13 +296,6 @@ class ChatRoomController {
             sig : sig
         )
         model.core.eventBus.publish(event)
-        
-        runInsideUIAsync {
-            long timestamp = System.currentTimeMillis()
-            String toDisplay = DataHelper.formatTime(timestamp) + " " + trans("YOU_RECONNECTED") + "\n" 
-            view.appendGreen(toDisplay)
-            trimLines()
-        }
     }
     
     void serverDisconnected() {
