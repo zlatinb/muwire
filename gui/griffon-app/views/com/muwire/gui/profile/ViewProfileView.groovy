@@ -7,6 +7,7 @@ import com.muwire.gui.HTMLSanitizer
 
 import javax.imageio.ImageIO
 import javax.swing.Icon
+import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextArea
@@ -48,6 +49,8 @@ class ViewProfileView {
     JLabel titleLabel
     ImagePanel imagePanel
     JTextArea bodyArea
+
+    private Icon trusted, neutral, distrusted
     
     void initUI() {
         mainFrame = application.windowManager.findWindow("main-frame")
@@ -59,6 +62,10 @@ class ViewProfileView {
         thumbnailPanel = new ImagePanel()
         thumbnailPanel.setPreferredSize([ProfileConstants.MAX_THUMBNAIL_SIZE, ProfileConstants.MAX_THUMBNAIL_SIZE] as Dimension)
         imagePanel = new ImagePanel()
+
+        trusted = new ImageIcon(getClass().getClassLoader().getResource("trusted.png"))
+        neutral = new ImageIcon(getClass().getClassLoader().getResource("neutral.png"))
+        distrusted = new ImageIcon(getClass().getClassLoader().getResource("distrusted.png"))
         
         window = builder.frame(visible: false, defaultCloseOperation: JFrame.DISPOSE_ON_CLOSE,
                 iconImage: builder.imageIcon("/MuWire-48x48.png").image,
@@ -107,8 +114,8 @@ class ViewProfileView {
                 panel {
                     borderLayout()
                     panel(constraints: BorderLayout.WEST) {
-                        label(text: trans("YOUR_TRUST") + " : ")
-                        label(text: bind {trans(model.trustLevel.name())})
+                        label(text: "", icon: bind{ getIcon(model.trustLevel) } ,
+                                toolTipText: bind {trans(model.trustLevel.name())})
                     }
                     panel(constraints: BorderLayout.EAST) {
                         label(text: bind { model.status == null ? "" : trans(model.status.name()) })
@@ -132,6 +139,13 @@ class ViewProfileView {
         window.setPreferredSize([dimX, dimY] as Dimension)        
     }
     
+    private Icon getIcon(TrustLevel level) {
+        switch(level) {
+            case TrustLevel.TRUSTED : return trusted
+            case TrustLevel.NEUTRAL : return neutral
+            case TrustLevel.DISTRUSTED : return distrusted
+        }
+    }
     void mvcGroupInit(Map<String, String> params) {
         window.addWindowListener(new WindowAdapter() {
             @Override
