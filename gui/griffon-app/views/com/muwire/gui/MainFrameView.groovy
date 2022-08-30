@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.google.common.collect.Sets
 import com.muwire.core.Persona
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
@@ -1043,6 +1044,8 @@ class MainFrameView {
 
         // shared files table and tree
         JTable sharedFilesTable = builder.getVariable("shared-files-table")
+        TableUtil.packColumns(sharedFilesTable, Sets.newHashSet(0,1))
+        TableUtil.sizeColumn(sharedFilesTable, 1)
         sharedFilesTable.columnModel.getColumn(0).setCellRenderer(new SharedFileNameRenderer(settings))
         sharedFilesTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         
