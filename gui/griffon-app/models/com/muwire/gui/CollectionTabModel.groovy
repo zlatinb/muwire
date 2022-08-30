@@ -44,8 +44,8 @@ class CollectionTabModel {
     boolean treeVisible = true
     
     @Observable CollectionFetchStatus status
-    @Observable String comment = trans("COLLECTION_SELECT")
     @Observable int totalCollections
+    @Observable boolean viewCollectionCommentButtonEnabled
     @Observable boolean viewCommentButtonEnabled
     @Observable boolean downloadItemButtonEnabled
     @Observable boolean downloadCollectionButtonEnabled

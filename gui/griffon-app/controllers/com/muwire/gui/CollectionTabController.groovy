@@ -89,6 +89,19 @@ class CollectionTabController {
     }
     
     @ControllerAction
+    void viewCollectionComment() {
+        int row = view.selectedCollection()
+        if (row < 0)
+            return
+        FileCollection collection = model.collections[row]
+        
+        def params = [:]
+        params['text'] = collection.getComment()
+        params['name'] = collection.getName()
+        mvcGroup.createMVCGroup("show-comment", params).destroy()
+    }
+    
+    @ControllerAction
     void copyId() {
         CopyPasteSupport.copyToClipboard(model.host.toBase64())
     }

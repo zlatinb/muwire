@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.google.common.collect.Sets
 import com.muwire.core.Persona
 import griffon.core.GriffonApplication
 
@@ -7,6 +8,7 @@ import javax.inject.Inject
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
+import javax.swing.JSplitPane
 import javax.swing.KeyStroke
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.event.ActionEvent
@@ -54,7 +56,6 @@ class CollectionTabView {
     
     JTable collectionsTable
     def lastCollectionsTableSortEvent
-    JTextArea commentArea
     def itemsPanel
     JTable itemsTable
     def lastItemsTableSortEvent
@@ -66,102 +67,98 @@ class CollectionTabView {
         int rowHeight = application.context.get("row-height")
         int treeRowHeight = application.context.get("tree-row-height")
         p = builder.panel {
-            gridLayout(rows : 3, cols: 1)
-            panel {
-                borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
+            gridLayout(rows : 1, cols: 1)
+            splitPane(orientation: JSplitPane.VERTICAL_SPLIT, continuousLayout : true, dividerLocation: 300 ) {
+                panel {
                     borderLayout()
-                    panel(constraints: BorderLayout.CENTER) {
-                        label(text: trans("STATUS") + ":")
-                        label(text: bind { trans(model.status.name()) })
-                    }
-                    panel(constraints: BorderLayout.EAST) {
-                        button(text : trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_COPY_SENDER_FULL_ID"), copyIdAction)
-                    }
-                }
-                scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                    collectionsTable = table(id: "collections-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                        tableModel(list : model.collections) {
-                            closureColumn(header: trans("NAME"), preferredWidth: 200, type : String, read : {HTMLSanitizer.sanitize(it.name)})
-                            closureColumn(header: trans("AUTHOR"), preferredWidth: 200, type : Persona, read : {it.author})
-                            closureColumn(header: trans("COLLECTION_TOTAL_FILES"), preferredWidth: 20, type: Integer, read : {it.numFiles()})
-                            closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), preferredWidth: 20, type: Long, read : {it.totalSize()})
-                            closureColumn(header: trans("COMMENT"), preferredWidth: 20, type: Boolean, read: {it.comment != ""})
-                            closureColumn(header: trans("CREATED"), preferredWidth: 50, type: Long, read: {it.timestamp})
+                    panel(constraints: BorderLayout.NORTH) {
+                        borderLayout()
+                        panel(constraints: BorderLayout.CENTER) {
+                            label(text: trans("STATUS") + ":")
+                            label(text: bind { trans(model.status.name()) })
+                        }
+                        panel(constraints: BorderLayout.EAST) {
+                            button(text: trans("COPY_FULL_ID"), toolTipText: trans("TOOLTIP_COPY_SENDER_FULL_ID"), copyIdAction)
                         }
                     }
-                }
-                panel(constraints : BorderLayout.SOUTH) {
-                    gridLayout(rows : 1, cols : 3)
-                    panel{}
-                    panel {
-                        button(text : trans("COLLECTION_DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FULL_COLLECTION"),
-                                enabled : bind{model.downloadCollectionButtonEnabled}, downloadCollectionAction)
-                    }
-                    panel {
-                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
-                        downloadSequentiallyCollectionCheckbox = checkBox(selected : bind {model.downloadSequentiallyCollection}, 
-                            enabled : bind {model.downloadCollectionButtonEnabled})
-                    }
-                }
-            }
-            panel {
-                borderLayout()
-                panel(constraints: BorderLayout.NORTH) {
-                    label(text : trans("DESCRIPTION"))
-                }
-                commentArea = textArea(text : bind {model.comment}, editable : false, lineWrap : true, wrapStyleWord : true, constraints : BorderLayout.CENTER,
-                    border : etchedBorder())
-            }
-            panel {
-                borderLayout()
-                panel(constraints : BorderLayout.NORTH) {
-                    label(text: trans("FILES"))
-                }
-                itemsPanel = panel(constraints : BorderLayout.CENTER) {
-                    cardLayout()
-                    panel(constraints : "table") {
-                        borderLayout()
-                        scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                            itemsTable = table(id: "items-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
-                                tableModel(list : model.items) {
-                                    closureColumn(header: trans("NAME"), preferredWidth : 200, type : String, read :{
-                                        HTMLSanitizer.sanitize(String.join(File.separator, it.pathElements))
-                                    })
-                                    closureColumn(header : trans("SIZE"), preferredWidth : 20, type : Long, read : {it.length})
-                                    closureColumn(header : trans("COMMENT"), preferredWidth : 20, type : Boolean, read : {it.comment != ""})
-                                }
+                    scrollPane(constraints: BorderLayout.CENTER, border: etchedBorder()) {
+                        collectionsTable = table(id: "collections-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                            tableModel(list: model.collections) {
+                                closureColumn(header: trans("NAME"), type: String, read: { HTMLSanitizer.sanitize(it.name) })
+                                closureColumn(header: trans("AUTHOR"), type: Persona, read: { it.author })
+                                closureColumn(header: trans("COLLECTION_TOTAL_FILES"), type: Integer, read: { it.numFiles() })
+                                closureColumn(header: trans("COLLECTION_TOTAL_SIZE"), type: Long, read: { it.totalSize() })
+                                closureColumn(header: trans("COMMENT"), type: Boolean, read: { it.comment != "" })
+                                closureColumn(header: trans("CREATED"), type: Long, read: { it.timestamp })
                             }
                         }
                     }
-                    panel(constraints : "tree") {
-                        borderLayout()
-                        scrollPane(constraints : BorderLayout.CENTER, border : etchedBorder()) {
-                            itemsTree = new JTree(model.fileTreeModel)
-                            itemsTree.setCellRenderer(new PathTreeRenderer())
-                            tree(id: "items-tree", rowHeight : treeRowHeight, rootVisible : false, expandsSelectedPaths : true, itemsTree)
+                    panel(constraints: BorderLayout.SOUTH) {
+                        gridLayout(rows: 1, cols: 3)
+                        panel {}
+                        panel {
+                            button(text: trans("COLLECTION_DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FULL_COLLECTION"),
+                                    enabled: bind { model.downloadCollectionButtonEnabled }, downloadCollectionAction)
+                            button(text: trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_VIEW_COLLECTION_COMMENT"),
+                                    enabled: bind {model.viewCollectionCommentButtonEnabled}, viewCollectionCommentAction)
+                        }
+                        panel {
+                            label(text: trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
+                            downloadSequentiallyCollectionCheckbox = checkBox(selected: bind { model.downloadSequentiallyCollection },
+                                    enabled : bind {model.downloadCollectionButtonEnabled })
                         }
                     }
                 }
-                panel(constraints : BorderLayout.SOUTH) {
-                    gridLayout(rows : 1, cols : 3)
-                    panel {
-                        buttonGroup(id : "viewType")
-                        radioButton(text : trans("TREE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TREE"),
-                                selected : true, buttonGroup : viewType, actionPerformed : showTree)
-                        radioButton(text : trans("TABLE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TABLE"),
-                                selected : false, buttonGroup : viewType, actionPerformed : showTable)
+                panel {
+                    borderLayout()
+                    panel(constraints: BorderLayout.NORTH) {
+                        label(text: trans("FILES"))
                     }
-                    panel {
-                        button(text : trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"),
-                                enabled : bind {model.downloadItemButtonEnabled}, downloadAction)
-                        button(text : trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_VIEW_RESULT_COMMENT"),
-                                enabled : bind{model.viewCommentButtonEnabled}, viewCommentAction)
+                    itemsPanel = panel(constraints: BorderLayout.CENTER) {
+                        cardLayout()
+                        panel(constraints: "table") {
+                            borderLayout()
+                            scrollPane(constraints: BorderLayout.CENTER, border: etchedBorder()) {
+                                itemsTable = table(id: "items-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
+                                    tableModel(list: model.items) {
+                                        closureColumn(header: trans("NAME"), type: String, read: {
+                                            HTMLSanitizer.sanitize(String.join(File.separator, it.pathElements))
+                                        })
+                                        closureColumn(header: trans("SIZE"), type: Long, read: { it.length })
+                                        closureColumn(header: trans("COMMENT"), type: Boolean, read: { it.comment != "" })
+                                    }
+                                }
+                            }
+                        }
+                        panel(constraints: "tree") {
+                            borderLayout()
+                            scrollPane(constraints: BorderLayout.CENTER, border: etchedBorder()) {
+                                itemsTree = new JTree(model.fileTreeModel)
+                                itemsTree.setCellRenderer(new PathTreeRenderer())
+                                tree(id: "items-tree", rowHeight: treeRowHeight, rootVisible: false, expandsSelectedPaths: true, itemsTree)
+                            }
+                        }
                     }
-                    panel {
-                        label(text : trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
-                        downloadSequentiallyItemCheckbox = checkBox(selected : bind {model.downloadSequentiallyItem},
-                        enabled : bind {model.downloadItemButtonEnabled})
+                    panel(constraints: BorderLayout.SOUTH) {
+                        gridLayout(rows: 1, cols: 3)
+                        panel {
+                            buttonGroup(id: "viewType")
+                            radioButton(text: trans("TREE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TREE"),
+                                    selected: true, buttonGroup: viewType, actionPerformed: showTree)
+                            radioButton(text: trans("TABLE"), toolTipText: trans("TOOLTIP_RESULT_VIEW_TABLE"),
+                                    selected: false, buttonGroup: viewType, actionPerformed: showTable)
+                        }
+                        panel {
+                            button(text: trans("DOWNLOAD"), toolTipText: trans("TOOLTIP_DOWNLOAD_FILE"),
+                                    enabled: bind { model.downloadItemButtonEnabled }, downloadAction)
+                            button(text: trans("VIEW_COMMENT"), toolTipText: trans("TOOLTIP_VIEW_RESULT_COMMENT"),
+                                    enabled: bind { model.viewCommentButtonEnabled }, viewCommentAction)
+                        }
+                        panel {
+                            label(text: trans("DOWNLOAD_SEQUENTIALLY"), toolTipText: trans("TOOLTIP_DOWNLOAD_SEQUENTIALLY"))
+                            downloadSequentiallyItemCheckbox = checkBox(selected: bind { model.downloadSequentiallyItem },
+                                    enabled: bind { model.downloadItemButtonEnabled })
+                        }
                     }
                 }
             }
@@ -228,6 +225,9 @@ class CollectionTabView {
         mainFrameGroup.view.showSearchWindow.call()
         
         // collections table
+        TableUtil.packColumns(collectionsTable, Sets.newHashSet(0,1,5))
+        TableUtil.nicknameColumn(collectionsTable, 1)
+        TableUtil.dateColumn(collectionsTable, 5)
         def centerRenderer = new DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(JLabel.CENTER)
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -248,7 +248,7 @@ class CollectionTabView {
                 return
             model.downloadCollectionButtonEnabled = true
             FileCollection selected = model.collections.get(row)
-            model.comment = selected.comment
+            model.viewCollectionCommentButtonEnabled = selected.getComment() != ""
             
             model.items.clear()
             model.items.addAll(selected.files)
@@ -275,6 +275,8 @@ class CollectionTabView {
         
         
         // items table
+        TableUtil.packColumns(itemsTable, Sets.newHashSet(0, 1))
+        TableUtil.sizeColumn(itemsTable, 1)
         itemsTable.setDefaultRenderer(Long.class, new SizeRenderer())
         itemsTable.rowSorter.addRowSorterListener({evt -> lastItemsTableSortEvent = evt})
         itemsTable.rowSorter.setSortsOnUpdates(true)
@@ -381,6 +383,12 @@ class CollectionTabView {
         JMenuItem downloadCollection = new JMenuItem(trans("COLLECTION_DOWNLOAD"))
         downloadCollection.addActionListener({controller.downloadCollection()})
         menu.add(downloadCollection)
+        
+        if (model.viewCollectionCommentButtonEnabled) {
+            JMenuItem viewCollectionComment = new JMenuItem(trans("VIEW_COMMENT"))
+            viewCollectionComment.addActionListener({controller.viewCollectionComment()})
+            menu.add(viewCollectionComment)
+        }
         showPopupMenu(menu, e)
     }
     
