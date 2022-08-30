@@ -28,7 +28,7 @@ class TableUtil {
     static void sizeColumn(JTable table, int index) {
         StringBuffer buf = new StringBuffer()
         SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
-        String str = buf.toString() + trans("BYTES_SHORT").length()
+        String str = buf.toString() + trans("BYTES_SHORT")
         int columnSize = stringWidth(table, str)
         fixedColumnSize(table, index, columnSize + 30)
     }
@@ -47,7 +47,7 @@ class TableUtil {
     static void speedColumn(JTable table, int index) {
         StringBuffer buf = new StringBuffer()
         SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
-        String str = buf.toString() + trans("B_SEC").length()
+        String str = buf.toString() + trans("B_SEC")
         int columnSize = stringWidth(table, str)
         fixedColumnSize(table, index, columnSize + 30)
     }
