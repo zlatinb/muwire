@@ -141,11 +141,10 @@ public class SharedFile {
     }
 
     /**
-     * Sets the path to the shared parent and computes
-     * the cached visible path.
+     * Sets the path to the shared parent 
      */
     public void setPathToSharedParent(Path path) {
-        this.pathToSharedParent = path;
+        this.pathToSharedParent = path.normalize();
     }
     
     public Path getPathToSharedParent() {
