@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.google.common.collect.Sets
 import com.muwire.core.Persona
+import com.muwire.core.filefeeds.FeedFetchStatus
 import com.muwire.core.messenger.MWMessage
 import com.muwire.core.messenger.Messenger
 import com.muwire.core.messenger.UIMessageMovedEvent
@@ -906,7 +907,9 @@ class MainFrameView {
         def trustRenderer = new TrustCellRenderer()
 
         // downloads table
-        def downloadsTable = builder.getVariable("downloads-table")
+        JTable downloadsTable = builder.getVariable("downloads-table")
+        TableUtil.enumColumn(downloadsTable, 1, Downloader.DownloadState.class)
+        TableUtil.speedColumn(downloadsTable, 3)
         def selectionModel = downloadsTable.getSelectionModel()
         selectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         selectionModel.addListSelectionListener({
@@ -1078,6 +1081,9 @@ class MainFrameView {
 
 
         // collections table
+        TableUtil.packColumns(collectionsTable, Sets.newHashSet(0,1,2,3,6))
+        TableUtil.sizeColumn(collectionsTable, 3)
+        TableUtil.dateColumn(collectionsTable, 6)
         def personaRenderer = new PersonaCellRenderer(application.context.get("ui-settings"))
         def personaComparator = new PersonaComparator()
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -1153,6 +1159,7 @@ class MainFrameView {
 
         // uploadsTable
         JTable uploadsTable = builder.getVariable("uploads-table")
+        TableUtil.speedColumn(uploadsTable, 4)
 
         uploadsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         uploadsTable.rowSorter.setComparator(2, popComparator)
@@ -1205,6 +1212,8 @@ class MainFrameView {
 
         // feeds table
         JTable feedsTable = builder.getVariable("feeds-table")
+        TableUtil.enumColumn(feedsTable, 3, FeedFetchStatus.class)
+        TableUtil.dateColumn(feedsTable, 2)
         feedsTable.rowSorter.addRowSorterListener({ evt -> lastFeedsSortEvent = evt })
         feedsTable.rowSorter.setSortsOnUpdates(true)
         feedsTable.rowSorter.setComparator(0, personaComparator)
@@ -1252,7 +1261,10 @@ class MainFrameView {
 
 
         // feed items table
-        def feedItemsTable = builder.getVariable("feed-items-table")
+        JTable feedItemsTable = builder.getVariable("feed-items-table")
+        TableUtil.packColumns(feedItemsTable, Sets.newHashSet(0,1,5))
+        TableUtil.sizeColumn(feedItemsTable, 1)
+        TableUtil.dateColumn(feedItemsTable, 5)
         feedItemsTable.rowSorter.addRowSorterListener({ evt -> lastFeedItemsSortEvent = evt })
         feedItemsTable.rowSorter.setSortsOnUpdates(true)
         feedItemsTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -1299,6 +1311,9 @@ class MainFrameView {
 
         // subscription table
         JTable subscriptionTable = builder.getVariable("subscription-table")
+        TableUtil.packColumns(subscriptionTable, Sets.newHashSet(0,3,4))
+        TableUtil.enumColumn(subscriptionTable, 3, RemoteTrustList.Status.class)
+        TableUtil.dateColumn(subscriptionTable, 4)
         subscriptionTable.setDefaultRenderer(Integer.class, centerRenderer)
         subscriptionTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         subscriptionTable.rowSorter.addRowSorterListener({ evt -> lastContactsSubscriptionSortEvent = evt })

@@ -1,6 +1,7 @@
 package com.muwire.gui
 
 import com.muwire.core.files.FileHasher
+import net.i2p.data.DataHelper
 
 import static com.muwire.gui.Translator.trans
 
@@ -16,7 +17,7 @@ class TableUtil {
                 continue
             TableColumn column = table.getColumnModel().getColumn(i)
             String value = (String) column.getHeaderValue()
-            int fixedWidth = stringWidth(table, value) + 10
+            int fixedWidth = stringWidth(table, value) + 30
             column.setMinWidth(fixedWidth)
             column.setMaxWidth(fixedWidth)
         }
@@ -26,7 +27,38 @@ class TableUtil {
         StringBuffer buf = new StringBuffer()
         SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
         String str = buf.toString() + trans("BYTES_SHORT").length()
-        int columnSize = stringWidth(table, str) + 30
+        int columnSize = stringWidth(table, str)
+        fixedColumnSize(table, index, columnSize + 30)
+    }
+    
+    static void enumColumn(JTable table, int index, Class<? extends Enum> clazz) {
+        int strLen = 0
+        Set<Enum> set = EnumSet.allOf(clazz)
+        for (Enum anEnum : set) {
+            try {
+                strLen = Math.max(strLen, stringWidth(table, trans(anEnum.name())))
+            } catch (MissingResourceException notTranslated) {}
+        }
+        fixedColumnSize(table, index, strLen + 30)
+    }
+    
+    static void speedColumn(JTable table, int index) {
+        StringBuffer buf = new StringBuffer()
+        SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
+        String str = buf.toString() + trans("B_SEC").length()
+        int columnSize = stringWidth(table, str)
+        fixedColumnSize(table, index, columnSize + 30)
+    }
+    
+    static void dateColumn(JTable table, int index) {
+        int len = stringWidth(table, trans("NEVER"))
+        long now = System.currentTimeMillis()
+        String formatted = DataHelper.formatTime(now)
+        len = Math.max(len, stringWidth(table, formatted))
+        fixedColumnSize(table, index, len + 60)
+    }
+    
+    private static void fixedColumnSize(JTable table, int index, int columnSize) {
         TableColumn column = table.getColumnModel().getColumn(index)
         column.setMinWidth(columnSize)
         column.setMaxWidth(columnSize)
