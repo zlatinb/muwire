@@ -2,6 +2,7 @@ package com.muwire.gui
 
 import com.muwire.core.InfoHash
 import com.muwire.core.profile.MWProfileHeader
+import com.muwire.core.trust.TrustEvent
 import com.muwire.gui.profile.ImageScaler
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ResultPOP
@@ -76,13 +77,23 @@ class SearchTabModel {
         treeModel = new ResultTreeModel(root)
         core = mvcGroup.parentGroup.model.core
         uiSettings = application.context.get("ui-settings")
+        
+        core.getEventBus().register(TrustEvent.class, this)
+        
         timer.start()
         mvcGroup.parentGroup.model.results[UUID.fromString(uuid)] = mvcGroup
     }
 
     void mvcGroupDestroy() {
         timer.stop()
+        core.getEventBus().unregister(TrustEvent.class, this)
         mvcGroup.parentGroup.model.results.remove(uuid)
+    }
+    
+    void onTrustEvent(TrustEvent event) {
+        runInsideUIAsync {
+            view.onTrustChanged(event.persona)
+        }
     }
     
     private boolean filter(InfoHash infoHash) {

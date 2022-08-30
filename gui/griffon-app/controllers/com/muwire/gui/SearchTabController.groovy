@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.InfoHash
 import com.muwire.core.SplitPattern
 import com.muwire.core.download.DownloadStartedEvent
+import com.muwire.core.profile.MWProfileHeader
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ViewProfileHelper
 import griffon.core.GriffonApplication
@@ -11,6 +12,7 @@ import griffon.core.controller.ControllerAction
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
+import net.i2p.data.Destination
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -209,5 +211,13 @@ class SearchTabController {
         params.senders = senders
         params.uuid = model.uuid
         mvcGroup.createMVCGroup("result-details-frame", mvcId, params)
+    }
+    
+    void markTrust(PersonaOrProfile pop, TrustLevel level) {
+        String reason = null
+        if (level != TrustLevel.NEUTRAL)
+            reason = view.promptTrustReason()
+        model.core.getEventBus().publish(new TrustEvent(persona: pop.getPersona(), profileHeader: pop.getHeader(),
+                reason: reason, level: level))
     }
 }

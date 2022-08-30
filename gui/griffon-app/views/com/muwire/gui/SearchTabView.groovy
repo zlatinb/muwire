@@ -16,6 +16,7 @@ import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
+import net.i2p.data.Destination
 
 import javax.annotation.Nonnull
 import javax.inject.Inject
@@ -505,7 +506,41 @@ class SearchTabView {
                 popupMenu.add(chatItem)
             }
         }
+        
+        PersonaOrProfile selected = selectedSender()
+        if (selected != null) {
+            popupMenu.addSeparator()
+            TrustLevel level = model.core.getTrustService().getLevel(selected.getPersona().getDestination())
+            if (level != TrustLevel.TRUSTED) {
+                JMenuItem addContactItem = new JMenuItem(trans("ADD_CONTACT"))
+                addContactItem.setToolTipText(trans("TOOLTIP_ADD_CONTACT_SENDER"))
+                addContactItem.addActionListener({controller.markTrust(
+                        selected, TrustLevel.TRUSTED
+                )})
+                popupMenu.add(addContactItem)
+            }
+            if (level != TrustLevel.NEUTRAL) {
+                JMenuItem removeContact = new JMenuItem(trans("REMOVE_CONTACT"))
+                removeContact.setToolTipText(trans("TOOLTIP_CONTACTS_REMOVE_CONTACT"))
+                removeContact.addActionListener({controller.markTrust(
+                        selected, TrustLevel.NEUTRAL
+                )})
+                popupMenu.add(removeContact)
+            }
+            if (level != TrustLevel.DISTRUSTED) {
+                JMenuItem block = new JMenuItem(trans("BLOCK"))
+                block.setToolTipText(trans("TOOLTIP_PROFILE_VIEWER_BLOCK"))
+                block.addActionListener({controller.markTrust(
+                        selected, TrustLevel.DISTRUSTED
+                )})
+                popupMenu.add(block)
+            }
+        }
         popupMenu.show(event.getComponent(), event.getX(), event.getY())
+    }
+    
+    String promptTrustReason() {
+        JOptionPane.showInputDialog(trans("ENTER_REASON_OPTIONAL"))
     }
     
     private void showResultDetailsByFile(UIResultEvent event) {
