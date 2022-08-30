@@ -122,21 +122,6 @@ class SearchTabView {
                                         }
                                     }
                                 }
-                                panel(constraints : BorderLayout.SOUTH) {
-                                    gridLayout(rows: 1, cols : 3)
-                                    panel (border : etchedBorder()){
-                                        button(text : trans("SUBSCRIBE"), toolTipText: trans("TOOLTIP_SUBSCRIBE_FILE_FEED"), enabled : bind {model.subscribeActionEnabled}, subscribeAction)
-                                        button(text : trans("MESSAGE_VERB"), toolTipText: trans("TOOLTIP_MESSAGE_SENDER"), enabled : bind{model.messageActionEnabled}, messageAction)
-                                        button(text : trans("CHAT"), toolTipText: trans("TOOLTIP_CHAT_SENDER"), enabled : bind{model.chatActionEnabled}, chatAction)
-                                    }
-                                    panel (border : etchedBorder()) {
-                                        button(text : trans("BROWSE_HOST"), toolTipText: trans("TOOLTIP_BROWSE_FILES_SENDER"), enabled : bind {model.browseActionEnabled}, browseAction)
-                                        button(text : trans("BROWSE_COLLECTIONS"), toolTipText: trans("TOOLTIP_BROWSE_COLLECTIONS_SENDER"), enabled : bind {model.browseCollectionsActionEnabled}, browseCollectionsAction)
-                                    }
-                                    panel (border : etchedBorder()){
-                                        button(text : trans("VIEW_PROFILE"), toolTipText: trans("TOOLTIP_VIEW_PROFILE"), enabled: bind {model.viewProfileActionEnabled}, viewProfileAction)
-                                    }
-                                }
                             }
                             panel {
                                 borderLayout()
@@ -501,9 +486,47 @@ class SearchTabView {
 
         JPopupMenu popupMenu = new JPopupMenu()
         JMenuItem viewProfileItem = new JMenuItem(trans("VIEW_PROFILE"))
+        viewProfileItem.setToolTipText(trans("TOOLTIP_VIEW_PROFILE"))
         viewProfileItem.addActionListener({mvcGroup.controller.viewProfile()})
         popupMenu.add(viewProfileItem)
         
+        if (model.browseActionEnabled || model.browseCollectionsActionEnabled) {
+            popupMenu.addSeparator()
+            if (model.browseActionEnabled) {
+                JMenuItem browseItem = new JMenuItem(trans("BROWSE_HOST"))
+                browseItem.setToolTipText(trans("TOOLTIP_BROWSE_FILES_SENDER"))
+                browseItem.addActionListener({ controller.browse() })
+                popupMenu.add(browseItem)
+            }
+            if (model.browseCollectionsActionEnabled) {
+                JMenuItem browseItem = new JMenuItem(trans("BROWSE_COLLECTIONS"))
+                browseItem.setToolTipText(trans("TOOLTIP_BROWSE_COLLECTIONS_SENDER"))
+                browseItem.addActionListener({ controller.browseCollections() })
+                popupMenu.add(browseItem)
+            }
+        }
+        if (model.subscribeActionEnabled) {
+            popupMenu.addSeparator()
+            JMenuItem subscribeItem = new JMenuItem(trans("SUBSCRIBE"))
+            subscribeItem.setToolTipText(trans("TOOLTIP_SUBSCRIBE_FILE_FEED"))
+            subscribeItem.addActionListener({controller.subscribe()})
+            popupMenu.add(subscribeItem)
+        }
+        if (model.messageActionEnabled || model.chatActionEnabled) {
+            popupMenu.addSeparator()
+            if (model.messageActionEnabled) {
+                JMenuItem messageItem = new JMenuItem(trans("MESSAGE_VERB"))
+                messageItem.setToolTipText(trans("TOOLTIP_MESSAGE_SENDER"))
+                messageItem.addActionListener({controller.message()})
+                popupMenu.add(messageItem)
+            }
+            if (model.chatActionEnabled) {
+                JMenuItem chatItem = new JMenuItem(trans("CHAT"))
+                chatItem.setToolTipText(trans("TOOLTIP_CHAT_SENDER"))
+                chatItem.addActionListener({controller.chat()})
+                popupMenu.add(chatItem)
+            }
+        }
         popupMenu.show(event.getComponent(), event.getX(), event.getY())
     }
     
