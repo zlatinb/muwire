@@ -1,6 +1,8 @@
 package com.muwire.gui
 
+import com.muwire.core.Constants
 import com.muwire.core.files.FileHasher
+import com.muwire.gui.profile.ProfileConstants
 import net.i2p.data.DataHelper
 
 import static com.muwire.gui.Translator.trans
@@ -56,6 +58,23 @@ class TableUtil {
         String formatted = DataHelper.formatTime(now)
         len = Math.max(len, stringWidth(table, formatted))
         fixedColumnSize(table, index, len + 60)
+    }
+    
+    static void nicknameColumn(JTable table, int index) {
+        String tmp = "A"
+        Constants.MAX_NICKNAME_LENGTH.times {tmp += "A"}
+        tmp += "@"
+        32.times {tmp += "a"}
+        int size = stringWidth(table, tmp) + ProfileConstants.MAX_THUMBNAIL_SIZE + 30
+        TableColumn column = table.getColumnModel().getColumn(index)
+        column.setMaxWidth(size)
+        column.setPreferredWidth((int)(size / 2))
+    }
+    
+    static void filesColumn(JTable table, int index) {
+        String million = String.valueOf(1000000)
+        int size = stringWidth(table, million)
+        fixedColumnSize(table, index, size + 30)
     }
     
     private static void fixedColumnSize(JTable table, int index, int columnSize) {

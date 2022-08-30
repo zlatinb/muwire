@@ -3,6 +3,7 @@ package com.muwire.gui
 import com.muwire.core.SharedFile
 import griffon.core.artifact.GriffonView
 
+import javax.swing.JTable
 import javax.swing.RowSorter
 import javax.swing.SortOrder
 
@@ -35,7 +36,7 @@ class MyFeedView {
     def mainFrame
     def dialog
     def itemsPanel
-    def itemsTable
+    JTable itemsTable
     def lastItemsTableSortEvent
     
     void initUI() {
@@ -53,9 +54,9 @@ class MyFeedView {
             scrollPane( constraints : BorderLayout.CENTER ) {
                 itemsTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list : model.items) {
-                        closureColumn(header : trans("NAME"), preferredWidth: 500, type : String, read : { HTMLSanitizer.sanitize(it.getCachedPath())})
-                        closureColumn(header : trans("SIZE"), preferredWidth: 100, type : Long, read : {it.getCachedLength()})
-                        closureColumn(header : trans("DATE"), preferredWidth: 200, type : Long, read : {it.getPublishedTimestamp()})
+                        closureColumn(header : trans("NAME"), type : String, read : { HTMLSanitizer.sanitize(it.getCachedPath())})
+                        closureColumn(header : trans("SIZE"), type : Long, read : {it.getCachedLength()})
+                        closureColumn(header : trans("DATE"), type : Long, read : {it.getPublishedTimestamp()})
                     }
                 }
             }
@@ -65,6 +66,8 @@ class MyFeedView {
             }
         }
         
+        TableUtil.sizeColumn(itemsTable, 1)
+        TableUtil.dateColumn(itemsTable, 2)
         itemsTable.rowSorter.addRowSorterListener({evt -> lastItemsTableSortEvent = evt})
         itemsTable.columnModel.getColumn(1).setCellRenderer(new SizeRenderer())
         itemsTable.columnModel.getColumn(2).setCellRenderer(new DateRenderer())

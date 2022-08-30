@@ -102,6 +102,7 @@ class ResultDetailsTabsView {
         }
 
         TableUtil.packColumns(sendersTable, Sets.newHashSet(0,2))
+        TableUtil.nicknameColumn(sendersTable, 0)
         
         commentsPanel = builder.panel {
             cardLayout()

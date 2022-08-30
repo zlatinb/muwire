@@ -1084,6 +1084,8 @@ class MainFrameView {
         TableUtil.packColumns(collectionsTable, Sets.newHashSet(0,1,2,3,6))
         TableUtil.sizeColumn(collectionsTable, 3)
         TableUtil.dateColumn(collectionsTable, 6)
+        TableUtil.nicknameColumn(collectionsTable, 1)
+        TableUtil.filesColumn(collectionsTable, 2)
         def personaRenderer = new PersonaCellRenderer(application.context.get("ui-settings"))
         def personaComparator = new PersonaComparator()
         collectionsTable.setDefaultRenderer(Integer.class, centerRenderer)
@@ -1130,6 +1132,8 @@ class MainFrameView {
 
 
         // collection files table
+        TableUtil.packColumns(collectionFilesTable, Sets.newHashSet(0,1))
+        TableUtil.sizeColumn(collectionFilesTable, 1)
         collectionFilesTable.setDefaultRenderer(Long.class, new SizeRenderer())
         collectionFilesTable.rowSorter.addRowSorterListener({ evt -> lastCollectionFilesSortEvent = evt })
         collectionFilesTable.rowSorter.setSortsOnUpdates(true)
@@ -1160,6 +1164,7 @@ class MainFrameView {
         // uploadsTable
         JTable uploadsTable = builder.getVariable("uploads-table")
         TableUtil.speedColumn(uploadsTable, 4)
+        TableUtil.nicknameColumn(uploadsTable, 2)
 
         uploadsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         uploadsTable.rowSorter.setComparator(2, popComparator)
@@ -1214,6 +1219,7 @@ class MainFrameView {
         JTable feedsTable = builder.getVariable("feeds-table")
         TableUtil.enumColumn(feedsTable, 3, FeedFetchStatus.class)
         TableUtil.dateColumn(feedsTable, 2)
+        TableUtil.filesColumn(feedsTable, 1)
         feedsTable.rowSorter.addRowSorterListener({ evt -> lastFeedsSortEvent = evt })
         feedsTable.rowSorter.setSortsOnUpdates(true)
         feedsTable.rowSorter.setComparator(0, personaComparator)
@@ -1352,6 +1358,7 @@ class MainFrameView {
 
         // trusted contacts table
         JTable trustedContactsTable = builder.getVariable("trusted-contacts-table")
+        TableUtil.nicknameColumn(trustedContactsTable, 0)
         trustedContactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         trustedContactsTable.rowSorter.setComparator(0, popComparator)
         trustedContactsTable.rowSorter.setSortsOnUpdates(true)
@@ -1388,6 +1395,7 @@ class MainFrameView {
 
         // distrusted contacts table
         JTable distrustedContactsTable = builder.getVariable("distrusted-contacts-table")
+        TableUtil.nicknameColumn(distrustedContactsTable, 0)
         distrustedContactsTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
         distrustedContactsTable.rowSorter.setComparator(0, popComparator)
         distrustedContactsTable.rowSorter.setSortsOnUpdates(true)

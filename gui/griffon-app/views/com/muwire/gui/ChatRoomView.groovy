@@ -1,6 +1,6 @@
 package com.muwire.gui
 
-
+import com.google.common.collect.Sets
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.chat.ChatEntry
 import com.muwire.gui.chat.ChatEntryPane
@@ -64,7 +64,7 @@ class ChatRoomView {
     ChatEntryPane sayField
     JTextPane roomTextArea
     def textScrollPane
-    def membersTable
+    JTable membersTable
     def lastMembersTableSortEvent
     UISettings settings
     
@@ -155,6 +155,8 @@ class ChatRoomView {
             
         if (membersTable != null) {
             
+            TableUtil.packColumns(membersTable, Sets.newHashSet(0))
+            TableUtil.nicknameColumn(membersTable, 0)
             membersTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
             membersTable.setDefaultRenderer(PersonaOrProfile.class, new PersonaOrProfileCellRenderer(application.context.get("ui-settings")))
             membersTable.rowSorter.setComparator(0, new PersonaOrProfileComparator())
