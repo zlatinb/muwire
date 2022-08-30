@@ -74,6 +74,7 @@ class TableUtil {
     static void filesColumn(JTable table, int index) {
         String million = String.valueOf(1000000)
         int size = stringWidth(table, million)
+        size = Math.max(size, stringWidth(table, trans("FILES")))
         fixedColumnSize(table, index, size + 30)
     }
     
