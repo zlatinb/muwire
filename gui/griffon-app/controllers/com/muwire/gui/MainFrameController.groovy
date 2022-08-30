@@ -90,6 +90,9 @@ class MainFrameController {
         def searchField = builder.getVariable("search-field")
         String search = searchField.getSelectedItem()
         
+        if (search == null)
+            return
+        
         if(search.startsWith("muwire://")) {
             try {
                 MuLink link = MuLink.parse(search)
