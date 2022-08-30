@@ -26,6 +26,8 @@ import groovy.json.JsonSlurper
 import groovy.mock.interceptor.MockFor
 
 class ConnectionAcceptorTest {
+    
+    private static final int SLEEP = 100
 
     EventBus eventBus
     final Destinations destinations = new Destinations()
@@ -103,7 +105,7 @@ class ConnectionAcceptorTest {
             hostCache, trustService, searchManager, uploadManager, null, connectionEstablisher, null, null, null, null,
                 {f, p -> true} as BiPredicate)
         acceptor.start()
-        Thread.sleep(100)
+        Thread.sleep(SLEEP)
     }
     
     @Test
@@ -140,7 +142,7 @@ class ConnectionAcceptorTest {
         dis.readFully(OK)
         assert OK == "OK".bytes
 
-        Thread.sleep(50)
+        Thread.sleep(SLEEP)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
@@ -184,10 +186,10 @@ class ConnectionAcceptorTest {
         dis.readFully(OK)
         assert OK == "REJECT".bytes
 
-        Thread.sleep(50)
+        Thread.sleep(SLEEP)
         assert dis.read() == -1
 
-        Thread.sleep(50)
+        Thread.sleep(SLEEP)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
@@ -242,7 +244,7 @@ class ConnectionAcceptorTest {
         assert json.tryHosts.size() == 1
         assert json.tryHosts.contains(destinations.dest2.toBase64())
 
-        Thread.sleep(50)
+        Thread.sleep(SLEEP)
         assert connectionEvents.size() == 1
         def event = connectionEvents[0]
         assert event.endpoint.destination == destinations.dest1
