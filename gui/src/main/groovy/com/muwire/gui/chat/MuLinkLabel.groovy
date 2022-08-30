@@ -1,6 +1,7 @@
 package com.muwire.gui.chat
 
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.TableUtil
 import com.muwire.gui.UISettings
 import com.muwire.core.mulinks.MuLink
 
@@ -24,11 +25,7 @@ abstract class MuLinkLabel extends JLabel {
         
         int preferredX = 0, preferredY = 24
 
-        FontMetrics fontMetrics = getFontMetrics(getFont())
-        for (int i = 0; i < visibleText.length(); i++) {
-            char c = text.charAt(i)
-            preferredX += fontMetrics.charWidth(c)
-        }
+        preferredX += TableUtil.stringWidth(this, visibleText)
 
         if (border) {
             Border b = BorderFactory.createEtchedBorder()

@@ -3,6 +3,7 @@ package com.muwire.gui.contacts
 import com.muwire.core.profile.MWProfileHeader
 import com.muwire.gui.HTMLSanitizer
 import com.muwire.gui.PersonaCellRenderer
+import com.muwire.gui.TableUtil
 import com.muwire.gui.UISettings
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.ProfileConstants
@@ -59,9 +60,7 @@ class POPLabel extends JLabel {
         }
         setText(text)
 
-        FontMetrics fontMetrics = getFontMetrics(getFont())
-        for (int i = 0; i < visibleText.length(); i++)
-            preferredX += fontMetrics.charWidth(text.charAt(i))
+        preferredX += TableUtil.stringWidth(this, visibleText)
 
         preferredX += getIconTextGap()
         if (border != null) {

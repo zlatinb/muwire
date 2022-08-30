@@ -1,6 +1,9 @@
 package com.muwire.gui
 
-import com.muwire.core.SharedFile
+import com.google.common.collect.Sets
+import com.muwire.core.InfoHash
+import com.muwire.core.Persona
+import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.SearchTabModel.SenderBucket
 import com.muwire.gui.profile.PersonaOrProfile
@@ -9,56 +12,25 @@ import com.muwire.gui.profile.PersonaOrProfileComparator
 import com.muwire.gui.profile.ResultPOP
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
-import net.i2p.data.Destination
-
-import javax.inject.Inject
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
-import javax.swing.JTextField
-import javax.swing.KeyStroke
-import javax.swing.RowSorter
-import javax.swing.table.DefaultTableModel
-import javax.swing.tree.TreePath
-import java.awt.Component
-import java.awt.Point
-import java.awt.event.ActionEvent
-import java.awt.event.KeyEvent
-import java.util.stream.Collectors
-
-import static com.muwire.gui.Translator.trans
 import griffon.core.mvc.MVCGroup
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
 import net.i2p.data.Base64
-import net.i2p.data.DataHelper
-
-import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JMenuItem
-import javax.swing.JPopupMenu
-import javax.swing.JSplitPane
-import javax.swing.JTable
-import javax.swing.ListSelectionModel
-import javax.swing.SwingConstants
-import javax.swing.table.DefaultTableCellRenderer
-
-import com.muwire.core.InfoHash
-import com.muwire.core.Persona
-import com.muwire.core.search.UIResultEvent
-import com.muwire.core.util.DataUtil
-
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.FlowLayout
-import java.awt.GridBagConstraints
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 
 import javax.annotation.Nonnull
+import javax.inject.Inject
+import javax.swing.*
+import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.tree.TreePath
+import java.awt.*
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.util.List
+import java.util.stream.Collectors
+
+import static com.muwire.gui.Translator.trans
 
 @ArtifactProviderFor(GriffonView)
 class SearchTabView {
@@ -109,16 +81,16 @@ class SearchTabView {
                                 scrollPane (constraints : BorderLayout.CENTER) {
                                     sendersTable = table(id : "senders-table", autoCreateRowSorter : true, rowHeight : rowHeight) {
                                         tableModel(list : model.senders) {
-                                            closureColumn(header : trans("SENDER"), preferredWidth : 600, type: PersonaOrProfile, read : { SenderBucket row -> row})
-                                            closureColumn(header : trans("RESULTS"), preferredWidth : 20, type: Integer, read : {SenderBucket row -> row.results.size()})
-                                            closureColumn(header : trans("BROWSE"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browse})
-                                            closureColumn(header : trans("COLLECTIONS"), preferredWidth : 20, type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
-                                            closureColumn(header : trans("FEED"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].feed})
-                                            closureColumn(header : trans("MESSAGES"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].messages})
-                                            closureColumn(header : trans("CHAT"), preferredWidth : 20, type : Boolean, read : {SenderBucket row -> row.results[0].chat})
-                                            closureColumn(header : trans("TRUST_STATUS"), preferredWidth : 10, type: TrustLevel, read : { SenderBucket row ->
+                                            closureColumn(header : trans("TRUST_STATUS"), type: TrustLevel, read : { SenderBucket row ->
                                                 model.core.trustService.getLevel(row.sender.destination)
                                             })
+                                            closureColumn(header : trans("RESULTS"), type: Integer, read : {SenderBucket row -> row.results.size()})
+                                            closureColumn(header : trans("SENDER"), preferredWidth : 600, type: PersonaOrProfile, read : { SenderBucket row -> row})
+                                            closureColumn(header : trans("BROWSE"), type: Boolean, read : {SenderBucket row -> row.results[0].browse})
+                                            closureColumn(header : trans("COLLECTIONS"), type: Boolean, read : {SenderBucket row -> row.results[0].browseCollections})
+                                            closureColumn(header : trans("FEED"), type : Boolean, read : {SenderBucket row -> row.results[0].feed})
+                                            closureColumn(header : trans("MESSAGES"), type : Boolean, read : {SenderBucket row -> row.results[0].messages})
+                                            closureColumn(header : trans("CHAT"), type : Boolean, read : {SenderBucket row -> row.results[0].chat})
                                         }
                                     }
                                 }
@@ -132,13 +104,13 @@ class SearchTabView {
                                         scrollPane(constraints: BorderLayout.CENTER) {
                                             resultsTable = table(id: "results-table", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                                 tableModel(list: model.results) {
-                                                    closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { it })
-                                                    closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: { row -> row.size })
-                                                    closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.hashBucket[row.infohash].sourceCount() })
-                                                    closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 50, type: Integer, read: { row -> model.sourcesBucket[row.infohash].size() })
-                                                    closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read: { row -> row.comment != null })
-                                                    closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: { row -> row.certificates })
-                                                    closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: { UIResultEvent row -> row.collections.size() })
+                                                    closureColumn(header: trans("NAME"), type: UIResultEvent, read: { it })
+                                                    closureColumn(header: trans("SIZE"), type: Long, read: { row -> row.size })
+                                                    closureColumn(header: trans("DIRECT_SOURCES"), type: Integer, read: { row -> model.hashBucket[row.infohash].sourceCount() })
+                                                    closureColumn(header: trans("POSSIBLE_SOURCES"), type: Integer, read: { row -> model.sourcesBucket[row.infohash].size() })
+                                                    closureColumn(header: trans("COMMENTS"), type: Boolean, read: { row -> row.comment != null })
+                                                    closureColumn(header: trans("CERTIFICATES"), type: Integer, read: { row -> row.certificates })
+                                                    closureColumn(header: trans("COLLECTIONS"), type: Integer, read: { UIResultEvent row -> row.collections.size() })
                                                 }
                                             }
                                         }
@@ -180,29 +152,29 @@ class SearchTabView {
                                 scrollPane(constraints: BorderLayout.CENTER) {
                                     resultsTable2 = table(id: "results-table2", autoCreateRowSorter: true, rowHeight: rowHeight) {
                                         tableModel(list: model.results2) {
-                                            closureColumn(header: trans("NAME"), preferredWidth: 350, type: UIResultEvent, read: { model.hashBucket[it].firstEvent() })
-                                            closureColumn(header: trans("SIZE"), preferredWidth: 20, type: Long, read: {
+                                            closureColumn(header: trans("NAME"), type: UIResultEvent, read: { model.hashBucket[it].firstEvent() })
+                                            closureColumn(header: trans("SIZE"), type: Long, read: {
                                                 model.hashBucket[it].getSize()
                                             })
-                                            closureColumn(header: trans("DIRECT_SOURCES"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("DIRECT_SOURCES"), type: Integer, read: {
                                                 model.hashBucket[it].sourceCount()
                                             })
-                                            closureColumn(header: trans("POSSIBLE_SOURCES"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("POSSIBLE_SOURCES"), type: Integer, read: {
                                                 model.sourcesBucket[it].size()
                                             })
-                                            closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("COMMENTS"), type: Integer, read: {
                                                 model.hashBucket[it].commentCount()
                                             })
-                                            closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("CERTIFICATES"), type: Integer, read: {
                                                 model.hashBucket[it].certificateCount()
                                             })
-                                            closureColumn(header: trans("FEEDS"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("FEEDS"), type: Integer, read: {
                                                 model.hashBucket[it].feedCount()
                                             })
-                                            closureColumn(header: trans("CHAT_HOSTS"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("CHAT_HOSTS"), type: Integer, read: {
                                                 model.hashBucket[it].chatCount()
                                             })
-                                            closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: {
+                                            closureColumn(header: trans("COLLECTIONS"), type: Integer, read: {
                                                 model.hashBucket[it].collectionsCount()
                                             })
                                         }
@@ -240,6 +212,12 @@ class SearchTabView {
                 }
             }
 
+        TableUtil.packColumns(sendersTable, Sets.newHashSet(2))
+        TableUtil.packColumns(resultsTable, Sets.newHashSet(0, 1))
+        TableUtil.sizeColumn(resultsTable, 1)
+        TableUtil.packColumns(resultsTable2, Sets.newHashSet(0, 1))
+        TableUtil.sizeColumn(resultsTable2, 1)
+        
         this.pane.putClientProperty("mvc-group", mvcGroup)
         this.pane.putClientProperty("results-table",resultsTable)
 
@@ -389,7 +367,7 @@ class SearchTabView {
         sendersTable.setDefaultRenderer(TrustLevel.class, new TrustCellRenderer())
         sendersTable.setDefaultRenderer(Integer.class, centerRenderer)
         sendersTable.setDefaultRenderer(PersonaOrProfile.class, popRenderer)
-        sendersTable.rowSorter.setComparator(0, popComparator)
+        sendersTable.rowSorter.setComparator(2, popComparator)
         sendersTable.rowSorter.addRowSorterListener({evt -> lastSendersSortEvent = evt})
         sendersTable.rowSorter.setSortsOnUpdates(true)
         selectionModel = sendersTable.getSelectionModel()
