@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.google.common.collect.Sets
 import griffon.core.artifact.GriffonView
 import static com.muwire.gui.Translator.trans
 
@@ -77,22 +78,21 @@ class CollectionWizardView {
                     panel {
                         borderLayout()
                         panel(constraints : BorderLayout.NORTH) {
-                            gridLayout(rows : 1, cols :3)
-                            panel  {
+                            gridBagLayout()
+                            panel(constraints: gbc(gridx: 0, gridy: 0, weightx: 100))  {
                                 label(text : bind { trans("COLLECTION_TOTAL_FILES") + ":" + model.numFiles })
                                 label(text : bind { trans("COLLECTION_TOTAL_SIZE") + ":" + formatSize(model.totalSize) })
                             }
-                            panel {
+                            panel(constraints: gbc(gridx: 1, gridy:0, gridwidth: 2, weightx: 100)) {
                                 label(text : trans("COLLECTION_DND"))
                             }
-                            panel{}
                         }
                         scrollPane(constraints : BorderLayout.CENTER) {
                             filesTable = table(id : "files-table", autoCreateRowSorter : true, rowHeight : rowHeight, fillsViewportHeight : true) {
                                 tableModel(list : model.files) {
                                     closureColumn(header : trans("NAME"), type : String, read : {it.getCachedPath()})
-                                    closureColumn(header : trans("SIZE"), type : Long, preferredWidth: 30, read : {it.getCachedLength()})
-                                    closureColumn(header : trans("COMMENT"), type : Boolean, preferredWidth : 20, read : {it.getComment() != null})
+                                    closureColumn(header : trans("SIZE"), type : Long, read : {it.getCachedLength()})
+                                    closureColumn(header : trans("COMMENT"), type : Boolean, read : {it.getComment() != null})
                                 }
                             }
                         }
@@ -138,6 +138,8 @@ class CollectionWizardView {
     }
     
     void mvcGroupInit(Map<String,String> args) {
+        TableUtil.packColumns(filesTable, Sets.newHashSet(0,1))
+        TableUtil.sizeColumn(filesTable, 1)
         filesTable.setDefaultRenderer(Long.class, new SizeRenderer())
         filesTable.setTransferHandler(new SFTransferHandler())
         filesTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
