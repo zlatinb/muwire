@@ -10,14 +10,6 @@ import java.awt.*
 
 class TableUtil {
     
-    private static final int SIZE_COLUMN 
-    static {
-        StringBuffer buf = new StringBuffer()
-        SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
-        String str = buf.toString() + trans("BYTES_SHORT").length()
-        SIZE_COLUMN = stringWidth(new JLabel(), str) + 30
-    }
-    
     static void packColumns(JTable table, Set<Integer> exclude) {
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (exclude.contains(i))
@@ -31,9 +23,13 @@ class TableUtil {
     }
     
     static void sizeColumn(JTable table, int index) {
+        StringBuffer buf = new StringBuffer()
+        SizeFormatter.format(FileHasher.MAX_SIZE - 1, buf)
+        String str = buf.toString() + trans("BYTES_SHORT").length()
+        int columnSize = stringWidth(table, str) + 30
         TableColumn column = table.getColumnModel().getColumn(index)
-        column.setMinWidth(SIZE_COLUMN)
-        column.setMaxWidth(SIZE_COLUMN)
+        column.setMinWidth(columnSize)
+        column.setMaxWidth(columnSize)
     }
     
     static int stringWidth(Component component, String string) {
