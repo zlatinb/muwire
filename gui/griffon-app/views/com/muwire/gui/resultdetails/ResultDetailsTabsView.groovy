@@ -1,8 +1,10 @@
 package com.muwire.gui.resultdetails
 
+import com.google.common.collect.Sets
 import com.muwire.core.search.UIResultEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.gui.HTMLSanitizer
+import com.muwire.gui.TableUtil
 import com.muwire.gui.TrustCellRenderer
 import com.muwire.gui.profile.PersonaOrProfile
 import com.muwire.gui.profile.PersonaOrProfileCellRenderer
@@ -72,20 +74,20 @@ class ResultDetailsTabsView {
             scrollPane(constraints: BorderLayout.CENTER) {
                 sendersTable = table(autoCreateRowSorter : true, rowHeight : rowHeight) {
                     tableModel(list: model.results) {
-                        closureColumn(header: trans("SENDER"), preferredWidth: 150, type: PersonaOrProfile, read : {it})
-                        closureColumn(header: trans("TRUST_STATUS"), preferredWidth: 10, type: TrustLevel, read : { ResultPOP row ->
+                        closureColumn(header: trans("SENDER"), type: PersonaOrProfile, read : {it})
+                        closureColumn(header: trans("TRUST_STATUS"), type: TrustLevel, read : { ResultPOP row ->
                             model.core.trustService.getLevel(row.getPersona().destination) 
                         })
-                        closureColumn(header: trans("NAME"), preferredWidth: 700,  type: String, read : { ResultPOP row -> 
+                        closureColumn(header: trans("NAME"), preferredWidth: 700, type: String, read : { ResultPOP row -> 
                             HTMLSanitizer.sanitize(row.getEvent().getFullPath())
                         })
-                        closureColumn(header: trans("COMMENTS"), preferredWidth: 20, type: Boolean, read : { ResultPOP row ->
+                        closureColumn(header: trans("COMMENTS"), type: Boolean, read : { ResultPOP row ->
                             row.getEvent().comment != null
                         })
-                        closureColumn(header: trans("CERTIFICATES"), preferredWidth: 20, type: Integer, read : { ResultPOP row ->
+                        closureColumn(header: trans("CERTIFICATES"), type: Integer, read : { ResultPOP row ->
                             row.getEvent().certificates
                         })
-                        closureColumn(header: trans("COLLECTIONS"), preferredWidth: 20, type: Integer, read: { ResultPOP row ->
+                        closureColumn(header: trans("COLLECTIONS"), type: Integer, read: { ResultPOP row ->
                             row.getEvent().collections.size()
                         })
                     }
@@ -98,6 +100,8 @@ class ResultDetailsTabsView {
                         enabled: bind {model.viewProfileActionEnabled}, viewProfileAction)
             }
         }
+
+        TableUtil.packColumns(sendersTable, Sets.newHashSet(0,2))
         
         commentsPanel = builder.panel {
             cardLayout()
