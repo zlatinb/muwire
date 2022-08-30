@@ -37,7 +37,8 @@ class ResultTreeModel extends DefaultTreeModel {
             node = elementNode
         }
      
-        node.addDescendant(new PlaceholderNode())
+        if (node.getChildCount() == 0)
+            node.addDescendant(new PlaceholderNode())
     }
 
     void addToTree(UIResultEvent event) {

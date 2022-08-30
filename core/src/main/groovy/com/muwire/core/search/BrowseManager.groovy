@@ -123,10 +123,12 @@ class BrowseManager {
         JsonOutput jsonOutput = new JsonOutput()
         def baos = new ByteArrayOutputStream()
         def dos = new DataOutputStream(new GZIPOutputStream(baos))
-        writeFiles(topLevelItems.files.values(), dos, jsonOutput)
-        writeDirs(topLevelItems.dirs, dos, jsonOutput)
-        dos.close()
-        os.write(baos.toByteArray())
+        if (count > 0) {
+            writeFiles(topLevelItems.files.values(), dos, jsonOutput)
+            writeDirs(topLevelItems.dirs, dos, jsonOutput)
+            dos.close()
+            os.write(baos.toByteArray())
+        }
         os.flush()
         
         InputStream is = endpoint.getInputStream()
@@ -168,19 +170,21 @@ class BrowseManager {
                 def cb = new PathCallback()
                 tempTree.traverse(requestedPath, cb)
                 filesToWrite = cb.files
-                dirsToWrite = Collections.emptySet()
+                dirsToWrite = cb.dirs
             }
             filesToWrite.each {it.hit(browser, System.currentTimeMillis(), "Browse Host")}
             os.write("Files:${filesToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("Dirs:${dirsToWrite.size()}\r\n".getBytes(StandardCharsets.US_ASCII))
             os.write("\r\n".getBytes(StandardCharsets.US_ASCII))
             
-            baos = new ByteArrayOutputStream()
-            dos = new DataOutputStream(new GZIPOutputStream(baos))
-            writeFiles(filesToWrite, dos, jsonOutput)  
-            writeDirs(dirsToWrite, dos, jsonOutput)
-            dos.close()
-            os.write(baos.toByteArray())
+            if (filesToWrite.size() + dirsToWrite.size() > 0) {
+                baos = new ByteArrayOutputStream()
+                dos = new DataOutputStream(new GZIPOutputStream(baos))
+                writeFiles(filesToWrite, dos, jsonOutput)
+                writeDirs(dirsToWrite, dos, jsonOutput)
+                dos.close()
+                os.write(baos.toByteArray())
+            }
             os.flush()
         }
     }
@@ -239,9 +243,14 @@ class BrowseManager {
     private static class PathCallback implements PathTreeCallback<BrowsedFile, BrowsedFolder> {
         
         final Set<SharedFile> files = new HashSet<>()
+        final Set<Path> dirs = new HashSet<>()
 
         @Override
         void onDirectoryEnter(Path path, BrowsedFolder value) {
+            if (!value.sent) {
+                value.sent = true
+                dirs.add(value.path)
+            }
         }
 
         @Override

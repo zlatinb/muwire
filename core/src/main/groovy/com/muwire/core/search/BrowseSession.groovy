@@ -136,48 +136,49 @@ class BrowseSession implements Runnable {
                     if (!headers.containsKey("Dirs"))
                         throw new Exception("Dirs header missing")
                     int dirs = Integer.parseInt(headers['Dirs'])
-                    eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
-                            totalResults: results, currentItems: (files + dirs), uuid: uuid))
-                    log.info("starting to fetch ${files} files and ${dirs} dirs with uuid $uuid")
+                    if (files + dirs > 0) {
+                        eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FETCHING,
+                                totalResults: results, currentItems: (files + dirs), uuid: uuid))
+                        log.info("starting to fetch ${files} files and ${dirs} dirs with uuid $uuid")
 
-                    JsonSlurper slurper = new JsonSlurper()
-                    DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
-                    UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, files)]
-                    int j = 0
-                    for (int i = 0; i < files; i++) {
-                        if (closed)
-                            return
-                        log.fine("parsing result $i at batch position $j")
+                        JsonSlurper slurper = new JsonSlurper()
+                        DataInputStream dis = new DataInputStream(new GZIPInputStream(is))
+                        UIResultEvent[] batch = new UIResultEvent[Math.min(BATCH_SIZE, files)]
+                        int j = 0
+                        for (int i = 0; i < files; i++) {
+                            if (closed)
+                                return
+                            log.fine("parsing result $i at batch position $j")
 
-                        def json = readJson(slurper, dis)
-                        UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
-                        result.chat = chat
-                        result.profileHeader = profileHeader
-                        batch[j++] = result
+                            def json = readJson(slurper, dis)
+                            UIResultEvent result = ResultsParser.parse(event.host, uuid, json)
+                            result.chat = chat
+                            result.profileHeader = profileHeader
+                            batch[j++] = result
 
 
-                        // publish piecemally
-                        if (j == batch.length) {
-                            eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
-                            j = 0
-                            batch = new UIResultEvent[Math.min(files - i - 1, BATCH_SIZE)]
-                            log.fine("publishing batch, next batch size ${batch.length}")
+                            // publish piecemally
+                            if (j == batch.length) {
+                                eventBus.publish(new UIResultBatchEvent(results: batch, uuid: uuid))
+                                j = 0
+                                batch = new UIResultEvent[Math.min(files - i - 1, BATCH_SIZE)]
+                                log.fine("publishing batch, next batch size ${batch.length}")
+                            }
                         }
-                    }
-                    for (int i = 0; i < dirs; i++) {
-                        if (closed)
-                            return
+                        for (int i = 0; i < dirs; i++) {
+                            if (closed)
+                                return
 
-                        def json = readJson(slurper, dis)
-                        if (!json.directory || json.path == null)
-                            throw new Exception("Invalid dir json")
-                        List<String> path = json.path.collect { DataUtil.readi18nString(Base64.decode(it)) }
-                        def event = new UIBrowseDirEvent(uuid: uuid,
-                                path: path.toArray(new String[0]))
-                        eventBus.publish(event)
+                            def json = readJson(slurper, dis)
+                            if (!json.directory || json.path == null)
+                                throw new Exception("Invalid dir json")
+                            List<String> path = json.path.collect { DataUtil.readi18nString(Base64.decode(it)) }
+                            def event = new UIBrowseDirEvent(uuid: uuid,
+                                    path: path.toArray(new String[0]))
+                            eventBus.publish(event)
+                        }
+                        eventBus.publish(new BrowseStatusEvent(host: event.host, status: BrowseStatus.FINISHED, uuid: uuid))
                     }
-                    eventBus.publish(new BrowseStatusEvent(host: event.host, status : BrowseStatus.FINISHED, uuid : uuid))
-                    
                     while(true) {
                         Request nextPath = fetchQueue.poll(PING_INTERVAL, TimeUnit.MILLISECONDS)
                         if (nextPath == null) {
