@@ -305,17 +305,21 @@ class PersisterFolderService extends BasePersisterService {
      * Generates a path with explicit shared parent
      * @param file that is being shared
      * @param explicitParent explicit parent
-     * @return a Path from parent to file
+     * @return a Path including invisible root suitable for insertion into trees
      */
     private Path explicitSharedParent(File file, File explicitParent) {
-        File parent = file.getParentFile()
-        if (parent == explicitParent)
-            return Path.of(saltHash)
         
-        Path toParent = explicitParent.toPath().relativize(parent.toPath())
+        String invisibleRoot
+        File parentOfParent = explicitParent.getParentFile()
+        if (parentOfParent == null)
+            invisibleRoot = saltHash
+        else {
+            invisibleRoot = cachedRoots.computeIfAbsent(parentOfParent.toPath(), {mac(it)})
+        }
+        
+        File parent = file.getParentFile()
+        Path toParent = explicitParent.getCanonicalFile().toPath().relativize(parent.getCanonicalFile().toPath())
         Path visible = Path.of(explicitParent.getName(), toParent.toString())
-        Path invisible = explicitParent.getParentFile().toPath()
-        String invisibleRoot = cachedRoots.computeIfAbsent(invisible,{mac(it)})
         return Path.of(invisibleRoot, visible.toString())
     }
 
