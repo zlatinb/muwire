@@ -58,7 +58,7 @@ class LibraryTreeModel extends DefaultTreeModel {
     List<SharedFile> getFilesInFolder(File folder) {
         def node = findParentNode(folder, false)
         if (node == null)
-            return 
+            return Collections.emptyList()
         def key = new InterimTreeNode(folder)
         def child = node.getByKey(key)
         List<SharedFile> rv = []
