@@ -615,7 +615,7 @@ class MainFrameModel {
     void onFileModifiedEvent(FileModifiedEvent event) {
         // shortcut
         FileUnsharedEvent e = new FileUnsharedEvent(
-                unsharedFiles: new SharedFile[]{event.sharedFile},
+                unsharedFiles: event.sharedFiles,
                 deleted: false,
                 implicit: false
         )

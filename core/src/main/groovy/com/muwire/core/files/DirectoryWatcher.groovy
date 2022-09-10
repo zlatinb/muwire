@@ -196,7 +196,7 @@ class DirectoryWatcher {
                                 SharedFile sf = fileManager.fileToSharedFile.get(file)
                                 if (sf != null) {
                                     log.fine ("modified shared $file")
-                                    eventBus.publish(new FileModifiedEvent(sharedFile: sf))
+                                    eventBus.publish(new FileModifiedEvent(sharedFiles: [sf]))
                                     return 
                                 }
                             }

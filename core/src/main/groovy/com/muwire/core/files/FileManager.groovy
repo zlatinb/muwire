@@ -207,7 +207,8 @@ class FileManager {
     }
     
     void onFileModifiedEvent(FileModifiedEvent event) {
-        unshareFile(event.sharedFile, false)
+        for(SharedFile sf : event.sharedFiles)
+            unshareFile(sf, false)
     }
     
     private void unshareFile(SharedFile sf, boolean deleted) {

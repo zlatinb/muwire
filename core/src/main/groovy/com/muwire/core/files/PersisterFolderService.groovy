@@ -148,9 +148,9 @@ class PersisterFolderService extends BasePersisterService {
     }
     
     void onFileModifiedEvent(FileModifiedEvent event) {
-        persisterExecutor.submit( {
-            unshareFile(event.sharedFile)
-        } as Runnable)
+        // shortcut
+        def unsharedEvent = new FileUnsharedEvent(unsharedFiles: event.sharedFiles)
+        onFileUnsharedEvent(unsharedEvent)
     }
     
     private void unshareFile(SharedFile sharedFile) {
