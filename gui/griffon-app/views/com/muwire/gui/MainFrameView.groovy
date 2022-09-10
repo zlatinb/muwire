@@ -361,7 +361,16 @@ class MainFrameView {
                             panel (id: "library-title", constraints : BorderLayout.NORTH) {
                                 cardLayout()
                                 panel(constraints: "library-is-loading") {
-                                    label(text: trans("LIBRARY_IS_LOADING"))
+                                    label(text: bind {
+                                        if (model.hashingFile == null && model.hashingFiles == 0) {
+                                            trans("LIBRARY_IS_LOADING")
+                                        } else if (model.hashingFiles == 1 && model.hashingFile != null) {
+                                            trans("HASHING") + ": " +
+                                                    model.hashingFile.getAbsolutePath() + " (" + formatSize(model.hashingFile.length(), "BYTES_SHORT") + ")"
+                                        } else {
+                                            trans("HASHING") + " " + model.hashingFiles + " " + trans("FILES")
+                                        }
+                                    })
                                 }
                                 panel(constraints: "you-can-drag-and-drop") {
                                     label(text: bind {

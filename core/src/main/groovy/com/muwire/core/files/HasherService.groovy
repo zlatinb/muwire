@@ -82,7 +82,7 @@ class HasherService {
             if (canonical.isDirectory())
                 executor.execute({processDirectory(evt.file)} as Runnable)
             else
-                throttlerExecutor.execute({ throttle(evt.file, canonical, evt.fromWatch) } as Runnable)
+                throttlerExecutor.execute({ throttle(evt.file, canonical, evt.fromWatch, null) } as Runnable)
         }
     }
     
@@ -100,17 +100,17 @@ class HasherService {
         for (SharedFile sharedFile : event.sharedFiles) {
             File f = sharedFile.getFile()
             File canonical = f.getCanonicalFile()
-            throttlerExecutor.execute({ throttle(f, canonical, true) })
+            throttlerExecutor.execute({ throttle(f, canonical, true, sharedFile) })
         }
     }
 
-    private synchronized void throttle(File f, File canonical, boolean forceHash) {
+    private synchronized void throttle(File f, File canonical, boolean forceHash, SharedFile original) {
         while(currentHashes >= settings.hashingCores)
             wait(10)
         currentHashes++
         if (++totalHashes % TARGET_Q_SIZE == 0)
             System.gc()
-        executor.execute({processFile(f, canonical, forceHash)} as Runnable)
+        executor.execute({processFile(f, canonical, forceHash, original)} as Runnable)
     }
     
     private void processDirectory(File f) {
@@ -125,7 +125,7 @@ class HasherService {
         }
     }
     
-    private void processFile(File f, File canonical, boolean forceHash) {
+    private void processFile(File f, File canonical, boolean forceHash, SharedFile original) {
         try {
             if (f.length() == 0) {
                 eventBus.publish new FileHashedEvent(error: "Not sharing empty file $f")
@@ -144,7 +144,7 @@ class HasherService {
                     log.fine("found an existing hash list for $f => $canonical")
                 def sf = new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length()),
                         System.currentTimeMillis())
-                eventBus.publish new FileHashedEvent(sharedFile: sf)
+                eventBus.publish new FileHashedEvent(sharedFile: sf, original: original)
             }
         } finally {
             synchronized (this) {

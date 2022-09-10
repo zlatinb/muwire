@@ -83,9 +83,8 @@ class FileManager {
             if (sideCar.exists()) 
                 e.sharedFile.setComment(Base64.encode(DataUtil.encodei18nString(sideCar.text)))
         }
-        
-        e.duplicate = fileToSharedFile[f]
-        
+        if (e.original != null)
+            e.sharedFile.setComment(e.original.getComment())
         addToIndex(e.sharedFile)
     }
 

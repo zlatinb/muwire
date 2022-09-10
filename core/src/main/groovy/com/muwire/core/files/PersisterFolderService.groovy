@@ -219,6 +219,7 @@ class PersisterFolderService extends BasePersisterService {
         })
         if (core.muOptions.plugin || !core.muOptions.throttleLoadingFiles)
             stream = stream.parallel()
+        Set<SharedFile> staleFiles = new HashSet<>()
         stream.forEach({
             log.fine("processing path $it")
             def slurper = new JsonSlurper(type: JsonParserType.LAX)
@@ -245,8 +246,11 @@ class PersisterFolderService extends BasePersisterService {
                     }
                 } else
                     log.fine("loaded shared parent from json ${event.loadedFile.getPathToSharedParent()}")
-                
-                listener.publish event
+
+                if (event.loadedFile.isStale())
+                    staleFiles.add(event.loadedFile)
+                else
+                    listener.publish event
                 
                 if (!core.muOptions.plugin && core.muOptions.throttleLoadingFiles) {
                     loaded++
@@ -258,7 +262,28 @@ class PersisterFolderService extends BasePersisterService {
                 failed.incrementAndGet()
             }
         })
+        waitForRehash(staleFiles)
         listener.publish(new AllFilesLoadedEvent(failed : failed.get()))
+    }
+
+    private void waitForRehash(Set<SharedFile> staleFiles) {
+        if (staleFiles.isEmpty())
+            return
+        def waiter = new Object() {
+            synchronized void onFileHashedEvent(FileHashedEvent event) {
+                staleFiles.remove(event.original)
+                notify()
+            }
+            synchronized void await() {
+                while(!staleFiles.isEmpty())
+                    wait()
+            }
+        }
+
+        listener.register(FileHashedEvent.class, waiter)
+        listener.publish(new FileModifiedEvent(sharedFiles: staleFiles.toArray(new SharedFile[0])))
+        waiter.await()
+        listener.unregister(FileHashedEvent.class, waiter)
     }
 
     /**

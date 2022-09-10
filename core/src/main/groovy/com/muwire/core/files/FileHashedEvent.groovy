@@ -11,9 +11,8 @@ class FileHashedEvent extends Event {
 
     /**
      * This will be non-null in case of a re-hash.
-     * Enriched by FileManager
      */
-    SharedFile duplicate
+    SharedFile original
 
     @Override
     public String toString() {
