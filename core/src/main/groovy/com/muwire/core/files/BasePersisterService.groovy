@@ -15,7 +15,7 @@ import java.util.stream.Collectors
 
 abstract class BasePersisterService extends Service{
 
-    protected static FileLoadedEvent fromJson(def json) {
+    protected static FileLoadedEvent fromJson(def json, long sharedTime) {
         if (json.file == null || json.length == null || json.infoHash == null || json.hashList == null)
             throw new IllegalArgumentException()
         if (!(json.hashList instanceof List))
@@ -53,13 +53,13 @@ abstract class BasePersisterService extends Service{
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
-            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sourceSet)
+            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sharedTime, sourceSet)
             df.setComment(json.comment)
             return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
 
 
-        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
+        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize, sharedTime)
         sf.setComment(json.comment)
         if (json.downloaders != null)
             json.downloaders.each {sf.addDownloader(it)}
@@ -77,7 +77,7 @@ abstract class BasePersisterService extends Service{
 
     }
     
-    protected static FileLoadedEvent fromJsonLite(json) {
+    protected static FileLoadedEvent fromJsonLite(json, long fileTime) {
         if (json.file == null || json.length == null || json.root == null)
             throw new IllegalArgumentException()
             
@@ -105,11 +105,15 @@ abstract class BasePersisterService extends Service{
         Path path = null
         if (json.pathToSharedParent != null) 
             path = Path.of(json.pathToSharedParent)
-        
+
+        long sharedTime = fileTime
+        if (json.sharedTime != null)
+            sharedTime = json.sharedTime
+
         if (json.sources != null) {
             List sources = (List)json.sources
             Set<Destination> sourceSet = sources.stream().map({ d -> new Destination(d.toString())}).collect Collectors.toSet()
-            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sourceSet)
+            DownloadedFile df = new DownloadedFile(file, ih.getRoot(), pieceSize, sharedTime, sourceSet)
             if (published)
                 df.publish(publishedTimestamp)
             df.setComment(json.comment)
@@ -117,8 +121,7 @@ abstract class BasePersisterService extends Service{
             return new FileLoadedEvent(loadedFile : df, infoHash: ih)
         }
 
-
-        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize)
+        SharedFile sf = new SharedFile(file, ih.getRoot(), pieceSize, sharedTime)
         sf.setPathToSharedParent(path)
         sf.setComment(json.comment)
         if (published)
@@ -152,6 +155,7 @@ abstract class BasePersisterService extends Service{
         json.comment = sf.getComment()
         json.hits = sf.getHits()
         json.downloaders = sf.getDownloaders()
+        json.sharedTime = sf.getSharedTime()
         if (sf.getPathToSharedParent() != null)
             json.pathToSharedParent = sf.getPathToSharedParent().toString()
 

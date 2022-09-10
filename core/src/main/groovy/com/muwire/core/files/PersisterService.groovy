@@ -54,10 +54,11 @@ class PersisterService extends BasePersisterService {
             int loaded = 0
             def slurper = new JsonSlurper()
             try {
+                final long sharedTime = location.lastModified()
                 location.eachLine {
                     if (it.trim().length() > 0) {
                         def parsed = slurper.parseText it
-                        def event = fromJson parsed
+                        def event = fromJson(parsed, sharedTime)
                         if (event != null) {
                             log.fine("loaded file $event.loadedFile.file")
                             event.source = "PersisterService"

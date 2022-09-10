@@ -135,7 +135,7 @@ abstract class Downloader {
     protected void fireEvent(Set<Destination> successfulDestinations, boolean confidential) {
         def event = new FileDownloadedEvent(
                 downloadedFile: new DownloadedFile(file.getCanonicalFile(), infoHash.getRoot(), 
-                        pieceSizePow2, successfulDestinations),
+                        pieceSizePow2, System.currentTimeMillis(), successfulDestinations),
                 parentToShare: toShare,
                 downloader: this,
                 infoHash: infoHash,

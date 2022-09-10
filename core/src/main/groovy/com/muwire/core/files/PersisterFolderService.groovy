@@ -223,8 +223,9 @@ class PersisterFolderService extends BasePersisterService {
             log.fine("processing path $it")
             def slurper = new JsonSlurper(type: JsonParserType.LAX)
             try {
-                def parsed = slurper.parse(it.toFile())
-                def event = fromJsonLite parsed
+                File file = it.toFile()
+                def parsed = slurper.parse(file)
+                def event = fromJsonLite(parsed, file.lastModified())
                 if (event == null) return
 
                 if (core.muOptions.ignoredFileTypes.contains(DataUtil.getFileExtension(event.loadedFile.file))) {

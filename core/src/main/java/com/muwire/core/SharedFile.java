@@ -16,6 +16,7 @@ public class SharedFile {
     private final byte[] root;
     private final InfoHash rootInfoHash;
     private final int pieceSize;
+    private final long sharedTime;
 
     private volatile VisualCache visualCache;
     private final int hashCode;
@@ -28,16 +29,25 @@ public class SharedFile {
     /** Path to the top-most parent File that is shared.  Null if no such exists */
     private volatile Path pathToSharedParent;
 
-    public SharedFile(File file, byte[] root, int pieceSize) throws IOException {
+    public SharedFile(File file, byte[] root, int pieceSize, long sharedTime) throws IOException {
         this.file = file;
         this.root = root;
         this.rootInfoHash = new InfoHash(root);
         this.pieceSize = pieceSize;
+        this.sharedTime = sharedTime;
         this.hashCode = Arrays.hashCode(root) ^ file.hashCode();
     }
 
     public File getFile() {
         return file;
+    }
+
+    public boolean isStale() {
+        return sharedTime < file.lastModified();
+    }
+
+    public long getSharedTime() {
+        return sharedTime;
     }
 
     private byte[] getPathHash() throws NoSuchAlgorithmException {

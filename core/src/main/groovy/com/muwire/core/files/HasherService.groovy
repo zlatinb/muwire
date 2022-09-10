@@ -140,7 +140,8 @@ class HasherService {
                     eventBus.publish new InfoHashEvent(file: canonical, infoHash: hash)
                 } else
                     log.fine("found an existing hash list for $f => $canonical")
-                def sf = new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length()))
+                def sf = new SharedFile(f, hash.getRoot(), FileHasher.getPieceSize(f.length()),
+                        System.currentTimeMillis())
                 eventBus.publish new FileHashedEvent(sharedFile: sf)
             }
         } finally {

@@ -57,7 +57,7 @@ class PersisterServiceSavingTest {
 
     @Test
     void testSavingSharedFile() {
-        sf = new SharedFile(f, ih, 0)
+        sf = new SharedFile(f, ih, 0, 0L)
 
         ps = new PersisterService(persisted, eventBus, 100, fileSource)
         ps.onUILoadedEvent(null)
@@ -76,7 +76,7 @@ class PersisterServiceSavingTest {
     @Test
     void testSavingDownloadedFile() {
         Destinations dests = new Destinations()
-        sf = new DownloadedFile(f, ih, 0, new HashSet([dests.dest1, dests.dest2]))
+        sf = new DownloadedFile(f, ih, 0, 0L,  new HashSet([dests.dest1, dests.dest2]))
 
         ps = new PersisterService(persisted, eventBus, 100, fileSource)
         ps.onUILoadedEvent(null)
