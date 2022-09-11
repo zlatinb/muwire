@@ -159,6 +159,7 @@ class MainFrameModel {
     @Observable int messages
     @Observable String me
     @Observable int loadedFiles
+    @Observable boolean allFilesLoaded
     @Observable int hashingFiles
     @Observable File hashingFile
     @Observable boolean cancelButtonEnabled
@@ -403,6 +404,7 @@ class MainFrameModel {
 
     void onAllFilesLoadedEvent(AllFilesLoadedEvent e) {
         runInsideUIAsync {
+            setAllFilesLoaded(true)
             view.refreshSharedFiles()
             loadedFiles = allSharedFiles.size()
             libraryDirty = false

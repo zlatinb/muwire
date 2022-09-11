@@ -248,4 +248,9 @@ mvcGroups {
         view = 'com.muwire.gui.profile.ViewProfileView'
         controller = 'com.muwire.gui.profile.ViewProfileController'
     }
+    'library-sync' {
+        model = 'com.muwire.gui.LibrarySyncModel'
+        view = 'com.muwire.gui.LibrarySyncView'
+        controller = 'com.muwire.gui.LibrarySyncController'
+    }
 }

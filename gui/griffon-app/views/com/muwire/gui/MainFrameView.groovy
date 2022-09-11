@@ -457,8 +457,10 @@ class MainFrameView {
                                         label(trans("SHARED") + ":")
                                         label(text : bind {model.loadedFiles}, id : "shared-files-count")
                                     }
-                                    button(text : trans("SHARE"), toolTipText: trans("TOOLTIP_LIBRARY_SHARE"), 
+                                    button(text : "", icon: imageIcon("/outbox.png"), toolTipText: trans("TOOLTIP_LIBRARY_SHARE"),
                                             actionPerformed : shareFiles)
+                                    button(text : "", icon: imageIcon("/restart.png"), toolTipText: trans("TOOLTIP_LIBRARY_SCAN"),
+                                        enabled: bind {model.allFilesLoaded}, scanLibraryAction)
                                 }
                             }
                         }

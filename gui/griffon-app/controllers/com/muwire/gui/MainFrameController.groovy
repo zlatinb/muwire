@@ -803,6 +803,13 @@ class MainFrameController {
         model.filter = null
         model.filterLibrary()
     }
+
+    @ControllerAction
+    void scanLibrary() {
+        def params = [:]
+        params.core = model.core
+        mvcGroup.createMVCGroup("library-sync", params).destroy()
+    }
     
     @ControllerAction
     void startChatServer() {
