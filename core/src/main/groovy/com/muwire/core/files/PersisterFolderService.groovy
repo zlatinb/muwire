@@ -413,7 +413,11 @@ class PersisterFolderService extends BasePersisterService {
         File file = path.toFile()
         if (!file.exists() || !file.isFile())
             return null
-        InfoHash.fromHashList(file.bytes)
+        try {
+            return InfoHash.fromHashList(file.bytes)
+        } catch (FileNotFoundException strange) {
+            return null
+        }
     }
     
     private static final class HMACKey implements SecretKey {
