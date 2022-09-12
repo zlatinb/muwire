@@ -29,6 +29,7 @@ class LibrarySyncController {
 
     @ControllerAction
     void reindex() {
-
+        view.startReindex()
+        model.startReindex()
     }
 }

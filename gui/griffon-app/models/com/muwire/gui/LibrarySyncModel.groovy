@@ -4,6 +4,8 @@ import com.muwire.core.Core
 import com.muwire.core.InfoHash
 import com.muwire.core.SharedFile
 import com.muwire.core.collections.FileCollection
+import com.muwire.core.files.FileHashedEvent
+import com.muwire.core.files.FileModifiedEvent
 import griffon.core.artifact.GriffonModel
 import griffon.inject.MVCMember
 import griffon.metadata.ArtifactProviderFor
@@ -70,6 +72,30 @@ class LibrarySyncModel {
             }
             staleCollections = affected.toList()
             view.scanFinished()
+        }
+    }
+
+    void startReindex() {
+        def observer = new ReindexObserver()
+        core.eventBus.register(FileHashedEvent.class, observer)
+        def event = new FileModifiedEvent(sharedFiles: staleFiles)
+        core.eventBus.publish(event)
+    }
+
+    private class ReindexObserver {
+        private final Set<SharedFile> remaining = new HashSet<>(staleFiles)
+        private final int total = remaining.size()
+        void onFileHashedEvent(FileHashedEvent event) {
+            runInsideUIAsync {
+                if (!remaining.remove(event.original))
+                    return
+                int percentage = (int)((total - remaining.size()) * 100 / total)
+                view.updateReindexProgressBar(percentage)
+                if (remaining.isEmpty()) {
+                    core.eventBus.unregister(FileHashedEvent.class, this)
+                    view.reindexComplete()
+                }
+            }
         }
     }
 }

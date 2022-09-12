@@ -16,6 +16,8 @@ import javax.swing.JProgressBar
 import javax.swing.JTable
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 import static com.muwire.gui.Translator.trans
 
@@ -43,6 +45,8 @@ class LibrarySyncView {
     private JProgressBar scanProgressBar
     JProgressBar reindexProgressBar
 
+    private final CloseAdapter closeAdapter = new CloseAdapter()
+
     void initUI() {
         mainFrame = (JFrame) application.windowManager.findWindow("main-frame")
         rowHeight = (int)application.context.get("row-height")
@@ -61,6 +65,7 @@ class LibrarySyncView {
         }
 
         scanDialog.with {
+            addWindowListener(closeAdapter)
             getContentPane().add(scanPanel)
             pack()
             setLocationRelativeTo(mainFrame)
@@ -146,6 +151,7 @@ class LibrarySyncView {
 
         Dimension dimension = mainFrame.getSize()
         previewDialog.with {
+            addWindowListener(closeAdapter)
             getContentPane().add(previewPanel)
             setSize((int)(dimension.getWidth() - 100), (int)(dimension.getHeight() - 100))
             setLocationRelativeTo(mainFrame)
@@ -156,5 +162,43 @@ class LibrarySyncView {
     void previewCancelled() {
         nextDialog = null
         previewDialog.setVisible(false)
+    }
+
+    void startReindex() {
+        previewDialog.setVisible(false)
+        reindexDialog = new JDialog(mainFrame, trans("LIBRARY_SCAN_REINDEX_TITLE"), true)
+        nextDialog = reindexDialog
+
+        JPanel reindexPanel = builder.panel {
+            borderLayout()
+            panel(constraints: BorderLayout.NORTH) {
+                label(text: trans("LIBRARY_SCAN_REINDEX_TITLE"))
+            }
+            reindexProgressBar = progressBar(constraints: BorderLayout.CENTER)
+        }
+
+        reindexDialog.with {
+            addWindowListener(closeAdapter)
+            getContentPane().add(reindexPanel)
+            pack()
+            setLocationRelativeTo(mainFrame)
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE)
+        }
+    }
+
+    void updateReindexProgressBar(int value) {
+        reindexProgressBar.setValue(value)
+    }
+
+    void reindexComplete() {
+        nextDialog = null
+        reindexDialog.setVisible(false)
+    }
+
+    private class CloseAdapter extends WindowAdapter {
+        void windowClosed(WindowEvent e) {
+            nextDialog?.setVisible(false)
+            nextDialog = null
+        }
     }
 }
