@@ -1,5 +1,6 @@
 package com.muwire.gui
 
+import com.google.common.collect.Sets
 import griffon.core.GriffonApplication
 import griffon.core.artifact.GriffonView
 import griffon.inject.MVCMember
@@ -12,7 +13,10 @@ import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JProgressBar
+import javax.swing.JTable
 import java.awt.BorderLayout
+import java.awt.Dimension
+
 import static com.muwire.gui.Translator.trans
 
 @ArtifactProviderFor(GriffonView)
@@ -28,16 +32,20 @@ class LibrarySyncView {
     LibrarySyncController controller
 
     private JFrame mainFrame
+    private int rowHeight
 
-    JDialog scanDialog
-    JDialog previewDialog
-    JDialog reindexDialog
+    private JDialog scanDialog
+    private JDialog previewDialog
+    private JDialog reindexDialog
+
+    private JDialog nextDialog
 
     private JProgressBar scanProgressBar
     JProgressBar reindexProgressBar
 
     void initUI() {
         mainFrame = (JFrame) application.windowManager.findWindow("main-frame")
+        rowHeight = (int)application.context.get("row-height")
 
         scanDialog = new JDialog(mainFrame, trans("LIBRARY_SCAN_TITLE"), true)
 
@@ -62,7 +70,9 @@ class LibrarySyncView {
 
     void mvcGroupInit(Map<String, String> args) {
         model.startScan()
-        scanDialog.setVisible(true)
+        nextDialog = scanDialog
+        while(nextDialog != null)
+            nextDialog.setVisible(true)
     }
 
     void updateScanProgressBar(int percent) {
@@ -70,16 +80,81 @@ class LibrarySyncView {
     }
 
     void scanCancelled() {
+        nextDialog = null
         scanDialog.setVisible(false)
     }
 
     void scanFinished() {
 
+        scanDialog.setVisible(false)
+
         if (model.staleFiles.isEmpty()) {
-            JOptionPane.showMessageDialog(scanDialog, trans("LIBRARY_SCAN_NO_STALE"),
+            JOptionPane.showMessageDialog(mainFrame, trans("LIBRARY_SCAN_NO_STALE"),
                 trans("LIBRARY_SCAN_NO_STALE"), JOptionPane.INFORMATION_MESSAGE)
-            scanDialog.setVisible(false)
+            nextDialog = null
             return
         }
+
+        previewDialog = new JDialog(mainFrame, trans("LIBRARY_SCAN_PREVIEW_TITLE"), true)
+        nextDialog = previewDialog
+
+        JTable staleFilesTable
+        JPanel previewPanel = builder.panel {
+            borderLayout()
+            panel(constraints: BorderLayout.CENTER) {
+                int rows = model.staleCollections.isEmpty() ? 1 : 2
+                gridLayout(rows: rows, cols: 1)
+                panel {
+                    borderLayout()
+                    panel (constraints: BorderLayout.NORTH) {
+                        label(text: trans("LIBRARY_SCAN_PREVIEW_FILES_BODY"))
+                    }
+                    scrollPane(constraints: BorderLayout.CENTER) {
+                        staleFilesTable = table(autoCreateRowSorter: true, rowHeight: rowHeight) {
+                            tableModel(list: model.staleFiles) {
+                                closureColumn(header : trans("LIBRARY_SCAN_PREVIEW_COLUMN_FILE"),
+                                        type: String, read: {it.getCachedPath()})
+                                closureColumn(header : trans("LIBRARY_SCAN_PREVIEW_COLUMN_SHARED"),
+                                        type: Long, read: {it.getSharedTime()})
+                                closureColumn(header: trans("LIBRARY_SCAN_PREVIEW_COLUMN_MODIFIED"),
+                                        type: Long, read: {it.getFile().lastModified()})
+                            }
+                        }
+                    }
+                }
+                if (rows > 1) {
+                    panel {
+                        borderLayout()
+                        panel(constraints: BorderLayout.NORTH) {
+                            label(text: trans("LIBRARY_SCAN_PREVIEW_COLLECTIONS_BODY"))
+                        }
+                        scrollPane(constraints: BorderLayout.CENTER) {
+                            list(items: model.staleCollections.collect {it.getName()})
+                        }
+                    }
+                }
+            }
+            panel(constraints: BorderLayout.SOUTH) {
+                button(text: trans("LIBRARY_SCAN_PREVIEW_REINDEX"), reindexAction)
+                button(text: trans("CANCEL"), cancelAction)
+            }
+        }
+
+        TableUtil.dateColumn(staleFilesTable, 1)
+        TableUtil.dateColumn(staleFilesTable, 2)
+        staleFilesTable.setDefaultRenderer(Long.class, new DateRenderer())
+
+        Dimension dimension = mainFrame.getSize()
+        previewDialog.with {
+            getContentPane().add(previewPanel)
+            setSize((int)(dimension.getWidth() - 100), (int)(dimension.getHeight() - 100))
+            setLocationRelativeTo(mainFrame)
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE)
+        }
+    }
+
+    void previewCancelled() {
+        nextDialog = null
+        previewDialog.setVisible(false)
     }
 }

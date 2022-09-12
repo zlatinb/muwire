@@ -21,4 +21,14 @@ class LibrarySyncController {
         model.cancelScan()
         view.scanCancelled()
     }
+
+    @ControllerAction
+    void cancel() {
+        view.previewCancelled()
+    }
+
+    @ControllerAction
+    void reindex() {
+
+    }
 }
