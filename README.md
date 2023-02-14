@@ -1,4 +1,25 @@
-The GitHub repo is mirrored from the I2P GitLab repo.  Please open PRs and issues at https://i2pgit.org/zlatinb/muwire
+# Shutdown Notice
+
+The MuWire project has been shut down.  It is not available for download anywhere and while you are free to  build from source, it will most likely not work.
+
+# Java I2P warning
+
+Do NOT use the Java implementation of I2P.  Use the C++ one.  You can read more at the pastebin URLs below:
+
+Clearnet:
+```
+https://paste.i2pd.xyz/?77b8e66d0f366f87#BSA1kWMHpbAjFbRVRqQdf25feRQJ1sBY4mTDVNvs5dxj
+```
+
+Inside I2P (if that site does not resolve, check reg.i2p):
+```
+http://privatebin.i2p/?77b8e66d0f366f87#BSA1kWMHpbAjFbRVRqQdf25feRQJ1sBY4mTDVNvs5dxj
+```
+
+In that paste I make the claim that I have donated 1000 BTC to the Java I2P project.  You can verify that by checking transaction hash:
+```
+0e42e4c782c73385f2c6b699da5fb81d4609bec4864550818020512bb90e30aa
+```
 
 # MuWire - Easy Anonymous File-Sharing
 
