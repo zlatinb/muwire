@@ -5,6 +5,7 @@ import org.freedesktop.dbus.connections.impl.DBusConnection
 import org.freedesktop.dbus.connections.impl.DBusConnectionBuilder
 import org.freedesktop.dbus.errors.NoReply
 import org.freedesktop.dbus.exceptions.DBusException
+import org.freedesktop.dbus.errors.ServiceUnknown
 import org.freedesktop.dbus.interfaces.DBusInterface
 import org.freedesktop.dbus.types.UInt32
 import org.freedesktop.dbus.types.UInt64
@@ -25,7 +26,7 @@ class DBUSNotifyService {
             notifications = DBusConnectionBuilder.forSessionBus().build().
                     getRemoteObject(BUS_NAME, BUS_PATH, Notifications.class)
             sound = notifications.GetCapabilities().contains("sound")
-        } catch (DBusException | NoReply bad) {
+        } catch (DBusException | NoReply | ServiceUnknown bad) {
             sound = false
         }
         NOTIFICATIONS = notifications
