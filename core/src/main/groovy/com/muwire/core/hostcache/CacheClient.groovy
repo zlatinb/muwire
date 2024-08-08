@@ -33,6 +33,7 @@ class CacheClient {
     final MuWireSettings settings
     final Timer timer
     private volatile I2PSession session
+    private volatile boolean connected
     private final AtomicBoolean stopped = new AtomicBoolean();
 
     public CacheClient(EventBus eventBus, HostCache cache,
@@ -56,16 +57,19 @@ class CacheClient {
     }
     
     void onRouterConnectedEvent(RouterConnectedEvent event) {
-        session = event.session
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
+        connected = true
+        if (session == null) {
+            session = event.session
+            session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, 0)
+        }
     }
     
     void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
-        session = null
+        connected = false
     }
 
     private void queryIfNeeded() {
-        if (stopped.get())
+        if (stopped.get() || !connected)
             return
         I2PSession session = this.session
         if (session == null)

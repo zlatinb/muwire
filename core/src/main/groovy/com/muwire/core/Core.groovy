@@ -499,7 +499,7 @@ public class Core {
         eventBus.register(UIBrowseEvent.class, browseManager)
         
         log.info("initializing acceptor")
-        I2PAcceptor i2pAcceptor = new I2PAcceptor(i2pConnector::getSocketManager)
+        I2PAcceptor i2pAcceptor = new I2PAcceptor()
         eventBus.register(RouterConnectedEvent.class, i2pAcceptor)
         eventBus.register(RouterDisconnectedEvent.class, i2pAcceptor)
         connectionAcceptor = new ConnectionAcceptor(eventBus, me, profileSupplier, connectionManager, props,
@@ -620,7 +620,7 @@ public class Core {
             }
         }
         
-        i2pConnector.connect()
+        i2pConnector.start()
         contentManager.start()
         hostCache.start({connectionManager.getConnections().collect{ it.endpoint.destination }} as Supplier)
         connectionManager.start()

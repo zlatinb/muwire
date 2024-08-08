@@ -47,6 +47,7 @@ class TrackerResponder {
     private volatile boolean shutdown
     
     private volatile I2PSession i2pSession
+    private volatile boolean connected
     
     TrackerResponder(MuWireSettings muSettings,
         FileManager fileManager, DownloadManager downloadManager,
@@ -70,12 +71,15 @@ class TrackerResponder {
     }
     
     void onRouterConnectedEvent(RouterConnectedEvent event) {
-        i2pSession = event.session
-        i2pSession.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.TRACKER_PORT)
+        connected = true
+        if (i2pSession == null) {
+            i2pSession = event.session
+            i2pSession.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.TRACKER_PORT)
+        }
     }
     
     void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
-        i2pSession = null
+        connected = false
     }
     
     private void expireUUIDs() {
@@ -91,6 +95,8 @@ class TrackerResponder {
     }
     
     private void respond(host, json) {
+        if (!connected)
+            return
         I2PSession i2pSession = this.i2pSession
         if (i2pSession == null)
             return

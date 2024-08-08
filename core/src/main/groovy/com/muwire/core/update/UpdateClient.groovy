@@ -47,6 +47,7 @@ class UpdateClient {
     private long lastUpdateCheckTime
 
     private volatile I2PSession session
+    private volatile boolean connected
     
     private volatile InfoHash updateInfoHash
     private volatile String version, signer
@@ -77,12 +78,15 @@ class UpdateClient {
     }
     
     void onRouterConnectedEvent(RouterConnectedEvent event) {
-        this.session = event.session
-        session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
+        connected = true
+        if (session == null) {
+            this.session = event.session
+            session.addMuxedSessionListener(new Listener(), I2PSession.PROTO_DATAGRAM, Constants.UPDATE_PORT)
+        }
     }
     
     void onRouterDisconnectedEvent(RouterDisconnectedEvent event) {
-        session = null
+        connected = false
     }
 
     void onUIResultBatchEvent(UIResultBatchEvent results) {
@@ -105,6 +109,8 @@ class UpdateClient {
     }
 
     private void checkUpdate() {
+        if (!connected)
+            return
         I2PSession session = this.session
         if (session == null)
             return
