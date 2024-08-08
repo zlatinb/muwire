@@ -462,7 +462,7 @@ class NetworkDownloader extends Downloader {
             } catch (DownloadRejectedException rejected) {
                 this.rejected = true  
             } catch (Exception bad) {
-                if (!this.cancelled) {
+                if (!this.cancelled && downloadManager.isRouterConnected()) {
                     log.log(Level.WARNING, "Exception while downloading", DataUtil.findRoot(bad))
                     markFailed(destination)
                     if (!hasLiveSources() && hopelessEventFired.compareAndSet(false, true)) {

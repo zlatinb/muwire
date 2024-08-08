@@ -475,6 +475,8 @@ public class Core {
         eventBus.register(UIDownloadCollectionEvent.class, downloadManager)
         eventBus.register(UIDownloadAttachmentEvent.class, downloadManager)
         eventBus.register(UIDownloadLinkEvent.class, downloadManager)
+        eventBus.register(RouterConnectedEvent.class, downloadManager)
+        eventBus.register(RouterDisconnectedEvent.class, downloadManager)
 
         log.info("initializing upload manager")
         uploadManager = new UploadManager(eventBus, fileManager, meshManager, 

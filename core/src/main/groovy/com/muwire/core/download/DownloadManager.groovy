@@ -32,6 +32,9 @@ import com.muwire.core.collections.FileCollection
 import com.muwire.core.collections.FileCollectionItem
 import com.muwire.core.collections.UIDownloadCollectionEvent
 
+import com.muwire.core.RouterConnectedEvent
+import com.muwire.core.RouterDisconnectedEvent
+
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -54,6 +57,8 @@ public class DownloadManager {
     private final FileManager fileManager
 
     private final Map<InfoHash, Downloader> downloaders = new ConcurrentHashMap<>()
+
+    private volatile boolean routerConnected
     
     public DownloadManager(EventBus eventBus, TrustService trustService, MeshManager meshManager, MuWireSettings muSettings,
         I2PConnector connector, File home, Persona me, Supplier<MWProfile> profileSupplier, 
@@ -347,5 +352,17 @@ public class DownloadManager {
         int total = 0
         downloaders.values().each { total += it.speed() }
         total
+    }
+
+    public void onRouterConnectedEvent(RouterConnectedEvent e) {
+        this.routerConnected = true
+    }
+
+    public void onRouterDisconnectedEvent(RouterDisconnectedEvent e) {
+        this.routerConnected = false
+    }
+
+    boolean isRouterConnected() {
+        this.routerConnected
     }
 }
