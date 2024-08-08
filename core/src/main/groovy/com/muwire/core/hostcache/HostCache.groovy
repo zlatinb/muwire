@@ -12,6 +12,9 @@ import com.muwire.core.connection.ConnectionEvent
 import com.muwire.core.trust.TrustLevel
 import com.muwire.core.trust.TrustService
 
+import com.muwire.core.RouterConnectedEvent
+import com.muwire.core.RouterDisconnectedEvent
+
 import net.i2p.data.Destination
 
 abstract class HostCache extends Service {
@@ -20,6 +23,7 @@ abstract class HostCache extends Service {
     
     protected final MuWireSettings settings
     private final Destination myself
+    private volatile boolean routerConnected
     
     protected HostCache(TrustService trustService, MuWireSettings settings, Destination myself) {
         this.trustService = trustService
@@ -51,9 +55,17 @@ abstract class HostCache extends Service {
     protected abstract void hostDiscovered(Destination d, boolean fromHostcache)
     
     void onConnectionEvent(ConnectionEvent e) {
-        if (e.leaf)
+        if (e.leaf || !routerConnected)
             return
         onConnection(e.endpoint.destination, e.status)
+    }
+
+    void onRouterConnectedEvent(RouterConnectedEvent e) {
+        routerConnected = true
+    }
+
+    void onRouterDisconnectedEvent(RouterDisconnectedEvent e) {
+        routerConnected = false
     }
     
     protected abstract void onConnection(Destination d, ConnectionAttemptStatus status)

@@ -380,7 +380,8 @@ public class Core {
         hostCache = new H2HostCache(home,trustService, props, me.destination)
         eventBus.register(HostDiscoveredEvent.class, hostCache)
         eventBus.register(ConnectionEvent.class, hostCache)
-
+        eventBus.register(RouterConnectedEvent.class, hostCache)
+        eventBus.register(RouterDisconnectedEvent.class, hostCache)
         
         log.info("initializing responder cache")
         ResponderCache responderCache = new ResponderCache(props.responderCacheSize)
