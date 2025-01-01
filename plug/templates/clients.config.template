@@ -1,6 +1,0 @@
-clientApp.0.main=com.muwire.webui.MuWireClient
-clientApp.0.name=MuWire
-clientApp.0.startOnLoad=true
-clientApp.0.delay=5
-clientApp.0.classpath=${libname}
-clientApp.0.args=version=${version} home="\$PLUGIN"

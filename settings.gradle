@@ -10,6 +10,3 @@ include 'cli-lanterna'
 // TODO: fix this on Gradle 7
 // include 'tracker' 
 
-// uncomment below when building plugin
-// include 'webui'
-// include 'plug'
