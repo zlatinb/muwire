@@ -347,7 +347,7 @@ class BrowseView {
         TreePath[] selectedPaths = tree.getSelectionPaths()
         Set<TreePath> expanded = new HashSet<>(treeExpansions.expandedPaths)
         model.resultsTreeModel.nodeStructureChanged(model.root)
-        if (model.session == null && !model.session.supportsIncremental()) {
+        if (model.session == null || !model.session.supportsIncremental()) {
             TreeUtil.expand(tree)
         } else if (!onDemandExpansionRegistered) {
             onDemandExpansionRegistered = true
