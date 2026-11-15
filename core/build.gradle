@@ -17,15 +17,6 @@ dependencies {
 }
 
 
-// this is necessary because applying both groovy and java-library doesn't work well
-configurations {
-    apiElements.outgoing.variants {
-        classes {
-            artifact file: compileGroovy.destinationDir, builtBy: compileGroovy
-        }
-    }
-}
-
 configurations.testImplementation {
         exclude group:'org.codehaus.groovy', module:'groovy-testng'
 }

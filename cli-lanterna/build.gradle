@@ -1,27 +1,15 @@
-buildscript {
-
-    repositories {
-        jcenter()
-        mavenLocal()
-    }
-
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
+plugins {
+    id 'application'
+    id 'com.gradleup.shadow'
 }
 
-apply plugin : 'application'
 application {
-    mainClassName = 'com.muwire.clilanterna.CliLanterna'
+    mainClass = 'com.muwire.clilanterna.CliLanterna'
     applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties','-Xmx256M']
     applicationName = 'MuWire-cli'
 }
-
-apply plugin : 'com.github.johnrengelman.shadow'
-
 
 dependencies {
     implementation project(":core")
     implementation 'com.googlecode.lanterna:lanterna:3.0.1'
 }
-

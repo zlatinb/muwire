@@ -1,22 +1,13 @@
-buildscript {
-
-    repositories {
-        jcenter()
-        mavenLocal()
-    }
-
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
+plugins {
+    id 'application'
+    id 'com.gradleup.shadow'
 }
 
-apply plugin : 'application'
-mainClassName = 'com.muwire.cli.Cli'
-apply plugin : 'com.github.johnrengelman.shadow'
-
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+application {
+    mainClass = 'com.muwire.cli.Cli'
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+}
 
 dependencies {
     implementation project(":core")
 }
-

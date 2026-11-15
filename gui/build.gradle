@@ -1,25 +1,10 @@
-buildscript {
-    repositories {
-        jcenter()
-        mavenLocal()
-        maven {
-            url "https://plugins.gradle.org/m2"
-        }
-    }
-    
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
-}
-
 plugins {
-    id  'application'
-    id  "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'application'
+    id 'com.gradleup.shadow'
 }
 
-repositories {
-    jcenter()
-}
+import java.nio.file.Path
+import java.nio.file.Paths
 
 sourceSets {
     main {
@@ -48,7 +33,7 @@ sourceSets {
 }
 
 application {
-    mainClassName = 'com.muwire.gui.Launcher'
+    mainClass = 'com.muwire.gui.Launcher'
     applicationName = 'MuWire'
 }
 
@@ -83,7 +68,7 @@ private void setDefaultArgs() {
                                     
 }
 
-configurations.all {
+configurations.configureEach {
         exclude group:'org.codehaus.groovy', module:'groovy-test'
         exclude group:'org.codehaus.groovy', module:'groovy-testng'
         exclude group:'org.codehaus.groovy', module:'groovy-test-junit5'
@@ -109,7 +94,7 @@ dependencies {
     implementation "org.codehaus.griffon:griffon-core-compile:${griffonVersion}"
 
     implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    implementation group: 'com.bulenkov', name: 'darcula', version: '2018.2' 
+    implementation 'org.freeplane.bulenkov:darcula:2018.2'
     implementation 'com.jtattoo:JTattoo:1.6.13'
 
     implementation "net.java.dev.jna:jna:5.10.0"
@@ -121,9 +106,9 @@ dependencies {
 
     // runtime "org.slf4j:slf4j-simple:${slf4jVersion}"
 
-    runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
-    runtimeOnly group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"    
-    runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: "${slf4jVersion}"
+    runtimeOnly "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+    runtimeOnly "org.slf4j:slf4j-api:${slf4jVersion}"
+    runtimeOnly "org.slf4j:jul-to-slf4j:${slf4jVersion}"
     runtimeOnly "javax.annotation:javax.annotation-api:1.3.2"
 
     // because java 14 doesn't come with it
@@ -156,9 +141,6 @@ if (hasProperty('debugRun') && ((project.debugRun as boolean))) {
     }
 }
 
-import java.nio.file.Path
-import java.nio.file.Paths
-
 String className(File f, String prefix) {
     Path pwd = file(".").getAbsoluteFile().toPath()
     Path prefixPath = Paths.get(pwd.toString(),prefix)
@@ -169,7 +151,8 @@ String className(File f, String prefix) {
     name.replace(File.separator,'.').substring(0, name.lastIndexOf(".") )
 }
 
-task griffonManifest {
+tasks.register('griffonManifest') {
+    def manifestDir = layout.buildDirectory.dir('griffonManifest')
     doLast {
         def models = fileTree("griffon-app/models").getFiles().collect {
             className(it, "griffon-app/models")
@@ -181,7 +164,7 @@ task griffonManifest {
             className(it, "griffon-app/controllers")
         }.sort()
         
-        def manifest = file("$buildDir/griffonManifest")
+        def manifest = manifestDir.get().asFile
         manifest.mkdirs()
         
         def controllerFile = new File(manifest, "griffon.core.artifact.GriffonController")
@@ -211,8 +194,8 @@ task griffonManifest {
 }
 
 jar {
-    dependsOn griffonManifest
-    from("$buildDir/griffonManifest") {
+    dependsOn 'griffonManifest'
+    from(layout.buildDirectory.dir('griffonManifest')) {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         into ("META-INF/griffon")
     }

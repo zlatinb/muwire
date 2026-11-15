@@ -13,7 +13,7 @@ If you prefer not to build MuWire from source, `.zip` bundles built from the lat
 
 ## Building
 
-You need a JDK version between 11 and 18 inclusive.  Newer versions may not work.  After installing that and setting up the appropriate paths, just type
+You need a JDK version 17 or newer to run the build. The build itself uses a Java 17 toolchain, which Gradle will download automatically if it is not already installed.  After installing that and setting up the appropriate paths, just type
 
 ```
 ./gradlew clean assemble

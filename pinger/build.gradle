@@ -1,5 +1,11 @@
-apply plugin: 'application'
-mainClassName = 'com.muwire.pinger.Pinger'
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'com.muwire.pinger.Pinger'
+}
+
 dependencies {
-   implementation "net.i2p:i2p:${i2pVersion}"
+    implementation "net.i2p:i2p:${i2pVersion}"
 }

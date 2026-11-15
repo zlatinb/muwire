@@ -1,6 +1,47 @@
+import java.nio.file.*
+import java.util.jar.*
+import java.util.zip.*
+
+plugins {
+    id 'com.gradleup.shadow' version '9.2.2' apply false
+}
+
+def stripJar = { File file ->
+    if (file.name.endsWith('.tar'))
+        return
+    println "stripping $file"
+    File newFile = new File(file.parent, 'tmp-' + file.name)
+    Set<String> names = new HashSet<>()
+    new JarOutputStream(new FileOutputStream(newFile)).withCloseable { out ->
+        new ZipInputStream(new BufferedInputStream(new FileInputStream(file))).withCloseable { input ->
+            ZipEntry entry
+            while ((entry = input.nextEntry) != null) {
+                if (!names.add(entry.name))
+                    continue
+                def copy = new JarEntry(entry.name)
+                copy.time = 1001
+                out.putNextEntry(copy)
+                byte[] buffer = new byte[8192]
+                int read
+                while ((read = input.read(buffer)) != -1)
+                    out.write(buffer, 0, read)
+            }
+        }
+        out.finish()
+    }
+    Files.copy(newFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    newFile.delete()
+}
+
 subprojects {
     apply plugin: 'groovy'
     apply plugin: 'java-library'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
 
     dependencies {
         api "org.codehaus.groovy:groovy:${groovyVersion}"
@@ -35,7 +76,7 @@ subprojects {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
         doLast {
-            stripJar(it.archivePath)
+            stripJar(it.archiveFile.get().asFile)
         }
     }
     
@@ -43,26 +84,3 @@ subprojects {
         metadataCharset = "US-ASCII"
     }
 }
-import java.util.jar.*
-import java.nio.file.*
-void stripJar(File file) {
-    if (file.getName().endsWith('.tar'))
-        return
-    println "stripping $file"
-    File newFile = new File(file.parent, 'tmp-' + file.name)
-    newFile.withOutputStream { fout ->
-        JarOutputStream out = new JarOutputStream(fout)
-        JarFile jf = new JarFile(file)
-        jf.entries().unique {it.name}.sort {it.name}.each {
-            def copy = new JarEntry(it.name)
-            copy.time = 1001
-            out.putNextEntry(copy)
-            out << jf.getInputStream(it)
-        }
-        out.finish()
-        jf.close()
-    }
-    Files.copy(newFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
-    newFile.delete()
-}
-

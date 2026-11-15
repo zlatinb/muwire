@@ -1,3 +1,7 @@
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 include 'pinger'
 include 'host-cache'
 include 'update-server'
@@ -9,4 +13,3 @@ include 'cli-lanterna'
 
 // TODO: fix this on Gradle 7
 // include 'tracker' 
-

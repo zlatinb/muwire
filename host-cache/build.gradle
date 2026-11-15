@@ -1,6 +1,11 @@
-apply plugin : 'application'
-mainClassName = 'com.muwire.hostcache.HostCache'
-applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'com.muwire.hostcache.HostCache'
+    applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
+}
 
 dependencies {
     implementation "net.i2p:i2p:${i2pVersion}"
